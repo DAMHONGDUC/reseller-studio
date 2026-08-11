@@ -7,8 +7,10 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/providers.dart';
 import '../../features/home/presentation/screens/home_screen/home_screen.dart';
 import '../../features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import '../../features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen/settings_screen.dart';
 import '../logging/app_logger.dart';
 import '../widgets/app_shell.dart';
 import '../widgets/splash_screen.dart';
@@ -88,6 +90,17 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.inventory,
                 builder: (BuildContext context, GoRouterState state) =>
                     const InventoryScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'item/:itemId',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        ItemDetailScreen(
+                          // The path parameter is the screen's only input, so
+                          // a deep link into an item works with just an id.
+                          itemId: state.pathParameters['itemId']!,
+                        ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -115,6 +128,17 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.more,
                 builder: (BuildContext context, GoRouterState state) =>
                     const MoreScreen(),
+                // Nested, not a sibling: a detail pushed inside its branch
+                // keeps the tab bar visible and keeps its own back stack, so
+                // a seller three screens deep in More can check an order and
+                // come back to where they were.
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'settings',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const SettingsScreen(),
+                  ),
+                ],
               ),
             ],
           ),

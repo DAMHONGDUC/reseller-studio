@@ -38,6 +38,15 @@ abstract final class DevFlags {
   static const bool bypassAuth =
       bool.fromEnvironment('BYPASS_AUTH') && !kReleaseMode;
 
+  /// True in debug and profile builds, false in release.
+  ///
+  /// The gate for affordances that are *settings* rather than build flags —
+  /// mock data is toggled from inside the running app, so it cannot be a
+  /// `bool.fromEnvironment` and needs a runtime guard instead. Showing a user
+  /// a fake business as if it were their own is worse than any crash, so the
+  /// stored preference is overridden here rather than trusted.
+  static const bool isDebugOrProfile = !kReleaseMode;
+
   /// The uid every workspace path and `createdBy` field uses while
   /// [bypassAuth] is on.
   ///
