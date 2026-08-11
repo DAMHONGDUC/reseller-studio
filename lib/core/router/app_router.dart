@@ -148,12 +148,16 @@ const Set<String> _authRoutes = <String>{
 
 /// Bridges a Riverpod provider to go_router's `refreshListenable`.
 ///
-/// go_router re-runs its redirect when this notifies. Watching rather than
-/// reading, and notifying only when the value actually changes, so a rebuild
-/// that produces the same auth state does not re-run every redirect in the
-/// stack.
+/// go_router re-runs its redirect when this notifies. It notifies only when
+/// the value actually changes, so a rebuild that produces the same auth state
+/// does not re-run every redirect in the stack.
+///
+/// Typed on `Provider<T>` rather than the more general `ProviderListenable<T>`
+/// that `ref.listen` accepts: Riverpod 3 declares that interface but does not
+/// export it from `riverpod.dart`, so naming it here does not compile. Every
+/// provider this bridges is a plain `Provider` anyway.
 class _ProviderRefreshListenable<T> extends ChangeNotifier {
-  _ProviderRefreshListenable(Ref ref, ProviderListenable<T> provider) {
+  _ProviderRefreshListenable(Ref ref, Provider<T> provider) {
     _subscription = ref.listen<T>(
       provider,
       (T? previous, T next) {

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./lib/firebase_options.dart)",
+      "Read(./android/app/google-services.json)",
+      "Read(./ios/Runner/GoogleService-Info.plist)",
+      "Read(./android/key.properties)",
+      "Bash(cat ./lib/firebase_options.dart)",
+      "Bash(cat ./android/app/google-services.json)",
+      "Bash(cat ./ios/Runner/GoogleService-Info.plist)"
+    ],
+    "allow": [
+      "Bash(fvm flutter analyze:*)",
+      "Bash(fvm flutter test:*)",
+      "Bash(fvm flutter pub get:*)",
+      "Bash(fvm flutter gen-l10n:*)",
+      "Bash(melos run:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ]
+  }
+}
