@@ -1,0 +1,23 @@
+{
+  "@@locale": "vi",
+
+  "appTitle": "Seller OS",
+
+  "navHome": "Trang chủ",
+  "navInventory": "Kho hàng",
+  "navOrders": "Đơn hàng",
+  "navAnalytics": "Phân tích",
+  "navMore": "Thêm",
+
+  "actionSave": "Lưu",
+  "actionCancel": "Hủy",
+  "actionRetry": "Thử lại",
+  "actionDelete": "Xóa",
+
+  "errorGenericTitle": "Đã xảy ra lỗi",
+  "errorGenericMessage": "Vui lòng thử lại.",
+  "errorOfflineTitle": "Bạn đang ngoại tuyến",
+  "errorOfflineMessage": "Thay đổi của bạn đã được lưu trên thiết bị này và sẽ đồng bộ khi có mạng trở lại.",
+
+  "emptyValuePlaceholder": "—"
+}

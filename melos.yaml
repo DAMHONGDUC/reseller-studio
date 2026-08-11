@@ -1,0 +1,51 @@
+# Melos 6 on purpose, not 7/8.
+#
+# Melos 7+ moves to Dart pub workspaces, which requires `resolution: workspace`
+# inside packages/system_design — and that stops the package resolving in any
+# project that is not itself a workspace. BaroEase consumes the same submodule
+# and is not a workspace, so adopting it here would break the other app.
+# That portability is the whole reason the design system is a submodule.
+#
+# Every melos since 3.0.0 needs `melos` in the root dev_dependencies, so that
+# part is unavoidable either way.
+name: seller_os
+
+packages:
+  - .
+  - packages/**
+
+# melos 6.3.3 ships without the IntelliJ run-configuration templates it tries
+# to write, so bootstrap crashes on `flutter_run_with_args.xml.tmpl`. Nothing
+# here uses those files — this project runs from VS Code launch configs.
+ide:
+  intellij: false
+
+# Each script is one line on purpose. Melos echoes the whole `run:` body
+# before AND after every run, with no flag to turn it off, so a multi-line
+# block buries the output it is meant to introduce. The bodies live in
+# `tool/*.sh`, which also makes them lintable and runnable under dash — the
+# shell melos actually uses on Linux, and the one macOS hides from you.
+scripts:
+  set-up:
+    description: >
+      Wipe build artefacts, then set up everything a clone needs.
+      Safe to re-run.
+    run: sh tool/set-up.sh
+
+  gen:
+    description: Regenerate localizations.
+    run: sh tool/gen.sh
+
+  analyze:
+    description: Analyze every package. Must pass with zero findings.
+    run: sh tool/analyze.sh
+
+  test:
+    description: Run the Flutter test suite.
+    run: sh tool/test.sh
+
+  deploy-firebase:
+    description: >
+      Deploy firestore rules, indexes and functions. Confirms the project
+      first — this reaches real users.
+    run: sh tool/deploy-firebase.sh

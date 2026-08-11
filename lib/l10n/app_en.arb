@@ -1,0 +1,68 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Seller OS",
+  "@appTitle": {
+    "description": "The app's own name. Not translated in either locale."
+  },
+
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Bottom tab 1 — answers 'what do I need to do today?'"
+  },
+  "navInventory": "Inventory",
+  "@navInventory": {
+    "description": "Bottom tab 2 — answers 'what do I have?'"
+  },
+  "navOrders": "Orders",
+  "@navOrders": {
+    "description": "Bottom tab 3 — answers 'what am I selling/processing?'"
+  },
+  "navAnalytics": "Analytics",
+  "@navAnalytics": {
+    "description": "Bottom tab 4 — answers 'how is my business performing?'"
+  },
+  "navMore": "More",
+  "@navMore": {
+    "description": "Bottom tab 5 — everything else."
+  },
+
+  "actionSave": "Save",
+  "@actionSave": {
+    "description": "Primary confirm on any create/edit form."
+  },
+  "actionCancel": "Cancel",
+  "@actionCancel": {
+    "description": "Low-emphasis dismiss in a dialog or sheet."
+  },
+  "actionRetry": "Try again",
+  "@actionRetry": {
+    "description": "Recovery action on an error state."
+  },
+  "actionDelete": "Delete",
+  "@actionDelete": {
+    "description": "Destructive confirm."
+  },
+
+  "errorGenericTitle": "Something went wrong",
+  "@errorGenericTitle": {
+    "description": "The only failure headline a user ever sees. Raw exceptions are never shown — see CLAUDE.md hard rule 6."
+  },
+  "errorGenericMessage": "Please try again.",
+  "@errorGenericMessage": {
+    "description": "Body under errorGenericTitle."
+  },
+  "errorOfflineTitle": "You're offline",
+  "@errorOfflineTitle": {
+    "description": "Shown when a write cannot reach Firestore and is queued locally."
+  },
+  "errorOfflineMessage": "Your changes are saved on this device and will sync when you're back online.",
+  "@errorOfflineMessage": {
+    "description": "Reassurance that an offline write is not lost — Firestore's local cache holds it."
+  },
+
+  "emptyValuePlaceholder": "—",
+  "@emptyValuePlaceholder": {
+    "description": "Shown instead of a number when there is not enough data to compute it — profit with no cost entered, ROI with no sale. Never render 0 here: 0 is a claim, — is an absence. See the master plan §15."
+  }
+}
