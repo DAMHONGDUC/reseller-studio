@@ -220,6 +220,16 @@ portability is the whole reason the design system is a submodule.
 - `melos run deploy-firebase` — rules, indexes and functions. Confirms the
   project first; this reaches real users.
 
+Running the app before Firebase exists — the app is otherwise stuck on a
+login screen that cannot succeed (hard rule 1):
+
+```sh
+fvm flutter run --dart-define=BYPASS_AUTH=true
+```
+
+VS Code users: the **"Seller OS (auth bypassed)"** launch configuration in
+`.vscode/launch.json` does the same thing.
+
 ## Hard rules
 
 1. **Login is mandatory. There is no guest mode.** Plan principle 1. The
@@ -227,6 +237,23 @@ portability is the whole reason the design system is a submodule.
    While auth state is still resolving the app shows the splash, never the
    login form: flashing a login screen at a returning user is the most common
    way this gets it wrong.
+
+   **The development bypass is not a guest mode and must never become one.**
+   `DevFlags.bypassAuth` (`--dart-define=BYPASS_AUTH=true`) enters the app as
+   a fake user. It exists because there is no Firebase project yet, so the
+   login screen is otherwise a dead end and none of the app can be looked at.
+   Three properties keep it honest, and a change that weakens any of them is
+   a change that ships a guest mode:
+   - it is `const` and ANDed with `!kReleaseMode`, so a release build contains
+     `if (false)` and the tree-shaker deletes the branch — the bypass is
+     *absent* from a shipped binary, not disabled in it;
+   - passing the define to a release build does nothing, so the guarantee does
+     not depend on who typed the build command;
+   - the app wears an `AUTH OFF` banner on every route while it is on.
+
+   `test/core/config/dev_flags_test.dart` asserts the flag is off by default.
+   **Delete this bypass once real sign-in works** — it is scaffolding, and its
+   reason to exist expires with "Pending setup".
 
 2. **Create takes the minimum; a state transition takes the rest.** Plan §28
    and §29, and it is the rule the whole product's speed rests on. Quick Add
@@ -357,7 +384,8 @@ portability is the whole reason the design system is a submodule.
   absent. Run `flutterfire configure` once the project exists. Until then
   `bootstrap` catches the init failure and the app runs without a backend —
   deliberately, so a missing config is a warning line rather than a white
-  screen.
+  screen. Use `--dart-define=BYPASS_AUTH=true` to get past login meanwhile
+  (hard rule 1), and **delete the bypass when real sign-in works.**
 - **`.firebaserc` does not exist**, so `melos run deploy-firebase` cannot run.
 - **The v3 design-system commit is local to this machine.** It is committed in
   `packages/system_design` on `main` but **not pushed**. Push it before anyone
