@@ -26,7 +26,7 @@ class AnalyticsScreen extends ConsumerWidget {
     return SdScaffoldV3(
       appBar: const SdAppBarV3(title: 'Analytics'),
       body: ListView(
-        padding: SdContentPaddingV3.fullBleed(context),
+        padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           const SdSectionHeaderV3(title: 'Overview', first: true),
           Padding(

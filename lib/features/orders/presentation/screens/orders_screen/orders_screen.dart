@@ -63,7 +63,7 @@ class _OrderList extends StatelessWidget {
     final DateTime now = DateTime.now();
 
     return ListView.separated(
-      padding: SdContentPaddingV3.screen(context),
+      padding: SdContentPaddingV3.screen(context, floatingNav: true),
       itemCount: orders.length,
       separatorBuilder: (BuildContext context, int index) =>
           SizedBox(height: SdContentPaddingV3.listItemGap),

@@ -39,10 +39,19 @@ class InventoryScreen extends ConsumerWidget {
           SizedBox(width: SdSpacingConstant.w8),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        icon: const Icon(Symbols.add_rounded),
-        label: const Text('Quick Add'),
+      // Lifted clear of the floating tab bar. `extendBody` keeps the FAB in
+      // the body's coordinate space rather than stacking it above the bottom
+      // slot, so without this the button renders *behind* the glass — which
+      // looks like a bug and makes it hard to tap.
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(
+          bottom: SdContentPaddingV3.floatingBarInset(context),
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: () {},
+          icon: const Icon(Symbols.add_rounded),
+          label: const Text('Quick Add'),
+        ),
       ),
       body: Column(
         children: <Widget>[
@@ -86,9 +95,10 @@ class _ItemList extends StatelessWidget {
         SdContentPaddingV3.horizontal,
         SdContentPaddingV3.topGap,
         SdContentPaddingV3.horizontal,
-        // Clears the FAB as well as the safe area — otherwise the last row
-        // sits under "Quick Add" and cannot be tapped.
-        SdContentPaddingV3.bottom(context) + SdSpacingConstant.h64,
+        // Clears the floating tab bar AND the FAB stacked above it —
+        // otherwise the last row sits under "Quick Add" and cannot be tapped.
+        SdContentPaddingV3.bottom(context, floatingNav: true) +
+            SdSpacingConstant.h64,
       ),
       itemCount: items.length,
       separatorBuilder: (BuildContext context, int index) =>
@@ -154,12 +164,10 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
       SdContentPaddingV3.horizontal,
       0,
     ),
-    child: SdTextFieldV3(
-      label: 'Search',
+    child: SdSearchFieldV3(
       controller: _controller,
       hint: 'Title, SKU or barcode',
-      prefixIcon: Symbols.search_rounded,
-      textInputAction: TextInputAction.search,
+      clearTooltip: 'Clear search',
       onChanged: (String value) =>
           ref.read(inventorySearchProvider.notifier).update(value),
     ),

@@ -65,6 +65,21 @@ chain is a screen that will be redesigned.
   generation. See below.
 - **Charts**: `fl_chart`. **Scanning**: `mobile_scanner`. **Photos**:
   `image_picker`.
+- **Typography is Inter, bundled in `assets/fonts/`** — not `google_fonts`,
+  which downloads on first launch and would show a seller with no signal a
+  fallback face. Two families: `Inter` for text, `Inter Display` for the
+  headline styles only, because a text face set at 28sp reads loose and a
+  display face at 12sp reads cramped. The scale, its optical tracking and its
+  line heights are in `AppTheme._textTheme`.
+- **Deep links use the `selleros://` scheme** (`ios/Runner/Info.plist`,
+  `FlutterDeepLinkingEnabled`). `selleros:///orders/ord-4` opens that order —
+  what the plan's notification taps (§22) need.
+  **Until Firebase is configured, any deep link hard-crashes the app**:
+  `firebase_auth`'s iOS plugin intercepts `openURL` and constructs
+  `Auth.auth()`, which fatals with *"The default FirebaseApp instance must be
+  configured"*. It is a native crash, so `bootstrap`'s guarded zone cannot
+  catch it. Nothing to fix in this app — it disappears the moment
+  `flutterfire configure` has run. Don't spend an afternoon on it.
 - **iOS minimum is 15.0**, raised from Flutter's template default of 13.0.
   Not a preference — the Firebase Swift packages refuse to link below it
   (`the package product 'cloud-firestore' requires minimum platform version
@@ -141,8 +156,42 @@ import 'package:system_design/index.dart';
 | --- | --- | --- |
 | Renders | BaroEase | **Seller OS** |
 | Palette | dark only | light + dark |
-| Chrome | frosted glass, body scrolls behind | opaque, takes layout space |
+| App bar | frosted glass, body scrolls behind | opaque, takes layout space |
+| Tab bar | floating glass pill | floating **liquid glass** pill |
 | Context getters | `context.sdTheme` | `context.sdTheme3` |
+
+### The tab bar is liquid glass and that makes its geometry layout
+
+`SdGlassNavBarV3` floats over the content in the iOS 26 idiom — a detached
+superellipse pill the body scrolls behind and refracts through. Three things
+follow, and missing any one of them looks like a bug:
+
+1. **`SdScaffoldV3` must be given `extendBody: true`** wherever that bar is
+   used, or the scaffold reserves its height and the glass refracts a blank
+   strip of page.
+2. **Every tab screen pads by `floatingNav: true`** —
+   `SdContentPaddingV3.screen(context, floatingNav: true)` or `.fullBleed(…)`.
+   That number is `floatingBarInset`, and it lives in one place because a bar
+   and the padding beneath it drifting apart is exactly what happens
+   otherwise. Pushed detail routes have nothing floating over them and must
+   *not* pass it.
+3. **A FAB needs lifting by `floatingBarInset` itself.** `extendBody` keeps
+   the FAB in the body's coordinate space rather than stacking it above the
+   bottom slot, so without the lift it renders *behind* the glass.
+
+`navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
+call, so both apps' floating bars sit identically. It caps at 20 against a
+portrait iPhone's 34pt home-indicator inset; that trade is documented on the
+getter.
+
+**The effect degrades by itself.** `SdGlassV3.isSupported` is false on
+Android's Skia fallback and in widget tests, where the bar renders `FakeGlass`
+— same geometry, flat fill, nothing reflows. Do not branch on it at a call
+site.
+
+The app bar deliberately stays opaque: a blur there costs a shader pass on
+every scroll frame of a list that can run to thousands of rows, whereas the
+tab bar is a fixed strip whose cost does not grow with the content.
 
 `packages/system_design/WIDGET_RULES.md` is the authority on what may go in
 the package and how it must be written. **Read it before adding to the
@@ -412,6 +461,18 @@ bypass goes.
   an icon, a label or a shape. `SdBadgeV3` always carries a label for exactly
   this reason — Seller OS draws a dozen states across items, listings, orders
   and offers, and a colour-only marker is a memory test.
+- **One loud element per screen.** `SdHeroStatV3` is a filled, gradient card
+  and a screen gets at most one; everything else is an `SdStatTileV3`. Four
+  equal tiles say four things matter equally, which on a dashboard means none
+  of them does. Same rule for `SdCardV3(elevated: true)` and
+  `SdIconTileV3(filled: true)`.
+- **Depth is border-first, shadow-second.** The hairline separates a card in
+  every palette; `SdElevationV3` only adds a shadow where there is a lighter
+  page behind it to darken, and dark mode sets `SdThemeV3.shadow` transparent
+  so it vanishes. That is the intended look, not a degradation.
+- **A list of physical things gets a thumbnail, not an icon.** Sellers
+  recognise a row by the picture. Icons in tinted `SdIconTileV3` squares are
+  for categories and status rows, where there is no picture to show.
 - **Every price, cost and total uses `.tabular3`.** Proportional digits are
   why a column of money appears to shuffle sideways as it updates, and this
   app is mostly columns of money.

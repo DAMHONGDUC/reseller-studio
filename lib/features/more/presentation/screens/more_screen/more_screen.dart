@@ -80,7 +80,7 @@ class MoreScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => SdScaffoldV3(
     appBar: const SdAppBarV3(title: 'More'),
     body: ListView(
-      padding: SdContentPaddingV3.fullBleed(context),
+      padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
       children: <Widget>[
         const SdSectionHeaderV3(title: 'Manage', first: true),
         Padding(

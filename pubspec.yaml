@@ -58,3 +58,31 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+
+  # Inter, bundled rather than fetched at runtime.
+  #
+  # `google_fonts` would download on first launch, which means a seller in a
+  # stockroom with no signal opens the app to a fallback face — and this app
+  # is mostly columns of money, where the typeface is doing real work.
+  #
+  # Two families on purpose. `Inter` is the text face used everywhere; `Inter
+  # Display` is optically tuned for large sizes (tighter apertures, less
+  # spacing) and is used only by the headline styles. Using the text face at
+  # 28sp looks loose; using the display face at 12sp looks cramped.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    - family: Inter Display
+      fonts:
+        - asset: assets/fonts/InterDisplay-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/InterDisplay-Bold.ttf
+          weight: 700
