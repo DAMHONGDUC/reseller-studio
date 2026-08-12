@@ -26,14 +26,14 @@ class _MoreRow extends StatelessWidget {
                 SizedBox(width: SdSpacingConstant.w12),
                 Expanded(
                   child: Text(
-                    destination.label,
+                    MoreLabel.of(context, destination.kind),
                     style: context.textTheme3.bodyLarge!.copyWith(
                       color: foreground,
                     ),
                   ),
                 ),
                 if (!destination.isBuilt)
-                  const SdBadgeV3(label: 'Soon')
+                  SdBadgeV3(label: context.l10n.moreComingSoon)
                 else
                   SdIconV3(
                     Symbols.chevron_right_rounded,

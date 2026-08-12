@@ -15,11 +15,11 @@ class _AccountCard extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Sign out?',
-        message: 'Your data stays where it is. Sign back in any time.',
+        title: context.l10n.settingsSignOutConfirmTitle,
+        message: context.l10n.settingsSignOutConfirmBody,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
-            label: 'Sign out',
+            label: context.l10n.settingsSignOut,
             isPrimary: true,
             onPressed: () => _run(
               context,
@@ -39,14 +39,12 @@ class _AccountCard extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Delete your account?',
-        message:
-            'This cannot be undone. Your sign-in is removed and you lose '
-            'access to every workspace you own.',
+        title: context.l10n.settingsDeleteAccountConfirmTitle,
+        message: context.l10n.settingsDeleteAccountConfirmBody,
         icon: Symbols.warning_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
-            label: 'Delete my account',
+            label: context.l10n.settingsDeleteAccountConfirm,
             isDestructive: true,
             onPressed: () => _run(
               context,
@@ -87,23 +85,21 @@ class _AccountCard extends ConsumerWidget {
     return AppListCard(
       children: <Widget>[
         AppListRow(
-          title: name ?? email ?? 'Signed in',
-          subtitle: isBypassed
-              ? 'Development bypass — no real account'
-              : email,
+          title: name ?? email ?? context.l10n.settingsSignedIn,
+          subtitle: isBypassed ? context.l10n.settingsBypassAccount : email,
           icon: Symbols.person_rounded,
           showChevron: false,
         ),
         AppListRow(
-          title: 'Sign out',
+          title: context.l10n.settingsSignOut,
           icon: Symbols.logout_rounded,
           iconTint: context.sdTheme3.textSecondary,
           showChevron: false,
           onTap: () => _confirmSignOut(context, ref),
         ),
         AppListRow(
-          title: 'Delete account',
-          subtitle: 'Permanent',
+          title: context.l10n.settingsDeleteAccount,
+          subtitle: context.l10n.settingsDeleteAccountPermanent,
           icon: Symbols.delete_forever_rounded,
           iconTint: context.sdTheme3.danger,
           showChevron: false,

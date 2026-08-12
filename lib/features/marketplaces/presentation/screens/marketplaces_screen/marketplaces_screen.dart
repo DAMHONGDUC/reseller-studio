@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/enums/marketplace.dart';
 
@@ -23,7 +24,7 @@ class MarketplacesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => SdScaffoldV3(
-    appBar: const SdAppBarV3(title: 'Marketplaces'),
+    appBar: SdAppBarV3(title: context.l10n.marketplacesTitle),
     body: ListView(
       padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
@@ -33,17 +34,14 @@ class MarketplacesScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Syncing is not switched on yet',
+                context.l10n.marketplacesSyncOffTitle,
                 style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
                   color: context.sdTheme3.textPrimary,
                 ),
               ),
               SizedBox(height: SdSpacingConstant.h6),
               Text(
-                'Connections run on the server so your marketplace passwords '
-                'and tokens never touch this app. Until that is live, list '
-                'and sell manually — everything else in Seller OS works the '
-                'same either way.',
+                context.l10n.marketplacesSyncOffBody,
                 style: context.textTheme3.bodySmall!.faint3(context),
               ),
             ],
@@ -62,13 +60,13 @@ class MarketplacesScreen extends ConsumerWidget {
                   title: marketplace.displayName,
                   subtitle:
                       '${(marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% '
-                      'estimated fee',
+                      '${context.l10n.marketplacesEstimatedFee}',
                   icon: Symbols.hub_rounded,
                   showChevron: false,
                   trailing: SdBadgeV3(
                     label: marketplace.hasIntegration
-                        ? 'Connected'
-                        : 'Coming soon',
+                        ? context.l10n.marketplacesConnected
+                        : context.l10n.marketplacesComingSoon,
                     tone: marketplace.hasIntegration
                         ? SdBadgeToneV3.success
                         : SdBadgeToneV3.neutral,

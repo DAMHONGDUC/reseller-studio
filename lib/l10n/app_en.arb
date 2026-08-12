@@ -1,11 +1,9 @@
 {
   "@@locale": "en",
-
   "appTitle": "Seller OS",
   "@appTitle": {
     "description": "The app's own name. Not translated in either locale."
   },
-
   "navHome": "Home",
   "@navHome": {
     "description": "Bottom tab 1 — answers 'what do I need to do today?'"
@@ -26,7 +24,6 @@
   "@navMore": {
     "description": "Bottom tab 5 — everything else."
   },
-
   "actionSave": "Save",
   "@actionSave": {
     "description": "Primary confirm on any create/edit form."
@@ -43,7 +40,6 @@
   "@actionDelete": {
     "description": "Destructive confirm."
   },
-
   "errorGenericTitle": "Something went wrong",
   "@errorGenericTitle": {
     "description": "The only failure headline a user ever sees. Raw exceptions are never shown — see CLAUDE.md hard rule 6."
@@ -80,12 +76,10 @@
   "@errorLimitReachedMessage": {
     "description": "AppFailureKind.limitReached — a free-tier cap was hit."
   },
-
   "emptyValuePlaceholder": "—",
   "@emptyValuePlaceholder": {
     "description": "Shown instead of a number when there is not enough data to compute it — profit with no cost entered, ROI with no sale. Never render 0 here: 0 is a claim, — is an absence. See the master plan §15."
   },
-
   "quickAddTitle": "Quick Add",
   "@quickAddTitle": {
     "description": "Screen title for the fastest create path, and the label on the Inventory FAB that opens it."
@@ -110,7 +104,6 @@
   "@quickAddEmptyTitleError": {
     "description": "Shown when Save is pressed with an empty Quick Add title."
   },
-
   "itemBlockMissingPrice": "Add an asking price to list this",
   "@itemBlockMissingPrice": {
     "description": "Why an item cannot move to Listed — plan §29 state validation."
@@ -126,5 +119,362 @@
   "itemBlockNoQuantity": "Nothing left in stock to move",
   "@itemBlockNoQuantity": {
     "description": "Why a transition is refused because quantity is zero."
+  },
+  "actionAdd": "Add",
+  "@actionAdd": {
+    "description": "Generic create action."
+  },
+  "actionEdit": "Edit",
+  "@actionEdit": {
+    "description": "Open a record for editing."
+  },
+  "actionRemove": "Remove",
+  "@actionRemove": {
+    "description": "Detach something without deleting the record it was on — a photo, a receipt."
+  },
+  "actionChoose": "Choose",
+  "@actionChoose": {
+    "description": "Pick a file from the photo library."
+  },
+  "actionPhotograph": "Photograph",
+  "@actionPhotograph": {
+    "description": "Take a new photo with the camera."
+  },
+  "actionNotSet": "Not set",
+  "@actionNotSet": {
+    "description": "Placeholder in a picker field the seller has not filled in. Never rendered as an empty string — a blank field looks broken."
+  },
+  "commonNameRequired": "Give it a name first",
+  "@commonNameRequired": {
+    "description": "Shown when a name-entry sheet is submitted empty."
+  },
+  "receiptLabel": "Receipt",
+  "@receiptLabel": {
+    "description": "Field label for the document attached to a purchase or expense."
+  },
+  "receiptAttached": "Attached",
+  "@receiptAttached": {
+    "description": "Shown beside the thumbnail once a receipt is on the record."
+  },
+  "receiptRemoveTooltip": "Remove receipt",
+  "@receiptRemoveTooltip": {
+    "description": "Tooltip on the button that detaches a receipt."
+  },
+  "authTagline": "Source, list, sell, ship, profit.",
+  "@authTagline": {
+    "description": "The line under the app name on the login screen — the product's lifecycle in five words."
+  },
+  "authContinueWithApple": "Continue with Apple",
+  "@authContinueWithApple": {
+    "description": "Sign in with Apple button. The brand name is never translated."
+  },
+  "authContinueWithGoogle": "Continue with Google",
+  "@authContinueWithGoogle": {
+    "description": "Google Sign-In button. The brand name is never translated."
+  },
+  "authPrivacyNote": "We only use your account to sign you in. Your inventory stays yours.",
+  "@authPrivacyNote": {
+    "description": "Reassurance under the two sign-in buttons. There is no email/password option — Apple and Google are the only ways in."
+  },
+  "workspaceSetupTitle": "Set up your business",
+  "@workspaceSetupTitle": {
+    "description": "App bar title on the onboarding screen between sign-in and Home."
+  },
+  "workspaceSetupIntro": "Everything you track lives under a business. You can rename it later; the currency you pick is what every figure is reported in.",
+  "@workspaceSetupIntro": {
+    "description": "Explains why the workspace step exists. The currency warning matters: changing it later does not convert existing records."
+  },
+  "workspaceNameLabel": "Business name",
+  "@workspaceNameLabel": {
+    "description": "The one required field at workspace setup."
+  },
+  "workspaceNameHint": "Duc Vintage",
+  "@workspaceNameHint": {
+    "description": "Example business name. A concrete example, not the word \"Name\"."
+  },
+  "workspaceCurrency": "Currency",
+  "@workspaceCurrency": {
+    "description": "Currency field label and its picker title."
+  },
+  "workspaceCountry": "Country",
+  "@workspaceCountry": {
+    "description": "Country field label and its picker title."
+  },
+  "workspaceBusinessType": "Business type",
+  "@workspaceBusinessType": {
+    "description": "Business type picker title."
+  },
+  "workspaceBusinessTypeOptional": "Business type (optional)",
+  "@workspaceBusinessTypeOptional": {
+    "description": "Business type field label. Optional per the plan §28."
+  },
+  "workspaceCreate": "Create business",
+  "@workspaceCreate": {
+    "description": "Submit button at workspace setup."
+  },
+  "workspaceStaleAfter": "Stale after",
+  "@workspaceStaleAfter": {
+    "description": "Settings row: how long a listing sits before this workspace calls it stale."
+  },
+  "workspaceNoneLoaded": "No workspace loaded.",
+  "@workspaceNoneLoaded": {
+    "description": "Shown in Settings when there is no workspace to describe."
+  },
+  "businessTypeSoleTrader": "Sole trader",
+  "@businessTypeSoleTrader": {
+    "description": "Business type option."
+  },
+  "businessTypePartnership": "Partnership",
+  "@businessTypePartnership": {
+    "description": "Business type option."
+  },
+  "businessTypeLimitedCompany": "Limited company",
+  "@businessTypeLimitedCompany": {
+    "description": "Business type option."
+  },
+  "businessTypeHobbySeller": "Hobby seller",
+  "@businessTypeHobbySeller": {
+    "description": "Business type option."
+  },
+  "currencyUsd": "US Dollar ($)",
+  "@currencyUsd": {
+    "description": "Currency option shown at workspace setup."
+  },
+  "currencyEur": "Euro (€)",
+  "@currencyEur": {
+    "description": "Currency option."
+  },
+  "currencyGbp": "British Pound (£)",
+  "@currencyGbp": {
+    "description": "Currency option."
+  },
+  "currencyVnd": "Vietnamese Dong (₫)",
+  "@currencyVnd": {
+    "description": "Currency option. Has no minor unit — see CurrencyDecimals."
+  },
+  "currencyAud": "Australian Dollar",
+  "@currencyAud": {
+    "description": "Currency option."
+  },
+  "currencyCad": "Canadian Dollar",
+  "@currencyCad": {
+    "description": "Currency option."
+  },
+  "currencyJpy": "Japanese Yen (¥)",
+  "@currencyJpy": {
+    "description": "Currency option. Has no minor unit."
+  },
+  "currencySgd": "Singapore Dollar",
+  "@currencySgd": {
+    "description": "Currency option."
+  },
+  "countryUs": "United States",
+  "@countryUs": {
+    "description": "Country option."
+  },
+  "countryGb": "United Kingdom",
+  "@countryGb": {
+    "description": "Country option."
+  },
+  "countryVn": "Vietnam",
+  "@countryVn": {
+    "description": "Country option."
+  },
+  "countryAu": "Australia",
+  "@countryAu": {
+    "description": "Country option."
+  },
+  "countryCa": "Canada",
+  "@countryCa": {
+    "description": "Country option."
+  },
+  "countryDe": "Germany",
+  "@countryDe": {
+    "description": "Country option."
+  },
+  "countryFr": "France",
+  "@countryFr": {
+    "description": "Country option."
+  },
+  "countryJp": "Japan",
+  "@countryJp": {
+    "description": "Country option."
+  },
+  "countrySg": "Singapore",
+  "@countrySg": {
+    "description": "Country option."
+  },
+  "moreManage": "Manage",
+  "@moreManage": {
+    "description": "Section header above the More screen list."
+  },
+  "moreSourcing": "Sourcing",
+  "@moreSourcing": {
+    "description": "More destination: where stock comes from and what it returned."
+  },
+  "moreListings": "Listings",
+  "@moreListings": {
+    "description": "More destination: everything live on a marketplace."
+  },
+  "moreExpenses": "Expenses",
+  "@moreExpenses": {
+    "description": "More destination: business costs that are not the cost of an item."
+  },
+  "moreReports": "Reports",
+  "@moreReports": {
+    "description": "More destination: the numbers, and CSV export."
+  },
+  "moreReceipts": "Receipts",
+  "@moreReceipts": {
+    "description": "More destination: every attached document."
+  },
+  "moreCategories": "Categories",
+  "@moreCategories": {
+    "description": "More destination: item categories."
+  },
+  "moreLocations": "Locations",
+  "@moreLocations": {
+    "description": "More destination: warehouse, shelf and bin."
+  },
+  "moreMarketplaces": "Marketplaces",
+  "@moreMarketplaces": {
+    "description": "More destination: marketplace connection status."
+  },
+  "moreTeam": "Team",
+  "@moreTeam": {
+    "description": "More destination: who can see this workspace."
+  },
+  "moreSettings": "Settings",
+  "@moreSettings": {
+    "description": "More destination: account and workspace settings."
+  },
+  "settingsAccount": "Account",
+  "@settingsAccount": {
+    "description": "Settings section header."
+  },
+  "settingsWorkspace": "Workspace",
+  "@settingsWorkspace": {
+    "description": "Settings section header."
+  },
+  "settingsDeveloper": "Developer",
+  "@settingsDeveloper": {
+    "description": "Settings section header for the debug-only block."
+  },
+  "settingsDeveloperNote": "Debug builds only — not present in a release build.",
+  "@settingsDeveloperNote": {
+    "description": "Explains that the developer block is compiled out of a release build."
+  },
+  "settingsSignedIn": "Signed in",
+  "@settingsSignedIn": {
+    "description": "Fallback account row title when the provider gave no name or email."
+  },
+  "settingsBypassAccount": "Development bypass — no real account",
+  "@settingsBypassAccount": {
+    "description": "Shown on the account row while the auth bypass is on."
+  },
+  "settingsSignOut": "Sign out",
+  "@settingsSignOut": {
+    "description": "Ends the session."
+  },
+  "settingsSignOutConfirmTitle": "Sign out?",
+  "@settingsSignOutConfirmTitle": {
+    "description": "Confirmation dialog title."
+  },
+  "settingsSignOutConfirmBody": "Your data stays where it is. Sign back in any time.",
+  "@settingsSignOutConfirmBody": {
+    "description": "Reassurance in the sign-out dialog."
+  },
+  "settingsDeleteAccount": "Delete account",
+  "@settingsDeleteAccount": {
+    "description": "Row that opens the irreversible account deletion dialog."
+  },
+  "settingsDeleteAccountPermanent": "Permanent",
+  "@settingsDeleteAccountPermanent": {
+    "description": "Caption under the delete account row."
+  },
+  "settingsDeleteAccountConfirmTitle": "Delete your account?",
+  "@settingsDeleteAccountConfirmTitle": {
+    "description": "Confirmation dialog title for account deletion."
+  },
+  "settingsDeleteAccountConfirmBody": "This cannot be undone. Your sign-in is removed and you lose access to every workspace you own.",
+  "@settingsDeleteAccountConfirmBody": {
+    "description": "Says exactly what is lost. Deletion is irreversible."
+  },
+  "settingsDeleteAccountConfirm": "Delete my account",
+  "@settingsDeleteAccountConfirm": {
+    "description": "The destructive confirm button."
+  },
+  "teamTitle": "Team",
+  "@teamTitle": {
+    "description": "Team screen title."
+  },
+  "teamAloneTitle": "Just you",
+  "@teamAloneTitle": {
+    "description": "Empty state when nobody else has access."
+  },
+  "teamAloneBody": "Nobody else has access to this workspace.",
+  "@teamAloneBody": {
+    "description": "Empty state body on the Team screen."
+  },
+  "teamInvitesOffTitle": "Inviting people is not switched on yet",
+  "@teamInvitesOffTitle": {
+    "description": "Explains why there is no invite button."
+  },
+  "teamInvitesOffBody": "Invites are handled on the server so a seat limit cannot be bypassed and the last owner cannot be removed. It arrives with the backend functions.",
+  "@teamInvitesOffBody": {
+    "description": "Why invites need a Cloud Function rather than a client write."
+  },
+  "roleOwner": "Owner",
+  "@roleOwner": {
+    "description": "Workspace role. Can delete or transfer the workspace."
+  },
+  "roleAdmin": "Admin",
+  "@roleAdmin": {
+    "description": "Workspace role. Can change the workspace, its members and their roles."
+  },
+  "roleMember": "Member",
+  "@roleMember": {
+    "description": "Workspace role. Can create and edit business records."
+  },
+  "roleViewer": "Viewer",
+  "@roleViewer": {
+    "description": "Workspace role. Read-only."
+  },
+  "marketplacesTitle": "Marketplaces",
+  "@marketplacesTitle": {
+    "description": "Marketplaces screen title."
+  },
+  "marketplacesSyncOffTitle": "Syncing is not switched on yet",
+  "@marketplacesSyncOffTitle": {
+    "description": "Explains why nothing is connected."
+  },
+  "marketplacesSyncOffBody": "Connections run on the server so your marketplace passwords and tokens never touch this app. Until that is live, list and sell manually — everything else in Seller OS works the same either way.",
+  "@marketplacesSyncOffBody": {
+    "description": "Why marketplace OAuth is server-side. Hard rule 10: no secret ships in the Flutter binary."
+  },
+  "marketplacesConnected": "Connected",
+  "@marketplacesConnected": {
+    "description": "Connection status badge."
+  },
+  "marketplacesComingSoon": "Coming soon",
+  "@marketplacesComingSoon": {
+    "description": "Connection status badge for a platform with no integration yet."
+  },
+  "marketplacesEstimatedFee": "Estimated fee",
+  "@marketplacesEstimatedFee": {
+    "description": "Caption on a marketplace row. A published rate for planning, never used as accounting."
+  },
+  "moreComingSoon": "Soon",
+  "@moreComingSoon": {
+    "description": "Badge on a More row whose screen is not built yet. Shown rather than hidden: hiding it would make the app look finished."
+  },
+  "commonDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@commonDays": {
+    "description": "A number of days. Plural on purpose: English needs \"1 day\" and \"60 days\", Vietnamese needs neither.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -52,11 +52,11 @@ class LoginScreen extends ConsumerWidget {
 
     return AuthFormShell(
       title: context.l10n.appTitle,
-      subtitle: 'Source, list, sell, ship, profit.',
+      subtitle: context.l10n.authTagline,
       children: <Widget>[
         SdButtonV3(
           variant: SdButtonVariantV3.primary,
-          label: 'Continue with Apple',
+          label: context.l10n.authContinueWithApple,
           icon: Symbols.person_rounded,
           expand: true,
           busy: state.isBusyWith(AuthProviderKind.apple),
@@ -67,7 +67,7 @@ class LoginScreen extends ConsumerWidget {
         SizedBox(height: SdSpacingConstant.h12),
         SdButtonV3(
           variant: SdButtonVariantV3.outlined,
-          label: 'Continue with Google',
+          label: context.l10n.authContinueWithGoogle,
           icon: Symbols.g_mobiledata_rounded,
           expand: true,
           busy: state.isBusyWith(AuthProviderKind.google),
@@ -77,8 +77,7 @@ class LoginScreen extends ConsumerWidget {
         ),
         SizedBox(height: SdSpacingConstant.h24),
         Text(
-          'We only use your account to sign you in. Your inventory stays '
-          'yours.',
+          context.l10n.authPrivacyNote,
           textAlign: TextAlign.center,
           style: context.textTheme3.bodySmall!.faint3(context),
         ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:system_design/index.dart';
 
+import '../extensions/context_extensions.dart';
+
 /// A sheet that asks for one short string and hands it back.
 ///
 /// Categories, locations, sources, shipping carriers — the app asks "what is
@@ -16,7 +18,7 @@ class NameEntrySheet extends StatefulWidget {
     required this.label,
     this.initialValue,
     this.hint,
-    this.confirmLabel = 'Save',
+    this.confirmLabel,
     super.key,
   });
 
@@ -24,7 +26,11 @@ class NameEntrySheet extends StatefulWidget {
   final String label;
   final String? initialValue;
   final String? hint;
-  final String confirmLabel;
+
+  /// Null falls back to the shared Save label — most callers want it, and a
+  /// default cannot be a localized string because a parameter default is
+  /// evaluated with no `BuildContext`.
+  final String? confirmLabel;
 
   static Future<String?> show(
     BuildContext context, {
@@ -32,7 +38,7 @@ class NameEntrySheet extends StatefulWidget {
     required String label,
     String? initialValue,
     String? hint,
-    String confirmLabel = 'Save',
+    String? confirmLabel,
   }) => showSdBottomSheetV3<String>(
     context: context,
     builder: (BuildContext context) => NameEntrySheet(
@@ -63,7 +69,7 @@ class _NameEntrySheetState extends State<NameEntrySheet> {
     final String value = _controller.text.trim();
 
     if (value.isEmpty) {
-      SdSnackBarUtilsV3.error(context, 'Give it a name first');
+      SdSnackBarUtilsV3.error(context, context.l10n.commonNameRequired);
 
       return;
     }
@@ -91,7 +97,7 @@ class _NameEntrySheetState extends State<NameEntrySheet> {
           SizedBox(height: SdSpacingConstant.h24),
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: widget.confirmLabel,
+            label: widget.confirmLabel ?? context.l10n.actionSave,
             expand: true,
             onPressed: _submit,
           ),

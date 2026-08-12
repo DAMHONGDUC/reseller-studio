@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../extensions/context_extensions.dart';
+
 /// A form row whose value is chosen from a sheet rather than typed.
 ///
 /// Looks like `SdTextFieldV3` on purpose — a form where half the rows are
@@ -16,25 +18,28 @@ class PickerField extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onTap,
-    this.placeholder = 'Not set',
+    this.placeholder,
     this.icon,
     super.key,
   });
 
   final String label;
   final String? value;
-  final String placeholder;
+  /// Null falls back to the shared "Not set" label. A parameter default
+  /// cannot be a localized string — it is evaluated with no `BuildContext`.
+  final String? placeholder;
   final IconData? icon;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final bool hasValue = value != null;
+    final String empty = placeholder ?? context.l10n.actionNotSet;
 
     return Semantics(
       button: true,
       label: label,
-      value: value ?? placeholder,
+      value: value ?? empty,
       child: InkWell(
         onTap: onTap,
         borderRadius: SdRadiusV3.inputAll,
@@ -65,7 +70,7 @@ class PickerField extends StatelessWidget {
                   ],
                   Expanded(
                     child: Text(
-                      value ?? placeholder,
+                      value ?? empty,
                       overflow: TextOverflow.ellipsis,
                       style: hasValue
                           ? context.textTheme3.bodyMedium!.copyWith(

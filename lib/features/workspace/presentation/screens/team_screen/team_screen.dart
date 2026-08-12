@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../domain/entities/workspace.dart';
@@ -29,7 +30,7 @@ class TeamScreen extends ConsumerWidget {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
-        title: 'Team',
+        title: context.l10n.teamTitle,
         subtitle: workspace?.name,
       ),
       body: ListView(
@@ -37,10 +38,10 @@ class TeamScreen extends ConsumerWidget {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           if (members.isEmpty)
-            const SdEmptyStateV3(
+            SdEmptyStateV3(
               icon: Symbols.group_rounded,
-              title: 'Just you',
-              message: 'Nobody else has access to this workspace.',
+              title: context.l10n.teamAloneTitle,
+              message: context.l10n.teamAloneBody,
             )
           else
             AppListCard(
@@ -52,7 +53,7 @@ class TeamScreen extends ConsumerWidget {
                       icon: Symbols.person_rounded,
                       showChevron: false,
                       trailing: SdBadgeV3(
-                        label: RoleLabel.of(member.role),
+                        label: RoleLabel.of(context, member.role),
                         tone: member.role == MemberRole.owner
                             ? SdBadgeToneV3.info
                             : SdBadgeToneV3.neutral,
@@ -67,16 +68,14 @@ class TeamScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Inviting people is not switched on yet',
+                  context.l10n.teamInvitesOffTitle,
                   style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
                     color: context.sdTheme3.textPrimary,
                   ),
                 ),
                 SizedBox(height: SdSpacingConstant.h6),
                 Text(
-                  'Invites are handled on the server so a seat limit cannot be '
-                  'bypassed and the last owner cannot be removed. It arrives '
-                  'with the backend functions.',
+                  context.l10n.teamInvitesOffBody,
                   style: context.textTheme3.bodySmall!.faint3(context),
                 ),
               ],
@@ -90,10 +89,10 @@ class TeamScreen extends ConsumerWidget {
 
 /// The words for a role. `domain/` holds none (hard rule 7).
 final class RoleLabel {
-  static String of(MemberRole role) => switch (role) {
-    MemberRole.owner => 'Owner',
-    MemberRole.admin => 'Admin',
-    MemberRole.member => 'Member',
-    MemberRole.viewer => 'Viewer',
+  static String of(BuildContext context, MemberRole role) => switch (role) {
+    MemberRole.owner => context.l10n.roleOwner,
+    MemberRole.admin => context.l10n.roleAdmin,
+    MemberRole.member => context.l10n.roleMember,
+    MemberRole.viewer => context.l10n.roleViewer,
   };
 }

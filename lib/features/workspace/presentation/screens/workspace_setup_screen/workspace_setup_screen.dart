@@ -4,12 +4,14 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/error/failure_presenter.dart';
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
 import '../../../workspace_constant.dart';
+import '../../../workspace_option_label.dart';
 import '../../controllers/workspace_setup_controller.dart';
 
-/// Workspace setup — the step between signing up and Home (plan §26).
+/// Workspace setup — the step between signing in and Home (plan §26).
 ///
 /// **Every business record lives under a workspace** (hard rule 14), so this
 /// is not a settings screen a seller can skip: without one there is nowhere
@@ -36,14 +38,14 @@ class _WorkspaceSetupScreenState
   Future<void> _pickCurrency() async {
     final String? code = await OptionPickerSheet.show<String>(
       context,
-      title: 'Currency',
+      title: context.l10n.workspaceCurrency,
       selected: ref.read(workspaceSetupControllerProvider).currency,
       options: WorkspaceConstant.currencies
           .map(
-            (WorkspaceOption option) => PickerOption<String>(
-              value: option.code,
-              label: option.label,
-              caption: option.code,
+            (String code) => PickerOption<String>(
+              value: code,
+              label: WorkspaceOptionLabel.currency(context, code),
+              caption: code,
             ),
           )
           .toList(),
@@ -57,12 +59,14 @@ class _WorkspaceSetupScreenState
   Future<void> _pickCountry() async {
     final String? code = await OptionPickerSheet.show<String>(
       context,
-      title: 'Country',
+      title: context.l10n.workspaceCountry,
       selected: ref.read(workspaceSetupControllerProvider).country,
       options: WorkspaceConstant.countries
           .map(
-            (WorkspaceOption option) =>
-                PickerOption<String>(value: option.code, label: option.label),
+            (String code) => PickerOption<String>(
+              value: code,
+              label: WorkspaceOptionLabel.country(context, code),
+            ),
           )
           .toList(),
     );
@@ -75,12 +79,14 @@ class _WorkspaceSetupScreenState
   Future<void> _pickBusinessType() async {
     final String? type = await OptionPickerSheet.show<String>(
       context,
-      title: 'Business type',
+      title: context.l10n.workspaceBusinessType,
       selected: ref.read(workspaceSetupControllerProvider).businessType,
       options: WorkspaceConstant.businessTypes
           .map(
-            (String value) =>
-                PickerOption<String>(value: value, label: value),
+            (String key) => PickerOption<String>(
+              value: key,
+              label: WorkspaceOptionLabel.businessType(context, key),
+            ),
           )
           .toList(),
     );
@@ -112,8 +118,8 @@ class _WorkspaceSetupScreenState
     );
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(
-        title: 'Set up your business',
+      appBar: SdAppBarV3(
+        title: context.l10n.workspaceSetupTitle,
         automaticallyImplyLeading: false,
       ),
       body: ListView(
@@ -121,15 +127,14 @@ class _WorkspaceSetupScreenState
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           Text(
-            'Everything you track lives under a business. You can rename it '
-            'later; the currency you pick is what every figure is reported in.',
+            context.l10n.workspaceSetupIntro,
             style: context.textTheme3.bodyMedium!.muted3(context),
           ),
           SizedBox(height: SdSpacingConstant.h24),
           SdTextFieldV3(
-            label: 'Business name',
+            label: context.l10n.workspaceNameLabel,
             controller: _name,
-            hint: 'Duc Vintage',
+            hint: context.l10n.workspaceNameHint,
             textInputAction: TextInputAction.done,
             onChanged: ref
                 .read(workspaceSetupControllerProvider.notifier)
@@ -137,35 +142,34 @@ class _WorkspaceSetupScreenState
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Currency',
+            label: context.l10n.workspaceCurrency,
             icon: Symbols.payments_rounded,
-            value: WorkspaceConstant.labelFor(
-              WorkspaceConstant.currencies,
-              state.currency,
-            ),
+            value: WorkspaceOptionLabel.currency(context, state.currency),
             onTap: _pickCurrency,
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Country',
+            label: context.l10n.workspaceCountry,
             icon: Symbols.public_rounded,
-            value: WorkspaceConstant.labelFor(
-              WorkspaceConstant.countries,
-              state.country,
-            ),
+            value: WorkspaceOptionLabel.country(context, state.country),
             onTap: _pickCountry,
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Business type (optional)',
+            label: context.l10n.workspaceBusinessTypeOptional,
             icon: Symbols.badge_rounded,
-            value: state.businessType,
+            value: state.businessType == null
+                ? null
+                : WorkspaceOptionLabel.businessType(
+                    context,
+                    state.businessType!,
+                  ),
             onTap: _pickBusinessType,
           ),
           SizedBox(height: SdSpacingConstant.h32),
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Create business',
+            label: context.l10n.workspaceCreate,
             expand: true,
             busy: state.isSaving,
             onPressed: state.canSubmit ? _submit : null,

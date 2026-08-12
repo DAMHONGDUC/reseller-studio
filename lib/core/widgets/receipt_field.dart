@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../extensions/context_extensions.dart';
+
 import 'app_photo.dart';
 
 /// The receipt slot on a purchase or expense form.
@@ -40,7 +42,7 @@ class ReceiptField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Receipt',
+          context.l10n.receiptLabel,
           style: context.textTheme3.labelMedium!.muted3(context),
         ),
         SizedBox(height: SdSpacingConstant.h6),
@@ -51,7 +53,7 @@ class ReceiptField extends StatelessWidget {
               SizedBox(width: SdSpacingConstant.w12),
               Expanded(
                 child: Text(
-                  'Attached',
+                  context.l10n.receiptAttached,
                   style: context.textTheme3.bodyMedium!.copyWith(
                     color: context.sdTheme3.textPrimary,
                   ),
@@ -63,7 +65,7 @@ class ReceiptField extends StatelessWidget {
                   size: SdIconV3.smallSize,
                   color: context.sdTheme3.danger,
                 ),
-                tooltip: 'Remove receipt',
+                tooltip: context.l10n.receiptRemoveTooltip,
                 onPressed: onRemove,
               ),
             ],
@@ -74,7 +76,7 @@ class ReceiptField extends StatelessWidget {
               Expanded(
                 child: SdButtonV3(
                   variant: SdButtonVariantV3.outlined,
-                  label: 'Photograph',
+                  label: context.l10n.actionPhotograph,
                   icon: Symbols.photo_camera_rounded,
                   size: SdButtonSizeV3.small,
                   expand: true,
@@ -86,7 +88,7 @@ class ReceiptField extends StatelessWidget {
               Expanded(
                 child: SdButtonV3(
                   variant: SdButtonVariantV3.outlined,
-                  label: 'Choose',
+                  label: context.l10n.actionChoose,
                   icon: Symbols.photo_library_rounded,
                   size: SdButtonSizeV3.small,
                   expand: true,

@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../more_constant.dart';
 
 part 'more_screen_more_row.dart';
@@ -27,12 +28,12 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => SdScaffoldV3(
-    appBar: const SdAppBarV3(title: 'More'),
+    appBar: SdAppBarV3(title: context.l10n.navMore),
     body: ListView(
       padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
-        const SdSectionHeaderV3(title: 'Manage', first: true),
+        SdSectionHeaderV3(title: context.l10n.moreManage, first: true),
         Padding(
           padding: EdgeInsets.symmetric(
             horizontal: SdContentPaddingV3.horizontal,

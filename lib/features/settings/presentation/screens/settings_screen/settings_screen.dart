@@ -12,6 +12,7 @@ import '../../../../auth/providers.dart';
 import '../../../../mock_data/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
+import '../../../../workspace/workspace_option_label.dart';
 
 part 'settings_screen_account_card.dart';
 part 'settings_screen_mock_data_card.dart';
@@ -36,19 +37,19 @@ class SettingsScreen extends ConsumerWidget {
     final Workspace? workspace = ref.watch(currentWorkspaceProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Settings'),
+      appBar: SdAppBarV3(title: context.l10n.moreSettings),
       body: ListView(
         padding: SdContentPaddingV3.fullBleed(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          const SdSectionHeaderV3(title: 'Account', first: true),
+          SdSectionHeaderV3(title: context.l10n.settingsAccount, first: true),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
             ),
             child: const _AccountCard(),
           ),
-          const SdSectionHeaderV3(title: 'Workspace'),
+          SdSectionHeaderV3(title: context.l10n.settingsWorkspace),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
@@ -56,30 +57,44 @@ class SettingsScreen extends ConsumerWidget {
             child: SdCardV3(
               child: workspace == null
                   ? Text(
-                      'No workspace loaded.',
+                      context.l10n.workspaceNoneLoaded,
                       style: context.textTheme3.bodyMedium!.muted3(context),
                     )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        _SettingRow(label: 'Name', value: workspace.name),
-                        _SettingRow(label: 'Country', value: workspace.country),
                         _SettingRow(
-                          label: 'Currency',
-                          value: workspace.currency,
+                          label: context.l10n.workspaceNameLabel,
+                          value: workspace.name,
                         ),
                         _SettingRow(
-                          label: 'Stale after',
-                          value: '${workspace.staleThresholdDays} days',
+                          label: context.l10n.workspaceCountry,
+                          value: WorkspaceOptionLabel.country(
+                            context,
+                            workspace.country,
+                          ),
+                        ),
+                        _SettingRow(
+                          label: context.l10n.workspaceCurrency,
+                          value: WorkspaceOptionLabel.currency(
+                            context,
+                            workspace.currency,
+                          ),
+                        ),
+                        _SettingRow(
+                          label: context.l10n.workspaceStaleAfter,
+                          value: context.l10n.commonDays(
+                            workspace.staleThresholdDays,
+                          ),
                         ),
                       ],
                     ),
             ),
           ),
           if (DevFlags.isDebugOrProfile) ...<Widget>[
-            const SdSectionHeaderV3(
-              title: 'Developer',
-              subtitle: 'Debug builds only — not present in a release build.',
+            SdSectionHeaderV3(
+              title: context.l10n.settingsDeveloper,
+              subtitle: context.l10n.settingsDeveloperNote,
             ),
             Padding(
               padding: EdgeInsets.symmetric(
