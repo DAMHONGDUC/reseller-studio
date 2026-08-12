@@ -1,20 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'core/bootstrap/app_bootstrap.dart';
+import 'seller_os_app.dart';
+
+/// The entry point, and deliberately the smallest file in the app.
+///
+/// Everything that could fail lives in [AppBootstrap], which runs it inside a
+/// guarded zone with the framework's error hooks already installed. Anything
+/// added here instead would throw *outside* that zone, where nothing is
+/// watching.
 void main() {
-  runApp(const MainApp());
-}
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
+  AppBootstrap.init(() => const ProviderScope(child: SellerOsApp()));
 }

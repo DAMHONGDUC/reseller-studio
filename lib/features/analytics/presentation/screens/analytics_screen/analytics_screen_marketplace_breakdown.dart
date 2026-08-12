@@ -1,0 +1,51 @@
+part of 'analytics_screen.dart';
+
+/// Revenue share per platform, as a bar per row.
+///
+/// A bar rather than a pie: comparing lengths against a shared baseline is
+/// something people do accurately, and comparing angles is not — and the
+/// question here is "which platform earns most", which is a comparison.
+class _MarketplaceBreakdown extends ConsumerWidget {
+  const _MarketplaceBreakdown();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<MarketplacePerformance> rows = ref.watch(
+      marketplacePerformanceProvider,
+    );
+
+    if (rows.isEmpty) {
+      return const SdEmptyStateV3(
+        icon: Symbols.bar_chart_rounded,
+        title: 'No sales yet',
+        message: 'Marketplace performance appears once you have orders.',
+      );
+    }
+
+    final int maxRevenue = rows
+        .map((MarketplacePerformance row) => row.revenue.minor)
+        .reduce((int a, int b) => a > b ? a : b);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
+      child: SdCardV3(
+        child: Column(
+          children: <Widget>[
+            for (int i = 0; i < rows.length; i++)
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: i == rows.length - 1 ? 0 : SdSpacingConstant.h16,
+                ),
+                child: _MarketplaceRow(
+                  row: rows[i],
+                  maxRevenue: maxRevenue,
+                  color:
+                      AppColors.chartSeries[i % AppColors.chartSeries.length],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

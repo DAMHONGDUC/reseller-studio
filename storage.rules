@@ -1,0 +1,65 @@
+rules_version = '2';
+
+// Storage holds every binary the app owns: item photos, purchase receipts,
+// expense receipts, workspace logos (plan §18).
+//
+// **The path carries the workspace id, and the rules read membership out of
+// Firestore.** A flat `receipts/{fileId}` bucket would have no way to answer
+// "may this person see this file", because a storage object has no fields to
+// check.
+//
+//   workspaces/{workspaceId}/items/{itemId}/{fileName}
+//   workspaces/{workspaceId}/receipts/{receiptId}/{fileName}
+//   workspaces/{workspaceId}/logo/{fileName}
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(workspaceId) {
+      return signedIn() && firestore.exists(
+        /databases/(default)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)
+      );
+    }
+
+    function role(workspaceId) {
+      return firestore.get(
+        /databases/(default)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)
+      ).data.role;
+    }
+
+    function canWrite(workspaceId) {
+      return isMember(workspaceId) && role(workspaceId) in ['owner', 'admin', 'member'];
+    }
+
+    // An item photo taken on a phone is routinely 4-8 MB before compression.
+    // The app compresses before upload; this is the backstop that stops a
+    // single bad upload eating the workspace's storage quota.
+    function withinSizeLimit() {
+      return request.resource.size < 15 * 1024 * 1024;
+    }
+
+    // Images and PDFs only — a receipt is often a PDF from an email. Anything
+    // else in this bucket is either a mistake or an attempt to use the
+    // workspace as free file hosting.
+    function isAllowedType() {
+      return request.resource.contentType.matches('image/.*')
+          || request.resource.contentType == 'application/pdf';
+    }
+
+    match /workspaces/{workspaceId}/{allPaths=**} {
+      allow read: if isMember(workspaceId);
+      allow write: if canWrite(workspaceId)
+                   && withinSizeLimit()
+                   && isAllowedType();
+      allow delete: if canWrite(workspaceId);
+    }
+
+    // Deny by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

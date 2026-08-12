@@ -5,6 +5,8 @@ library;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/config/dev_flags.dart';
+
 /// The `FirebaseAuth` instance, behind a provider so a test can override it.
 final Provider<FirebaseAuth> firebaseAuthProvider = Provider<FirebaseAuth>(
   (Ref ref) => FirebaseAuth.instance,
@@ -28,6 +30,16 @@ final StreamProvider<User?> authUserProvider = StreamProvider<User?>(
 /// the splash screen rather than the login screen for that moment, or a
 /// returning user sees a login form flash before their own data.
 final Provider<bool?> isSignedInProvider = Provider<bool?>((Ref ref) {
+  // Returns BEFORE watching `authUserProvider`, and that ordering is the
+  // whole point rather than a micro-optimisation: that provider reaches
+  // `FirebaseAuth.instance`, which throws `[core/no-app]` when Firebase has
+  // not been initialized — the exact situation the bypass exists for. Watch
+  // first and the bypass crashes on the case it was built to rescue.
+  //
+  // `DevFlags.bypassAuth` is a compile-time false in release, so this whole
+  // branch is gone from a shipped binary.
+  if (DevFlags.bypassAuth) return true;
+
   final AsyncValue<User?> user = ref.watch(authUserProvider);
 
   return user.when(
@@ -38,4 +50,20 @@ final Provider<bool?> isSignedInProvider = Provider<bool?>((Ref ref) {
     error: (Object error, StackTrace stackTrace) => false,
     loading: () => null,
   );
+});
+
+/// The signed-in user's uid, or null when nobody is.
+///
+/// **Every Firestore path and `createdBy` field reads this, never
+/// `FirebaseAuth.instance.currentUser!.uid`.** It is the one seam where the
+/// auth bypass substitutes its fake uid, so a repository written against this
+/// provider works under the bypass and a repository that reaches for
+/// `currentUser` directly crashes on the first read.
+final Provider<String?> currentUidProvider = Provider<String?>((Ref ref) {
+  if (DevFlags.bypassAuth) return DevFlags.bypassUid;
+
+  // `.value` is nullable on Riverpod 3's AsyncValue (it was `valueOrNull` in
+  // 2.x) and is null while loading or errored — which is the right answer
+  // here: nobody is signed in until the stream says so.
+  return ref.watch(authUserProvider).value?.uid;
 });

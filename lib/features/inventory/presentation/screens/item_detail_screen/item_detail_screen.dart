@@ -1,0 +1,55 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:system_design/index.dart';
+
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../listings/domain/entities/listing.dart';
+import '../../../../listings/domain/enums/listing_status.dart';
+import '../../../../listings/providers.dart';
+import '../../../domain/entities/item.dart';
+import '../../../providers.dart';
+
+part 'item_detail_screen_detail_row.dart';
+part 'item_detail_screen_item_body.dart';
+part 'item_detail_screen_listing_row.dart';
+part 'item_detail_screen_listings.dart';
+
+/// Item detail (plan §7).
+///
+/// Watches the item rather than taking it as an argument, so an edit made on
+/// another device — or by a teammate — appears here without a reload, and so
+/// a deep link into this screen works with only an id.
+class ItemDetailScreen extends ConsumerWidget {
+  const ItemDetailScreen({required this.itemId, super.key});
+
+  final String itemId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<Item?> item = ref.watch(itemProvider(itemId));
+
+    return SdScaffoldV3(
+      appBar: SdAppBarV3(
+        title: item.value?.title ?? 'Item',
+        subtitle: item.value?.sku,
+      ),
+      body: switch (item) {
+        AsyncLoading<Item?>() when !item.hasValue => const SdLoadingV3Page(),
+        AsyncError<Item?>() => const SdEmptyStateV3(
+          icon: Symbols.error_rounded,
+          title: 'Could not load this item',
+          message: 'Please try again.',
+        ),
+        // Null rather than an error: the row may have been deleted by a
+        // teammate while this screen was open, which is not a failure.
+        AsyncData<Item?>(value: null) => const SdEmptyStateV3(
+          icon: Symbols.search_off_rounded,
+          title: 'Item not found',
+          message: 'It may have been deleted.',
+        ),
+        _ => _ItemBody(item: item.value!),
+      },
+    );
+  }
+}

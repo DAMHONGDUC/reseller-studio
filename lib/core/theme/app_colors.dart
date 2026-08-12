@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 ///
 /// Nothing outside this file writes a `Color(0x…)`. A screen that needs a
 /// colour reads `context.sdTheme3` or `context.colorScheme3`.
-abstract final class AppColors {
+final class AppColors {
   // --- Brand ---
 
   /// The action colour: primary buttons, selected tabs, focused inputs.
@@ -113,7 +113,82 @@ abstract final class AppColors {
     Color(0xFFFF7A70),
   ];
 
-  // --- Scrim ---
+  // --- Scrim and shadow ---
 
   static const Color barrier = Color(0x99000000);
+
+  /// What a raised surface casts in light mode.
+  ///
+  /// A desaturated navy at low alpha, not black. Pure black at low opacity
+  /// goes grey and makes a white card look dusty; tinting the shadow toward
+  /// the palette's own blue keeps it reading as depth.
+  static const Color shadow = Color(0x14101828);
+
+  /// Transparent — dark mode casts nothing.
+  ///
+  /// Not an oversight: a shadow works by darkening what is behind it, and on
+  /// a near-black page there is nothing to darken. Dark separates surfaces
+  /// with [borderDark] and the surface step instead. See `SdThemeV3.shadow`.
+  static const Color shadowDark = Color(0x00000000);
+
+  // --- Gradients ---
+  //
+  // Only the hero stat uses these. A gradient is the loudest thing a flat UI
+  // can do, so exactly one element per screen gets one — past that they stop
+  // signalling importance and start being wallpaper.
+
+  /// Behind the headline profit figure. Brand indigo, deepening downward.
+  static const List<Color> brandGradient = <Color>[
+    Color(0xFF4B5BE8),
+    Color(0xFF2E3BB5),
+  ];
+
+  static const List<Color> brandGradientDark = <Color>[
+    Color(0xFF3A46B8),
+    Color(0xFF232A6B),
+  ];
+
+  /// The same shape in green, for a screen whose hero figure is profit and
+  /// which should read as good news on sight.
+  static const List<Color> profitGradient = <Color>[
+    Color(0xFF11916A),
+    Color(0xFF0A6B4D),
+  ];
+
+  static const List<Color> profitGradientDark = <Color>[
+    Color(0xFF0E7A59),
+    Color(0xFF075038),
+  ];
+
+  /// Used when the hero figure is a loss. Never decorative — a red hero card
+  /// is the app telling the seller something is wrong.
+  static const List<Color> lossGradient = <Color>[
+    Color(0xFFC0453A),
+    Color(0xFF922C23),
+  ];
+
+  static const List<Color> lossGradientDark = <Color>[
+    Color(0xFF9E3A30),
+    Color(0xFF6B211A),
+  ];
+
+  /// The brand ramp for the current brightness, as a ready `Gradient`.
+  ///
+  /// Diagonal rather than vertical: a top-left to bottom-right ramp reads as
+  /// lit from the corner the eye starts at, and a purely vertical one on a
+  /// wide card looks like a banding artefact.
+  static LinearGradient brandRamp({required bool isDark}) =>
+      _ramp(isDark ? brandGradientDark : brandGradient);
+
+  static LinearGradient profitRamp({required bool isDark}) =>
+      _ramp(isDark ? profitGradientDark : profitGradient);
+
+  static LinearGradient lossRamp({required bool isDark}) =>
+      _ramp(isDark ? lossGradientDark : lossGradient);
+
+  static LinearGradient _ramp(List<Color> colors) => LinearGradient(
+    colors: colors,
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

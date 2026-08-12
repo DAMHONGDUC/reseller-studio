@@ -3,12 +3,15 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
-import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
 import '../../features/auth/providers.dart';
 import '../../features/home/presentation/screens/home_screen/home_screen.dart';
 import '../../features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import '../../features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
+import '../../features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen/settings_screen.dart';
 import '../logging/app_logger.dart';
 import '../widgets/app_shell.dart';
 import '../widgets/splash_screen.dart';
@@ -88,6 +91,22 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.inventory,
                 builder: (BuildContext context, GoRouterState state) =>
                     const InventoryScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'quick-add',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const QuickAddScreen(),
+                  ),
+                  GoRoute(
+                    path: 'item/:itemId',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        ItemDetailScreen(
+                          // The path parameter is the screen's only input, so
+                          // a deep link into an item works with just an id.
+                          itemId: state.pathParameters['itemId']!,
+                        ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -115,23 +134,33 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.more,
                 builder: (BuildContext context, GoRouterState state) =>
                     const MoreScreen(),
+                // Nested, not a sibling: a detail pushed inside its branch
+                // keeps the tab bar visible and keeps its own back stack, so
+                // a seller three screens deep in More can check an order and
+                // come back to where they were.
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'settings',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const SettingsScreen(),
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
     ],
-    onException:
-        (BuildContext context, GoRouterState state, GoRouter router) {
-          // A route that does not exist is a bug in the app, not something to
-          // show the user a stack trace about. Log it and put them somewhere
-          // real. Plan §31: never expose a raw technical error.
-          AppLogger.error(
-            'Navigate to unknown route',
-            error: StateError('No route for ${state.uri}'),
-          );
-          router.go(AppRoutes.home);
-        },
+    onException: (BuildContext context, GoRouterState state, GoRouter router) {
+      // A route that does not exist is a bug in the app, not something to
+      // show the user a stack trace about. Log it and put them somewhere
+      // real. Plan §31: never expose a raw technical error.
+      AppLogger.error(
+        'Navigate to unknown route',
+        error: StateError('No route for ${state.uri}'),
+      );
+      router.go(AppRoutes.home);
+    },
   );
 
   ref.onDispose(router.dispose);
@@ -148,18 +177,19 @@ const Set<String> _authRoutes = <String>{
 
 /// Bridges a Riverpod provider to go_router's `refreshListenable`.
 ///
-/// go_router re-runs its redirect when this notifies. Watching rather than
-/// reading, and notifying only when the value actually changes, so a rebuild
-/// that produces the same auth state does not re-run every redirect in the
-/// stack.
+/// go_router re-runs its redirect when this notifies. It notifies only when
+/// the value actually changes, so a rebuild that produces the same auth state
+/// does not re-run every redirect in the stack.
+///
+/// Typed on `Provider<T>` rather than the more general `ProviderListenable<T>`
+/// that `ref.listen` accepts: Riverpod 3 declares that interface but does not
+/// export it from `riverpod.dart`, so naming it here does not compile. Every
+/// provider this bridges is a plain `Provider` anyway.
 class _ProviderRefreshListenable<T> extends ChangeNotifier {
-  _ProviderRefreshListenable(Ref ref, ProviderListenable<T> provider) {
-    _subscription = ref.listen<T>(
-      provider,
-      (T? previous, T next) {
-        if (previous != next) notifyListeners();
-      },
-    );
+  _ProviderRefreshListenable(Ref ref, Provider<T> provider) {
+    _subscription = ref.listen<T>(provider, (T? previous, T next) {
+      if (previous != next) notifyListeners();
+    });
   }
 
   late final ProviderSubscription<T> _subscription;

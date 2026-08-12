@@ -19,5 +19,17 @@
   "errorOfflineTitle": "Bạn đang ngoại tuyến",
   "errorOfflineMessage": "Thay đổi của bạn đã được lưu trên thiết bị này và sẽ đồng bộ khi có mạng trở lại.",
 
-  "emptyValuePlaceholder": "—"
+  "emptyValuePlaceholder": "—",
+
+  "quickAddTitle": "Thêm nhanh",
+  "quickAddNameLabel": "Đây là món gì?",
+  "quickAddNameHint": "Nike Air Max 90, size 10",
+  "quickAddHelp": "Chỉ cần tên là đủ. Giá, ảnh và phần còn lại để sau cũng được.",
+  "quickAddSaved": "Đã thêm vào kho",
+  "quickAddEmptyTitleError": "Đặt tên cho món đã",
+
+  "itemBlockMissingPrice": "Thêm giá bán mong muốn để đăng bán",
+  "itemBlockMissingSalePrice": "Thêm giá bán để đánh dấu đã bán",
+  "itemBlockWrongStatus": "Món này không thể chuyển sang trạng thái đó từ trạng thái hiện tại",
+  "itemBlockNoQuantity": "Không còn tồn kho để chuyển"
 }

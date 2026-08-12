@@ -49,6 +49,24 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Deep links. Needed by the notification tap targets the plan calls for
+	     (section 22) — a "new order" push has to open that order, not Home.
+	     go_router reads the path, so a link is sellerosic:///orders/ord-4. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.dd.seller.os</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>selleros</string>
+			</array>
+		</dict>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

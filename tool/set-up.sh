@@ -23,6 +23,17 @@ echo "→ pub get (system_design)"
 echo "→ pub get (app)"
 fvm flutter pub get
 
+echo "→ env files"
+# Seed the real env files from their templates. Never overwrite: a developer's
+# dev.json holds the ids they filled in, and clobbering it on every set-up is
+# how those get lost.
+for flavour in dev prod; do
+  if [ ! -f "env/$flavour.json" ]; then
+    cp "env/$flavour.example.json" "env/$flavour.json"
+    echo "  created env/$flavour.json from the template — fill it in"
+  fi
+done
+
 echo "→ gen-l10n"
 fvm flutter gen-l10n
 

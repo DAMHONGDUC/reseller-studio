@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:system_design/index.dart';
+
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../domain/entities/analytics_summary.dart';
+import '../../../providers.dart';
+
+part 'analytics_screen_marketplace_breakdown.dart';
+part 'analytics_screen_marketplace_row.dart';
+part 'analytics_screen_profit_statement.dart';
+part 'analytics_screen_statement_row.dart';
+
+/// Analytics — "how is my business performing?".
+///
+/// Every figure is derived from the rows on read (hard rule 3), so correcting
+/// a fee on one order corrects every total here at once.
+///
+/// **A figure this screen cannot derive renders as `—`, never as zero**, and
+/// the profit card says so out loud when some costs are missing rather than
+/// presenting a partial number as the whole truth.
+class AnalyticsScreen extends ConsumerWidget {
+  const AnalyticsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AnalyticsSummary summary = ref.watch(analyticsSummaryProvider);
+
+    return SdScaffoldV3(
+      appBar: const SdAppBarV3(title: 'Analytics'),
+      body: ListView(
+        padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
+        children: <Widget>[
+          SizedBox(height: SdContentPaddingV3.topGap),
+          const SdSectionHeaderV3(title: 'Overview', first: true),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: _ProfitStatement(summary: summary),
+          ),
+          const SdSectionHeaderV3(
+            title: 'By marketplace',
+            subtitle: 'Where the money actually comes from',
+          ),
+          const _MarketplaceBreakdown(),
+        ],
+      ),
+    );
+  }
+}
