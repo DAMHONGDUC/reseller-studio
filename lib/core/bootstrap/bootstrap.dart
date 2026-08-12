@@ -5,6 +5,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import '../config/app_env.dart';
 import '../logging/app_logger.dart';
 import '../logging/crash_reporter.dart';
 
@@ -31,6 +32,8 @@ Future<void> bootstrap(Widget Function() builder) async {
   await runZonedGuarded<Future<void>>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+
+      _logEnvironment();
 
       await _initializeFirebase();
 
@@ -68,7 +71,36 @@ Future<void> bootstrap(Widget Function() builder) async {
 /// Swallows its own failure on purpose — see [bootstrap]. The failure is
 /// logged to the console, which is the only place it can go when the thing
 /// that reports failures is what failed.
+/// Log which configuration this build is running on, before anything can
+/// fail. **Names keys, never values** — hard rule 9.
+void _logEnvironment() {
+  AppLogger.info('Environment', <String, String>{'config': AppEnv.summary});
+
+  if (kReleaseMode && AppEnv.missingReleaseKeys.isNotEmpty) {
+    // A release build with no Firebase config is a build that will fail on
+    // every screen. Say so once, loudly, naming every missing key at once
+    // rather than one per rebuild.
+    AppLogger.warning(
+      'Release build is missing required env keys',
+      <String, String>{'keys': AppEnv.missingReleaseKeys.join(', ')},
+    );
+  }
+}
+
 Future<void> _initializeFirebase() async {
+  if (!AppEnv.hasFirebaseConfig) {
+    // Distinct from a thrown init failure on purpose: "no project configured"
+    // and "configured but unreachable" look identical from the exception and
+    // want completely different responses from whoever reads the log.
+    AppLogger.warning(
+      'No Firebase config in this build — running without a backend. '
+      'Fill the FIREBASE_* keys in env/${AppEnv.flavor.name}.json once '
+      '`flutterfire configure` has been run.',
+    );
+
+    return;
+  }
+
   try {
     await Firebase.initializeApp();
 

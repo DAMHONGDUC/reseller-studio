@@ -32,6 +32,12 @@ scripts:
       Safe to re-run.
     run: sh tool/set-up.sh
 
+  run:
+    description: >
+      Run the app against a flavour's env config. `melos run run -- prod`
+      for release config; defaults to dev.
+    run: sh tool/run.sh
+
   gen:
     description: Regenerate localizations.
     run: sh tool/gen.sh

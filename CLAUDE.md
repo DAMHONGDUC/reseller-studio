@@ -242,6 +242,50 @@ dependencies per generation, which pub does not support in one package —
 meaning it would take a second package. Not worth it for a warning. Revisit
 only if it becomes a build failure.
 
+## `env/` — build-time configuration
+
+One JSON file per flavour, passed with `--dart-define-from-file`, read through
+**`lib/core/config/app_env.dart` — the only file allowed to name an env key.**
+A `String.fromEnvironment('FIREBASE_…')` in a feature is a magic string nobody
+can audit and a typo that silently returns `''`.
+
+```sh
+melos run run            # env/dev.json
+melos run run -- prod    # env/prod.json
+```
+
+- `env/*.example.json` is checked in and is the key list; `env/dev.json` and
+  `env/prod.json` are gitignored. `melos run set-up` copies the templates when
+  the real files are missing and **never overwrites** an existing one.
+- **Adding a key means adding it to both templates and to `AppEnv`.**
+  `test/core/config/app_env_test.dart` fails if the two flavours' key sets
+  diverge — a key in one and not the other is a build that works locally and
+  fails in CI.
+- **Every getter has a default**, so a build with no `--dart-define-from-file`
+  still compiles. That is what keeps `melos run test` working without a
+  flavour.
+
+**Nothing in `env/` is secret.** `--dart-define-from-file` compiles the JSON
+into the binary; anyone with the `.ipa` can read it. Firebase api keys and app
+ids are fine — they are public identifiers protected by `firestore.rules`, not
+credentials. **Marketplace OAuth secrets are not** (hard rule 10): they live in
+Secret Manager and are read only by Cloud Functions. A test rejects any key
+whose name contains `SECRET` or `PRIVATE`.
+
+**`AppEnv` says what was asked for; `DevFlags` says what is allowed.** The
+dev switches are read from the env file but every one is ANDed with
+`!kReleaseMode` in `DevFlags`, so a `prod.json` with `"BYPASS_AUTH": true`
+still ships an app with no bypass. Never read `AppEnv.bypassAuthRequested`
+directly.
+
+**Design tokens and domain policy deliberately stay out of `env/`** —
+`AppColors`, `SdRadiusV3`, `PurchaseEvaluation.defaultTargetRoi`,
+`Marketplace.estimatedFeeRate`. They do not vary per build, and they must be
+readable from a unit test without a build flag. The stale threshold especially:
+it is per-workspace data in Firestore (`Workspace.staleThresholdDays`), so
+freezing it into a build file would contradict `docs/DATA_MODEL.md`.
+`env/README.md` has the full list and the reasoning.
+
 ## Commands
 
 **Melos is the task runner** (`melos.yaml`). Installed once per machine at the
@@ -270,14 +314,17 @@ portability is the whole reason the design system is a submodule.
   project first; this reaches real users.
 
 Running the app before Firebase exists — the app is otherwise stuck on a
-login screen that cannot succeed (hard rule 1):
+login screen that cannot succeed (hard rule 1). `env/dev.json` carries
+`BYPASS_AUTH` and `MOCK_DATA_DEFAULT`, so this is all it takes:
 
 ```sh
-fvm flutter run --dart-define=BYPASS_AUTH=true
+melos run run
 ```
 
-VS Code users: the **"Seller OS (auth bypassed)"** launch configuration in
-`.vscode/launch.json` does the same thing.
+VS Code users: the **"Seller OS (dev)"** launch configuration does the same.
+**Never run the app bare** — with no `--dart-define-from-file` every `AppEnv`
+getter falls back to its default, which is a silently different app from the
+one CI builds.
 
 ## Mock data — the app runs fully before Firebase exists
 
@@ -320,7 +367,7 @@ bypass goes.
    way this gets it wrong.
 
    **The development bypass is not a guest mode and must never become one.**
-   `DevFlags.bypassAuth` (`--dart-define=BYPASS_AUTH=true`) enters the app as
+   `DevFlags.bypassAuth` — `BYPASS_AUTH` in `env/dev.json` — enters the app as
    a fake user. It exists because there is no Firebase project yet, so the
    login screen is otherwise a dead end and none of the app can be looked at.
    Three properties keep it honest, and a change that weakens any of them is
@@ -328,8 +375,9 @@ bypass goes.
    - it is `const` and ANDed with `!kReleaseMode`, so a release build contains
      `if (false)` and the tree-shaker deletes the branch — the bypass is
      *absent* from a shipped binary, not disabled in it;
-   - passing the define to a release build does nothing, so the guarantee does
-     not depend on who typed the build command;
+   - a `prod.json` that says `"BYPASS_AUTH": true` still ships an app with no
+     bypass, so the guarantee does not depend on the contents of a config
+     file or on who typed the build command;
    - the app wears an `AUTH OFF` banner on every route while it is on.
 
    `test/core/config/dev_flags_test.dart` asserts the flag is off by default.
@@ -485,8 +533,10 @@ bypass goes.
   absent. Run `flutterfire configure` once the project exists. Until then
   `bootstrap` catches the init failure and the app runs without a backend —
   deliberately, so a missing config is a warning line rather than a white
-  screen. Use `--dart-define=BYPASS_AUTH=true` to get past login meanwhile
-  (hard rule 1), and **delete the bypass when real sign-in works.**
+  screen. `melos run run` gets past login meanwhile (hard rule 1), and
+  **delete the bypass when real sign-in works.**
+  The `FIREBASE_*` keys in `env/*.json` are empty until then; `bootstrap` logs
+  one clean warning rather than a Firebase stack trace when it sees that.
 - **`.firebaserc` does not exist**, so `melos run deploy-firebase` cannot run.
 - **The v3 design-system commit is local to this machine.** It is committed in
   `packages/system_design` on `main` but **not pushed**. Push it before anyone

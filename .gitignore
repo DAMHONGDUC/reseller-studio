@@ -86,6 +86,12 @@ app.*.map.json
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
+# Build-time configuration. The real files can hold ids that identify a
+# project; the templates carry the key list and nothing else. See env/README.md
+# — none of this is a secret store, and secrets must not go in either.
+env/*.json
+!env/*.example.json
+
 # Firebase — generated per-project, and they carry real project identifiers.
 # Regenerate with `flutterfire configure`; see CLAUDE.md "Pending setup".
 lib/firebase_options.dart
