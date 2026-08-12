@@ -174,19 +174,30 @@ test in this repo fails any key whose name contains `SECRET` or `PRIVATE`.
    the backfill now (a large mechanical pass), (c) drop `vi` from
    `supportedLocales` until it is real. **A half-translated app is the worst of
    the three** — pick one.
-2. **Analytics events.** `CLAUDE.md` describes an `AppAnalytics` class with a
-   typed method per event. It does not exist and nothing calls
-   `FirebaseAnalytics` — so no rule is broken, but you are also shipping with
-   no product analytics. Want it before launch?
-3. **Zero-decimal currencies.** Money parsing and display assume 2 decimals.
-   VND is in the currency picker and has none — `₫450.000` will be off by a
-   factor of 100. Either drop VND from `WorkspaceConstant.currencies` for v1 or
-   let me make the decimal count per-currency.
-4. **Offers** (plan §8) are not built. No entity, no screen. Home's Needs
+2. **Offers** (plan §8) are not built. No entity, no screen. Home's Needs
    Attention does not mention them. Fine for v1?
-5. **Receipts** (plan §18) are not built as their own screen — expenses and
+3. **Receipts** (plan §18) are not built as their own screen — expenses and
    purchases can hold a receipt URL, but there is no upload UI for them yet.
    Item photos do work end to end.
+4. **Analytics sub-screens** (plan §9: Sales, Profit, Inventory, Marketplace,
+   Categories, Sources). The Analytics tab has the overview, the profit
+   statement and the marketplace breakdown; the six drill-downs are not built.
+   The figures they would show are all already computed. Worth it for v1?
+
+### Resolved since the first draft
+
+- **Analytics events** — `AppAnalytics` now exists with a typed method per
+  event, wired beside each `AppLogger.action` in the controllers. It is a
+  no-op until Firebase is configured. **No item title, buyer name or
+  credential is ever a parameter** (hard rule 9). The one number worth
+  watching is `item_created.via_quick_add`: hard rule 2 says the product's
+  speed rests on Quick Add, and that flag is how anyone finds out whether
+  sellers actually use it.
+- **Zero-decimal currencies** — fixed rather than dodged. `CurrencyDecimals`
+  knows which ISO codes have no minor unit, `Money` parses and formats through
+  it, and every hardcoded `/100` in the app is gone. VND is safe to leave in
+  the picker; `test/core/money/currency_decimals_test.dart` is what stops the
+  2-decimal assumption creeping back.
 
 ---
 

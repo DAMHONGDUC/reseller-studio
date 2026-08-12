@@ -5,6 +5,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/name_entry_sheet.dart';
 import '../../../domain/entities/item.dart';
@@ -133,17 +134,10 @@ class CategoriesScreen extends ConsumerWidget {
         source.value ?? const <ItemCategory>[];
     final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
 
-    return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: 'Categories',
-        actions: <Widget>[
-          IconButton(
-            icon: const SdIconV3(Symbols.add_rounded),
-            tooltip: 'New category',
-            onPressed: () => _add(context, ref),
-          ),
-        ],
-      ),
+    return AppAddFabScaffold(
+      appBar: const SdAppBarV3(title: 'Categories'),
+      addLabel: 'Add a category',
+      onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<ItemCategory>>() when !source.hasValue =>
           const SdLoadingV3Page(),
@@ -158,7 +152,7 @@ class CategoriesScreen extends ConsumerWidget {
           ),
         ),
         _ => ListView(
-          padding: SdContentPaddingV3.screen(context),
+          padding: AppAddFabScaffold.listPadding(context),
           children: <Widget>[
             SizedBox(height: SdContentPaddingV3.topGap),
             AppListCard(

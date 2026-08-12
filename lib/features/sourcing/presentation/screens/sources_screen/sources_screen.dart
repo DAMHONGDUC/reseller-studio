@@ -5,6 +5,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/name_entry_sheet.dart';
 import '../../../domain/entities/source.dart';
@@ -62,17 +63,10 @@ class SourcesScreen extends ConsumerWidget {
           for (final SourcePerformance row in performance) row.sourceId: row,
         };
 
-    return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: 'Sources',
-        actions: <Widget>[
-          IconButton(
-            icon: const SdIconV3(Symbols.add_rounded),
-            tooltip: 'New source',
-            onPressed: () => _add(context, ref),
-          ),
-        ],
-      ),
+    return AppAddFabScaffold(
+      appBar: const SdAppBarV3(title: 'Sources'),
+      addLabel: 'Add a source',
+      onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<Source>>() when !source.hasValue =>
           const SdLoadingV3Page(),
@@ -89,7 +83,7 @@ class SourcesScreen extends ConsumerWidget {
           ),
         ),
         _ => ListView(
-          padding: SdContentPaddingV3.screen(context),
+          padding: AppAddFabScaffold.listPadding(context),
           children: <Widget>[
             SizedBox(height: SdContentPaddingV3.topGap),
             AppListCard(

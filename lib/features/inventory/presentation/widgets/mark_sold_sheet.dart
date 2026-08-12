@@ -41,9 +41,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
   static const int pickerYearsBack = 2;
 
   late final TextEditingController _price = TextEditingController(
-    text: widget.item.askingPrice == null
-        ? ''
-        : (widget.item.askingPrice!.minor / 100).toStringAsFixed(2),
+    text: widget.item.askingPrice?.toInputString() ?? '',
   );
 
   final TextEditingController _buyer = TextEditingController();

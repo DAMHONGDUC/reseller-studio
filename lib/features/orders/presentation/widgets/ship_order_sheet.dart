@@ -40,9 +40,7 @@ class ShipOrderSheet extends ConsumerStatefulWidget {
 class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
   final TextEditingController _tracking = TextEditingController();
   late final TextEditingController _cost = TextEditingController(
-    text: widget.order.shippingCost == null
-        ? ''
-        : (widget.order.shippingCost!.minor / 100).toStringAsFixed(2),
+    text: widget.order.shippingCost?.toInputString() ?? '',
   );
 
   String? _carrier;
@@ -181,8 +179,7 @@ class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
     text: _major(widget.order.payout),
   );
 
-  static String _major(Money? amount) =>
-      amount == null ? '' : (amount.minor / 100).toStringAsFixed(2);
+  static String _major(Money? amount) => amount?.toInputString() ?? '';
 
   @override
   void dispose() {

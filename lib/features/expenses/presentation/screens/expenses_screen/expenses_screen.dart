@@ -7,6 +7,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../domain/entities/expense.dart';
@@ -81,17 +82,10 @@ class ExpensesScreen extends ConsumerWidget {
         .map((Expense expense) => expense.amount)
         .totalOrNull();
 
-    return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: 'Expenses',
-        actions: <Widget>[
-          IconButton(
-            icon: const SdIconV3(Symbols.add_rounded),
-            tooltip: 'New expense',
-            onPressed: () => _add(context),
-          ),
-        ],
-      ),
+    return AppAddFabScaffold(
+      appBar: const SdAppBarV3(title: 'Expenses'),
+      addLabel: 'Add an expense',
+      onAdd: () => _add(context),
       body: switch (source) {
         AsyncLoading<List<Expense>>() when !source.hasValue =>
           const SdLoadingV3Page(),
@@ -108,7 +102,7 @@ class ExpensesScreen extends ConsumerWidget {
           ),
         ),
         _ => ListView(
-          padding: SdContentPaddingV3.screen(context),
+          padding: AppAddFabScaffold.listPadding(context),
           children: <Widget>[
             SizedBox(height: SdContentPaddingV3.topGap),
             SdStatTileV3(

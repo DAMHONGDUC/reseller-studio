@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import 'currency_decimals.dart';
+
 /// An amount of money, stored as an integer number of **minor units** — cents
 /// for USD, đồng for VND.
 ///
@@ -30,11 +32,11 @@ final class Money implements Comparable<Money> {
   /// because an empty price field means "not entered", which is precisely the
   /// null case the class doc describes. A form that turned an empty box into
   /// `Money.zero` would be claiming the item is free.
-  static Money? tryParse(
-    String input,
-    String currency, {
-    int decimalDigits = 2,
-  }) {
+  ///
+  /// **The decimal count comes from the currency**, not from a default: a
+  /// đồng has no subdivision, so `'450000'` in VND is 450000 minor units and
+  /// not 45,000,000. See [CurrencyDecimals].
+  static Money? tryParse(String input, String currency) {
     final String trimmed = input.trim().replaceAll(',', '');
 
     if (trimmed.isEmpty) return null;
@@ -46,7 +48,10 @@ final class Money implements Comparable<Money> {
     // `round`, not `toInt`: toInt truncates, so 0.1 + 0.2 arriving as
     // 0.30000000000000004 would be fine but 19.99 arriving as 19.989999…
     // would silently become 1998.
-    return Money((major * _pow10(decimalDigits)).round(), currency);
+    return Money(
+      (major * CurrencyDecimals.factorFor(currency)).round(),
+      currency,
+    );
   }
 
   /// The amount in minor units. Negative is meaningful: a loss, a refund.
@@ -54,6 +59,24 @@ final class Money implements Comparable<Money> {
 
   /// ISO 4217 code — `USD`, `VND`, `EUR`.
   final String currency;
+
+  /// How many decimal places this currency shows — 2 for USD, 0 for VND.
+  int get decimals => CurrencyDecimals.of(currency);
+
+  /// The amount in major units, as a double.
+  ///
+  /// **For display and export only.** Every calculation stays in [minor]; a
+  /// double is exactly the representation hard rule 4 exists to keep out of
+  /// the arithmetic.
+  double get major => minor / CurrencyDecimals.factorFor(currency);
+
+  /// What goes back into a text field the seller edits: `19.99`, or `450000`
+  /// for a currency with no minor unit.
+  ///
+  /// Round-trips through [tryParse] unchanged, which is the whole contract —
+  /// an edit form that reformatted the number it was given would change an
+  /// amount nobody touched.
+  String toInputString() => major.toStringAsFixed(decimals);
 
   bool get isZero => minor == 0;
   bool get isNegative => minor < 0;
@@ -99,7 +122,10 @@ final class Money implements Comparable<Money> {
         ? NumberFormat.simpleCurrency(locale: locale, name: currency)
         : NumberFormat.decimalPattern(locale);
 
-    return formatter.format(minor / _pow10(formatter.decimalDigits ?? 2));
+    // The currency's own decimal count, not the formatter's: `decimalPattern`
+    // reports 3 whatever currency it is asked about, and dividing a VND
+    // amount by a thousand is how ₫450.000 becomes ₫450.
+    return formatter.format(major);
   }
 
   /// Compact form for a dense tile: `$1.2K`, `$45K`.
@@ -114,7 +140,7 @@ final class Money implements Comparable<Money> {
   String formatCompact({String? locale}) => NumberFormat.compactSimpleCurrency(
     locale: locale,
     name: currency,
-  ).format(minor / _pow10(2));
+  ).format(major);
 
   Money _checked(Money other) {
     if (other.currency != currency) {
@@ -125,16 +151,6 @@ final class Money implements Comparable<Money> {
     }
 
     return other;
-  }
-
-  static int _pow10(int exponent) {
-    int result = 1;
-
-    for (int i = 0; i < exponent; i++) {
-      result *= 10;
-    }
-
-    return result;
   }
 
   @override

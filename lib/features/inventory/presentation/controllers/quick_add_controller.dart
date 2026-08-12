@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/item.dart';
@@ -87,6 +88,7 @@ class QuickAddController extends Notifier<QuickAddState> {
         'itemId': id,
         'status': ItemStatus.draft.name,
       });
+      AppAnalytics.instance.itemCreated(viaQuickAdd: true, hasPhoto: false);
 
       state = state.copyWith(isSaving: false, savedItemId: id);
 

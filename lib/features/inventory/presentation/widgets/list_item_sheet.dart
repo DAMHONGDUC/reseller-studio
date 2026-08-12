@@ -38,9 +38,7 @@ class ListItemSheet extends ConsumerStatefulWidget {
 
 class _ListItemSheetState extends ConsumerState<ListItemSheet> {
   late final TextEditingController _price = TextEditingController(
-    text: widget.item.askingPrice == null
-        ? ''
-        : (widget.item.askingPrice!.minor / 100).toStringAsFixed(2),
+    text: widget.item.askingPrice?.toInputString() ?? '',
   );
 
   Marketplace _marketplace = Marketplace.ebay;

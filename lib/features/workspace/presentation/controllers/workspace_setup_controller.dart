@@ -1,5 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/config/app_env.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../auth/providers.dart';
@@ -100,6 +101,11 @@ class WorkspaceSetupController extends Notifier<WorkspaceSetupState> {
         ownerName: ref.read(authUserProvider).value?.displayName,
         ownerEmail: ref.read(authUserProvider).value?.email,
         businessType: state.businessType,
+      );
+
+      AppAnalytics.instance.workspaceCreated(
+        currency: state.currency,
+        country: state.country,
       );
 
       state = state.copyWith(isSaving: false);

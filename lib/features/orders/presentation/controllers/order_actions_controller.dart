@@ -1,5 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
@@ -35,7 +36,10 @@ class OrderActionsController extends Notifier<bool> {
     String? trackingNumber,
     Money? shippingCost,
     DateTime? shippedAt,
-  }) => _save(
+  }) {
+    AppAnalytics.instance.orderShipped(hasTracking: trackingNumber != null);
+
+    return _save(
     'Ship order',
     order.copyWith(
       status: OrderStatus.shipped,
@@ -44,11 +48,12 @@ class OrderActionsController extends Notifier<bool> {
       shippingCost: shippingCost,
       shippedAt: shippedAt ?? DateTime.now(),
     ),
-    <String, Object>{
-      'hasTracking': trackingNumber != null,
-      'hasCarrier': carrier != null,
-    },
-  );
+      <String, Object>{
+        'hasTracking': trackingNumber != null,
+        'hasCarrier': carrier != null,
+      },
+    );
+  }
 
   Future<void> markDelivered(Order order) => _save(
     'Deliver order',
@@ -77,11 +82,15 @@ class OrderActionsController extends Notifier<bool> {
     },
   );
 
-  Future<void> requestReturn(Order order) => _save(
-    'Open return',
-    order.copyWith(status: OrderStatus.returnRequested),
-    const <String, Object>{},
-  );
+  Future<void> requestReturn(Order order) {
+    AppAnalytics.instance.returnOpened();
+
+    return _save(
+      'Open return',
+      order.copyWith(status: OrderStatus.returnRequested),
+      const <String, Object>{},
+    );
+  }
 
   /// The item is physically back.
   ///

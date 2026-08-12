@@ -99,6 +99,19 @@ Owner's rules, all of them read from one place so no screen types them:
 - **The FAB is `SdFabV3`, never Material's.** It is 48 tall against
   Material's 56 and sheds its label while the list is moving — but it never
   hides. A create action a seller has to hunt for is one they stop using.
+- **Every screen that creates something uses that same button, in that same
+  place.** Owner's rule. Not an `IconButton` in the app bar, not a row at the
+  bottom of a list — the labelled FAB Inventory has. `AppAddFabScaffold`
+  (`lib/core/widgets/app_add_fab_scaffold.dart`) is the one implementation:
+  it owns the scroll notifier, installs the `NotificationListener` around the
+  body, and lifts the button clear of the floating tab bar when the screen is
+  a tab. Screens pass a label and a callback and get the behaviour.
+  - **`floatingNav` is true on the five tab screens and false everywhere
+    else.** A pushed route has no glass bar under it, so the inset would leave
+    the button hovering above nothing.
+  - A screen whose create action needs more than a tap — one that opens a
+    sheet or a form — still uses this button. What the tap *does* is the
+    screen's business; where the seller looks for it is not.
 
 **The effect degrades by itself.** `SdGlassV3.isSupported` is false on
 Android's Skia fallback and in widget tests, where the bar renders `FakeGlass`

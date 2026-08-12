@@ -35,9 +35,7 @@ class _RepriceSheetState extends ConsumerState<RepriceSheet> {
   /// otherwise the box would suggest a number that happens to belong to one
   /// row and quietly apply it to the rest.
   late final TextEditingController _price = TextEditingController(
-    text: _sharedPrice == null
-        ? ''
-        : (_sharedPrice!.minor / 100).toStringAsFixed(2),
+    text: _sharedPrice?.toInputString() ?? '',
   );
 
   Money? get _sharedPrice {

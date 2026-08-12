@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:system_design/index.dart';
 
+import '../money/currency_decimals.dart';
+
 /// A field that takes an amount of money.
 ///
 /// **An empty box stays empty and means "not known".** It never becomes zero
@@ -36,11 +38,17 @@ class MoneyField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
+  /// `0.00` where there are cents, `0` where there are not — the hint is the
+  /// only thing telling a seller in đồng that this box does not want decimals.
+  String get _hint => CurrencyDecimals.of(currency) == 0
+      ? '0'
+      : '0.${'0' * CurrencyDecimals.of(currency)}';
+
   @override
   Widget build(BuildContext context) => SdTextFieldV3(
     label: label,
     controller: controller,
-    hint: '0.00',
+    hint: _hint,
     helperText: helperText,
     keyboardType: const TextInputType.numberWithOptions(decimal: true),
     inputFormatters: <TextInputFormatter>[

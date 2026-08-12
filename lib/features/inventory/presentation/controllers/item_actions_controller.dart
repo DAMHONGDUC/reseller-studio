@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/money/money.dart';
 import '../../../listings/domain/entities/listing.dart';
@@ -93,6 +94,7 @@ class ItemActionsController extends Notifier<bool> {
         'itemId': item.id,
         'listingId': listingId,
       });
+      AppAnalytics.instance.itemListed(marketplace: marketplace.name);
     } catch (error, stackTrace) {
       AppLogger.error(
         'Failed to list item',
@@ -169,6 +171,12 @@ class ItemActionsController extends Notifier<bool> {
         'itemId': item.id,
         'orderId': orderId,
       });
+      AppAnalytics.instance.itemSold(
+        marketplace: marketplace.name,
+        // The share of sales with no cost is the health metric for the whole
+        // "insight" half of the product — it is what makes profit unknowable.
+        hadCost: item.purchasePrice != null,
+      );
 
       return orderId;
     } catch (error, stackTrace) {
@@ -257,6 +265,10 @@ class ItemActionsController extends Notifier<bool> {
       'count': items.length,
       ...data,
     });
+    AppAnalytics.instance.bulkAction(
+      action: describe,
+      count: items.length,
+    );
 
     state = true;
 

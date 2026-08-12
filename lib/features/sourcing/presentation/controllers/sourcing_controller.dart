@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/money/money.dart';
 import '../../../listings/domain/enums/listing_status.dart';
@@ -121,6 +122,7 @@ class SourcingController extends Notifier<bool> {
       'isNew': id == null,
       'hasSource': sourceId != null,
     });
+    AppAnalytics.instance.purchaseRecorded(hasSource: sourceId != null);
 
     try {
       await ref

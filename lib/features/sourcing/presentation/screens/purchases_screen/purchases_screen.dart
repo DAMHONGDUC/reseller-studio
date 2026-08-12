@@ -8,6 +8,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/purchase.dart';
 import '../../../providers.dart';
@@ -39,17 +40,10 @@ class PurchasesScreen extends ConsumerWidget {
     final List<Purchase> purchases = source.value ?? const <Purchase>[];
     final Map<String, String> sourceNames = ref.watch(sourceNamesProvider);
 
-    return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: 'Purchases',
-        actions: <Widget>[
-          IconButton(
-            icon: const SdIconV3(Symbols.add_rounded),
-            tooltip: 'New purchase',
-            onPressed: () => _add(context, ref),
-          ),
-        ],
-      ),
+    return AppAddFabScaffold(
+      appBar: const SdAppBarV3(title: 'Purchases'),
+      addLabel: 'Record a purchase',
+      onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<Purchase>>() when !source.hasValue =>
           const SdLoadingV3Page(),
@@ -66,7 +60,7 @@ class PurchasesScreen extends ConsumerWidget {
           ),
         ),
         _ => ListView(
-          padding: SdContentPaddingV3.screen(context),
+          padding: AppAddFabScaffold.listPadding(context),
           children: <Widget>[
             SizedBox(height: SdContentPaddingV3.topGap),
             AppListCard(

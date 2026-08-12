@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/utils/date_time_utils.dart';
@@ -38,10 +39,6 @@ enum ReportKind {
 /// separator: a spreadsheet parses `19.99` and does not parse `$19.99`. The
 /// currency gets its own column so the figure is still unambiguous.
 class ReportController extends Notifier<bool> {
-  /// Minor units per major unit. The export writes major units because that
-  /// is what an accountant expects to see in a column.
-  static const int minorPerMajor = 100;
-
   /// True while a file is being written and handed to the share sheet.
   @override
   bool build() => false;
@@ -54,6 +51,7 @@ class ReportController extends Notifier<bool> {
   Future<void> export(ReportKind kind) async {
     state = true;
     AppLogger.action('Export report', <String, Object>{'kind': kind.name});
+    AppAnalytics.instance.reportExported(kind: kind.name);
 
     try {
       final String csv = switch (kind) {
@@ -226,11 +224,7 @@ class ReportController extends Notifier<bool> {
   /// **An unknown amount exports as an empty cell, never as 0** (hard rule 5).
   /// A zero in a spreadsheet is a number an accountant will sum; a blank is a
   /// question they will ask.
-  static String _major(Money? amount) {
-    if (amount == null) return '';
-
-    return (amount.minor / minorPerMajor).toStringAsFixed(2);
-  }
+  static String _major(Money? amount) => amount?.toInputString() ?? '';
 
   static String _date(DateTime? value) =>
       value == null ? '' : DateTimeUtils.isoDate(value);

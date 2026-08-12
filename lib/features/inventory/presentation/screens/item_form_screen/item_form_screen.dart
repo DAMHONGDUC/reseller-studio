@@ -95,24 +95,12 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
     _quantity.text = '${item.quantity}';
     _sku.text = item.sku ?? '';
     _barcode.text = item.barcode ?? '';
-    _cost.text = _majorUnits(item.purchasePrice?.minor);
-    _asking.text = _majorUnits(item.askingPrice?.minor);
-    _minimum.text = _majorUnits(item.minimumPrice?.minor);
+    _cost.text = item.purchasePrice?.toInputString() ?? '';
+    _asking.text = item.askingPrice?.toInputString() ?? '';
+    _minimum.text = item.minimumPrice?.toInputString() ?? '';
     _description.text = item.description ?? '';
     _notes.text = item.notes ?? '';
     ref.read(itemFormControllerProvider.notifier).seed(item);
-  }
-
-  /// Minor units back into something a person types: `1999` → `19.99`.
-  ///
-  /// Two decimals unconditionally, because the field is parsed back with
-  /// `Money.tryParse`, which assumes them. A zero-decimal currency is a
-  /// known gap and is listed in the release notes rather than half-handled
-  /// here.
-  static String _majorUnits(int? minor) {
-    if (minor == null) return '';
-
-    return (minor / 100).toStringAsFixed(2);
   }
 
   Future<void> _submit() async {

@@ -2,6 +2,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/file_uploader.dart';
@@ -255,6 +256,13 @@ class ItemFormController extends Notifier<ItemFormState> {
         'itemId': id,
         'status': item.status.name,
       });
+
+      if (!state.isEditing) {
+        AppAnalytics.instance.itemCreated(
+          viaQuickAdd: false,
+          hasPhoto: state.photoUrls.isNotEmpty,
+        );
+      }
 
       return id;
     } catch (error, stackTrace) {

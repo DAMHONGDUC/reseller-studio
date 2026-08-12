@@ -335,6 +335,17 @@ feature's own `CLAUDE.md`.
   exempt). Name child files `<main_file>_<widget>.dart` — e.g.
   `home_screen.dart` + `home_screen_needs_attention.dart` with
   `part of 'home_screen.dart';`.
+- **Every screen with a create action uses the same button Inventory does.**
+  Owner's rule. That is `SdFabV3` in the floating-action slot — a labelled
+  button that sheds its label while the list is moving and brings it back the
+  moment it stops — via `AppAddFabScaffold` (`core/widgets/`), never an
+  `IconButton` in the app bar. An add hidden behind a 24pt glyph in the corner
+  is one a seller has to hunt for, and a create action that is hard to find is
+  one they stop using. Same button, same place, every screen: Inventory,
+  Categories, Locations, Sources, Purchases, Expenses.
+  - `floatingNav: true` **only on the five tab screens** — a pushed route has
+    nothing floating over it, and adding the inset there leaves the button
+    hovering in dead space (`docs/rules/DESIGN_SYSTEM.md`).
 - **One folder per screen under `presentation/screens/`.** Each screen gets
   its own subfolder named after the screen file:
   `presentation/screens/<name>_screen/` holds `<name>_screen.dart` and all of
