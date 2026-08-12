@@ -28,9 +28,9 @@ class CategoriesScreen extends ConsumerWidget {
   Future<void> _add(BuildContext context, WidgetRef ref) async {
     final String? name = await NameEntrySheet.show(
       context,
-      title: 'New category',
-      label: 'Name',
-      hint: 'Outerwear',
+      title: context.l10n.categoryNew,
+      label: context.l10n.commonName,
+      hint: context.l10n.categoryNameHint,
     );
 
     if (name == null || !context.mounted) return;
@@ -40,7 +40,7 @@ class CategoriesScreen extends ConsumerWidget {
       () => ref.read(catalogControllerProvider.notifier).saveCategory(
         name: name,
       ),
-      'Category added',
+      context.l10n.categoryAdded,
     );
   }
 
@@ -51,8 +51,8 @@ class CategoriesScreen extends ConsumerWidget {
   ) async {
     final String? name = await NameEntrySheet.show(
       context,
-      title: 'Rename category',
-      label: 'Name',
+      title: context.l10n.categoryRename,
+      label: context.l10n.commonName,
       initialValue: category.name,
     );
 
@@ -65,7 +65,7 @@ class CategoriesScreen extends ConsumerWidget {
         id: category.id,
         parentId: category.parentId,
       ),
-      'Renamed',
+      context.l10n.commonRenamed,
     );
   }
 
@@ -78,11 +78,10 @@ class CategoriesScreen extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Delete "${category.name}"?',
+        title: context.l10n.categoryDeleteConfirmTitle(category.name),
         message: itemCount == 0
-            ? 'Nothing is using it.'
-            : '$itemCount items are in it. They keep working — they just stop '
-                  'having a category.',
+            ? context.l10n.categoryDeleteUnused
+            : context.l10n.categoryDeleteInUse(itemCount),
         icon: Symbols.warning_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
@@ -93,7 +92,7 @@ class CategoriesScreen extends ConsumerWidget {
               () => ref
                   .read(catalogControllerProvider.notifier)
                   .deleteCategory(category.id),
-              'Deleted',
+              context.l10n.commonDeleted,
             ),
           ),
           SdDialogActionV3(
@@ -135,19 +134,19 @@ class CategoriesScreen extends ConsumerWidget {
     final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Categories'),
-      addLabel: 'Add a category',
+      appBar: SdAppBarV3(title: context.l10n.categoriesTitle),
+      addLabel: context.l10n.categoryAdd,
       onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<ItemCategory>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when categories.isEmpty => SdEmptyStateV3(
           icon: Symbols.category_rounded,
-          title: 'No categories yet',
-          message: 'Group your stock so analytics can tell you what sells.',
+          title: context.l10n.categoriesEmptyTitle,
+          message: context.l10n.categoriesEmptyBody,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Add a category',
+            label: context.l10n.categoryAdd,
             onPressed: () => _add(context, ref),
           ),
         ),
@@ -163,7 +162,7 @@ class CategoriesScreen extends ConsumerWidget {
 
                 return AppListRow(
                   title: category.name,
-                  subtitle: count == 1 ? '1 item' : '$count items',
+                  subtitle: context.l10n.categoryItemCount(count),
                   icon: Symbols.category_rounded,
                   onTap: () => _rename(context, ref, category),
                   trailing: IconButton(

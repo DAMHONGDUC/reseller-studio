@@ -29,9 +29,11 @@ class _ItemBody extends StatelessWidget {
               spacing: SdSpacingConstant.w6,
               runSpacing: SdSpacingConstant.h4,
               children: <Widget>[
-                SdBadgeV3(label: item.status.name),
+                SdBadgeV3(label: ItemStatusLabel.of(context, item.status)),
                 if (item.condition != null)
-                  SdBadgeV3(label: item.condition!.name),
+                  SdBadgeV3(
+                    label: ItemConditionLabel.of(context, item.condition!),
+                  ),
                 if (item.quantity > 1) SdBadgeV3(label: '×${item.quantity}'),
               ],
             ),
@@ -39,21 +41,24 @@ class _ItemBody extends StatelessWidget {
         ),
       ),
       SizedBox(height: SdContentPaddingV3.sectionGap),
-      _SectionTitle(title: 'Pricing'),
+      _SectionTitle(title: context.l10n.itemPricing),
       SdCardV3(
         child: Column(
           children: <Widget>[
-            _DetailRow(label: 'Cost', value: context.money(item.purchasePrice)),
             _DetailRow(
-              label: 'Asking price',
+              label: context.l10n.itemCost,
+              value: context.money(item.purchasePrice),
+            ),
+            _DetailRow(
+              label: context.l10n.itemAskingPrice,
               value: context.money(item.askingPrice),
             ),
             _DetailRow(
-              label: 'Minimum price',
+              label: context.l10n.itemMinimumPrice,
               value: context.money(item.minimumPrice),
             ),
             _DetailRow(
-              label: 'Expected profit',
+              label: context.l10n.itemExpectedProfit,
               value: context.money(item.expectedProfit),
               // Hard rule 5: an em dash is not a figure, so it must not be
               // tinted as though it were good or bad news.
@@ -67,14 +72,14 @@ class _ItemBody extends StatelessWidget {
         ),
       ),
       SizedBox(height: SdContentPaddingV3.sectionGap),
-      _SectionTitle(title: 'Provenance'),
+      _SectionTitle(title: context.l10n.itemProvenance),
       _Provenance(item: item),
       SizedBox(height: SdContentPaddingV3.sectionGap),
-      _SectionTitle(title: 'Listings'),
+      _SectionTitle(title: context.l10n.itemListings),
       _Listings(itemId: item.id),
       if (item.description != null) ...<Widget>[
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        _SectionTitle(title: 'Description'),
+        _SectionTitle(title: context.l10n.commonDescription),
         SdCardV3(
           child: Text(
             item.description!,
@@ -84,7 +89,7 @@ class _ItemBody extends StatelessWidget {
       ],
       if (item.notes != null) ...<Widget>[
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        _SectionTitle(title: 'Notes'),
+        _SectionTitle(title: context.l10n.commonNotes),
         SdCardV3(
           child: Text(
             item.notes!,

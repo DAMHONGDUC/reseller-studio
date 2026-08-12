@@ -18,14 +18,12 @@ class _BulkActionBar extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Archive ${items.length} items?',
-        message:
-            'They leave your inventory and stop counting toward its value. '
-            'You can put them back at any time.',
+        title: context.l10n.bulkArchiveConfirmTitle(items.length),
+        message: context.l10n.bulkArchiveConfirmBody,
         icon: Symbols.archive_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
-            label: 'Archive',
+            label: context.l10n.itemActionArchive,
             isPrimary: true,
             onPressed: () async {
               try {
@@ -38,7 +36,7 @@ class _BulkActionBar extends ConsumerWidget {
                 ref.read(inventorySelectionProvider.notifier).clear();
                 SdSnackBarUtilsV3.success(
                   context,
-                  'Archived ${items.length} items',
+                  context.l10n.bulkArchiveDone(items.length),
                 );
               } catch (error) {
                 // Already logged by the controller.
@@ -67,14 +65,14 @@ class _BulkActionBar extends ConsumerWidget {
     final List<Item> items = ref.read(selectedItemsProvider);
 
     if (locations.isEmpty) {
-      SdSnackBarUtilsV3.info(context, 'Add a location first: More → Locations');
+      SdSnackBarUtilsV3.info(context, context.l10n.itemAddLocationFirst);
 
       return;
     }
 
     final String? picked = await OptionPickerSheet.show<String>(
       context,
-      title: 'Move ${items.length} items to',
+      title: context.l10n.bulkMoveTitle(items.length),
       options: locations
           .map(
             (StorageLocation location) => PickerOption<String>(
@@ -95,7 +93,10 @@ class _BulkActionBar extends ConsumerWidget {
       if (!context.mounted) return;
 
       ref.read(inventorySelectionProvider.notifier).clear();
-      SdSnackBarUtilsV3.success(context, 'Moved ${items.length} items');
+      SdSnackBarUtilsV3.success(
+        context,
+        context.l10n.bulkMoveDone(items.length),
+      );
     } catch (error) {
       // Already logged by the controller.
       if (!context.mounted) return;
@@ -127,7 +128,7 @@ class _BulkActionBar extends ConsumerWidget {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    '$count selected',
+                    context.l10n.inventorySelectedCount(count),
                     style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
                       color: context.sdTheme3.textPrimary,
                     ),
@@ -135,7 +136,7 @@ class _BulkActionBar extends ConsumerWidget {
                 ),
                 SdButtonV3(
                   variant: SdButtonVariantV3.text,
-                  label: 'Clear',
+                  label: context.l10n.commonClear,
                   size: SdButtonSizeV3.small,
                   onPressed: () =>
                       ref.read(inventorySelectionProvider.notifier).clear(),
@@ -148,7 +149,7 @@ class _BulkActionBar extends ConsumerWidget {
                 Expanded(
                   child: SdButtonV3(
                     variant: SdButtonVariantV3.primary,
-                    label: 'Reprice',
+                    label: context.l10n.itemActionReprice,
                     size: SdButtonSizeV3.small,
                     expand: true,
                     onPressed: () => RepriceSheet.show(
@@ -161,7 +162,7 @@ class _BulkActionBar extends ConsumerWidget {
                 Expanded(
                   child: SdButtonV3(
                     variant: SdButtonVariantV3.secondary,
-                    label: 'Move',
+                    label: context.l10n.itemActionMove,
                     size: SdButtonSizeV3.small,
                     expand: true,
                     onPressed: () => _move(context, ref),
@@ -171,7 +172,7 @@ class _BulkActionBar extends ConsumerWidget {
                 Expanded(
                   child: SdButtonV3(
                     variant: SdButtonVariantV3.outlined,
-                    label: 'Archive',
+                    label: context.l10n.itemActionArchive,
                     size: SdButtonSizeV3.small,
                     expand: true,
                     onPressed: () => _archive(context, ref),

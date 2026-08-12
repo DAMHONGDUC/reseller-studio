@@ -22,11 +22,11 @@ class _Provenance extends ConsumerWidget {
       child: Column(
         children: <Widget>[
           _DetailRow(
-            label: 'Source',
+            label: context.l10n.commonSource,
             value: sources[item.sourceId] ?? dash,
           ),
           _DetailRow(
-            label: 'Purchased',
+            label: context.l10n.itemPurchased,
             value: item.purchaseDate == null
                 ? dash
                 : DateTimeUtils.mediumDate(
@@ -35,14 +35,17 @@ class _Provenance extends ConsumerWidget {
                   ),
           ),
           _DetailRow(
-            label: 'Category',
+            label: context.l10n.commonCategory,
             value: categories[item.categoryId] ?? dash,
           ),
           _DetailRow(
-            label: 'Location',
+            label: context.l10n.commonLocation,
             value: locations[item.locationId] ?? dash,
           ),
-          _DetailRow(label: 'Barcode', value: item.barcode ?? dash),
+          _DetailRow(
+            label: context.l10n.commonBarcode,
+            value: item.barcode ?? dash,
+          ),
         ],
       ),
     );

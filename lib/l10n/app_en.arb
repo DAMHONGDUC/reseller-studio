@@ -476,5 +476,733 @@
         "type": "int"
       }
     }
+  },
+  "commonName": "Name",
+  "@commonName": {
+    "description": "Field label for the name of a category, location or source."
+  },
+  "commonCategory": "Category",
+  "@commonCategory": {
+    "description": "Field label and picker title for an item category."
+  },
+  "commonLocation": "Location",
+  "@commonLocation": {
+    "description": "Field label and picker title for where an item is stored."
+  },
+  "commonSource": "Source",
+  "@commonSource": {
+    "description": "Field label and picker title for where stock came from."
+  },
+  "commonMarketplace": "Marketplace",
+  "@commonMarketplace": {
+    "description": "Field label and picker title for a selling platform."
+  },
+  "commonNotes": "Notes",
+  "@commonNotes": {
+    "description": "Section heading for free text on a record."
+  },
+  "commonDescription": "Description",
+  "@commonDescription": {
+    "description": "Section heading for an item description."
+  },
+  "commonBarcode": "Barcode",
+  "@commonBarcode": {
+    "description": "Field label for the code a scanner reads."
+  },
+  "commonSku": "SKU",
+  "@commonSku": {
+    "description": "The seller's own stock code. Not translated — SKU is the term resellers use in every language."
+  },
+  "commonQuantity": "Quantity",
+  "@commonQuantity": {
+    "description": "How many of an item are on hand."
+  },
+  "commonTitle": "Title",
+  "@commonTitle": {
+    "description": "An item's name. The only field Quick Add requires."
+  },
+  "commonSaved": "Saved",
+  "@commonSaved": {
+    "description": "Confirmation after a form writes."
+  },
+  "commonDeleted": "Deleted",
+  "@commonDeleted": {
+    "description": "Confirmation after a record is removed."
+  },
+  "commonRenamed": "Renamed",
+  "@commonRenamed": {
+    "description": "Confirmation after a rename."
+  },
+  "commonClear": "Clear",
+  "@commonClear": {
+    "description": "Drops a bulk selection."
+  },
+  "commonNoneYet": "None yet",
+  "@commonNoneYet": {
+    "description": "Picker placeholder when the list it would show is empty."
+  },
+  "commonCouldNotLoad": "Please try again.",
+  "@commonCouldNotLoad": {
+    "description": "Body under any \"could not load\" empty state."
+  },
+  "commonMayHaveBeenDeleted": "It may have been deleted.",
+  "@commonMayHaveBeenDeleted": {
+    "description": "Body when a record a link pointed at is gone — usually a teammate deleted it, which is not a failure."
+  },
+  "commonNothingHere": "Nothing here",
+  "@commonNothingHere": {
+    "description": "Empty state title when a filter matches nothing but the collection is not empty."
+  },
+  "itemStatusDraft": "Draft",
+  "@itemStatusDraft": {
+    "description": "Item status: created but not yet sellable inventory. What Quick Add produces."
+  },
+  "itemStatusInStock": "In stock",
+  "@itemStatusInStock": {
+    "description": "Item status: on the shelf, not listed anywhere."
+  },
+  "itemStatusListed": "Listed",
+  "@itemStatusListed": {
+    "description": "Item status: live on at least one marketplace."
+  },
+  "itemStatusReserved": "Reserved",
+  "@itemStatusReserved": {
+    "description": "Item status: an offer was accepted but the sale has not completed."
+  },
+  "itemStatusSold": "Sold",
+  "@itemStatusSold": {
+    "description": "Item status: sold."
+  },
+  "itemStatusArchived": "Archived",
+  "@itemStatusArchived": {
+    "description": "Item status: withdrawn from inventory without a sale."
+  },
+  "itemStale": "Stale",
+  "@itemStale": {
+    "description": "Badge on an item that has been listed longer than the workspace threshold. A query, not a status."
+  },
+  "conditionNewWithTags": "New with tags",
+  "@conditionNewWithTags": {
+    "description": "Item condition, in the vocabulary the marketplaces share."
+  },
+  "conditionNewWithoutTags": "New without tags",
+  "@conditionNewWithoutTags": {
+    "description": "Item condition."
+  },
+  "conditionLikeNew": "Like new",
+  "@conditionLikeNew": {
+    "description": "Item condition."
+  },
+  "conditionGood": "Good",
+  "@conditionGood": {
+    "description": "Item condition."
+  },
+  "conditionFair": "Fair",
+  "@conditionFair": {
+    "description": "Item condition."
+  },
+  "conditionPoor": "Poor",
+  "@conditionPoor": {
+    "description": "Item condition."
+  },
+  "conditionForParts": "For parts",
+  "@conditionForParts": {
+    "description": "Item condition: sold for components, not to use."
+  },
+  "itemCondition": "Condition",
+  "@itemCondition": {
+    "description": "Field label and picker title for an item condition."
+  },
+  "inventorySearchHint": "Title, SKU or barcode",
+  "@inventorySearchHint": {
+    "description": "Placeholder in the Inventory search field. Names the three things a seller has to hand when looking for an item."
+  },
+  "inventoryClearSearch": "Clear search",
+  "@inventoryClearSearch": {
+    "description": "Tooltip on the search field clear button."
+  },
+  "inventoryAddItem": "Add item",
+  "@inventoryAddItem": {
+    "description": "Opens the full Add Item form. Quick Add is the other, faster path."
+  },
+  "inventoryScan": "Scan",
+  "@inventoryScan": {
+    "description": "Opens the barcode scanner."
+  },
+  "inventoryLoadFailed": "Could not load inventory",
+  "@inventoryLoadFailed": {
+    "description": "Error empty state on the Inventory tab."
+  },
+  "inventoryNoMatch": "No items match this filter.",
+  "@inventoryNoMatch": {
+    "description": "Shown when a tab is empty but the seller does have inventory. Distinguished from having none at all — telling someone with 400 items they have none is good news reported as an empty screen."
+  },
+  "inventoryEmptyTitle": "No items yet",
+  "@inventoryEmptyTitle": {
+    "description": "Empty state when the workspace has no inventory at all."
+  },
+  "inventoryEmptyBody": "Add your first item to start tracking inventory.",
+  "@inventoryEmptyBody": {
+    "description": "Body of the first-run inventory empty state."
+  },
+  "inventorySelected": "Selected",
+  "@inventorySelected": {
+    "description": "Semantics label on a ticked row in a bulk selection."
+  },
+  "inventoryNotSelected": "Not selected",
+  "@inventoryNotSelected": {
+    "description": "Semantics label on an unticked row in a bulk selection."
+  },
+  "inventorySelectedCount": "{count} selected",
+  "@inventorySelectedCount": {
+    "description": "Count on the bulk action bar.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemCost": "Cost",
+  "@itemCost": {
+    "description": "What the seller paid. Null renders as an em dash, never zero."
+  },
+  "itemAsking": "Asking",
+  "@itemAsking": {
+    "description": "Short form of asking price, for a dense row."
+  },
+  "itemAskingPrice": "Asking price",
+  "@itemAskingPrice": {
+    "description": "What the item is listed at, or intended to be."
+  },
+  "itemMinimumPrice": "Minimum price",
+  "@itemMinimumPrice": {
+    "description": "The floor for offers and bulk repricing."
+  },
+  "itemMinimumPriceHelp": "The floor for offers and bulk repricing",
+  "@itemMinimumPriceHelp": {
+    "description": "Helper under the minimum price field."
+  },
+  "itemProfit": "Profit",
+  "@itemProfit": {
+    "description": "Short form of expected profit, for a dense row."
+  },
+  "itemExpectedProfit": "Expected profit",
+  "@itemExpectedProfit": {
+    "description": "Asking price minus cost. Ignores fees and shipping, which depend on where it sells."
+  },
+  "itemCostHelp": "What you paid. Leave empty if you do not know.",
+  "@itemCostHelp": {
+    "description": "Helper under the cost field. Leaving it empty is a supported answer — hard rule 2."
+  },
+  "itemTitleFallback": "Item",
+  "@itemTitleFallback": {
+    "description": "App bar title while the item is still loading."
+  },
+  "itemActions": "Actions",
+  "@itemActions": {
+    "description": "Tooltip on the button that opens the item action sheet."
+  },
+  "itemLoadFailed": "Could not load this item",
+  "@itemLoadFailed": {
+    "description": "Error state on the item detail screen."
+  },
+  "itemNotFound": "Item not found",
+  "@itemNotFound": {
+    "description": "Shown when the item behind a link is gone."
+  },
+  "itemPricing": "Pricing",
+  "@itemPricing": {
+    "description": "Section heading on item detail."
+  },
+  "itemProvenance": "Provenance",
+  "@itemProvenance": {
+    "description": "Section heading: where the item came from and where it is. The Source to Purchase to Item chain made visible."
+  },
+  "itemListings": "Listings",
+  "@itemListings": {
+    "description": "Section heading: every marketplace this item is live on."
+  },
+  "itemNotListed": "Not listed anywhere yet.",
+  "@itemNotListed": {
+    "description": "Shown in the Listings block when an item has no listings."
+  },
+  "itemPurchased": "Purchased",
+  "@itemPurchased": {
+    "description": "When the item was bought."
+  },
+  "itemPhotos": "Photos",
+  "@itemPhotos": {
+    "description": "Section heading on the item form."
+  },
+  "itemRemovePhoto": "Remove photo",
+  "@itemRemovePhoto": {
+    "description": "Semantics label on the photo delete affordance."
+  },
+  "itemTakePhoto": "Take a photo",
+  "@itemTakePhoto": {
+    "description": "Semantics label on the camera button in the photo strip."
+  },
+  "itemChoosePhoto": "Choose a photo",
+  "@itemChoosePhoto": {
+    "description": "Semantics label on the library button in the photo strip."
+  },
+  "itemFormEditTitle": "Edit item",
+  "@itemFormEditTitle": {
+    "description": "App bar title when editing."
+  },
+  "itemFormBasics": "Basics",
+  "@itemFormBasics": {
+    "description": "Form section heading."
+  },
+  "itemFormOnlyRequired": "The only field this needs",
+  "@itemFormOnlyRequired": {
+    "description": "Helper under the title field. Hard rule 2: create takes the minimum."
+  },
+  "itemFormWhereFrom": "Where it came from",
+  "@itemFormWhereFrom": {
+    "description": "Form section heading for source and purchase date."
+  },
+  "itemFormWhereIs": "Where it is",
+  "@itemFormWhereIs": {
+    "description": "Form section heading for location."
+  },
+  "itemFormIdentifiers": "Identifiers",
+  "@itemFormIdentifiers": {
+    "description": "Form section heading for SKU and barcode."
+  },
+  "itemFormPrivateNotes": "Private notes",
+  "@itemFormPrivateNotes": {
+    "description": "Notes only the seller sees — never sent to a marketplace."
+  },
+  "itemPurchaseDate": "Purchase date",
+  "@itemPurchaseDate": {
+    "description": "When the item was bought."
+  },
+  "itemCategoryEmptyHint": "None yet — add one in More",
+  "@itemCategoryEmptyHint": {
+    "description": "Placeholder on the category picker when no categories exist."
+  },
+  "itemLocationEmptyHint": "None yet — add one in Locations",
+  "@itemLocationEmptyHint": {
+    "description": "Placeholder on the location picker when none exist."
+  },
+  "itemSourceEmptyHint": "None yet — add one in Sourcing",
+  "@itemSourceEmptyHint": {
+    "description": "Placeholder on the source picker when none exist."
+  },
+  "itemAddCategoryFirst": "Add a category first: More → Categories",
+  "@itemAddCategoryFirst": {
+    "description": "Says where to go when the picker has nothing to offer."
+  },
+  "itemAddLocationFirst": "Add a location first: More → Locations",
+  "@itemAddLocationFirst": {
+    "description": "Says where to go when the location picker is empty."
+  },
+  "itemAddSourceFirst": "Add a source first: More → Sourcing",
+  "@itemAddSourceFirst": {
+    "description": "Says where to go when the source picker is empty."
+  },
+  "itemActionList": "List on a marketplace",
+  "@itemActionList": {
+    "description": "Opens the sheet that puts an item on a marketplace."
+  },
+  "itemActionReprice": "Reprice",
+  "@itemActionReprice": {
+    "description": "Set a new asking price."
+  },
+  "itemActionMove": "Move",
+  "@itemActionMove": {
+    "description": "Put an item on a different shelf."
+  },
+  "itemActionMoveTo": "Move to",
+  "@itemActionMoveTo": {
+    "description": "Title of the location picker opened by Move."
+  },
+  "itemActionMarkSold": "Mark as sold",
+  "@itemActionMarkSold": {
+    "description": "Records a sale. Creates the order too — profit is derived from orders."
+  },
+  "itemActionArchive": "Archive",
+  "@itemActionArchive": {
+    "description": "Withdraw from inventory without a sale."
+  },
+  "itemActionRestore": "Put back in stock",
+  "@itemActionRestore": {
+    "description": "Undo an archive."
+  },
+  "itemMoved": "Moved",
+  "@itemMoved": {
+    "description": "Confirmation after a move."
+  },
+  "itemArchived": "Archived",
+  "@itemArchived": {
+    "description": "Confirmation after an archive."
+  },
+  "itemRestored": "Back in stock",
+  "@itemRestored": {
+    "description": "Confirmation after a restore."
+  },
+  "itemDeleteConfirmTitle": "Delete this item?",
+  "@itemDeleteConfirmTitle": {
+    "description": "Destructive confirmation title."
+  },
+  "itemDeleteConfirmBody": "It disappears from your inventory. Orders and purchases that reference it keep working.",
+  "@itemDeleteConfirmBody": {
+    "description": "Explains that deleting is soft — hard rule 15 keeps the row joinable."
+  },
+  "listItemTitle": "List this item",
+  "@listItemTitle": {
+    "description": "Sheet title."
+  },
+  "listItemPrice": "Listing price",
+  "@listItemPrice": {
+    "description": "What the item goes up at."
+  },
+  "listItemSubmit": "List it",
+  "@listItemSubmit": {
+    "description": "Confirm button on the listing sheet."
+  },
+  "listItemPriceRequired": "Enter a listing price first",
+  "@listItemPriceRequired": {
+    "description": "Plan §29: listing needs a price, and this is where it is asked for."
+  },
+  "listItemDone": "Listed on {marketplace}",
+  "@listItemDone": {
+    "description": "Confirmation after a listing is created.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceManualCaption": "Manual — no sync yet",
+  "@marketplaceManualCaption": {
+    "description": "Caption on a marketplace with no integration. The app must not claim to have published anything."
+  },
+  "markSoldTitle": "Mark as sold",
+  "@markSoldTitle": {
+    "description": "Sheet title."
+  },
+  "markSoldPrice": "Sale price",
+  "@markSoldPrice": {
+    "description": "What the buyer paid."
+  },
+  "markSoldOn": "Sold on",
+  "@markSoldOn": {
+    "description": "Which marketplace the sale happened on."
+  },
+  "markSoldDate": "Sale date",
+  "@markSoldDate": {
+    "description": "When it sold."
+  },
+  "markSoldBuyer": "Buyer (optional)",
+  "@markSoldBuyer": {
+    "description": "The buyer's name. Optional, and never sent to analytics."
+  },
+  "markSoldSubmit": "Record the sale",
+  "@markSoldSubmit": {
+    "description": "Confirm button."
+  },
+  "markSoldPriceRequired": "Enter what it sold for",
+  "@markSoldPriceRequired": {
+    "description": "Plan §29: selling needs sale information."
+  },
+  "markSoldDone": "Sold — the order is in Orders",
+  "@markSoldDone": {
+    "description": "Confirmation. Says where the order went, because marking sold creates one."
+  },
+  "repriceTitle": "Reprice",
+  "@repriceTitle": {
+    "description": "Sheet title for a single item."
+  },
+  "repriceTitleBulk": "Reprice {count} items",
+  "@repriceTitleBulk": {
+    "description": "Sheet title for a bulk reprice.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repriceNewPrice": "New asking price",
+  "@repriceNewPrice": {
+    "description": "The field on the reprice sheet."
+  },
+  "repriceBulkHelp": "Applied to every selected item",
+  "@repriceBulkHelp": {
+    "description": "Helper on a bulk reprice, so nobody is surprised."
+  },
+  "repriceSubmit": "Update price",
+  "@repriceSubmit": {
+    "description": "Confirm button."
+  },
+  "repriceRequired": "Enter the new price",
+  "@repriceRequired": {
+    "description": "Shown when the reprice sheet is submitted empty."
+  },
+  "repriceDone": "Price updated",
+  "@repriceDone": {
+    "description": "Confirmation after repricing one item."
+  },
+  "repriceDoneBulk": "Repriced {count} items",
+  "@repriceDoneBulk": {
+    "description": "Confirmation after a bulk reprice.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkArchiveConfirmTitle": "Archive {count} items?",
+  "@bulkArchiveConfirmTitle": {
+    "description": "Bulk archive confirmation title.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkArchiveConfirmBody": "They leave your inventory and stop counting toward its value. You can put them back at any time.",
+  "@bulkArchiveConfirmBody": {
+    "description": "Bulk archive confirmation body. Archiving is reversible and says so."
+  },
+  "bulkArchiveDone": "Archived {count} items",
+  "@bulkArchiveDone": {
+    "description": "Confirmation after a bulk archive.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkMoveTitle": "Move {count} items to",
+  "@bulkMoveTitle": {
+    "description": "Title of the location picker in a bulk move.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkMoveDone": "Moved {count} items",
+  "@bulkMoveDone": {
+    "description": "Confirmation after a bulk move.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoriesTitle": "Categories",
+  "@categoriesTitle": {
+    "description": "Screen title."
+  },
+  "categoryNew": "New category",
+  "@categoryNew": {
+    "description": "Sheet title for creating one."
+  },
+  "categoryRename": "Rename category",
+  "@categoryRename": {
+    "description": "Sheet title for renaming."
+  },
+  "categoryNameHint": "Outerwear",
+  "@categoryNameHint": {
+    "description": "Example category name."
+  },
+  "categoryAdd": "Add a category",
+  "@categoryAdd": {
+    "description": "The create button, and the empty state action."
+  },
+  "categoryAdded": "Category added",
+  "@categoryAdded": {
+    "description": "Confirmation."
+  },
+  "categoriesEmptyTitle": "No categories yet",
+  "@categoriesEmptyTitle": {
+    "description": "Empty state title."
+  },
+  "categoriesEmptyBody": "Group your stock so analytics can tell you what sells.",
+  "@categoriesEmptyBody": {
+    "description": "Empty state body — says why categories are worth the effort."
+  },
+  "categoryDeleteConfirmTitle": "Delete \"{name}\"?",
+  "@categoryDeleteConfirmTitle": {
+    "description": "Destructive confirmation title, naming the category.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryDeleteUnused": "Nothing is using it.",
+  "@categoryDeleteUnused": {
+    "description": "Shown when the category has no items."
+  },
+  "categoryDeleteInUse": "{count} items are in it. They keep working — they just stop having a category.",
+  "@categoryDeleteInUse": {
+    "description": "Shown when the category is in use. Deleting is soft (hard rule 15).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryItemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@categoryItemCount": {
+    "description": "How many items are in a category.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationsTitle": "Locations",
+  "@locationsTitle": {
+    "description": "Screen title."
+  },
+  "locationAdd": "Add a location",
+  "@locationAdd": {
+    "description": "The create button, and the empty state action."
+  },
+  "locationAdded": "Location added",
+  "@locationAdded": {
+    "description": "Confirmation."
+  },
+  "locationsEmptyTitle": "No locations yet",
+  "@locationsEmptyTitle": {
+    "description": "Empty state title."
+  },
+  "locationsEmptyBody": "Add a warehouse, then shelves and bins inside it.",
+  "@locationsEmptyBody": {
+    "description": "Empty state body, naming the three levels."
+  },
+  "locationKindQuestion": "What kind?",
+  "@locationKindQuestion": {
+    "description": "Picker title: warehouse, shelf or bin."
+  },
+  "locationWarehouse": "Warehouse",
+  "@locationWarehouse": {
+    "description": "Top level of the storage tree."
+  },
+  "locationWarehouseCaption": "A room, a unit, a garage",
+  "@locationWarehouseCaption": {
+    "description": "What a warehouse means here — it does not have to be a warehouse."
+  },
+  "locationShelf": "Shelf",
+  "@locationShelf": {
+    "description": "Middle level of the storage tree."
+  },
+  "locationShelfCaption": "Inside a warehouse",
+  "@locationShelfCaption": {
+    "description": "Where a shelf sits."
+  },
+  "locationBin": "Bin",
+  "@locationBin": {
+    "description": "Bottom level of the storage tree — where items actually sit."
+  },
+  "locationBinCaption": "Inside a shelf — where items actually sit",
+  "@locationBinCaption": {
+    "description": "Where a bin sits."
+  },
+  "locationNeedWarehouse": "Add a warehouse first",
+  "@locationNeedWarehouse": {
+    "description": "A shelf or bin needs a parent."
+  },
+  "locationParentQuestion": "Inside which one?",
+  "@locationParentQuestion": {
+    "description": "Picker title for a location parent."
+  },
+  "locationNewTitle": "New {kind}",
+  "@locationNewTitle": {
+    "description": "Sheet title when creating a location of a given kind.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "locationNameLabel": "Name or code",
+  "@locationNameLabel": {
+    "description": "A bin is usually a code, a warehouse usually a name."
+  },
+  "locationBinHint": "Bin A1",
+  "@locationBinHint": {
+    "description": "Example bin name."
+  },
+  "locationWarehouseHint": "Garage",
+  "@locationWarehouseHint": {
+    "description": "Example warehouse name."
+  },
+  "locationDeleteConfirmTitle": "Delete \"{name}\"?",
+  "@locationDeleteConfirmTitle": {
+    "description": "Destructive confirmation title, naming the location.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "locationDeleteUnused": "Nothing is stored there.",
+  "@locationDeleteUnused": {
+    "description": "Shown when the location holds nothing."
+  },
+  "locationDeleteInUse": "{count} items are there. They keep working — they just stop having a location.",
+  "@locationDeleteInUse": {
+    "description": "Shown when the location is in use.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationItemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@locationItemCount": {
+    "description": "How many items are at a location.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scannerTitle": "Scan",
+  "@scannerTitle": {
+    "description": "Screen title."
+  },
+  "scannerTorch": "Torch",
+  "@scannerTorch": {
+    "description": "Tooltip on the torch toggle."
+  },
+  "scannerSwitchCamera": "Switch camera",
+  "@scannerSwitchCamera": {
+    "description": "Tooltip on the camera flip."
+  },
+  "scannerHint": "Point at a barcode, a SKU label or a bin tag.",
+  "@scannerHint": {
+    "description": "Names the three things a scan can match."
+  },
+  "scannerFoundLocation": "That is {name}",
+  "@scannerFoundLocation": {
+    "description": "Shown when a scanned code matched a bin rather than an item.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scannerNoMatchTitle": "Nothing has that code",
+  "@scannerNoMatchTitle": {
+    "description": "Dialog title when a scan matched nothing."
+  },
+  "scannerNoMatchBody": "Add an item and keep the code on it?",
+  "@scannerNoMatchBody": {
+    "description": "The useful branch: an unknown code usually means something new is in the seller’s hand."
+  },
+  "scannerAddItem": "Add an item",
+  "@scannerAddItem": {
+    "description": "Confirm on the unknown-code dialog."
+  },
+  "scannerScanAgain": "Scan again",
+  "@scannerScanAgain": {
+    "description": "Dismiss on the unknown-code dialog."
   }
 }

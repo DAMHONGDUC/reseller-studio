@@ -34,7 +34,7 @@ class _PhotoStrip extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Photos',
+          context.l10n.itemPhotos,
           style: context.textTheme3.titleSmall!.semiBold3.copyWith(
             color: context.sdTheme3.textPrimary,
           ),
@@ -98,7 +98,7 @@ class _PhotoTile extends StatelessWidget {
               Symbols.close_rounded,
               size: SdIconV3.smallSize,
               color: context.sdTheme3.danger,
-              semanticLabel: 'Remove photo',
+              semanticLabel: context.l10n.itemRemovePhoto,
             ),
           ),
         ),
@@ -124,14 +124,14 @@ class _AddPhotoTile extends StatelessWidget {
     children: <Widget>[
       _AddPhotoButton(
         icon: Symbols.photo_camera_rounded,
-        label: 'Take a photo',
+        label: context.l10n.itemTakePhoto,
         isBusy: isBusy,
         onTap: onCamera,
       ),
       SizedBox(width: SdSpacingConstant.w8),
       _AddPhotoButton(
         icon: Symbols.photo_library_rounded,
-        label: 'Choose a photo',
+        label: context.l10n.itemChoosePhoto,
         isBusy: isBusy,
         onTap: onLibrary,
       ),

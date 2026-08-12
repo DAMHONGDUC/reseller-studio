@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/error/failure_presenter.dart';
+import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
@@ -55,7 +56,7 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
     final Money? price = Money.tryParse(_price.text, currency);
 
     if (price == null) {
-      SdSnackBarUtilsV3.error(context, 'Enter a listing price first');
+      SdSnackBarUtilsV3.error(context, context.l10n.listItemPriceRequired);
 
       return;
     }
@@ -74,7 +75,7 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
       navigator.pop();
       SdSnackBarUtilsV3.success(
         context,
-        'Listed on ${_marketplace.displayName}',
+        context.l10n.listItemDone(_marketplace.displayName),
       );
     } catch (error) {
       // Already logged by the controller.
@@ -90,18 +91,18 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
     final String currency = ref.watch(workspaceCurrencyProvider);
 
     return SdBottomSheetV3(
-      title: 'List this item',
+      title: context.l10n.listItemTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           PickerField(
-            label: 'Marketplace',
+            label: context.l10n.commonMarketplace,
             value: _marketplace.displayName,
             onTap: () async {
               final Marketplace? picked =
                   await OptionPickerSheet.show<Marketplace>(
                     context,
-                    title: 'Marketplace',
+                    title: context.l10n.commonMarketplace,
                     selected: _marketplace,
                     options: Marketplace.values
                         .map(
@@ -110,8 +111,8 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
                                 value: marketplace,
                                 label: marketplace.displayName,
                                 caption: marketplace.hasIntegration
-                                    ? 'Connected'
-                                    : 'Manual — no sync yet',
+                                    ? context.l10n.marketplacesConnected
+                                    : context.l10n.marketplaceManualCaption,
                               ),
                         )
                         .toList(),
@@ -124,7 +125,7 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           MoneyField(
-            label: 'Listing price',
+            label: context.l10n.listItemPrice,
             controller: _price,
             currency: currency,
             textInputAction: TextInputAction.done,
@@ -133,7 +134,7 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
           SizedBox(height: SdSpacingConstant.h24),
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'List it',
+            label: context.l10n.listItemSubmit,
             expand: true,
             busy: isBusy,
             onPressed: isBusy ? null : _submit,

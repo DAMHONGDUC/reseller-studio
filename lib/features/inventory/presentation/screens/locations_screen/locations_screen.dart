@@ -11,6 +11,7 @@ import '../../../../../core/widgets/name_entry_sheet.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
+import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../controllers/catalog_controller.dart';
 
@@ -42,22 +43,22 @@ class LocationsScreen extends ConsumerWidget {
 
     final LocationKind? kind = await OptionPickerSheet.show<LocationKind>(
       context,
-      title: 'What kind?',
+      title: context.l10n.locationKindQuestion,
       options: <PickerOption<LocationKind>>[
-        const PickerOption<LocationKind>(
+        PickerOption<LocationKind>(
           value: LocationKind.warehouse,
-          label: 'Warehouse',
-          caption: 'A room, a unit, a garage',
+          label: context.l10n.locationWarehouse,
+          caption: context.l10n.locationWarehouseCaption,
         ),
-        const PickerOption<LocationKind>(
+        PickerOption<LocationKind>(
           value: LocationKind.shelf,
-          label: 'Shelf',
-          caption: 'Inside a warehouse',
+          label: context.l10n.locationShelf,
+          caption: context.l10n.locationShelfCaption,
         ),
-        const PickerOption<LocationKind>(
+        PickerOption<LocationKind>(
           value: LocationKind.bin,
-          label: 'Bin',
-          caption: 'Inside a shelf — where items actually sit',
+          label: context.l10n.locationBin,
+          caption: context.l10n.locationBinCaption,
         ),
       ],
     );
@@ -74,7 +75,7 @@ class LocationsScreen extends ConsumerWidget {
           .toList();
 
       if (parents.isEmpty) {
-        SdSnackBarUtilsV3.info(context, 'Add a warehouse first');
+        SdSnackBarUtilsV3.info(context, context.l10n.locationNeedWarehouse);
 
         return;
       }
@@ -83,7 +84,7 @@ class LocationsScreen extends ConsumerWidget {
 
       parentId = await OptionPickerSheet.show<String>(
         context,
-        title: 'Inside which one?',
+        title: context.l10n.locationParentQuestion,
         options: parents
             .map(
               (StorageLocation parent) => PickerOption<String>(
@@ -99,9 +100,13 @@ class LocationsScreen extends ConsumerWidget {
 
     final String? name = await NameEntrySheet.show(
       context,
-      title: 'New ${kind.name}',
-      label: 'Name or code',
-      hint: kind == LocationKind.bin ? 'Bin A1' : 'Garage',
+      title: context.l10n.locationNewTitle(
+        LocationKindLabel.of(context, kind).toLowerCase(),
+      ),
+      label: context.l10n.locationNameLabel,
+      hint: kind == LocationKind.bin
+          ? context.l10n.locationBinHint
+          : context.l10n.locationWarehouseHint,
     );
 
     if (name == null || !context.mounted) return;
@@ -113,7 +118,7 @@ class LocationsScreen extends ConsumerWidget {
         kind: kind,
         parentId: parentId,
       ),
-      'Location added',
+      context.l10n.locationAdded,
     );
   }
 
@@ -126,11 +131,10 @@ class LocationsScreen extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Delete "${location.name}"?',
+        title: context.l10n.locationDeleteConfirmTitle(location.name),
         message: itemCount == 0
-            ? 'Nothing is stored there.'
-            : '$itemCount items are there. They keep working — they just stop '
-                  'having a location.',
+            ? context.l10n.locationDeleteUnused
+            : context.l10n.locationDeleteInUse(itemCount),
         icon: Symbols.warning_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
@@ -141,7 +145,7 @@ class LocationsScreen extends ConsumerWidget {
               () => ref
                   .read(catalogControllerProvider.notifier)
                   .deleteLocation(location.id),
-              'Deleted',
+              context.l10n.commonDeleted,
             ),
           ),
           SdDialogActionV3(
@@ -183,19 +187,19 @@ class LocationsScreen extends ConsumerWidget {
     final List<StorageLocation> ordered = LocationTreeOrder.flatten(locations);
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Locations'),
-      addLabel: 'Add a location',
+      appBar: SdAppBarV3(title: context.l10n.locationsTitle),
+      addLabel: context.l10n.locationAdd,
       onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<StorageLocation>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when locations.isEmpty => SdEmptyStateV3(
           icon: Symbols.shelves,
-          title: 'No locations yet',
-          message: 'Add a warehouse, then shelves and bins inside it.',
+          title: context.l10n.locationsEmptyTitle,
+          message: context.l10n.locationsEmptyBody,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Add a location',
+            label: context.l10n.locationAdd,
             onPressed: () => _add(context, ref),
           ),
         ),

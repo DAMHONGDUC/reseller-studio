@@ -17,6 +17,7 @@ import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_category.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../domain/enums/item_status.dart';
+import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../controllers/item_form_controller.dart';
 
@@ -130,7 +131,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
       if (id == null || !mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Saved');
+      SdSnackBarUtilsV3.success(context, context.l10n.commonSaved);
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -153,7 +154,9 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
-        title: state.isEditing ? 'Edit item' : 'Add item',
+        title: state.isEditing
+            ? context.l10n.itemFormEditTitle
+            : context.l10n.inventoryAddItem,
       ),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
@@ -162,17 +165,17 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
           const _PhotoStrip(),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           _FormSection(
-            title: 'Basics',
+            title: context.l10n.itemFormBasics,
             children: <Widget>[
               SdTextFieldV3(
-                label: 'Title',
+                label: context.l10n.commonTitle,
                 controller: _title,
-                hint: 'Nike Air Max 90, size 10',
-                helperText: 'The only field this needs',
+                hint: context.l10n.quickAddNameHint,
+                helperText: context.l10n.itemFormOnlyRequired,
                 textInputAction: TextInputAction.next,
               ),
               SdTextFieldV3(
-                label: 'Quantity',
+                label: context.l10n.commonQuantity,
                 controller: _quantity,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
@@ -183,33 +186,33 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           _FormSection(
-            title: 'Pricing',
+            title: context.l10n.itemPricing,
             children: <Widget>[
               MoneyField(
-                label: 'Cost',
+                label: context.l10n.itemCost,
                 controller: _cost,
                 currency: currency,
-                helperText: 'What you paid. Leave empty if you do not know.',
+                helperText: context.l10n.itemCostHelp,
                 textInputAction: TextInputAction.next,
               ),
               MoneyField(
-                label: 'Asking price',
+                label: context.l10n.itemAskingPrice,
                 controller: _asking,
                 currency: currency,
                 textInputAction: TextInputAction.next,
               ),
               MoneyField(
-                label: 'Minimum price',
+                label: context.l10n.itemMinimumPrice,
                 controller: _minimum,
                 currency: currency,
-                helperText: 'The floor for offers and bulk repricing',
+                helperText: context.l10n.itemMinimumPriceHelp,
                 textInputAction: TextInputAction.next,
               ),
             ],
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           _FormSection(
-            title: 'Where it came from',
+            title: context.l10n.itemFormWhereFrom,
             children: <Widget>[
               _SourceField(state: state),
               _PurchaseDateField(state: state),
@@ -217,20 +220,20 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           _FormSection(
-            title: 'Where it is',
+            title: context.l10n.itemFormWhereIs,
             children: <Widget>[_LocationField(state: state)],
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           _FormSection(
-            title: 'Identifiers',
+            title: context.l10n.itemFormIdentifiers,
             children: <Widget>[
               SdTextFieldV3(
-                label: 'SKU',
+                label: context.l10n.commonSku,
                 controller: _sku,
                 textInputAction: TextInputAction.next,
               ),
               SdTextFieldV3(
-                label: 'Barcode',
+                label: context.l10n.commonBarcode,
                 controller: _barcode,
                 textInputAction: TextInputAction.next,
               ),
@@ -238,15 +241,15 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           _FormSection(
-            title: 'Notes',
+            title: context.l10n.commonNotes,
             children: <Widget>[
               SdTextFieldV3(
-                label: 'Description',
+                label: context.l10n.commonDescription,
                 controller: _description,
                 maxLines: 3,
               ),
               SdTextFieldV3(
-                label: 'Private notes',
+                label: context.l10n.itemFormPrivateNotes,
                 controller: _notes,
                 maxLines: 3,
               ),

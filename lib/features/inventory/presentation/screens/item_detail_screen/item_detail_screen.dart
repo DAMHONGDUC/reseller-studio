@@ -11,6 +11,7 @@ import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../../listings/providers.dart';
 import '../../../../sourcing/providers.dart';
 import '../../../domain/entities/item.dart';
+import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../widgets/item_actions_sheet.dart';
 
@@ -43,30 +44,30 @@ class ItemDetailScreen extends ConsumerWidget {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
-        title: value?.title ?? 'Item',
+        title: value?.title ?? context.l10n.itemTitleFallback,
         subtitle: value?.sku,
         actions: <Widget>[
           if (value != null)
             IconButton(
               icon: const SdIconV3(Symbols.more_vert_rounded),
-              tooltip: 'Actions',
+              tooltip: context.l10n.itemActions,
               onPressed: () => ItemActionsSheet.show(context, value),
             ),
         ],
       ),
       body: switch (item) {
         AsyncLoading<Item?>() when !item.hasValue => const SdLoadingV3Page(),
-        AsyncError<Item?>() => const SdEmptyStateV3(
+        AsyncError<Item?>() => SdEmptyStateV3(
           icon: Symbols.error_rounded,
-          title: 'Could not load this item',
-          message: 'Please try again.',
+          title: context.l10n.itemLoadFailed,
+          message: context.l10n.commonCouldNotLoad,
         ),
         // Null rather than an error: the row may have been deleted by a
         // teammate while this screen was open, which is not a failure.
-        AsyncData<Item?>(value: null) => const SdEmptyStateV3(
+        AsyncData<Item?>(value: null) => SdEmptyStateV3(
           icon: Symbols.search_off_rounded,
-          title: 'Item not found',
-          message: 'It may have been deleted.',
+          title: context.l10n.itemNotFound,
+          message: context.l10n.commonMayHaveBeenDeleted,
         ),
         _ => _ItemBody(item: item.value!),
       },

@@ -62,7 +62,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final Money? price = Money.tryParse(_price.text, currency);
 
     if (price == null) {
-      SdSnackBarUtilsV3.error(context, 'Enter what it sold for');
+      SdSnackBarUtilsV3.error(context, context.l10n.markSoldPriceRequired);
 
       return;
     }
@@ -81,7 +81,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
       if (!mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Sold — the order is in Orders');
+      SdSnackBarUtilsV3.success(context, context.l10n.markSoldDone);
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -97,25 +97,25 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final DateTime now = DateTime.now();
 
     return SdBottomSheetV3(
-      title: 'Mark as sold',
+      title: context.l10n.markSoldTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           MoneyField(
-            label: 'Sale price',
+            label: context.l10n.markSoldPrice,
             controller: _price,
             currency: currency,
             textInputAction: TextInputAction.next,
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Sold on',
+            label: context.l10n.markSoldOn,
             value: _marketplace.displayName,
             onTap: () async {
               final Marketplace? picked =
                   await OptionPickerSheet.show<Marketplace>(
                     context,
-                    title: 'Marketplace',
+                    title: context.l10n.commonMarketplace,
                     selected: _marketplace,
                     options: Marketplace.values
                         .map(
@@ -135,7 +135,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Sale date',
+            label: context.l10n.markSoldDate,
             value: DateTimeUtils.mediumDate(
               _soldAt,
               locale: context.localeTag,
@@ -155,7 +155,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
-            label: 'Buyer (optional)',
+            label: context.l10n.markSoldBuyer,
             controller: _buyer,
             textInputAction: TextInputAction.done,
             onSubmitted: (_) => _submit(),
@@ -163,7 +163,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           SizedBox(height: SdSpacingConstant.h24),
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Record the sale',
+            label: context.l10n.markSoldSubmit,
             expand: true,
             busy: isBusy,
             onPressed: isBusy ? null : _submit,

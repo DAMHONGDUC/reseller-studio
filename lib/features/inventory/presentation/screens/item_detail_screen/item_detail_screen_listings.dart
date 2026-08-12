@@ -15,7 +15,7 @@ class _Listings extends ConsumerWidget {
     if (listings.isEmpty) {
       return SdCardV3(
         child: Text(
-          'Not listed anywhere yet.',
+          context.l10n.itemNotListed,
           style: context.textTheme3.bodyMedium!.muted3(context),
         ),
       );

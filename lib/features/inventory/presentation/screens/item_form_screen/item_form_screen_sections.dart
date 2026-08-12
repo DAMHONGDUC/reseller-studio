@@ -43,35 +43,23 @@ class _ConditionField extends ConsumerWidget {
 
   final ItemFormState state;
 
-  /// Turns `newWithTags` into `New with tags`.
-  ///
-  /// Derived rather than a switch with nine cases: the enum is the marketplace
-  /// vocabulary, and a hand-written label per case is nine more places to
-  /// update when a tenth grade arrives.
-  static String label(ItemCondition condition) {
-    final String spaced = condition.name.replaceAllMapped(
-      RegExp('[A-Z]'),
-      (Match match) => ' ${match.group(0)!.toLowerCase()}',
-    );
-
-    return spaced[0].toUpperCase() + spaced.substring(1);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) => PickerField(
-    label: 'Condition',
+    label: context.l10n.itemCondition,
     icon: Symbols.grade_rounded,
-    value: state.condition == null ? null : label(state.condition!),
+    value: state.condition == null
+        ? null
+        : ItemConditionLabel.of(context, state.condition!),
     onTap: () async {
       final ItemCondition? picked = await OptionPickerSheet.show<ItemCondition>(
         context,
-        title: 'Condition',
+        title: context.l10n.itemCondition,
         selected: state.condition,
         options: ItemCondition.values
             .map(
               (ItemCondition condition) => PickerOption<ItemCondition>(
                 value: condition,
-                label: label(condition),
+                label: ItemConditionLabel.of(context, condition),
               ),
             )
             .toList(),
@@ -96,19 +84,21 @@ class _CategoryField extends ConsumerWidget {
     final Map<String, String> names = ref.watch(categoryNamesProvider);
 
     return PickerField(
-      label: 'Category',
+      label: context.l10n.commonCategory,
       icon: Symbols.category_rounded,
       value: state.categoryId == null ? null : names[state.categoryId],
-      placeholder: categories.isEmpty ? 'None yet — add one in More' : 'Not set',
+      placeholder: categories.isEmpty
+          ? context.l10n.itemCategoryEmptyHint
+          : null,
       onTap: categories.isEmpty
           ? () => SdSnackBarUtilsV3.info(
               context,
-              'Add a category first: More → Categories',
+              context.l10n.itemAddCategoryFirst,
             )
           : () async {
               final String? picked = await OptionPickerSheet.show<String>(
                 context,
-                title: 'Category',
+                title: context.l10n.commonCategory,
                 selected: state.categoryId,
                 options: categories
                     .map(
@@ -142,28 +132,28 @@ class _LocationField extends ConsumerWidget {
     final Map<String, String> paths = ref.watch(locationPathsProvider);
 
     return PickerField(
-      label: 'Location',
+      label: context.l10n.commonLocation,
       icon: Symbols.shelves,
       value: state.locationId == null ? null : paths[state.locationId],
       placeholder: locations.isEmpty
-          ? 'None yet — add one in Locations'
-          : 'Not set',
+          ? context.l10n.itemLocationEmptyHint
+          : null,
       onTap: locations.isEmpty
           ? () => SdSnackBarUtilsV3.info(
               context,
-              'Add a location first: More → Locations',
+              context.l10n.itemAddLocationFirst,
             )
           : () async {
               final String? picked = await OptionPickerSheet.show<String>(
                 context,
-                title: 'Location',
+                title: context.l10n.commonLocation,
                 selected: state.locationId,
                 options: locations
                     .map(
                       (StorageLocation location) => PickerOption<String>(
                         value: location.id,
                         label: paths[location.id] ?? location.name,
-                        caption: location.kind.name,
+                        caption: LocationKindLabel.of(context, location.kind),
                       ),
                     )
                     .toList(),
@@ -191,19 +181,19 @@ class _SourceField extends ConsumerWidget {
     final Map<String, String> names = ref.watch(sourceNamesProvider);
 
     return PickerField(
-      label: 'Source',
+      label: context.l10n.commonSource,
       icon: Symbols.storefront_rounded,
       value: state.sourceId == null ? null : names[state.sourceId],
-      placeholder: sources.isEmpty ? 'None yet — add one in Sourcing' : 'Not set',
+      placeholder: sources.isEmpty ? context.l10n.itemSourceEmptyHint : null,
       onTap: sources.isEmpty
           ? () => SdSnackBarUtilsV3.info(
               context,
-              'Add a source first: More → Sourcing',
+              context.l10n.itemAddSourceFirst,
             )
           : () async {
               final String? picked = await OptionPickerSheet.show<String>(
                 context,
-                title: 'Source',
+                title: context.l10n.commonSource,
                 selected: state.sourceId,
                 options: sources
                     .map(
@@ -241,7 +231,7 @@ class _PurchaseDateField extends ConsumerWidget {
     final DateTime now = DateTime.now();
 
     return PickerField(
-      label: 'Purchase date',
+      label: context.l10n.itemPurchaseDate,
       icon: Symbols.calendar_month_rounded,
       value: state.purchaseDate == null
           ? null

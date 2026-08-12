@@ -67,7 +67,7 @@ class ItemActionsSheet extends ConsumerWidget {
     if (locations.isEmpty) {
       SdSnackBarUtilsV3.info(
         context,
-        'Add a location first: More → Locations',
+        context.l10n.itemAddLocationFirst,
       );
 
       return;
@@ -75,7 +75,7 @@ class ItemActionsSheet extends ConsumerWidget {
 
     final String? picked = await OptionPickerSheet.show<String>(
       context,
-      title: 'Move to',
+      title: context.l10n.itemActionMoveTo,
       selected: item.locationId,
       options: locations
           .map(
@@ -95,7 +95,7 @@ class ItemActionsSheet extends ConsumerWidget {
       () => ref
           .read(itemActionsControllerProvider.notifier)
           .move(<Item>[item], picked),
-      'Moved',
+      context.l10n.itemMoved,
     );
   }
 
@@ -105,7 +105,7 @@ class ItemActionsSheet extends ConsumerWidget {
     () => ref
         .read(itemActionsControllerProvider.notifier)
         .archive(<Item>[item]),
-    'Archived',
+    context.l10n.itemArchived,
   );
 
   Future<void> _restore(BuildContext context, WidgetRef ref) => _run(
@@ -114,17 +114,15 @@ class ItemActionsSheet extends ConsumerWidget {
     () => ref
         .read(itemActionsControllerProvider.notifier)
         .restore(<Item>[item]),
-    'Back in stock',
+    context.l10n.itemRestored,
   );
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Delete this item?',
-        message:
-            'It disappears from your inventory. Orders and purchases that '
-            'reference it keep working.',
+        title: context.l10n.itemDeleteConfirmTitle,
+        message: context.l10n.itemDeleteConfirmBody,
         icon: Symbols.warning_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
@@ -136,7 +134,7 @@ class ItemActionsSheet extends ConsumerWidget {
               () => ref
                   .read(itemActionsControllerProvider.notifier)
                   .delete(item.id),
-              'Deleted',
+              context.l10n.commonDeleted,
             ),
           ),
           SdDialogActionV3(
@@ -187,7 +185,7 @@ class ItemActionsSheet extends ConsumerWidget {
         children: <Widget>[
           _ActionRow(
             icon: Symbols.edit_rounded,
-            label: 'Edit',
+            label: context.l10n.actionEdit,
             onTap: () {
               Navigator.of(context).pop();
               context.push(AppRoutes.editItem(item.id));
@@ -195,7 +193,7 @@ class ItemActionsSheet extends ConsumerWidget {
           ),
           _ActionRow(
             icon: Symbols.sell_rounded,
-            label: 'List on a marketplace',
+            label: context.l10n.itemActionList,
             onTap: () => _guarded(context, ref, ItemStatus.listed, () {
               Navigator.of(context).pop();
               ListItemSheet.show(context, item);
@@ -203,7 +201,7 @@ class ItemActionsSheet extends ConsumerWidget {
           ),
           _ActionRow(
             icon: Symbols.price_change_rounded,
-            label: 'Reprice',
+            label: context.l10n.itemActionReprice,
             onTap: () {
               Navigator.of(context).pop();
               RepriceSheet.show(context, <Item>[item]);
@@ -211,12 +209,12 @@ class ItemActionsSheet extends ConsumerWidget {
           ),
           _ActionRow(
             icon: Symbols.shelves,
-            label: 'Move',
+            label: context.l10n.itemActionMove,
             onTap: () => _move(context, ref),
           ),
           _ActionRow(
             icon: Symbols.payments_rounded,
-            label: 'Mark as sold',
+            label: context.l10n.itemActionMarkSold,
             onTap: () => _guarded(context, ref, ItemStatus.sold, () {
               Navigator.of(context).pop();
               MarkSoldSheet.show(context, item);
@@ -226,7 +224,9 @@ class ItemActionsSheet extends ConsumerWidget {
             icon: isArchived
                 ? Symbols.unarchive_rounded
                 : Symbols.archive_rounded,
-            label: isArchived ? 'Put back in stock' : 'Archive',
+            label: isArchived
+                ? context.l10n.itemActionRestore
+                : context.l10n.itemActionArchive,
             onTap: () => isArchived
                 ? _restore(context, ref)
                 : _archive(context, ref),

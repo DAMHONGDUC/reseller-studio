@@ -33,8 +33,8 @@ class _LocationRow extends StatelessWidget {
     child: AppListRow(
       title: location.name,
       subtitle: <String>[
-        location.kind.name,
-        if (itemCount > 0) '$itemCount items',
+        LocationKindLabel.of(context, location.kind),
+        if (itemCount > 0) context.l10n.locationItemCount(itemCount),
         if (location.barcode != null) location.barcode!,
       ].join(' · '),
       icon: iconFor(location.kind),

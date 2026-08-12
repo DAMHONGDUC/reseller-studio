@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/error/failure_presenter.dart';
+import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../workspace/providers.dart';
@@ -63,7 +64,7 @@ class _RepriceSheetState extends ConsumerState<RepriceSheet> {
     final int count = widget.items.length;
 
     if (price == null) {
-      SdSnackBarUtilsV3.error(context, 'Enter the new price');
+      SdSnackBarUtilsV3.error(context, context.l10n.repriceRequired);
 
       return;
     }
@@ -78,7 +79,9 @@ class _RepriceSheetState extends ConsumerState<RepriceSheet> {
       navigator.pop();
       SdSnackBarUtilsV3.success(
         context,
-        count == 1 ? 'Price updated' : 'Repriced $count items',
+        count == 1
+            ? context.l10n.repriceDone
+            : context.l10n.repriceDoneBulk(count),
       );
     } catch (error) {
       // Already logged by the controller.
@@ -94,24 +97,24 @@ class _RepriceSheetState extends ConsumerState<RepriceSheet> {
     final int count = widget.items.length;
 
     return SdBottomSheetV3(
-      title: count == 1 ? 'Reprice' : 'Reprice $count items',
+      title: count == 1
+          ? context.l10n.repriceTitle
+          : context.l10n.repriceTitleBulk(count),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           MoneyField(
-            label: 'New asking price',
+            label: context.l10n.repriceNewPrice,
             controller: _price,
             currency: ref.watch(workspaceCurrencyProvider),
-            helperText: count == 1
-                ? null
-                : 'Applied to every selected item',
+            helperText: count == 1 ? null : context.l10n.repriceBulkHelp,
             textInputAction: TextInputAction.done,
             onSubmitted: (_) => _submit(),
           ),
           SizedBox(height: SdSpacingConstant.h24),
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Update price',
+            label: context.l10n.repriceSubmit,
             expand: true,
             busy: isBusy,
             onPressed: isBusy ? null : _submit,

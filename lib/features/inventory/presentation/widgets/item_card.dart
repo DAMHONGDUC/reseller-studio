@@ -7,6 +7,7 @@ import '../../../../core/widgets/app_photo.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
+import '../../item_label.dart';
 
 part 'item_card_price_cell.dart';
 part 'item_card_price_line.dart';
@@ -80,7 +81,9 @@ class ItemCard extends StatelessWidget {
                 color: isSelected
                     ? context.colorScheme3.primary
                     : context.sdTheme3.textTertiary,
-                semanticLabel: isSelected ? 'Selected' : 'Not selected',
+                semanticLabel: isSelected
+                    ? context.l10n.inventorySelected
+                    : context.l10n.inventoryNotSelected,
               ),
               SizedBox(width: SdSpacingConstant.w12),
             ],
@@ -104,12 +107,12 @@ class ItemCard extends StatelessWidget {
                     runSpacing: SdSpacingConstant.h4,
                     children: <Widget>[
                       SdBadgeV3(
-                        label: _statusLabel(item.status),
+                        label: ItemStatusLabel.of(context, item.status),
                         tone: _statusTone(item.status),
                       ),
                       if (isStale)
-                        const SdBadgeV3(
-                          label: 'Stale',
+                        SdBadgeV3(
+                          label: context.l10n.itemStale,
                           tone: SdBadgeToneV3.warning,
                           icon: Symbols.hourglass_bottom_rounded,
                         ),
@@ -127,15 +130,6 @@ class ItemCard extends StatelessWidget {
       ),
     );
   }
-
-  static String _statusLabel(ItemStatus status) => switch (status) {
-    ItemStatus.draft => 'Draft',
-    ItemStatus.inStock => 'In stock',
-    ItemStatus.listed => 'Listed',
-    ItemStatus.reserved => 'Reserved',
-    ItemStatus.sold => 'Sold',
-    ItemStatus.archived => 'Archived',
-  };
 
   static SdBadgeToneV3 _statusTone(ItemStatus status) => switch (status) {
     ItemStatus.draft => SdBadgeToneV3.neutral,

@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/logging/app_logger.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../domain/entities/item.dart';
@@ -92,7 +93,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     final StorageLocation? location = _findLocation(code);
 
     if (location != null) {
-      SdSnackBarUtilsV3.info(context, 'That is ${location.name}');
+      SdSnackBarUtilsV3.info(
+        context,
+        context.l10n.scannerFoundLocation(location.name),
+      );
       context.pop();
 
       return;
@@ -128,17 +132,17 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Nothing has that code',
-        message: 'Add an item and keep the code on it?',
+        title: context.l10n.scannerNoMatchTitle,
+        message: context.l10n.scannerNoMatchBody,
         icon: Symbols.qr_code_scanner_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
-            label: 'Add an item',
+            label: context.l10n.scannerAddItem,
             isPrimary: true,
             onPressed: () => context.pushReplacement(AppRoutes.addItem),
           ),
           SdDialogActionV3(
-            label: 'Scan again',
+            label: context.l10n.scannerScanAgain,
             onPressed: () => setState(() => _handled = false),
           ),
         ],
@@ -149,16 +153,16 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   @override
   Widget build(BuildContext context) => SdScaffoldV3(
     appBar: SdAppBarV3(
-      title: 'Scan',
+      title: context.l10n.scannerTitle,
       actions: <Widget>[
         IconButton(
           icon: const SdIconV3(Symbols.flashlight_on_rounded),
-          tooltip: 'Torch',
+          tooltip: context.l10n.scannerTorch,
           onPressed: () => _controller.toggleTorch(),
         ),
         IconButton(
           icon: const SdIconV3(Symbols.cameraswitch_rounded),
-          tooltip: 'Switch camera',
+          tooltip: context.l10n.scannerSwitchCamera,
           onPressed: () => _controller.switchCamera(),
         ),
       ],
@@ -174,7 +178,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
           child: SdCardV3(
             layer: SdCardLayerV3.elevated,
             child: Text(
-              'Point at a barcode, a SKU label or a bin tag.',
+              context.l10n.scannerHint,
               textAlign: TextAlign.center,
               style: context.textTheme3.bodyMedium!.copyWith(
                 color: context.sdTheme3.textPrimary,

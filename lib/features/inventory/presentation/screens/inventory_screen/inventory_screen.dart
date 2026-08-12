@@ -80,21 +80,21 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
       body: CustomScrollView(
         slivers: <Widget>[
           SdSearchHeaderV3(
-            title: 'Inventory',
+            title: context.l10n.navInventory,
             controller: _search,
-            hint: 'Title, SKU or barcode',
-            clearTooltip: 'Clear search',
+            hint: context.l10n.inventorySearchHint,
+            clearTooltip: context.l10n.inventoryClearSearch,
             onChanged: (String value) =>
                 ref.read(inventorySearchProvider.notifier).update(value),
             actions: <SdAppBarActionV3>[
               SdAppBarActionV3(
                 icon: Symbols.add_box_rounded,
-                tooltip: 'Add item',
+                tooltip: context.l10n.inventoryAddItem,
                 onPressed: () => context.push(AppRoutes.addItem),
               ),
               SdAppBarActionV3(
                 icon: Symbols.qr_code_scanner_rounded,
-                tooltip: 'Scan',
+                tooltip: context.l10n.inventoryScan,
                 onPressed: () => context.push(AppRoutes.scanner),
               ),
             ],
@@ -113,12 +113,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 hasScrollBody: false,
                 child: SdLoadingV3Page(),
               ),
-            AsyncError<List<Item>>() => const SliverFillRemaining(
+            AsyncError<List<Item>>() => SliverFillRemaining(
               hasScrollBody: false,
               child: SdEmptyStateV3(
                 icon: Symbols.error_rounded,
-                title: 'Could not load inventory',
-                message: 'Please try again.',
+                title: context.l10n.inventoryLoadFailed,
+                message: context.l10n.commonCouldNotLoad,
               ),
             ),
             _ when items.isEmpty => SliverFillRemaining(
