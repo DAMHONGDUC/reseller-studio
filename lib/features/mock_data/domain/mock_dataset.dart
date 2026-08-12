@@ -1,6 +1,8 @@
 import '../../../core/money/money.dart';
 import '../../expenses/domain/entities/expense.dart';
 import '../../inventory/domain/entities/item.dart';
+import '../../inventory/domain/entities/item_category.dart';
+import '../../inventory/domain/entities/storage_location.dart';
 import '../../inventory/domain/enums/item_status.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/enums/listing_status.dart';
@@ -44,6 +46,8 @@ class MockDataset {
     required this.listings,
     required this.orders,
     required this.expenses,
+    required this.categories,
+    required this.locations,
   });
 
   /// Build the world.
@@ -581,6 +585,65 @@ class MockDataset {
       ),
     ];
 
+    // Reference data. Short lists on purpose: a demo taxonomy with forty
+    // categories teaches nothing the four below do not, and the pickers that
+    // read it are easier to judge at a realistic size.
+    final List<ItemCategory> categories = <ItemCategory>[
+      ItemCategory(
+        id: 'cat-outerwear',
+        name: 'Outerwear',
+        createdAt: daysAgo(400),
+      ),
+      ItemCategory(
+        id: 'cat-footwear',
+        name: 'Footwear',
+        createdAt: daysAgo(400),
+      ),
+      ItemCategory(
+        id: 'cat-glassware',
+        name: 'Glassware',
+        createdAt: daysAgo(150),
+      ),
+      ItemCategory(
+        id: 'cat-electronics',
+        name: 'Electronics',
+        createdAt: daysAgo(88),
+      ),
+    ];
+
+    final List<StorageLocation> locations = <StorageLocation>[
+      StorageLocation(
+        id: 'loc-garage',
+        name: 'Garage',
+        kind: LocationKind.warehouse,
+        createdAt: daysAgo(400),
+        address: 'Home',
+      ),
+      StorageLocation(
+        id: 'loc-shelf-a',
+        name: 'Shelf A',
+        kind: LocationKind.shelf,
+        parentId: 'loc-garage',
+        createdAt: daysAgo(400),
+      ),
+      StorageLocation(
+        id: 'loc-bin-a1',
+        name: 'Bin A1',
+        kind: LocationKind.bin,
+        parentId: 'loc-shelf-a',
+        createdAt: daysAgo(400),
+        barcode: 'BIN-A1',
+      ),
+      StorageLocation(
+        id: 'loc-bin-a2',
+        name: 'Bin A2',
+        kind: LocationKind.bin,
+        parentId: 'loc-shelf-a',
+        createdAt: daysAgo(400),
+        barcode: 'BIN-A2',
+      ),
+    ];
+
     return MockDataset._(
       workspace: workspace,
       members: members,
@@ -590,6 +653,8 @@ class MockDataset {
       listings: listings,
       orders: orders,
       expenses: expenses,
+      categories: categories,
+      locations: locations,
     );
   }
 
@@ -601,4 +666,6 @@ class MockDataset {
   final List<Listing> listings;
   final List<Order> orders;
   final List<Expense> expenses;
+  final List<ItemCategory> categories;
+  final List<StorageLocation> locations;
 }

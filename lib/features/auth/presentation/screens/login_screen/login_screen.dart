@@ -3,101 +3,86 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../controllers/auth_controller.dart';
+import '../../widgets/auth_form_shell.dart';
 
-/// Login — the gate. **There is no guest mode** (plan principle 1), so this
-/// is the first screen anyone without a session reaches, and every route
-/// below the shell is unreachable until it is passed.
+/// Login — the gate. **There is no guest mode** (plan principle 1), so this is
+/// the first screen anyone without a session reaches, and every route below
+/// the shell is unreachable until it is passed.
 ///
-/// The plan (§26) asks for email/password, Sign in with Apple and Google
-/// Sign-In. Apple is not optional once Google ships: App Store guideline 4.8
-/// requires it whenever a third-party sign-in is offered.
+/// **Two buttons and nothing else** (owner's rule): Sign in with Apple and
+/// Google Sign-In. No email field, no password, no sign-up form, no reset —
+/// the identity provider owns all of it, so this app never stores a password
+/// and never has to secure a reset flow.
 ///
-/// Scaffolded: the frame and fields are real, the credentials go nowhere.
-/// Wiring this means a `LoginController` under
-/// `presentation/controllers/` — the screen stays a `ConsumerWidget` that
-/// watches state and calls methods, and never talks to `FirebaseAuth`
-/// itself.
-class LoginScreen extends ConsumerStatefulWidget {
+/// Apple is not optional beside Google: App Store guideline 4.8 requires it
+/// wherever a third-party sign-in is offered. **Both brand marks are still
+/// placeholders** and must be the real ones before submission — Apple and
+/// Google each require their own logo and forbid a substitute
+/// (`RELEASE_ACTIONS.md`).
+///
+/// The screen navigates nowhere on success: the router's redirect watches auth
+/// state and moves the seller on by itself.
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
-  @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
-}
+  Future<void> _signIn(
+    BuildContext context,
+    WidgetRef ref,
+    AuthProviderKind provider,
+  ) async {
+    try {
+      await ref.read(authControllerProvider.notifier).signIn(provider);
+    } catch (error) {
+      // Already logged by the controller; the seller gets the one message
+      // hard rule 6 allows. A cancellation never reaches here — the
+      // repository reports it as an outcome, not a throw.
+      if (!context.mounted) return;
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final TextEditingController _email = TextEditingController();
-  final TextEditingController _password = TextEditingController();
-
-  @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
+      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+    }
   }
 
   @override
-  Widget build(BuildContext context) => SdScaffoldV3(
-    body: SafeArea(
-      child: ListView(
-        padding: SdContentPaddingV3.screen(context),
-        children: <Widget>[
-          SizedBox(height: SdSpacingConstant.h64),
-          Text(
-            context.l10n.appTitle,
-            style: context.textTheme3.headlineMedium!.bold3.copyWith(
-              color: context.sdTheme3.textPrimary,
-            ),
-          ),
-          SizedBox(height: SdSpacingConstant.h8),
-          Text(
-            'Source, list, sell, ship, profit.',
-            style: context.textTheme3.bodyMedium!.muted3(context),
-          ),
-          SizedBox(height: SdSpacingConstant.h40),
-          SdTextFieldV3(
-            label: 'Email',
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            autofillHints: const <String>[AutofillHints.email],
-          ),
-          SizedBox(height: SdSpacingConstant.h16),
-          SdTextFieldV3(
-            label: 'Password',
-            controller: _password,
-            obscureText: true,
-            textInputAction: TextInputAction.done,
-            autofillHints: const <String>[AutofillHints.password],
-          ),
-          SizedBox(height: SdSpacingConstant.h24),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
-            label: 'Sign in',
-            expand: true,
-            onPressed: () {},
-          ),
-          SizedBox(height: SdSpacingConstant.h12),
-          SdButtonV3(
-            variant: SdButtonVariantV3.outlined,
-            label: 'Continue with Apple',
-            // Placeholder glyph. Both brand marks must be the real ones
-            // before this ships — Apple and Google each require their own
-            // logo and forbid a substitute in a sign-in button.
-            icon: Symbols.person_rounded,
-            expand: true,
-            onPressed: () {},
-          ),
-          SizedBox(height: SdSpacingConstant.h12),
-          SdButtonV3(
-            variant: SdButtonVariantV3.outlined,
-            label: 'Continue with Google',
-            icon: Symbols.g_mobiledata_rounded,
-            expand: true,
-            onPressed: () {},
-          ),
-        ],
-      ),
-    ),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AuthFormState state = ref.watch(authControllerProvider);
+
+    return AuthFormShell(
+      title: context.l10n.appTitle,
+      subtitle: 'Source, list, sell, ship, profit.',
+      children: <Widget>[
+        SdButtonV3(
+          variant: SdButtonVariantV3.primary,
+          label: 'Continue with Apple',
+          icon: Symbols.person_rounded,
+          expand: true,
+          busy: state.isBusyWith(AuthProviderKind.apple),
+          onPressed: state.isBusy
+              ? null
+              : () => _signIn(context, ref, AuthProviderKind.apple),
+        ),
+        SizedBox(height: SdSpacingConstant.h12),
+        SdButtonV3(
+          variant: SdButtonVariantV3.outlined,
+          label: 'Continue with Google',
+          icon: Symbols.g_mobiledata_rounded,
+          expand: true,
+          busy: state.isBusyWith(AuthProviderKind.google),
+          onPressed: state.isBusy
+              ? null
+              : () => _signIn(context, ref, AuthProviderKind.google),
+        ),
+        SizedBox(height: SdSpacingConstant.h24),
+        Text(
+          'We only use your account to sign you in. Your inventory stays '
+          'yours.',
+          textAlign: TextAlign.center,
+          style: context.textTheme3.bodySmall!.faint3(context),
+        ),
+      ],
+    );
+  }
 }

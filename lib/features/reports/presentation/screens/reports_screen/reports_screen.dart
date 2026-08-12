@@ -1,0 +1,154 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:system_design/index.dart';
+
+import '../../../../../core/error/failure_presenter.dart';
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/money/money.dart';
+import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../analytics/domain/entities/analytics_summary.dart';
+import '../../../../analytics/providers.dart';
+import '../../controllers/report_controller.dart';
+
+/// Reports — the numbers, and a way to get them out (plan §19).
+///
+/// **Export is the feature.** A reseller's year-end goes to an accountant or
+/// into a spreadsheet, and the app's job is to hand over rows they can sum
+/// rather than to become the accounting software.
+///
+/// The summary above the exports is this month against the whole record, so
+/// the seller can see whether the file they are about to send looks right
+/// before they send it.
+class ReportsScreen extends ConsumerWidget {
+  const ReportsScreen({super.key});
+
+  Future<void> _export(
+    BuildContext context,
+    WidgetRef ref,
+    ReportKind kind,
+  ) async {
+    try {
+      await ref.read(reportControllerProvider.notifier).export(kind);
+    } catch (error) {
+      // Already logged by the controller.
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AnalyticsSummary summary = ref.watch(analyticsSummaryProvider);
+    final bool isBusy = ref.watch(reportControllerProvider);
+    final DateTime now = DateTime.now();
+
+    return SdScaffoldV3(
+      appBar: const SdAppBarV3(title: 'Reports'),
+      body: ListView(
+        padding: SdContentPaddingV3.screen(context),
+        children: <Widget>[
+          SizedBox(height: SdContentPaddingV3.topGap),
+          SdSectionHeaderV3(
+            title: 'Everything to date',
+            subtitle: 'As of ${DateTimeUtils.mediumDate(now, locale: context.localeTag)}',
+            first: true,
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: SdStatTileV3(
+                  label: 'Revenue',
+                  value: context.money(summary.revenue, compact: true),
+                  icon: Symbols.trending_up_rounded,
+                ),
+              ),
+              SizedBox(width: SdSpacingConstant.w8),
+              Expanded(
+                child: SdStatTileV3(
+                  label: 'Net profit',
+                  value: context.money(summary.netProfit, compact: true),
+                  tone: _profitTone(summary.netProfit),
+                  caption: summary.isProfitComplete
+                      ? null
+                      : 'Some costs missing',
+                  icon: Symbols.savings_rounded,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: SdSpacingConstant.h8),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: SdStatTileV3(
+                  label: 'Orders',
+                  value: '${summary.orderCount}',
+                  icon: Symbols.receipt_long_rounded,
+                ),
+              ),
+              SizedBox(width: SdSpacingConstant.w8),
+              Expanded(
+                child: SdStatTileV3(
+                  label: 'Inventory value',
+                  value: context.money(summary.inventoryValue, compact: true),
+                  icon: Symbols.inventory_2_rounded,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: SdContentPaddingV3.sectionGap),
+          const SdSectionHeaderV3(
+            title: 'Export',
+            subtitle: 'CSV, ready for a spreadsheet or an accountant',
+            first: true,
+          ),
+          AppListCard(
+            children: <Widget>[
+              AppListRow(
+                title: 'Sales',
+                subtitle: 'One row per item sold, with fees and payout',
+                icon: Symbols.point_of_sale_rounded,
+                onTap: isBusy
+                    ? null
+                    : () => _export(context, ref, ReportKind.sales),
+              ),
+              AppListRow(
+                title: 'Inventory',
+                subtitle: 'Everything you hold, with cost and location',
+                icon: Symbols.inventory_2_rounded,
+                onTap: isBusy
+                    ? null
+                    : () => _export(context, ref, ReportKind.inventory),
+              ),
+              AppListRow(
+                title: 'Expenses',
+                subtitle: 'Every cost, by category and date',
+                icon: Symbols.receipt_rounded,
+                onTap: isBusy
+                    ? null
+                    : () => _export(context, ref, ReportKind.expenses),
+              ),
+            ],
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          Text(
+            'Amounts export as plain numbers so a spreadsheet can add them '
+            'up. Anything you have not recorded exports as an empty cell, '
+            'never as zero.',
+            style: context.textTheme3.bodySmall!.faint3(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// An em dash is not a figure, so it is never tinted as good or bad news.
+  static SdStatToneV3 _profitTone(Money? profit) {
+    if (profit == null) return SdStatToneV3.neutral;
+
+    return profit.isNegative ? SdStatToneV3.loss : SdStatToneV3.profit;
+  }
+}

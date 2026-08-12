@@ -52,9 +52,12 @@ class HomeScreen extends ConsumerWidget {
         // attention — is the reason the app was opened.
         actions: <Widget>[
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Symbols.notifications_rounded),
-            tooltip: 'Notifications',
+            // Global search is reached from Home because Home is where a
+            // seller starts (plan §5's global entry points). It sits outside
+            // the shell so it can send them into any tab.
+            onPressed: () => context.push(AppRoutes.search),
+            icon: const Icon(Symbols.search_rounded),
+            tooltip: 'Search',
           ),
           SizedBox(width: SdSpacingConstant.w8),
         ],

@@ -6,10 +6,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/config/dev_flags.dart';
+import 'data/repositories/firebase_auth_repository.dart';
+import 'domain/repositories/auth_repository.dart';
 
 /// The `FirebaseAuth` instance, behind a provider so a test can override it.
 final Provider<FirebaseAuth> firebaseAuthProvider = Provider<FirebaseAuth>(
   (Ref ref) => FirebaseAuth.instance,
+);
+
+/// Sign in, sign up, reset, sign out, delete — behind the domain interface,
+/// so nothing in `presentation/` names a Firebase type.
+final Provider<AuthRepository> authRepositoryProvider = Provider<AuthRepository>(
+  (Ref ref) => FirebaseAuthRepository(ref.watch(firebaseAuthProvider)),
 );
 
 /// Who is signed in, as a stream.

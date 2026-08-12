@@ -1,10 +1,15 @@
 part of 'orders_screen.dart';
 
 class _OrderCard extends StatelessWidget {
-  const _OrderCard({required this.order, required this.now});
+  const _OrderCard({
+    required this.order,
+    required this.now,
+    required this.onTap,
+  });
 
   final Order order;
   final DateTime now;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +17,7 @@ class _OrderCard extends StatelessWidget {
     final Money? profit = order.profit().netProfit;
 
     return SdCardV3(
-      onTap: () {},
+      onTap: onTap,
       // A tinted edge, and a "Late" badge saying the same thing — colour is
       // never the only signal.
       borderColor: isOverdue ? context.sdTheme3.danger : null,

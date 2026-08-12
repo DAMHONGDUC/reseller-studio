@@ -193,6 +193,23 @@ directly.
    **Delete this bypass once real sign-in works** — it is scaffolding, and its
    reason to exist expires with "Pending setup".
 
+   **There are exactly two ways in: Sign in with Apple and Google Sign-In.**
+   Owner's rule, and it narrows plan §26. There is **no email/password**, no
+   sign-up form, no password reset and no email verification — so there is no
+   password for this app to store, no reset flow to secure, and no "forgot
+   password" support load. It also removes the two screens (sign-up, reset)
+   that the plan's §28 field lists were written for; those lists no longer
+   apply to authentication.
+   - Both providers ship, and Apple is not optional: App Store guideline 4.8
+     requires Sign in with Apple wherever a third-party sign-in is offered.
+     Shipping Google alone is a review rejection.
+   - **Neither works until the owner configures it** — an OAuth client for
+     Google, a Services ID and key for Apple. Until then the buttons are the
+     only way in and the app is unusable without the dev bypass. See
+     `RELEASE_ACTIONS.md`.
+   - A cancelled sign-in is **not** an error: the seller closed a sheet. It is
+     logged as info and shows no message.
+
 2. **Create takes the minimum; a state transition takes the rest.** Plan §28
    and §29, and it is the rule the whole product's speed rests on. Quick Add
    requires **only a title**. An item does not need a price, a photo, a

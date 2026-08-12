@@ -39,21 +39,25 @@ final class MoreConstant {
       label: 'Sourcing',
       icon: Symbols.storefront_rounded,
       route: AppRoutes.sourcing,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Listings',
       icon: Symbols.sell_rounded,
       route: AppRoutes.listings,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Expenses',
       icon: Symbols.receipt_rounded,
       route: AppRoutes.expenses,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Reports',
       icon: Symbols.summarize_rounded,
       route: AppRoutes.reports,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Receipts',
@@ -64,21 +68,25 @@ final class MoreConstant {
       label: 'Categories',
       icon: Symbols.category_rounded,
       route: AppRoutes.categories,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Locations',
       icon: Symbols.shelves,
       route: AppRoutes.locations,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Marketplaces',
       icon: Symbols.hub_rounded,
       route: AppRoutes.marketplaces,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Team',
       icon: Symbols.group_rounded,
       route: AppRoutes.team,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Settings',

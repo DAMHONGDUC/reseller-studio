@@ -37,7 +37,6 @@ dependencies:
   package_info_plus: ^10.2.1
   share_plus: ^13.2.0
   shared_preferences: ^2.5.5
-  sign_in_with_apple: ^8.1.0
   # The shared design system. Its own git repo, checked out here as a
   # submodule — tokens, theme and string-free widgets live there, not in
   # lib/core. Seller OS renders on its v3 generation and never touches v2.

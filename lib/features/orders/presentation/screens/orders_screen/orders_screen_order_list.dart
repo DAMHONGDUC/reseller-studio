@@ -14,8 +14,11 @@ class _OrderList extends StatelessWidget {
       itemCount: orders.length,
       separatorBuilder: (BuildContext context, int index) =>
           SizedBox(height: SdContentPaddingV3.listItemGap),
-      itemBuilder: (BuildContext context, int index) =>
-          _OrderCard(order: orders[index], now: now),
+      itemBuilder: (BuildContext context, int index) => _OrderCard(
+        order: orders[index],
+        now: now,
+        onTap: () => context.push(AppRoutes.order(orders[index].id)),
+      ),
     );
   }
 }

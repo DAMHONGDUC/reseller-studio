@@ -2,26 +2,147 @@
 ///
 /// **Every other feature reads its currency and its stale threshold from
 /// here**, so a screen never hardcodes `'USD'` and a policy never hardcodes
-/// 60 days. When real workspaces arrive, only this file changes.
+/// 60 days. It is also where the app decides *whose* data the six business
+/// repositories are pointed at — [workspaceContextProvider] is the seam
+/// between "signed in" and "reading a business".
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/firestore/workspace_collections.dart';
+import '../../core/firestore/workspace_context.dart';
+import '../auth/providers.dart';
 import '../mock_data/providers.dart';
+import 'data/repositories/firestore_workspace_repository.dart';
+import 'domain/entities/user_profile.dart';
 import 'domain/entities/workspace.dart';
+import 'domain/repositories/workspace_repository.dart';
+
+/// The `FirebaseFirestore` instance, behind a provider so a test can override
+/// it and so nothing in a feature reaches for the singleton.
+final Provider<FirebaseFirestore> firebaseFirestoreProvider =
+    Provider<FirebaseFirestore>((Ref ref) => FirebaseFirestore.instance);
+
+final Provider<WorkspaceRepository> workspaceRepositoryProvider =
+    Provider<WorkspaceRepository>(
+      (Ref ref) =>
+          FirestoreWorkspaceRepository(ref.watch(firebaseFirestoreProvider)),
+    );
+
+/// The signed-in person's own record — name, email, and which workspaces they
+/// belong to.
+///
+/// Not read in mock mode: there is no account, and the mock dataset carries
+/// its own workspace.
+final StreamProvider<UserProfile?> userProfileProvider =
+    StreamProvider<UserProfile?>((Ref ref) {
+      final String? uid = ref.watch(currentUidProvider);
+
+      if (uid == null || ref.watch(dataModeProvider).isMock) {
+        return Stream<UserProfile?>.value(null);
+      }
+
+      return ref.watch(workspaceRepositoryProvider).watchProfile(uid);
+    });
+
+/// Which workspace the app is showing, by id.
+final Provider<String?> currentWorkspaceIdProvider = Provider<String?>((
+  Ref ref,
+) {
+  if (ref.watch(dataModeProvider).isMock) {
+    return ref.watch(mockStoreProvider).dataset.workspace.id;
+  }
+
+  return ref.watch(userProfileProvider).value?.resolvedWorkspaceId;
+});
+
+/// The live workspace document.
+// See `itemProvider` for why a family's type is inferred rather than written.
+// ignore: type_annotate_public_apis
+final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>((
+  Ref ref,
+  String workspaceId,
+) => ref.watch(workspaceRepositoryProvider).watchWorkspace(workspaceId));
 
 /// The workspace the app is currently showing.
 ///
-/// Null in live mode until workspace loading is written — the screens treat
-/// that the same way they treat "still loading", which is correct: neither
-/// state has a workspace to render.
+/// Null while it is still loading, and null when the account has none — the
+/// router tells those apart through [workspaceStatusProvider], because one is
+/// a splash screen and the other is onboarding.
 final Provider<Workspace?> currentWorkspaceProvider = Provider<Workspace?>((
   Ref ref,
 ) {
-  if (!ref.watch(dataModeProvider).isMock) return null;
+  if (ref.watch(dataModeProvider).isMock) {
+    return ref.watch(mockStoreProvider).dataset.workspace;
+  }
 
-  return ref.watch(mockStoreProvider).dataset.workspace;
+  final String? id = ref.watch(currentWorkspaceIdProvider);
+
+  if (id == null) return null;
+
+  return ref.watch(liveWorkspaceProvider(id)).value;
 });
+
+/// Where onboarding has got to.
+///
+/// The router branches on this, so the three cases have to be distinguishable:
+/// a user whose profile has not loaded must see the splash, not the workspace
+/// form, or a returning seller is asked to create a second business every time
+/// they open the app.
+enum WorkspaceStatus {
+  /// The profile has not arrived yet. Show the splash.
+  loading,
+
+  /// Signed in with no workspace. Onboarding.
+  none,
+
+  /// Ready to render the app.
+  ready,
+}
+
+final Provider<WorkspaceStatus> workspaceStatusProvider =
+    Provider<WorkspaceStatus>((Ref ref) {
+      if (ref.watch(dataModeProvider).isMock) return WorkspaceStatus.ready;
+
+      final AsyncValue<UserProfile?> profile = ref.watch(userProfileProvider);
+
+      if (profile.isLoading && !profile.hasValue) {
+        return WorkspaceStatus.loading;
+      }
+
+      // A failed profile read is treated as "no workspace" rather than
+      // "loading": the user gets a screen they can act on instead of a splash
+      // that never resolves.
+      return profile.value?.resolvedWorkspaceId == null
+          ? WorkspaceStatus.none
+          : WorkspaceStatus.ready;
+    });
+
+/// What the six business repositories are pointed at, or null when there is
+/// nothing to point them at yet.
+///
+/// Null means signed out, or signed in with onboarding unfinished. Both are
+/// states the router keeps the user out of the app for, so a repository that
+/// finds a null here is being read from a screen that should not be on
+/// screen — which is why the repository providers say so out loud rather than
+/// returning an empty list.
+final Provider<WorkspaceContext?> workspaceContextProvider =
+    Provider<WorkspaceContext?>((Ref ref) {
+      final String? uid = ref.watch(currentUidProvider);
+      final String? workspaceId = ref.watch(currentWorkspaceIdProvider);
+
+      if (uid == null || workspaceId == null) return null;
+
+      return WorkspaceContext(
+        collections: WorkspaceCollections(
+          ref.watch(firebaseFirestoreProvider),
+          workspaceId,
+        ),
+        currency: ref.watch(workspaceCurrencyProvider),
+        uid: uid,
+      );
+    });
 
 /// The currency every money figure in the app is denominated in.
 ///
@@ -42,7 +163,20 @@ final Provider<Duration> staleThresholdProvider = Provider<Duration>((Ref ref) {
 final Provider<List<Member>> workspaceMembersProvider = Provider<List<Member>>((
   Ref ref,
 ) {
-  if (!ref.watch(dataModeProvider).isMock) return const <Member>[];
+  if (ref.watch(dataModeProvider).isMock) {
+    return ref.watch(mockStoreProvider).dataset.members;
+  }
 
-  return ref.watch(mockStoreProvider).dataset.members;
+  final String? id = ref.watch(currentWorkspaceIdProvider);
+
+  if (id == null) return const <Member>[];
+
+  return ref.watch(liveMembersProvider(id)).value ?? const <Member>[];
 });
+
+// See `itemProvider` for why a family's type is inferred rather than written.
+// ignore: type_annotate_public_apis
+final liveMembersProvider = StreamProvider.family<List<Member>, String>((
+  Ref ref,
+  String workspaceId,
+) => ref.watch(workspaceRepositoryProvider).watchMembers(workspaceId));

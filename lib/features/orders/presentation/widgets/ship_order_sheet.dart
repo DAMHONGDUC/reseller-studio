@@ -1,0 +1,260 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/index.dart';
+
+import '../../../../core/error/failure_presenter.dart';
+import '../../../../core/money/money.dart';
+import '../../../../core/widgets/money_field.dart';
+import '../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../core/widgets/picker_field.dart';
+import '../../../workspace/providers.dart';
+import '../../domain/entities/order.dart';
+import '../../orders_constant.dart';
+import '../controllers/order_actions_controller.dart';
+
+/// Ship an order (plan §8's `Pick → Pack → Label → Tracking → Shipped`).
+///
+/// **Nothing here is required.** Plan §29 attaches shipment information at the
+/// transition, and this is that transition — but a seller who dropped a parcel
+/// at the post office with no tracking still needs the order out of their
+/// queue, and a form that refused would make the queue lie about what is left
+/// to do.
+///
+/// The shipping cost is asked for here because it is the moment the seller
+/// knows it, and it is the line that turns a sale price into a profit.
+class ShipOrderSheet extends ConsumerStatefulWidget {
+  const ShipOrderSheet({required this.order, super.key});
+
+  final Order order;
+
+  static Future<void> show(BuildContext context, Order order) =>
+      showSdBottomSheetV3<void>(
+        context: context,
+        builder: (BuildContext context) => ShipOrderSheet(order: order),
+      );
+
+  @override
+  ConsumerState<ShipOrderSheet> createState() => _ShipOrderSheetState();
+}
+
+class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
+  final TextEditingController _tracking = TextEditingController();
+  late final TextEditingController _cost = TextEditingController(
+    text: widget.order.shippingCost == null
+        ? ''
+        : (widget.order.shippingCost!.minor / 100).toStringAsFixed(2),
+  );
+
+  String? _carrier;
+
+  @override
+  void initState() {
+    super.initState();
+    _carrier = widget.order.carrier;
+    _tracking.text = widget.order.trackingNumber ?? '';
+  }
+
+  @override
+  void dispose() {
+    _tracking.dispose();
+    _cost.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final NavigatorState navigator = Navigator.of(context);
+    final String currency = ref.read(workspaceCurrencyProvider);
+    final String tracking = _tracking.text.trim();
+
+    try {
+      await ref
+          .read(orderActionsControllerProvider.notifier)
+          .markShipped(
+            widget.order,
+            carrier: _carrier,
+            trackingNumber: tracking.isEmpty ? null : tracking,
+            shippingCost: Money.tryParse(_cost.text, currency),
+          );
+
+      if (!mounted) return;
+
+      navigator.pop();
+      SdSnackBarUtilsV3.success(context, 'Shipped');
+    } catch (error) {
+      // Already logged by the controller.
+      if (!mounted) return;
+
+      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isBusy = ref.watch(orderActionsControllerProvider);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SdBottomSheetV3(
+        title: 'Ship this order',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            PickerField(
+              label: 'Carrier (optional)',
+              value: _carrier,
+              onTap: () async {
+                final String? picked = await OptionPickerSheet.show<String>(
+                  context,
+                  title: 'Carrier',
+                  selected: _carrier,
+                  options: OrdersConstant.carriers
+                      .map(
+                        (String carrier) => PickerOption<String>(
+                          value: carrier,
+                          label: carrier,
+                        ),
+                      )
+                      .toList(),
+                );
+
+                if (picked == null) return;
+
+                setState(() => _carrier = picked);
+              },
+            ),
+            SizedBox(height: SdSpacingConstant.h16),
+            SdTextFieldV3(
+              label: 'Tracking number (optional)',
+              controller: _tracking,
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: SdSpacingConstant.h16),
+            MoneyField(
+              label: 'Shipping cost (optional)',
+              controller: _cost,
+              currency: ref.watch(workspaceCurrencyProvider),
+              helperText: 'What postage cost you — it comes off the profit',
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _submit(),
+            ),
+            SizedBox(height: SdSpacingConstant.h24),
+            SdButtonV3(
+              variant: SdButtonVariantV3.primary,
+              label: 'Mark as shipped',
+              expand: true,
+              busy: isBusy,
+              onPressed: isBusy ? null : _submit,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Record what the marketplace actually took and paid.
+///
+/// **The payout is the one stored figure that is not derived** (hard rule 3):
+/// it is a fact the platform reported, and it is what a seller reconciles
+/// their bank statement against. Everything else on the profit statement is
+/// computed from it and the costs.
+class SettleOrderSheet extends ConsumerStatefulWidget {
+  const SettleOrderSheet({required this.order, super.key});
+
+  final Order order;
+
+  static Future<void> show(BuildContext context, Order order) =>
+      showSdBottomSheetV3<void>(
+        context: context,
+        builder: (BuildContext context) => SettleOrderSheet(order: order),
+      );
+
+  @override
+  ConsumerState<SettleOrderSheet> createState() => _SettleOrderSheetState();
+}
+
+class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
+  late final TextEditingController _fees = TextEditingController(
+    text: _major(widget.order.fees),
+  );
+  late final TextEditingController _payout = TextEditingController(
+    text: _major(widget.order.payout),
+  );
+
+  static String _major(Money? amount) =>
+      amount == null ? '' : (amount.minor / 100).toStringAsFixed(2);
+
+  @override
+  void dispose() {
+    _fees.dispose();
+    _payout.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final NavigatorState navigator = Navigator.of(context);
+    final String currency = ref.read(workspaceCurrencyProvider);
+
+    try {
+      await ref
+          .read(orderActionsControllerProvider.notifier)
+          .recordSettlement(
+            widget.order,
+            fees: Money.tryParse(_fees.text, currency),
+            payout: Money.tryParse(_payout.text, currency),
+          );
+
+      if (!mounted) return;
+
+      navigator.pop();
+      SdSnackBarUtilsV3.success(context, 'Saved');
+    } catch (error) {
+      // Already logged by the controller.
+      if (!mounted) return;
+
+      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isBusy = ref.watch(orderActionsControllerProvider);
+    final String currency = ref.watch(workspaceCurrencyProvider);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SdBottomSheetV3(
+        title: 'Fees and payout',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            MoneyField(
+              label: 'Platform fees',
+              controller: _fees,
+              currency: currency,
+              helperText: 'What the marketplace took',
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: SdSpacingConstant.h16),
+            MoneyField(
+              label: 'Payout',
+              controller: _payout,
+              currency: currency,
+              helperText: 'What actually landed in your account',
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _submit(),
+            ),
+            SizedBox(height: SdSpacingConstant.h24),
+            SdButtonV3(
+              variant: SdButtonVariantV3.primary,
+              label: 'Save',
+              expand: true,
+              busy: isBusy,
+              onPressed: isBusy ? null : _submit,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

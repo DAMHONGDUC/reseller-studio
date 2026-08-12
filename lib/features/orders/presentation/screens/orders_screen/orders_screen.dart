@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
@@ -30,7 +32,16 @@ class OrdersScreen extends ConsumerWidget {
     final AsyncValue<List<Order>> source = ref.watch(ordersProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Orders'),
+      appBar: SdAppBarV3(
+        title: 'Orders',
+        actions: <Widget>[
+          IconButton(
+            icon: const SdIconV3(Symbols.local_shipping_rounded),
+            tooltip: 'Shipping queue',
+            onPressed: () => context.push(AppRoutes.shippingQueue),
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),

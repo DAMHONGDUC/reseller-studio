@@ -2,17 +2,30 @@
 /// real one. Other features import this file, never anything under `data/`.
 library;
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/config/dev_flags.dart';
 import '../../core/constants/prefs_key_constant.dart';
+import '../../core/firestore/workspace_context.dart';
 import '../../core/logging/app_logger.dart';
+import '../../core/storage/file_uploader.dart';
+import '../../core/storage/firebase_file_uploader.dart';
+import '../../core/storage/local_file_uploader.dart';
+import '../expenses/data/repositories/firestore_expense_repository.dart';
 import '../expenses/domain/repositories/expense_repository.dart';
+import '../inventory/data/repositories/firestore_catalog_repositories.dart';
+import '../inventory/data/repositories/firestore_item_repository.dart';
+import '../inventory/domain/repositories/catalog_repository.dart';
 import '../inventory/domain/repositories/item_repository.dart';
+import '../listings/data/repositories/firestore_listing_repository.dart';
 import '../listings/domain/repositories/listing_repository.dart';
+import '../orders/data/repositories/firestore_order_repository.dart';
 import '../orders/domain/repositories/order_repository.dart';
+import '../sourcing/data/repositories/firestore_sourcing_repositories.dart';
 import '../sourcing/domain/repositories/sourcing_repository.dart';
+import '../workspace/providers.dart';
 import 'data/in_memory_repositories.dart';
 
 /// Where the app's data comes from.
@@ -157,69 +170,146 @@ final Provider<MockDataSummary> mockDataSummaryProvider =
       );
     });
 
-/// Thrown when a screen reads a repository in live mode before the Firestore
-/// implementations exist.
+/// Thrown when a screen reads a repository in live mode before there is a
+/// workspace to read from.
 ///
-/// A named error rather than a null: it says exactly what is missing and why,
-/// instead of surfacing as a mysterious null-check failure three frames later.
+/// A named error rather than a null: the router keeps a user without a
+/// workspace on the onboarding route, so reaching this means a screen is
+/// mounted that should not be, and a message saying which repository and why
+/// is the difference between a five-minute fix and an afternoon.
 final class LiveRepositoryGuard {
-  static Never notImplemented(String repository) => throw UnimplementedError(
-    '$repository has no Firestore implementation yet. Turn on mock data in '
-    'More → Settings, or run with --dart-define=BYPASS_AUTH=true. See '
-    "CLAUDE.md 'Pending setup'.",
+  static Never noWorkspace(String repository) => throw StateError(
+    '$repository was read with no active workspace. Sign in and finish '
+    'workspace setup, or turn on mock data in More → Settings.',
   );
 }
 
 final Provider<ItemRepository> itemRepositoryProvider =
     Provider<ItemRepository>((Ref ref) {
-      if (!ref.watch(dataModeProvider).isMock) {
-        LiveRepositoryGuard.notImplemented('ItemRepository');
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryItemRepository(ref.watch(mockStoreProvider));
       }
 
-      return InMemoryItemRepository(ref.watch(mockStoreProvider));
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) LiveRepositoryGuard.noWorkspace('ItemRepository');
+
+      return FirestoreItemRepository(context);
     });
 
 final Provider<OrderRepository> orderRepositoryProvider =
     Provider<OrderRepository>((Ref ref) {
-      if (!ref.watch(dataModeProvider).isMock) {
-        LiveRepositoryGuard.notImplemented('OrderRepository');
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryOrderRepository(ref.watch(mockStoreProvider));
       }
 
-      return InMemoryOrderRepository(ref.watch(mockStoreProvider));
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) LiveRepositoryGuard.noWorkspace('OrderRepository');
+
+      return FirestoreOrderRepository(context);
     });
 
 final Provider<ListingRepository> listingRepositoryProvider =
     Provider<ListingRepository>((Ref ref) {
-      if (!ref.watch(dataModeProvider).isMock) {
-        LiveRepositoryGuard.notImplemented('ListingRepository');
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryListingRepository(ref.watch(mockStoreProvider));
       }
 
-      return InMemoryListingRepository(ref.watch(mockStoreProvider));
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('ListingRepository');
+      }
+
+      return FirestoreListingRepository(context);
     });
 
 final Provider<SourceRepository> sourceRepositoryProvider =
     Provider<SourceRepository>((Ref ref) {
-      if (!ref.watch(dataModeProvider).isMock) {
-        LiveRepositoryGuard.notImplemented('SourceRepository');
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemorySourceRepository(ref.watch(mockStoreProvider));
       }
 
-      return InMemorySourceRepository(ref.watch(mockStoreProvider));
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) LiveRepositoryGuard.noWorkspace('SourceRepository');
+
+      return FirestoreSourceRepository(context);
     });
 
 final Provider<PurchaseRepository> purchaseRepositoryProvider =
     Provider<PurchaseRepository>((Ref ref) {
-      if (!ref.watch(dataModeProvider).isMock) {
-        LiveRepositoryGuard.notImplemented('PurchaseRepository');
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryPurchaseRepository(ref.watch(mockStoreProvider));
       }
 
-      return InMemoryPurchaseRepository(ref.watch(mockStoreProvider));
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('PurchaseRepository');
+      }
+
+      return FirestorePurchaseRepository(context);
+    });
+
+/// Where photos and receipts go.
+///
+/// Mock mode keeps the local path rather than uploading: there is no Firebase
+/// project behind it, so a real upload would fail on the first byte.
+final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>((
+  Ref ref,
+) {
+  if (ref.watch(dataModeProvider).isMock) return const LocalFileUploader();
+
+  final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+  if (context == null) LiveRepositoryGuard.noWorkspace('FileUploader');
+
+  return FirebaseFileUploader(FirebaseStorage.instance, context.workspaceId);
+});
+
+final Provider<CategoryRepository> categoryRepositoryProvider =
+    Provider<CategoryRepository>((Ref ref) {
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryCategoryRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('CategoryRepository');
+      }
+
+      return FirestoreCategoryRepository(context);
+    });
+
+final Provider<LocationRepository> locationRepositoryProvider =
+    Provider<LocationRepository>((Ref ref) {
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryLocationRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('LocationRepository');
+      }
+
+      return FirestoreLocationRepository(context);
     });
 
 final Provider<ExpenseRepository> expenseRepositoryProvider =
     Provider<ExpenseRepository>((Ref ref) {
-      if (!ref.watch(dataModeProvider).isMock) {
-        LiveRepositoryGuard.notImplemented('ExpenseRepository');
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryExpenseRepository(ref.watch(mockStoreProvider));
       }
 
-      return InMemoryExpenseRepository(ref.watch(mockStoreProvider));
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('ExpenseRepository');
+      }
+
+      return FirestoreExpenseRepository(context);
     });

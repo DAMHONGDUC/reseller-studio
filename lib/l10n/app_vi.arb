@@ -18,6 +18,11 @@
   "errorGenericMessage": "Vui lòng thử lại.",
   "errorOfflineTitle": "Bạn đang ngoại tuyến",
   "errorOfflineMessage": "Thay đổi của bạn đã được lưu trên thiết bị này và sẽ đồng bộ khi có mạng trở lại.",
+  "errorSignedOutMessage": "Vui lòng đăng nhập lại để tiếp tục.",
+  "errorNoAccessMessage": "Bạn không có quyền thực hiện điều đó trong không gian làm việc này.",
+  "errorNotFoundMessage": "Mục này không còn nữa. Có thể nó đã bị xóa.",
+  "errorInvalidDataMessage": "Một số thông tin còn thiếu hoặc không hợp lệ.",
+  "errorLimitReachedMessage": "Bạn đã đạt giới hạn của gói hiện tại.",
 
   "emptyValuePlaceholder": "—",
 

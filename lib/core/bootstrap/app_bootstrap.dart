@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../config/app_env.dart';
 import '../logging/app_logger.dart';
@@ -40,6 +41,8 @@ final class AppBootstrap {
       WidgetsFlutterBinding.ensureInitialized();
 
       await _initializeFirebase();
+
+      await _initializeGoogleSignIn();
 
       _logEnvironment();
 
@@ -96,6 +99,41 @@ final class AppBootstrap {
         String
       >{'error': error.toString()});
       debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  /// Configure Google Sign-In before any button can call it.
+  ///
+  /// `google_sign_in` 7 requires `initialize` to have completed before
+  /// `authenticate`, and sign-in is one of only two ways into this app
+  /// (`CLAUDE.md` hard rule 1) — so doing it lazily on the first tap would put
+  /// a round trip in front of the seller at the worst moment.
+  ///
+  /// Guards itself like every other step: a failure here leaves the Google
+  /// button broken and the Apple one working, which is a far better outcome
+  /// than an app that does not start.
+  static Future<void> _initializeGoogleSignIn() async {
+    try {
+      await GoogleSignIn.instance.initialize(
+        // Empty means "read it from the platform config file"
+        // (`GoogleService-Info.plist` / `google-services.json`), which is what
+        // `flutterfire configure` writes. The env keys exist to override that
+        // for a build whose bundle id differs from the Firebase app's.
+        clientId: AppEnv.googleSignInIosClientId.isEmpty
+            ? null
+            : AppEnv.googleSignInIosClientId,
+        serverClientId: AppEnv.googleSignInServerClientId.isEmpty
+            ? null
+            : AppEnv.googleSignInServerClientId,
+      );
+
+      AppLogger.info('Google Sign-In initialized');
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Google Sign-In failed to initialize',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

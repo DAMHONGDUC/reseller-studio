@@ -10,6 +10,10 @@ class _ItemBody extends StatelessWidget {
     padding: SdContentPaddingV3.screen(context),
     children: <Widget>[
       SizedBox(height: SdContentPaddingV3.topGap),
+      if (item.photoUrls.isNotEmpty) ...<Widget>[
+        _Photos(urls: item.photoUrls),
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+      ],
       SdCardV3(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,13 +39,7 @@ class _ItemBody extends StatelessWidget {
         ),
       ),
       SizedBox(height: SdContentPaddingV3.sectionGap),
-      Text(
-        'Pricing',
-        style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-          color: context.sdTheme3.textPrimary,
-        ),
-      ),
-      SizedBox(height: SdSpacingConstant.h8),
+      _SectionTitle(title: 'Pricing'),
       SdCardV3(
         child: Column(
           children: <Widget>[
@@ -69,23 +67,24 @@ class _ItemBody extends StatelessWidget {
         ),
       ),
       SizedBox(height: SdContentPaddingV3.sectionGap),
-      Text(
-        'Listings',
-        style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-          color: context.sdTheme3.textPrimary,
-        ),
-      ),
-      SizedBox(height: SdSpacingConstant.h8),
+      _SectionTitle(title: 'Provenance'),
+      _Provenance(item: item),
+      SizedBox(height: SdContentPaddingV3.sectionGap),
+      _SectionTitle(title: 'Listings'),
       _Listings(itemId: item.id),
-      if (item.notes != null) ...<Widget>[
+      if (item.description != null) ...<Widget>[
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        Text(
-          'Notes',
-          style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-            color: context.sdTheme3.textPrimary,
+        _SectionTitle(title: 'Description'),
+        SdCardV3(
+          child: Text(
+            item.description!,
+            style: context.textTheme3.bodyMedium!.muted3(context),
           ),
         ),
-        SizedBox(height: SdSpacingConstant.h8),
+      ],
+      if (item.notes != null) ...<Widget>[
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+        _SectionTitle(title: 'Notes'),
         SdCardV3(
           child: Text(
             item.notes!,
@@ -93,6 +92,28 @@ class _ItemBody extends StatelessWidget {
           ),
         ),
       ],
+      SizedBox(height: SdContentPaddingV3.bottomGap),
     ],
+  );
+}
+
+/// The heading above each block, with its gap already in it.
+///
+/// Extracted the moment the body had six of them: six copies of a `Text` plus
+/// a `SizedBox` is six chances for one of the gaps to drift.
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(bottom: SdSpacingConstant.h8),
+    child: Text(
+      title,
+      style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+        color: context.sdTheme3.textPrimary,
+      ),
+    ),
   );
 }

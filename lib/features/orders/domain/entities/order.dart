@@ -155,4 +155,45 @@ class Order {
 
   int get unitCount =>
       lines.fold(0, (int total, OrderLine line) => total + line.quantity);
+
+  /// A copy with some fields changed.
+  ///
+  /// **[lines], [salePrice] and [orderedAt] are deliberately not settable.**
+  /// They are what the buyer bought, what they paid and when — history, not
+  /// state. A correction to any of them is a different order, and letting a
+  /// shipping update rewrite them is how a report run next year stops
+  /// reproducing this year's number.
+  Order copyWith({
+    OrderStatus? status,
+    Money? fees,
+    Money? shippingCost,
+    Money? refund,
+    Money? payout,
+    String? buyerName,
+    String? trackingNumber,
+    String? carrier,
+    DateTime? shipByDate,
+    DateTime? shippedAt,
+    DateTime? deliveredAt,
+    String? notes,
+  }) => Order(
+    id: id,
+    status: status ?? this.status,
+    marketplace: marketplace,
+    lines: lines,
+    salePrice: salePrice,
+    orderedAt: orderedAt,
+    fees: fees ?? this.fees,
+    shippingCost: shippingCost ?? this.shippingCost,
+    refund: refund ?? this.refund,
+    payout: payout ?? this.payout,
+    externalOrderId: externalOrderId,
+    buyerName: buyerName ?? this.buyerName,
+    trackingNumber: trackingNumber ?? this.trackingNumber,
+    carrier: carrier ?? this.carrier,
+    shipByDate: shipByDate ?? this.shipByDate,
+    shippedAt: shippedAt ?? this.shippedAt,
+    deliveredAt: deliveredAt ?? this.deliveredAt,
+    notes: notes ?? this.notes,
+  );
 }

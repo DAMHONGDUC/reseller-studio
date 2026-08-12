@@ -3,6 +3,9 @@ import 'dart:async';
 import '../../expenses/domain/entities/expense.dart';
 import '../../expenses/domain/repositories/expense_repository.dart';
 import '../../inventory/domain/entities/item.dart';
+import '../../inventory/domain/entities/item_category.dart';
+import '../../inventory/domain/entities/storage_location.dart';
+import '../../inventory/domain/repositories/catalog_repository.dart';
 import '../../inventory/domain/repositories/item_repository.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/repositories/listing_repository.dart';
@@ -30,7 +33,9 @@ class MockStore {
       listings = List<Listing>.of(dataset.listings),
       sources = List<Source>.of(dataset.sources),
       purchases = List<Purchase>.of(dataset.purchases),
-      expenses = List<Expense>.of(dataset.expenses);
+      expenses = List<Expense>.of(dataset.expenses),
+      categories = List<ItemCategory>.of(dataset.categories),
+      locations = List<StorageLocation>.of(dataset.locations);
 
   /// Seeded from the current clock, so the demo data is always recent.
   factory MockStore.seeded({DateTime? now}) =>
@@ -44,6 +49,8 @@ class MockStore {
   final List<Source> sources;
   final List<Purchase> purchases;
   final List<Expense> expenses;
+  final List<ItemCategory> categories;
+  final List<StorageLocation> locations;
 
   // Broadcast because several screens watch the same collection at once —
   // Home counts orders while the Orders tab lists them. A single-subscription
@@ -288,6 +295,84 @@ class InMemoryPurchaseRepository implements PurchaseRepository {
   @override
   Future<void> delete(String id) async {
     _store.purchases.removeWhere((Purchase purchase) => purchase.id == id);
+    _store.notifyChanged();
+  }
+}
+
+class InMemoryCategoryRepository implements CategoryRepository {
+  const InMemoryCategoryRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<ItemCategory>> watchCategories() => _store.watch(() {
+    final List<ItemCategory> live =
+        _store.categories
+            .where((ItemCategory category) => !category.isDeleted)
+            .toList()
+          ..sort(
+            (ItemCategory a, ItemCategory b) => a.name.compareTo(b.name),
+          );
+
+    return live;
+  });
+
+  @override
+  Future<void> save(ItemCategory category) => Future<void>.sync(
+    () => _store.upsert(
+      _store.categories,
+      category,
+      (ItemCategory other) => other.id == category.id,
+    ),
+  );
+
+  @override
+  Future<void> delete(String id) async {
+    final int index = _store.categories.indexWhere(
+      (ItemCategory category) => category.id == id,
+    );
+
+    if (index == -1) return;
+
+    _store.categories[index] = _store.categories[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
+class InMemoryLocationRepository implements LocationRepository {
+  const InMemoryLocationRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<StorageLocation>> watchLocations() => _store.watch(
+    () => _store.locations
+        .where((StorageLocation location) => !location.isDeleted)
+        .toList(),
+  );
+
+  @override
+  Future<void> save(StorageLocation location) => Future<void>.sync(
+    () => _store.upsert(
+      _store.locations,
+      location,
+      (StorageLocation other) => other.id == location.id,
+    ),
+  );
+
+  @override
+  Future<void> delete(String id) async {
+    final int index = _store.locations.indexWhere(
+      (StorageLocation location) => location.id == id,
+    );
+
+    if (index == -1) return;
+
+    _store.locations[index] = _store.locations[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
     _store.notifyChanged();
   }
 }

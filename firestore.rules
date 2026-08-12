@@ -110,7 +110,20 @@ service cloud.firestore {
         // Only admins invite and remove. **Nobody edits their own membership
         // document** — without that clause a member could set their own role
         // to owner, and every rule above is decided by this document.
-        allow create, delete: if canAdmin(workspaceId);
+        //
+        // The second clause is the bootstrap, and it is the one case where
+        // somebody writes their own membership. `canAdmin` cannot authorise
+        // it: it reads the very document being created, so the first member
+        // of a new workspace could never be written and the workspace would
+        // be unreadable by anyone, forever. It is narrow on purpose — only
+        // the uid the workspace itself names as `ownerId`, only as `owner`,
+        // and only as a create, so it cannot be used to promote anyone later.
+        allow create: if canAdmin(workspaceId)
+                      || (signedIn()
+                          && memberUid == request.auth.uid
+                          && request.resource.data.role == 'owner'
+                          && get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.ownerId == request.auth.uid);
+        allow delete: if canAdmin(workspaceId);
         allow update: if canAdmin(workspaceId)
                       && memberUid != request.auth.uid;
 

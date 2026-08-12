@@ -60,6 +60,26 @@
   "@errorOfflineMessage": {
     "description": "Reassurance that an offline write is not lost — Firestore's local cache holds it."
   },
+  "errorSignedOutMessage": "Please sign in again to continue.",
+  "@errorSignedOutMessage": {
+    "description": "AppFailureKind.unauthenticated — the session expired, the credential was rejected, or an action needs a recent sign-in."
+  },
+  "errorNoAccessMessage": "You don't have access to do that in this workspace.",
+  "@errorNoAccessMessage": {
+    "description": "AppFailureKind.permissionDenied — signed in, but the member's role does not allow it."
+  },
+  "errorNotFoundMessage": "That's no longer there. It may have been deleted.",
+  "@errorNotFoundMessage": {
+    "description": "AppFailureKind.notFound — a stale link, or a row a teammate deleted while the screen was open."
+  },
+  "errorInvalidDataMessage": "Some details are missing or not valid.",
+  "@errorInvalidDataMessage": {
+    "description": "AppFailureKind.invalidData — the server rejected the write."
+  },
+  "errorLimitReachedMessage": "You've reached the limit on your current plan.",
+  "@errorLimitReachedMessage": {
+    "description": "AppFailureKind.limitReached — a free-tier cap was hit."
+  },
 
   "emptyValuePlaceholder": "—",
   "@emptyValuePlaceholder": {

@@ -5,12 +5,18 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../domain/entities/item.dart';
+import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
+import '../../controllers/item_actions_controller.dart';
 import '../../widgets/item_card.dart';
+import '../../widgets/reprice_sheet.dart';
 
+part 'inventory_screen_bulk_bar.dart';
 part 'inventory_screen_empty_inventory.dart';
 part 'inventory_screen_filter_strip.dart';
 part 'inventory_screen_item_list.dart';
@@ -33,6 +39,10 @@ part 'inventory_screen_item_list.dart';
 /// three. The screen owns the controller for the same reason: the field is
 /// inside a sliver that rebuilds on every scroll frame, and a controller
 /// created there would be a new one each time.
+///
+/// **Long-press starts a bulk selection** (hard rule 16). While one is open
+/// the Quick Add button is replaced by the action bar: two floating controls
+/// competing for one corner is how the wrong one gets tapped.
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
 
@@ -76,26 +86,31 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   Widget build(BuildContext context) {
     final List<Item> items = ref.watch(visibleItemsProvider);
     final AsyncValue<List<Item>> source = ref.watch(itemsProvider);
+    final bool isSelecting = ref.watch(inventorySelectionProvider).isNotEmpty;
 
     return SdScaffoldV3(
       // Lifted clear of the floating tab bar. `extendBody` keeps the FAB in
       // the body's coordinate space rather than stacking it above the bottom
       // slot, so without this the button renders *behind* the glass — which
       // looks like a bug and makes it hard to tap.
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(
-          bottom: SdContentPaddingV3.floatingBarInset(context),
-        ),
-        child: ValueListenableBuilder<bool>(
-          valueListenable: _quickAddExpanded,
-          builder: (BuildContext context, bool expanded, Widget? _) => SdFabV3(
-            icon: Symbols.add_rounded,
-            label: context.l10n.quickAddTitle,
-            expanded: expanded,
-            onPressed: () => context.push(AppRoutes.quickAdd),
-          ),
-        ),
-      ),
+      floatingActionButton: isSelecting
+          ? null
+          : Padding(
+              padding: EdgeInsets.only(
+                bottom: SdContentPaddingV3.floatingBarInset(context),
+              ),
+              child: ValueListenableBuilder<bool>(
+                valueListenable: _quickAddExpanded,
+                builder: (BuildContext context, bool expanded, Widget? _) =>
+                    SdFabV3(
+                      icon: Symbols.add_rounded,
+                      label: context.l10n.quickAddTitle,
+                      expanded: expanded,
+                      onPressed: () => context.push(AppRoutes.quickAdd),
+                    ),
+              ),
+            ),
+      bottomNavigationBar: isSelecting ? const _BulkActionBar() : null,
       body: NotificationListener<UserScrollNotification>(
         onNotification: _onUserScroll,
         child: CustomScrollView(
@@ -109,9 +124,14 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                   ref.read(inventorySearchProvider.notifier).update(value),
               actions: <SdAppBarActionV3>[
                 SdAppBarActionV3(
+                  icon: Symbols.add_box_rounded,
+                  tooltip: 'Add item',
+                  onPressed: () => context.push(AppRoutes.addItem),
+                ),
+                SdAppBarActionV3(
                   icon: Symbols.qr_code_scanner_rounded,
                   tooltip: 'Scan',
-                  onPressed: () {},
+                  onPressed: () => context.push(AppRoutes.scanner),
                 ),
               ],
             ),

@@ -4,19 +4,30 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/config/dev_flags.dart';
+import '../../../../../core/error/failure_presenter.dart';
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../../auth/providers.dart';
 import '../../../../mock_data/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
 
+part 'settings_screen_account_card.dart';
 part 'settings_screen_mock_data_card.dart';
 part 'settings_screen_mock_summary.dart';
 part 'settings_screen_setting_row.dart';
 
 /// Settings (plan §25).
 ///
-/// Most of the plan's sections are not built yet. What is here is the
-/// **Developer** block, and specifically the mock-data switch — the thing
-/// that makes the whole app explorable before a Firebase project exists.
+/// **Sign out and delete account are here and they work.** Everything else the
+/// plan lists — theme, notifications, date format, subscription — is either
+/// waiting on a backend or is a preference nobody has asked for yet, and a
+/// screen full of controls that do nothing is worse than a short one.
+///
+/// The Developer block is compiled out of a release build: `DevFlags` is a
+/// `const` false there, so the tree-shaker removes the branch and everything
+/// only it reached.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -30,7 +41,14 @@ class SettingsScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.fullBleed(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          const SdSectionHeaderV3(title: 'Workspace', first: true),
+          const SdSectionHeaderV3(title: 'Account', first: true),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: const _AccountCard(),
+          ),
+          const SdSectionHeaderV3(title: 'Workspace'),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
@@ -58,16 +76,18 @@ class SettingsScreen extends ConsumerWidget {
                     ),
             ),
           ),
-          const SdSectionHeaderV3(
-            title: 'Developer',
-            subtitle: 'Debug builds only — not present in a release build.',
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
+          if (DevFlags.isDebugOrProfile) ...<Widget>[
+            const SdSectionHeaderV3(
+              title: 'Developer',
+              subtitle: 'Debug builds only — not present in a release build.',
             ),
-            child: const _MockDataCard(),
-          ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: SdContentPaddingV3.horizontal,
+              ),
+              child: const _MockDataCard(),
+            ),
+          ],
         ],
       ),
     );

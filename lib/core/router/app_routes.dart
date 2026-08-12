@@ -13,9 +13,11 @@ final class AppRoutes {
   // --- Outside the shell: nothing here shows the tab bar. ---
 
   static const String splash = '/';
+
+  /// The only unauthenticated route. There is no sign-up and no password
+  /// reset: sign-in is Apple or Google, and both create the account
+  /// themselves on first use (owner's rule, `CLAUDE.md` hard rule 1).
   static const String login = '/login';
-  static const String signUp = '/sign-up';
-  static const String forgotPassword = '/forgot-password';
 
   /// Chosen or created after sign-in and before Home. Login is mandatory and
   /// there is no guest mode (plan principle 1), so no route below this point
@@ -32,6 +34,7 @@ final class AppRoutes {
 
   static const String inventory = '/inventory';
   static const String itemDetail = '/inventory/item/:itemId';
+  static const String editItemPath = '/inventory/item/:itemId/edit';
   static const String addItem = '/inventory/add';
   static const String quickAdd = '/inventory/quick-add';
   static const String scanner = '/inventory/scanner';
@@ -60,7 +63,14 @@ final class AppRoutes {
   static const String more = '/more';
   static const String sourcing = '/more/sourcing';
   static const String purchases = '/more/sourcing/purchases';
+  static const String purchaseDetail = '/more/sourcing/purchases/:purchaseId';
+  static const String addPurchase = '/more/sourcing/purchases/new';
   static const String sources = '/more/sourcing/sources';
+  static const String sourceDetail = '/more/sourcing/sources/:sourceId';
+
+  /// The calculation a reseller does standing in a shop (plan §11). Its own
+  /// route because it is reached mid-hunt, not from a record.
+  static const String purchaseEvaluator = '/more/sourcing/evaluate';
   static const String listings = '/more/listings';
   static const String expenses = '/more/expenses';
   static const String reports = '/more/reports';
@@ -79,5 +89,9 @@ final class AppRoutes {
   /// `AppRoutes.item('abc')` rather than `'/inventory/item/abc'`, so the one
   /// place that knows the segment layout is this file.
   static String item(String itemId) => '/inventory/item/$itemId';
+  static String editItem(String itemId) => '/inventory/item/$itemId/edit';
   static String order(String orderId) => '/orders/$orderId';
+  static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
+  static String purchase(String purchaseId) =>
+      '/more/sourcing/purchases/$purchaseId';
 }
