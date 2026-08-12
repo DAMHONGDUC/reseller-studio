@@ -25,6 +25,22 @@ with background they did not ask for, and don't narrate the options that were
 not taken. Two labelled rows and a sentence each beat three paragraphs saying
 the same thing.
 
+## Where the rest of the rules live
+
+This file holds only what applies to every change. Everything else loads when
+it is relevant. Read the file in the right-hand column *before* doing the work
+in the left.
+
+| Working on | Read |
+|---|---|
+| `packages/system_design/`, or any screen or widget rendering `Sd*` v3 components | `docs/rules/DESIGN_SYSTEM.md` |
+| a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
+| running, building, generating or deploying | `docs/rules/COMMANDS.md` |
+| writing or fixing a test | `docs/rules/TESTING.md` |
+| anything that looks like missing infrastructure — Firebase, signing, icons | `docs/rules/SETUP.md` |
+| asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
+| anything in `lib/features/mock_data/` | `lib/features/mock_data/CLAUDE.md` (loads on its own) |
+
 ## What this project is
 
 A seller operating system for resellers — not an inventory tracker. The
@@ -62,7 +78,7 @@ chain is a screen that will be redesigned.
   inventory is inherently a synced business record shared with a team. Do not
   add Drift here.
 - **Design system**: `packages/system_design`, a **submodule**, on its **v3**
-  generation. See below.
+  generation. See `docs/rules/DESIGN_SYSTEM.md`.
 - **Charts**: `fl_chart`. **Scanning**: `mobile_scanner`. **Photos**:
   `image_picker`.
 - **Typography is Inter, bundled in `assets/fonts/`** — not `google_fonts`,
@@ -74,12 +90,8 @@ chain is a screen that will be redesigned.
 - **Deep links use the `selleros://` scheme** (`ios/Runner/Info.plist`,
   `FlutterDeepLinkingEnabled`). `selleros:///orders/ord-4` opens that order —
   what the plan's notification taps (§22) need.
-  **Until Firebase is configured, any deep link hard-crashes the app**:
-  `firebase_auth`'s iOS plugin intercepts `openURL` and constructs
-  `Auth.auth()`, which fatals with *"The default FirebaseApp instance must be
-  configured"*. It is a native crash, so `bootstrap`'s guarded zone cannot
-  catch it. Nothing to fix in this app — it disappears the moment
-  `flutterfire configure` has run. Don't spend an afternoon on it.
+  why: see `docs/rules/DECISIONS.md` § Deep links hard-crash until Firebase
+  is configured
 - **iOS minimum is 15.0**, raised from Flutter's template default of 13.0.
   Not a preference — the Firebase Swift packages refuse to link below it
   (`the package product 'cloud-firestore' requires minimum platform version
@@ -140,130 +152,7 @@ placeholder folders.
 features, import only another feature's `domain/` or its `providers.dart`,
 never its `data/` or `presentation/`.
 
-## `system_design` — the design system is a separate package
-
-Tokens and string-free widgets live in `packages/system_design`, a **separate
-git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired
-in as a path dependency. There is exactly one import, and it is the index:
-
-```dart
-import 'package:system_design/index.dart';
-```
-
-**The package holds two generations and Seller OS renders on v3.**
-
-| | `v2/` | `v3/` |
-| --- | --- | --- |
-| Renders | BaroEase | **Seller OS** |
-| Palette | dark only | light + dark |
-| App bar | frosted glass, body scrolls behind | opaque, takes layout space |
-| Tab bar | floating glass pill | floating **liquid glass** pill |
-| Context getters | `context.sdTheme` | `context.sdTheme3` |
-
-### The tab bar is liquid glass and that makes its geometry layout
-
-`SdGlassNavBarV3` floats over the content in the iOS 26 idiom — a detached
-superellipse pill the body scrolls behind and refracts through. Three things
-follow, and missing any one of them looks like a bug:
-
-1. **`SdScaffoldV3` must be given `extendBody: true`** wherever that bar is
-   used, or the scaffold reserves its height and the glass refracts a blank
-   strip of page.
-2. **Every tab screen pads by `floatingNav: true`** —
-   `SdContentPaddingV3.screen(context, floatingNav: true)` or `.fullBleed(…)`.
-   That number is `floatingBarInset`, and it lives in one place because a bar
-   and the padding beneath it drifting apart is exactly what happens
-   otherwise. Pushed detail routes have nothing floating over them and must
-   *not* pass it.
-3. **A FAB needs lifting by `floatingBarInset` itself.** `extendBody` keeps
-   the FAB in the body's coordinate space rather than stacking it above the
-   bottom slot, so without the lift it renders *behind* the glass.
-
-`navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
-call, so both apps' floating bars sit identically. It caps at 20 against a
-portrait iPhone's 34pt home-indicator inset; that trade is documented on the
-getter.
-
-**The effect degrades by itself.** `SdGlassV3.isSupported` is false on
-Android's Skia fallback and in widget tests, where the bar renders `FakeGlass`
-— same geometry, flat fill, nothing reflows. Do not branch on it at a call
-site.
-
-The app bar deliberately stays opaque: a blur there costs a shader pass on
-every scroll frame of a list that can run to thousands of rows, whereas the
-tab bar is a fixed strip whose cost does not grow with the content.
-
-`packages/system_design/WIDGET_RULES.md` is the authority on what may go in
-the package and how it must be written. **Read it before adding to the
-package.** The short version:
-
-1. A widget belongs there only if it takes **every user-facing string as a
-   parameter** and **imports nothing from this app** — no `context.l10n`, no
-   provider, no repository, no router, no domain entity. Failing either test is
-   not a reason to weaken the rule; it is the answer, and the widget stays in
-   `lib/features/…/presentation/widgets/`.
-2. One folder per widget, one `export` line in `v3/index.dart`, nothing else
-   changes.
-3. Nothing in the package hardcodes a colour, a font size or a dimension.
-
-**Never touch `v2/`.** It is what a shipped app renders. If a v3 widget wants
-something a v2 widget already does, copy the idea into v3 — never import it,
-and never edit v2 to suit this product.
-
-**The palette is NOT in the package — this app owns it.** `AppColors` and
-`AppTheme` stay in `lib/core/theme/`. `AppTheme.light`/`.dark` hand the design
-system its colours by registering an `SdThemeV3` on `ThemeData.extensions`;
-package widgets read `context.colorScheme3`, `context.textTheme3` and
-`context.sdTheme3` and never name a colour.
-
-**A widget test that pumps a bare `MaterialApp` will assert** — `sdTheme3`
-requires the extension. Pass `theme: AppTheme.light`, and install
-`ScreenUtilInit` too, or the first `SdSpacingConstant.w16` throws.
-
-**The submodule is a shared repo, and a v3 commit lands in the repo BaroEase
-also pulls.** That is harmless — BaroEase never imports v3 — but it means a
-change there is not local to this project. Commit the gitlink deliberately.
-
-### Seller OS pays for v2's dependencies, and one of them warns on every Android build
-
-The package declares `liquid_glass_renderer`, `fl_chart` and `auto_size_text`
-for the whole package, not per generation, so this app resolves them even
-though **no file under `lib/` imports liquid glass** — it belongs to v2's
-frosted chrome, which v3 deliberately does not have.
-
-The visible cost: `flutter build apk` prints
-`Compiled to invalid SkSL` for `liquid_glass_geometry_blended.frag`. **It is
-non-fatal — the APK builds** — and it is not a bug in this app. Do not try to
-fix it by editing the package's `pubspec.yaml` to drop the dependency; that
-breaks BaroEase, which actually renders those widgets.
-
-The real fix, if the noise ever justifies it, is splitting the package's
-dependencies per generation, which pub does not support in one package —
-meaning it would take a second package. Not worth it for a warning. Revisit
-only if it becomes a build failure.
-
-## `env/` — build-time configuration
-
-One JSON file per flavour, passed with `--dart-define-from-file`, read through
-**`lib/core/config/app_env.dart` — the only file allowed to name an env key.**
-A `String.fromEnvironment('FIREBASE_…')` in a feature is a magic string nobody
-can audit and a typo that silently returns `''`.
-
-```sh
-melos run run            # env/dev.json
-melos run run -- prod    # env/prod.json
-```
-
-- `env/*.example.json` is checked in and is the key list; `env/dev.json` and
-  `env/prod.json` are gitignored. `melos run set-up` copies the templates when
-  the real files are missing and **never overwrites** an existing one.
-- **Adding a key means adding it to both templates and to `AppEnv`.**
-  `test/core/config/app_env_test.dart` fails if the two flavours' key sets
-  diverge — a key in one and not the other is a build that works locally and
-  fails in CI.
-- **Every getter has a default**, so a build with no `--dart-define-from-file`
-  still compiles. That is what keeps `melos run test` working without a
-  flavour.
+## Configuration and secrets
 
 **Nothing in `env/` is secret.** `--dart-define-from-file` compiles the JSON
 into the binary; anyone with the `.ipa` can read it. Firebase api keys and app
@@ -277,86 +166,6 @@ dev switches are read from the env file but every one is ANDed with
 `!kReleaseMode` in `DevFlags`, so a `prod.json` with `"BYPASS_AUTH": true`
 still ships an app with no bypass. Never read `AppEnv.bypassAuthRequested`
 directly.
-
-**Design tokens and domain policy deliberately stay out of `env/`** —
-`AppColors`, `SdRadiusV3`, `PurchaseEvaluation.defaultTargetRoi`,
-`Marketplace.estimatedFeeRate`. They do not vary per build, and they must be
-readable from a unit test without a build flag. The stale threshold especially:
-it is per-workspace data in Firestore (`Workspace.staleThresholdDays`), so
-freezing it into a build file would contradict `docs/DATA_MODEL.md`.
-`env/README.md` has the full list and the reasoning.
-
-## Commands
-
-**Melos is the task runner** (`melos.yaml`). Installed once per machine at the
-version `pubspec.yaml` pins — `dart pub global activate melos 6.3.3`. The
-global and local versions must match exactly. **Melos 6, not 7/8** — 7+
-requires `resolution: workspace` inside `packages/system_design`, which would
-stop that package resolving in BaroEase, which is not a workspace. That
-portability is the whole reason the design system is a submodule.
-
-- `melos run set-up` — **always wipes first**, then everything a clone needs:
-  submodules, `pub get` for both packages, `gen-l10n`, `npm ci` in
-  `functions/`, `pod install` on macOS. Idempotent. The wipe is unconditional
-  on purpose: this is the one answer to "it built yesterday and not today".
-  Don't reach for it when `melos run gen` would do.
-  It also puts the submodule on `main` and fast-forwards it, so the design
-  system is editable in place — **what you build is whatever is on that
-  branch, not what the parent commit pins.**
-- `melos run gen` — after editing any ARB file.
-- `melos run analyze` — `--fatal-infos`, exactly what CI runs. **Must pass
-  with zero findings before considering any task done.** It analyzes the
-  design system standalone first, on purpose: the package must compile without
-  the host app, and running it from inside the app would hide an app
-  dependency leaking in.
-- `melos run test` — the Flutter test suite.
-- `melos run deploy-firebase` — rules, indexes and functions. Confirms the
-  project first; this reaches real users.
-
-Running the app before Firebase exists — the app is otherwise stuck on a
-login screen that cannot succeed (hard rule 1). `env/dev.json` carries
-`BYPASS_AUTH` and `MOCK_DATA_DEFAULT`, so this is all it takes:
-
-```sh
-melos run run
-```
-
-VS Code users: the **"Seller OS (dev)"** launch configuration does the same.
-**Never run the app bare** — with no `--dart-define-from-file` every `AppEnv`
-getter falls back to its default, which is a silently different app from the
-one CI builds.
-
-## Mock data — the app runs fully before Firebase exists
-
-**More → Settings → Mock data** swaps every repository for an in-memory one
-seeded with a coherent demo business (`features/mock_data/`). It is on by
-default whenever auth is bypassed, because the two go together: a bypassed
-session has no project and no user, so live mode would show an empty app and
-a stream of permission errors.
-
-- `DataMode` is **persisted** (unlike the auth bypass, which is a build flag),
-  because it is a setting a developer toggles from inside the running app. It
-  therefore carries its own guard: `DataModeController` refuses to return
-  `mock` in a release build whatever is stored, and the Settings card is
-  tree-shaken out entirely. Showing a user a fake business as if it were
-  theirs is worse than any crash.
-- **The seed is coherent, not random.** Every item traces to a purchase, every
-  purchase to a source, every order to items that existed, and the totals add
-  up by hand — `test/features/screens_with_mock_data_test.dart` asserts the
-  arithmetic. Random rows would fill the screens and prove nothing.
-- Three properties of the seed are deliberate and must survive edits to it:
-  **some items have no cost** (so `—` appears and hard rule 5 is exercised),
-  **some listings are stale and one failed to publish** (so Needs Attention
-  has something in it), and **one order sold under cost** (so the loss colour
-  renders somewhere).
-- **Nothing is persisted.** A restart re-seeds, so the dataset stays the
-  known-good one the tests are written against.
-- Live mode throws `UnimplementedError` from any repository provider — the
-  Firestore implementations do not exist yet. That is a named, explanatory
-  failure rather than a null-check crash three frames later.
-
-Delete this feature when the real data layer is done, the same way the auth
-bypass goes.
 
 ## Hard rules
 
@@ -485,7 +294,7 @@ bypass goes.
     spreadsheets.
 
 17. **`system_design/v2` is never modified, and v3 never imports it.** Plan
-    principles 17–19. See the design system section above.
+    principles 17–19. See `docs/rules/DESIGN_SYSTEM.md`.
 
 ## Code style
 
@@ -505,77 +314,17 @@ bypass goes.
 - **Never `var`.** Explicit types everywhere, `final`/`const` where possible.
   `prefer_final_locals` and `type_annotate_public_apis` are on.
 - **Declarations first, blank line, then logic.** No interleaving.
-- **Colour is never the only signal.** A state told by colour is also told by
-  an icon, a label or a shape. `SdBadgeV3` always carries a label for exactly
-  this reason — Seller OS draws a dozen states across items, listings, orders
-  and offers, and a colour-only marker is a memory test.
-- **One loud element per screen.** `SdHeroStatV3` is a filled, gradient card
-  and a screen gets at most one; everything else is an `SdStatTileV3`. Four
-  equal tiles say four things matter equally, which on a dashboard means none
-  of them does. Same rule for `SdCardV3(elevated: true)` and
-  `SdIconTileV3(filled: true)`.
-- **Depth is border-first, shadow-second.** The hairline separates a card in
-  every palette; `SdElevationV3` only adds a shadow where there is a lighter
-  page behind it to darken, and dark mode sets `SdThemeV3.shadow` transparent
-  so it vanishes. That is the intended look, not a degradation.
-- **A list of physical things gets a thumbnail, not an icon.** Sellers
-  recognise a row by the picture. Icons in tinted `SdIconTileV3` squares are
-  for categories and status rows, where there is no picture to show.
-- **Every price, cost and total uses `.tabular3`.** Proportional digits are
-  why a column of money appears to shuffle sideways as it updates, and this
-  app is mostly columns of money.
-- Motion: `SdMotionV3` only. No widget writes a `Duration(milliseconds:)`.
 
-## Pending setup — the owner does this by hand, don't assume it exists
+Visual and design-system rules — colour, hierarchy, depth, thumbnails,
+tabular figures, motion — are in `docs/rules/DESIGN_SYSTEM.md`.
 
-- **There is no Firebase project yet.** `lib/firebase_options.dart`,
-  `google-services.json` and `GoogleService-Info.plist` are all gitignored and
-  absent. Run `flutterfire configure` once the project exists. Until then
-  `bootstrap` catches the init failure and the app runs without a backend —
-  deliberately, so a missing config is a warning line rather than a white
-  screen. `melos run run` gets past login meanwhile (hard rule 1), and
-  **delete the bypass when real sign-in works.**
-  The `FIREBASE_*` keys in `env/*.json` are empty until then; `bootstrap` logs
-  one clean warning rather than a Firebase stack trace when it sees that.
-- **`.firebaserc` does not exist**, so `melos run deploy-firebase` cannot run.
-- **The v3 design-system commit is local to this machine.** It is committed in
-  `packages/system_design` on `main` but **not pushed**. Push it before anyone
-  else clones this repo, or their `melos run set-up` will fast-forward the
-  submodule to an upstream `main` that has no `v3/` and nothing will compile.
-- **Sign in with Apple and Google Sign-In are not configured** — no Services
-  ID, no OAuth client, no entitlement. The login screen's buttons are inert
-  and carry placeholder glyphs; both platforms require their own brand mark
-  and forbid a substitute, so the real assets must land before release.
-- **`functions/` has no deployed function.** `npm ci` has not been run there.
-- **App icons and launch screens are Flutter's defaults.**
-- **No `firebase_options.dart` means no FCM, no Crashlytics data, no
-  Analytics.** Everything is wired; nothing is reporting.
+## Definition of done
 
-## Testing priorities
-
-Done: **(1) profit, margin, ROI and max-buy-price**, including the plan §11
-worked example, and screen-level tests that assert the figures rendered
-against the mock seed rather than eyeballing a screenshot.
-
-Still to do, in order:
-
-2. **State transitions** (plan §29) — that listing an item without a price is
-   refused, and that Quick Add with only a title is not.
-3. **Permissions** — that a `viewer` cannot write and that nobody can edit
-   their own membership document. Firestore rules tests against the emulator.
-4. **Repository boundary** — that every `data/` method maps its failures to
-   `AppFailure` rather than leaking a `FirebaseException`.
-5. **Widget tests** for forms and error states.
-
-Two things about widget tests here, both learned the hard way:
-
-- **`pumpScreen` in `test/support/pump_app.dart` pins the surface to
-  1179×2556.** The default 800×600 is wider and much shorter than any phone,
-  so it hides real overflows behind fake ones.
-- **Warm the streams with `warmUp(container)`, not `await
-  container.read(p.future)`.** The mock repositories are backed by a broadcast
-  controller that never closes, so awaiting their future hangs until the test
-  times out.
+- `melos run analyze` — `--fatal-infos`, exactly what CI runs. **Must pass
+  with zero findings before considering any task done.** It analyzes the
+  design system standalone first, on purpose: the package must compile without
+  the host app, and running it from inside the app would hide an app
+  dependency leaking in.
 
 ## When unsure
 
