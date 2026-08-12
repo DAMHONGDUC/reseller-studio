@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/analytics_summary.dart';
 import '../../../providers.dart';
 
+part 'analytics_screen_drill_downs.dart';
 part 'analytics_screen_marketplace_breakdown.dart';
 part 'analytics_screen_marketplace_row.dart';
 part 'analytics_screen_profit_statement.dart';
@@ -46,6 +50,16 @@ class AnalyticsScreen extends ConsumerWidget {
             subtitle: 'Where the money actually comes from',
           ),
           const _MarketplaceBreakdown(),
+          const SdSectionHeaderV3(
+            title: 'Go deeper',
+            subtitle: 'The same figures, one question at a time',
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: const _DrillDowns(),
+          ),
         ],
       ),
     );

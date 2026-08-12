@@ -36,6 +36,11 @@ class OrdersScreen extends ConsumerWidget {
         title: 'Orders',
         actions: <Widget>[
           IconButton(
+            icon: const SdIconV3(Symbols.local_offer_rounded),
+            tooltip: 'Offers',
+            onPressed: () => context.push(AppRoutes.offers),
+          ),
+          IconButton(
             icon: const SdIconV3(Symbols.local_shipping_rounded),
             tooltip: 'Shipping queue',
             onPressed: () => context.push(AppRoutes.shippingQueue),

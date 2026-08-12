@@ -4,6 +4,8 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/storage/document_picker.dart';
+import '../../../../core/storage/file_uploader.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
@@ -32,6 +34,7 @@ class ExpenseController extends Notifier<bool> {
     String? vendor,
     String? notes,
     String? orderId,
+    String? receiptUrl,
     double? mileage,
     bool isRecurring = false,
   }) async {
@@ -62,6 +65,7 @@ class ExpenseController extends Notifier<bool> {
               createdAt: DateTime.now(),
               vendor: _orNull(vendor),
               notes: _orNull(notes),
+              receiptUrl: receiptUrl,
               mileage: mileage,
               orderId: orderId,
               isRecurring: isRecurring,
@@ -76,6 +80,38 @@ class ExpenseController extends Notifier<bool> {
           'expenseId': expenseId,
           'category': category.name,
         },
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Photograph or choose a receipt and store it, returning its URL.
+  ///
+  /// Uploaded now rather than at save, so a seller who photographs a receipt
+  /// and then loses signal has one upload to retry rather than a form that
+  /// will not submit. Returns null when they cancelled — not an error.
+  Future<String?> attachReceipt({
+    required String recordId,
+    required bool fromCamera,
+  }) async {
+    state = true;
+
+    try {
+      return await DocumentPicker.pickAndUpload(
+        uploader: ref.read(fileUploaderProvider),
+        folder: FileFolder.receipts,
+        recordId: recordId,
+        fromCamera: fromCamera,
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Failed to attach a receipt',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'recordId': recordId},
       );
 
       rethrow;

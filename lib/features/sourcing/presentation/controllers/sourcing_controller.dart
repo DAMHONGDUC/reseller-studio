@@ -4,6 +4,8 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/storage/document_picker.dart';
+import '../../../../core/storage/file_uploader.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
@@ -111,6 +113,7 @@ class SourcingController extends Notifier<bool> {
     String? sourceId,
     String totalCost = '',
     String? notes,
+    String? receiptUrl,
     int itemCount = 0,
   }) async {
     final String purchaseId = id ?? _uuid.v4();
@@ -134,6 +137,7 @@ class SourcingController extends Notifier<bool> {
               createdAt: DateTime.now(),
               sourceId: sourceId,
               totalCost: Money.tryParse(totalCost, currency),
+              receiptUrl: receiptUrl,
               notes: _orNull(notes),
               itemCount: itemCount,
             ),
@@ -146,6 +150,37 @@ class SourcingController extends Notifier<bool> {
         error: error,
         stackTrace: stackTrace,
         data: <String, Object>{'purchaseId': purchaseId},
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Photograph or choose a receipt and store it, returning its URL.
+  ///
+  /// Uploaded now rather than at save — see the note on the expense form's
+  /// version. Returns null when the seller cancelled, which is not an error.
+  Future<String?> attachReceipt({
+    required String recordId,
+    required bool fromCamera,
+  }) async {
+    state = true;
+
+    try {
+      return await DocumentPicker.pickAndUpload(
+        uploader: ref.read(fileUploaderProvider),
+        folder: FileFolder.receipts,
+        recordId: recordId,
+        fromCamera: fromCamera,
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Failed to attach a receipt',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'recordId': recordId},
       );
 
       rethrow;

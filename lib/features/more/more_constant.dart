@@ -63,6 +63,7 @@ final class MoreConstant {
       label: 'Receipts',
       icon: Symbols.description_rounded,
       route: AppRoutes.receipts,
+      isBuilt: true,
     ),
     MoreDestination(
       label: 'Categories',

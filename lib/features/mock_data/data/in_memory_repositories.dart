@@ -9,6 +9,8 @@ import '../../inventory/domain/repositories/catalog_repository.dart';
 import '../../inventory/domain/repositories/item_repository.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/repositories/listing_repository.dart';
+import '../../offers/domain/entities/offer.dart';
+import '../../offers/domain/repositories/offer_repository.dart';
 import '../../orders/domain/entities/order.dart';
 import '../../orders/domain/repositories/order_repository.dart';
 import '../../sourcing/domain/entities/purchase.dart';
@@ -35,7 +37,8 @@ class MockStore {
       purchases = List<Purchase>.of(dataset.purchases),
       expenses = List<Expense>.of(dataset.expenses),
       categories = List<ItemCategory>.of(dataset.categories),
-      locations = List<StorageLocation>.of(dataset.locations);
+      locations = List<StorageLocation>.of(dataset.locations),
+      offers = List<Offer>.of(dataset.offers);
 
   /// Seeded from the current clock, so the demo data is always recent.
   factory MockStore.seeded({DateTime? now}) =>
@@ -51,6 +54,7 @@ class MockStore {
   final List<Expense> expenses;
   final List<ItemCategory> categories;
   final List<StorageLocation> locations;
+  final List<Offer> offers;
 
   // Broadcast because several screens watch the same collection at once —
   // Home counts orders while the Orders tab lists them. A single-subscription
@@ -297,6 +301,27 @@ class InMemoryPurchaseRepository implements PurchaseRepository {
     _store.purchases.removeWhere((Purchase purchase) => purchase.id == id);
     _store.notifyChanged();
   }
+}
+
+class InMemoryOfferRepository implements OfferRepository {
+  const InMemoryOfferRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<Offer>> watchOffers() => _store.watch(() {
+    final List<Offer> sorted = List<Offer>.of(_store.offers)
+      ..sort((Offer a, Offer b) => b.createdAt.compareTo(a.createdAt));
+
+    return sorted;
+  });
+
+  @override
+  Future<void> save(Offer offer) async => _store.upsert(
+    _store.offers,
+    offer,
+    (Offer other) => other.id == offer.id,
+  );
 }
 
 class InMemoryCategoryRepository implements CategoryRepository {

@@ -21,6 +21,8 @@ import '../inventory/domain/repositories/catalog_repository.dart';
 import '../inventory/domain/repositories/item_repository.dart';
 import '../listings/data/repositories/firestore_listing_repository.dart';
 import '../listings/domain/repositories/listing_repository.dart';
+import '../offers/data/repositories/firestore_offer_repository.dart';
+import '../offers/domain/repositories/offer_repository.dart';
 import '../orders/data/repositories/firestore_order_repository.dart';
 import '../orders/domain/repositories/order_repository.dart';
 import '../sourcing/data/repositories/firestore_sourcing_repositories.dart';
@@ -208,6 +210,19 @@ final Provider<OrderRepository> orderRepositoryProvider =
       if (context == null) LiveRepositoryGuard.noWorkspace('OrderRepository');
 
       return FirestoreOrderRepository(context);
+    });
+
+final Provider<OfferRepository> offerRepositoryProvider =
+    Provider<OfferRepository>((Ref ref) {
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemoryOfferRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) LiveRepositoryGuard.noWorkspace('OfferRepository');
+
+      return FirestoreOfferRepository(context);
     });
 
 final Provider<ListingRepository> listingRepositoryProvider =

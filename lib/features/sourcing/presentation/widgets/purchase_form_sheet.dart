@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
@@ -9,6 +10,7 @@ import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../core/widgets/picker_field.dart';
+import '../../../../core/widgets/receipt_field.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/source.dart';
 import '../../providers.dart';
@@ -40,14 +42,37 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
   final TextEditingController _total = TextEditingController();
   final TextEditingController _notes = TextEditingController();
 
+  /// Minted here so a receipt uploaded before the purchase is saved already
+  /// lands under the record it belongs to.
+  final String _purchaseId = const Uuid().v4();
+
   DateTime _date = DateTime.now();
   String? _sourceId;
+  String? _receiptUrl;
 
   @override
   void dispose() {
     _total.dispose();
     _notes.dispose();
     super.dispose();
+  }
+
+  Future<void> _attach({required bool fromCamera}) async {
+    try {
+      final String? url = await ref
+          .read(sourcingControllerProvider.notifier)
+          .attachReceipt(recordId: _purchaseId, fromCamera: fromCamera);
+
+      // Null means the seller cancelled the picker, which is not a change.
+      if (url == null || !mounted) return;
+
+      setState(() => _receiptUrl = url);
+    } catch (error) {
+      // Already logged by the controller.
+      if (!mounted) return;
+
+      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+    }
   }
 
   Future<void> _submit() async {
@@ -57,10 +82,12 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
       await ref
           .read(sourcingControllerProvider.notifier)
           .savePurchase(
+            id: _purchaseId,
             purchaseDate: _date,
             sourceId: _sourceId,
             totalCost: _total.text,
             notes: _notes.text,
+            receiptUrl: _receiptUrl,
           );
 
       if (!mounted) return;
@@ -158,6 +185,14 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
               controller: _notes,
               maxLines: 2,
               textInputAction: TextInputAction.done,
+            ),
+            SizedBox(height: SdSpacingConstant.h16),
+            ReceiptField(
+              url: _receiptUrl,
+              isBusy: isBusy,
+              onCamera: () => _attach(fromCamera: true),
+              onLibrary: () => _attach(fromCamera: false),
+              onRemove: () => setState(() => _receiptUrl = null),
             ),
             SizedBox(height: SdSpacingConstant.h24),
             SdButtonV3(

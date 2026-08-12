@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../features/analytics/presentation/screens/analytics_categories_screen/analytics_categories_screen.dart';
+import '../../features/analytics/presentation/screens/analytics_inventory_screen/analytics_inventory_screen.dart';
+import '../../features/analytics/presentation/screens/analytics_marketplace_screen/analytics_marketplace_screen.dart';
+import '../../features/analytics/presentation/screens/analytics_profit_screen/analytics_profit_screen.dart';
+import '../../features/analytics/presentation/screens/analytics_sales_screen/analytics_sales_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
+import '../../features/analytics/presentation/screens/analytics_sources_screen/analytics_sources_screen.dart';
 import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
 import '../../features/auth/providers.dart';
 import '../../features/expenses/presentation/screens/expenses_screen/expenses_screen.dart';
@@ -17,9 +23,11 @@ import '../../features/inventory/presentation/screens/scanner_screen/scanner_scr
 import '../../features/listings/presentation/screens/listings_screen/listings_screen.dart';
 import '../../features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
+import '../../features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
+import '../../features/receipts/presentation/screens/receipts_screen/receipts_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen/reports_screen.dart';
 import '../../features/search/presentation/screens/search_screen/search_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen/settings_screen.dart';
@@ -198,6 +206,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     builder: (BuildContext context, GoRouterState state) =>
                         const ShippingQueueScreen(),
                   ),
+                  GoRoute(
+                    path: 'offers',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const OffersScreen(),
+                  ),
                   // Last among the order sub-routes on purpose: a literal
                   // segment declared after `:orderId` would be swallowed by
                   // the parameter, so every fixed path must come first.
@@ -218,6 +231,38 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.analytics,
                 builder: (BuildContext context, GoRouterState state) =>
                     const AnalyticsScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'sales',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AnalyticsSalesScreen(),
+                  ),
+                  GoRoute(
+                    path: 'profit',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AnalyticsProfitScreen(),
+                  ),
+                  GoRoute(
+                    path: 'inventory',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AnalyticsInventoryScreen(),
+                  ),
+                  GoRoute(
+                    path: 'marketplace',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AnalyticsMarketplaceScreen(),
+                  ),
+                  GoRoute(
+                    path: 'categories',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AnalyticsCategoriesScreen(),
+                  ),
+                  GoRoute(
+                    path: 'sources',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AnalyticsSourcesScreen(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -286,6 +331,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'reports',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ReportsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'receipts',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const ReceiptsScreen(),
                   ),
                   GoRoute(
                     path: 'categories',
