@@ -46,7 +46,8 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
           ref.watch(ordersProvider).value ?? const <Order>[];
       final String currency = ref.watch(workspaceCurrencyProvider);
 
-      final Map<Marketplace, List<Order>> grouped = <Marketplace, List<Order>>{};
+      final Map<Marketplace, List<Order>> grouped =
+          <Marketplace, List<Order>>{};
 
       for (final Order order in orders) {
         if (!order.status.countsAsRevenue) continue;
@@ -54,20 +55,21 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
         grouped.putIfAbsent(order.marketplace, () => <Order>[]).add(order);
       }
 
-      final List<MarketplacePerformance> rows = grouped.entries
-          .map(
-            (MapEntry<Marketplace, List<Order>> entry) =>
-                MarketplacePerformance.from(
-                  marketplace: entry.key,
-                  orders: entry.value,
-                  currency: currency,
-                ),
-          )
-          .toList()
-        ..sort(
-          (MarketplacePerformance a, MarketplacePerformance b) =>
-              b.revenue.compareTo(a.revenue),
-        );
+      final List<MarketplacePerformance> rows =
+          grouped.entries
+              .map(
+                (MapEntry<Marketplace, List<Order>> entry) =>
+                    MarketplacePerformance.from(
+                      marketplace: entry.key,
+                      orders: entry.value,
+                      currency: currency,
+                    ),
+              )
+              .toList()
+            ..sort(
+              (MarketplacePerformance a, MarketplacePerformance b) =>
+                  b.revenue.compareTo(a.revenue),
+            );
 
       return rows;
     });
@@ -78,22 +80,23 @@ final Provider<List<Item>> staleItemsProvider = Provider<List<Item>>((Ref ref) {
   final Duration threshold = ref.watch(staleThresholdProvider);
   final DateTime now = DateTime.now();
 
-  final List<Item> stale = items
-      .where(
-        (Item item) =>
-            item.status == ItemStatus.listed &&
-            StaleInventoryPolicy.isStale(
-              item.listedAt,
-              now: now,
-              threshold: threshold,
-            ),
-      )
-      .toList()
-    // Oldest first — the one that has tied up capital longest is the one to
-    // act on.
-    ..sort(
-      (Item a, Item b) => (a.listedAt ?? now).compareTo(b.listedAt ?? now),
-    );
+  final List<Item> stale =
+      items
+          .where(
+            (Item item) =>
+                item.status == ItemStatus.listed &&
+                StaleInventoryPolicy.isStale(
+                  item.listedAt,
+                  now: now,
+                  threshold: threshold,
+                ),
+          )
+          .toList()
+        // Oldest first — the one that has tied up capital longest is the one to
+        // act on.
+        ..sort(
+          (Item a, Item b) => (a.listedAt ?? now).compareTo(b.listedAt ?? now),
+        );
 
   return stale;
 });

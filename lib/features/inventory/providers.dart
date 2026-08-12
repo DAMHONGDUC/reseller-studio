@@ -48,10 +48,11 @@ enum InventoryFilter {
 }
 
 /// Every item in the workspace, live.
-final StreamProvider<List<Item>> itemsProvider =
-    StreamProvider<List<Item>>((Ref ref) {
-      return ref.watch(itemRepositoryProvider).watchItems();
-    });
+final StreamProvider<List<Item>> itemsProvider = StreamProvider<List<Item>>((
+  Ref ref,
+) {
+  return ref.watch(itemRepositoryProvider).watchItems();
+});
 
 /// One item, live — what the detail screen watches so an edit made on another
 /// device (or by a teammate) appears without a reload.
@@ -61,10 +62,7 @@ final StreamProvider<List<Item>> itemsProvider =
 // cannot be named here. The generic arguments on `.family` carry the same
 // information.
 // ignore: type_annotate_public_apis
-final itemProvider = StreamProvider.family<Item?, String>((
-  Ref ref,
-  String id,
-) {
+final itemProvider = StreamProvider.family<Item?, String>((Ref ref, String id) {
   return ref.watch(itemRepositoryProvider).watchItem(id);
 });
 
@@ -91,10 +89,9 @@ class InventorySearchController extends Notifier<String> {
 }
 
 final NotifierProvider<InventorySearchController, String>
-inventorySearchProvider =
-    NotifierProvider<InventorySearchController, String>(
-      InventorySearchController.new,
-    );
+inventorySearchProvider = NotifierProvider<InventorySearchController, String>(
+  InventorySearchController.new,
+);
 
 /// How many items sit under each tab.
 ///

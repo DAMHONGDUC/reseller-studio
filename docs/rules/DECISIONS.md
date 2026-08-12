@@ -44,3 +44,14 @@ The real fix, if the noise ever justifies it, is splitting the package's
 dependencies per generation, which pub does not support in one package —
 meaning it would take a second package. Not worth it for a warning. Revisit
 only if it becomes a build failure.
+
+## Why a caught error must still be logged
+
+Explains "Every `catch` logs, wherever it sits" in the root `CLAUDE.md`.
+Inherited from the sibling app (BaroEase), where the rule was written after
+the fact — the reasoning transfers, the incident is not Seller OS's.
+
+The rule was written after three features failed silently at once: WeatherKit
+answered every call `401` and the app said "no weather", `sendTestPush` was
+refused by the backend, and neither left a line anywhere. The reason to log a
+caught error is that a caught error is invisible by construction.

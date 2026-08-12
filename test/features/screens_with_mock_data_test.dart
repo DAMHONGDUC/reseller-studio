@@ -11,6 +11,7 @@ import 'package:seller_os/features/inventory/providers.dart';
 import 'package:seller_os/features/orders/domain/entities/order.dart';
 import 'package:seller_os/features/orders/providers.dart';
 import 'package:seller_os/features/settings/presentation/screens/settings_screen/settings_screen.dart';
+import 'package:system_design/index.dart';
 
 import '../support/pump_app.dart';
 
@@ -180,10 +181,15 @@ void main() {
       expect(find.text('—'), findsWidgets);
 
       // The oldest item is tenth and is not built until scrolled to.
+      //
+      // `.first` is the `CustomScrollView`'s own scrollable, which is the
+      // outermost one on this screen. Deliberately not `.last`: the pinned
+      // header holds the filter strip, and that is a horizontal `ListView` —
+      // dragging it vertically scrolls nothing and the row never appears.
       await tester.scrollUntilVisible(
         find.textContaining('Vintage Levi'),
         300,
-        scrollable: find.byType(Scrollable).last,
+        scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
 
@@ -193,6 +199,88 @@ void main() {
       // loses the fact that it is still live and still earning nothing.
       expect(find.text('Stale'), findsWidgets);
       expect(find.text('Listed'), findsWidgets);
+    });
+
+    testWidgets('Inventory docks the search field into the bar on scroll', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const InventoryScreen());
+
+      final Rect expanded = tester.getRect(find.byType(SdSearchFieldV3));
+
+      expect(find.text('Inventory'), findsOneWidget);
+
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+
+      final Rect docked = tester.getRect(find.byType(SdSearchFieldV3));
+
+      // It moved up into the title's row and gave the width back to the
+      // actions beside it — the two halves of "docked".
+      expect(docked.top, lessThan(expanded.top));
+      expect(docked.width, lessThan(expanded.width));
+
+      // The title is faded out, not removed: one field, one tree, no
+      // cross-fade between two of them.
+      expect(
+        tester
+            .widget<Opacity>(
+              find.ancestor(
+                of: find.text('Inventory'),
+                matching: find.byType(Opacity),
+              ),
+            )
+            .opacity,
+        0,
+      );
+
+      // Search and the scanner stay reachable 300 rows down — they are the
+      // chrome. The filter strip deliberately does NOT: it is a widget in the
+      // body, never part of the app bar, so it scrolls away with the content.
+      expect(find.byTooltip('Scan'), findsOneWidget);
+      expect(find.text('All'), findsNothing);
+    });
+
+    testWidgets('Inventory keeps the filter strip out of the app bar', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const InventoryScreen());
+
+      final Rect strip = tester.getRect(find.text('All'));
+      final Rect field = tester.getRect(find.byType(SdSearchFieldV3));
+
+      // Below the chrome, not inside it.
+      expect(strip.top, greaterThan(field.bottom));
+    });
+
+    testWidgets('Quick Add sheds its label only while the list is moving', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const InventoryScreen());
+
+      expect(find.text('Quick Add'), findsOneWidget);
+
+      // Held, not flicked: the button expands again the moment a scroll
+      // ends, so a completed drag would prove nothing.
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.byType(CustomScrollView)),
+      );
+
+      // Two steps, because one long move is a single pointer event and the
+      // drag recogniser never sees the touch slop crossed — the list would
+      // not move at all and the assertion below would pass for the wrong
+      // reason.
+      await gesture.moveBy(const Offset(0, -40));
+      await tester.pump();
+      await gesture.moveBy(const Offset(0, -260));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Quick Add'), findsNothing);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Quick Add'), findsOneWidget);
     });
 
     testWidgets('Analytics renders the profit statement', (

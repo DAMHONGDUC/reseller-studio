@@ -175,7 +175,7 @@ class PurchaseEvaluation {
 /// workspace's threshold. Storing it would mean a nightly job flipping
 /// thousands of documents, and a seller who reprices would have to wait for
 /// that job before the item left the Stale tab.
-abstract final class StaleInventoryPolicy {
+final class StaleInventoryPolicy {
   /// How long a listing sits before it counts as stale, when the workspace
   /// has not set its own.
   ///

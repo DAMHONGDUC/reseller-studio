@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../domain/entities/item.dart';
 import '../../../providers.dart';
 import '../../widgets/item_card.dart';
+
+part 'inventory_screen_empty_inventory.dart';
+part 'inventory_screen_filter_strip.dart';
+part 'inventory_screen_item_list.dart';
 
 /// Inventory — "what do I have?".
 ///
@@ -19,26 +25,59 @@ import '../../widgets/item_card.dart';
 /// **All five counts come from one stream**, folded in
 /// `inventoryCountsProvider`. Per-tab queries would mean five live listeners
 /// for one screen, and the counts could disagree with the list being shown.
-class InventoryScreen extends ConsumerWidget {
+///
+/// **The chrome collapses as the list scrolls.** `SdSearchHeaderV3` docks the
+/// search field into the title's row and pins the filter strip under it, so a
+/// seller 300 rows down still has search, filters and the scanner without
+/// scrolling back to the top — and pays one bar of height for them instead of
+/// three. The screen owns the controller for the same reason: the field is
+/// inside a sliver that rebuilds on every scroll frame, and a controller
+/// created there would be a new one each time.
+class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<InventoryScreen> createState() => _InventoryScreenState();
+}
+
+class _InventoryScreenState extends ConsumerState<InventoryScreen> {
+  final TextEditingController _search = TextEditingController();
+
+  /// Whether Quick Add shows its label. A notifier rather than `setState`:
+  /// the direction of a scroll changes several times a second, and rebuilding
+  /// the whole list for the width of a button is exactly the cost this screen
+  /// cannot pay.
+  final ValueNotifier<bool> _quickAddExpanded = ValueNotifier<bool>(true);
+
+  @override
+  void dispose() {
+    _search.dispose();
+    _quickAddExpanded.dispose();
+    super.dispose();
+  }
+
+  /// Collapses the button while the list is moving away under the thumb, and
+  /// brings the label back the moment it stops or reverses. `idle` counts as
+  /// expanded — a seller who has stopped scrolling is a seller reading, and
+  /// that is when they decide to add something.
+  ///
+  /// Vertical only: the filter strip is a horizontal `ListView` inside the
+  /// header, and swiping to reach "Stale" is not a reason to shrink the
+  /// button.
+  bool _onUserScroll(UserScrollNotification notification) {
+    if (notification.metrics.axis != Axis.vertical) return false;
+
+    _quickAddExpanded.value = notification.direction != ScrollDirection.reverse;
+
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final List<Item> items = ref.watch(visibleItemsProvider);
     final AsyncValue<List<Item>> source = ref.watch(itemsProvider);
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: 'Inventory',
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Symbols.qr_code_scanner_rounded),
-            tooltip: 'Scan',
-          ),
-          SizedBox(width: SdSpacingConstant.w8),
-        ],
-      ),
       // Lifted clear of the floating tab bar. `extendBody` keeps the FAB in
       // the body's coordinate space rather than stacking it above the bottom
       // slot, so without this the button renders *behind* the glass — which
@@ -47,163 +86,67 @@ class InventoryScreen extends ConsumerWidget {
         padding: EdgeInsets.only(
           bottom: SdContentPaddingV3.floatingBarInset(context),
         ),
-        child: FloatingActionButton.extended(
-          onPressed: () {},
-          icon: const Icon(Symbols.add_rounded),
-          label: const Text('Quick Add'),
+        child: ValueListenableBuilder<bool>(
+          valueListenable: _quickAddExpanded,
+          builder: (BuildContext context, bool expanded, Widget? _) => SdFabV3(
+            icon: Symbols.add_rounded,
+            label: context.l10n.quickAddTitle,
+            expanded: expanded,
+            onPressed: () => context.push(AppRoutes.quickAdd),
+          ),
         ),
       ),
-      body: Column(
-        children: <Widget>[
-          const _SearchField(),
-          const _FilterStrip(),
-          Expanded(
-            child: switch (source) {
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: _onUserScroll,
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SdSearchHeaderV3(
+              title: 'Inventory',
+              controller: _search,
+              hint: 'Title, SKU or barcode',
+              clearTooltip: 'Clear search',
+              onChanged: (String value) =>
+                  ref.read(inventorySearchProvider.notifier).update(value),
+              actions: <SdAppBarActionV3>[
+                SdAppBarActionV3(
+                  icon: Symbols.qr_code_scanner_rounded,
+                  tooltip: 'Scan',
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            // The filter strip is never part of the app bar (owner's rule):
+            // its own widget in the body, one topGap below the chrome.
+            SliverToBoxAdapter(
+              child: SizedBox(height: SdContentPaddingV3.topGap),
+            ),
+            const SliverToBoxAdapter(child: _FilterStrip()),
+            switch (source) {
               // A screen that has not loaded is not empty — saying "No items"
               // to a seller with four hundred is worse than a spinner.
               AsyncLoading<List<Item>>() when !source.hasValue =>
-                const SdLoadingV3Page(),
-              AsyncError<List<Item>>() => const SdEmptyStateV3(
-                icon: Symbols.error_rounded,
-                title: 'Could not load inventory',
-                message: 'Please try again.',
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: SdLoadingV3Page(),
+                ),
+              AsyncError<List<Item>>() => const SliverFillRemaining(
+                hasScrollBody: false,
+                child: SdEmptyStateV3(
+                  icon: Symbols.error_rounded,
+                  title: 'Could not load inventory',
+                  message: 'Please try again.',
+                ),
               ),
-              _ when items.isEmpty => _EmptyInventory(
-                hasAnyItems: (source.value ?? const <Item>[]).isNotEmpty,
+              _ when items.isEmpty => SliverFillRemaining(
+                hasScrollBody: false,
+                child: _EmptyInventory(
+                  hasAnyItems: (source.value ?? const <Item>[]).isNotEmpty,
+                ),
               ),
               _ => _ItemList(items: items),
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ItemList extends StatelessWidget {
-  const _ItemList({required this.items});
-
-  final List<Item> items;
-
-  @override
-  Widget build(BuildContext context) {
-    // One `now` for the whole list, so every row agrees on what stale means.
-    final DateTime now = DateTime.now();
-
-    return ListView.separated(
-      padding: EdgeInsets.fromLTRB(
-        SdContentPaddingV3.horizontal,
-        SdContentPaddingV3.topGap,
-        SdContentPaddingV3.horizontal,
-        // Clears the floating tab bar AND the FAB stacked above it —
-        // otherwise the last row sits under "Quick Add" and cannot be tapped.
-        SdContentPaddingV3.bottom(context, floatingNav: true) +
-            SdSpacingConstant.h64,
-      ),
-      itemCount: items.length,
-      separatorBuilder: (BuildContext context, int index) =>
-          SizedBox(height: SdContentPaddingV3.listItemGap),
-      itemBuilder: (BuildContext context, int index) {
-        final Item item = items[index];
-
-        return ItemCard(
-          item: item,
-          now: now,
-          onTap: () => context.push(AppRoutes.item(item.id)),
-        );
-      },
-    );
-  }
-}
-
-/// Distinguishes "no inventory at all" from "nothing matches this filter".
-///
-/// The same layout would otherwise tell a seller with four hundred items that
-/// they have none, just because the Stale tab happens to be clear — which is
-/// good news being reported as an empty screen.
-class _EmptyInventory extends StatelessWidget {
-  const _EmptyInventory({required this.hasAnyItems});
-
-  final bool hasAnyItems;
-
-  @override
-  Widget build(BuildContext context) => hasAnyItems
-      ? const SdEmptyStateV3(
-          icon: Symbols.filter_alt_off_rounded,
-          title: 'Nothing here',
-          message: 'No items match this filter.',
-        )
-      : const SdEmptyStateV3(
-          icon: Symbols.inventory_2_rounded,
-          title: 'No items yet',
-          message: 'Add your first item to start tracking inventory.',
-        );
-}
-
-class _SearchField extends ConsumerStatefulWidget {
-  const _SearchField();
-
-  @override
-  ConsumerState<_SearchField> createState() => _SearchFieldState();
-}
-
-class _SearchFieldState extends ConsumerState<_SearchField> {
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.fromLTRB(
-      SdContentPaddingV3.horizontal,
-      SdContentPaddingV3.topGap,
-      SdContentPaddingV3.horizontal,
-      0,
-    ),
-    child: SdSearchFieldV3(
-      controller: _controller,
-      hint: 'Title, SKU or barcode',
-      clearTooltip: 'Clear search',
-      onChanged: (String value) =>
-          ref.read(inventorySearchProvider.notifier).update(value),
-    ),
-  );
-}
-
-class _FilterStrip extends ConsumerWidget {
-  const _FilterStrip();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final InventoryFilter selected = ref.watch(inventoryFilterProvider);
-    final Map<InventoryFilter, int> counts = ref.watch(inventoryCountsProvider);
-
-    return SizedBox(
-      height: SdSpacingConstant.h56,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(
-          horizontal: SdContentPaddingV3.horizontal,
-          vertical: SdSpacingConstant.h8,
+          ],
         ),
-        itemCount: InventoryFilter.values.length,
-        separatorBuilder: (BuildContext context, int index) =>
-            SizedBox(width: SdSpacingConstant.w8),
-        itemBuilder: (BuildContext context, int index) {
-          final InventoryFilter filter = InventoryFilter.values[index];
-
-          return SdFilterChipV3(
-            label: filter.label,
-            count: counts[filter],
-            selected: filter == selected,
-            onSelected: () =>
-                ref.read(inventoryFilterProvider.notifier).select(filter),
-          );
-        },
       ),
     );
   }

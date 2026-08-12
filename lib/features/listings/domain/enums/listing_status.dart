@@ -20,7 +20,8 @@ enum ListingStatus {
   /// into a generic "ended" is how a policy strike goes unnoticed.
   error;
 
-  bool get isLive => this == ListingStatus.active || this == ListingStatus.paused;
+  bool get isLive =>
+      this == ListingStatus.active || this == ListingStatus.paused;
 }
 
 /// Expense categories (plan §17).

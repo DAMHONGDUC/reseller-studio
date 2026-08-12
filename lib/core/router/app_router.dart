@@ -3,11 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
-import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
 import '../../features/auth/providers.dart';
 import '../../features/home/presentation/screens/home_screen/home_screen.dart';
 import '../../features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import '../../features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
+import '../../features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen/settings_screen.dart';
@@ -92,6 +93,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     const InventoryScreen(),
                 routes: <RouteBase>[
                   GoRoute(
+                    path: 'quick-add',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const QuickAddScreen(),
+                  ),
+                  GoRoute(
                     path: 'item/:itemId',
                     builder: (BuildContext context, GoRouterState state) =>
                         ItemDetailScreen(
@@ -145,17 +151,16 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         ],
       ),
     ],
-    onException:
-        (BuildContext context, GoRouterState state, GoRouter router) {
-          // A route that does not exist is a bug in the app, not something to
-          // show the user a stack trace about. Log it and put them somewhere
-          // real. Plan §31: never expose a raw technical error.
-          AppLogger.error(
-            'Navigate to unknown route',
-            error: StateError('No route for ${state.uri}'),
-          );
-          router.go(AppRoutes.home);
-        },
+    onException: (BuildContext context, GoRouterState state, GoRouter router) {
+      // A route that does not exist is a bug in the app, not something to
+      // show the user a stack trace about. Log it and put them somewhere
+      // real. Plan §31: never expose a raw technical error.
+      AppLogger.error(
+        'Navigate to unknown route',
+        error: StateError('No route for ${state.uri}'),
+      );
+      router.go(AppRoutes.home);
+    },
   );
 
   ref.onDispose(router.dispose);
@@ -182,12 +187,9 @@ const Set<String> _authRoutes = <String>{
 /// provider this bridges is a plain `Provider` anyway.
 class _ProviderRefreshListenable<T> extends ChangeNotifier {
   _ProviderRefreshListenable(Ref ref, Provider<T> provider) {
-    _subscription = ref.listen<T>(
-      provider,
-      (T? previous, T next) {
-        if (previous != next) notifyListeners();
-      },
-    );
+    _subscription = ref.listen<T>(provider, (T? previous, T next) {
+      if (previous != next) notifyListeners();
+    });
   }
 
   late final ProviderSubscription<T> _subscription;

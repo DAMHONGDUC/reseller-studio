@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
-import '../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/extensions/context_extensions.dart';
 
 /// Login — the gate. **There is no guest mode** (plan principle 1), so this
 /// is the first screen anyone without a session reaches, and every route

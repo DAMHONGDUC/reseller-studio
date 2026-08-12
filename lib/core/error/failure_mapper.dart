@@ -20,7 +20,7 @@ import 'app_failure.dart';
 /// that swallowed it holds the only copy of what actually happened — so the
 /// log happens here, once, rather than at forty call sites that each might
 /// forget.
-abstract final class FailureMapper {
+final class FailureMapper {
   /// Run [action], returning its value, and convert any throw into an
   /// [AppFailure].
   ///
@@ -91,8 +91,8 @@ abstract final class FailureMapper {
           'permission-denied' => AppFailureKind.permissionDenied,
           'unauthenticated' => AppFailureKind.unauthenticated,
           'not-found' => AppFailureKind.notFound,
-          'invalid-argument' || 'failed-precondition' =>
-            AppFailureKind.invalidData,
+          'invalid-argument' ||
+          'failed-precondition' => AppFailureKind.invalidData,
           'resource-exhausted' => AppFailureKind.limitReached,
           _ => AppFailureKind.unknown,
         },
@@ -101,9 +101,6 @@ abstract final class FailureMapper {
       );
     }
 
-    return AppFailure.unknown(
-      technicalMessage: error.toString(),
-      cause: error,
-    );
+    return AppFailure.unknown(technicalMessage: error.toString(), cause: error);
   }
 }

@@ -42,7 +42,7 @@ enum Flavor {
 /// credentials. **Marketplace OAuth secrets are not fine and must never
 /// appear here** (hard rule 10): they live in Secret Manager and are read
 /// only by Cloud Functions. See `env/README.md`.
-abstract final class AppEnv {
+final class AppEnv {
   // --- Identity ---
 
   static const Flavor flavor = _flavor == 'prod'
@@ -78,9 +78,7 @@ abstract final class AppEnv {
 
   /// Whether mock data starts on. Only a *default* — `DataModeController`
   /// persists the user's own choice on top of it.
-  static const bool mockDataDefault = bool.fromEnvironment(
-    'MOCK_DATA_DEFAULT',
-  );
+  static const bool mockDataDefault = bool.fromEnvironment('MOCK_DATA_DEFAULT');
 
   /// Turns on `AppLogger.debug` output. Off even in debug builds unless
   /// asked for, so the console stays a story of what the app did rather than

@@ -51,16 +51,51 @@ getter.
 
 Owner's rules, all of them read from one place so no screen types them:
 
-- **The gap from the app bar down to the content under it is 12** —
-  `SdContentPaddingV3.topGap`. It is what `screen()`, `fullBleed()` and
-  `sectionHeader()` are built on, so changing it is one edit.
-- **The app bar is 48 tall, not `kToolbarHeight`'s 56, and its title is
-  `titleMedium`** — `SdAppBarV3.toolbarHeight`. A screen title is a label,
-  not a headline; the screen's own content is what should be loud.
+- **The gap from the app bar down to the content under it is 8** —
+  `SdContentPaddingV3.topGap`. Owner's rule. The bar already carries a band of
+  empty space at its own bottom edge, the more so now it is a full 56 —
+  anything more under it reads as a hole between the chrome and the page.
+- **`topGap` is a `SizedBox` the screen places, never padding and never added
+  to a bar's height.** Owner's rule. `screen()` and `fullBleed()` therefore
+  carry **no top inset**, and `SdAppBarV3.toolbarHeight + topGap` is a sum
+  that must not appear anywhere. A gap folded into an `EdgeInsets` is
+  invisible at the call site; a gap added to the toolbar height makes the bar
+  *measure* taller than it *draws*, which is how a docked control ends up
+  mis-set in a row whose height nobody can point at. A box in the tree can be
+  seen, moved and skipped. `SdSearchHeaderV3` keeps its own internal spacing
+  on `SdSearchHeaderMetricsV3` for the same reason — the distance between two
+  things the header draws is not the screen's `topGap`, even at the same
+  value.
+- **A filter strip is never part of the app bar.** Owner's rule. It is its own
+  widget in the body, `topGap` below the chrome, and it scrolls away with the
+  content. `SdSearchHeaderV3` holds the title, the search field and the
+  actions — there is no `bottom` slot on it, deliberately. What stays pinned
+  300 rows down is search and the actions; a filter row is content, and
+  content scrolls.
+- **The app bar follows the system: 56, `kToolbarHeight`** —
+  `SdAppBarV3.toolbarHeight`. Owner's rule. It was 48 for a while, on the
+  reasoning that eight points of chrome on every route is a row of inventory;
+  the bar reading as *this app's* bar rather than the platform's was the
+  higher cost. Taken through the spacing scale (`h56`), not as the raw
+  constant — everything the bar contains is scaled, and a raw 56 next to a
+  scaled child drifts apart on any device whose aspect differs from the
+  design canvas. **The title stays `titleMedium`**: a screen title is a
+  label, not a headline, and the screen's own content is what should be
+  loud.
 - **A screen whose search box is the point uses `SdSearchHeaderV3`, not an
   app bar with a field under it.** The field docks into the title's row as
   the list scrolls and the filter strip pins under it, so scrolled chrome
   costs one bar instead of three. Inventory is the reference implementation.
+- **The search field shrinks as it docks: 48 in its own row,
+  `SdSearchFieldV3.dockedHeight` (44) once it is in the bar.** Owner's rule.
+  44 is `SdAppBarActionV3.slot` — the pill and the action share that row, so
+  they share a height and read as one piece of chrome rather than two things
+  centred near each other. The field used to equal the full bar height, which
+  left it running edge to edge with no air above or below while the action
+  beside it floated; one control bursting out of the row reads as a
+  misalignment even when both are centred. The leftover splits evenly, ~6pt
+  top and bottom. **A control docking into the bar pads itself; it does not
+  fill the bar.**
 - **The FAB is `SdFabV3`, never Material's.** It is 48 tall against
   Material's 56 and sheds its label while the list is moving — but it never
   hides. A create action a seller has to hunt for is one they stop using.
@@ -127,3 +162,53 @@ why: see DECISIONS.md § Seller OS pays for v2's dependencies
   why a column of money appears to shuffle sideways as it updates, and this
   app is mostly columns of money.
 - Motion: `SdMotionV3` only. No widget writes a `Duration(milliseconds:)`.
+  Animations must be calm — fade/scale/slide, short, gentle curves. Never
+  flashing or strobing.
+
+## Dimensions and colour
+
+- **Responsive sizing via `flutter_screenutil`** (design size 390×844,
+  `minTextAdapt: true` — `SellerOsApp.designSize`), but NEVER as raw literals
+  in widgets: every dimension goes through `SdSpacingConstant` —
+  `w*` horizontal, `h*` vertical, `r*` square/radius, `sp*` font.
+  `SdSpacingConstant` lives in the package's generation-neutral `core/`, so it
+  is the same class v2 uses; there is no `V3` suffix and none is coming.
+- **Colour comes from `AppColors` (`lib/core/theme/`), never from the
+  package.** This is where Seller OS differs from BaroEase, whose palette
+  ships inside `system_design`: here the app owns the palette and hands it to
+  the design system as an `SdThemeV3` theme extension. So a *screen* reads
+  `context.colorScheme3` / `context.sdTheme3` or names an `AppColors` constant;
+  a *package widget* reads the extension and never names a colour at all.
+
+## Snackbars, dialogs and sheets — the v3 primitives do not exist yet
+
+These four rules are inherited from the sibling app and are written against
+the v3 names they will have. **None of them is built in `v3/` today**, and no
+screen in `lib/` currently needs one — there is not a single raw
+`showDialog`, `showModalBottomSheet` or `ScaffoldMessenger` call in the app.
+So this section is a specification for the first person who needs one, not a
+description of what is there.
+
+**Build the v3 widget first, then use it. Never reach into `v2/` for these**
+(hard rule 17), and never call the raw Flutter API as a stopgap — a stopgap is
+how the app ends up with two snackbar looks. `WIDGET_RULES.md` governs how to
+build them.
+
+- Snackbars: always `SdSnackBarUtilsV3.success/error/info` — never raw
+  `ScaffoldMessenger.showSnackBar`. It draws the app's own card and shows one
+  message at a time. Pass a finished localized string; the kind picks the icon
+  and accent, and the icon always differs so colour is never the only signal.
+  **It must draw into the root `Overlay`, not a `ScaffoldMessenger`** — a
+  messenger renders into the nearest registered `Scaffold`, so a route without
+  one sends its messages to the screen *underneath*, where the very sheet that
+  raised them covers them up. Widget tests do not catch it: `find.text`
+  matches a widget the user cannot see. Placement is a second prop —
+  `SdSnackBarPlacementV3.bottom` is the default and what every screen wants,
+  `top` is for a route that owns the bottom of the screen. Assert on
+  `SdSnackBarCardV3`, the only public handle on what a static presenter drew.
+- Dialogs: always `showSdDialogV3` + `SdDialogV3`/`SdDialogOptionV3` — never
+  raw `showDialog`.
+- Sheets: always `showSdBottomSheetV3` — it must use the root navigator so
+  sheets cover the floating glass tab bar; raw `showModalBottomSheet` slides
+  under it.
+- Use `SdPressableScaleV3` for tactile button feedback.

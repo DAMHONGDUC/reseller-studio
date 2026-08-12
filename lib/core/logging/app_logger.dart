@@ -69,17 +69,26 @@ final class AppLogger {
   /// [message] says *what was being attempted*, not what went wrong — the
   /// error object already carries that, and 'failed to load inventory' is
   /// what makes a Crashlytics issue findable six weeks later.
+  ///
+  /// [data] is what the call was doing — the arguments, the collection, the
+  /// record id. Without it a report says a save failed but not which save,
+  /// and the only way to find out is to reproduce the run. **Never a
+  /// credential or a buyer address** (hard rule 9): the id, the key name, the
+  /// count.
   static void error(
     String message, {
     Object? error,
     StackTrace? stackTrace,
+    Object? data,
   }) {
+    final String composed = _compose(message, data);
+
     if (enabled) {
-      _logger.e(message, error: error, stackTrace: stackTrace);
+      _logger.e(composed, error: error, stackTrace: stackTrace);
     }
 
     CrashReporter.instance.recordError(
-      message,
+      composed,
       error: error,
       stackTrace: stackTrace,
     );

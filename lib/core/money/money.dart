@@ -111,11 +111,10 @@ final class Money implements Comparable<Money> {
   /// **`compactSimpleCurrency`, not `compactCurrency`.** The latter renders
   /// the ISO code verbatim — `USD439` — because it treats `name` as the
   /// symbol to print. The `simple` variant looks the code up and prints `$439`.
-  String formatCompact({String? locale}) =>
-      NumberFormat.compactSimpleCurrency(
-        locale: locale,
-        name: currency,
-      ).format(minor / _pow10(2));
+  String formatCompact({String? locale}) => NumberFormat.compactSimpleCurrency(
+    locale: locale,
+    name: currency,
+  ).format(minor / _pow10(2));
 
   Money _checked(Money other) {
     if (other.currency != currency) {

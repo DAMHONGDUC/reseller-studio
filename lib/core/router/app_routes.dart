@@ -9,7 +9,7 @@
 /// shell branches, and everything else pushed on top of whichever branch it
 /// belongs to. A detail screen is a child of its tab, not a sibling — that is
 /// what keeps the tab bar visible and the back stack per-tab.
-abstract final class AppRoutes {
+final class AppRoutes {
   // --- Outside the shell: nothing here shows the tab bar. ---
 
   static const String splash = '/';

@@ -24,7 +24,7 @@ import 'app_env.dart';
 ///
 /// **Never read `AppEnv.bypassAuthRequested` directly.** It is the unguarded
 /// value, and it exists only so this file can guard it.
-abstract final class DevFlags {
+final class DevFlags {
   /// True in debug and profile builds, false in release.
   ///
   /// The gate for affordances that are *settings* rather than build flags —

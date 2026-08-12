@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 ///
 /// Nothing outside this file writes a `Color(0x…)`. A screen that needs a
 /// colour reads `context.sdTheme3` or `context.colorScheme3`.
-abstract final class AppColors {
+final class AppColors {
   // --- Brand ---
 
   /// The action colour: primary buttons, selected tabs, focused inputs.

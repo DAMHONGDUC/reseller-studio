@@ -101,8 +101,9 @@ class InMemoryItemRepository implements ItemRepository {
   Stream<List<Item>> watchItems() => _store.watch(() => _live);
 
   @override
-  Stream<Item?> watchItem(String id) =>
-      _store.watch(() => _store.items.where((Item i) => i.id == id).firstOrNull);
+  Stream<Item?> watchItem(String id) => _store.watch(
+    () => _store.items.where((Item i) => i.id == id).firstOrNull,
+  );
 
   @override
   Future<Item?> findById(String id) async =>
@@ -253,12 +254,14 @@ class InMemoryPurchaseRepository implements PurchaseRepository {
 
   @override
   Stream<List<Purchase>> watchPurchases() => _store.watch(() {
-    final List<Purchase> live = _store.purchases
-        .where((Purchase purchase) => !purchase.isDeleted)
-        .toList()
-      ..sort(
-        (Purchase a, Purchase b) => b.purchaseDate.compareTo(a.purchaseDate),
-      );
+    final List<Purchase> live =
+        _store.purchases
+            .where((Purchase purchase) => !purchase.isDeleted)
+            .toList()
+          ..sort(
+            (Purchase a, Purchase b) =>
+                b.purchaseDate.compareTo(a.purchaseDate),
+          );
 
     return live;
   });
@@ -296,10 +299,9 @@ class InMemoryExpenseRepository implements ExpenseRepository {
 
   @override
   Stream<List<Expense>> watchExpenses() => _store.watch(() {
-    final List<Expense> live = _store.expenses
-        .where((Expense expense) => !expense.isDeleted)
-        .toList()
-      ..sort((Expense a, Expense b) => b.date.compareTo(a.date));
+    final List<Expense> live =
+        _store.expenses.where((Expense expense) => !expense.isDeleted).toList()
+          ..sort((Expense a, Expense b) => b.date.compareTo(a.date));
 
     return live;
   });

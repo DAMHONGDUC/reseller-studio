@@ -64,5 +64,47 @@
   "emptyValuePlaceholder": "—",
   "@emptyValuePlaceholder": {
     "description": "Shown instead of a number when there is not enough data to compute it — profit with no cost entered, ROI with no sale. Never render 0 here: 0 is a claim, — is an absence. See the master plan §15."
+  },
+
+  "quickAddTitle": "Quick Add",
+  "@quickAddTitle": {
+    "description": "Screen title for the fastest create path, and the label on the Inventory FAB that opens it."
+  },
+  "quickAddNameLabel": "What is it?",
+  "@quickAddNameLabel": {
+    "description": "Label for the only field Quick Add requires — the item title. Phrased as a question because a seller is looking at the object while they type."
+  },
+  "quickAddNameHint": "Nike Air Max 90, size 10",
+  "@quickAddNameHint": {
+    "description": "Placeholder in the Quick Add title field. A concrete example, not the word 'Title'."
+  },
+  "quickAddHelp": "A title is all it takes. Price, photos and the rest can wait.",
+  "@quickAddHelp": {
+    "description": "Reassurance under the Quick Add field that nothing else is required — see hard rule 2."
+  },
+  "quickAddSaved": "Added to inventory",
+  "@quickAddSaved": {
+    "description": "Confirmation after Quick Add writes the item."
+  },
+  "quickAddEmptyTitleError": "Give it a name first",
+  "@quickAddEmptyTitleError": {
+    "description": "Shown when Save is pressed with an empty Quick Add title."
+  },
+
+  "itemBlockMissingPrice": "Add an asking price to list this",
+  "@itemBlockMissingPrice": {
+    "description": "Why an item cannot move to Listed — plan §29 state validation."
+  },
+  "itemBlockMissingSalePrice": "Add a sale price to mark this sold",
+  "@itemBlockMissingSalePrice": {
+    "description": "Why an item cannot move to Sold."
+  },
+  "itemBlockWrongStatus": "This item cannot move there from where it is",
+  "@itemBlockWrongStatus": {
+    "description": "Why a transition is refused because the item's current status is not a valid starting point."
+  },
+  "itemBlockNoQuantity": "Nothing left in stock to move",
+  "@itemBlockNoQuantity": {
+    "description": "Why a transition is refused because quantity is zero."
   }
 }

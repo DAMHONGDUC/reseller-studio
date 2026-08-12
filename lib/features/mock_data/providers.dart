@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/config/dev_flags.dart';
+import '../../core/constants/prefs_key_constant.dart';
 import '../../core/logging/app_logger.dart';
 import '../expenses/domain/repositories/expense_repository.dart';
 import '../inventory/domain/repositories/item_repository.dart';
@@ -38,15 +39,13 @@ enum DataMode {
 /// is stored. A user who somehow had the flag set could otherwise be shown a
 /// fake business as if it were theirs — which is worse than any crash.
 class DataModeController extends Notifier<DataMode> {
-  static const String _prefsKey = 'data_mode_mock';
-
   @override
   DataMode build() {
     final SharedPreferences? prefs = ref.watch(sharedPreferencesProvider).value;
 
     if (prefs == null) return _default;
 
-    final bool stored = prefs.getBool(_prefsKey) ?? DevFlags.mockDataDefault;
+    final bool stored = prefs.getBool(PrefsKeyConstant.dataModeMock) ?? DevFlags.mockDataDefault;
 
     return stored ? _guarded(DataMode.mock) : DataMode.live;
   }
@@ -85,7 +84,7 @@ class DataModeController extends Notifier<DataMode> {
       return;
     }
 
-    await prefs.setBool(_prefsKey, resolved.isMock);
+    await prefs.setBool(PrefsKeyConstant.dataModeMock, resolved.isMock);
     AppLogger.action('Data mode changed', <String, String>{
       'mode': resolved.name,
     });
@@ -163,16 +162,18 @@ final Provider<MockDataSummary> mockDataSummaryProvider =
 ///
 /// A named error rather than a null: it says exactly what is missing and why,
 /// instead of surfacing as a mysterious null-check failure three frames later.
-Never _liveNotImplemented(String repository) => throw UnimplementedError(
-  '$repository has no Firestore implementation yet. Turn on mock data in '
-  'More → Settings, or run with --dart-define=BYPASS_AUTH=true. See '
-  "CLAUDE.md 'Pending setup'.",
-);
+final class LiveRepositoryGuard {
+  static Never notImplemented(String repository) => throw UnimplementedError(
+    '$repository has no Firestore implementation yet. Turn on mock data in '
+    'More → Settings, or run with --dart-define=BYPASS_AUTH=true. See '
+    "CLAUDE.md 'Pending setup'.",
+  );
+}
 
 final Provider<ItemRepository> itemRepositoryProvider =
     Provider<ItemRepository>((Ref ref) {
       if (!ref.watch(dataModeProvider).isMock) {
-        _liveNotImplemented('ItemRepository');
+        LiveRepositoryGuard.notImplemented('ItemRepository');
       }
 
       return InMemoryItemRepository(ref.watch(mockStoreProvider));
@@ -181,7 +182,7 @@ final Provider<ItemRepository> itemRepositoryProvider =
 final Provider<OrderRepository> orderRepositoryProvider =
     Provider<OrderRepository>((Ref ref) {
       if (!ref.watch(dataModeProvider).isMock) {
-        _liveNotImplemented('OrderRepository');
+        LiveRepositoryGuard.notImplemented('OrderRepository');
       }
 
       return InMemoryOrderRepository(ref.watch(mockStoreProvider));
@@ -190,7 +191,7 @@ final Provider<OrderRepository> orderRepositoryProvider =
 final Provider<ListingRepository> listingRepositoryProvider =
     Provider<ListingRepository>((Ref ref) {
       if (!ref.watch(dataModeProvider).isMock) {
-        _liveNotImplemented('ListingRepository');
+        LiveRepositoryGuard.notImplemented('ListingRepository');
       }
 
       return InMemoryListingRepository(ref.watch(mockStoreProvider));
@@ -199,7 +200,7 @@ final Provider<ListingRepository> listingRepositoryProvider =
 final Provider<SourceRepository> sourceRepositoryProvider =
     Provider<SourceRepository>((Ref ref) {
       if (!ref.watch(dataModeProvider).isMock) {
-        _liveNotImplemented('SourceRepository');
+        LiveRepositoryGuard.notImplemented('SourceRepository');
       }
 
       return InMemorySourceRepository(ref.watch(mockStoreProvider));
@@ -208,7 +209,7 @@ final Provider<SourceRepository> sourceRepositoryProvider =
 final Provider<PurchaseRepository> purchaseRepositoryProvider =
     Provider<PurchaseRepository>((Ref ref) {
       if (!ref.watch(dataModeProvider).isMock) {
-        _liveNotImplemented('PurchaseRepository');
+        LiveRepositoryGuard.notImplemented('PurchaseRepository');
       }
 
       return InMemoryPurchaseRepository(ref.watch(mockStoreProvider));
@@ -217,7 +218,7 @@ final Provider<PurchaseRepository> purchaseRepositoryProvider =
 final Provider<ExpenseRepository> expenseRepositoryProvider =
     Provider<ExpenseRepository>((Ref ref) {
       if (!ref.watch(dataModeProvider).isMock) {
-        _liveNotImplemented('ExpenseRepository');
+        LiveRepositoryGuard.notImplemented('ExpenseRepository');
       }
 
       return InMemoryExpenseRepository(ref.watch(mockStoreProvider));

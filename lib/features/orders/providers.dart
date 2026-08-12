@@ -40,10 +40,11 @@ enum OrderFilter {
   };
 }
 
-final StreamProvider<List<Order>> ordersProvider =
-    StreamProvider<List<Order>>((Ref ref) {
-      return ref.watch(orderRepositoryProvider).watchOrders();
-    });
+final StreamProvider<List<Order>> ordersProvider = StreamProvider<List<Order>>((
+  Ref ref,
+) {
+  return ref.watch(orderRepositoryProvider).watchOrders();
+});
 
 // See `itemProvider` for why the type is inferred rather than written.
 // ignore: type_annotate_public_apis
@@ -80,8 +81,7 @@ final Provider<Map<OrderFilter, int>> orderCountsProvider =
 final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
   Ref ref,
 ) {
-  final List<Order> orders =
-      ref.watch(ordersProvider).value ?? const <Order>[];
+  final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
 
   return orders.where(ref.watch(orderFilterProvider).matches).toList();
 });
@@ -92,26 +92,26 @@ final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
 /// longest is not necessarily the one about to breach a shipping window, and
 /// the penalty falls on the deadline. Orders with no deadline sort last —
 /// they are real work, but nothing external is counting down on them.
-final Provider<List<Order>> ordersNeedingActionProvider =
-    Provider<List<Order>>((Ref ref) {
-      final List<Order> orders =
-          ref.watch(ordersProvider).value ?? const <Order>[];
+final Provider<List<Order>> ordersNeedingActionProvider = Provider<List<Order>>(
+  (Ref ref) {
+    final List<Order> orders =
+        ref.watch(ordersProvider).value ?? const <Order>[];
 
-      final List<Order> pending = orders
-          .where((Order order) => order.status.needsAction)
-          .toList()
-        ..sort((Order a, Order b) {
-          final DateTime? left = a.shipByDate;
-          final DateTime? right = b.shipByDate;
+    final List<Order> pending =
+        orders.where((Order order) => order.status.needsAction).toList()
+          ..sort((Order a, Order b) {
+            final DateTime? left = a.shipByDate;
+            final DateTime? right = b.shipByDate;
 
-          if (left == null && right == null) {
-            return a.orderedAt.compareTo(b.orderedAt);
-          }
-          if (left == null) return 1;
-          if (right == null) return -1;
+            if (left == null && right == null) {
+              return a.orderedAt.compareTo(b.orderedAt);
+            }
+            if (left == null) return 1;
+            if (right == null) return -1;
 
-          return left.compareTo(right);
-        });
+            return left.compareTo(right);
+          });
 
-      return pending;
-    });
+    return pending;
+  },
+);

@@ -58,12 +58,9 @@ class _FirebaseCrashReporter implements CrashReporter {
     // Deliberately not awaited: reporting a failure must never make the
     // caller wait, and a failure to report is not worth a second failure.
     // `unawaited_futures` is satisfied by the explicit ignore below.
-    _crashlytics.recordError(
-      error ?? reason,
-      stackTrace,
-      reason: reason,
-      fatal: false,
-    ).ignore();
+    _crashlytics
+        .recordError(error ?? reason, stackTrace, reason: reason, fatal: false)
+        .ignore();
   }
 
   @override

@@ -14,7 +14,7 @@ import 'app_colors.dart';
 /// `context.textTheme3` and never name a size. Sizes go through
 /// `SdSpacingConstant.sp*` so they scale with screenutil like every other
 /// dimension.
-abstract final class AppTheme {
+final class AppTheme {
   static ThemeData get light => _build(
     brightness: Brightness.light,
     colorScheme: const ColorScheme.light(
@@ -119,9 +119,24 @@ abstract final class AppTheme {
   /// no air above it) and generous for body, where it is what makes a
   /// paragraph scannable.
   static TextTheme _textTheme(Color color) => TextTheme(
-    headlineLarge: _display(SdSpacingConstant.sp36, color, -1.2, FontWeight.w700),
-    headlineMedium: _display(SdSpacingConstant.sp28, color, -0.8, FontWeight.w700),
-    headlineSmall: _display(SdSpacingConstant.sp24, color, -0.6, FontWeight.w700),
+    headlineLarge: _display(
+      SdSpacingConstant.sp36,
+      color,
+      -1.2,
+      FontWeight.w700,
+    ),
+    headlineMedium: _display(
+      SdSpacingConstant.sp28,
+      color,
+      -0.8,
+      FontWeight.w700,
+    ),
+    headlineSmall: _display(
+      SdSpacingConstant.sp24,
+      color,
+      -0.6,
+      FontWeight.w700,
+    ),
     titleLarge: _display(SdSpacingConstant.sp22, color, -0.4, FontWeight.w600),
     titleMedium: _text(SdSpacingConstant.sp16, color, -0.2, 1.35),
     titleSmall: _text(SdSpacingConstant.sp14, color, -0.1, 1.35),
