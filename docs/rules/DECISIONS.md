@@ -45,13 +45,13 @@ dependencies per generation, which pub does not support in one package —
 meaning it would take a second package. Not worth it for a warning. Revisit
 only if it becomes a build failure.
 
-## v3 keeps its own chrome — three v2 patterns are deliberately not ported
+## v3 keeps its own chrome — two v2 patterns are deliberately not ported
 
 Owner's call. Explains the "What v3 deliberately does NOT have" section in
 `DESIGN_SYSTEM.md`, and exists so the next session does not read the gap as an
 oversight and "finish the port".
 
-The spacing rulebook (`SdContentPaddingV2`) **was** ported in full. Three
+The spacing rulebook (`SdContentPaddingV2`) **was** ported in full. Two
 neighbouring v2 patterns were not, and this is the standing answer:
 
 - **`SdCollapsingFilterScaffoldV2` + `SdPinnedFilterBarV2`.** v2 lifts the
@@ -63,19 +63,34 @@ neighbouring v2 patterns were not, and this is the standing answer:
 - **`SdContentPaddingV3.belowPinnedFilterBar`.** Follows from the above: it is
   `appBarInset` plus the strip's height, the first term is zero under an
   opaque bar, and nothing pins a strip over a list anyway.
-- **`SdFloatingBarScopeV2`.** Not ported. See the open item below before
-  assuming that is harmless.
+- **`SdFloatingBarScopeV2`.** This one *was* ported, and is the exception that
+  proves the rest are deliberate. See below.
 - **Two search entry points on purpose.** Inventory uses `SdSearchHeaderV3`,
   whose field docks into the title row as the list scrolls. The Search screen
   builds a plain field with `autofocus` and no collapse, because that screen
   exists to be typed into immediately and collapsing chrome buys nothing when
   the list starts empty.
 
-**Not porting `SdFloatingBarScopeV2` has one known cost**: a snackbar renders
-over the glass nav bar on the five tab screens. Deferred by decision, and
-written up with the fix under "Remaining work" in `RELEASE_ACTIONS.md` — the
-symptom and the numbers live there, not here, so there is one copy to keep
-true.
+## The floating-bar scope was ported, and v3 asks a different question
+
+Owner approved the new component. `SdFloatingBarScopeV3` exists because not
+having it cost a real bug: a snackbar draws into the root overlay, above the
+whole app, so nothing in its own build can tell the glass nav bar is under it.
+On all five tab screens the card sat at `detailBottom` and its lower edge
+landed well inside `floatingBarInset` — the band the bar occupies.
+
+**v3's scope returns a bool where v2's returns a double.** `insetOf` was the
+right shape in v2, whose snackbar host does its own bottom arithmetic from
+`safe.bottom`. v3 already has `SdContentPaddingV3.bottom(floatingNav: …)` —
+the exact call every tab screen makes for its own last row — so the host asks
+`hasBarBelow` and hands the answer to that, and a message rests exactly where
+the content it is about does. One rulebook, no second copy of the arithmetic
+to drift.
+
+Both generations read from the **caller's** context rather than the entry's
+builder, and that part is not a style choice: the root overlay sits above the
+shell, so a scope inside it is invisible from down there and every message
+would read "no bar".
 
 ## Two rules from the sibling app that Seller OS deliberately inverts
 

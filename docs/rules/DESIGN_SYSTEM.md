@@ -233,10 +233,13 @@ disagree with reality** — do not port them back "for later":
   pins a filter strip over a scrolling list either: a filter strip is its own
   widget in the body and takes real layout space, so nothing has to clear it.
 
-The same call covers `SdCollapsingFilterScaffoldV2`, `SdPinnedFilterBarV2` and
-`SdFloatingBarScopeV2`, none of which v3 has. **v3's chrome is its own design,
-not an unfinished copy of v2's** — `DECISIONS.md` has the reasoning and one
-known open item. Read it before "finishing the port".
+The same call covers `SdCollapsingFilterScaffoldV2` and `SdPinnedFilterBarV2`,
+neither of which v3 has. **v3's chrome is its own design, not an unfinished
+copy of v2's** — `DECISIONS.md` has the reasoning. Read it before "finishing
+the port".
+
+`SdFloatingBarScopeV3` is the one that *was* ported, because leaving it out
+cost a real bug: see the snackbar entry under "Snackbars, dialogs and sheets".
 
 ### The traps — each one cost a real bug
 
@@ -348,6 +351,16 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   `SdSnackBarPlacementV3.bottom` is the default and what every screen wants,
   `top` is for a route that owns the bottom of the screen. Assert on
   `SdSnackBarCardV3`, the only public handle on what a static presenter drew.
+  - **Drawing into the root overlay means it cannot see the glass nav bar**,
+    and for a while it landed inside the band the bar occupies on all five
+    tab screens. `SdFloatingBarScopeV3` wraps `AppShell`'s body and is the
+    only signal that a bar is down there; `SdSnackBarUtilsV3` reads it **from
+    the caller's context**, never in the entry's builder, which sits above
+    the shell and would always read "no bar". A pushed route is outside the
+    scope and correctly reads `false` — it covers the bar anyway.
+    `test/core/widgets/snack_bar_clears_nav_bar_test.dart` asserts on the
+    rendered rectangle, because a message the user cannot see still matches
+    `find.text`.
 - Dialogs: always `showSdDialogV3` + `SdDialogV3`/`SdDialogOptionV3` — never
   raw `showDialog`.
 - Sheets: always `showSdBottomSheetV3` — it must use the root navigator so
