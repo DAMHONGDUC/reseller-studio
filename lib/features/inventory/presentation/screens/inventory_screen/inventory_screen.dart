@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -10,6 +12,9 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
@@ -64,6 +69,27 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     super.dispose();
   }
 
+  /// Opens the create flow, or explains why it cannot.
+  ///
+  /// **Checked before the form opens, never after the seller has typed.**
+  /// Refusing a title someone has already entered is the worst moment to
+  /// mention a plan limit, and it loses their work.
+  Future<void> _add(String route) async {
+    final PlanBlock block = ref.read(addItemBlockProvider);
+
+    if (block == PlanBlock.none) {
+      unawaited(context.push(route));
+
+      return;
+    }
+
+    await PlanBlockSheet.show(
+      context,
+      block: block,
+      plan: ref.read(currentPlanProvider),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Item> items = ref.watch(visibleItemsProvider);
@@ -72,7 +98,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
 
     return AppAddFabScaffold(
       addLabel: context.l10n.quickAddTitle,
-      onAdd: () => context.push(AppRoutes.quickAdd),
+      onAdd: () => _add(AppRoutes.quickAdd),
       floatingNav: true,
       showAdd: !isSelecting,
       bottomNavigationBar: isSelecting ? const _BulkActionBar() : null,
@@ -91,7 +117,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               SdAppBarActionV3(
                 icon: Symbols.add_box_rounded,
                 tooltip: context.l10n.inventoryAddItem,
-                onPressed: () => context.push(AppRoutes.addItem),
+                onPressed: () => _add(AppRoutes.addItem),
               ),
               SdAppBarActionV3(
                 icon: Symbols.qr_code_scanner_rounded,

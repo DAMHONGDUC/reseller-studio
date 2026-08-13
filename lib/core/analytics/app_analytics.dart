@@ -77,6 +77,25 @@ abstract class AppAnalytics {
   void purchaseRecorded({required bool hasSource});
 
   void reportExported({required String kind});
+
+  // --- Subscription (plan §27) ---
+  //
+  // Plan and period names only. **No price, no product id, no receipt and no
+  // store transaction** (hard rule 9) — RevenueCat's own dashboard is where
+  // revenue is read, and a receipt in an analytics payload is a credential in
+  // a third-party dashboard.
+
+  /// A seller hit a limit or a locked feature. The share of sellers who see
+  /// this and never upgrade is what says whether the free tier is the wrong
+  /// size, and no other event can answer it.
+  void paywallShown({required String reason, required String fromPlan});
+
+  void subscriptionPurchaseStarted({
+    required String plan,
+    required String period,
+  });
+
+  void subscriptionActivated({required String plan});
 }
 
 class _NoopAnalytics implements AppAnalytics {
@@ -120,6 +139,18 @@ class _NoopAnalytics implements AppAnalytics {
 
   @override
   void reportExported({required String kind}) {}
+
+  @override
+  void paywallShown({required String reason, required String fromPlan}) {}
+
+  @override
+  void subscriptionPurchaseStarted({
+    required String plan,
+    required String period,
+  }) {}
+
+  @override
+  void subscriptionActivated({required String plan}) {}
 }
 
 class _FirebaseAppAnalytics implements AppAnalytics {
@@ -189,6 +220,26 @@ class _FirebaseAppAnalytics implements AppAnalytics {
   @override
   void reportExported({required String kind}) =>
       _send('report_exported', <String, Object>{'kind': kind});
+
+  @override
+  void paywallShown({required String reason, required String fromPlan}) =>
+      _send('paywall_shown', <String, Object>{
+        'reason': reason,
+        'from_plan': fromPlan,
+      });
+
+  @override
+  void subscriptionPurchaseStarted({
+    required String plan,
+    required String period,
+  }) => _send('subscription_purchase_started', <String, Object>{
+    'plan': plan,
+    'period': period,
+  });
+
+  @override
+  void subscriptionActivated({required String plan}) =>
+      _send('subscription_activated', <String, Object>{'plan': plan});
 
   void _send(String name, Map<String, Object> parameters) =>
       _report(name, _analytics.logEvent(name: name, parameters: parameters));

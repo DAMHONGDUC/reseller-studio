@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/config/app_env.dart';
 import '../../core/config/dev_flags.dart';
 import '../../core/constants/prefs_key_constant.dart';
 import '../../core/firestore/workspace_context.dart';
@@ -27,6 +28,9 @@ import '../orders/data/repositories/firestore_order_repository.dart';
 import '../orders/domain/repositories/order_repository.dart';
 import '../sourcing/data/repositories/firestore_sourcing_repositories.dart';
 import '../sourcing/domain/repositories/sourcing_repository.dart';
+import '../subscription/data/repositories/revenue_cat_subscription_repository.dart';
+import '../subscription/data/repositories/unconfigured_subscription_repository.dart';
+import '../subscription/domain/repositories/subscription_repository.dart';
 import '../workspace/providers.dart';
 import 'data/in_memory_repositories.dart';
 
@@ -327,4 +331,23 @@ final Provider<ExpenseRepository> expenseRepositoryProvider =
       }
 
       return FirestoreExpenseRepository(context);
+    });
+
+/// Billing is the one repository with a **third** state.
+///
+/// The others are mock or Firestore, and live mode without a workspace is a
+/// programming error. Here, live mode without a RevenueCat key is the app's
+/// normal condition until the owner sets it up — so it gets a real
+/// implementation that puts everyone on Free rather than a guard that throws.
+/// It also needs no `WorkspaceContext`: entitlement belongs to the account,
+/// not to a workspace.
+final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
+    Provider<SubscriptionRepository>((Ref ref) {
+      if (ref.watch(dataModeProvider).isMock) {
+        return InMemorySubscriptionRepository(ref.watch(mockStoreProvider));
+      }
+
+      if (!AppEnv.hasBillingConfig) return UnconfiguredSubscriptionRepository();
+
+      return RevenueCatSubscriptionRepository();
     });

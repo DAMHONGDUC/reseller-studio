@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../analytics/app_analytics.dart';
 import '../config/app_env.dart';
@@ -47,6 +48,8 @@ final class AppBootstrap {
         await _initializeFirebase();
 
         await _initializeGoogleSignIn();
+
+        await _initializeBilling();
 
         await _goEdgeToEdge();
 
@@ -166,6 +169,46 @@ final class AppBootstrap {
     } catch (error, stackTrace) {
       AppLogger.error(
         'Google Sign-In failed to initialize',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Configure RevenueCat, if this build has a key for it.
+  ///
+  /// Skipped silently-but-logged when it does not, which is the app's normal
+  /// condition until the owner sets billing up: `subscriptionRepositoryProvider`
+  /// then hands out the unconfigured implementation and every seller reads as
+  /// Free. Configuring with an empty key would throw here instead.
+  ///
+  /// **No user identifier is passed.** RevenueCat generates an anonymous id;
+  /// linking it to the Firebase uid is a `logIn` call that belongs after
+  /// sign-in, not at startup where there is no user yet.
+  static Future<void> _initializeBilling() async {
+    final String key = defaultTargetPlatform == TargetPlatform.android
+        ? AppEnv.revenueCatAndroidApiKey
+        : AppEnv.revenueCatIosApiKey;
+
+    if (key.isEmpty) {
+      AppLogger.warning(
+        'No RevenueCat key in this build — every seller reads as Free. '
+        'Fill REVENUECAT_*_API_KEY in env/${AppEnv.flavor.name}.json.',
+      );
+
+      return;
+    }
+
+    try {
+      await Purchases.configure(PurchasesConfiguration(key));
+
+      AppLogger.info('Billing initialized');
+    } catch (error, stackTrace) {
+      // The app must still start: a seller who cannot reach RevenueCat keeps
+      // the free tier, which is worse than what they paid for but is not a
+      // reason to show them nothing.
+      AppLogger.error(
+        'Billing failed to initialize — falling back to Free',
         error: error,
         stackTrace: stackTrace,
       );

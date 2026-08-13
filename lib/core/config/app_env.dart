@@ -149,6 +149,33 @@ final class AppEnv {
     'APPLE_SIGN_IN_SERVICE_ID',
   );
 
+  // --- Billing (RevenueCat) ---
+  //
+  // **Public SDK keys**, the same category as the Firebase ids above: they
+  // identify the app to RevenueCat and are protected by the store's receipt
+  // verification, not by being unreadable. The secret half is the webhook
+  // auth header, which only a Cloud Function ever sees (hard rule 10) — it
+  // must never appear in this file.
+  //
+  // One key per store, because RevenueCat issues one per store and using the
+  // wrong one fails at configure time rather than at purchase time.
+
+  static const String revenueCatIosApiKey = String.fromEnvironment(
+    'REVENUECAT_IOS_API_KEY',
+  );
+
+  static const String revenueCatAndroidApiKey = String.fromEnvironment(
+    'REVENUECAT_ANDROID_API_KEY',
+  );
+
+  /// Whether billing was configured for **either** store.
+  ///
+  /// What the Subscription screen reads to tell "not set up yet" apart from
+  /// "set up and the seller is on Free" — two states that look identical from
+  /// an empty offerings list and want very different screens.
+  static bool get hasBillingConfig =>
+      revenueCatIosApiKey.isNotEmpty || revenueCatAndroidApiKey.isNotEmpty;
+
   // --- Workspace defaults ---
   //
   // What a brand-new workspace is created with, before the owner picks. Not

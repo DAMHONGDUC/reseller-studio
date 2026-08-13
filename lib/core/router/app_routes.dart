@@ -83,6 +83,11 @@ final class AppRoutes {
   static const String team = '/more/team';
   static const String settings = '/more/settings';
 
+  /// Plan §25's Subscription block, over §27's tiers. Under More rather than
+  /// nested in Settings: a blocked action pushes straight here, and a paywall
+  /// two levels deep is one nobody reaches from the moment it matters.
+  static const String subscription = '/more/subscription';
+
   // --- Global, reachable from anywhere ---
 
   static const String search = '/search';

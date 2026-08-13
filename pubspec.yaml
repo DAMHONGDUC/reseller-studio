@@ -35,6 +35,7 @@ dependencies:
   material_symbols_icons: ^4.2960.0
   mobile_scanner: ^7.1.4
   package_info_plus: ^10.2.1
+  purchases_flutter: ^10.9.0
   share_plus: ^13.2.0
   shared_preferences: ^2.5.5
   # The shared design system. Its own git repo, checked out here as a

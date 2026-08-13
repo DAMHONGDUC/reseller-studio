@@ -36,6 +36,7 @@ import '../../features/sourcing/presentation/screens/purchase_evaluator_screen/p
 import '../../features/sourcing/presentation/screens/purchases_screen/purchases_screen.dart';
 import '../../features/sourcing/presentation/screens/sources_screen/sources_screen.dart';
 import '../../features/sourcing/presentation/screens/sourcing_screen/sourcing_screen.dart';
+import '../../features/subscription/presentation/screens/subscription_screen/subscription_screen.dart';
 import '../../features/workspace/presentation/screens/team_screen/team_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
 import '../../features/workspace/providers.dart';
@@ -351,6 +352,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'team',
                     builder: (BuildContext context, GoRouterState state) =>
                         const TeamScreen(),
+                  ),
+                  GoRoute(
+                    path: 'subscription',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const SubscriptionScreen(),
                   ),
                 ],
               ),

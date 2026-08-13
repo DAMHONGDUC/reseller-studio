@@ -16,6 +16,10 @@ import '../../orders/domain/repositories/order_repository.dart';
 import '../../sourcing/domain/entities/purchase.dart';
 import '../../sourcing/domain/entities/source.dart';
 import '../../sourcing/domain/repositories/sourcing_repository.dart';
+import '../../subscription/domain/entities/plan_offering.dart';
+import '../../subscription/domain/entities/subscription_status.dart';
+import '../../subscription/domain/enums/seller_plan.dart';
+import '../../subscription/domain/repositories/subscription_repository.dart';
 import '../domain/mock_dataset.dart';
 
 /// The mutable world behind every in-memory repository.
@@ -55,6 +59,11 @@ class MockStore {
   final List<ItemCategory> categories;
   final List<StorageLocation> locations;
   final List<Offer> offers;
+
+  /// The demo business starts on the free tier, so the limits and the paywall
+  /// are what a developer sees first. `InMemorySubscriptionRepository` moves
+  /// it; nothing else does.
+  SellerPlan plan = SellerPlan.free;
 
   // Broadcast because several screens watch the same collection at once —
   // Home counts orders while the Orders tab lists them. A single-subscription
@@ -433,4 +442,84 @@ class InMemoryExpenseRepository implements ExpenseRepository {
     _store.expenses.removeWhere((Expense expense) => expense.id == id);
     _store.notifyChanged();
   }
+}
+
+/// A billing backend with no store behind it.
+///
+/// **Purchases succeed here, and that is the point.** Every other in-memory
+/// repository exists so a screen can be looked at before Firebase; this one
+/// exists so the *paywall and the limits* can be walked end to end before
+/// RevenueCat — hit the free item cap, upgrade, watch the cap lift. A mock
+/// that refused to buy would leave the whole gating path unexercised until
+/// the day the store is live.
+///
+/// Nothing is persisted, so a restart puts the demo business back on Free.
+class InMemorySubscriptionRepository implements SubscriptionRepository {
+  const InMemorySubscriptionRepository(this._store);
+
+  /// What the fake store sells. Prices are formatted strings for the same
+  /// reason the real ones are — see `PlanOffering`.
+  static const List<PlanOffering> catalogue = <PlanOffering>[
+    PlanOffering(
+      productId: 'mock_pro_monthly',
+      plan: SellerPlan.pro,
+      period: BillingPeriod.monthly,
+      formattedPrice: r'$9.99',
+    ),
+    PlanOffering(
+      productId: 'mock_pro_yearly',
+      plan: SellerPlan.pro,
+      period: BillingPeriod.yearly,
+      formattedPrice: r'$89.99',
+    ),
+    PlanOffering(
+      productId: 'mock_business_monthly',
+      plan: SellerPlan.business,
+      period: BillingPeriod.monthly,
+      formattedPrice: r'$24.99',
+    ),
+    PlanOffering(
+      productId: 'mock_business_yearly',
+      plan: SellerPlan.business,
+      period: BillingPeriod.yearly,
+      formattedPrice: r'$229.99',
+    ),
+  ];
+
+  final MockStore _store;
+
+  @override
+  Stream<SubscriptionStatus> watchStatus() => _store.watch(_read);
+
+  @override
+  Future<List<PlanOffering>> offerings() async => catalogue;
+
+  @override
+  Future<SubscriptionStatus> purchase(PlanOffering offering) async {
+    _store.plan = offering.plan;
+    _store.notifyChanged();
+
+    return _read();
+  }
+
+  /// Nothing to restore from — the fake store has no history, and returning
+  /// the current plan is the honest answer rather than a reset to Free.
+  @override
+  Future<SubscriptionStatus> restore() async => _read();
+
+  SubscriptionStatus _read() => _store.plan.isPaid
+      ? SubscriptionStatus(
+          plan: _store.plan,
+          source: SubscriptionSource.appStore,
+          renewsAt: DateTime.now().add(MockPlanConstant.mockRenewal),
+          willRenew: true,
+        )
+      : SubscriptionStatus.free;
+}
+
+/// The one number the fake subscription needs.
+final class MockPlanConstant {
+  /// How far out a mock purchase renews. A month, so the Subscription screen
+  /// has a plausible date to render rather than an empty row.
+  static const Duration mockRenewal = Duration(days: 30);
 }

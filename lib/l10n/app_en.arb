@@ -344,6 +344,10 @@
   "@moreTeam": {
     "description": "More destination: who can see this workspace."
   },
+  "moreSubscription": "Subscription",
+  "@moreSubscription": {
+    "description": "More destination: the current plan and the other tiers."
+  },
   "moreSettings": "Settings",
   "@moreSettings": {
     "description": "More destination: account and workspace settings."
