@@ -45,6 +45,39 @@ dependencies per generation, which pub does not support in one package —
 meaning it would take a second package. Not worth it for a warning. Revisit
 only if it becomes a build failure.
 
+## v3 keeps its own chrome — three v2 patterns are deliberately not ported
+
+Owner's call. Explains the "What v3 deliberately does NOT have" section in
+`DESIGN_SYSTEM.md`, and exists so the next session does not read the gap as an
+oversight and "finish the port".
+
+The spacing rulebook (`SdContentPaddingV2`) **was** ported in full. Three
+neighbouring v2 patterns were not, and this is the standing answer:
+
+- **`SdCollapsingFilterScaffoldV2` + `SdPinnedFilterBarV2`.** v2 lifts the
+  whole filter row into the app bar as the list scrolls. v3 does the opposite
+  and it is a recorded owner's rule: a filter strip is never part of the app
+  bar, it is its own widget in the body, and it scrolls away with the content.
+  What stays pinned is search and the actions. These are mutually exclusive
+  designs, not two halves of one — v3's stands.
+- **`SdContentPaddingV3.belowPinnedFilterBar`.** Follows from the above: it is
+  `appBarInset` plus the strip's height, the first term is zero under an
+  opaque bar, and nothing pins a strip over a list anyway.
+- **`SdFloatingBarScopeV2`.** Not ported. See the open item below before
+  assuming that is harmless.
+- **Two search entry points on purpose.** Inventory uses `SdSearchHeaderV3`,
+  whose field docks into the title row as the list scrolls. The Search screen
+  builds a plain field with `autofocus` and no collapse, because that screen
+  exists to be typed into immediately and collapsing chrome buys nothing when
+  the list starts empty.
+
+**Known open item, recorded rather than fixed.** `SdSnackBarV3` draws into the
+root overlay and positions itself by `detailBottom`, which does not clear
+`floatingBarInset` — so on the five tab screens a snackbar renders over the
+glass nav bar. v2 solved exactly this with `SdFloatingBarScopeV2`, an
+`InheritedWidget` around the shell body that lets a root-overlay presenter ask
+whether a bar is below it. Porting that is the fix if this is ever picked up.
+
 ## Why a caught error must still be logged
 
 Explains "Every `catch` logs, wherever it sits" in the root `CLAUDE.md`.

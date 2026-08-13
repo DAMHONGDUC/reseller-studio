@@ -233,6 +233,11 @@ disagree with reality** — do not port them back "for later":
   pins a filter strip over a scrolling list either: a filter strip is its own
   widget in the body and takes real layout space, so nothing has to clear it.
 
+The same call covers `SdCollapsingFilterScaffoldV2`, `SdPinnedFilterBarV2` and
+`SdFloatingBarScopeV2`, none of which v3 has. **v3's chrome is its own design,
+not an unfinished copy of v2's** — `DECISIONS.md` has the reasoning and one
+known open item. Read it before "finishing the port".
+
 ### The traps — each one cost a real bug
 
 - **Insets come off the view, not the ambient `MediaQuery`.** `Scaffold` wraps
