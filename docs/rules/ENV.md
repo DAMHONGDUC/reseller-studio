@@ -24,6 +24,15 @@ melos run run -- prod    # env/prod.json
   still compiles. That is what keeps `melos run test` working without a
   flavour.
 
+**`REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY` are public SDK
+keys and belong here**, the same category as the Firebase ids: they identify
+the app to RevenueCat and are protected by the store's receipt verification,
+not by being unreadable. The **webhook auth header is the secret half** and
+must never appear in `env/` — it is read only by the Cloud Function that
+mirrors entitlement into Firestore (hard rule 10). An empty key is a
+supported state: `AppEnv.hasBillingConfig` is false, billing is skipped at
+bootstrap, and every seller reads as Free.
+
 The two secret-handling rules for `env/` — that nothing in it is secret, and
 that `AppEnv` states the request while `DevFlags` states the permission — are
 always-apply and live in the root `CLAUDE.md` under "Configuration and
