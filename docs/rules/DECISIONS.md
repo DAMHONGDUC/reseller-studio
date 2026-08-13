@@ -145,6 +145,45 @@ reads as a working destination to the next caller and fails as a deep link
 without saying why. A comment sits where each was, so the gap reads as a
 decision. They come back with their screens.
 
+## RevenueCat is approved, and the app never sees a receipt
+
+Owner's call, recorded because `CLAUDE.md` requires a reason in writing for
+any third-party SDK. The plan (§27) allows "RevenueCat or equivalent"; this
+picks one. The owner owns the RevenueCat account and the App Store / Play
+products — none of that is in this repo.
+
+Why not StoreKit and Billing directly: the two stores disagree about almost
+everything a subscription needs — proration, grace periods, restore, a plan
+change mid-period — and the code that reconciles them is the part that gets
+subscription billing wrong. That reconciliation is what is being bought.
+
+Two constraints that follow, and they are hard rules 9 and 10 applied rather
+than new ones:
+
+- **The app asks RevenueCat what the seller is entitled to; it never validates
+  a receipt itself and never logs one.** A receipt is a credential.
+- **Entitlement is mirrored into Firestore by a Cloud Function**, from
+  RevenueCat's webhook, because `firestore.rules` cannot ask an SDK a
+  question. The client copy is a cache for rendering; the server copy is what
+  a rule reads. A client that could write its own plan is a paywall with a
+  free bypass.
+
+## Tax ships for two jurisdictions, and the third is data
+
+Owner's rule: launch markets are the US and the UK (`CLAUDE.md`). Plan §20
+says tax must stay country-specific and configurable, which is the same thing
+said from the other side.
+
+So a jurisdiction is a **value**, never a branch: `TaxJurisdiction` names one,
+and everything that differs — the category list, the tax-year boundary, the
+mileage rate and its tiers, what the year-end summary is called — hangs off
+that value. The US tax year is the calendar year and the UK's starts on 6
+April; a single `DateTime(year, 1, 1)` anywhere in this feature is the bug.
+
+Mileage rates change every year and are set by the IRS and HMRC, so they are
+dated data with an effective-from date, not a constant. A rate typed into a
+widget is a wrong deduction the following April.
+
 ## Why a caught error must still be logged
 
 Explains "Every `catch` logs, wherever it sits" in the root `CLAUDE.md`.

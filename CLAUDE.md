@@ -87,6 +87,15 @@ The core UX principle, from the plan:
 workflows. A screen that shows data but does not lead to the next step in that
 chain is a screen that will be redesigned.
 
+**The launch markets are the United States and the United Kingdom.** Owner's
+rule, and it is the answer to every "which country?" question the plan leaves
+open — most of all §20, whose tax rules it says must stay country-specific.
+Two jurisdictions ship: `us` and `uk`. The point of the rule is not that
+others are forbidden; it is that a third one is **added as data behind the
+same interface**, never by widening an `if` at a call site. Anything that
+hardcodes one country's category names, its tax year boundary or its mileage
+rate is the bug this rule exists to stop.
+
 ## Tech stack
 
 - **Flutter** 3.44.5, pinned in `.fvmrc`. Always run through `fvm` —
