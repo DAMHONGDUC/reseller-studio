@@ -77,6 +77,29 @@ written up with the fix under "Remaining work" in `RELEASE_ACTIONS.md` — the
 symptom and the numbers live there, not here, so there is one copy to keep
 true.
 
+## Two rules from the sibling app that Seller OS deliberately inverts
+
+The rulebook these files were ported from is BaroEase's. Most of it transfers
+unchanged. Two rules do not, and both would look like bugs to anyone reading
+that rulebook next to this code — so the answer is recorded here rather than
+re-argued.
+
+- **"No FAB on a screen with the floating nav" — inverted.** There, the pill
+  overlays the content and eats the tap, so every tab puts its primary action
+  in the app bar. Here the opposite is an owner's rule: **every screen that
+  creates something uses the same labelled `SdFabV3`**, tab screens included,
+  and `AppAddFabScaffold` lifts it clear by `floatingBarInset` so the glass
+  never covers it. The reasoning is the product's, not the layout's — a seller
+  adds inventory dozens of times a day, and a create action hidden behind a
+  24pt glyph in a corner is one they stop using. BaroEase's screens create
+  something occasionally; Inventory exists to.
+- **"Local-first, account optional" — does not apply.** Hard rule 1: login is
+  mandatory and there is no guest mode. Health data must survive with no
+  account, whereas a seller's inventory is a synced business record shared with
+  a team, which is also why there is no local database here. Anything in the
+  ported rules about an account being optional, or about the device being the
+  source of truth, belongs to that app.
+
 ## Why a caught error must still be logged
 
 Explains "Every `catch` logs, wherever it sits" in the root `CLAUDE.md`.

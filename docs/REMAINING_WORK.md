@@ -108,6 +108,19 @@ Nothing started. Listed with what already exists to build on.
   nothing is a deep link that fails silently.
 - **`team` and `marketplaces` are read-only screens.** Both render and both
   explain why they cannot do more yet; neither is a stub that fails.
+- **Nothing sets `systemOverlayStyle`, anywhere.** No `AppBarTheme`
+  `systemOverlayStyle`, no `AnnotatedRegion`, no `SystemChrome` call in `lib/`
+  or in the package — so the status bar's icons are whatever Flutter infers
+  from a bar colour, in an app that ships light *and* dark. The inference is
+  per-platform and the two fields are inverted, so this is the shape of bug
+  that looks fine on the device it was built on. The fix is one derived style
+  in `AppTheme` plus a widget test that reads it: `docs/rules/SCREENS.md` §
+  The device status bar.
+- **The five tabs log no screen view.** `AppShell` is a
+  `StatefulShellRoute.indexedStack`, so switching tabs pushes no route and a
+  navigator observer sees nothing — tab analytics will read as if nobody opens
+  Inventory. It has to be logged from the shell when the branch index changes,
+  through `AppAnalytics` like every other event.
 - **`lib/features/mock_data/` ships in the binary.** It is gated behind
   `DevFlags`, but it is a whole fake backend inside the app. Worth deciding
   before release whether it is compiled out.
