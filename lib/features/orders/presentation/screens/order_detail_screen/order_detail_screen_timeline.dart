@@ -14,10 +14,11 @@ class _Timeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<_TimelineEntry> entries = <_TimelineEntry>[
-      _TimelineEntry('Ordered', order.orderedAt),
-      if (order.shippedAt != null) _TimelineEntry('Shipped', order.shippedAt!),
+      _TimelineEntry(context.l10n.orderOrdered, order.orderedAt),
+      if (order.shippedAt != null)
+        _TimelineEntry(context.l10n.orderStatusShipped, order.shippedAt!),
       if (order.deliveredAt != null)
-        _TimelineEntry('Delivered', order.deliveredAt!),
+        _TimelineEntry(context.l10n.orderStatusDelivered, order.deliveredAt!),
     ];
 
     return SdCardV3(

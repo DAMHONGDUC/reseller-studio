@@ -29,7 +29,7 @@ class _OrderCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   order.lines.isEmpty
-                      ? 'Order ${order.id}'
+                      ? context.l10n.orderFallbackTitle(order.id)
                       : order.lines.first.title,
                   style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
                     color: context.sdTheme3.textPrimary,
@@ -52,13 +52,13 @@ class _OrderCard extends StatelessWidget {
             runSpacing: SdSpacingConstant.h4,
             children: <Widget>[
               SdBadgeV3(
-                label: _statusLabel(order.status),
+                label: OrderStatusLabel.of(context, order.status),
                 tone: _statusTone(order.status),
               ),
               SdBadgeV3(label: order.marketplace.displayName),
               if (isOverdue)
-                const SdBadgeV3(
-                  label: 'Late',
+                SdBadgeV3(
+                  label: context.l10n.orderLate,
                   tone: SdBadgeToneV3.danger,
                   icon: Symbols.priority_high_rounded,
                 ),
@@ -73,7 +73,7 @@ class _OrderCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'Profit ',
+                '${context.l10n.orderProfitPrefix} ',
                 style: context.textTheme3.bodySmall!.faint3(context),
               ),
               Text(
@@ -93,17 +93,6 @@ class _OrderCard extends StatelessWidget {
       ),
     );
   }
-
-  static String _statusLabel(OrderStatus status) => switch (status) {
-    OrderStatus.awaitingPayment => 'Awaiting payment',
-    OrderStatus.toShip => 'To ship',
-    OrderStatus.shipped => 'Shipped',
-    OrderStatus.delivered => 'Delivered',
-    OrderStatus.returnRequested => 'Return requested',
-    OrderStatus.returned => 'Returned',
-    OrderStatus.refunded => 'Refunded',
-    OrderStatus.cancelled => 'Cancelled',
-  };
 
   static SdBadgeToneV3 _statusTone(OrderStatus status) => switch (status) {
     OrderStatus.awaitingPayment => SdBadgeToneV3.warning,

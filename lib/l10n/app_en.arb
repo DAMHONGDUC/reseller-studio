@@ -1204,5 +1204,531 @@
   "scannerScanAgain": "Scan again",
   "@scannerScanAgain": {
     "description": "Dismiss on the unknown-code dialog."
+  },
+  "commonOther": "Other",
+  "@commonOther": {
+    "description": "Catch-all option in a picker — a carrier or a marketplace that is not on the list."
+  },
+  "commonAll": "All",
+  "@commonAll": {
+    "description": "The unfiltered tab in a filter strip."
+  },
+  "commonRevenue": "Revenue",
+  "@commonRevenue": {
+    "description": "What buyers paid, after refunds."
+  },
+  "commonProfit": "Profit",
+  "@commonProfit": {
+    "description": "What was left after every cost."
+  },
+  "commonNetProfit": "Net profit",
+  "@commonNetProfit": {
+    "description": "The bottom line of a profit statement."
+  },
+  "commonMargin": "Margin",
+  "@commonMargin": {
+    "description": "Profit as a share of revenue — whether the price is right."
+  },
+  "commonRoi": "ROI",
+  "@commonRoi": {
+    "description": "Profit as a share of cost — whether the buy was right. Kept as the acronym: it is what resellers say in both languages."
+  },
+  "commonFees": "Fees",
+  "@commonFees": {
+    "description": "What the marketplace took."
+  },
+  "commonShipping": "Shipping",
+  "@commonShipping": {
+    "description": "What postage cost."
+  },
+  "commonExpenses": "Expenses",
+  "@commonExpenses": {
+    "description": "Costs that are not the cost of an item."
+  },
+  "commonCostOfGoods": "Cost of goods",
+  "@commonCostOfGoods": {
+    "description": "What the sold items cost. Null when any is unknown — profit is then an em dash."
+  },
+  "commonPartial": "Partial",
+  "@commonPartial": {
+    "description": "Badge on a figure computed from incomplete data. Never presented as the whole truth."
+  },
+  "commonItems": "Items",
+  "@commonItems": {
+    "description": "Section heading for a list of items."
+  },
+  "commonOrders": "Orders",
+  "@commonOrders": {
+    "description": "A count of orders."
+  },
+  "commonDate": "Date",
+  "@commonDate": {
+    "description": "A date field label."
+  },
+  "commonAmount": "Amount",
+  "@commonAmount": {
+    "description": "A money field label."
+  },
+  "commonSellThrough": "Sell-through",
+  "@commonSellThrough": {
+    "description": "Sold as a share of everything ever held."
+  },
+  "orderStatusAwaitingPayment": "Awaiting payment",
+  "@orderStatusAwaitingPayment": {
+    "description": "Order status: sold, money not cleared. Do not ship on this."
+  },
+  "orderStatusToShip": "To ship",
+  "@orderStatusToShip": {
+    "description": "Order status: paid and waiting on the seller. The status the whole Orders tab exists to drain."
+  },
+  "orderStatusShipped": "Shipped",
+  "@orderStatusShipped": {
+    "description": "Order status: with the carrier."
+  },
+  "orderStatusDelivered": "Delivered",
+  "@orderStatusDelivered": {
+    "description": "Order status: arrived."
+  },
+  "orderStatusReturnRequested": "Return requested",
+  "@orderStatusReturnRequested": {
+    "description": "Order status: the buyer asked to send it back."
+  },
+  "orderStatusReturned": "Returned",
+  "@orderStatusReturned": {
+    "description": "Order status: physically back with the seller."
+  },
+  "orderStatusRefunded": "Refunded",
+  "@orderStatusRefunded": {
+    "description": "Order status: money returned to the buyer."
+  },
+  "orderStatusCancelled": "Cancelled",
+  "@orderStatusCancelled": {
+    "description": "Order status: never happened. Does not count as revenue."
+  },
+  "ordersLoadFailed": "Could not load orders",
+  "@ordersLoadFailed": {
+    "description": "Error empty state on the Orders tab."
+  },
+  "ordersNoMatch": "No orders match this filter.",
+  "@ordersNoMatch": {
+    "description": "Empty state when a tab is empty."
+  },
+  "orderFilterToShip": "To Ship",
+  "@orderFilterToShip": {
+    "description": "Orders tab. Folds in awaiting-payment: from the seller’s point of view both are \"not gone yet\"."
+  },
+  "orderFilterReturns": "Returns",
+  "@orderFilterReturns": {
+    "description": "Orders tab covering return requested, returned and refunded."
+  },
+  "orderLate": "Late",
+  "@orderLate": {
+    "description": "Badge on an order past its shipping deadline. The one thing here with an external penalty."
+  },
+  "orderProfitPrefix": "Profit",
+  "@orderProfitPrefix": {
+    "description": "Prefix on the profit figure of an order row."
+  },
+  "orderFallbackTitle": "Order {id}",
+  "@orderFallbackTitle": {
+    "description": "Row title when an order has no line items to name it by.",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTitleFallback": "Order",
+  "@orderTitleFallback": {
+    "description": "App bar title while the order loads."
+  },
+  "orderTitle": "{marketplace} order",
+  "@orderTitle": {
+    "description": "App bar title on order detail.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "orderLoadFailed": "Could not load this order",
+  "@orderLoadFailed": {
+    "description": "Error state on order detail."
+  },
+  "orderNotFound": "Order not found",
+  "@orderNotFound": {
+    "description": "Shown when the order behind a link is gone."
+  },
+  "orderOverdue": "Overdue",
+  "@orderOverdue": {
+    "description": "Badge when the shipping deadline has passed."
+  },
+  "orderTimeline": "Timeline",
+  "@orderTimeline": {
+    "description": "Section heading: what has happened to this order."
+  },
+  "orderOrdered": "Ordered",
+  "@orderOrdered": {
+    "description": "Timeline entry: when the sale happened."
+  },
+  "orderCarrier": "Carrier",
+  "@orderCarrier": {
+    "description": "Who is carrying the parcel."
+  },
+  "orderTracking": "Tracking",
+  "@orderTracking": {
+    "description": "The tracking number."
+  },
+  "orderShipBy": "Ship by",
+  "@orderShipBy": {
+    "description": "The platform's shipping deadline."
+  },
+  "orderShippingCost": "Shipping cost",
+  "@orderShippingCost": {
+    "description": "What postage cost the seller."
+  },
+  "orderLineCost": "Cost {amount}",
+  "@orderLineCost": {
+    "description": "Subtitle on an order line: what the item cost.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderLineQuantityCost": "×{quantity} · cost {amount}",
+  "@orderLineQuantityCost": {
+    "description": "Subtitle on an order line with more than one unit.",
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPlatformFees": "Platform fees",
+  "@orderPlatformFees": {
+    "description": "What the marketplace took, on the profit statement."
+  },
+  "orderOtherExpenses": "Other expenses",
+  "@orderOtherExpenses": {
+    "description": "Costs attributed to this sale from the Expenses feature."
+  },
+  "orderProfitIncomplete": "No cost recorded for one of these items, so profit cannot be worked out. Add it on the item and this fills in.",
+  "@orderProfitIncomplete": {
+    "description": "Says why the bottom line is an em dash, and how to fix it. Never guesses."
+  },
+  "orderShipIt": "Ship it",
+  "@orderShipIt": {
+    "description": "Primary action on an unshipped order."
+  },
+  "orderMarkDelivered": "Mark delivered",
+  "@orderMarkDelivered": {
+    "description": "Moves a shipped order to delivered."
+  },
+  "orderMarkedDelivered": "Marked delivered",
+  "@orderMarkedDelivered": {
+    "description": "Confirmation."
+  },
+  "orderOpenReturn": "Open a return",
+  "@orderOpenReturn": {
+    "description": "Starts the return flow."
+  },
+  "orderReturnOpened": "Return opened",
+  "@orderReturnOpened": {
+    "description": "Confirmation."
+  },
+  "orderItemCameBack": "It came back",
+  "@orderItemCameBack": {
+    "description": "Closes a return: the item is physically back."
+  },
+  "orderReturnDialogTitle": "The item came back",
+  "@orderReturnDialogTitle": {
+    "description": "Dialog title when closing a return."
+  },
+  "orderReturnDialogBody": "Put it back on the shelf, or keep it out of inventory if it came back damaged.",
+  "@orderReturnDialogBody": {
+    "description": "Restocking is a choice: a damaged return must not be silently sold twice."
+  },
+  "orderRestock": "Restock it",
+  "@orderRestock": {
+    "description": "Return the item to sellable inventory."
+  },
+  "orderRestocked": "Returned and restocked",
+  "@orderRestocked": {
+    "description": "Confirmation."
+  },
+  "orderDoNotRestock": "Do not restock",
+  "@orderDoNotRestock": {
+    "description": "Keep a damaged return out of inventory."
+  },
+  "orderReturnedDone": "Returned",
+  "@orderReturnedDone": {
+    "description": "Confirmation after closing a return without restocking."
+  },
+  "orderRecordSettlement": "Record fees and payout",
+  "@orderRecordSettlement": {
+    "description": "Opens the sheet for what the platform took and paid."
+  },
+  "shipTitle": "Ship this order",
+  "@shipTitle": {
+    "description": "Sheet title."
+  },
+  "shipCarrierOptional": "Carrier (optional)",
+  "@shipCarrierOptional": {
+    "description": "Nothing on this sheet is required — a seller who posted it with no tracking still needs the order out of their queue."
+  },
+  "shipTrackingOptional": "Tracking number (optional)",
+  "@shipTrackingOptional": {
+    "description": "Optional tracking number."
+  },
+  "shipCostOptional": "Shipping cost (optional)",
+  "@shipCostOptional": {
+    "description": "Optional postage cost."
+  },
+  "shipCostHelp": "What postage cost you — it comes off the profit",
+  "@shipCostHelp": {
+    "description": "Why the shipping cost is worth entering."
+  },
+  "shipSubmit": "Mark as shipped",
+  "@shipSubmit": {
+    "description": "Confirm button."
+  },
+  "shipDone": "Shipped",
+  "@shipDone": {
+    "description": "Confirmation."
+  },
+  "settleTitle": "Fees and payout",
+  "@settleTitle": {
+    "description": "Sheet title."
+  },
+  "settleFeesHelp": "What the marketplace took",
+  "@settleFeesHelp": {
+    "description": "Helper under the fees field."
+  },
+  "settlePayout": "Payout",
+  "@settlePayout": {
+    "description": "What actually landed in the seller’s account. The one stored figure that is not derived."
+  },
+  "settlePayoutHelp": "What actually landed in your account",
+  "@settlePayoutHelp": {
+    "description": "Helper under the payout field. This is what a bank statement is reconciled against."
+  },
+  "offersTitle": "Offers",
+  "@offersTitle": {
+    "description": "Screen title, and the tooltip on the Orders app bar action that opens it."
+  },
+  "offersLoadFailed": "Could not load offers",
+  "@offersLoadFailed": {
+    "description": "Error state title on the Offers list."
+  },
+  "offersNoMatch": "No offers under this tab.",
+  "@offersNoMatch": {
+    "description": "Empty state body when a filter matches nothing."
+  },
+  "offerFilterPending": "Pending",
+  "@offerFilterPending": {
+    "description": "Offers filter chip."
+  },
+  "offerFilterAccepted": "Accepted",
+  "@offerFilterAccepted": {
+    "description": "Offers filter chip."
+  },
+  "offerFilterDeclined": "Declined",
+  "@offerFilterDeclined": {
+    "description": "Offers filter chip."
+  },
+  "offerFilterExpired": "Expired",
+  "@offerFilterExpired": {
+    "description": "Offers filter chip, and the badge on an offer whose window closed."
+  },
+  "offerUnderAnHourLeft": "Under an hour left",
+  "@offerUnderAnHourLeft": {
+    "description": "Countdown badge when the offer is about to lapse."
+  },
+  "offerHoursLeft": "{hours}h left",
+  "@offerHoursLeft": {
+    "description": "Countdown badge, hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "offerDaysLeft": "{days}d left",
+  "@offerDaysLeft": {
+    "description": "Countdown badge, days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "offerAsking": "asking {amount}",
+  "@offerAsking": {
+    "description": "Fragment on the offer card: what the item is listed at.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerBelowAsking": "{percent} below",
+  "@offerBelowAsking": {
+    "description": "Fragment on the offer card: how far under the asking price the buyer came.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "offerMessageQuote": "“{message}”",
+  "@offerMessageQuote": {
+    "description": "The buyer's note, quoted.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "offerCountered": "Countered {amount}",
+  "@offerCountered": {
+    "description": "Badge showing what the seller came back with.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerAccept": "Accept",
+  "@offerAccept": {
+    "description": "Button and dialog action."
+  },
+  "offerAcceptTitle": "Accept {amount}?",
+  "@offerAcceptTitle": {
+    "description": "Confirmation dialog title.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerAcceptBody": "This records the sale and creates the order, so the item leaves your inventory.",
+  "@offerAcceptBody": {
+    "description": "Confirmation dialog body. Says what accepting actually changes."
+  },
+  "offerAccepted": "Sold — the order is in Orders",
+  "@offerAccepted": {
+    "description": "Snackbar after accepting. Names where the order went."
+  },
+  "offerCounter": "Counter",
+  "@offerCounter": {
+    "description": "Button."
+  },
+  "offerDecline": "Decline",
+  "@offerDecline": {
+    "description": "Button."
+  },
+  "offerDeclined": "Declined",
+  "@offerDeclined": {
+    "description": "Snackbar after declining."
+  },
+  "offerCounterTitle": "Counter {amount}",
+  "@offerCounterTitle": {
+    "description": "Counter sheet title, naming the offer being answered.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerCounterAmount": "What you would accept",
+  "@offerCounterAmount": {
+    "description": "Label on the counter amount field."
+  },
+  "offerCounterRequired": "Enter what you would accept",
+  "@offerCounterRequired": {
+    "description": "Validation snackbar when the counter sheet is submitted empty."
+  },
+  "offerCounterNote": "This is saved for your records. Send the counter on the marketplace itself — nothing is connected yet.",
+  "@offerCounterNote": {
+    "description": "Note under the counter field. A seller who thinks the counter was sent will wait for an answer that never comes."
+  },
+  "offerCounterSubmit": "Record counter",
+  "@offerCounterSubmit": {
+    "description": "Counter sheet submit button."
+  },
+  "offerCounterRecorded": "Counter recorded",
+  "@offerCounterRecorded": {
+    "description": "Snackbar after recording a counter."
+  },
+  "shippingQueueTitle": "Shipping queue",
+  "@shippingQueueTitle": {
+    "description": "Screen title."
+  },
+  "shippingQueueCount": "{count} to send",
+  "@shippingQueueCount": {
+    "description": "Subtitle counting what is left.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shippingQueueEmptyTitle": "Nothing to ship",
+  "@shippingQueueEmptyTitle": {
+    "description": "Empty state title."
+  },
+  "shippingQueueEmptyBody": "Every paid order is on its way.",
+  "@shippingQueueEmptyBody": {
+    "description": "Empty state body."
+  },
+  "shippingQueueShip": "Ship",
+  "@shippingQueueShip": {
+    "description": "The per-row action, so posting a parcel is one tap rather than two."
+  },
+  "shippingNoDeadline": "{marketplace} · no deadline",
+  "@shippingNoDeadline": {
+    "description": "Row subtitle when the platform gave no shipping deadline.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "shippingOverdueBy": "{marketplace} · {days}d overdue",
+  "@shippingOverdueBy": {
+    "description": "Row subtitle for a late order.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "shippingDueToday": "{marketplace} · due today",
+  "@shippingDueToday": {
+    "description": "Row subtitle for an order due today.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "shippingDueIn": "{marketplace} · due in {days}d",
+  "@shippingDueIn": {
+    "description": "Row subtitle counting down to the deadline.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
   }
 }

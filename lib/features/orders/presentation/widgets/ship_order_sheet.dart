@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/error/failure_presenter.dart';
+import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
@@ -77,7 +78,7 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
       if (!mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Shipped');
+      SdSnackBarUtilsV3.success(context, context.l10n.shipDone);
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -93,17 +94,17 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SdBottomSheetV3(
-        title: 'Ship this order',
+        title: context.l10n.shipTitle,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             PickerField(
-              label: 'Carrier (optional)',
+              label: context.l10n.shipCarrierOptional,
               value: _carrier,
               onTap: () async {
                 final String? picked = await OptionPickerSheet.show<String>(
                   context,
-                  title: 'Carrier',
+                  title: context.l10n.orderCarrier,
                   selected: _carrier,
                   options: OrdersConstant.carriers
                       .map(
@@ -122,23 +123,23 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
             ),
             SizedBox(height: SdSpacingConstant.h16),
             SdTextFieldV3(
-              label: 'Tracking number (optional)',
+              label: context.l10n.shipTrackingOptional,
               controller: _tracking,
               textInputAction: TextInputAction.next,
             ),
             SizedBox(height: SdSpacingConstant.h16),
             MoneyField(
-              label: 'Shipping cost (optional)',
+              label: context.l10n.shipCostOptional,
               controller: _cost,
               currency: ref.watch(workspaceCurrencyProvider),
-              helperText: 'What postage cost you — it comes off the profit',
+              helperText: context.l10n.shipCostHelp,
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _submit(),
             ),
             SizedBox(height: SdSpacingConstant.h24),
             SdButtonV3(
               variant: SdButtonVariantV3.primary,
-              label: 'Mark as shipped',
+              label: context.l10n.shipSubmit,
               expand: true,
               busy: isBusy,
               onPressed: isBusy ? null : _submit,
@@ -204,7 +205,7 @@ class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
       if (!mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Saved');
+      SdSnackBarUtilsV3.success(context, context.l10n.commonSaved);
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -221,30 +222,30 @@ class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SdBottomSheetV3(
-        title: 'Fees and payout',
+        title: context.l10n.settleTitle,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             MoneyField(
-              label: 'Platform fees',
+              label: context.l10n.orderPlatformFees,
               controller: _fees,
               currency: currency,
-              helperText: 'What the marketplace took',
+              helperText: context.l10n.settleFeesHelp,
               textInputAction: TextInputAction.next,
             ),
             SizedBox(height: SdSpacingConstant.h16),
             MoneyField(
-              label: 'Payout',
+              label: context.l10n.settlePayout,
               controller: _payout,
               currency: currency,
-              helperText: 'What actually landed in your account',
+              helperText: context.l10n.settlePayoutHelp,
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _submit(),
             ),
             SizedBox(height: SdSpacingConstant.h24),
             SdButtonV3(
               variant: SdButtonVariantV3.primary,
-              label: 'Save',
+              label: context.l10n.actionSave,
               expand: true,
               busy: isBusy,
               onPressed: isBusy ? null : _submit,

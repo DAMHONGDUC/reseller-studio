@@ -20,8 +20,11 @@ class _OrderLines extends StatelessWidget {
           (OrderLine line) => AppListRow(
             title: line.title,
             subtitle: line.quantity == 1
-                ? 'Cost ${context.money(line.unitCost)}'
-                : '×${line.quantity} · cost ${context.money(line.unitCost)}',
+                ? context.l10n.orderLineCost(context.money(line.unitCost))
+                : context.l10n.orderLineQuantityCost(
+                    line.quantity,
+                    context.money(line.unitCost),
+                  ),
             trailingText: context.money(line.lineTotal),
             onTap: () => context.push(AppRoutes.item(line.itemId)),
           ),

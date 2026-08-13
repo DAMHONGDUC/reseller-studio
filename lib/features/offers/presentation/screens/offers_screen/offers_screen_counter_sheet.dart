@@ -37,7 +37,7 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
     final Money? amount = Money.tryParse(_amount.text, currency);
 
     if (amount == null) {
-      SdSnackBarUtilsV3.error(context, 'Enter what you would accept');
+      SdSnackBarUtilsV3.error(context, context.l10n.offerCounterRequired);
 
       return;
     }
@@ -50,7 +50,7 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
       if (!mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Counter recorded');
+      SdSnackBarUtilsV3.success(context, context.l10n.offerCounterRecorded);
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -66,12 +66,14 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SdBottomSheetV3(
-        title: 'Counter ${context.money(widget.offer.amount)}',
+        title: context.l10n.offerCounterTitle(
+          context.money(widget.offer.amount),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             MoneyField(
-              label: 'What you would accept',
+              label: context.l10n.offerCounterAmount,
               controller: _amount,
               currency: ref.watch(workspaceCurrencyProvider),
               textInputAction: TextInputAction.done,
@@ -79,14 +81,13 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
             ),
             SizedBox(height: SdSpacingConstant.h12),
             Text(
-              'This is saved for your records. Send the counter on the '
-              'marketplace itself — nothing is connected yet.',
+              context.l10n.offerCounterNote,
               style: context.textTheme3.bodySmall!.faint3(context),
             ),
             SizedBox(height: SdSpacingConstant.h24),
             SdButtonV3(
               variant: SdButtonVariantV3.primary,
-              label: 'Record counter',
+              label: context.l10n.offerCounterSubmit,
               expand: true,
               busy: isBusy,
               onPressed: isBusy ? null : _submit,

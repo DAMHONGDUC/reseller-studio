@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
@@ -31,14 +32,16 @@ class ShippingQueueScreen extends ConsumerWidget {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
-        title: 'Shipping queue',
-        subtitle: orders.isEmpty ? null : '${orders.length} to send',
+        title: context.l10n.shippingQueueTitle,
+        subtitle: orders.isEmpty
+            ? null
+            : context.l10n.shippingQueueCount(orders.length),
       ),
       body: orders.isEmpty
-          ? const SdEmptyStateV3(
+          ? SdEmptyStateV3(
               icon: Symbols.local_shipping_rounded,
-              title: 'Nothing to ship',
-              message: 'Every paid order is on its way.',
+              title: context.l10n.shippingQueueEmptyTitle,
+              message: context.l10n.shippingQueueEmptyBody,
             )
           : ListView(
               padding: SdContentPaddingV3.screen(context),
@@ -59,7 +62,7 @@ class ShippingQueueScreen extends ConsumerWidget {
                           onTap: () => context.push(AppRoutes.order(order.id)),
                           trailing: SdButtonV3(
                             variant: SdButtonVariantV3.primary,
-                            label: 'Ship',
+                            label: context.l10n.shippingQueueShip,
                             size: SdButtonSizeV3.small,
                             onPressed: () =>
                                 ShipOrderSheet.show(context, order),
@@ -82,13 +85,13 @@ class ShippingQueueScreen extends ConsumerWidget {
     final DateTime? deadline = order.shipByDate;
     final String marketplace = order.marketplace.displayName;
 
-    if (deadline == null) return '$marketplace · no deadline';
+    if (deadline == null) return context.l10n.shippingNoDeadline(marketplace);
 
     final int days = DateTimeUtils.daysBetween(now, deadline);
 
-    if (days < 0) return '$marketplace · ${-days}d overdue';
-    if (days == 0) return '$marketplace · due today';
+    if (days < 0) return context.l10n.shippingOverdueBy(marketplace, -days);
+    if (days == 0) return context.l10n.shippingDueToday(marketplace);
 
-    return '$marketplace · due in ${days}d';
+    return context.l10n.shippingDueIn(marketplace, days);
   }
 }

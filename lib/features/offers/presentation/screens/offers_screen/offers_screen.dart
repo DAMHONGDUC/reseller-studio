@@ -16,6 +16,7 @@ import '../../../../workspace/providers.dart';
 import '../../../domain/entities/offer.dart';
 import '../../../providers.dart';
 import '../../controllers/offer_actions_controller.dart';
+import '../../offer_filter_label.dart';
 
 part 'offers_screen_card.dart';
 part 'offers_screen_counter_sheet.dart';
@@ -41,7 +42,7 @@ class OffersScreen extends ConsumerWidget {
     final OfferFilter selected = ref.watch(offerFilterProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Offers'),
+      appBar: SdAppBarV3(title: context.l10n.offersTitle),
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
@@ -60,7 +61,7 @@ class OffersScreen extends ConsumerWidget {
                 final OfferFilter filter = OfferFilter.values[index];
 
                 return SdFilterChipV3(
-                  label: filter.label,
+                  label: OfferFilterLabel.of(context, filter),
                   count: counts[filter],
                   selected: filter == selected,
                   onSelected: () =>
@@ -73,15 +74,15 @@ class OffersScreen extends ConsumerWidget {
             child: switch (source) {
               AsyncLoading<List<Offer>>() when !source.hasValue =>
                 const SdLoadingV3Page(),
-              AsyncError<List<Offer>>() => const SdEmptyStateV3(
+              AsyncError<List<Offer>>() => SdEmptyStateV3(
                 icon: Symbols.error_rounded,
-                title: 'Could not load offers',
-                message: 'Please try again.',
+                title: context.l10n.offersLoadFailed,
+                message: context.l10n.commonCouldNotLoad,
               ),
-              _ when offers.isEmpty => const SdEmptyStateV3(
+              _ when offers.isEmpty => SdEmptyStateV3(
                 icon: Symbols.local_offer_rounded,
-                title: 'Nothing here',
-                message: 'No offers under this tab.',
+                title: context.l10n.commonNothingHere,
+                message: context.l10n.offersNoMatch,
               ),
               _ => ListView.separated(
                 padding: SdContentPaddingV3.screen(context),

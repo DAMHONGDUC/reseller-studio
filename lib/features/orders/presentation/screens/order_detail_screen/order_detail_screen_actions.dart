@@ -35,31 +35,29 @@ class _OrderActions extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'The item came back',
-        message:
-            'Put it back on the shelf, or keep it out of inventory if it came '
-            'back damaged.',
+        title: context.l10n.orderReturnDialogTitle,
+        message: context.l10n.orderReturnDialogBody,
         icon: Symbols.assignment_return_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
-            label: 'Restock it',
+            label: context.l10n.orderRestock,
             isPrimary: true,
             onPressed: () => _run(
               context,
               () => ref
                   .read(orderActionsControllerProvider.notifier)
                   .markReturned(order, restock: true),
-              'Returned and restocked',
+              context.l10n.orderRestocked,
             ),
           ),
           SdDialogActionV3(
-            label: 'Do not restock',
+            label: context.l10n.orderDoNotRestock,
             onPressed: () => _run(
               context,
               () => ref
                   .read(orderActionsControllerProvider.notifier)
                   .markReturned(order, restock: false),
-              'Returned',
+              context.l10n.orderReturnedDone,
             ),
           ),
           SdDialogActionV3(
@@ -85,7 +83,7 @@ class _OrderActions extends ConsumerWidget {
             order.status == OrderStatus.awaitingPayment)
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Ship it',
+            label: context.l10n.orderShipIt,
             icon: Symbols.local_shipping_rounded,
             expand: true,
             busy: isBusy,
@@ -94,14 +92,14 @@ class _OrderActions extends ConsumerWidget {
         if (order.status == OrderStatus.shipped) ...<Widget>[
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Mark delivered',
+            label: context.l10n.orderMarkDelivered,
             icon: Symbols.check_circle_rounded,
             expand: true,
             busy: isBusy,
             onPressed: () => _run(
               context,
               () => actions.markDelivered(order),
-              'Marked delivered',
+              context.l10n.orderMarkedDelivered,
             ),
           ),
           SizedBox(height: SdSpacingConstant.h8),
@@ -109,7 +107,7 @@ class _OrderActions extends ConsumerWidget {
         if (order.status == OrderStatus.returnRequested) ...<Widget>[
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'It came back',
+            label: context.l10n.orderItemCameBack,
             icon: Symbols.assignment_return_rounded,
             expand: true,
             busy: isBusy,
@@ -122,20 +120,20 @@ class _OrderActions extends ConsumerWidget {
           SizedBox(height: SdSpacingConstant.h8),
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,
-            label: 'Open a return',
+            label: context.l10n.orderOpenReturn,
             expand: true,
             busy: isBusy,
             onPressed: () => _run(
               context,
               () => actions.requestReturn(order),
-              'Return opened',
+              context.l10n.orderReturnOpened,
             ),
           ),
         ],
         SizedBox(height: SdSpacingConstant.h8),
         SdButtonV3(
           variant: SdButtonVariantV3.secondary,
-          label: 'Record fees and payout',
+          label: context.l10n.orderRecordSettlement,
           expand: true,
           busy: isBusy,
           onPressed: () => SettleOrderSheet.show(context, order),

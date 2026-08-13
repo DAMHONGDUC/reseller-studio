@@ -15,14 +15,6 @@ enum OrderFilter {
   delivered,
   returns;
 
-  String get label => switch (this) {
-    OrderFilter.all => 'All',
-    OrderFilter.toShip => 'To Ship',
-    OrderFilter.shipped => 'Shipped',
-    OrderFilter.delivered => 'Delivered',
-    OrderFilter.returns => 'Returns',
-  };
-
   bool matches(Order order) => switch (this) {
     OrderFilter.all => true,
     // `awaitingPayment` is folded in here on purpose: from the seller's point

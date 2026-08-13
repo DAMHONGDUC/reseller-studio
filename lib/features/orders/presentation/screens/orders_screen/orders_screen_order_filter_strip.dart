@@ -23,7 +23,7 @@ class _OrderFilterStrip extends ConsumerWidget {
           final OrderFilter filter = OrderFilter.values[index];
 
           return SdFilterChipV3(
-            label: filter.label,
+            label: OrderFilterLabel.of(context, filter),
             count: counts[filter],
             selected: filter == selected,
             onSelected: () =>

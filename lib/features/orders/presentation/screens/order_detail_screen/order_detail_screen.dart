@@ -17,6 +17,7 @@ import '../../../domain/entities/order.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
 import '../../controllers/order_actions_controller.dart';
+import '../../order_status_label.dart';
 import '../../widgets/ship_order_sheet.dart';
 
 part 'order_detail_screen_actions.dart';
@@ -48,21 +49,21 @@ class OrderDetailScreen extends ConsumerWidget {
     return SdScaffoldV3(
       appBar: SdAppBarV3(
         title: value == null
-            ? 'Order'
-            : '${value.marketplace.displayName} order',
+            ? context.l10n.orderTitleFallback
+            : context.l10n.orderTitle(value.marketplace.displayName),
         subtitle: value?.externalOrderId,
       ),
       body: switch (order) {
         AsyncLoading<Order?>() when !order.hasValue => const SdLoadingV3Page(),
-        AsyncError<Order?>() => const SdEmptyStateV3(
+        AsyncError<Order?>() => SdEmptyStateV3(
           icon: Symbols.error_rounded,
-          title: 'Could not load this order',
-          message: 'Please try again.',
+          title: context.l10n.orderLoadFailed,
+          message: context.l10n.commonCouldNotLoad,
         ),
-        AsyncData<Order?>(value: null) => const SdEmptyStateV3(
+        AsyncData<Order?>(value: null) => SdEmptyStateV3(
           icon: Symbols.search_off_rounded,
-          title: 'Order not found',
-          message: 'It may have been deleted.',
+          title: context.l10n.orderNotFound,
+          message: context.l10n.commonMayHaveBeenDeleted,
         ),
         _ => _OrderBody(order: value!),
       },

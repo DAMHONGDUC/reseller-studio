@@ -33,23 +33,23 @@ class _ProfitStatement extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _OrderDetailRow(
-            label: 'Revenue',
+            label: context.l10n.commonRevenue,
             value: context.money(profit.revenue),
           ),
           _OrderDetailRow(
-            label: 'Cost of goods',
+            label: context.l10n.commonCostOfGoods,
             value: context.money(profit.cogs),
           ),
           _OrderDetailRow(
-            label: 'Platform fees',
+            label: context.l10n.orderPlatformFees,
             value: context.money(profit.fees),
           ),
           _OrderDetailRow(
-            label: 'Shipping',
+            label: context.l10n.commonShipping,
             value: context.money(profit.shipping),
           ),
           _OrderDetailRow(
-            label: 'Other expenses',
+            label: context.l10n.orderOtherExpenses,
             value: context.money(profit.otherExpenses),
           ),
           Divider(
@@ -58,7 +58,7 @@ class _ProfitStatement extends StatelessWidget {
             color: context.sdTheme3.divider,
           ),
           _OrderDetailRow(
-            label: 'Net profit',
+            label: context.l10n.commonNetProfit,
             value: context.money(net),
             isEmphasis: true,
             // An em dash is not a figure, so it must not be tinted as though
@@ -70,15 +70,17 @@ class _ProfitStatement extends StatelessWidget {
                 : context.sdTheme3.profit,
           ),
           _OrderDetailRow(
-            label: 'Margin',
+            label: context.l10n.commonMargin,
             value: context.percent(profit.margin),
           ),
-          _OrderDetailRow(label: 'ROI', value: context.percent(profit.roi)),
+          _OrderDetailRow(
+            label: context.l10n.commonRoi,
+            value: context.percent(profit.roi),
+          ),
           if (!profit.isComplete) ...<Widget>[
             SizedBox(height: SdSpacingConstant.h8),
             Text(
-              'No cost recorded for one of these items, so profit cannot be '
-              'worked out. Add it on the item and this fills in.',
+              context.l10n.orderProfitIncomplete,
               style: context.textTheme3.bodySmall!.copyWith(
                 color: context.sdTheme3.warning,
               ),

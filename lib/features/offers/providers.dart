@@ -18,13 +18,6 @@ enum OfferFilter {
   declined,
   expired;
 
-  String get label => switch (this) {
-    OfferFilter.pending => 'Pending',
-    OfferFilter.accepted => 'Accepted',
-    OfferFilter.declined => 'Declined',
-    OfferFilter.expired => 'Expired',
-  };
-
   /// Whether [offer] belongs under this tab, as of [now].
   ///
   /// **Expiry is decided by the clock, not by the stored status** (hard rule

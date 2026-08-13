@@ -33,20 +33,18 @@ class _OfferCard extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Accept ${context.money(offer.amount)}?',
-        message:
-            'This records the sale and creates the order, so the item leaves '
-            'your inventory.',
+        title: context.l10n.offerAcceptTitle(context.money(offer.amount)),
+        message: context.l10n.offerAcceptBody,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
-            label: 'Accept',
+            label: context.l10n.offerAccept,
             isPrimary: true,
             onPressed: () => _run(
               context,
               () => ref
                   .read(offerActionsControllerProvider.notifier)
                   .accept(offer),
-              'Sold — the order is in Orders',
+              context.l10n.offerAccepted,
             ),
           ),
           SdDialogActionV3(
@@ -59,18 +57,18 @@ class _OfferCard extends ConsumerWidget {
   }
 
   /// How long is left, in the words a seller reacts to.
-  static String? _deadline(Offer offer, DateTime now) {
+  static String? _deadline(BuildContext context, Offer offer, DateTime now) {
     final DateTime? expires = offer.expiresAt;
 
     if (expires == null || !offer.needsAction) return null;
 
     final Duration left = expires.difference(now);
 
-    if (left.isNegative) return 'Expired';
-    if (left.inHours < 1) return 'Under an hour left';
-    if (left.inHours < 24) return '${left.inHours}h left';
+    if (left.isNegative) return context.l10n.offerFilterExpired;
+    if (left.inHours < 1) return context.l10n.offerUnderAnHourLeft;
+    if (left.inHours < 24) return context.l10n.offerHoursLeft(left.inHours);
 
-    return '${left.inDays}d left';
+    return context.l10n.offerDaysLeft(left.inDays);
   }
 
   @override
@@ -78,7 +76,7 @@ class _OfferCard extends ConsumerWidget {
     final DateTime now = DateTime.now();
     final bool isBusy = ref.watch(offerActionsControllerProvider);
     final bool canAct = offer.needsAction && !offer.hasExpired(now);
-    final String? deadline = _deadline(offer, now);
+    final String? deadline = _deadline(context, offer, now);
 
     final Item? item = (ref.watch(itemsProvider).value ?? const <Item>[])
         .where((Item row) => row.id == offer.itemId)
@@ -123,9 +121,9 @@ class _OfferCard extends ConsumerWidget {
             <String>[
               offer.marketplace.displayName,
               if (item?.askingPrice != null)
-                'asking ${context.money(item!.askingPrice)}',
+                context.l10n.offerAsking(context.money(item!.askingPrice)),
               if (discount != null)
-                '${context.percent(discount)} below',
+                context.l10n.offerBelowAsking(context.percent(discount)),
               if (offer.buyerName != null) offer.buyerName!,
             ].join(' · '),
             style: context.textTheme3.bodySmall!.faint3(context),
@@ -133,7 +131,7 @@ class _OfferCard extends ConsumerWidget {
           if (offer.message != null) ...<Widget>[
             SizedBox(height: SdSpacingConstant.h6),
             Text(
-              '“${offer.message}”',
+              context.l10n.offerMessageQuote(offer.message!),
               style: context.textTheme3.bodySmall!.muted3(context),
             ),
           ],
@@ -150,7 +148,9 @@ class _OfferCard extends ConsumerWidget {
                 ),
               if (offer.counterAmount != null)
                 SdBadgeV3(
-                  label: 'Countered ${context.money(offer.counterAmount)}',
+                  label: context.l10n.offerCountered(
+                    context.money(offer.counterAmount),
+                  ),
                   icon: Symbols.reply_rounded,
                 ),
               if (offer.respondedAt != null)
@@ -169,7 +169,7 @@ class _OfferCard extends ConsumerWidget {
                 Expanded(
                   child: SdButtonV3(
                     variant: SdButtonVariantV3.primary,
-                    label: 'Accept',
+                    label: context.l10n.offerAccept,
                     size: SdButtonSizeV3.small,
                     expand: true,
                     busy: isBusy,
@@ -180,7 +180,7 @@ class _OfferCard extends ConsumerWidget {
                 Expanded(
                   child: SdButtonV3(
                     variant: SdButtonVariantV3.secondary,
-                    label: 'Counter',
+                    label: context.l10n.offerCounter,
                     size: SdButtonSizeV3.small,
                     expand: true,
                     onPressed: () => _CounterSheet.show(context, offer),
@@ -190,7 +190,7 @@ class _OfferCard extends ConsumerWidget {
                 Expanded(
                   child: SdButtonV3(
                     variant: SdButtonVariantV3.outlined,
-                    label: 'Decline',
+                    label: context.l10n.offerDecline,
                     size: SdButtonSizeV3.small,
                     expand: true,
                     onPressed: () => _run(
@@ -198,7 +198,7 @@ class _OfferCard extends ConsumerWidget {
                       () => ref
                           .read(offerActionsControllerProvider.notifier)
                           .decline(offer),
-                      'Declined',
+                      context.l10n.offerDeclined,
                     ),
                   ),
                 ),

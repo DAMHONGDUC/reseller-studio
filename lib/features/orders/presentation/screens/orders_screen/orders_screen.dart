@@ -10,6 +10,8 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
+import '../../order_filter_label.dart';
+import '../../order_status_label.dart';
 
 part 'orders_screen_order_card.dart';
 part 'orders_screen_order_filter_strip.dart';
@@ -33,16 +35,16 @@ class OrdersScreen extends ConsumerWidget {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
-        title: 'Orders',
+        title: context.l10n.navOrders,
         actions: <Widget>[
           IconButton(
             icon: const SdIconV3(Symbols.local_offer_rounded),
-            tooltip: 'Offers',
+            tooltip: context.l10n.offersTitle,
             onPressed: () => context.push(AppRoutes.offers),
           ),
           IconButton(
             icon: const SdIconV3(Symbols.local_shipping_rounded),
-            tooltip: 'Shipping queue',
+            tooltip: context.l10n.shippingQueueTitle,
             onPressed: () => context.push(AppRoutes.shippingQueue),
           ),
         ],
@@ -55,15 +57,15 @@ class OrdersScreen extends ConsumerWidget {
             child: switch (source) {
               AsyncLoading<List<Order>>() when !source.hasValue =>
                 const SdLoadingV3Page(),
-              AsyncError<List<Order>>() => const SdEmptyStateV3(
+              AsyncError<List<Order>>() => SdEmptyStateV3(
                 icon: Symbols.error_rounded,
-                title: 'Could not load orders',
-                message: 'Please try again.',
+                title: context.l10n.ordersLoadFailed,
+                message: context.l10n.commonCouldNotLoad,
               ),
-              _ when orders.isEmpty => const SdEmptyStateV3(
+              _ when orders.isEmpty => SdEmptyStateV3(
                 icon: Symbols.receipt_long_rounded,
-                title: 'Nothing here',
-                message: 'No orders match this filter.',
+                title: context.l10n.commonNothingHere,
+                message: context.l10n.ordersNoMatch,
               ),
               _ => _OrderList(orders: orders),
             },

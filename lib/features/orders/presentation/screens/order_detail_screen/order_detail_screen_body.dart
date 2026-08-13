@@ -27,16 +27,16 @@ class _OrderBody extends ConsumerWidget {
         SizedBox(height: SdContentPaddingV3.topGap),
         _StatusCard(order: order),
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        _OrderSectionTitle(title: 'Items'),
+        _OrderSectionTitle(title: context.l10n.commonItems),
         _OrderLines(order: order),
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        _OrderSectionTitle(title: 'Profit'),
+        _OrderSectionTitle(title: context.l10n.commonProfit),
         _ProfitStatement(profit: profit),
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        _OrderSectionTitle(title: 'Shipping'),
+        _OrderSectionTitle(title: context.l10n.commonShipping),
         _ShippingCard(order: order),
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        _OrderSectionTitle(title: 'Timeline'),
+        _OrderSectionTitle(title: context.l10n.orderTimeline),
         _Timeline(order: order),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderActions(order: order),
@@ -63,17 +63,6 @@ class _StatusCard extends StatelessWidget {
     OrderStatus.cancelled => SdBadgeToneV3.neutral,
   };
 
-  static String labelFor(OrderStatus status) => switch (status) {
-    OrderStatus.awaitingPayment => 'Awaiting payment',
-    OrderStatus.toShip => 'To ship',
-    OrderStatus.shipped => 'Shipped',
-    OrderStatus.delivered => 'Delivered',
-    OrderStatus.returnRequested => 'Return requested',
-    OrderStatus.returned => 'Returned',
-    OrderStatus.refunded => 'Refunded',
-    OrderStatus.cancelled => 'Cancelled',
-  };
-
   @override
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
@@ -86,13 +75,13 @@ class _StatusCard extends StatelessWidget {
           Row(
             children: <Widget>[
               SdBadgeV3(
-                label: labelFor(order.status),
+                label: OrderStatusLabel.of(context, order.status),
                 tone: toneFor(order.status),
               ),
               if (isOverdue) ...<Widget>[
                 SizedBox(width: SdSpacingConstant.w6),
-                const SdBadgeV3(
-                  label: 'Overdue',
+                SdBadgeV3(
+                  label: context.l10n.orderOverdue,
                   tone: SdBadgeToneV3.danger,
                   icon: Symbols.schedule_rounded,
                 ),
@@ -137,13 +126,16 @@ class _ShippingCard extends StatelessWidget {
     return SdCardV3(
       child: Column(
         children: <Widget>[
-          _OrderDetailRow(label: 'Carrier', value: order.carrier ?? dash),
           _OrderDetailRow(
-            label: 'Tracking',
+            label: context.l10n.orderCarrier,
+            value: order.carrier ?? dash,
+          ),
+          _OrderDetailRow(
+            label: context.l10n.orderTracking,
             value: order.trackingNumber ?? dash,
           ),
           _OrderDetailRow(
-            label: 'Ship by',
+            label: context.l10n.orderShipBy,
             value: order.shipByDate == null
                 ? dash
                 : DateTimeUtils.mediumDate(
@@ -152,7 +144,7 @@ class _ShippingCard extends StatelessWidget {
                   ),
           ),
           _OrderDetailRow(
-            label: 'Shipping cost',
+            label: context.l10n.orderShippingCost,
             value: context.money(order.shippingCost),
           ),
         ],
