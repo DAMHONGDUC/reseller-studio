@@ -20,6 +20,18 @@ commit, immediately** — never folded into the change it governs. A rule that
 arrives inside a 40-file feature commit is a rule nobody reviewed.
 Message: `docs: update docs - detail is <what changed>`.
 
+**A hard rule is cited by number, never restated.** Write "hard rule 9", not
+the rule again in your own words. One list, one number, referenced from
+everywhere — that is what stops the same constraint living in four files and
+drifting in three of them. A file that repeats one says why it is repeating it,
+the way `docs/rules/PRIVACY_AND_SECURITY.md` does.
+
+**Numbers live in code; a document points at the field and never repeats the
+value.** Write `` `listItemGap` ``, never `` `listItemGap` (12) ``, anywhere
+outside the class that defines it. A number copied into a sentence goes stale
+silently — the sibling app's prose still claims a gap the code stopped using,
+and nobody noticed because prose does not fail to compile.
+
 **Every document in this repo is written in English, in full.** `CLAUDE.md`,
 everything under `docs/`, every `README.md`. No mixed-language paragraphs and
 no untranslated quotes. The app's user-facing strings are the exception and
@@ -45,6 +57,8 @@ in the left.
 | Working on | Read |
 |---|---|
 | `packages/system_design/`, or any screen or widget rendering `Sd*` v3 components | `docs/rules/DESIGN_SYSTEM.md` |
+| a screen's app bar, status bar, scrolling list, empty state or search mode | `docs/rules/SCREENS.md` |
+| `firestore.rules`, `firestore.indexes.json`, `functions/`, or a `data/` method that queries or calls out | `docs/rules/BACKEND.md` |
 | a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
 | running, building, generating or deploying | `docs/rules/COMMANDS.md` |
 | writing or fixing a test | `docs/rules/TESTING.md` |
@@ -111,7 +125,9 @@ chain is a screen that will be redesigned.
   15.0`). Lowering it back breaks the iOS build outright.
 - Prefer boring, well-maintained pub.dev packages (>1k likes, recent commits)
   over clever ones. **Ask before adding any new third-party service, SDK or
-  analytics tool.**
+  analytics tool.** An exception to that bar is fine and gets its reason
+  written into `docs/rules/DECISIONS.md` in the same turn — otherwise the next
+  session reads an odd dependency as an accident and swaps it.
 
 ## Repo layout
 
