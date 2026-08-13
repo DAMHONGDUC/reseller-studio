@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:seller_os/core/theme/app_theme.dart';
+import 'package:seller_os/core/time/app_clock.dart';
 import 'package:seller_os/features/expenses/domain/entities/expense.dart';
 import 'package:seller_os/features/expenses/providers.dart';
 import 'package:seller_os/features/inventory/domain/entities/item.dart';
@@ -24,6 +25,22 @@ import 'package:seller_os/seller_os_app.dart';
 /// relative to "now", so a floating clock would make "listed 84 days ago"
 /// drift across the stale threshold on some runs and not others.
 final DateTime testNow = DateTime(2026, 8, 12);
+
+/// A clock stopped at [testNow].
+///
+/// Seeding the dataset against a fixed instant is only half of it: a screen
+/// that read the wall clock would still drift past those rows as the calendar
+/// moves, so what a test asserts about "overdue" or "stale" would depend on
+/// the day it ran. Overriding [clockProvider] pins both halves to the same
+/// instant.
+class FixedClock extends AppClock {
+  const FixedClock(this.instant);
+
+  final DateTime instant;
+
+  @override
+  DateTime now() => instant;
+}
 
 /// Forces mock mode without touching `SharedPreferences`.
 ///
@@ -61,6 +78,7 @@ Future<void> pumpScreen(WidgetTester tester, Widget screen) async {
     ProviderScope(
       overrides: [
         dataModeProvider.overrideWith(_AlwaysMock.new),
+        clockProvider.overrideWith((Ref ref) => FixedClock(testNow)),
         mockStoreProvider.overrideWith(
           (Ref ref) => MockStore(MockDataset.seed(now: testNow)),
         ),
@@ -92,6 +110,7 @@ ProviderContainer mockContainer() {
   final ProviderContainer container = ProviderContainer(
     overrides: [
       dataModeProvider.overrideWith(_AlwaysMock.new),
+      clockProvider.overrideWith((Ref ref) => FixedClock(testNow)),
       mockStoreProvider.overrideWith(
         (Ref ref) => MockStore(MockDataset.seed(now: testNow)),
       ),

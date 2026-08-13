@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/listing.dart';
 import '../../../domain/enums/listing_status.dart';
@@ -37,7 +38,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
     final List<Listing> listings = _filter == null
         ? all
         : all.where((Listing listing) => listing.status == _filter).toList();
-    final DateTime now = DateTime.now();
+    final DateTime now = ref.watch(clockProvider).now();
 
     return SdScaffoldV3(
       appBar: const SdAppBarV3(title: 'Listings'),

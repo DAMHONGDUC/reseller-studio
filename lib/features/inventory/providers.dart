@@ -4,6 +4,7 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/time/app_clock.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import 'domain/entities/item.dart';
@@ -104,7 +105,7 @@ inventorySearchProvider = NotifierProvider<InventorySearchController, String>(
 final Provider<Map<InventoryFilter, int>> inventoryCountsProvider =
     Provider<Map<InventoryFilter, int>>((Ref ref) {
       final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
-      final DateTime now = DateTime.now();
+      final DateTime now = ref.watch(clockProvider).now();
 
       return <InventoryFilter, int>{
         for (final InventoryFilter filter in InventoryFilter.values)
@@ -257,7 +258,7 @@ final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
   final InventoryFilter filter = ref.watch(inventoryFilterProvider);
   final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
-  final DateTime now = DateTime.now();
+  final DateTime now = ref.watch(clockProvider).now();
 
   return items.where((Item item) {
     if (!filter.matches(item, now: now)) return false;

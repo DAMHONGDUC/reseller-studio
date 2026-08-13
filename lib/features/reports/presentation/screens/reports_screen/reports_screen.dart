@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
@@ -43,7 +44,7 @@ class ReportsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AnalyticsSummary summary = ref.watch(analyticsSummaryProvider);
     final bool isBusy = ref.watch(reportControllerProvider);
-    final DateTime now = DateTime.now();
+    final DateTime now = ref.watch(clockProvider).now();
 
     return SdScaffoldV3(
       appBar: const SdAppBarV3(title: 'Reports'),

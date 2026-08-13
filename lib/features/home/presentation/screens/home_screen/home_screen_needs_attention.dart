@@ -13,7 +13,7 @@ class _NeedsAttention extends ConsumerWidget {
     final List<Order> pending = ref.watch(ordersNeedingActionProvider);
     final List<Item> stale = ref.watch(staleItemsProvider);
     final List<Item> unlisted = ref.watch(unlistedItemsProvider);
-    final DateTime now = DateTime.now();
+    final DateTime now = ref.watch(clockProvider).now();
 
     final int overdue = pending
         .where((Order order) => order.isOverdue(now) ?? false)

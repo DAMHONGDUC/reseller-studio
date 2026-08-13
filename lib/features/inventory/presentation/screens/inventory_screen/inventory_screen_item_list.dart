@@ -8,7 +8,7 @@ class _ItemList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // One `now` for the whole list, so every row agrees on what stale means.
-    final DateTime now = DateTime.now();
+    final DateTime now = ref.watch(clockProvider).now();
     final Set<String> selected = ref.watch(inventorySelectionProvider);
     final bool isSelecting = selected.isNotEmpty;
 

@@ -9,6 +9,7 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/money/money.dart';
+import '../../core/time/app_clock.dart';
 import '../expenses/domain/entities/expense.dart';
 import '../expenses/providers.dart';
 import '../inventory/domain/entities/item.dart';
@@ -56,7 +57,7 @@ final Provider<InventoryMetrics> inventoryMetricsProvider =
     Provider<InventoryMetrics>((Ref ref) {
       return InventoryMetrics.from(
         items: ref.watch(itemsProvider).value ?? const <Item>[],
-        now: DateTime.now(),
+        now: ref.watch(clockProvider).now(),
         staleThreshold: ref.watch(staleThresholdProvider),
       );
     });
@@ -170,7 +171,7 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
 final Provider<List<Item>> staleItemsProvider = Provider<List<Item>>((Ref ref) {
   final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
   final Duration threshold = ref.watch(staleThresholdProvider);
-  final DateTime now = DateTime.now();
+  final DateTime now = ref.watch(clockProvider).now();
 
   final List<Item> stale =
       items

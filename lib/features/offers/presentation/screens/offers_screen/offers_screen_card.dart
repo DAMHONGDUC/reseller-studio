@@ -73,7 +73,7 @@ class _OfferCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final DateTime now = DateTime.now();
+    final DateTime now = ref.watch(clockProvider).now();
     final bool isBusy = ref.watch(offerActionsControllerProvider);
     final bool canAct = offer.needsAction && !offer.hasExpired(now);
     final String? deadline = _deadline(context, offer, now);

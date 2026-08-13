@@ -25,7 +25,7 @@ class _OrderBody extends ConsumerWidget {
       padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
-        _StatusCard(order: order),
+        _StatusCard(order: order, now: ref.watch(clockProvider).now()),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSectionTitle(title: context.l10n.commonItems),
         _OrderLines(order: order),
@@ -49,9 +49,10 @@ class _OrderBody extends ConsumerWidget {
 /// Status, buyer and what the platform took — the three facts a seller checks
 /// before deciding what to do.
 class _StatusCard extends StatelessWidget {
-  const _StatusCard({required this.order});
+  const _StatusCard({required this.order, required this.now});
 
   final Order order;
+  final DateTime now;
 
   static SdBadgeToneV3 toneFor(OrderStatus status) => switch (status) {
     OrderStatus.toShip => SdBadgeToneV3.warning,
@@ -65,7 +66,6 @@ class _StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime now = DateTime.now();
     final bool isOverdue = order.isOverdue(now) ?? false;
 
     return SdCardV3(

@@ -7,6 +7,7 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/time/app_clock.dart';
 import '../mock_data/providers.dart';
 import '../orders/domain/enums/order_status.dart';
 import 'domain/entities/offer.dart';
@@ -58,7 +59,7 @@ final Provider<Map<OfferFilter, int>> offerCountsProvider =
     Provider<Map<OfferFilter, int>>((Ref ref) {
       final List<Offer> offers =
           ref.watch(offersProvider).value ?? const <Offer>[];
-      final DateTime now = DateTime.now();
+      final DateTime now = ref.watch(clockProvider).now();
 
       return <OfferFilter, int>{
         for (final OfferFilter filter in OfferFilter.values)
@@ -74,7 +75,7 @@ final Provider<List<Offer>> visibleOffersProvider = Provider<List<Offer>>((
   final List<Offer> offers =
       ref.watch(offersProvider).value ?? const <Offer>[];
   final OfferFilter filter = ref.watch(offerFilterProvider);
-  final DateTime now = DateTime.now();
+  final DateTime now = ref.watch(clockProvider).now();
 
   return offers.where((Offer offer) => filter.matches(offer, now)).toList();
 });
@@ -89,7 +90,7 @@ final Provider<List<Offer>> pendingOffersProvider = Provider<List<Offer>>((
 ) {
   final List<Offer> offers =
       ref.watch(offersProvider).value ?? const <Offer>[];
-  final DateTime now = DateTime.now();
+  final DateTime now = ref.watch(clockProvider).now();
 
   final List<Offer> pending =
       offers

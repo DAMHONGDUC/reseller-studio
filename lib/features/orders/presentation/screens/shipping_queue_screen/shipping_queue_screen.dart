@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/order.dart';
@@ -28,7 +29,7 @@ class ShippingQueueScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Order> orders = ref.watch(ordersNeedingActionProvider);
-    final DateTime now = DateTime.now();
+    final DateTime now = ref.watch(clockProvider).now();
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
