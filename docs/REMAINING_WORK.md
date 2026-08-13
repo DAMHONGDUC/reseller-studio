@@ -36,23 +36,6 @@ arguing about, not the buttons: `Offers → "Đề nghị giá"`,
 `vi` is worse than an English one, so do not advertise `vi` in the store
 listing until that is done.
 
-### A snackbar renders over the floating nav bar
-
-Visible on all five tab screens. `SdSnackBarV3` draws into the root overlay
-and sets its bottom from `SdContentPaddingV3.detailBottom`, which knows
-nothing about the glass bar — so the snackbar's bottom edge lands inside the
-band the bar occupies (`navBarOffset` up to `floatingBarInset`).
-
-Nothing in `v3` can detect it: a root-overlay presenter sits above the whole
-app, and `floatingBarInset` is only ever read by screens padding themselves.
-
-**The fix is a port.** `SdFloatingBarScopeV2` is an `InheritedWidget` wrapped
-once around the shell body; `insetOf(context)` returns the footprint inside it
-and 0 outside, so a pushed route — which covers the bar anyway — correctly
-reads zero. Port it as `SdFloatingBarScopeV3`, wrap `AppShell`, add it to the
-snackbar host's bottom. It needs a **new component in
-`packages/system_design`**, which `CLAUDE.md` says to ask about first.
-
 ### v3 keeps its own chrome
 
 `SdCollapsingFilterScaffoldV2`, `SdPinnedFilterBarV2` and
@@ -60,7 +43,8 @@ snackbar host's bottom. It needs a **new component in
 row into the app bar on scroll, and v3's recorded rule is the opposite. The
 two search entry points (Inventory's docking header, the Search screen's plain
 autofocused field) also differ on purpose. `docs/rules/DECISIONS.md` has the
-reasoning; do not "finish the port".
+reasoning; do not "finish the port". `SdFloatingBarScopeV3` is the one that
+*was* ported — it is what keeps a snackbar off the glass bar.
 
 ## 2. Blocked on Cloud Functions
 

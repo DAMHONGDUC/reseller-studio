@@ -67,12 +67,15 @@ are there and the mock backend drives them end to end.
   deferred — `REMAINING_WORK.md`.
 - **Design system**: v3 on its own generation, spacing owned entirely by
   `SdContentPaddingV3`, no `MediaQuery` read for spacing anywhere in `lib/`.
+  `SdFloatingBarScopeV3` wraps the shell body so a snackbar — which draws into
+  the root overlay and cannot see the glass nav bar — rests above it instead
+  of inside it.
 - **Read-time "now" is injected**, not read from the wall clock. `AppClock`
   and `clockProvider` (`core/time/`) are what every derived figure — overdue,
   stale, expired, days left — asks, so a test pins the instant with
   `FixedClock`. Recorded timestamps (`createdAt`, `deletedAt`, when an order
   shipped) deliberately still call `DateTime.now()`.
-- **Tests**: 92 passing, none known-failing. Profit/margin/ROI including the
+- **Tests**: 94 passing, none known-failing. Profit/margin/ROI including the
   plan §11 worked example, plus screen-level tests asserting rendered figures
   against the mock seed. `test/features/shot_tmp_test.dart` is the gitignored
   scratch harness and is excluded — it hangs by design.
