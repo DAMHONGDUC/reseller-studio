@@ -27,6 +27,20 @@ abstract class AppAnalytics {
     AppLogger.info('Analytics attached');
   }
 
+  // --- Navigation ---
+
+  /// One of the five bottom tabs came to the front.
+  ///
+  /// **The router cannot report this.** The tabs are branches of a
+  /// `StatefulShellRoute.indexedStack`, so switching one pushes no route and a
+  /// navigator observer sees nothing — without this call, tab analytics read
+  /// as if nobody ever opens Inventory. `AppShell` is the only place that sees
+  /// the change.
+  ///
+  /// [tab] is a stable identifier from `NavTabConstant`, never a localized
+  /// label: a name that changes with the locale splits one tab into two series.
+  void tabViewed({required String tab});
+
   // --- Session ---
 
   void signedIn({required String provider});
@@ -69,16 +83,16 @@ class _NoopAnalytics implements AppAnalytics {
   const _NoopAnalytics();
 
   @override
+  void tabViewed({required String tab}) {}
+
+  @override
   void signedIn({required String provider}) {}
 
   @override
   void signedOut() {}
 
   @override
-  void workspaceCreated({
-    required String currency,
-    required String country,
-  }) {}
+  void workspaceCreated({required String currency, required String country}) {}
 
   @override
   void itemCreated({required bool viaQuickAdd, required bool hasPhoto}) {}
@@ -113,6 +127,12 @@ class _FirebaseAppAnalytics implements AppAnalytics {
 
   final FirebaseAnalytics _analytics;
 
+  // Firebase's own `screen_view`, so the tabs land in the standard screen
+  // report rather than a custom event nobody's dashboard knows about.
+  @override
+  void tabViewed({required String tab}) =>
+      _report('screen_view', _analytics.logScreenView(screenName: tab));
+
   @override
   void signedIn({required String provider}) =>
       _send('sign_in', <String, Object>{'provider': provider});
@@ -121,13 +141,11 @@ class _FirebaseAppAnalytics implements AppAnalytics {
   void signedOut() => _send('sign_out', const <String, Object>{});
 
   @override
-  void workspaceCreated({
-    required String currency,
-    required String country,
-  }) => _send('workspace_created', <String, Object>{
-    'currency': currency,
-    'country': country,
-  });
+  void workspaceCreated({required String currency, required String country}) =>
+      _send('workspace_created', <String, Object>{
+        'currency': currency,
+        'country': country,
+      });
 
   @override
   void itemCreated({required bool viaQuickAdd, required bool hasPhoto}) =>
@@ -151,10 +169,7 @@ class _FirebaseAppAnalytics implements AppAnalytics {
 
   @override
   void bulkAction({required String action, required int count}) =>
-      _send('bulk_action', <String, Object>{
-        'action': action,
-        'count': count,
-      });
+      _send('bulk_action', <String, Object>{'action': action, 'count': count});
 
   @override
   void orderShipped({required bool hasTracking}) =>
@@ -175,19 +190,20 @@ class _FirebaseAppAnalytics implements AppAnalytics {
   void reportExported({required String kind}) =>
       _send('report_exported', <String, Object>{'kind': kind});
 
+  void _send(String name, Map<String, Object> parameters) =>
+      _report(name, _analytics.logEvent(name: name, parameters: parameters));
+
   /// Fire and forget, and never let a failed event break the action that
   /// raised it — but log it, because a caught error nobody logs is a failure
   /// nobody can fix (hard rule 8).
-  void _send(String name, Map<String, Object> parameters) {
-    _analytics
-        .logEvent(name: name, parameters: parameters)
-        .catchError((Object error, StackTrace stackTrace) {
-          AppLogger.error(
-            'Analytics event failed',
-            error: error,
-            stackTrace: stackTrace,
-            data: <String, Object>{'event': name},
-          );
-        });
+  void _report(String name, Future<void> sent) {
+    sent.catchError((Object error, StackTrace stackTrace) {
+      AppLogger.error(
+        'Analytics event failed',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'event': name},
+      );
+    });
   }
 }
