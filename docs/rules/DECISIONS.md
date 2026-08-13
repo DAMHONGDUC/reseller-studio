@@ -71,12 +71,11 @@ neighbouring v2 patterns were not, and this is the standing answer:
   exists to be typed into immediately and collapsing chrome buys nothing when
   the list starts empty.
 
-**Known open item, recorded rather than fixed.** `SdSnackBarV3` draws into the
-root overlay and positions itself by `detailBottom`, which does not clear
-`floatingBarInset` — so on the five tab screens a snackbar renders over the
-glass nav bar. v2 solved exactly this with `SdFloatingBarScopeV2`, an
-`InheritedWidget` around the shell body that lets a root-overlay presenter ask
-whether a bar is below it. Porting that is the fix if this is ever picked up.
+**Not porting `SdFloatingBarScopeV2` has one known cost**: a snackbar renders
+over the glass nav bar on the five tab screens. Deferred by decision, and
+written up with the fix under "Remaining work" in `RELEASE_ACTIONS.md` — the
+symptom and the numbers live there, not here, so there is one copy to keep
+true.
 
 ## Why a caught error must still be logged
 

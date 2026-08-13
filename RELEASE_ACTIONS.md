@@ -268,6 +268,35 @@ Orders, Offers — **388 keys**, in `en` and `vi`.
 A `vi` locale that is half-translated is worse than an English one, so `vi`
 should not be advertised in the store listing until step 2 is done.
 
+### A snackbar renders over the floating nav bar
+
+Visible on **all five tab screens**, deferred by decision.
+
+`SdSnackBarV3` draws into the root overlay and sets its bottom edge from
+`SdContentPaddingV3.detailBottom`, which knows nothing about the glass tab
+bar. The two spans overlap outright:
+
+| | Where it sits |
+|---|---|
+| Snackbar, bottom edge | `detailBottom` — the device inset, floored |
+| Nav bar, occupied band | `navBarOffset` up to `floatingBarInset` |
+
+The snackbar's bottom lands **inside** the bar's band, so every message on a
+tab screen is drawn on top of the pill. Nothing in `v3` can detect this: a
+root-overlay presenter sits above the whole app and has no way to know a bar
+is below it, and `floatingBarInset` is only ever read by screens padding
+themselves.
+
+**The fix is a port, and the sibling app already has it.**
+`SdFloatingBarScopeV2` is an `InheritedWidget` wrapped once around the shell
+body; `insetOf(context)` returns the bar's footprint inside it and 0 outside,
+so a pushed route — which covers the bar anyway — correctly reads zero. Port
+it as `SdFloatingBarScopeV3`, wrap `AppShell`, and have the snackbar host add
+it to its bottom.
+
+Note this needs a **new component in `packages/system_design`**, which
+`CLAUDE.md` says to ask about first, and `WIDGET_RULES.md` governs.
+
 ### Known-failing test
 
 `test/features/screens_with_mock_data_test.dart` — *Home shows the workspace
