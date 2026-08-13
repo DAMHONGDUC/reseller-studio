@@ -62,8 +62,13 @@ theme, which is the hardest kind of bug to be told about.
   `AnnotatedRegion` value, and that is the only thing that keeps this correct
   after a palette change.
 
-Nothing in `lib/` sets `systemOverlayStyle` today. That gap is written up in
-`docs/REMAINING_WORK.md`, not here — one copy to keep true.
+`AppTheme.statusBarStyle(Brightness)` is that one place; `AppTheme._build`
+hands it to `AppBarTheme.systemOverlayStyle`, and `SellerOsApp`'s builder wraps
+the app in an `AnnotatedRegion` of the same value so a route with no app bar —
+splash, login — is covered too. `test/core/theme/app_theme_test.dart` asserts
+both platform fields in both themes. Android also needs
+`SystemUiMode.edgeToEdge`, which `AppBootstrap` turns on in its own guarded
+step.
 
 ## The tab shell
 
@@ -75,9 +80,15 @@ because they are about the shell, not the bar:
   other piece of chrome, from `SdMotionV3`. No flash, no strobe.
 - **Tabs are branches of an `IndexedStack`, so no route is pushed and a
   navigator observer sees nothing.** Screen-view analytics for the five tabs
-  therefore cannot come from the router: log it from the shell when the branch
-  index changes, or tab analytics are silently empty and look like nobody uses
-  the app. Also in `docs/REMAINING_WORK.md` — `AppShell` does not log it yet.
+  therefore cannot come from the router, or tab analytics are silently empty
+  and read as if nobody uses the app. `AppShell` logs it from `initState` and
+  `didUpdateWidget` — the first tab of a session counts, and re-tapping the
+  active tab does not — through `AppAnalytics.tabViewed`, naming the tab from
+  `NavTabConstant`. **The name is an identifier, never a localized label**: one
+  that changes with the locale splits a tab into two series.
+  - This is the one analytics event raised from a widget rather than a
+    controller. There is no controller between a tab tap and the shell, and it
+    is a lifecycle callback, never `build`.
 
 ## Lists
 
