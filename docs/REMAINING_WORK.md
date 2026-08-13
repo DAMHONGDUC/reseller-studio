@@ -62,15 +62,6 @@ two search entry points (Inventory's docking header, the Search screen's plain
 autofocused field) also differ on purpose. `docs/rules/DECISIONS.md` has the
 reasoning; do not "finish the port".
 
-### Known-failing test
-
-`test/features/screens_with_mock_data_test.dart` — *Home shows the workspace
-and its real figures*. `testNow` in `test/support/pump_app.dart` is a fixed
-date but `HomeScreen` reads the real `DateTime.now()`, so the seeded
-`shipByDate` values drift past it as the calendar moves and the overdue count
-changes. The real fix is injecting a clock into the widgets that read
-`DateTime.now()`.
-
 ## 2. Blocked on Cloud Functions
 
 `functions/` has never had `npm ci` run in it and nothing is deployed. Each of
@@ -94,18 +85,12 @@ Nothing started. Listed with what already exists to build on.
 |---|---|---|
 | 13 | Cross-listing | `listings` feature and the `Listing` entity exist; there is no cross-list flow |
 | 20 | Tax — categories, deductible expenses, mileage, tax reports, year-end summary | nothing. Expenses and Receipts are the data it would read. **Country-specific and configurable** by the plan, so it is not a small feature |
-| 22 | Notifications — the in-app inbox | route constant only, see below |
-| 23 | Activity / audit log — the screen | Home has a recent-activity block reading order and item timestamps; there is no `activity/` collection and no screen |
+| 22 | Notifications — the in-app inbox | nothing. Its route constant was deleted rather than left resolving to no screen — `docs/rules/DECISIONS.md` |
+| 23 | Activity / audit log — the screen | Home has a recent-activity block reading order and item timestamps; there is no `activity/` collection and no screen. Its route constant was deleted with §22's |
 | 27 | Monetization — Free / Pro / Business, and §25's Subscription settings | nothing. No paywall, no plan gating, no RevenueCat or equivalent. Adding one needs approval first |
 
 ## 4. Loose ends found in the code
 
-- **Three route constants are declared and never wired**:
-  `AppRoutes.notifications`, `AppRoutes.activity`, `AppRoutes.returns`
-  (`lib/core/router/app_routes.dart`). Zero usages anywhere. They are
-  placeholders for §22, §23 and a returns screen that folded into order
-  detail. Either wire them or delete them — a route constant that resolves to
-  nothing is a deep link that fails silently.
 - **`team` and `marketplaces` are read-only screens.** Both render and both
   explain why they cannot do more yet; neither is a stub that fails.
 - **`lib/features/mock_data/` ships in the binary.** It is gated behind
