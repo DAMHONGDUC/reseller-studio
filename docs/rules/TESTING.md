@@ -2,6 +2,26 @@
 
 Read this when writing or fixing tests.
 
+## Never run the whole suite to verify a change
+
+Owner's rule. Scope the run to what changed — the file, or the directory:
+
+```sh
+fvm flutter test test/features/pricing
+fvm flutter test test/core/money/money_test.dart
+```
+
+A full run is minutes of waiting for an answer about three files, and the
+noise from everything unrelated is where a real regression gets skimmed past.
+CI runs the whole suite; that is what it is for.
+
+Two exceptions, both narrow: a change to `core/` that everything imports, and
+the run just before handing work over.
+
+**`test/features/shot_tmp_test.dart` is a gitignored scratch harness that
+hangs by design.** Exclude it from any run wide enough to pick it up.
+
+
 Done: **(1) profit, margin, ROI and max-buy-price**, including the plan §11
 worked example, and screen-level tests that assert the figures rendered
 against the mock seed rather than eyeballing a screenshot.

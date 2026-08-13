@@ -4,10 +4,21 @@ Read `SELLER_OS_FINAL_MASTER_PLAN.md` for the full product spec before making
 any architectural decision. It is the product authority; this file is the
 engineering one. `docs/DATA_MODEL.md` is the authority on what is stored.
 
-**Every rule the owner states goes into this file, in the same turn it is
+**Every rule the owner states goes into the rulebook, in the same turn it is
 stated.** A rule that lives only in a chat is gone by the next session — write
-it into the section it belongs to, with the reason, before doing the work it
-governs.
+it with its reason, before doing the work it governs. Which file it goes in
+depends on how wide it is:
+
+| The rule applies to | It goes in |
+|---|---|
+| every change in the repo | this file |
+| one topic — tests, commands, the design system | `docs/rules/<TOPIC>.md` |
+| one feature | `lib/features/<feature>/CLAUDE.md` |
+
+**Any edit to this file or to anything under `docs/rules/` gets its own
+commit, immediately** — never folded into the change it governs. A rule that
+arrives inside a 40-file feature commit is a rule nobody reviewed.
+Message: `docs: update docs - detail is <what changed>`.
 
 **Every document in this repo is written in English, in full.** `CLAUDE.md`,
 everything under `docs/`, every `README.md`. No mixed-language paragraphs and
@@ -37,6 +48,7 @@ in the left.
 | a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
 | running, building, generating or deploying | `docs/rules/COMMANDS.md` |
 | writing or fixing a test | `docs/rules/TESTING.md` |
+| anything that reads a key, logs, exports or uploads | `docs/rules/PRIVACY_AND_SECURITY.md` |
 | anything that looks like missing infrastructure — Firebase, signing, icons | `docs/rules/SETUP.md` |
 | asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
 | anything in `lib/features/mock_data/` | `lib/features/mock_data/CLAUDE.md` (loads on its own) |
@@ -256,6 +268,19 @@ directly.
    **every new key must be added to BOTH**. Access via `context.l10n`, never
    `AppLocalizations.of(context)` directly. Tooltips and semantics labels are
    user-facing strings too.
+
+   **Until release, write English only, and do not hand-translate.** Owner's
+   rule. New keys go into `app_en.arb`; `app_vi.arb` is filled in **once, in
+   one pass, at release**, and every other locale with it. The reason is that
+   translating a screen that is about to be redesigned pays for the same
+   string twice, and a half-translated app reads worse than an English one.
+   - **The ARB indirection still applies to every new string** — the rule
+     above is unchanged. What is deferred is the *translation*, never the key.
+     A string hardcoded in a widget now is a string nobody finds at release.
+   - The keys already in `app_vi.arb` stay. Do not delete them and do not add
+     more by hand.
+   - `vi` translations written before this rule are unreviewed machine work.
+     They are on the release checklist in `RELEASE_ACTIONS.md`, not trusted.
 
 8. **Every `catch` logs — handling an error is not the same as knowing it
    happened.** Call
@@ -544,8 +569,24 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
 
 ## Git
 
+- **Conventional commits, and the scope goes inline — never in parentheses.**
+  Owner's rule. `feat: inventory - bulk reprice on the selection bar`, never
+  `feat(inventory): …`. The scope names the part of the app that changed, and
+  it never names the tool that changed it.
+  - Types: `feat:`, `fix:`, `chore:`, `docs:`.
+  - Commits before this rule use `feat(scope):`. History is not rewritten;
+    everything from here follows the form above.
+- **Commit freely; never push.** Owner's rule. Committing costs nothing and is
+  local; pushing is the irreversible half and it is the owner's to call. That
+  includes the `packages/system_design` submodule — commit there too, and
+  leave it unpushed unless told otherwise.
 - **Never add a `Co-Authored-By` trailer to a commit.** Owner's rule. The
   commit message describes the change, not who or what typed it.
+- **No tool, agent or model is ever named in a commit message or a PR.**
+  Owner's rule, and it is the same reason as the trailer above: no attribution
+  footer, no "Generated with", no tool name anywhere in the title, the body or
+  a comment. A PR describes the change; who typed it is not a fact about the
+  change.
 - **A PR title and description are short, plain and written as bullets.**
   Owner's rule. No prose paragraphs, no essay: a one-line title and a body
   that is a list. A reviewer opens a PR to find out what changed and what to
