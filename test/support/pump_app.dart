@@ -48,6 +48,13 @@ Future<void> pumpScreen(WidgetTester tester, Widget screen) async {
   // drawn for (iPhone 15, @3x).
   tester.view.physicalSize = const Size(1179, 2556);
   tester.view.devicePixelRatio = 3;
+
+  // **The default test view has no notch**, so every inset bug costs exactly
+  // 0 pixels here and a widget test cannot see it. Give it the device's real
+  // insets: a 59pt status bar and a 34pt home indicator, in physical pixels
+  // because that is what `FakeViewPadding` takes.
+  tester.view.viewPadding = const FakeViewPadding(top: 177, bottom: 102);
+  tester.view.padding = const FakeViewPadding(top: 177, bottom: 102);
   addTearDown(tester.view.reset);
 
   await tester.pumpWidget(

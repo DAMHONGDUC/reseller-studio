@@ -55,7 +55,10 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -63,37 +66,32 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
   Widget build(BuildContext context) {
     final bool isBusy = ref.watch(offerActionsControllerProvider);
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SdBottomSheetV3(
-        title: context.l10n.offerCounterTitle(
-          context.money(widget.offer.amount),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            MoneyField(
-              label: context.l10n.offerCounterAmount,
-              controller: _amount,
-              currency: ref.watch(workspaceCurrencyProvider),
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _submit(),
-            ),
-            SizedBox(height: SdSpacingConstant.h12),
-            Text(
-              context.l10n.offerCounterNote,
-              style: context.textTheme3.bodySmall!.faint3(context),
-            ),
-            SizedBox(height: SdSpacingConstant.h24),
-            SdButtonV3(
-              variant: SdButtonVariantV3.primary,
-              label: context.l10n.offerCounterSubmit,
-              expand: true,
-              busy: isBusy,
-              onPressed: isBusy ? null : _submit,
-            ),
-          ],
-        ),
+    return SdBottomSheetV3(
+      title: context.l10n.offerCounterTitle(context.money(widget.offer.amount)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          MoneyField(
+            label: context.l10n.offerCounterAmount,
+            controller: _amount,
+            currency: ref.watch(workspaceCurrencyProvider),
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submit(),
+          ),
+          SizedBox(height: SdSpacingConstant.h12),
+          Text(
+            context.l10n.offerCounterNote,
+            style: context.textTheme3.bodySmall!.faint3(context),
+          ),
+          SizedBox(height: SdSpacingConstant.h24),
+          SdButtonV3(
+            variant: SdButtonVariantV3.primary,
+            label: context.l10n.offerCounterSubmit,
+            expand: true,
+            busy: isBusy,
+            onPressed: isBusy ? null : _submit,
+          ),
+        ],
       ),
     );
   }

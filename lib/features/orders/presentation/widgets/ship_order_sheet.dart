@@ -83,7 +83,10 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -91,61 +94,56 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
   Widget build(BuildContext context) {
     final bool isBusy = ref.watch(orderActionsControllerProvider);
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SdBottomSheetV3(
-        title: context.l10n.shipTitle,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            PickerField(
-              label: context.l10n.shipCarrierOptional,
-              value: _carrier,
-              onTap: () async {
-                final String? picked = await OptionPickerSheet.show<String>(
-                  context,
-                  title: context.l10n.orderCarrier,
-                  selected: _carrier,
-                  options: OrdersConstant.carriers
-                      .map(
-                        (String carrier) => PickerOption<String>(
-                          value: carrier,
-                          label: carrier,
-                        ),
-                      )
-                      .toList(),
-                );
+    return SdBottomSheetV3(
+      title: context.l10n.shipTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          PickerField(
+            label: context.l10n.shipCarrierOptional,
+            value: _carrier,
+            onTap: () async {
+              final String? picked = await OptionPickerSheet.show<String>(
+                context,
+                title: context.l10n.orderCarrier,
+                selected: _carrier,
+                options: OrdersConstant.carriers
+                    .map(
+                      (String carrier) =>
+                          PickerOption<String>(value: carrier, label: carrier),
+                    )
+                    .toList(),
+              );
 
-                if (picked == null) return;
+              if (picked == null) return;
 
-                setState(() => _carrier = picked);
-              },
-            ),
-            SizedBox(height: SdSpacingConstant.h16),
-            SdTextFieldV3(
-              label: context.l10n.shipTrackingOptional,
-              controller: _tracking,
-              textInputAction: TextInputAction.next,
-            ),
-            SizedBox(height: SdSpacingConstant.h16),
-            MoneyField(
-              label: context.l10n.shipCostOptional,
-              controller: _cost,
-              currency: ref.watch(workspaceCurrencyProvider),
-              helperText: context.l10n.shipCostHelp,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _submit(),
-            ),
-            SizedBox(height: SdSpacingConstant.h24),
-            SdButtonV3(
-              variant: SdButtonVariantV3.primary,
-              label: context.l10n.shipSubmit,
-              expand: true,
-              busy: isBusy,
-              onPressed: isBusy ? null : _submit,
-            ),
-          ],
-        ),
+              setState(() => _carrier = picked);
+            },
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          SdTextFieldV3(
+            label: context.l10n.shipTrackingOptional,
+            controller: _tracking,
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          MoneyField(
+            label: context.l10n.shipCostOptional,
+            controller: _cost,
+            currency: ref.watch(workspaceCurrencyProvider),
+            helperText: context.l10n.shipCostHelp,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submit(),
+          ),
+          SizedBox(height: SdSpacingConstant.h24),
+          SdButtonV3(
+            variant: SdButtonVariantV3.primary,
+            label: context.l10n.shipSubmit,
+            expand: true,
+            busy: isBusy,
+            onPressed: isBusy ? null : _submit,
+          ),
+        ],
       ),
     );
   }
@@ -210,7 +208,10 @@ class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -219,39 +220,36 @@ class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
     final bool isBusy = ref.watch(orderActionsControllerProvider);
     final String currency = ref.watch(workspaceCurrencyProvider);
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SdBottomSheetV3(
-        title: context.l10n.settleTitle,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            MoneyField(
-              label: context.l10n.orderPlatformFees,
-              controller: _fees,
-              currency: currency,
-              helperText: context.l10n.settleFeesHelp,
-              textInputAction: TextInputAction.next,
-            ),
-            SizedBox(height: SdSpacingConstant.h16),
-            MoneyField(
-              label: context.l10n.settlePayout,
-              controller: _payout,
-              currency: currency,
-              helperText: context.l10n.settlePayoutHelp,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _submit(),
-            ),
-            SizedBox(height: SdSpacingConstant.h24),
-            SdButtonV3(
-              variant: SdButtonVariantV3.primary,
-              label: context.l10n.actionSave,
-              expand: true,
-              busy: isBusy,
-              onPressed: isBusy ? null : _submit,
-            ),
-          ],
-        ),
+    return SdBottomSheetV3(
+      title: context.l10n.settleTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          MoneyField(
+            label: context.l10n.orderPlatformFees,
+            controller: _fees,
+            currency: currency,
+            helperText: context.l10n.settleFeesHelp,
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          MoneyField(
+            label: context.l10n.settlePayout,
+            controller: _payout,
+            currency: currency,
+            helperText: context.l10n.settlePayoutHelp,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submit(),
+          ),
+          SizedBox(height: SdSpacingConstant.h24),
+          SdButtonV3(
+            variant: SdButtonVariantV3.primary,
+            label: context.l10n.actionSave,
+            expand: true,
+            busy: isBusy,
+            onPressed: isBusy ? null : _submit,
+          ),
+        ],
       ),
     );
   }

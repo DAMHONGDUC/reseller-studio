@@ -24,11 +24,10 @@ import '../controllers/sourcing_controller.dart';
 class PurchaseFormSheet extends ConsumerStatefulWidget {
   const PurchaseFormSheet({super.key});
 
-  static Future<void> show(BuildContext context) =>
-      showSdBottomSheetV3<void>(
-        context: context,
-        builder: (BuildContext context) => const PurchaseFormSheet(),
-      );
+  static Future<void> show(BuildContext context) => showSdBottomSheetV3<void>(
+    context: context,
+    builder: (BuildContext context) => const PurchaseFormSheet(),
+  );
 
   @override
   ConsumerState<PurchaseFormSheet> createState() => _PurchaseFormSheetState();
@@ -71,7 +70,10 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -98,7 +100,10 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -110,100 +115,93 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
     final Map<String, String> names = ref.watch(sourceNamesProvider);
     final DateTime now = DateTime.now();
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SdBottomSheetV3(
-        title: 'New purchase',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            PickerField(
-              label: 'Date',
-              icon: Symbols.calendar_month_rounded,
-              value: DateTimeUtils.mediumDate(
-                _date,
-                locale: context.localeTag,
-              ),
-              onTap: () async {
-                final DateTime? picked = await showDatePicker(
-                  context: context,
-                  initialDate: _date,
-                  firstDate: DateTime(now.year - pickerYearsBack),
-                  // A purchase cannot be from next month, and one filed there
-                  // breaks every period report it lands in.
-                  lastDate: now,
-                );
+    return SdBottomSheetV3(
+      title: 'New purchase',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          PickerField(
+            label: 'Date',
+            icon: Symbols.calendar_month_rounded,
+            value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
+            onTap: () async {
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: _date,
+                firstDate: DateTime(now.year - pickerYearsBack),
+                // A purchase cannot be from next month, and one filed there
+                // breaks every period report it lands in.
+                lastDate: now,
+              );
 
-                if (picked == null) return;
+              if (picked == null) return;
 
-                setState(() => _date = picked);
-              },
-            ),
-            SizedBox(height: SdSpacingConstant.h16),
-            PickerField(
-              label: 'Source (optional)',
-              icon: Symbols.storefront_rounded,
-              value: names[_sourceId],
-              placeholder: sources.isEmpty ? 'None yet' : 'Not set',
-              onTap: sources.isEmpty
-                  ? () => SdSnackBarUtilsV3.info(
+              setState(() => _date = picked);
+            },
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          PickerField(
+            label: 'Source (optional)',
+            icon: Symbols.storefront_rounded,
+            value: names[_sourceId],
+            placeholder: sources.isEmpty ? 'None yet' : 'Not set',
+            onTap: sources.isEmpty
+                ? () => SdSnackBarUtilsV3.info(
+                    context,
+                    'Add a source first: Sourcing → Sources',
+                  )
+                : () async {
+                    final String? picked = await OptionPickerSheet.show<String>(
                       context,
-                      'Add a source first: Sourcing → Sources',
-                    )
-                  : () async {
-                      final String? picked =
-                          await OptionPickerSheet.show<String>(
-                            context,
-                            title: 'Source',
-                            selected: _sourceId,
-                            options: sources
-                                .map(
-                                  (Source source) => PickerOption<String>(
-                                    value: source.id,
-                                    label: source.name,
-                                  ),
-                                )
-                                .toList(),
-                          );
+                      title: 'Source',
+                      selected: _sourceId,
+                      options: sources
+                          .map(
+                            (Source source) => PickerOption<String>(
+                              value: source.id,
+                              label: source.name,
+                            ),
+                          )
+                          .toList(),
+                    );
 
-                      if (picked == null) return;
+                    if (picked == null) return;
 
-                      setState(() => _sourceId = picked);
-                    },
-            ),
-            SizedBox(height: SdSpacingConstant.h16),
-            MoneyField(
-              label: 'Total paid (optional)',
-              controller: _total,
-              currency: ref.watch(workspaceCurrencyProvider),
-              helperText: 'What the receipt says, not the sum of the items',
-              textInputAction: TextInputAction.next,
-            ),
-            SizedBox(height: SdSpacingConstant.h16),
-            SdTextFieldV3(
-              label: 'Notes (optional)',
-              controller: _notes,
-              maxLines: 2,
-              textInputAction: TextInputAction.done,
-            ),
-            SizedBox(height: SdSpacingConstant.h16),
-            ReceiptField(
-              url: _receiptUrl,
-              isBusy: isBusy,
-              onCamera: () => _attach(fromCamera: true),
-              onLibrary: () => _attach(fromCamera: false),
-              onRemove: () => setState(() => _receiptUrl = null),
-            ),
-            SizedBox(height: SdSpacingConstant.h24),
-            SdButtonV3(
-              variant: SdButtonVariantV3.primary,
-              label: context.l10n.actionSave,
-              expand: true,
-              busy: isBusy,
-              onPressed: isBusy ? null : _submit,
-            ),
-          ],
-        ),
+                    setState(() => _sourceId = picked);
+                  },
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          MoneyField(
+            label: 'Total paid (optional)',
+            controller: _total,
+            currency: ref.watch(workspaceCurrencyProvider),
+            helperText: 'What the receipt says, not the sum of the items',
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          SdTextFieldV3(
+            label: 'Notes (optional)',
+            controller: _notes,
+            maxLines: 2,
+            textInputAction: TextInputAction.done,
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          ReceiptField(
+            url: _receiptUrl,
+            isBusy: isBusy,
+            onCamera: () => _attach(fromCamera: true),
+            onLibrary: () => _attach(fromCamera: false),
+            onRemove: () => setState(() => _receiptUrl = null),
+          ),
+          SizedBox(height: SdSpacingConstant.h24),
+          SdButtonV3(
+            variant: SdButtonVariantV3.primary,
+            label: context.l10n.actionSave,
+            expand: true,
+            busy: isBusy,
+            onPressed: isBusy ? null : _submit,
+          ),
+        ],
       ),
     );
   }

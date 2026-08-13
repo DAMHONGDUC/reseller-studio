@@ -78,31 +78,26 @@ class _NameEntrySheetState extends State<NameEntrySheet> {
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
-    // Lifts the sheet above the keyboard: without this the field it exists to
-    // fill in is the part covered up.
-    padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-    child: SdBottomSheetV3(
-      title: widget.title,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SdTextFieldV3(
-            label: widget.label,
-            controller: _controller,
-            hint: widget.hint,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _submit(),
-          ),
-          SizedBox(height: SdSpacingConstant.h24),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
-            label: widget.confirmLabel ?? context.l10n.actionSave,
-            expand: true,
-            onPressed: _submit,
-          ),
-        ],
-      ),
+  Widget build(BuildContext context) => SdBottomSheetV3(
+    title: widget.title,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SdTextFieldV3(
+          label: widget.label,
+          controller: _controller,
+          hint: widget.hint,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _submit(),
+        ),
+        SizedBox(height: SdSpacingConstant.h24),
+        SdButtonV3(
+          variant: SdButtonVariantV3.primary,
+          label: widget.confirmLabel ?? context.l10n.actionSave,
+          expand: true,
+          onPressed: _submit,
+        ),
+      ],
     ),
   );
 }
