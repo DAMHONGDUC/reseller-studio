@@ -354,3 +354,91 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   sheets cover the floating glass tab bar; raw `showModalBottomSheet` slides
   under it.
 - Use `SdPressableScaleV3` for tactile button feedback.
+
+## The rest of the primitives
+
+One widget per job, and feature code never reaches past it to the raw Flutter
+one. All of these are built and in use; the rules are here so a screen does not
+quietly re-invent one.
+
+- **Cards: `SdCardV3`, never Material's `Card`.** Material's carries an
+  invisible `EdgeInsets.all(4)` of margin, which is how a list whose separator
+  says one number comes out at another and sits narrower than the list on the
+  next tab. `SdCardV3` has **no margin at all** — the space *between* cards
+  belongs to whoever places them (`sectionGap`) — and takes its inside padding
+  from `SdContentPaddingV3.card`, because the inset inside a card is the same
+  inset in every card.
+- **Buttons: the look is a prop, never a named constructor.**
+  `SdButtonVariantV3` selects it and every variant wears the same
+  `SdContentPaddingV3.button`, so a filled, an outlined and a text button read
+  the same size side by side. `SdButtonSizeV3` scales that padding, the icon
+  and the gap together — a small button is the same shape scaled, never
+  differently proportioned. Material's `.icon` constructors carry their own
+  padding per variant, which is exactly the drift this avoids.
+- **Icons: `SdIconV3`, and it always resolves to a concrete size.** A bare
+  `Icon` inherits the ambient `IconTheme`, so the same glyph comes out at
+  different sizes depending on what happens to wrap it.
+- **Dividers: one thickness, one colour, and between items only**
+  (`if (index > 0)`). A rule above the first row lands on the container's edge
+  and reads as a border it does not have. Its height equals its thickness — see
+  the divider trap under Spacing.
+- **Modal colour is one slot and sheets and dialogs both wear it**
+  (`SdThemeV3`). A dialog opening over a sheet must never be a second shade. It
+  sits a step *below* the card, not above: a modal already separates itself with
+  the scrim and its corners, and going darker keeps a card on it reading as the
+  nearer layer. Material trains every tool to raise a modal instead, so the
+  theme overrides it — a raw `Dialog` cannot come out a different colour.
+- **Anything that must stay visible while sitting *on* a card or a sheet steps
+  up** to the elevated surface. A tile left on the card colour disappears the
+  moment its sheet is that colour.
+- **Charts hide their marks from screen readers and expose a summary instead.**
+  A chart without that label is silence to VoiceOver, and this app's analytics
+  is mostly charts.
+- **Tapping outside a focused field drops focus**, wired once in `SdScaffoldV3`
+  with a translucent hit test so it never eats a tap meant for a button or a
+  row.
+- Every `Text` carries an explicit `style:` — root `CLAUDE.md`, Syntax. Not
+  repeated here.
+
+**A design mockup is reference, not authority.** Where a mockup and these rules
+disagree, the rules win silently: build what the rules say and say what was
+overridden. Every colour comes from the palette, every dimension from
+`SdSpacingConstant`, every text style from the text theme. What a mockup *is*
+for is hierarchy, rhythm, density and where the eye lands — take that, leave
+the tokens.
+
+## Working inside the package
+
+`WIDGET_RULES.md` in the submodule is the authority. These are the ones that
+get broken from this side.
+
+- **Every generation-scoped name carries its suffix, including extension
+  members.** `context.sdTheme3`, `.tabular3` — the suffix is why a file
+  importing `index.dart` gets both generations' extensions without either
+  shadowing the other. An unsuffixed member on a generation's extension is a
+  bug, not a convenience.
+- **`core/` is shared and it is the only shared thing** — raw dimensions any
+  generation measures in, no look, no suffix. Adding a getter is additive and
+  fine; **changing or removing one edits a shipped app**, because v2 renders
+  BaroEase. When in doubt it goes in the generation folder: moving down into
+  `core/` later is cheap, pulling it back out once two generations depend on it
+  is not.
+- **Even the glass gate is copied, not shared.** `SdGlassV3` declares its own
+  support check and its own settings rather than importing v2's, because the
+  tuning differs per product and the check is four lines. Copying it is cheaper
+  than the coupling (hard rule 17).
+- **A static holder that needs a colour or a text style takes a
+  `BuildContext`.** A static getter cannot reach the theme, and a value baked in
+  at authoring time is exactly the coupling the package exists to avoid. Pure
+  dimensions stay parameterless.
+- **One folder per widget, flat — never a grouping folder.** No `buttons/`, no
+  `charts/`. The flat list with one folder each is what keeps adding a widget a
+  folder, a file and one `export` line.
+- **Four greps catch almost every violation** before a commit, and they are
+  faster than reading the diff: a literal colour (`Color(0x`, `Colors.`), a raw
+  number in a widget (`\.w\b|\.h\b|\.r\b|\.sp\b` outside `SdSpacingConstant`), a
+  quoted user-facing string, and an import that starts with anything other than
+  the framework, a declared dependency, or a sibling widget folder.
+- **The package analyzes standalone** — `melos run analyze` does it first and
+  from outside the app, on purpose. If it only analyzes from inside, an app
+  dependency has leaked in.
