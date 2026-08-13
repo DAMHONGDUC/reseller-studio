@@ -24,7 +24,9 @@ import '../logging/app_logger.dart';
 /// **The bar floats and the body runs underneath it** — `extendBody`, plus
 /// every tab screen padding by `SdContentPaddingV3.floatingBarInset`. Without
 /// both, the glass has nothing moving behind it to refract and the last row
-/// of every list hides under the bar.
+/// of every list hides under the bar. The body is wrapped in
+/// `SdFloatingBarScopeV3` for the one thing that cannot pad itself: a
+/// snackbar, which renders into the root overlay above the whole app.
 ///
 /// **Screen views for the five tabs are logged here and nowhere else.**
 /// Switching a branch pushes no route, so a navigator observer sees nothing
@@ -80,7 +82,10 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) => SdScaffoldV3(
     extendBody: true,
-    body: widget.shell,
+    // Marks everything under the tabs as having the glass bar below it. The
+    // only reader is the snackbar, which draws into the root overlay above
+    // the shell and could not otherwise tell the bar is there.
+    body: SdFloatingBarScopeV3(child: widget.shell),
     bottomNavigationBar: SdGlassNavBarV3(
       selectedIndex: widget.shell.currentIndex,
       onSelected: (int index) => widget.shell.goBranch(
