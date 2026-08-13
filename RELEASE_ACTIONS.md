@@ -164,11 +164,63 @@ test in this repo fails any key whose name contains `SECRET` or `PRIVATE`.
 
 ---
 
+## 4b. Billing — RevenueCat, which you said you would handle
+
+The app is built against it and runs without it: with no key, every seller
+reads as Free and the Subscription screen says billing is not set up. Nothing
+below can be done from this repo.
+
+1. **RevenueCat project**, one app per store.
+2. **Entitlements named `pro` and `business`** — the identifiers are in
+   `SubscriptionProductConstant.planByEntitlement`. If they do not match the
+   dashboard, every paying seller reads as Free and nothing throws, so this is
+   the first thing to check when an account looks wrong.
+3. **Products whose identifiers contain the plan name** — `pro_monthly`,
+   `pro_yearly`, `business_monthly`, `business_yearly`. The app reads the tier
+   off the identifier and **drops any product it cannot place**, rather than
+   selling it as the wrong tier.
+4. **App Store Connect and Play Console subscriptions**, attached to those
+   products, with a subscription group per tier.
+5. **Two keys into `env/dev.json` and `env/prod.json`** — I could not edit
+   `env/`, so these are yours to add to both files and both templates:
+   `REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY`. They are public
+   SDK keys and belong there (`docs/rules/ENV.md`).
+6. **The webhook secret is NOT an env key.** It goes in Secret Manager and is
+   read only by the Cloud Function that mirrors entitlement into Firestore —
+   which is not written yet, and is why the plan gates are a UI decision and
+   not yet a security boundary.
+7. **Price the tiers.** `PlanLimits.byPlan` holds the ceilings and
+   `InMemorySubscriptionRepository.catalogue` holds the demo prices; both are
+   a first proposal nobody has priced.
+
+**Restore purchases is already wired** and App Store review requires it, so do
+not remove that row from the Subscription screen.
+
+## 4c. Tax — verify the mileage rates before anyone files
+
+`MileageRateConstant.published` carries the IRS and HMRC figures as they stood
+when the feature was written: US 67¢/mile for 2024 and 70¢ for 2025, UK 45p
+for the first 10,000 miles and 25p after.
+
+**A wrong rate here is a wrong tax return.** Check both against the
+authorities' current tables before release, and add a new dated entry rather
+than editing an old one — a past year must keep deducting at the rate that
+applied to it.
+
+The jurisdiction comes from the workspace's country, and only `US` and `GB`
+are recognised; anything else falls back to the US. That matches the launch
+markets in `CLAUDE.md`.
+
 ## 5. Decisions I need from you
 
 Nothing is open. Everything that was here is under **Resolved** below.
 
 ### Resolved since the first draft
+
+- **Launch markets are the US and the UK**, and **RevenueCat is approved** —
+  owner's calls. Both are recorded in `CLAUDE.md` and
+  `docs/rules/DECISIONS.md`. §20 Tax and §27 Monetization are built against
+  them; what only you can do is in sections 4b and 4c above.
 
 - **Localization — English only until release.** Owner's call. New strings
   still go through ARB keys (hard rule 7 is unchanged), but `app_vi.arb` and

@@ -68,10 +68,8 @@ Nothing started. Listed with what already exists to build on.
 | Plan § | Feature | What is there today |
 |---|---|---|
 | 13 | Cross-listing | `listings` feature and the `Listing` entity exist; there is no cross-list flow |
-| 20 | Tax — categories, deductible expenses, mileage, tax reports, year-end summary | nothing. Expenses and Receipts are the data it would read. **Country-specific and configurable** by the plan, so it is not a small feature |
 | 22 | Notifications — the in-app inbox | nothing. Its route constant was deleted rather than left resolving to no screen — `docs/rules/DECISIONS.md` |
 | 23 | Activity / audit log — the screen | Home has a recent-activity block reading order and item timestamps; there is no `activity/` collection and no screen. Its route constant was deleted with §22's |
-| 27 | Monetization — Free / Pro / Business, and §25's Subscription settings | nothing. No paywall, no plan gating, no RevenueCat or equivalent. Adding one needs approval first |
 
 ## 4. Loose ends found in the code
 
@@ -80,3 +78,16 @@ Nothing started. Listed with what already exists to build on.
 - **`lib/features/mock_data/` ships in the binary.** It is gated behind
   `DevFlags`, but it is a whole fake backend inside the app. Worth deciding
   before release whether it is compiled out.
+- **The plan limits are a first proposal, not a priced decision.**
+  `PlanLimits.byPlan` holds every ceiling; changing one is a one-line edit and
+  the paywall copy follows, because it reads the table rather than repeating
+  it. Nobody has priced these against what a reseller will pay.
+- **The mileage rates must be checked against the IRS and HMRC before
+  release.** `MileageRateConstant.published` carries the figures at the time
+  of writing. A wrong rate here is a wrong tax return, so it is on
+  `RELEASE_ACTIONS.md` rather than left to be noticed.
+- **Entitlement is not mirrored into Firestore yet.** The client reads
+  RevenueCat, which is a cache for rendering. `firestore.rules` cannot ask an
+  SDK a question, so the server-side half — a Cloud Function on RevenueCat's
+  webhook — is blocked with the rest of `functions/` above. Until it exists,
+  the gates are a UI decision and not a security boundary.

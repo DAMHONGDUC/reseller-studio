@@ -25,10 +25,12 @@ are there and the mock backend drives them end to end.
 | 17 | Expenses — add, list, totals by category, delete | built |
 | 18 | Receipts — attach to a purchase or expense, with upload | built |
 | 19 | Reports — CSV export of sales, inventory and expenses via the share sheet | built |
+| 20 | Tax — year-end summary by form line, mileage at the published rate | built for US and UK |
 | 21 | Search — items, orders, listings and sources in one list | built |
 | 24 | Workspace / team — team screen is read-only | partial |
 | 25 | Settings — account, workspace, mock-data switch (debug only) | built |
 | 26 | Authentication — Apple and Google, sign out, delete account | built, unconfigured |
+| 27 | Monetization — Free / Pro / Business, limits, paywall, Subscription screen | built, unconfigured |
 
 ## What the flows actually cover
 
@@ -70,12 +72,25 @@ are there and the mock backend drives them end to end.
   `SdFloatingBarScopeV3` wraps the shell body so a snackbar — which draws into
   the root overlay and cannot see the glass nav bar — rests above it instead
   of inside it.
+- **Plans are enforced by one gate.** `PlanGate` decides every limit and
+  every locked feature from the plan plus a count; `PlanLimits` is the single
+  table of ceilings, and the sales copy reads it rather than repeating it.
+  `PlanBlockSheet` names the ceiling that was hit before offering the upgrade.
+  Billing is RevenueCat behind a repository — with no key configured the app
+  hands out `UnconfiguredSubscriptionRepository` and everyone is on Free.
+  The in-memory backend lets a purchase succeed, so the whole gating path is
+  walkable before the store exists.
+- **Tax is two jurisdictions and no branches.** `TaxJurisdiction` carries the
+  year boundary (US calendar, UK 6 April), the form's line names (Schedule C,
+  SA103) and the mileage rate; adding a third country is a case in two files.
+  Mileage is banded over the year's total — the UK's 10,000-mile threshold —
+  and rated by the journey's own date, never by today's table.
 - **Read-time "now" is injected**, not read from the wall clock. `AppClock`
   and `clockProvider` (`core/time/`) are what every derived figure — overdue,
   stale, expired, days left — asks, so a test pins the instant with
   `FixedClock`. Recorded timestamps (`createdAt`, `deletedAt`, when an order
   shipped) deliberately still call `DateTime.now()`.
-- **Tests**: 94 passing, none known-failing. Profit/margin/ROI including the
+- **Tests**: 133 passing, none known-failing. Profit/margin/ROI including the
   plan §11 worked example, plus screen-level tests asserting rendered figures
   against the mock seed. `test/features/shot_tmp_test.dart` is the gitignored
   scratch harness and is excluded — it hangs by design.
