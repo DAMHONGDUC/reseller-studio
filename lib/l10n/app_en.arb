@@ -344,6 +344,10 @@
   "@moreTeam": {
     "description": "More destination: who can see this workspace."
   },
+  "moreTax": "Tax",
+  "@moreTax": {
+    "description": "More destination: the year-end tax summary."
+  },
   "moreSubscription": "Subscription",
   "@moreSubscription": {
     "description": "More destination: the current plan and the other tiers."

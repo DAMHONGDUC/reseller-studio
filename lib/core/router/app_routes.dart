@@ -78,6 +78,7 @@ final class AppRoutes {
   static const String expenses = '/more/expenses';
   static const String reports = '/more/reports';
   static const String receipts = '/more/receipts';
+  static const String tax = '/more/tax';
   static const String categories = '/more/categories';
   static const String marketplaces = '/more/marketplaces';
   static const String team = '/more/team';
