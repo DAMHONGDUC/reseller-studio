@@ -43,18 +43,19 @@ follow, and missing any one of them looks like a bug:
    bottom slot, so without the lift it renders *behind* the glass.
 
 `navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
-call, so both apps' floating bars sit identically. It caps at 20 against a
-portrait iPhone's 34pt home-indicator inset; that trade is documented on the
-getter.
+call, so both apps' floating bars sit identically. `maxNavBarOffset` lands
+short of a portrait iPhone's home-indicator inset, which trades system
+clearance for a tighter bar; that trade is documented on the getter.
 
 ### The chrome is minimal, and its numbers live in the design system
 
 Owner's rules, all of them read from one place so no screen types them:
 
-- **The gap from the app bar down to the content under it is 8** —
-  `SdContentPaddingV3.topGap`. Owner's rule. The bar already carries a band of
-  empty space at its own bottom edge, the more so now it is a full 56 —
-  anything more under it reads as a hole between the chrome and the page.
+- **The gap from the app bar down to the content under it is
+  `SdContentPaddingV3.topGap`.** Owner's rule. The bar already carries a band
+  of empty space at its own bottom edge, the more so now it is a full
+  `kToolbarHeight` — anything more under it reads as a hole between the chrome
+  and the page.
 - **`topGap` is a `SizedBox` the screen places, never padding and never added
   to a bar's height.** Owner's rule. `screen()` and `fullBleed()` therefore
   carry **no top inset**, and `SdAppBarV3.toolbarHeight + topGap` is a sum
@@ -72,33 +73,34 @@ Owner's rules, all of them read from one place so no screen types them:
   actions — there is no `bottom` slot on it, deliberately. What stays pinned
   300 rows down is search and the actions; a filter row is content, and
   content scrolls.
-- **The app bar follows the system: 56, `kToolbarHeight`** —
-  `SdAppBarV3.toolbarHeight`. Owner's rule. It was 48 for a while, on the
-  reasoning that eight points of chrome on every route is a row of inventory;
+- **The app bar follows the system, `kToolbarHeight`** —
+  `SdAppBarV3.toolbarHeight`. Owner's rule. It was shorter for a while, on the
+  reasoning that every point of chrome on every route is a row of inventory;
   the bar reading as *this app's* bar rather than the platform's was the
-  higher cost. Taken through the spacing scale (`h56`), not as the raw
-  constant — everything the bar contains is scaled, and a raw 56 next to a
-  scaled child drifts apart on any device whose aspect differs from the
-  design canvas. **The title stays `titleMedium`**: a screen title is a
+  higher cost. Taken through the spacing scale, not as the raw constant —
+  everything the bar contains is scaled, and a raw dimension next to a scaled
+  child drifts apart on any device whose aspect differs from the design
+  canvas. **The title stays `titleMedium`**: a screen title is a
   label, not a headline, and the screen's own content is what should be
   loud.
 - **A screen whose search box is the point uses `SdSearchHeaderV3`, not an
   app bar with a field under it.** The field docks into the title's row as
   the list scrolls and the filter strip pins under it, so scrolled chrome
   costs one bar instead of three. Inventory is the reference implementation.
-- **The search field shrinks as it docks: 48 in its own row,
-  `SdSearchFieldV3.dockedHeight` (44) once it is in the bar.** Owner's rule.
-  44 is `SdAppBarActionV3.slot` — the pill and the action share that row, so
-  they share a height and read as one piece of chrome rather than two things
-  centred near each other. The field used to equal the full bar height, which
-  left it running edge to edge with no air above or below while the action
-  beside it floated; one control bursting out of the row reads as a
-  misalignment even when both are centred. The leftover splits evenly, ~6pt
-  top and bottom. **A control docking into the bar pads itself; it does not
-  fill the bar.**
-- **The FAB is `SdFabV3`, never Material's.** It is 48 tall against
-  Material's 56 and sheds its label while the list is moving — but it never
-  hides. A create action a seller has to hunt for is one they stop using.
+- **The search field shrinks as it docks:
+  `SdSearchFieldV3.expandedHeight` in its own row,
+  `SdSearchFieldV3.dockedHeight` once it is in the bar.** Owner's rule. The
+  docked height equals `SdAppBarActionV3.slot` — the pill and the action share
+  that row, so they share a height and read as one piece of chrome rather than
+  two things centred near each other. The field used to equal the full bar
+  height, which left it running edge to edge with no air above or below while
+  the action beside it floated; one control bursting out of the row reads as a
+  misalignment even when both are centred. The leftover splits evenly top and
+  bottom. **A control docking into the bar pads itself; it does not fill the
+  bar.**
+- **The FAB is `SdFabV3`, never Material's.** It is shorter than Material's
+  and sheds its label while the list is moving — but it never hides. A create
+  action a seller has to hunt for is one they stop using.
 - **Every screen that creates something uses that same button, in that same
   place.** Owner's rule. Not an `IconButton` in the app bar, not a row at the
   bottom of a list — the labelled FAB Inventory has. `AppAddFabScaffold`
@@ -153,6 +155,135 @@ change there is not local to this project. Commit the gitlink deliberately.
 
 why: see DECISIONS.md § Seller OS pays for v2's dependencies
 
+## Spacing — one class owns it, and nothing else does
+
+Ported from BaroEase's `SdContentPaddingV2`, which v3 was copied from. Read
+this before adding any inset, gap or padding anywhere.
+
+### The one law
+
+**No widget and no screen holds spacing logic — `SdContentPaddingV3` does.**
+Not the scaffold, not the app bar, not a screen. Any inset another widget pads
+by is a static on that one class.
+
+The only thing a widget keeps is its **own intrinsic size** — a bar's height,
+a badge's max count, a card's radius, a divider's thickness. That is what the
+widget *is*, not configuration about it.
+
+Under it sits `SdSpacingConstant` in the package's generation-neutral `core/`:
+every screenutil dimension, one home, **no version suffix**, because a raw
+dimension belongs to no generation. Naming is unit prefix + design-size value.
+Getters, not consts — screenutil resolves at runtime, after `ScreenUtilInit`.
+
+**No raw `16.w` / `12.h` / `20.r` in any widget, ever.** A mockup measuring 13
+becomes 12: snap to the ladder rather than adding a rung.
+
+### The fields
+
+Names only — the values live on the class, and see "two rules about the rules"
+below for why they are not repeated here.
+
+**The screen frame**
+
+| Field | What it is |
+|---|---|
+| `horizontal` | the gutter, either side of all content |
+| `topGap` | app bar to first item — a separate field from the bottom on purpose, because breathing room under chrome and thumb room above the home indicator are different problems and each must move without dragging the other |
+| `bottomGap` | last item to whatever is below it |
+| `screen(context, {floatingNav})` | gutter + bottom, the whole thing |
+| `fullBleed(context, {floatingNav})` | same vertical insets, no gutter, for rows that inset themselves |
+
+**Rhythm inside the content**
+
+| Field | What it is |
+|---|---|
+| `listItemGap` | between two items of the same list — **one number for every list in the app**, and the gap from a filter row down to its list is also this, because a filter sits above the list like one more item above the first |
+| `sectionGap` | between two whole cards or sections stacked on a screen — a distinct section, not a repeated row, so it gets the roomier number |
+| `sectionHeader({first})` | a heading's own insets; `first` drops the top gap because `topGap` already placed it. Its gutter is the *list's*, so the heading lines up with the left edge of the rows under it |
+| `button` | the one padding every button variant wears, so filled, outlined and text buttons never come out different sizes next to each other |
+| `card`, `row` | the inside of a card, and of a list row that is not one |
+| `filterStrip`, `filterStripGap` | the chip strip's height and its internal air |
+| `pinnedActionsGap` | above a pinned bottom action. Its own field, not `bottomGap`: that one is the air *below* the last item, and pinning created a second edge on the side the content arrives from |
+
+**Chrome the content has to clear**
+
+| Field | What it is |
+|---|---|
+| `bottom(context, {floatingNav})` | where the last item ends. `floatingNav: true` on the five tab screens only |
+| `detailBottom(context)` | the plain rule for everything else: the device's safe area **floored** at `minDetailBottom`, and **deliberately not `bottomGap` on top of it** — a device reporting a deep inset already gives more room than the floor asks for, and stacking a gap on it makes a detail screen look like it ends early |
+| `floatingBarHeight` / `floatingBarRadius` | the glass bar's height, and its radius **derived** as half of it |
+| `floatingBarHorizontal` | side margin shared by every floating bar |
+| `navBarOffset(context)` | the device's bottom inset **clamped** between `minNavBarOffset` and `maxNavBarOffset` |
+| `floatingBarInset(context)` | offset + height — the bar's whole footprint, what content and overlays must clear |
+| `statusBarInset(context)` | the status bar, for the one thing that draws chrome from the top of the window itself |
+| `keyboardInset(context)` | how far the keyboard covers the window |
+
+### What v3 deliberately does NOT have
+
+`v3` is a copy of `v2`, not a binding. Two fields were dropped because this
+product's chrome differs, and **an unused inset is one more number that can
+disagree with reality** — do not port them back "for later":
+
+- **`appBarInset` — deleted.** v3's app bar is opaque, so `Scaffold` has
+  already subtracted it by the time a body builds. `top` is `topGap` alone.
+  `statusBarInset` is not a replacement: it exists only for
+  `SdSearchHeaderV3`, whose `maxExtent` has no context to read from.
+- **`belowPinnedFilterBar` — not ported.** It is `appBarInset` plus the
+  strip's height, and with an opaque bar the first term is zero. Nothing here
+  pins a filter strip over a scrolling list either: a filter strip is its own
+  widget in the body and takes real layout space, so nothing has to clear it.
+
+### The traps — each one cost a real bug
+
+- **Insets come off the view, not the ambient `MediaQuery`.** `Scaffold` wraps
+  its body in `removePadding(removeTop)` when there is an app bar and
+  `removeBottom` when there is a bottom bar, so the same read returns different
+  numbers above vs inside the body — 0 for the home indicator where the
+  screen's own build got the real inset, and the last row of every tab screen
+  ends up *behind* the nav pill. Read `MediaQueryData.fromView(View.of(
+  context))`; the inset is a property of the window, so the view is the one
+  place with a stable answer. `SdContentPaddingV3` does this in one private
+  helper and **feature code never reads `MediaQuery` for spacing at all**.
+  - The one exception is `keyboardInset`, which reads the ambient
+    `MediaQuery` on purpose: the keyboard is transient, and a route animating
+    one open needs the value that changes with it rather than the window's
+    resting state.
+- **Never re-add an inset the class already applied.** `SdScaffoldV3` adds no
+  padding — no `SafeArea`, no insets — and every screen pads its own
+  scrollable *inside* the scrollable, so content still scrolls behind the
+  chrome. A scaffold-level `SafeArea` plus a body clearing the floating bar is
+  how insets double up. `SdBottomSheetV3` lifts itself over the keyboard, so a
+  caller that also wraps it in a `Padding` applies the same inset twice.
+- **Two things that must line up get the value measured ONCE and handed to
+  both.** `SdSearchHeaderV3` passes `topPadding` down to its delegate rather
+  than letting the delegate read it, because a read inside the `Scaffold` body
+  differs from the read at the site that pads the list — and then the strip
+  and the gap never agree.
+- **A floating bar's height is one field, never typed twice.** It drifted once
+  in the sibling app and the difference was silently eaten out of `bottomGap`.
+  Same for the radius: derive it from the height rather than typing a literal
+  that only looks right because the shape clamps it.
+- **A divider occupies exactly the line it draws.** Material's reserves height
+  around a 0-thickness rule, so a "1px line" costs real vertical space and two
+  rows drift apart for reasons nothing at the call site explains. Pass
+  `height` equal to `thickness`; the gap around a divider belongs to whoever
+  places it.
+- **The default test view has no notch**, so every one of these bugs costs
+  exactly 0 pixels in a widget test. `pumpScreen` gives the view the device's
+  real top and bottom insets, and pins it to the design size — screenutil's
+  `.sp` on the default surface scales fonts about double and breaks layout.
+
+### Two rules about the rules
+
+- **Numbers live in the class; docs point at the field rather than repeating
+  the value.** Write `` `listItemGap` ``, never `` `listItemGap` (12) ``,
+  anywhere outside the class itself. A number copied into a sentence is a
+  number that goes stale silently — the sibling app's prose still claims a gap
+  the code stopped using.
+- **A new spacing need is a new field on the class, on its first use** — not a
+  literal now and a cleanup later. If two call sites would want the same
+  indent, that is the moment it becomes a field, never a number typed twice.
+
 ## Visual rules for screens that use it
 
 - **Colour is never the only signal.** A state told by colour is also told by
@@ -193,19 +324,12 @@ why: see DECISIONS.md § Seller OS pays for v2's dependencies
   `context.colorScheme3` / `context.sdTheme3` or names an `AppColors` constant;
   a *package widget* reads the extension and never names a colour at all.
 
-## Snackbars, dialogs and sheets — the v3 primitives do not exist yet
+## Snackbars, dialogs and sheets
 
-These four rules are inherited from the sibling app and are written against
-the v3 names they will have. **None of them is built in `v3/` today**, and no
-screen in `lib/` currently needs one — there is not a single raw
-`showDialog`, `showModalBottomSheet` or `ScaffoldMessenger` call in the app.
-So this section is a specification for the first person who needs one, not a
-description of what is there.
-
-**Build the v3 widget first, then use it. Never reach into `v2/` for these**
-(hard rule 17), and never call the raw Flutter API as a stopgap — a stopgap is
-how the app ends up with two snackbar looks. `WIDGET_RULES.md` governs how to
-build them.
+All three are built in `v3/` and in use across the app. **Never reach into
+`v2/` for them** (hard rule 17), and never call the raw Flutter API as a
+stopgap — a stopgap is how the app ends up with two snackbar looks.
+`WIDGET_RULES.md` governs how to build a new one.
 
 - Snackbars: always `SdSnackBarUtilsV3.success/error/info` — never raw
   `ScaffoldMessenger.showSnackBar`. It draws the app's own card and shows one
