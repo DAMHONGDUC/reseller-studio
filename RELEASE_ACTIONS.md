@@ -195,116 +195,16 @@ Nothing is open. Everything that was here is under **Resolved** below.
 
 ---
 
-## 6. What is built, so you know what to test
+## 6. What is built, and what is left
 
-Everything below works against both the mock dataset and Firestore.
+Both moved out of this file, which is only for what needs an account, a key or
+a card:
 
-- **Auth**: Apple + Google sign-in, sign out, delete account, profile document
-  created on first sign-in, workspace setup before Home.
-- **Inventory**: Quick Add (title only), full Add/Edit form with photos,
-  item detail, list on a marketplace, mark sold (creates the order), reprice,
-  move, archive, restore, soft delete, **bulk reprice / move / archive**,
-  barcode scanner, categories, locations (warehouse → shelf → bin).
-- **Orders**: detail with the full profit statement, ship (carrier, tracking,
-  cost), deliver, open and close a return with optional restock, record fees
-  and payout, shipping queue sorted by deadline.
-- **Sourcing**: sources ranked by ROI, purchases, purchase detail with the
-  apportionment gap called out, and the buy calculator (profit, ROI, maximum
-  buy price).
-- **Expenses**: add, list, totals by category, delete.
-- **Listings**: filtered by status, platform rejection messages surfaced.
-- **Reports**: CSV export of sales, inventory and expenses via the share sheet.
-- **Search**: items, orders, listings and sources in one list.
-- **Settings**: account, workspace, and the mock-data switch (debug only).
-- **Team / Marketplaces**: read-only, and each says why.
+- **`docs/DONE_WORK.md`** — what exists and works, by plan section, plus the
+  flows worth testing by hand before you trust a build.
+- **`docs/REMAINING_WORK.md`** — what is not built, grouped by what is
+  stopping it: deferred by decision, blocked on Cloud Functions, or not
+  started.
 
-### Things to test hard
-
-- Sign in on a **release-signed Android build** (Google Sign-In and SHA
-  registration).
-- Create a workspace on a fresh account — that is the sequential write the
-  rules note above is about.
-- An item with **no cost**: profit, margin and ROI must all show `—`, never
-  `0`. That rule is everywhere and it is the one that matters most.
-- A bulk action on 20+ items.
-- Airplane mode: Firestore queues the write and the app says so.
-
----
-
-## 7. Remaining work — deferred on purpose
-
-Not blockers, and not forgotten. Each one has a reason it is not done yet.
-
-### Localization — the one-pass translation at release
-
-Decided: **English only until release**, then every locale in one pass. What
-that leaves:
-
-| Feature | Strings still inline |
-|---|---|
-| Analytics | ~51 |
-| Sourcing | ~46 |
-| Expenses | ~13 |
-| Home | ~11 |
-| Reports | ~9 |
-| Receipts, Search, Settings, Listings, Inventory | ~21 combined |
-
-Roughly **150 user-facing strings**, counted over `presentation/screens/` and
-`presentation/widgets/` only. Log lines in `presentation/controllers/` are
-deliberately excluded — those stay English forever (hard rule 8).
-
-Done already, and the pattern to copy: shared/auth/workspace/More, Inventory,
-Orders, Offers — **388 keys**, in `en` and `vi`.
-
-**Two things to do at release, in this order:**
-
-1. Backfill the ~150 into `app_en.arb` and replace the inline strings.
-2. Translate `app_vi.arb` in one pass, **and review the `vi` already there** —
-   those 388 keys are unreviewed and were written without a native speaker.
-   The product vocabulary is the part worth arguing about, not the buttons:
-   `Offers → "Đề nghị giá"`, `Counter → "Trả giá"`,
-   `Sell-through → "Tỷ lệ bán hết"`.
-
-A `vi` locale that is half-translated is worse than an English one, so `vi`
-should not be advertised in the store listing until step 2 is done.
-
-### A snackbar renders over the floating nav bar
-
-Visible on **all five tab screens**, deferred by decision.
-
-`SdSnackBarV3` draws into the root overlay and sets its bottom edge from
-`SdContentPaddingV3.detailBottom`, which knows nothing about the glass tab
-bar. The two spans overlap outright:
-
-| | Where it sits |
-|---|---|
-| Snackbar, bottom edge | `detailBottom` — the device inset, floored |
-| Nav bar, occupied band | `navBarOffset` up to `floatingBarInset` |
-
-The snackbar's bottom lands **inside** the bar's band, so every message on a
-tab screen is drawn on top of the pill. Nothing in `v3` can detect this: a
-root-overlay presenter sits above the whole app and has no way to know a bar
-is below it, and `floatingBarInset` is only ever read by screens padding
-themselves.
-
-**The fix is a port, and the sibling app already has it.**
-`SdFloatingBarScopeV2` is an `InheritedWidget` wrapped once around the shell
-body; `insetOf(context)` returns the bar's footprint inside it and 0 outside,
-so a pushed route — which covers the bar anyway — correctly reads zero. Port
-it as `SdFloatingBarScopeV3`, wrap `AppShell`, and have the snackbar host add
-it to its bottom.
-
-Note this needs a **new component in `packages/system_design`**, which
-`CLAUDE.md` says to ask about first, and `WIDGET_RULES.md` governs.
-
-### Known-failing test
-
-`test/features/screens_with_mock_data_test.dart` — *Home shows the workspace
-and its real figures*. `testNow` in `test/support/pump_app.dart` is a fixed
-date, but `HomeScreen` reads the real `DateTime.now()`, so the seeded
-`shipByDate` values drift past it as the calendar moves and the overdue count
-changes. Skipped by decision. The real fix is injecting a clock into the
-widgets that read `DateTime.now()`.
-
-`test/features/shot_tmp_test.dart` is a gitignored scratch harness that hangs
-by design — exclude it when running the suite.
+The Cloud Functions table in section 4 above is the overlap: those features
+are blocked on the deploy that section describes.

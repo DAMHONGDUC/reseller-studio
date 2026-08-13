@@ -51,6 +51,7 @@ in the left.
 | anything that reads a key, logs, exports or uploads | `docs/rules/PRIVACY_AND_SECURITY.md` |
 | anything that looks like missing infrastructure — Firebase, signing, icons | `docs/rules/SETUP.md` |
 | asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
+| asking what is already built, or what is left and why | `docs/DONE_WORK.md`, `docs/REMAINING_WORK.md` |
 | anything in `lib/features/mock_data/` | `lib/features/mock_data/CLAUDE.md` (loads on its own) |
 
 ## What this project is
