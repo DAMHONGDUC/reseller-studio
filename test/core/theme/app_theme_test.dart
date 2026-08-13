@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:seller_os/core/theme/app_colors.dart';
@@ -85,15 +86,73 @@ void main() {
     });
   });
 
+  group('status bar style', () {
+    // Both platform fields are inverted with respect to each other, so an
+    // eyeball on one device proves nothing about the other. These four
+    // assertions are the whole guarantee.
+    test('light theme asks for dark icons on both platforms', () {
+      final SystemUiOverlayStyle style = AppTheme.statusBarStyle(
+        Brightness.light,
+      );
+
+      // Android names the icons...
+      expect(style.statusBarIconBrightness, Brightness.dark);
+      // ...iOS names the background behind them.
+      expect(style.statusBarBrightness, Brightness.light);
+    });
+
+    test('dark theme asks for light icons on both platforms', () {
+      final SystemUiOverlayStyle style = AppTheme.statusBarStyle(
+        Brightness.dark,
+      );
+
+      expect(style.statusBarIconBrightness, Brightness.light);
+      expect(style.statusBarBrightness, Brightness.dark);
+    });
+
+    test('the system bars stay transparent so the body shows through', () {
+      final SystemUiOverlayStyle style = AppTheme.statusBarStyle(
+        Brightness.light,
+      );
+
+      expect(style.statusBarColor, Colors.transparent);
+      expect(style.systemNavigationBarColor, Colors.transparent);
+    });
+
+    testWidgets('both themes carry it on the app bar theme', (
+      WidgetTester tester,
+    ) async {
+      late ThemeData resolved;
+
+      await pumpThemed(
+        tester,
+        Builder(
+          builder: (BuildContext context) {
+            resolved = Theme.of(context);
+
+            return const SizedBox.shrink();
+          },
+        ),
+        theme: () => AppTheme.dark,
+      );
+
+      // `SdAppBarV3` builds a real `AppBar`, which turns this into the
+      // `AnnotatedRegion` over every route that has a bar. Unset, the style is
+      // inferred from a bar colour and comes out wrong on one platform.
+      expect(
+        resolved.appBarTheme.systemOverlayStyle,
+        AppTheme.statusBarStyle(Brightness.dark),
+      );
+    });
+  });
+
   group('v3 widgets render under the app theme', () {
     testWidgets('SdStatTileV3 shows an em dash for a null value, never 0', (
       WidgetTester tester,
     ) async {
       await pumpThemed(
         tester,
-        const Scaffold(
-          body: SdStatTileV3(label: 'Profit', value: null),
-        ),
+        const Scaffold(body: SdStatTileV3(label: 'Profit', value: null)),
       );
 
       // Hard rule 5: a zero is a claim, an em dash is an absence.

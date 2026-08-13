@@ -4,6 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -39,25 +40,56 @@ final class AppBootstrap {
   /// does not show an error screen — it stops the app from starting at all —
   /// so every step needs a fallback that leaves the app usable.
   static Future<void> init(Widget Function() builder) async {
-    await runZonedGuarded<Future<void>>(() async {
-      WidgetsFlutterBinding.ensureInitialized();
+    await runZonedGuarded<Future<void>>(
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
 
-      await _initializeFirebase();
+        await _initializeFirebase();
 
-      await _initializeGoogleSignIn();
+        await _initializeGoogleSignIn();
 
-      _logEnvironment();
+        await _goEdgeToEdge();
 
-      _installErrorHooks();
+        _logEnvironment();
 
-      runApp(builder());
-    }, (Object error, StackTrace stackTrace) {
+        _installErrorHooks();
+
+        runApp(builder());
+      },
+      (Object error, StackTrace stackTrace) {
+        AppLogger.error(
+          'Uncaught zone error',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      },
+    );
+  }
+
+  /// Let the app draw under the system bars.
+  ///
+  /// Android only in effect — iOS is already edge to edge. Without it the
+  /// floating glass tab bar has an opaque system strip under it instead of the
+  /// content it is supposed to refract, and `extendBody` buys nothing.
+  ///
+  /// The *style* of those bars is not set here: that is
+  /// `AppTheme.statusBarStyle`, read through the theme, because a
+  /// `SystemChrome` call made once at startup cannot follow a device switching
+  /// between light and dark.
+  static Future<void> _goEdgeToEdge() async {
+    try {
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+      AppLogger.info('Edge-to-edge enabled');
+    } catch (error, stackTrace) {
+      // Cosmetic, so it must never stop the app starting — but a silent
+      // failure here is a layout bug nobody can trace back (hard rule 8).
       AppLogger.error(
-        'Uncaught zone error',
+        'Failed to enable edge-to-edge',
         error: error,
         stackTrace: stackTrace,
       );
-    });
+    }
   }
 
   /// Bring Firebase up, and attach Crashlytics if it comes up.
@@ -97,10 +129,10 @@ final class AppBootstrap {
     } catch (error, stackTrace) {
       // Cannot use AppLogger.error's Crashlytics half — that is what just
       // failed. The console line is the whole report.
-      AppLogger.warning('Firebase failed to initialize — running without backend', <
-        String,
-        String
-      >{'error': error.toString()});
+      AppLogger.warning(
+        'Firebase failed to initialize — running without backend',
+        <String, String>{'error': error.toString()},
+      );
       debugPrintStack(stackTrace: stackTrace);
     }
   }
@@ -168,7 +200,11 @@ final class AppBootstrap {
     };
 
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-      AppLogger.error('Uncaught platform error', error: error, stackTrace: stack);
+      AppLogger.error(
+        'Uncaught platform error',
+        error: error,
+        stackTrace: stack,
+      );
 
       // True means "handled" — the process stays alive. It is already
       // reported, and killing the app would lose the user's unsaved work over

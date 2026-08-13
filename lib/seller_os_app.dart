@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -61,7 +62,15 @@ class SellerOsApp extends ConsumerWidget {
         ],
         supportedLocales: AppLocalizations.supportedLocales,
         builder: (BuildContext context, Widget? child) =>
-            _DevBanner(child: child ?? const SizedBox.shrink()),
+            AnnotatedRegion<SystemUiOverlayStyle>(
+              // Covers the routes with no app bar — splash, login, a
+              // full-screen sheet — which would otherwise keep whatever the
+              // platform last set. Same derivation the app bar theme uses, so
+              // there is still one place the style is decided, and it unwinds
+              // with the route rather than leaking like `SystemChrome` does.
+              value: AppTheme.statusBarStyle(Theme.of(context).brightness),
+              child: _DevBanner(child: child ?? const SizedBox.shrink()),
+            ),
       ),
     );
   }
