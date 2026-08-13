@@ -26,9 +26,11 @@ final class AppRoutes {
 
   // --- Shell branch 1: Home ---
 
+  // `/home/notifications` (§22) and `/home/activity` (§23) are deliberately
+  // absent: both features are blocked on Cloud Functions, and a constant
+  // whose path no route serves is a deep link that fails silently. They come
+  // back with their screens.
   static const String home = '/home';
-  static const String notifications = '/home/notifications';
-  static const String activity = '/home/activity';
 
   // --- Shell branch 2: Inventory ---
 
@@ -46,7 +48,8 @@ final class AppRoutes {
   static const String orderDetail = '/orders/:orderId';
   static const String shippingQueue = '/orders/shipping-queue';
   static const String offers = '/orders/offers';
-  static const String returns = '/orders/returns';
+  // No `/orders/returns`: returns are opened and closed from order detail
+  // (plan §16), so the screen that constant was reserved for does not exist.
 
   // --- Shell branch 4: Analytics ---
 
