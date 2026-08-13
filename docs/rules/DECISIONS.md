@@ -100,6 +100,36 @@ re-argued.
   ported rules about an account being optional, or about the device being the
   source of truth, belongs to that app.
 
+## Why "now" is a provider and not a parameter
+
+Explains the `clockProvider` rule in the root `CLAUDE.md`.
+
+The alternative was threading a `DateTime now` down from each screen's root.
+It was rejected for two reasons. Most of the drift lives in *providers* —
+`staleItemsProvider`, `inventoryCountsProvider`, `visibleOffersProvider` — and
+a provider has no parent to take a parameter from, so those would have needed
+a family keyed on an instant, which recomputes on every distinct value it is
+ever passed. And a parameter is opt-in: nothing stops the next screen calling
+`DateTime.now()` again, whereas an override in `pump_app.dart` covers every
+screen that reads the clock, including ones not written yet.
+
+The cost, recorded so it is not rediscovered as a bug: the clock is read at
+build time, so a screen left open does not re-derive "overdue" as the deadline
+passes. It already behaved that way — this changed where the instant comes
+from, not when it is read.
+
+## Three route constants were deleted rather than wired
+
+`AppRoutes.notifications`, `AppRoutes.activity` and `AppRoutes.returns` had
+zero usages and no route serving their paths. Notifications (§22) and the
+activity log (§23) are blocked on Cloud Functions; returns folded into order
+detail (§16), so its screen was never built.
+
+Deleted rather than left in place, because a constant that resolves to nothing
+reads as a working destination to the next caller and fails as a deep link
+without saying why. A comment sits where each was, so the gap reads as a
+decision. They come back with their screens.
+
 ## Why a caught error must still be logged
 
 Explains "Every `catch` logs, wherever it sits" in the root `CLAUDE.md`.

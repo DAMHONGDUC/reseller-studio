@@ -465,6 +465,17 @@ feature's own `CLAUDE.md`.
     stays.
   - **`packages/system_design` is out of scope** — it is a separate repo with
     its own `WIDGET_RULES.md`, and its statics are widget-intrinsic.
+- **Read-time "now" comes from `clockProvider`, never `DateTime.now()`**
+  (`core/time/app_clock.dart`). Anything a screen or a provider *derives* —
+  what is overdue, what is stale, whether an offer has expired, how many days
+  are left — reads the clock, so a test pins it with `FixedClock` and the same
+  assertion cannot pass in June and fail in August. That is exactly how
+  `test/features/screens_with_mock_data_test.dart` broke: the seed was placed
+  against a fixed instant and Home read the wall clock.
+  - **A recorded timestamp is the opposite and stays `DateTime.now()`**:
+    `createdAt`, `deletedAt`, the instant an order shipped, the default date
+    on a form. Those are facts about when something happened, not figures
+    computed from it, and pinning them in a test would prove nothing.
 - **All date and time arithmetic goes in `DateTimeUtils`, never a second
   date-shaped utils class.** Owner's rule: clock formatting, month arithmetic
   and the time axis of a chart are one subject, and two classes is how the

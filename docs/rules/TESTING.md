@@ -45,3 +45,9 @@ Two things about widget tests here, both learned the hard way:
   container.read(p.future)`.** The mock repositories are backed by a broadcast
   controller that never closes, so awaiting their future hangs until the test
   times out.
+- **The clock is pinned, and both halves have to be.** `pumpScreen` and
+  `mockContainer` seed the dataset against `testNow` *and* override
+  `clockProvider` with `FixedClock(testNow)`. Pinning only the seed is what
+  made the Home test fail as the calendar moved past it. A widget or provider
+  that still calls `DateTime.now()` to derive something is the bug, not the
+  test — see the `clockProvider` rule in the root `CLAUDE.md`.
