@@ -132,7 +132,7 @@ void main() {
         orders: const <Order>[],
         expenses: <Expense>[
           // £40 of fuel recorded against 200 miles. The deduction is
-          // 200 × 45p = £90, and the £40 must not also appear on a line.
+          // 200 × 55p = £110, and the £40 must not also appear on a line.
           expense(
             DateTime(2026, DateTime.june),
             ExpenseCategory.mileage,
@@ -144,7 +144,7 @@ void main() {
       );
 
       expect(summary.mileageDistance, 200);
-      expect(summary.mileageDeduction, const Money(9000, 'GBP'));
+      expect(summary.mileageDeduction, const Money(11000, 'GBP'));
 
       // The recorded amount is not double-counted into the car line.
       final TaxLineTotal car = summary.lines.firstWhere(
@@ -175,10 +175,10 @@ void main() {
         currency: 'GBP',
       );
 
-      // 12,000 miles across two trips: 10,000 × 45p + 2,000 × 25p. Rating
-      // each trip on its own would give 12,000 × 45p and over-deduct.
+      // 12,000 miles across two trips: 10,000 × 55p + 2,000 × 25p. Rating
+      // each trip on its own would give 12,000 × 55p and over-deduct.
       expect(summary.mileageDistance, 12000);
-      expect(summary.mileageDeduction, const Money(500000, 'GBP'));
+      expect(summary.mileageDeduction, const Money(600000, 'GBP'));
     });
   });
 

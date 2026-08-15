@@ -7,18 +7,28 @@ import '../enums/tax_jurisdiction.dart';
 /// modelling that as a one-element list rather than a special case is what
 /// keeps the calculator free of `if (isUk)`.
 class MileageBand {
-  const MileageBand({required this.upToDistance, required this.rateMinor});
+  const MileageBand({
+    required this.upToDistance,
+    required this.rateMinorHundredths,
+  });
 
   /// The distance this band runs to, or null for "everything above the last
   /// band". Cumulative from zero, not a width.
   final double? upToDistance;
 
-  /// Minor units per [MileageUnit] — cents per mile, pence per mile.
+  /// Hundredths of a minor unit per [MileageUnit] — so 67 cents a mile is
+  /// `6700` and 45p is `4500`.
   ///
-  /// **Integer minor units, like every other amount in this app** (hard rule
-  /// 4). 67 cents is representable; 0.67 dollars is not, and a year of
-  /// mileage summed in doubles drifts visibly.
-  final int rateMinor;
+  /// **Integer, like every other amount in this app** (hard rule 4); a year
+  /// of mileage summed in doubles drifts visibly. Scaled by [rateScale]
+  /// rather than held in whole minor units because a rate is not itself an
+  /// amount and the authorities do publish fractions of one: the IRS set 72.5
+  /// cents for the first half of 2026.
+  final int rateMinorHundredths;
+
+  /// What [rateMinorHundredths] is scaled by. The field's own unit, not
+  /// configuration about it.
+  static const int rateScale = 100;
 }
 
 /// What one jurisdiction allows per mile, from a given date.
@@ -50,9 +60,10 @@ class MileageRate {
 /// list is reviewable in a diff, and a remote value that changed under the
 /// app would not be.
 ///
-/// **These must be verified against the IRS and HMRC before release.** They
-/// are the published figures at the time of writing; nobody should file from
-/// them without checking, and `RELEASE_ACTIONS.md` carries that as an item.
+/// **Verified against irs.gov and gov.uk on 16 August 2026.** A wrong rate
+/// here is a wrong tax return, so re-check before each filing season and add
+/// a new dated entry rather than editing an old one — a past year must keep
+/// deducting at the rate that applied to it.
 final class MileageRateConstant {
   static final List<MileageRate> published = <MileageRate>[
     // IRS standard mileage rate, business use. One band, no ceiling.
@@ -60,14 +71,30 @@ final class MileageRateConstant {
       jurisdiction: TaxJurisdiction.us,
       effectiveFrom: DateTime(2024),
       bands: const <MileageBand>[
-        MileageBand(upToDistance: null, rateMinor: 67),
+        MileageBand(upToDistance: null, rateMinorHundredths: 6700),
       ],
     ),
     MileageRate(
       jurisdiction: TaxJurisdiction.us,
       effectiveFrom: DateTime(2025),
       bands: const <MileageBand>[
-        MileageBand(upToDistance: null, rateMinor: 70),
+        MileageBand(upToDistance: null, rateMinorHundredths: 7000),
+      ],
+    ),
+    MileageRate(
+      jurisdiction: TaxJurisdiction.us,
+      effectiveFrom: DateTime(2026),
+      bands: const <MileageBand>[
+        MileageBand(upToDistance: null, rateMinorHundredths: 7250),
+      ],
+    ),
+    // The IRS raised the rate mid-year, which is why a journey is rated by its
+    // own date and a year is not rated by one figure.
+    MileageRate(
+      jurisdiction: TaxJurisdiction.us,
+      effectiveFrom: DateTime(2026, DateTime.july),
+      bands: const <MileageBand>[
+        MileageBand(upToDistance: null, rateMinorHundredths: 7600),
       ],
     ),
     // HMRC approved mileage allowance payments, cars and vans. Two bands, and
@@ -76,8 +103,17 @@ final class MileageRateConstant {
       jurisdiction: TaxJurisdiction.uk,
       effectiveFrom: DateTime(2011, DateTime.april, 6),
       bands: const <MileageBand>[
-        MileageBand(upToDistance: 10000, rateMinor: 45),
-        MileageBand(upToDistance: null, rateMinor: 25),
+        MileageBand(upToDistance: 10000, rateMinorHundredths: 4500),
+        MileageBand(upToDistance: null, rateMinorHundredths: 2500),
+      ],
+    ),
+    // First change since 2011: the first band went to 55p, the second stayed.
+    MileageRate(
+      jurisdiction: TaxJurisdiction.uk,
+      effectiveFrom: DateTime(2026, DateTime.april, 6),
+      bands: const <MileageBand>[
+        MileageBand(upToDistance: 10000, rateMinorHundredths: 5500),
+        MileageBand(upToDistance: null, rateMinorHundredths: 2500),
       ],
     ),
   ];

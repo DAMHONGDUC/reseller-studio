@@ -2,7 +2,7 @@ import '../../../../core/money/money.dart';
 import '../../../expenses/domain/entities/expense.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../orders/domain/entities/order.dart';
-import '../entities/mileage_rate.dart';
+import '../entities/mileage_journey.dart';
 import '../entities/tax_category.dart';
 import '../entities/tax_summary.dart';
 import '../entities/tax_year.dart';
@@ -41,13 +41,15 @@ final class TaxSummaryCalculator {
         .map((Order order) => order.costOfGoods)
         .totalOfKnown();
 
+    final List<MileageJourney> journeys = _journeys(costs);
+
     return TaxSummary(
       year: year,
       revenue: revenue,
       costOfGoods: costOfGoods,
       lines: _lines(year, costs),
-      mileageDistance: _distance(costs),
-      mileageDeduction: _mileage(year, costs, currency),
+      mileageDistance: _distance(journeys),
+      mileageDeduction: _mileage(year, journeys, currency),
       currency: currency,
     );
   }
@@ -79,33 +81,39 @@ final class TaxSummaryCalculator {
     ];
   }
 
-  static double _distance(List<Expense> expenses) => expenses
-      .where((Expense expense) => expense.category == ExpenseCategory.mileage)
-      .fold(
-        0,
-        (double running, Expense expense) => running + (expense.mileage ?? 0),
-      );
+  /// An expense with no distance recorded is not a journey worth nothing; it
+  /// is one nobody measured, so it is dropped rather than counted as zero.
+  static List<MileageJourney> _journeys(List<Expense> expenses) => expenses
+      .where(
+        (Expense expense) =>
+            expense.category == ExpenseCategory.mileage &&
+            expense.mileage != null,
+      )
+      .map(
+        (Expense expense) =>
+            MileageJourney(date: expense.date, distance: expense.mileage!),
+      )
+      .toList();
 
-  /// **Banded over the year's total, not per journey**, which is what HMRC's
-  /// 10,000-mile threshold means. The rate is read at the year's start, so a
-  /// mid-year change does not silently re-rate journeys already taken.
+  static double _distance(List<MileageJourney> journeys) => journeys.fold(
+    0,
+    (double running, MileageJourney journey) => running + journey.distance,
+  );
+
+  /// **Banded over the year's total, rated per journey.** The band is
+  /// cumulative because HMRC's 10,000-mile threshold is; the rate is the one
+  /// in force on the day of the trip, because the IRS changed its 2026 figure
+  /// on 1 July and a single figure for the year would understate half of it.
   static Money? _mileage(
     TaxYear year,
-    List<Expense> expenses,
+    List<MileageJourney> journeys,
     String currency,
   ) {
-    final double distance = _distance(expenses);
+    if (journeys.isEmpty) return null;
 
-    if (distance <= 0) return null;
-
-    final MileageRate? rate = MileageCalculator.rateFor(
-      year.jurisdiction,
-      year.start,
-    );
-
-    return MileageCalculator.deduction(
-      distance: distance,
-      rate: rate,
+    return MileageCalculator.forJourneys(
+      journeys: journeys,
+      jurisdiction: year.jurisdiction,
       currency: currency,
     );
   }
