@@ -16,9 +16,20 @@ Ordered by what blocks what. Work top to bottom.
 | 2 | Google Sign-In OAuth clients | One of only two ways into the app. | 30 min |
 | 3 | Sign in with Apple (Services ID + key) | The other way in, and **App Store review rejects** an app offering Google without it. | 45 min |
 | 4 | Deploy `firestore.rules`, `firestore.indexes.json`, `storage.rules` | Without rules, Firestore is either locked shut or wide open. | 10 min |
-| 5 | App icons + launch screen | Flutter's default icon is an automatic store rejection. | 1 h |
+| 5 | Apple and Google brand marks on the login buttons | Both vendors require their own artwork and forbid a substitute. The buttons still carry placeholder glyphs, which fails Beta App Review. | 20 min |
 | 6 | Bundle id, signing, App Store / Play listings | No build can be uploaded. | 2–3 h |
 | 7 | Privacy policy URL + data-safety answers | Both stores refuse the listing without them. | 1 h |
+
+App icons, the launch screen and the iOS permission strings **are done** and
+are no longer on this list.
+
+### TestFlight: internal and external are not the same gate
+
+Internal testing — up to 100 people on your App Store Connect team — needs no
+review at all, so a build can go out as soon as rows 1–4 and 6 are done.
+**External testing, which is what "customers" means, goes through Beta App
+Review**, and that is the reviewer who rejects a placeholder logo. Row 5 only
+blocks the external half.
 
 ---
 
@@ -99,19 +110,27 @@ blocking rather than nice-to-have.
 5. `APPLE_SIGN_IN_SERVICE_ID` in `env/*.json` is for reference; the app itself
    goes through `FirebaseAuth.signInWithProvider`, which handles the nonce.
 
-### Brand marks — do not skip
+### Brand marks — blocker 5, and the only one of these that is code
 
-The two buttons on the login screen currently use **placeholder glyphs**
+The two buttons on the login screen use **placeholder glyphs**
 (`Symbols.person_rounded` and `Symbols.g_mobiledata_rounded`). Apple and Google
-each require their own logo and explicitly forbid a substitute. Shipping the
-placeholders is a review rejection from Apple and a branding-guideline
-violation from Google.
+each require their own logo and explicitly forbid a substitute, so this cannot
+be drawn from scratch — an approximated trademark is worse than an obvious
+placeholder, because it looks finished. The artwork has to come from them:
 
 - Apple: <https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple>
 - Google: <https://developers.google.com/identity/branding-guidelines>
 
-Drop the assets into `assets/` and swap the `icon:` on the two `SdButtonV3`s in
-`lib/features/auth/presentation/screens/login_screen/login_screen.dart`.
+Two things to know before wiring it up:
+
+1. Drop the assets in `assets/brand/` and declare that folder in
+   `pubspec.yaml`. Declaring it before the files exist fails the build.
+2. **`SdButtonV3.icon` is an `IconData`, so it cannot take an image.** Either
+   add a `leading` widget slot to `SdButtonV3` in the design-system submodule,
+   or build the two rows by hand in
+   `lib/features/auth/presentation/screens/login_screen/login_screen.dart`.
+   The submodule change is the one that keeps the buttons consistent with
+   every other button in the app.
 
 ### I removed a dependency
 
@@ -196,16 +215,18 @@ below can be done from this repo.
 **Restore purchases is already wired** and App Store review requires it, so do
 not remove that row from the Subscription screen.
 
-## 4c. Tax — verify the mileage rates before anyone files
+## 4c. Tax — the mileage rates are now verified
 
-`MileageRateConstant.published` carries the IRS and HMRC figures as they stood
-when the feature was written: US 67¢/mile for 2024 and 70¢ for 2025, UK 45p
-for the first 10,000 miles and 25p after.
+**Done, 16 August 2026.** `MileageRateConstant.published` was two years out of
+date and has been checked against irs.gov and gov.uk. Four figures were
+missing: the IRS set 72.5¢ for the first half of 2026 and 76¢ from 1 July, and
+HMRC raised its first band from 45p to 55p on 6 April 2026 — its first change
+since 2011.
 
-**A wrong rate here is a wrong tax return.** Check both against the
-authorities' current tables before release, and add a new dated entry rather
-than editing an old one — a past year must keep deducting at the rate that
-applied to it.
+Nothing here needs an account, so it is only listed to record that it was
+done. What is left for you: **re-check both tables before each filing season**,
+and add a new dated entry rather than editing an old one — a past year must
+keep deducting at the rate that applied to it.
 
 The jurisdiction comes from the workspace's country, and only `US` and `GB`
 are recognised; anything else falls back to the US. That matches the launch

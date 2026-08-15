@@ -25,7 +25,7 @@ are there and the mock backend drives them end to end.
 | 17 | Expenses — add, list, totals by category, delete | built |
 | 18 | Receipts — attach to a purchase or expense, with upload | built |
 | 19 | Reports — CSV export of sales, inventory and expenses via the share sheet | built |
-| 20 | Tax — year-end summary by form line, mileage at the published rate | built for US and UK |
+| 20 | Tax — year-end summary by form line, mileage at the published rate | built for US and UK, rates verified 16 Aug 2026 |
 | 21 | Search — items, orders, listings and sources in one list | built |
 | 24 | Workspace / team — team screen is read-only | partial |
 | 25 | Settings — account, workspace, mock-data switch (debug only) | built |
@@ -84,16 +84,24 @@ are there and the mock backend drives them end to end.
   year boundary (US calendar, UK 6 April), the form's line names (Schedule C,
   SA103) and the mileage rate; adding a third country is a case in two files.
   Mileage is banded over the year's total — the UK's 10,000-mile threshold —
-  and rated by the journey's own date, never by today's table.
+  and each journey is rated by its own date, never by today's table and never
+  by one figure for the year: the IRS changed its 2026 rate on 1 July, and a
+  band holds hundredths of a minor unit because 72.5¢ is not an integer.
 - **Read-time "now" is injected**, not read from the wall clock. `AppClock`
   and `clockProvider` (`core/time/`) are what every derived figure — overdue,
   stale, expired, days left — asks, so a test pins the instant with
   `FixedClock`. Recorded timestamps (`createdAt`, `deletedAt`, when an order
   shipped) deliberately still call `DateTime.now()`.
-- **Tests**: 133 passing, none known-failing. Profit/margin/ROI including the
+- **Tests**: 143 passing, none known-failing. Profit/margin/ROI including the
   plan §11 worked example, plus screen-level tests asserting rendered figures
   against the mock seed. `test/features/shot_tmp_test.dart` is the gitignored
   scratch harness and is excluded — it hangs by design.
+- **Store assets exist.** The app icon is a price tag on the brand indigo, at
+  every size iOS and Android ask for, with an Android adaptive foreground; the
+  iOS launch screen carries the same mark and follows the theme, so it does
+  not flash white into a dark-mode app. `NSCameraUsageDescription` and
+  `NSPhotoLibraryUsageDescription` are set — without them iOS hard-crashes the
+  first time the scanner or the photo picker opens.
 
 ## Things worth testing by hand first
 

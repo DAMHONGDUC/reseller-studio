@@ -82,10 +82,16 @@ Nothing started. Listed with what already exists to build on.
   `PlanLimits.byPlan` holds every ceiling; changing one is a one-line edit and
   the paywall copy follows, because it reads the table rather than repeating
   it. Nobody has priced these against what a reseller will pay.
-- **The mileage rates must be checked against the IRS and HMRC before
-  release.** `MileageRateConstant.published` carries the figures at the time
-  of writing. A wrong rate here is a wrong tax return, so it is on
-  `RELEASE_ACTIONS.md` rather than left to be noticed.
+- **The Apple and Google brand marks are still placeholder glyphs.** The one
+  remaining code-side blocker, and it cannot be done from this repo: both
+  vendors require their own artwork and forbid a substitute, so the files have
+  to be downloaded. `SdButtonV3.icon` is an `IconData` and cannot take an
+  image, so it also needs a `leading` slot on the submodule's button.
+  `RELEASE_ACTIONS.md` blocker 5 has the detail.
+- **`selleros://` deep links work on iOS only.** `Info.plist` declares the
+  scheme and `FlutterDeepLinkingEnabled`; `AndroidManifest.xml` has neither,
+  so the notification taps the plan calls for (§22) will not open a record on
+  Android. Not on the TestFlight path, which is iOS.
 - **Entitlement is not mirrored into Firestore yet.** The client reads
   RevenueCat, which is a cache for rendering. `firestore.rules` cannot ask an
   SDK a question, so the server-side half — a Cloud Function on RevenueCat's
