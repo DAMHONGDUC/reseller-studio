@@ -26,6 +26,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Both strings name the task, not the permission. iOS hard-crashes on
+	     first access without them, and a reviewer rejects "for camera access". -->
+	<key>NSCameraUsageDescription</key>
+	<string>Seller OS uses the camera to scan barcodes on your inventory and to photograph the items you are listing for sale.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Seller OS needs your photo library so you can attach existing photos to an item, a purchase receipt or an expense.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -51,7 +57,7 @@
 	<true/>
 	<!-- Deep links. Needed by the notification tap targets the plan calls for
 	     (section 22) — a "new order" push has to open that order, not Home.
-	     go_router reads the path, so a link is sellerosic:///orders/ord-4. -->
+	     go_router reads the path, so a link is selleros:///orders/ord-4. -->
 	<key>FlutterDeepLinkingEnabled</key>
 	<true/>
 	<key>CFBundleURLTypes</key>
