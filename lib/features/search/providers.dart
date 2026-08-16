@@ -53,9 +53,7 @@ class SearchQueryController extends Notifier<String> {
 }
 
 final NotifierProvider<SearchQueryController, String> searchQueryProvider =
-    NotifierProvider<SearchQueryController, String>(
-      SearchQueryController.new,
-    );
+    NotifierProvider<SearchQueryController, String>(SearchQueryController.new);
 
 /// Everything matching the query, across items, orders, listings and sources.
 ///
@@ -64,95 +62,91 @@ final NotifierProvider<SearchQueryController, String> searchQueryProvider =
 /// tracking number. **Notes and descriptions are deliberately not searched** —
 /// they are long, and matching them makes the results look random to someone
 /// who typed a SKU.
-final Provider<List<SearchHit>> searchResultsProvider =
-    Provider<List<SearchHit>>((Ref ref) {
-      final String query = ref.watch(searchQueryProvider).trim().toLowerCase();
+final Provider<List<SearchHit>>
+searchResultsProvider = Provider<List<SearchHit>>((Ref ref) {
+  final String query = ref.watch(searchQueryProvider).trim().toLowerCase();
 
-      if (query.length < SearchConstant.minimumQueryLength) {
-        return const <SearchHit>[];
-      }
+  if (query.length < SearchConstant.minimumQueryLength) {
+    return const <SearchHit>[];
+  }
 
-      final List<SearchHit> hits = <SearchHit>[];
+  final List<SearchHit> hits = <SearchHit>[];
 
-      for (final Item item in ref.watch(itemsProvider).value ?? const <Item>[]) {
-        if (SearchConstant.matches(query, <String?>[
-          item.title,
-          item.sku,
-          item.barcode,
-        ])) {
-          hits.add(
-            SearchHit(
-              kind: SearchHitKind.item,
-              id: item.id,
-              title: item.title,
-              subtitle: <String>[
-                item.status.name,
-                if (item.sku != null) item.sku!,
-              ].join(' · '),
-            ),
-          );
-        }
-      }
+  for (final Item item in ref.watch(itemsProvider).value ?? const <Item>[]) {
+    if (SearchConstant.matches(query, <String?>[
+      item.title,
+      item.sku,
+      item.barcode,
+    ])) {
+      hits.add(
+        SearchHit(
+          kind: SearchHitKind.item,
+          id: item.id,
+          title: item.title,
+          subtitle: <String>[
+            item.status.name,
+            if (item.sku != null) item.sku!,
+          ].join(' · '),
+        ),
+      );
+    }
+  }
 
-      for (final Order order
-          in ref.watch(ordersProvider).value ?? const <Order>[]) {
-        if (SearchConstant.matches(query, <String?>[
-          order.externalOrderId,
-          order.trackingNumber,
-          order.buyerName,
-          ...order.lines.map((OrderLine line) => line.title),
-        ])) {
-          hits.add(
-            SearchHit(
-              kind: SearchHitKind.order,
-              id: order.id,
-              title: order.lines.isEmpty
-                  ? order.marketplace.displayName
-                  : order.lines.first.title,
-              subtitle:
-                  '${order.marketplace.displayName} · ${order.status.name}',
-            ),
-          );
-        }
-      }
+  for (final Order order
+      in ref.watch(ordersProvider).value ?? const <Order>[]) {
+    if (SearchConstant.matches(query, <String?>[
+      order.externalOrderId,
+      order.trackingNumber,
+      order.buyerName,
+      ...order.lines.map((OrderLine line) => line.title),
+    ])) {
+      hits.add(
+        SearchHit(
+          kind: SearchHitKind.order,
+          id: order.id,
+          title: order.lines.isEmpty
+              ? order.marketplace.displayName
+              : order.lines.first.title,
+          subtitle: '${order.marketplace.displayName} · ${order.status.name}',
+        ),
+      );
+    }
+  }
 
-      for (final Listing listing
-          in ref.watch(listingsProvider).value ?? const <Listing>[]) {
-        if (SearchConstant.matches(query, <String?>[
-          listing.title,
-          listing.externalListingId,
-        ])) {
-          hits.add(
-            SearchHit(
-              kind: SearchHitKind.listing,
-              id: listing.itemId,
-              title: listing.title,
-              subtitle:
-                  '${listing.marketplace.displayName} · ${listing.status.name}',
-            ),
-          );
-        }
-      }
+  for (final Listing listing
+      in ref.watch(listingsProvider).value ?? const <Listing>[]) {
+    if (SearchConstant.matches(query, <String?>[
+      listing.title,
+      listing.externalListingId,
+    ])) {
+      hits.add(
+        SearchHit(
+          kind: SearchHitKind.listing,
+          id: listing.itemId,
+          title: listing.title,
+          subtitle:
+              '${listing.marketplace.displayName} · ${listing.status.name}',
+        ),
+      );
+    }
+  }
 
-      for (final Source source
-          in ref.watch(sourcesProvider).value ?? const <Source>[]) {
-        if (SearchConstant.matches(query, <String?>[
-          source.name,
-          source.address,
-        ])) {
-          hits.add(
-            SearchHit(
-              kind: SearchHitKind.source,
-              id: source.id,
-              title: source.name,
-              subtitle: source.address,
-            ),
-          );
-        }
-      }
+  for (final Source source
+      in ref.watch(sourcesProvider).value ?? const <Source>[]) {
+    if (SearchConstant.matches(query, <String?>[source.name, source.address])) {
+      hits.add(
+        SearchHit(
+          kind: SearchHitKind.source,
+          id: source.id,
+          title: source.name,
+          subtitle: source.address,
+        ),
+      );
+    }
+  }
 
-      return hits;
-    });
+  return hits;
+});
 
 /// The matching rule, in one place so every collection is searched the same
 /// way.

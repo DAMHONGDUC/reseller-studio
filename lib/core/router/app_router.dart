@@ -100,7 +100,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               : AppRoutes.onboarding;
         }
 
-        return location == AppRoutes.login ? null : AppRoutes.login;
+        // Owner's rule: the five tabs render before sign-in, empty. The gate
+        // moved from the route to the action — see `NavigationUtils`. What is
+        // still refused is anything that needs a workspace to mean anything.
+        return _previewRoutes.contains(location) ? null : AppRoutes.home;
       }
 
       final WorkspaceStatus workspace = ref.read(workspaceStatusProvider);
@@ -462,6 +465,23 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
 const Set<String> _authRoutes = <String>{
   AppRoutes.onboarding,
   AppRoutes.login,
+};
+
+/// What a signed-out visitor may sit on — the five tabs, empty, plus the gate
+/// itself (owner's rule; `CLAUDE.md` hard rule 1).
+///
+/// **Deliberately the five tab roots and nothing below them.** A detail route
+/// names a record that a signed-out visitor cannot have, and workspace setup
+/// needs an account to attach the business to; both are bounced to Home rather
+/// than rendered against nothing. Everything reachable *from* a tab is an
+/// action, and actions go through `NavigationUtils.requireSignIn`.
+const Set<String> _previewRoutes = <String>{
+  AppRoutes.login,
+  AppRoutes.home,
+  AppRoutes.inventory,
+  AppRoutes.orders,
+  AppRoutes.analytics,
+  AppRoutes.more,
 };
 
 /// Bridges the two providers the redirect reads to go_router's

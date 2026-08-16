@@ -119,15 +119,12 @@ final Provider<List<CategoryPerformance>> categoryPerformanceProvider =
               soldCount: sold.length,
               revenue: revenue,
               cost: cost,
-              profit: (revenue == null || cost == null)
-                  ? null
-                  : revenue - cost,
+              profit: (revenue == null || cost == null) ? null : revenue - cost,
             );
-          }).toList()
-            ..sort(
-              (CategoryPerformance a, CategoryPerformance b) =>
-                  b.itemCount.compareTo(a.itemCount),
-            );
+          }).toList()..sort(
+            (CategoryPerformance a, CategoryPerformance b) =>
+                b.itemCount.compareTo(a.itemCount),
+          );
 
       return rows;
     });

@@ -16,9 +16,10 @@ final Provider<FirebaseAuth> firebaseAuthProvider = Provider<FirebaseAuth>(
 
 /// Sign in, sign up, reset, sign out, delete — behind the domain interface,
 /// so nothing in `presentation/` names a Firebase type.
-final Provider<AuthRepository> authRepositoryProvider = Provider<AuthRepository>(
-  (Ref ref) => FirebaseAuthRepository(ref.watch(firebaseAuthProvider)),
-);
+final Provider<AuthRepository> authRepositoryProvider =
+    Provider<AuthRepository>(
+      (Ref ref) => FirebaseAuthRepository(ref.watch(firebaseAuthProvider)),
+    );
 
 /// Who is signed in, as a stream.
 ///

@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/time/app_clock.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/item.dart';
 import 'domain/entities/item_category.dart';
 import 'domain/entities/storage_location.dart';
@@ -54,7 +55,10 @@ enum InventoryFilter {
 final StreamProvider<List<Item>> itemsProvider = StreamProvider<List<Item>>((
   Ref ref,
 ) {
-  return ref.watch(itemRepositoryProvider).watchItems();
+  return WorkspaceGuard.listOrEmpty<Item>(
+    ref,
+    () => ref.watch(itemRepositoryProvider).watchItems(),
+  );
 });
 
 /// One item, live — what the detail screen watches so an edit made on another
@@ -66,7 +70,10 @@ final StreamProvider<List<Item>> itemsProvider = StreamProvider<List<Item>>((
 // information.
 // ignore: type_annotate_public_apis
 final itemProvider = StreamProvider.family<Item?, String>((Ref ref, String id) {
-  return ref.watch(itemRepositoryProvider).watchItem(id);
+  return WorkspaceGuard.oneOrNull<Item>(
+    ref,
+    () => ref.watch(itemRepositoryProvider).watchItem(id),
+  );
 });
 
 /// Which tab is selected.
@@ -139,8 +146,7 @@ class InventorySelectionController extends Notifier<Set<String>> {
     state = next;
   }
 
-  void selectAll(Iterable<String> itemIds) =>
-      state = Set<String>.of(itemIds);
+  void selectAll(Iterable<String> itemIds) => state = Set<String>.of(itemIds);
 
   void clear() => state = const <String>{};
 }
@@ -172,12 +178,18 @@ final Provider<List<Item>> selectedItemsProvider = Provider<List<Item>>((
 /// one live stream that every picker and every row folds over.
 final StreamProvider<List<ItemCategory>> categoriesProvider =
     StreamProvider<List<ItemCategory>>((Ref ref) {
-      return ref.watch(categoryRepositoryProvider).watchCategories();
+      return WorkspaceGuard.listOrEmpty<ItemCategory>(
+        ref,
+        () => ref.watch(categoryRepositoryProvider).watchCategories(),
+      );
     });
 
 final StreamProvider<List<StorageLocation>> locationsProvider =
     StreamProvider<List<StorageLocation>>((Ref ref) {
-      return ref.watch(locationRepositoryProvider).watchLocations();
+      return WorkspaceGuard.listOrEmpty<StorageLocation>(
+        ref,
+        () => ref.watch(locationRepositoryProvider).watchLocations(),
+      );
     });
 
 /// Category id → name, for rendering a row without looking one up per item.
@@ -203,8 +215,7 @@ final Provider<Map<String, String>> locationPathsProvider =
           ref.watch(locationsProvider).value ?? const <StorageLocation>[];
 
       final Map<String, StorageLocation> byId = <String, StorageLocation>{
-        for (final StorageLocation location in locations)
-          location.id: location,
+        for (final StorageLocation location in locations) location.id: location,
       };
 
       return <String, String>{

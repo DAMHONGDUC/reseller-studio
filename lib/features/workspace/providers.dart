@@ -62,10 +62,10 @@ final Provider<String?> currentWorkspaceIdProvider = Provider<String?>((
 /// The live workspace document.
 // See `itemProvider` for why a family's type is inferred rather than written.
 // ignore: type_annotate_public_apis
-final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>((
-  Ref ref,
-  String workspaceId,
-) => ref.watch(workspaceRepositoryProvider).watchWorkspace(workspaceId));
+final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>(
+  (Ref ref, String workspaceId) =>
+      ref.watch(workspaceRepositoryProvider).watchWorkspace(workspaceId),
+);
 
 /// The workspace the app is currently showing.
 ///
@@ -148,6 +148,42 @@ final Provider<WorkspaceContext?> workspaceContextProvider =
       );
     });
 
+/// Whether there is anything to read from at all.
+///
+/// Mirrors the branching in every repository provider on purpose: mock mode
+/// answers yes without a context, because the in-memory repositories never
+/// look at one.
+final Provider<bool> hasWorkspaceProvider = Provider<bool>((Ref ref) {
+  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+    return true;
+  }
+
+  return ref.watch(workspaceContextProvider) != null;
+});
+
+/// Keeps a business stream empty instead of exploding when there is no
+/// workspace behind it.
+///
+/// **The app now renders its five tabs before anyone signs in** (hard rule 1),
+/// and a signed-out visitor has no workspace — but the repository providers
+/// *throw* on a null context rather than returning an empty repository, so the
+/// check has to happen before the repository is read. Hence a wrapper around
+/// the read rather than a null check after it.
+///
+/// The throw is still right for what it was written for: a signed-in seller
+/// reaching a business screen with no workspace is a routing bug, and one that
+/// should be loud. This only covers the state where having no workspace is the
+/// expected answer.
+final class WorkspaceGuard {
+  static Stream<List<T>> listOrEmpty<T>(
+    Ref ref,
+    Stream<List<T>> Function() live,
+  ) => ref.watch(hasWorkspaceProvider) ? live() : Stream<List<T>>.value(<T>[]);
+
+  static Stream<T?> oneOrNull<T>(Ref ref, Stream<T?> Function() live) =>
+      ref.watch(hasWorkspaceProvider) ? live() : Stream<T?>.value(null);
+}
+
 /// The currency every money figure in the app is denominated in.
 ///
 /// Falls back to USD when no workspace is loaded. A fallback rather than a
@@ -180,7 +216,7 @@ final Provider<List<Member>> workspaceMembersProvider = Provider<List<Member>>((
 
 // See `itemProvider` for why a family's type is inferred rather than written.
 // ignore: type_annotate_public_apis
-final liveMembersProvider = StreamProvider.family<List<Member>, String>((
-  Ref ref,
-  String workspaceId,
-) => ref.watch(workspaceRepositoryProvider).watchMembers(workspaceId));
+final liveMembersProvider = StreamProvider.family<List<Member>, String>(
+  (Ref ref, String workspaceId) =>
+      ref.watch(workspaceRepositoryProvider).watchMembers(workspaceId),
+);

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
+
+import '../router/navigation_utils.dart';
 
 /// A scaffold whose create action is the button Inventory has.
 ///
@@ -20,7 +23,7 @@ import 'package:system_design/index.dart';
 /// [floatingNav] is true on the five tab screens and false everywhere else: a
 /// pushed route has no glass bar under it, and the inset would leave the
 /// button hovering above nothing.
-class AppAddFabScaffold extends StatefulWidget {
+class AppAddFabScaffold extends ConsumerStatefulWidget {
   const AppAddFabScaffold({
     required this.body,
     this.appBar,
@@ -85,20 +88,17 @@ class AppAddFabScaffold extends StatefulWidget {
   static EdgeInsets listPadding(
     BuildContext context, {
     bool floatingNav = false,
-  }) => SdContentPaddingV3.screen(
-    context,
-    floatingNav: floatingNav,
-  ).copyWith(
+  }) => SdContentPaddingV3.screen(context, floatingNav: floatingNav).copyWith(
     bottom:
         fabInset(context, floatingNav: floatingNav) +
         SdContentPaddingV3.bottomGap,
   );
 
   @override
-  State<AppAddFabScaffold> createState() => _AppAddFabScaffoldState();
+  ConsumerState<AppAddFabScaffold> createState() => _AppAddFabScaffoldState();
 }
 
-class _AppAddFabScaffoldState extends State<AppAddFabScaffold> {
+class _AppAddFabScaffoldState extends ConsumerState<AppAddFabScaffold> {
   /// Whether the button shows its label. A notifier rather than `setState`:
   /// the direction of a scroll changes several times a second, and rebuilding
   /// the whole body for the width of a button is exactly the cost a list
@@ -126,6 +126,17 @@ class _AppAddFabScaffoldState extends State<AppAddFabScaffold> {
     return false;
   }
 
+  /// The create action, behind the sign-in gate.
+  ///
+  /// Every screen with a create button routes through here, so a signed-out
+  /// visitor tapping Add on any of the six lands on the same sign-in step
+  /// rather than on six different guesses about what should happen.
+  void _onAdd() {
+    if (!NavigationUtils.requireSignIn(context, ref)) return;
+
+    widget.onAdd();
+  }
+
   @override
   Widget build(BuildContext context) => SdScaffoldV3(
     appBar: widget.appBar,
@@ -147,7 +158,7 @@ class _AppAddFabScaffoldState extends State<AppAddFabScaffold> {
                     icon: Symbols.add_rounded,
                     label: widget.addLabel,
                     expanded: expanded,
-                    onPressed: widget.onAdd,
+                    onPressed: _onAdd,
                   ),
             ),
           )

@@ -34,6 +34,7 @@ void main() {
     WidgetTester tester, {
     required bool signedIn,
     required bool seenIntro,
+    String? startAt,
   }) async {
     // The default 800×600 test surface is shorter than any phone, so Home
     // overflows here for reasons that have nothing to do with the redirect.
@@ -53,6 +54,10 @@ void main() {
         // Overridden so the test never reaches FirebaseAuth, which throws
         // with no app configured.
         isSignedInProvider.overrideWithValue(signedIn),
+        // Home now renders for a signed-out visitor, and it reads this on the
+        // way to the business providers. Without the override it reaches
+        // FirebaseAuth and throws.
+        currentUidProvider.overrideWithValue(signedIn ? 'uid' : null),
         workspaceStatusProvider.overrideWithValue(WorkspaceStatus.ready),
       ],
     );
@@ -60,6 +65,8 @@ void main() {
     addTearDown(container.dispose);
 
     final GoRouter router = container.read(routerProvider);
+
+    if (startAt != null) router.go(startAt);
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -95,13 +102,28 @@ void main() {
     );
   });
 
-  testWidgets('once the intro is done the gate is the login screen', (
+  testWidgets('once the intro is done the five tabs render, empty', (
     WidgetTester tester,
   ) async {
     expect(
       await landingFor(tester, signedIn: false, seenIntro: true),
-      AppRoutes.login,
+      AppRoutes.home,
     );
   });
 
+  testWidgets('a signed-out visitor cannot reach workspace setup', (
+    WidgetTester tester,
+  ) async {
+    // It needs an account to attach the business to, so it is bounced to Home
+    // rather than rendered against nothing.
+    expect(
+      await landingFor(
+        tester,
+        signedIn: false,
+        seenIntro: true,
+        startAt: AppRoutes.workspaceSetup,
+      ),
+      AppRoutes.home,
+    );
+  });
 }

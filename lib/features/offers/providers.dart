@@ -10,6 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/time/app_clock.dart';
 import '../mock_data/providers.dart';
 import '../orders/domain/enums/order_status.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/offer.dart';
 
 /// The tabs across the top of Offers (plan §8).
@@ -40,7 +41,10 @@ enum OfferFilter {
 }
 
 final StreamProvider<List<Offer>> offersProvider = StreamProvider<List<Offer>>(
-  (Ref ref) => ref.watch(offerRepositoryProvider).watchOffers(),
+  (Ref ref) => WorkspaceGuard.listOrEmpty<Offer>(
+    ref,
+    () => ref.watch(offerRepositoryProvider).watchOffers(),
+  ),
 );
 
 class OfferFilterController extends Notifier<OfferFilter> {
@@ -55,25 +59,21 @@ final NotifierProvider<OfferFilterController, OfferFilter> offerFilterProvider =
       OfferFilterController.new,
     );
 
-final Provider<Map<OfferFilter, int>> offerCountsProvider =
-    Provider<Map<OfferFilter, int>>((Ref ref) {
-      final List<Offer> offers =
-          ref.watch(offersProvider).value ?? const <Offer>[];
-      final DateTime now = ref.watch(clockProvider).now();
+final Provider<Map<OfferFilter, int>>
+offerCountsProvider = Provider<Map<OfferFilter, int>>((Ref ref) {
+  final List<Offer> offers = ref.watch(offersProvider).value ?? const <Offer>[];
+  final DateTime now = ref.watch(clockProvider).now();
 
-      return <OfferFilter, int>{
-        for (final OfferFilter filter in OfferFilter.values)
-          filter: offers
-              .where((Offer offer) => filter.matches(offer, now))
-              .length,
-      };
-    });
+  return <OfferFilter, int>{
+    for (final OfferFilter filter in OfferFilter.values)
+      filter: offers.where((Offer offer) => filter.matches(offer, now)).length,
+  };
+});
 
 final Provider<List<Offer>> visibleOffersProvider = Provider<List<Offer>>((
   Ref ref,
 ) {
-  final List<Offer> offers =
-      ref.watch(offersProvider).value ?? const <Offer>[];
+  final List<Offer> offers = ref.watch(offersProvider).value ?? const <Offer>[];
   final OfferFilter filter = ref.watch(offerFilterProvider);
   final DateTime now = ref.watch(clockProvider).now();
 
@@ -88,8 +88,7 @@ final Provider<List<Offer>> visibleOffersProvider = Provider<List<Offer>>((
 final Provider<List<Offer>> pendingOffersProvider = Provider<List<Offer>>((
   Ref ref,
 ) {
-  final List<Offer> offers =
-      ref.watch(offersProvider).value ?? const <Offer>[];
+  final List<Offer> offers = ref.watch(offersProvider).value ?? const <Offer>[];
   final DateTime now = ref.watch(clockProvider).now();
 
   final List<Offer> pending =

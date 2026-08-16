@@ -68,7 +68,9 @@ class DataModeController extends Notifier<DataMode> {
 
     if (prefs == null) return _default;
 
-    final bool stored = prefs.getBool(PrefsKeyConstant.dataModeMock) ?? DevFlags.mockDataDefault;
+    final bool stored =
+        prefs.getBool(PrefsKeyConstant.dataModeMock) ??
+        DevFlags.mockDataDefault;
 
     return stored ? _guarded(DataMode.mock) : DataMode.live;
   }

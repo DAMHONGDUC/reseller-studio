@@ -14,17 +14,24 @@ import '../inventory/providers.dart';
 import '../mock_data/providers.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/purchase.dart';
 import 'domain/entities/source.dart';
 
 final StreamProvider<List<Source>> sourcesProvider =
     StreamProvider<List<Source>>((Ref ref) {
-      return ref.watch(sourceRepositoryProvider).watchSources();
+      return WorkspaceGuard.listOrEmpty<Source>(
+        ref,
+        () => ref.watch(sourceRepositoryProvider).watchSources(),
+      );
     });
 
 final StreamProvider<List<Purchase>> purchasesProvider =
     StreamProvider<List<Purchase>>((Ref ref) {
-      return ref.watch(purchaseRepositoryProvider).watchPurchases();
+      return WorkspaceGuard.listOrEmpty<Purchase>(
+        ref,
+        () => ref.watch(purchaseRepositoryProvider).watchPurchases(),
+      );
     });
 
 /// Source id → name, so a row renders without a lookup per item.
@@ -42,9 +49,12 @@ final Provider<Map<String, String>> sourceNamesProvider =
 // ignore: type_annotate_public_apis
 final purchasesForSourceProvider =
     StreamProvider.family<List<Purchase>, String>((Ref ref, String sourceId) {
-      return ref
-          .watch(purchaseRepositoryProvider)
-          .watchPurchasesForSource(sourceId);
+      return WorkspaceGuard.listOrEmpty<Purchase>(
+        ref,
+        () => ref
+            .watch(purchaseRepositoryProvider)
+            .watchPurchasesForSource(sourceId),
+      );
     });
 
 // ignore: type_annotate_public_apis
@@ -52,7 +62,10 @@ final itemsForPurchaseProvider = StreamProvider.family<List<Item>, String>((
   Ref ref,
   String purchaseId,
 ) {
-  return ref.watch(itemRepositoryProvider).watchItemsForPurchase(purchaseId);
+  return WorkspaceGuard.listOrEmpty<Item>(
+    ref,
+    () => ref.watch(itemRepositoryProvider).watchItemsForPurchase(purchaseId),
+  );
 });
 
 /// What one source has actually returned (plan §9, Source section).

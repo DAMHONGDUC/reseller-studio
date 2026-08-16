@@ -24,11 +24,22 @@ class AuthFormShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SdScaffoldV3(
+    // Only when it was pushed. Sign-in is the app's front door on a cold
+    // start and has nothing to go back to — but it is also pushed over a tab
+    // by `NavigationUtils.requireSignIn`, and there it must be escapable or a
+    // visitor who changes their mind is stuck on it.
+    appBar: Navigator.canPop(context)
+        ? SdAppBarV3(title: '', automaticallyImplyLeading: true)
+        : null,
     body: SafeArea(
       child: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
-          SizedBox(height: SdSpacingConstant.h64),
+          SizedBox(
+            height: Navigator.canPop(context)
+                ? SdSpacingConstant.h24
+                : SdSpacingConstant.h64,
+          ),
           Text(
             title,
             style: context.textTheme3.headlineMedium!.bold3.copyWith(

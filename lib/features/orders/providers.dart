@@ -4,6 +4,7 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../mock_data/providers.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
 import 'domain/enums/order_status.dart';
 
@@ -35,7 +36,10 @@ enum OrderFilter {
 final StreamProvider<List<Order>> ordersProvider = StreamProvider<List<Order>>((
   Ref ref,
 ) {
-  return ref.watch(orderRepositoryProvider).watchOrders();
+  return WorkspaceGuard.listOrEmpty<Order>(
+    ref,
+    () => ref.watch(orderRepositoryProvider).watchOrders(),
+  );
 });
 
 // See `itemProvider` for why the type is inferred rather than written.
@@ -44,7 +48,10 @@ final orderProvider = StreamProvider.family<Order?, String>((
   Ref ref,
   String id,
 ) {
-  return ref.watch(orderRepositoryProvider).watchOrder(id);
+  return WorkspaceGuard.oneOrNull<Order>(
+    ref,
+    () => ref.watch(orderRepositoryProvider).watchOrder(id),
+  );
 });
 
 class OrderFilterController extends Notifier<OrderFilter> {

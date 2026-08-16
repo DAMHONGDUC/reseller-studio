@@ -53,10 +53,9 @@ class SelectedTaxYearController extends Notifier<TaxYear> {
 }
 
 final NotifierProvider<SelectedTaxYearController, TaxYear>
-selectedTaxYearProvider =
-    NotifierProvider<SelectedTaxYearController, TaxYear>(
-      SelectedTaxYearController.new,
-    );
+selectedTaxYearProvider = NotifierProvider<SelectedTaxYearController, TaxYear>(
+  SelectedTaxYearController.new,
+);
 
 /// The years the picker offers: this one and the four behind it.
 ///

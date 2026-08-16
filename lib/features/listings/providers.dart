@@ -4,11 +4,15 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../mock_data/providers.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/listing.dart';
 
 final StreamProvider<List<Listing>> listingsProvider =
     StreamProvider<List<Listing>>((Ref ref) {
-      return ref.watch(listingRepositoryProvider).watchListings();
+      return WorkspaceGuard.listOrEmpty<Listing>(
+        ref,
+        () => ref.watch(listingRepositoryProvider).watchListings(),
+      );
     });
 
 /// Every marketplace one item is live on — the item detail's Listings block
@@ -19,5 +23,8 @@ final listingsForItemProvider = StreamProvider.family<List<Listing>, String>((
   Ref ref,
   String itemId,
 ) {
-  return ref.watch(listingRepositoryProvider).watchListingsForItem(itemId);
+  return WorkspaceGuard.listOrEmpty<Listing>(
+    ref,
+    () => ref.watch(listingRepositoryProvider).watchListingsForItem(itemId),
+  );
 });

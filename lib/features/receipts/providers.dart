@@ -76,9 +76,7 @@ final Provider<List<ReceiptEntry>> receiptsProvider =
               title: expense.vendor ?? 'Expense',
               amount: expense.amount,
             ),
-      ]..sort(
-        (ReceiptEntry a, ReceiptEntry b) => b.date.compareTo(a.date),
-      );
+      ]..sort((ReceiptEntry a, ReceiptEntry b) => b.date.compareTo(a.date));
 
       return entries;
     });
