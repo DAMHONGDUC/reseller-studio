@@ -127,6 +127,17 @@ Owner's rules, all of them read from one place so no screen types them:
   actions — there is no `bottom` slot on it, deliberately. What stays pinned
   300 rows down is search and the actions; a filter row is content, and
   content scrolls.
+- **A filter strip carries no gap of its own and fits its chips exactly, and
+  the screen places `topGap` above it and the same below.** Owner's rule, and
+  it is the one-owner rule applied to the one widget that kept breaking it.
+  `AppFilterStrip` (`core/widgets/`) is that strip — every screen uses it,
+  none builds its own. There is **no `filterStrip` height and no
+  `filterStripGap`**: both were deleted, because a fixed-height box with an
+  internal vertical inset means the daylight above a chip is built from two
+  numbers owned by two files. A `Row` inside a horizontal scroll view has
+  exactly the height of its chips and no opinion about what is above or below
+  it. `test/core/widgets/filter_strip_gap_test.dart` measures the chip
+  against the strip's own edges, so any padding creeping back in fails.
 - **The app bar follows the system, `kToolbarHeight`** —
   `SdAppBarV3.toolbarHeight`. Owner's rule. It was shorter for a while, on the
   reasoning that every point of chrome on every route is a row of inventory;
