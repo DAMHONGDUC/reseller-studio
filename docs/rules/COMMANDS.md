@@ -20,7 +20,14 @@ portability is the whole reason the design system is a submodule.
 - `melos run gen` — after editing any ARB file.
 - `melos run analyze` — always-apply; see the root `CLAUDE.md` under
   "Definition of done". Not repeated here.
-- `melos run test` — the Flutter test suite.
+- `melos run test` — the Flutter test suite. **Exclude `*_tmp_test.dart`** —
+  the scratch harnesses hang the runner by design, and `flutter test` with no
+  arguments picks them up.
+- `melos run preflight` — everything that must be true before a build is
+  worth uploading: the Firebase and sign-in files, the bypass being off, the
+  icon not being Flutter's, the iOS usage strings, and a clean analyze. Exits
+  non-zero on an unmet blocker, so it is the check `RELEASE_ACTIONS.md` cannot
+  be. Run it after the account setup, before `flutter build ipa`.
 - `melos run deploy-firebase` — rules, indexes and functions. Confirms the
   project first; this reaches real users.
 
