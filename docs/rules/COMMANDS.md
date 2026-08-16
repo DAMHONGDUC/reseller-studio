@@ -24,7 +24,7 @@ portability is the whole reason the design system is a submodule.
   the scratch harnesses hang the runner by design, and `flutter test` with no
   arguments picks them up.
 - `melos run preflight` — everything that must be true before a build is
-  worth uploading: the Firebase and sign-in files, the bypass being off, the
+  worth uploading: the Firebase and sign-in files, no auth bypass in `lib/`, the
   icon not being Flutter's, the iOS usage strings, and a clean analyze. Exits
   non-zero on an unmet blocker, so it is the check `RELEASE_ACTIONS.md` cannot
   be. Run it after the account setup, before `flutter build ipa`.

@@ -61,11 +61,17 @@ blocks the external half.
    one people actually run — that is how `storage` came to be missing from
    the script while this page still named it.
 
-**Then turn the dev bypass off.** `env/dev.json` has `BYPASS_AUTH: true`; once
-sign-in works, set it to `false`, confirm you can get in for real, and delete
-the bypass (`DevFlags.bypassAuth`, `AppEnv.bypassAuthRequested`, the `AUTH OFF`
-banner in `SellerOsApp`). It is scaffolding and `CLAUDE.md` hard rule 1 says it
-goes.
+**The dev bypass is already gone** — deleted, not switched off, along with the
+`AUTH OFF` banner. Nothing enters the app without an account. Two consequences
+while Firebase is still missing:
+
+- the app opens on the **signed-out shell** — onboarding, then five empty tabs
+  — and sign-in fails with the one message hard rule 6 allows;
+- to develop against data, turn **mock data on in More → Settings**, which is
+  reachable without signing in.
+
+`BYPASS_AUTH` may still sit in `env/*.json`; nothing reads it, and the key can
+be deleted from both files and both templates whenever you are next in there.
 
 ### ⚠️ Read this before you deploy the rules
 

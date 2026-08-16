@@ -203,9 +203,9 @@ whose name contains `SECRET` or `PRIVATE`.
 
 **`AppEnv` says what was asked for; `DevFlags` says what is allowed.** The
 dev switches are read from the env file but every one is ANDed with
-`!kReleaseMode` in `DevFlags`, so a `prod.json` with `"BYPASS_AUTH": true`
-still ships an app with no bypass. Never read `AppEnv.bypassAuthRequested`
-directly.
+`!kReleaseMode` in `DevFlags`, so a `prod.json` with a switch turned on still
+ships an app without it. Read the guarded flag, never the raw `AppEnv` value
+behind it.
 
 ## Hard rules
 
@@ -254,23 +254,23 @@ directly.
    to "not seen" would flash the intro on every cold start.
    `test/core/router/onboarding_precedes_login_test.dart` pins the order.
 
-   **The development bypass is not a guest mode and must never become one.**
-   `DevFlags.bypassAuth` — `BYPASS_AUTH` in `env/dev.json` — enters the app as
-   a fake user. It exists because there is no Firebase project yet, so the
-   login screen is otherwise a dead end and none of the app can be looked at.
-   Three properties keep it honest, and a change that weakens any of them is
-   a change that ships a guest mode:
-   - it is `const` and ANDed with `!kReleaseMode`, so a release build contains
-     `if (false)` and the tree-shaker deletes the branch — the bypass is
-     *absent* from a shipped binary, not disabled in it;
-   - a `prod.json` that says `"BYPASS_AUTH": true` still ships an app with no
-     bypass, so the guarantee does not depend on the contents of a config
-     file or on who typed the build command;
-   - the app wears an `AUTH OFF` banner on every route while it is on.
+   **The development bypass is gone, and nothing replaces it.** It entered
+   the app as a fake signed-in user because the login screen was otherwise a
+   dead end before Firebase existed. The five tabs now render empty without an
+   account, so that reason expired and the flag went with it — `bypassAuth`,
+   `bypassUid`, `BYPASS_AUTH` and the `AUTH OFF` banner are all deleted. **Do
+   not reintroduce one.** To develop without a backend, turn on mock data in
+   More → Settings, which is reachable in the signed-out shell.
 
-   `test/core/config/dev_flags_test.dart` asserts the flag is off by default.
-   **Delete this bypass once real sign-in works** — it is scaffolding, and its
-   reason to exist expires with "Pending setup".
+   **A build with no Firebase resolves to signed OUT, never signed in.**
+   `firebaseReadyProvider` is checked before anything touches
+   `FirebaseAuth.instance`, which throws `[core/no-app]` when
+   `Firebase.initializeApp` has not run — and `AppBootstrap` skips that when
+   the build carries no config. Without the guard the first read of auth state
+   takes the app down before its first frame; with it, an unconfigured build is
+   simply a signed-out one. `test/core/config/dev_flags_test.dart` holds both
+   halves: no fake uid anywhere, and no path that answers "signed in" without
+   an account.
 
    **There are exactly two ways in: Sign in with Apple and Google Sign-In.**
    Owner's rule, and it narrows plan §26. There is **no email/password**, no
@@ -284,8 +284,9 @@ directly.
      Shipping Google alone is a review rejection.
    - **Neither works until the owner configures it** — an OAuth client for
      Google, a Services ID and key for Apple. Until then the buttons are the
-     only way in and the app is unusable without the dev bypass. See
-     `RELEASE_ACTIONS.md`.
+     only way in and no account can be created; the app opens on the
+     signed-out shell, and mock data in More → Settings is how it is developed
+     against. See `RELEASE_ACTIONS.md`.
    - A cancelled sign-in is **not** an error: the seller closed a sheet. It is
      logged as info and shows no message.
 
