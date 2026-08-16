@@ -25,6 +25,8 @@ import '../../features/marketplaces/presentation/screens/marketplaces_screen/mar
 import '../../features/more/presentation/screens/about_screen/about_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
 import '../../features/offers/presentation/screens/offers_screen/offers_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen/onboarding_screen.dart';
+import '../../features/onboarding/providers.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
@@ -56,8 +58,13 @@ import 'app_routes.dart';
 /// none has nowhere to read or write. Rather than each screen checking either,
 /// one function does:
 ///
-/// - auth state still unknown → [AppRoutes.splash]; showing the login form
-///   here would flash it at a returning user before their session resolves;
+/// - onboarding or auth state still unknown → [AppRoutes.splash]; showing the
+///   login form here would flash it at a returning user before their session
+///   resolves, and showing the intro would flash it at one who finished it
+///   months ago;
+/// - signed out with the intro unfinished → [AppRoutes.onboarding]. It is
+///   checked before login and never after it: a returning seller who signs
+///   out must land on the login form, not be re-introduced to the product;
 /// - signed out, anywhere but an auth route → [AppRoutes.login];
 /// - signed in, workspace still loading → [AppRoutes.splash], for the same
 ///   reason: asking a returning seller to create a second business every time
@@ -76,14 +83,25 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
     debugLogDiagnostics: false,
     redirect: (BuildContext context, GoRouterState state) {
       final bool? signedIn = ref.read(isSignedInProvider);
+      final OnboardingStatus onboarding = ref.read(onboardingStatusProvider);
       final String location = state.matchedLocation;
       final bool onAuthRoute = _authRoutes.contains(location);
 
-      if (signedIn == null) {
+      if (signedIn == null || onboarding == OnboardingStatus.loading) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
       }
 
-      if (!signedIn) return onAuthRoute ? null : AppRoutes.login;
+      if (!signedIn) {
+        // The intro is only ever shown to someone who is not signed in, so a
+        // returning seller never sees it again whatever the flag says.
+        if (onboarding == OnboardingStatus.pending) {
+          return location == AppRoutes.onboarding
+              ? null
+              : AppRoutes.onboarding;
+        }
+
+        return location == AppRoutes.login ? null : AppRoutes.login;
+      }
 
       final WorkspaceStatus workspace = ref.read(workspaceStatusProvider);
 
@@ -115,6 +133,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.splash,
         builder: (BuildContext context, GoRouterState state) =>
             const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (BuildContext context, GoRouterState state) =>
+            const OnboardingScreen(),
       ),
       GoRoute(
         path: AppRoutes.login,
@@ -429,9 +452,17 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
 
 /// The routes a signed-out user is allowed to sit on.
 ///
-/// One, and that is the whole of it: sign-in is Apple or Google, so there is
-/// no sign-up screen and no password reset to reach (owner's rule).
-const Set<String> _authRoutes = <String>{AppRoutes.login};
+/// Two, and that is the whole of it: the intro, and the sign-in gate itself.
+/// There is no sign-up screen and no password reset to reach — sign-in is
+/// Apple or Google, and both create the account themselves (owner's rule).
+///
+/// Read by the signed-in branch, which uses it to bounce an authenticated
+/// seller off either one to Home. Which of the two a signed-*out* user belongs
+/// on is decided above, by `OnboardingStatus`.
+const Set<String> _authRoutes = <String>{
+  AppRoutes.onboarding,
+  AppRoutes.login,
+};
 
 /// Bridges the two providers the redirect reads to go_router's
 /// `refreshListenable`.
@@ -448,24 +479,36 @@ class _RouterRefreshListenable extends ChangeNotifier {
   _RouterRefreshListenable(Ref ref) {
     _signedIn = _listen<bool?>(ref, isSignedInProvider);
     _workspace = _listen<WorkspaceStatus>(ref, workspaceStatusProvider);
+    // Declared inline rather than through [_listen] because this one is a
+    // `NotifierProvider`, which is not a `Provider<T>` — see that method.
+    _onboarding = ref.listen<OnboardingStatus>(
+      onboardingStatusProvider,
+      _notifyIfChanged<OnboardingStatus>,
+    );
   }
 
   late final ProviderSubscription<bool?> _signedIn;
   late final ProviderSubscription<WorkspaceStatus> _workspace;
+  late final ProviderSubscription<OnboardingStatus> _onboarding;
 
   /// Typed on `Provider<T>` rather than the more general
   /// `ProviderListenable<T>` that `ref.listen` accepts: Riverpod 3 declares
   /// that interface but does not export it from `riverpod.dart`, so naming it
-  /// here does not compile. Both providers are plain `Provider`s anyway.
+  /// here does not compile.
   ProviderSubscription<T> _listen<T>(Ref ref, Provider<T> provider) =>
-      ref.listen<T>(provider, (T? previous, T next) {
-        if (previous != next) notifyListeners();
-      });
+      ref.listen<T>(provider, _notifyIfChanged<T>);
+
+  /// One callback for all three, so a redirect cannot start re-running on one
+  /// provider and not another.
+  void _notifyIfChanged<T>(T? previous, T next) {
+    if (previous != next) notifyListeners();
+  }
 
   @override
   void dispose() {
     _signedIn.close();
     _workspace.close();
+    _onboarding.close();
     super.dispose();
   }
 }

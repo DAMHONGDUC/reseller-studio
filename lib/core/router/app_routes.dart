@@ -16,9 +16,16 @@ final class AppRoutes {
 
   static const String splash = '/';
 
-  /// The only unauthenticated route. There is no sign-up and no password
-  /// reset: sign-in is Apple or Google, and both create the account
-  /// themselves on first use (owner's rule, `CLAUDE.md` hard rule 1).
+  /// The intro flow, shown once per install and only before sign-in.
+  ///
+  /// It describes the product and reads nothing — hard rule 1 is untouched,
+  /// because the only way out of it is [login].
+  static const String onboarding = '/onboarding';
+
+  /// The only route that can *enter* the app unauthenticated. There is no
+  /// sign-up and no password reset: sign-in is Apple or Google, and both
+  /// create the account themselves on first use (owner's rule, `CLAUDE.md`
+  /// hard rule 1).
   static const String login = '/login';
 
   /// Chosen or created after sign-in and before Home. Login is mandatory and

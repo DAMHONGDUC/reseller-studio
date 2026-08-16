@@ -11,4 +11,12 @@ final class PrefsKeyConstant {
   /// Whether mock data is on. Read by `DataModeController`, which guards it
   /// again in release — a stored `true` never survives into a shipped build.
   static const String dataModeMock = 'data_mode_mock';
+
+  /// Whether the intro flow has been got through once.
+  ///
+  /// Device-local on purpose: it is about this install, not this account, so
+  /// it belongs in preferences rather than on the user document. A seller who
+  /// reinstalls sees the intro again, which is the right answer — nothing
+  /// about their business is behind it.
+  static const String onboardingSeen = 'onboarding_seen';
 }

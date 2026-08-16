@@ -160,6 +160,54 @@
   "@receiptRemoveTooltip": {
     "description": "Tooltip on the button that detaches a receipt."
   },
+  "onboardingInventoryTitle": "Know what you own",
+  "@onboardingInventoryTitle": {
+    "description": "Intro page 1 heading — the inventory half of the product."
+  },
+  "onboardingInventoryBody": "Add an item in seconds with just a title. Photos, cost and category can wait until you have them.",
+  "@onboardingInventoryBody": {
+    "description": "Intro page 1 body. States the Quick Add promise — a title is the only required field (hard rule 2)."
+  },
+  "onboardingSellTitle": "List it, sell it, ship it",
+  "@onboardingSellTitle": {
+    "description": "Intro page 2 heading — the selling half of the product."
+  },
+  "onboardingSellBody": "Track every listing and order in one place, and see what needs packing today.",
+  "@onboardingSellBody": {
+    "description": "Intro page 2 body. 'Needs packing today' is the app's core principle: say what needs attention, then make it fast."
+  },
+  "onboardingProfitTitle": "See what actually earned",
+  "@onboardingProfitTitle": {
+    "description": "Intro page 3 heading — the analytics half of the product."
+  },
+  "onboardingProfitBody": "Fees, shipping and cost come off automatically, so you know your real profit and where to source next.",
+  "@onboardingProfitBody": {
+    "description": "Intro page 3 body. Profit is derived, never stored (hard rule 3), which is why it stays right when a fee is corrected."
+  },
+  "onboardingSkip": "Skip",
+  "@onboardingSkip": {
+    "description": "Dismisses the intro and goes straight to the sign-in gate."
+  },
+  "onboardingNext": "Next",
+  "@onboardingNext": {
+    "description": "Advances to the next intro page."
+  },
+  "onboardingStart": "Get started",
+  "@onboardingStart": {
+    "description": "The action on the last intro page. Leads to sign-in, which is mandatory (hard rule 1)."
+  },
+  "onboardingPageSemantics": "Page {current} of {total}",
+  "@onboardingPageSemantics": {
+    "description": "Screen-reader label for the dots indicator, which is decorative on its own.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "authTagline": "Source, list, sell, ship, profit.",
   "@authTagline": {
     "description": "The line under the app name on the login screen — the product's lifecycle in five words."
