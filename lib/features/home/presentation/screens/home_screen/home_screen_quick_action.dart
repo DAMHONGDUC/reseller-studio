@@ -1,6 +1,6 @@
 part of 'home_screen.dart';
 
-/// Every create action in the app, one tap from where a seller starts.
+/// Every create action in the app, plus the page explaining how they connect.
 ///
 /// **The create actions are scattered by design** — each lives on the screen
 /// that owns the records it makes, behind that screen's own `SdFabV3`
@@ -11,6 +11,11 @@ part of 'home_screen.dart';
 /// This does not replace those buttons and must not: it is a shortcut into
 /// them, so every row pushes the screen that owns the action rather than
 /// opening a form Home would then have to know how to save.
+///
+/// **About rides last** — owner's rule. It is the one row here that does not
+/// create something, and it sits two levels deep under Settings, so this is
+/// what keeps it findable. Last in the list, so the actions above it keep the
+/// section's shape.
 ///
 /// **Rows, and near the bottom** — owner's rule. Home answers "what needs
 /// attention today" first; a launcher above the figures made the screen open
@@ -30,31 +35,6 @@ class _QuickAction extends StatelessWidget {
             icon: action.icon,
             onTap: () => context.push(action.route),
           ),
-      ],
-    ),
-  );
-}
-
-/// What is worth *reading* rather than doing.
-///
-/// **Its own section, under the actions** — owner's rule. About is not a
-/// create action, and putting it among them would make a seller scanning for
-/// "add" step over a row that adds nothing. Separating the two is also what
-/// keeps `QuickActionConstant` able to say "only create actions" and mean it.
-class _QuickAccess extends StatelessWidget {
-  const _QuickAccess();
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-    child: AppListCard(
-      children: <Widget>[
-        AppListRow(
-          title: context.l10n.moreAbout,
-          subtitle: context.l10n.aboutTagline,
-          icon: Symbols.info_rounded,
-          onTap: () => context.push(AppRoutes.about),
-        ),
       ],
     ),
   );

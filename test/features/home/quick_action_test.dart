@@ -9,8 +9,7 @@ import 'package:seller_os/features/home/presentation/screens/home_screen/home_sc
 
 import '../../support/pump_app.dart';
 
-/// Quick Action lists everything this app can create. Quick Access, the
-/// section under it, holds what is worth reading rather than doing.
+/// Quick Action lists everything this app can create, and — last — About.
 ///
 /// **Its whole value is being complete.** A section that shows six of the
 /// eight create actions is worse than none: a seller who has learned to look
@@ -96,7 +95,7 @@ void main() {
     );
   });
 
-  testWidgets('Quick Action holds create actions and nothing else', (
+  testWidgets('About is in the list, and it is last', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const HomeScreen());
@@ -104,20 +103,21 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
-    // Owner's rule: About sits in its own section under this one. A seller
-    // scanning for "add" must never step over a row that adds nothing.
-    //
-    // Asserted as an order rather than as two headers being on screen at
-    // once — the two sections together are taller than the viewport, so a
-    // test that needed both visible would be testing the phone, not the
-    // layout.
-    expect(find.text(context.l10n.homeQuickAccess), findsWidgets);
+    // Owner's rule: the one row here that does not create something goes at
+    // the end, so a seller scanning for "add" never steps over it.
+    expect(QuickActionConstant.actions.last.kind, QuickActionKind.about);
 
-    final double aboutTop = tester.getRect(find.text(context.l10n.moreAbout)).top;
+    final double aboutTop = tester
+        .getRect(find.text(context.l10n.moreAbout))
+        .top;
 
     for (final QuickAction action in QuickActionConstant.actions) {
+      if (action.kind == QuickActionKind.about) continue;
+
       expect(
-        tester.getRect(find.text(QuickActionLabel.of(context, action.kind))).top,
+        tester
+            .getRect(find.text(QuickActionLabel.of(context, action.kind)))
+            .top,
         lessThan(aboutTop),
         reason: '${action.kind.name} sits below About',
       );

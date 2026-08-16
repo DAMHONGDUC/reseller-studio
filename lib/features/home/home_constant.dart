@@ -98,9 +98,11 @@ enum QuickActionKind {
   addSource,
   addCategory,
   addLocation,
+  about,
 }
 
-/// **The one list of everything this app can create.**
+/// **Everything this app can create, and — last — the page explaining how
+/// it all connects.**
 ///
 /// Quick Action exists because the create actions are scattered by design —
 /// each lives on the screen that owns the records it makes, behind that
@@ -108,10 +110,11 @@ enum QuickActionKind {
 /// on the screen and wrong for one who opened the app to add something: it is
 /// three taps to record an expense from Home.
 ///
-/// **Only create actions.** Owner's rule, and it is what the section is for:
-/// About and anything else worth *reading* lives in Quick Access below it, so
-/// a seller scanning this list never steps over a row that does not add
-/// something. See `docs/rules/SCREENS.md`.
+/// **About is the one row that does not create something, and it goes last** —
+/// owner's rule. It lives two levels deep under Settings, so this is what
+/// keeps it findable; putting it at the end is what stops a seller scanning
+/// for "add" from stepping over it. Nothing else non-create joins it without
+/// the same decision.
 ///
 /// **Adding a create action anywhere means adding it here.**
 /// `test/features/home/quick_access_test.dart` fails when a screen grows an
@@ -162,6 +165,11 @@ final class QuickActionConstant {
       icon: Symbols.shelves,
       route: AppRoutes.locations,
     ),
+    QuickAction(
+      kind: QuickActionKind.about,
+      icon: Symbols.info_rounded,
+      route: AppRoutes.about,
+    ),
   ];
 }
 
@@ -176,5 +184,6 @@ final class QuickActionLabel {
     QuickActionKind.addSource => context.l10n.homeQuickAddSource,
     QuickActionKind.addCategory => context.l10n.categoryAdd,
     QuickActionKind.addLocation => context.l10n.locationAdd,
+    QuickActionKind.about => context.l10n.moreAbout,
   };
 }

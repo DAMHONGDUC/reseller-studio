@@ -25,7 +25,7 @@ part 'home_screen_all_clear.dart';
 part 'home_screen_attention_row.dart';
 part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
-part 'home_screen_quick_access.dart';
+part 'home_screen_quick_action.dart';
 part 'home_screen_recent_activity.dart';
 part 'home_screen_shortcuts.dart';
 
@@ -66,10 +66,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  /// Quick Action and the Quick Access section under it are the last two
-  /// (owner's rule, held by `test/features/home/quick_access_test.dart`), so
-  /// the end of the list reaches both — no key to keep in sync with a section
-  /// that moved.
+  /// Quick Action is the last section (owner's rule, held by
+  /// `test/features/home/quick_action_test.dart`), so the end of the list is
+  /// where it is — no key to keep in sync with a section that moved.
   void _toQuickAction() => ScrollUtils.toEnd(_controller);
 
   @override
@@ -113,11 +112,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             subtitle: context.l10n.homeQuickActionSubtitle,
           ),
           const _QuickAction(),
-          SdSectionHeaderV3(
-            title: context.l10n.homeQuickAccess,
-            subtitle: context.l10n.homeQuickAccessSubtitle,
-          ),
-          const _QuickAccess(),
         ],
       ),
     );
