@@ -2,13 +2,13 @@ part of 'onboarding_screen.dart';
 
 /// One intro page: a glyph, a headline, a sentence.
 ///
-/// Centred and driven entirely by its [OnboardingPage], so adding a fourth
-/// page is a list entry and two ARB keys rather than another layout to keep
-/// in step with these three.
+/// Centred and driven entirely by its [AppFeature], so adding a fourth page is
+/// a list entry and two ARB keys rather than another layout to keep in step
+/// with these three. The login screen renders the same three compactly.
 class _OnboardingPageView extends StatelessWidget {
   const _OnboardingPageView({required this.page});
 
-  final OnboardingPage page;
+  final AppFeature page;
 
   @override
   Widget build(BuildContext context) {

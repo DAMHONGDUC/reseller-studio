@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_feature_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
-import '../../../onboarding_page.dart';
-import '../../../onboarding_page_content.dart';
 import '../../../providers.dart';
 
 part 'onboarding_screen_actions.dart';
@@ -59,7 +58,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<OnboardingPage> pages = OnboardingPageContent.of(context);
+    final List<AppFeature> pages = AppFeatureConstant.of(context);
     final bool isLast = _index == pages.length - 1;
 
     return SdScaffoldV3(

@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_feature_constant.dart';
 import '../../../../../core/constants/brand_asset_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/auth_brand_mark.dart';
-import '../../widgets/auth_form_shell.dart';
 
-/// Login — the gate. **There is no guest mode** (plan principle 1), so this is
-/// the first screen anyone without a session reaches, and every route below
-/// the shell is unreachable until it is passed.
+part 'login_screen_actions.dart';
+part 'login_screen_features.dart';
+part 'login_screen_header.dart';
+
+/// Login — the gate. **There is no guest mode** (plan principle 1).
+///
+/// **It sells before it asks.** A seller reaches this screen from a tab they
+/// were already browsing, so it has to answer "why hand over an account?"
+/// before two buttons mean anything — hence the three feature rows, which are
+/// the same three the intro flow shows (`AppFeatureConstant`). Written once,
+/// rendered twice: full pages there, compact rows here.
 ///
 /// **Two buttons and nothing else** (owner's rule): Sign in with Apple and
 /// Google Sign-In. No email field, no password, no sign-up form, no reset —
@@ -42,60 +51,51 @@ class LoginScreen extends ConsumerWidget {
       // repository reports it as an outcome, not a throw.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(
-        context,
-        FailurePresenter.message(context, error),
-      );
+      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AuthFormState state = ref.watch(authControllerProvider);
-    // Apple's guidelines want the mark in the label's colour, so it is read
-    // from the variant rather than assumed.
-    final Color appleForeground = SdButtonStyleV3.of(
-      context,
-      SdButtonVariantV3.primary,
-    ).foreground;
+    // Only when it was pushed. Sign-in is the front door on a cold start and
+    // has nothing to go back to — but it is also pushed over a tab by
+    // `NavigationUtils.requireSignIn`, and there it must be escapable.
+    final bool canGoBack = Navigator.canPop(context);
 
-    return AuthFormShell(
-      title: context.l10n.appTitle,
-      subtitle: context.l10n.authTagline,
-      children: <Widget>[
-        SdButtonV3(
-          variant: SdButtonVariantV3.primary,
-          label: context.l10n.authContinueWithApple,
-          leading: AuthBrandMark(
-            asset: BrandAssetConstant.appleLogo,
-            tint: appleForeground,
-          ),
-          expand: true,
-          busy: state.isBusyWith(AuthProviderKind.apple),
-          onPressed: state.isBusy
-              ? null
-              : () => _signIn(context, ref, AuthProviderKind.apple),
+    return SdScaffoldV3(
+      appBar: canGoBack
+          ? SdAppBarV3(title: '', automaticallyImplyLeading: true)
+          : null,
+      // `bottom: false` — the pinned actions carry the device inset
+      // themselves, and a SafeArea here would add the home indicator twice.
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: SdContentPaddingV3.horizontal,
+                ),
+                children: <Widget>[
+                  SizedBox(
+                    height: canGoBack
+                        ? SdContentPaddingV3.topGap
+                        : SdSpacingConstant.h40,
+                  ),
+                  const _LoginHeader(),
+                  SizedBox(height: SdSpacingConstant.h32),
+                  const _LoginFeatures(),
+                ],
+              ),
+            ),
+            _LoginActions(
+              onSignIn: (AuthProviderKind provider) =>
+                  _signIn(context, ref, provider),
+            ),
+          ],
         ),
-        SizedBox(height: SdSpacingConstant.h12),
-        SdButtonV3(
-          variant: SdButtonVariantV3.outlined,
-          label: context.l10n.authContinueWithGoogle,
-          // Untinted on purpose — the four-colour "G" is the only form
-          // Google's branding guidelines allow.
-          leading: const AuthBrandMark(asset: BrandAssetConstant.googleG),
-          expand: true,
-          busy: state.isBusyWith(AuthProviderKind.google),
-          onPressed: state.isBusy
-              ? null
-              : () => _signIn(context, ref, AuthProviderKind.google),
-        ),
-        SizedBox(height: SdSpacingConstant.h24),
-        Text(
-          context.l10n.authPrivacyNote,
-          textAlign: TextAlign.center,
-          style: context.textTheme3.bodySmall!.faint3(context),
-        ),
-      ],
+      ),
     );
   }
 }
