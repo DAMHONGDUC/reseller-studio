@@ -77,13 +77,12 @@ class _AccountCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final String? email = ref.watch(authUserProvider).value?.email;
     final String? name = ref.watch(authUserProvider).value?.displayName;
-    final bool isBypassed = DevFlags.bypassAuth;
 
     return AppListCard(
       children: <Widget>[
         AppListRow(
           title: name ?? email ?? context.l10n.settingsSignedIn,
-          subtitle: isBypassed ? context.l10n.settingsBypassAccount : email,
+          subtitle: email,
           icon: Symbols.person_rounded,
           showChevron: false,
         ),

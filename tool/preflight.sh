@@ -53,11 +53,11 @@ if [ -f ios/Runner/GoogleService-Info.plist ]; then
 fi
 
 echo "→ 4    Auth is real, not bypassed"
-# Hard rule 1: the bypass is scaffolding and a release must not want it.
-grep -q '"BYPASS_AUTH": *false' env/prod.json 2>/dev/null
-blocker "env/prod.json has BYPASS_AUTH false" "$?"
-warn "env/dev.json has BYPASS_AUTH false — the bypass is deletable" \
-  "$(grep -q '"BYPASS_AUTH": *false' env/dev.json 2>/dev/null && echo 0 || echo 1)"
+# Hard rule 1: the dev bypass is deleted and must not come back. Checking the
+# source rather than the env file — a flag nothing reads cannot be re-armed by
+# editing JSON, but it can be re-added in code.
+! grep -rq "bypassAuth\|bypassUid" lib/
+blocker "no auth bypass in lib/" "$?"
 
 echo "→ 5    Store assets and brand marks"
 # Checksum, not file size: the icon can be redesigned to any size, but there

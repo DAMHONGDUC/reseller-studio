@@ -74,8 +74,6 @@ final class AppEnv {
   // that class ANDs each one with `!kReleaseMode`, which is what makes a
   // shipped binary immune to a mis-edited prod.json.
 
-  static const bool bypassAuthRequested = bool.fromEnvironment('BYPASS_AUTH');
-
   /// Whether mock data starts on. Only a *default* — `DataModeController`
   /// persists the user's own choice on top of it.
   static const bool mockDataDefault = bool.fromEnvironment('MOCK_DATA_DEFAULT');

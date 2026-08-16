@@ -3,11 +3,27 @@
 library;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../core/config/dev_flags.dart';
 import 'data/repositories/firebase_auth_repository.dart';
 import 'domain/repositories/auth_repository.dart';
+
+/// Whether Firebase came up at all.
+///
+/// **Nothing may touch `FirebaseAuth.instance` without checking this first.**
+/// It throws `[core/no-app]` when `Firebase.initializeApp` has not run, and
+/// `AppBootstrap` deliberately skips that when the build carries no Firebase
+/// config — so on a machine with no `firebase_options.dart` the very first
+/// read of auth state would take the app down before its first frame.
+///
+/// Not configured is treated as **signed out**, which is a state the app now
+/// renders properly: the five tabs come up empty and sign-in fails with the
+/// one message hard rule 6 allows. That is what the dev auth bypass used to
+/// be for, and why there no longer is one.
+final Provider<bool> firebaseReadyProvider = Provider<bool>(
+  (Ref ref) => Firebase.apps.isNotEmpty,
+);
 
 /// The `FirebaseAuth` instance, behind a provider so a test can override it.
 final Provider<FirebaseAuth> firebaseAuthProvider = Provider<FirebaseAuth>(
@@ -29,9 +45,13 @@ final Provider<AuthRepository> authRepositoryProvider =
 /// verification landing, a provider being linked. Seller OS shows the account
 /// on Home and in Settings, and with `authStateChanges` those screens keep
 /// rendering the pre-edit user until the app is restarted.
-final StreamProvider<User?> authUserProvider = StreamProvider<User?>(
-  (Ref ref) => ref.watch(firebaseAuthProvider).userChanges(),
-);
+final StreamProvider<User?> authUserProvider = StreamProvider<User?>((Ref ref) {
+  // Checked before `firebaseAuthProvider` is watched, never after: watching it
+  // is itself what throws when there is no Firebase app.
+  if (!ref.watch(firebaseReadyProvider)) return Stream<User?>.value(null);
+
+  return ref.watch(firebaseAuthProvider).userChanges();
+});
 
 /// Whether anyone is signed in at all. What the router redirects on.
 ///
@@ -39,16 +59,6 @@ final StreamProvider<User?> authUserProvider = StreamProvider<User?>(
 /// the splash screen rather than the login screen for that moment, or a
 /// returning user sees a login form flash before their own data.
 final Provider<bool?> isSignedInProvider = Provider<bool?>((Ref ref) {
-  // Returns BEFORE watching `authUserProvider`, and that ordering is the
-  // whole point rather than a micro-optimisation: that provider reaches
-  // `FirebaseAuth.instance`, which throws `[core/no-app]` when Firebase has
-  // not been initialized — the exact situation the bypass exists for. Watch
-  // first and the bypass crashes on the case it was built to rescue.
-  //
-  // `DevFlags.bypassAuth` is a compile-time false in release, so this whole
-  // branch is gone from a shipped binary.
-  if (DevFlags.bypassAuth) return true;
-
   final AsyncValue<User?> user = ref.watch(authUserProvider);
 
   return user.when(
@@ -64,13 +74,10 @@ final Provider<bool?> isSignedInProvider = Provider<bool?>((Ref ref) {
 /// The signed-in user's uid, or null when nobody is.
 ///
 /// **Every Firestore path and `createdBy` field reads this, never
-/// `FirebaseAuth.instance.currentUser!.uid`.** It is the one seam where the
-/// auth bypass substitutes its fake uid, so a repository written against this
-/// provider works under the bypass and a repository that reaches for
-/// `currentUser` directly crashes on the first read.
+/// `FirebaseAuth.instance.currentUser!.uid`.** Reaching for `currentUser`
+/// directly crashes on a build with no Firebase app; this provider answers
+/// null there, which every caller already handles as "nobody is signed in".
 final Provider<String?> currentUidProvider = Provider<String?>((Ref ref) {
-  if (DevFlags.bypassAuth) return DevFlags.bypassUid;
-
   // `.value` is nullable on Riverpod 3's AsyncValue (it was `valueOrNull` in
   // 2.x) and is null while loading or errored — which is the right answer
   // here: nobody is signed in until the stream says so.
