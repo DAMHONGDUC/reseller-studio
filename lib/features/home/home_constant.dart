@@ -13,7 +13,6 @@ final class HomeConstant {
   /// Three rows. Enough to answer "what happened since I last looked" without
   /// turning Home into a second Orders screen.
   static const int recentActivityMaxRows = 3;
-
 }
 
 /// One of the three cards at the top of Home.
@@ -175,15 +174,16 @@ final class QuickActionConstant {
 
 /// The words for a Quick Access tile.
 final class QuickActionLabel {
-  static String of(BuildContext context, QuickActionKind kind) => switch (kind) {
-    QuickActionKind.quickAddItem => context.l10n.quickAddTitle,
-    QuickActionKind.addItem => context.l10n.inventoryAddItem,
-    QuickActionKind.scan => context.l10n.inventoryScan,
-    QuickActionKind.recordPurchase => context.l10n.homeQuickRecordPurchase,
-    QuickActionKind.addExpense => context.l10n.homeQuickAddExpense,
-    QuickActionKind.addSource => context.l10n.homeQuickAddSource,
-    QuickActionKind.addCategory => context.l10n.categoryAdd,
-    QuickActionKind.addLocation => context.l10n.locationAdd,
-    QuickActionKind.about => context.l10n.moreAbout,
-  };
+  static String of(BuildContext context, QuickActionKind kind) =>
+      switch (kind) {
+        QuickActionKind.quickAddItem => context.l10n.quickAddTitle,
+        QuickActionKind.addItem => context.l10n.inventoryAddItem,
+        QuickActionKind.scan => context.l10n.inventoryScan,
+        QuickActionKind.recordPurchase => context.l10n.homeQuickRecordPurchase,
+        QuickActionKind.addExpense => context.l10n.homeQuickAddExpense,
+        QuickActionKind.addSource => context.l10n.homeQuickAddSource,
+        QuickActionKind.addCategory => context.l10n.categoryAdd,
+        QuickActionKind.addLocation => context.l10n.locationAdd,
+        QuickActionKind.about => context.l10n.moreAbout,
+      };
 }

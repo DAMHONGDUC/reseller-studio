@@ -42,7 +42,10 @@ class LoginScreen extends ConsumerWidget {
       // repository reports it as an outcome, not a throw.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 

@@ -45,10 +45,8 @@ class TaxYear {
   /// Exclusive on purpose: an inclusive end date has to be "the last day at
   /// 23:59:59.999", and every comparison written against that eventually
   /// drops a sale timestamped in the last second of the year.
-  DateTime get endExclusive => TaxYear(
-    jurisdiction: jurisdiction,
-    startingYear: startingYear + 1,
-  ).start;
+  DateTime get endExclusive =>
+      TaxYear(jurisdiction: jurisdiction, startingYear: startingYear + 1).start;
 
   bool contains(DateTime when) =>
       !when.isBefore(start) && when.isBefore(endExclusive);

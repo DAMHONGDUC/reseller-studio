@@ -70,8 +70,8 @@ class _MileageCard extends StatelessWidget {
             title: 'Deduction',
             // Null here means no published rate for that year, which is a
             // different problem from "no miles" — say which.
-            subtitle: summary.mileageDistance > 0 &&
-                    summary.mileageDeduction == null
+            subtitle:
+                summary.mileageDistance > 0 && summary.mileageDeduction == null
                 ? 'No published rate for this year yet'
                 : null,
             icon: Symbols.calculate_rounded,

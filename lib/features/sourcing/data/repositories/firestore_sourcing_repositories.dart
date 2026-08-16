@@ -49,9 +49,7 @@ class FirestoreSourceRepository implements SourceRepository {
               SetOptions(merge: true),
             );
 
-        AppLogger.info('Source saved', <String, Object>{
-          'sourceId': source.id,
-        });
+        AppLogger.info('Source saved', <String, Object>{'sourceId': source.id});
       });
 
   @override
@@ -64,9 +62,7 @@ class FirestoreSourceRepository implements SourceRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
-        AppLogger.info('Source soft-deleted', <String, Object>{
-          'sourceId': id,
-        });
+        AppLogger.info('Source soft-deleted', <String, Object>{'sourceId': id});
       });
 }
 
@@ -137,7 +133,6 @@ class FirestorePurchaseRepository implements PurchaseRepository {
   Purchase _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
       PurchaseDto.toEntity(doc, fallbackCurrency: _context.currency);
 
-  static List<Purchase> _live(List<Purchase> purchases) => purchases
-      .where((Purchase purchase) => !purchase.isDeleted)
-      .toList();
+  static List<Purchase> _live(List<Purchase> purchases) =>
+      purchases.where((Purchase purchase) => !purchase.isDeleted).toList();
 }

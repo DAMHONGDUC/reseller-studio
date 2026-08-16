@@ -22,9 +22,11 @@ class _HomeShortcuts extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          for (int i = 0; i < HomeShortcutConstant.shortcuts.length; i++) ...<
-            Widget
-          >[
+          for (
+            int i = 0;
+            i < HomeShortcutConstant.shortcuts.length;
+            i++
+          ) ...<Widget>[
             if (i > 0) SizedBox(width: SdContentPaddingV3.listItemGap),
             Expanded(
               child: _HomeShortcutCard(
@@ -41,7 +43,10 @@ class _HomeShortcuts extends StatelessWidget {
 
 /// One shortcut: a tinted glyph over its label.
 class _HomeShortcutCard extends StatelessWidget {
-  const _HomeShortcutCard({required this.shortcut, required this.onQuickAction});
+  const _HomeShortcutCard({
+    required this.shortcut,
+    required this.onQuickAction,
+  });
 
   final HomeShortcut shortcut;
   final VoidCallback onQuickAction;

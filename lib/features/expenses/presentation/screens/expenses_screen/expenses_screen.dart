@@ -61,10 +61,7 @@ class ExpensesScreen extends ConsumerWidget {
               }
             },
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );
@@ -148,9 +145,7 @@ class ExpensesScreen extends ConsumerWidget {
                           Text(
                             context.money(expense.amount),
                             style: context.textTheme3.bodyMedium!.tabular3
-                                .copyWith(
-                                  color: context.sdTheme3.textPrimary,
-                                ),
+                                .copyWith(color: context.sdTheme3.textPrimary),
                           ),
                           IconButton(
                             icon: SdIconV3(

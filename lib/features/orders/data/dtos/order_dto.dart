@@ -39,8 +39,7 @@ final class OrderDto {
           ? lines
                 .whereType<Map<Object?, Object?>>()
                 .map(
-                  (Map<Object?, Object?> line) =>
-                      _lineToEntity(line, currency),
+                  (Map<Object?, Object?> line) => _lineToEntity(line, currency),
                 )
                 .toList()
           : const <OrderLine>[],

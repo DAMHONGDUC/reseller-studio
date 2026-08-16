@@ -16,14 +16,11 @@ import '../../onboarding_status.dart';
 class OnboardingController extends Notifier<OnboardingStatus> {
   @override
   OnboardingStatus build() {
-    final SharedPreferences? prefs = ref
-        .watch(sharedPreferencesProvider)
-        .value;
+    final SharedPreferences? prefs = ref.watch(sharedPreferencesProvider).value;
 
     if (prefs == null) return OnboardingStatus.loading;
 
-    final bool seen =
-        prefs.getBool(PrefsKeyConstant.onboardingSeen) ?? false;
+    final bool seen = prefs.getBool(PrefsKeyConstant.onboardingSeen) ?? false;
 
     return seen ? OnboardingStatus.done : OnboardingStatus.pending;
   }
@@ -43,9 +40,7 @@ class OnboardingController extends Notifier<OnboardingStatus> {
   Future<void> complete() async {
     state = OnboardingStatus.done;
 
-    final SharedPreferences? prefs = ref
-        .read(sharedPreferencesProvider)
-        .value;
+    final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
 
     if (prefs == null) {
       AppLogger.warning('Could not persist onboarding — preferences not ready');

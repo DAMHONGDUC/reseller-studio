@@ -63,15 +63,17 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
     // Merged rather than created: called after every sign-in, so an account
     // whose first write failed still gets a profile, and one that already has
     // a workspace list does not lose it.
-    await _users.doc(uid).set(
-      FirestoreMapper.pruned(<String, Object?>{
-        'displayName': displayName,
-        'email': email,
-        'photoUrl': photoUrl,
-        'updatedAt': FirestoreMapper.serverTimestamp,
-      }),
-      SetOptions(merge: true),
-    );
+    await _users
+        .doc(uid)
+        .set(
+          FirestoreMapper.pruned(<String, Object?>{
+            'displayName': displayName,
+            'email': email,
+            'photoUrl': photoUrl,
+            'updatedAt': FirestoreMapper.serverTimestamp,
+          }),
+          SetOptions(merge: true),
+        );
 
     AppLogger.info('Profile ensured', <String, Object>{'uid': uid});
   });
@@ -89,35 +91,39 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
     final String id = _uuid.v4();
     final DateTime now = DateTime.now();
 
-    await _workspaces.doc(id).set(
-      FirestoreMapper.pruned(<String, Object?>{
-        'name': name,
-        // Checked by the rules against the caller's uid, so a client cannot
-        // create a workspace owned by somebody else.
-        'ownerId': ownerId,
-        'country': country,
-        'currency': currency,
-        'businessType': businessType,
-        // The policy class owns this number — it is the algorithm the
-        // threshold belongs to, not configuration about a workspace.
-        'staleThresholdDays': StaleInventoryPolicy.defaultThreshold.inDays,
-        'createdAt': FirestoreMapper.serverTimestamp,
-        'updatedAt': FirestoreMapper.serverTimestamp,
-        'createdBy': ownerId,
-      }),
-    );
+    await _workspaces
+        .doc(id)
+        .set(
+          FirestoreMapper.pruned(<String, Object?>{
+            'name': name,
+            // Checked by the rules against the caller's uid, so a client cannot
+            // create a workspace owned by somebody else.
+            'ownerId': ownerId,
+            'country': country,
+            'currency': currency,
+            'businessType': businessType,
+            // The policy class owns this number — it is the algorithm the
+            // threshold belongs to, not configuration about a workspace.
+            'staleThresholdDays': StaleInventoryPolicy.defaultThreshold.inDays,
+            'createdAt': FirestoreMapper.serverTimestamp,
+            'updatedAt': FirestoreMapper.serverTimestamp,
+            'createdBy': ownerId,
+          }),
+        );
 
-    await WorkspaceCollections(_firestore, id).members.doc(ownerId).set(
-      MemberDto.toMap(
-        Member(
-          uid: ownerId,
-          role: MemberRole.owner,
-          joinedAt: now,
-          displayName: ownerName,
-          email: ownerEmail,
-        ),
-      ),
-    );
+    await WorkspaceCollections(_firestore, id).members
+        .doc(ownerId)
+        .set(
+          MemberDto.toMap(
+            Member(
+              uid: ownerId,
+              role: MemberRole.owner,
+              joinedAt: now,
+              displayName: ownerName,
+              email: ownerEmail,
+            ),
+          ),
+        );
 
     await _users.doc(ownerId).set(<String, Object?>{
       'workspaceIds': FieldValue.arrayUnion(<String>[id]),
@@ -139,10 +145,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
       FailureMapper.guard('update workspace', () async {
         await _workspaces
             .doc(workspace.id)
-            .set(
-              WorkspaceDto.toUpdateMap(workspace),
-              SetOptions(merge: true),
-            );
+            .set(WorkspaceDto.toUpdateMap(workspace), SetOptions(merge: true));
 
         AppLogger.info('Workspace updated', <String, Object>{
           'workspaceId': workspace.id,
@@ -165,16 +168,14 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
   });
 
   CollectionReference<Map<String, Object?>> get _users =>
-      WorkspaceCollections.users(_firestore).withConverter(
-        fromFirestore: _readMap,
-        toFirestore: _writeMap,
-      );
+      WorkspaceCollections.users(
+        _firestore,
+      ).withConverter(fromFirestore: _readMap, toFirestore: _writeMap);
 
   CollectionReference<Map<String, Object?>> get _workspaces =>
-      WorkspaceCollections.workspaces(_firestore).withConverter(
-        fromFirestore: _readMap,
-        toFirestore: _writeMap,
-      );
+      WorkspaceCollections.workspaces(
+        _firestore,
+      ).withConverter(fromFirestore: _readMap, toFirestore: _writeMap);
 
   static Map<String, Object?> _readMap(
     DocumentSnapshot<Map<String, dynamic>> snapshot,

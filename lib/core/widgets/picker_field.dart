@@ -25,6 +25,7 @@ class PickerField extends StatelessWidget {
 
   final String label;
   final String? value;
+
   /// Null falls back to the shared "Not set" label. A parameter default
   /// cannot be a localized string — it is evaluated with no `BuildContext`.
   final String? placeholder;

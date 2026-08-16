@@ -40,10 +40,9 @@ class _ItemList extends ConsumerWidget {
             // seller mid-bulk-edit who lands on a detail screen has lost the
             // forty rows they had just picked.
             onTap: isSelecting
-                ? () =>
-                      ref
-                          .read(inventorySelectionProvider.notifier)
-                          .toggle(item.id)
+                ? () => ref
+                      .read(inventorySelectionProvider.notifier)
+                      .toggle(item.id)
                 : () => context.push(AppRoutes.item(item.id)),
             onLongPress: () =>
                 ref.read(inventorySelectionProvider.notifier).toggle(item.id),

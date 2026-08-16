@@ -36,7 +36,10 @@ class ReportsScreen extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -54,7 +57,8 @@ class ReportsScreen extends ConsumerWidget {
           SizedBox(height: SdContentPaddingV3.topGap),
           SdSectionHeaderV3(
             title: 'Everything to date',
-            subtitle: 'As of ${DateTimeUtils.mediumDate(now, locale: context.localeTag)}',
+            subtitle:
+                'As of ${DateTimeUtils.mediumDate(now, locale: context.localeTag)}',
             first: true,
           ),
           Row(

@@ -186,10 +186,8 @@ class _SourceField extends ConsumerWidget {
       value: state.sourceId == null ? null : names[state.sourceId],
       placeholder: sources.isEmpty ? context.l10n.itemSourceEmptyHint : null,
       onTap: sources.isEmpty
-          ? () => SdSnackBarUtilsV3.info(
-              context,
-              context.l10n.itemAddSourceFirst,
-            )
+          ? () =>
+                SdSnackBarUtilsV3.info(context, context.l10n.itemAddSourceFirst)
           : () async {
               final String? picked = await OptionPickerSheet.show<String>(
                 context,

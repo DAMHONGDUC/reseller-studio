@@ -47,7 +47,10 @@ class _PlanCard extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -70,10 +73,7 @@ class _PlanCard extends ConsumerWidget {
                 ),
               ),
               if (isCurrent)
-                const SdBadgeV3(
-                  label: 'Your plan',
-                  tone: SdBadgeToneV3.info,
-                ),
+                const SdBadgeV3(label: 'Your plan', tone: SdBadgeToneV3.info),
             ],
           ),
           SizedBox(height: SdSpacingConstant.h8),

@@ -194,16 +194,20 @@ class ItemActionsController extends Notifier<bool> {
   }
 
   /// Change the asking price on one item or forty (plan §7, hard rule 16).
-  Future<void> reprice(List<Item> items, Money price) =>
-      _bulk('Reprice items', items, <String, Object>{
-        'priceMinor': price.minor,
-      }, (Item item) => item.copyWith(askingPrice: price));
+  Future<void> reprice(List<Item> items, Money price) => _bulk(
+    'Reprice items',
+    items,
+    <String, Object>{'priceMinor': price.minor},
+    (Item item) => item.copyWith(askingPrice: price),
+  );
 
   /// Put items on a shelf.
-  Future<void> move(List<Item> items, String locationId) =>
-      _bulk('Move items', items, <String, Object>{'locationId': locationId}, (
-        Item item,
-      ) => item.copyWith(locationId: locationId));
+  Future<void> move(List<Item> items, String locationId) => _bulk(
+    'Move items',
+    items,
+    <String, Object>{'locationId': locationId},
+    (Item item) => item.copyWith(locationId: locationId),
+  );
 
   /// Withdraw from inventory without a sale — damaged, lost, kept.
   ///
@@ -265,10 +269,7 @@ class ItemActionsController extends Notifier<bool> {
       'count': items.length,
       ...data,
     });
-    AppAnalytics.instance.bulkAction(
-      action: describe,
-      count: items.length,
-    );
+    AppAnalytics.instance.bulkAction(action: describe, count: items.length);
 
     state = true;
 
@@ -292,5 +293,6 @@ class ItemActionsController extends Notifier<bool> {
 }
 
 final NotifierProvider<ItemActionsController, bool>
-itemActionsControllerProvider =
-    NotifierProvider<ItemActionsController, bool>(ItemActionsController.new);
+itemActionsControllerProvider = NotifierProvider<ItemActionsController, bool>(
+  ItemActionsController.new,
+);

@@ -35,10 +35,7 @@ class TaxScreen extends ConsumerWidget {
     final TaxJurisdiction jurisdiction = ref.watch(taxJurisdictionProvider);
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: 'Tax',
-        subtitle: _authority(jurisdiction),
-      ),
+      appBar: SdAppBarV3(title: 'Tax', subtitle: _authority(jurisdiction)),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[

@@ -37,9 +37,7 @@ final class ItemCategoryDto {
 
 /// How a [StorageLocation] is stored.
 final class StorageLocationDto {
-  static StorageLocation toEntity(
-    DocumentSnapshot<Map<String, Object?>> doc,
-  ) {
+  static StorageLocation toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return StorageLocation(

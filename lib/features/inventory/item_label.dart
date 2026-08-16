@@ -11,15 +11,14 @@ import 'domain/enums/item_status.dart';
 /// that used to derive "New with tags" from `newWithTags` — clever, and wrong
 /// the moment the app is read in Vietnamese.
 final class ItemStatusLabel {
-  static String of(BuildContext context, ItemStatus status) =>
-      switch (status) {
-        ItemStatus.draft => context.l10n.itemStatusDraft,
-        ItemStatus.inStock => context.l10n.itemStatusInStock,
-        ItemStatus.listed => context.l10n.itemStatusListed,
-        ItemStatus.reserved => context.l10n.itemStatusReserved,
-        ItemStatus.sold => context.l10n.itemStatusSold,
-        ItemStatus.archived => context.l10n.itemStatusArchived,
-      };
+  static String of(BuildContext context, ItemStatus status) => switch (status) {
+    ItemStatus.draft => context.l10n.itemStatusDraft,
+    ItemStatus.inStock => context.l10n.itemStatusInStock,
+    ItemStatus.listed => context.l10n.itemStatusListed,
+    ItemStatus.reserved => context.l10n.itemStatusReserved,
+    ItemStatus.sold => context.l10n.itemStatusSold,
+    ItemStatus.archived => context.l10n.itemStatusArchived,
+  };
 }
 
 /// The condition grades resellers actually use in listings.

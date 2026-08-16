@@ -44,8 +44,7 @@ class PurchaseDetailScreen extends ConsumerWidget {
     }
 
     final List<Item> items =
-        ref.watch(itemsForPurchaseProvider(purchaseId)).value ??
-        const <Item>[];
+        ref.watch(itemsForPurchaseProvider(purchaseId)).value ?? const <Item>[];
 
     final Money? apportioned = items
         .map((Item item) => item.purchasePrice)
@@ -85,9 +84,7 @@ class PurchaseDetailScreen extends ConsumerWidget {
           ),
           if (purchase.totalCost != null && apportioned != null) ...<Widget>[
             SizedBox(height: SdSpacingConstant.h12),
-            _ApportionmentNote(
-              gap: purchase.totalCost! - apportioned,
-            ),
+            _ApportionmentNote(gap: purchase.totalCost! - apportioned),
           ],
           if (purchase.notes != null) ...<Widget>[
             SizedBox(height: SdContentPaddingV3.sectionGap),

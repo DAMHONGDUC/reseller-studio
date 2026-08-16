@@ -37,10 +37,7 @@ final class ExpenseDto {
       receiptUrl: FirestoreMapper.stringOrNull(data['receiptUrl']),
       mileage: FirestoreMapper.doubleOrNull(data['mileage']),
       orderId: FirestoreMapper.stringOrNull(data['orderId']),
-      isRecurring: FirestoreMapper.boolOr(
-        data['isRecurring'],
-        fallback: false,
-      ),
+      isRecurring: FirestoreMapper.boolOr(data['isRecurring'], fallback: false),
       deletedAt: FirestoreMapper.dateOrNull(data['deletedAt']),
     );
   }

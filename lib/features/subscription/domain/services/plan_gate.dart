@@ -41,16 +41,14 @@ final class PlanGate {
   static PlanBlock canListItem(
     SellerPlan plan, {
     required int currentActiveListings,
-  }) =>
-      _underLimit(currentActiveListings, PlanLimits.of(plan).activeListings)
+  }) => _underLimit(currentActiveListings, PlanLimits.of(plan).activeListings)
       ? PlanBlock.none
       : PlanBlock.listingLimit;
 
   static PlanBlock canConnectMarketplace(
     SellerPlan plan, {
     required int currentMarketplaces,
-  }) =>
-      _underLimit(currentMarketplaces, PlanLimits.of(plan).marketplaces)
+  }) => _underLimit(currentMarketplaces, PlanLimits.of(plan).marketplaces)
       ? PlanBlock.none
       : PlanBlock.marketplaceLimit;
 
@@ -81,8 +79,7 @@ final class PlanGate {
         PlanBlock.none => null,
         PlanBlock.itemLimit || PlanBlock.listingLimit => SellerPlan.pro,
         PlanBlock.marketplaceLimit => _next(from),
-        PlanBlock.memberLimit ||
-        PlanBlock.featureLocked => SellerPlan.business,
+        PlanBlock.memberLimit || PlanBlock.featureLocked => SellerPlan.business,
       };
 
   /// Null limit means unlimited — see `PlanLimits`.
@@ -90,8 +87,8 @@ final class PlanGate {
       limit == null || current < limit;
 
   /// One tier up, or the top one if there is nowhere left to go.
-  static SellerPlan _next(SellerPlan from) => from.index + 1 <
-          SellerPlan.values.length
+  static SellerPlan _next(SellerPlan from) =>
+      from.index + 1 < SellerPlan.values.length
       ? SellerPlan.values[from.index + 1]
       : SellerPlan.business;
 }

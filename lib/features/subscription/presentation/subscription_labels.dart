@@ -93,7 +93,5 @@ final class SubscriptionLabels {
   static String blockKey(PlanBlock block) => block.name;
 
   static String _countLine(int? limit, String noun, String unlimited) =>
-      limit == null
-      ? unlimited
-      : '$limit $noun${limit == 1 ? '' : 's'}';
+      limit == null ? unlimited : '$limit $noun${limit == 1 ? '' : 's'}';
 }

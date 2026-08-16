@@ -25,7 +25,10 @@ class _OfferCard extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -47,10 +50,7 @@ class _OfferCard extends ConsumerWidget {
               context.l10n.offerAccepted,
             ),
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );
@@ -88,7 +88,8 @@ class _OfferCard extends ConsumerWidget {
       onTap: () => context.push(AppRoutes.item(offer.itemId)),
       // Tinted only while it is still actionable — a closed offer is history
       // and should not keep shouting.
-      borderColor: canAct && (offer.expiresAt?.difference(now).inHours ?? 99) < 24
+      borderColor:
+          canAct && (offer.expiresAt?.difference(now).inHours ?? 99) < 24
           ? context.sdTheme3.warning
           : null,
       child: Column(

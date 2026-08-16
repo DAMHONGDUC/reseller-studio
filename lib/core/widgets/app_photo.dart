@@ -51,16 +51,18 @@ class AppPhoto extends StatelessWidget {
               width: size,
               height: size,
               fit: BoxFit.cover,
-              errorBuilder: (BuildContext context, Object error, StackTrace? s) =>
-                  _onError(context, error, s, radius),
+              errorBuilder:
+                  (BuildContext context, Object error, StackTrace? s) =>
+                      _onError(context, error, s, radius),
             )
           : Image.file(
               File(source),
               width: size,
               height: size,
               fit: BoxFit.cover,
-              errorBuilder: (BuildContext context, Object error, StackTrace? s) =>
-                  _onError(context, error, s, radius),
+              errorBuilder:
+                  (BuildContext context, Object error, StackTrace? s) =>
+                      _onError(context, error, s, radius),
             ),
     );
   }

@@ -46,17 +46,17 @@ class FirestoreExpenseRepository implements ExpenseRepository {
       });
 
   @override
-  Future<void> delete(String id) =>
-      FailureMapper.guard('delete expense', () async {
-        await _context.collections.expenses.doc(id).set(<String, Object?>{
-          'deletedAt': Timestamp.fromDate(DateTime.now()),
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+  Future<void> delete(String id) => FailureMapper.guard(
+    'delete expense',
+    () async {
+      await _context.collections.expenses.doc(id).set(<String, Object?>{
+        'deletedAt': Timestamp.fromDate(DateTime.now()),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
 
-        AppLogger.info('Expense soft-deleted', <String, Object>{
-          'expenseId': id,
-        });
-      });
+      AppLogger.info('Expense soft-deleted', <String, Object>{'expenseId': id});
+    },
+  );
 
   Expense _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
       ExpenseDto.toEntity(doc, fallbackCurrency: _context.currency);

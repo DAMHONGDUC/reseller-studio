@@ -47,30 +47,31 @@ class FirestoreListingRepository implements ListingRepository {
       });
 
   @override
-  Future<void> saveAll(List<Listing> listings) =>
-      FailureMapper.guard('publish listings', () async {
-        if (listings.isEmpty) return;
+  Future<void> saveAll(List<Listing> listings) => FailureMapper.guard(
+    'publish listings',
+    () async {
+      if (listings.isEmpty) return;
 
-        // Cross-listing is one user intent and must not half-succeed
-        // silently (plan §13): the batch either lands or it does not, and a
-        // failure is reported once rather than as four separate errors.
-        final WriteBatch batch = _context.collections.listings.firestore
-            .batch();
+      // Cross-listing is one user intent and must not half-succeed
+      // silently (plan §13): the batch either lands or it does not, and a
+      // failure is reported once rather than as four separate errors.
+      final WriteBatch batch = _context.collections.listings.firestore.batch();
 
-        for (final Listing listing in listings) {
-          batch.set(
-            _context.collections.listings.doc(listing.id),
-            ListingDto.toMap(listing, createdBy: _context.uid),
-            SetOptions(merge: true),
-          );
-        }
+      for (final Listing listing in listings) {
+        batch.set(
+          _context.collections.listings.doc(listing.id),
+          ListingDto.toMap(listing, createdBy: _context.uid),
+          SetOptions(merge: true),
+        );
+      }
 
-        await batch.commit();
+      await batch.commit();
 
-        AppLogger.info('Listings saved in bulk', <String, Object>{
-          'count': listings.length,
-        });
+      AppLogger.info('Listings saved in bulk', <String, Object>{
+        'count': listings.length,
       });
+    },
+  );
 
   Listing _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
       ListingDto.toEntity(doc, fallbackCurrency: _context.currency);

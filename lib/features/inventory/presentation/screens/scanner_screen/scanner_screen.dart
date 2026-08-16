@@ -72,8 +72,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   void _onDetect(BarcodeCapture capture) {
     final String? code = capture.barcodes
         .map((Barcode barcode) => barcode.rawValue)
-        .firstWhere((String? value) => value != null && value.isNotEmpty,
-            orElse: () => null);
+        .firstWhere(
+          (String? value) => value != null && value.isNotEmpty,
+          orElse: () => null,
+        );
 
     if (_handled || code == null) return;
 

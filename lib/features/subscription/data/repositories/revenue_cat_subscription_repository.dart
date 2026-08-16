@@ -28,8 +28,7 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
     final StreamController<SubscriptionStatus> controller =
         StreamController<SubscriptionStatus>.broadcast();
 
-    void onUpdate(CustomerInfo info) =>
-        controller.add(_statusFrom(info));
+    void onUpdate(CustomerInfo info) => controller.add(_statusFrom(info));
 
     Purchases.addCustomerInfoUpdateListener(onUpdate);
     controller.onCancel = () =>

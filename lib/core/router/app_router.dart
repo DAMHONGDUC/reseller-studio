@@ -95,9 +95,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         // The intro is only ever shown to someone who is not signed in, so a
         // returning seller never sees it again whatever the flag says.
         if (onboarding == OnboardingStatus.pending) {
-          return location == AppRoutes.onboarding
-              ? null
-              : AppRoutes.onboarding;
+          return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
         }
 
         // Owner's rule: the five tabs render before sign-in, empty. The gate
@@ -118,6 +116,9 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             : AppRoutes.workspaceSetup;
       }
 
+      // `workspaceCreate` is absent from this list on purpose: it is a pushed
+      // route a seller who already has a business opens deliberately, so
+      // bouncing them off it is exactly the bug the separate path avoids.
       if (onAuthRoute ||
           location == AppRoutes.splash ||
           location == AppRoutes.workspaceSetup) {
@@ -146,6 +147,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.login,
         builder: (BuildContext context, GoRouterState state) =>
             const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.workspaceCreate,
+        builder: (BuildContext context, GoRouterState state) =>
+            const WorkspaceSetupScreen(isAdditional: true),
       ),
       GoRoute(
         path: AppRoutes.workspaceSetup,
@@ -357,13 +363,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                             parentNavigatorKey: AppNavigatorKey.root,
                             path: ':purchaseId',
                             builder:
-                                (
-                                  BuildContext context,
-                                  GoRouterState state,
-                                ) => PurchaseDetailScreen(
-                                  purchaseId:
-                                      state.pathParameters['purchaseId']!,
-                                ),
+                                (BuildContext context, GoRouterState state) =>
+                                    PurchaseDetailScreen(
+                                      purchaseId:
+                                          state.pathParameters['purchaseId']!,
+                                    ),
                           ),
                         ],
                       ),
@@ -462,10 +466,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
 /// Read by the signed-in branch, which uses it to bounce an authenticated
 /// seller off either one to Home. Which of the two a signed-*out* user belongs
 /// on is decided above, by `OnboardingStatus`.
-const Set<String> _authRoutes = <String>{
-  AppRoutes.onboarding,
-  AppRoutes.login,
-};
+const Set<String> _authRoutes = <String>{AppRoutes.onboarding, AppRoutes.login};
 
 /// What a signed-out visitor may sit on — the five tabs, empty, plus the gate
 /// itself (owner's rule; `CLAUDE.md` hard rule 1).

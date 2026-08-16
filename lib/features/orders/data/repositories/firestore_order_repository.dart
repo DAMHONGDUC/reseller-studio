@@ -45,21 +45,20 @@ class FirestoreOrderRepository implements OrderRepository {
       });
 
   @override
-  Future<void> save(Order order) =>
-      FailureMapper.guard('save order', () async {
-        await _context.collections.orders
-            .doc(order.id)
-            .set(
-              OrderDto.toMap(order, createdBy: _context.uid),
-              SetOptions(merge: true),
-            );
+  Future<void> save(Order order) => FailureMapper.guard('save order', () async {
+    await _context.collections.orders
+        .doc(order.id)
+        .set(
+          OrderDto.toMap(order, createdBy: _context.uid),
+          SetOptions(merge: true),
+        );
 
-        AppLogger.info('Order saved', <String, Object>{
-          'orderId': order.id,
-          'status': order.status.name,
-          'lines': order.lines.length,
-        });
-      });
+    AppLogger.info('Order saved', <String, Object>{
+      'orderId': order.id,
+      'status': order.status.name,
+      'lines': order.lines.length,
+    });
+  });
 
   Order _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
       OrderDto.toEntity(doc, fallbackCurrency: _context.currency);

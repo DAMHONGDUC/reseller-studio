@@ -33,6 +33,14 @@ final class AppRoutes {
   /// is reachable without a workspace.
   static const String workspaceSetup = '/workspace-setup';
 
+  /// Creating an *additional* business, pushed from the switcher.
+  ///
+  /// A separate path from [workspaceSetup] on purpose: that one is a gate the
+  /// redirect forces a new account through and then bounces them off again,
+  /// so a seller who already has a business would be thrown straight back out
+  /// of it. This one is an ordinary pushed route that pops when it is done.
+  static const String workspaceCreate = '/workspace/new';
+
   // --- Shell branch 1: Home ---
 
   // `/home/notifications` (§22) and `/home/activity` (§23) are deliberately

@@ -46,10 +46,10 @@ class OfferActionsController extends Notifier<bool> {
         // The item was deleted while the offer sat there. Recording the
         // decision is still right; inventing an order for a thing that no
         // longer exists is not.
-        AppLogger.warning('Accepted an offer whose item is gone', <String, Object>{
-          'offerId': offer.id,
-          'itemId': offer.itemId,
-        });
+        AppLogger.warning(
+          'Accepted an offer whose item is gone',
+          <String, Object>{'offerId': offer.id, 'itemId': offer.itemId},
+        );
 
         await _save(offer, OfferStatus.accepted);
 
@@ -129,11 +129,7 @@ class OfferActionsController extends Notifier<bool> {
     }
   }
 
-  Future<void> _save(
-    Offer offer,
-    OfferStatus status, {
-    Money? counterAmount,
-  }) {
+  Future<void> _save(Offer offer, OfferStatus status, {Money? counterAmount}) {
     final OfferRepository repository = ref.read(offerRepositoryProvider);
 
     return repository.save(
@@ -147,7 +143,6 @@ class OfferActionsController extends Notifier<bool> {
 }
 
 final NotifierProvider<OfferActionsController, bool>
-offerActionsControllerProvider =
-    NotifierProvider<OfferActionsController, bool>(
-      OfferActionsController.new,
-    );
+offerActionsControllerProvider = NotifierProvider<OfferActionsController, bool>(
+  OfferActionsController.new,
+);

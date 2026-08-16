@@ -7,12 +7,15 @@ import 'package:system_design/index.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/router/navigation_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/scroll_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
+import '../../../../auth/providers.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
@@ -74,19 +77,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final Workspace? workspace = ref.watch(currentWorkspaceProvider);
+    final bool signedIn = ref.watch(isSignedInProvider) ?? false;
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
         title: workspace?.name ?? context.l10n.appTitle,
+        // Slack's move: the title names the business and is how you change
+        // it. Only offered once there is one — a signed-out visitor has
+        // nothing to switch between, and a chevron opening an empty sheet is
+        // worse than no chevron.
+        onTitleTap: workspace == null
+            ? null
+            : () => WorkspaceSwitcherSheet.show(context),
         // No subtitle. "Your business today" was decoration, and it cost a
         // second row of chrome on the one screen whose content — what needs
         // attention — is the reason the app was opened.
         actions: <Widget>[
+          // The one plain way in while the tabs are being browsed empty.
+          // Without it the only route to sign-in is tapping a create button
+          // and being redirected, which is a thing to discover rather than a
+          // thing to see.
+          if (!signedIn)
+            SdButtonV3(
+              variant: SdButtonVariantV3.text,
+              label: context.l10n.workspaceSignInAction,
+              size: SdButtonSizeV3.small,
+              onPressed: () => context.push(AppRoutes.login),
+            ),
           IconButton(
             // Global search is reached from Home because Home is where a
             // seller starts (plan §5's global entry points). It sits outside
             // the shell so it can send them into any tab.
-            onPressed: () => context.push(AppRoutes.search),
+            onPressed: () {
+              if (!NavigationUtils.requireSignIn(context, ref)) return;
+
+              context.push(AppRoutes.search);
+            },
             icon: const Icon(Symbols.search_rounded),
             tooltip: context.l10n.homeShortcutSearch,
           ),

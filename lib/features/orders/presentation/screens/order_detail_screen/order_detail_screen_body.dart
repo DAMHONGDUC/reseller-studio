@@ -17,9 +17,7 @@ class _OrderBody extends ConsumerWidget {
         .map((Expense expense) => expense.amount)
         .totalOrNull();
 
-    final ProfitBreakdown profit = order.profit(
-      otherExpenses: otherExpenses,
-    );
+    final ProfitBreakdown profit = order.profit(otherExpenses: otherExpenses);
 
     return ListView(
       padding: SdContentPaddingV3.screen(context),

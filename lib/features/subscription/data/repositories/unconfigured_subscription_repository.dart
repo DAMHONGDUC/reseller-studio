@@ -24,9 +24,10 @@ class UnconfiguredSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<SubscriptionStatus> purchase(PlanOffering offering) async {
-    AppLogger.warning('Purchase attempted with billing not configured', <String, String>{
-      'productId': offering.productId,
-    });
+    AppLogger.warning(
+      'Purchase attempted with billing not configured',
+      <String, String>{'productId': offering.productId},
+    );
 
     throw const AppFailure(
       AppFailureKind.invalidData,

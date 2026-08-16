@@ -13,7 +13,9 @@ class _RecentActivity extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Order> orders =
         ref.watch(ordersProvider).value ?? const <Order>[];
-    final List<Order> recent = orders.take(HomeConstant.recentActivityMaxRows).toList();
+    final List<Order> recent = orders
+        .take(HomeConstant.recentActivityMaxRows)
+        .toList();
 
     if (recent.isEmpty) return const SizedBox.shrink();
 

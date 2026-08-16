@@ -28,9 +28,7 @@ class _OnboardingDots extends StatelessWidget {
               AnimatedContainer(
                 duration: SdMotionV3.normal,
                 curve: SdMotionV3.standard,
-                margin: EdgeInsets.symmetric(
-                  horizontal: SdSpacingConstant.w4,
-                ),
+                margin: EdgeInsets.symmetric(horizontal: SdSpacingConstant.w4),
                 height: dot,
                 width: i == index ? SdSpacingConstant.w24 : dot,
                 decoration: BoxDecoration(

@@ -86,7 +86,10 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -136,10 +139,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
             label: context.l10n.markSoldDate,
-            value: DateTimeUtils.mediumDate(
-              _soldAt,
-              locale: context.localeTag,
-            ),
+            value: DateTimeUtils.mediumDate(_soldAt, locale: context.localeTag),
             onTap: () async {
               final DateTime? picked = await showDatePicker(
                 context: context,

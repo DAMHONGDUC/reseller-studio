@@ -7,6 +7,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
+import '../../../providers.dart';
 import '../../../workspace_constant.dart';
 import '../../../workspace_option_label.dart';
 import '../../controllers/workspace_setup_controller.dart';
@@ -23,7 +24,16 @@ part 'workspace_setup_screen_actions.dart';
 /// **The create action is pinned to the bottom** (owner's rule) — only the
 /// form scrolls. See [_PinnedCreateAction].
 class WorkspaceSetupScreen extends ConsumerStatefulWidget {
-  const WorkspaceSetupScreen({super.key});
+  const WorkspaceSetupScreen({this.isAdditional = false, super.key});
+
+  /// True when a seller who already has a business is adding another from the
+  /// switcher, rather than a new account being forced through the gate.
+  ///
+  /// It changes two things and nothing else: the title, and what happens on
+  /// success. The first workspace is finished by the router's redirect; an
+  /// additional one is a pushed route, so it switches to what it just made
+  /// and pops itself.
+  final bool isAdditional;
 
   @override
   ConsumerState<WorkspaceSetupScreen> createState() =>
@@ -102,11 +112,23 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
         .selectBusinessType(type);
   }
 
-  /// Creates the workspace and stops. The router watches
-  /// `workspaceStatusProvider` and moves the seller to Home by itself.
+  /// Creates the workspace. For the first one this stops here — the router
+  /// watches `workspaceStatusProvider` and moves the seller to Home itself.
   Future<void> _submit() async {
     try {
-      await ref.read(workspaceSetupControllerProvider.notifier).submit();
+      final String? id = await ref
+          .read(workspaceSetupControllerProvider.notifier)
+          .submit();
+
+      if (id == null || !widget.isAdditional) return;
+
+      // Opening what you just created is the only sensible landing: nobody
+      // adds a business in order to keep looking at the previous one.
+      await ref.read(workspaceSwitchControllerProvider.notifier).switchTo(id);
+
+      if (!mounted) return;
+
+      Navigator.of(context).pop();
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -126,8 +148,12 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
-        title: context.l10n.workspaceSetupTitle,
-        automaticallyImplyLeading: false,
+        title: widget.isAdditional
+            ? context.l10n.workspaceAddTitle
+            : context.l10n.workspaceSetupTitle,
+        // The first one is a gate with nothing behind it; an additional one is
+        // pushed and must be escapable.
+        automaticallyImplyLeading: widget.isAdditional,
       ),
       body: Column(
         children: <Widget>[

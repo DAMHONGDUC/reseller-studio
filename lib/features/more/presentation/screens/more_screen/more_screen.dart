@@ -25,7 +25,6 @@ part 'more_screen_more_row.dart';
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) => SdScaffoldV3(
     appBar: SdAppBarV3(title: context.l10n.navMore),
@@ -42,7 +41,8 @@ class MoreScreen extends ConsumerWidget {
             padding: EdgeInsets.zero,
             child: Column(
               children: <Widget>[
-                for (final MoreDestination destination in MoreConstant.destinations)
+                for (final MoreDestination destination
+                    in MoreConstant.destinations)
                   _MoreRow(
                     destination: destination,
                     isLast: destination == MoreConstant.destinations.last,

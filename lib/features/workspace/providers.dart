@@ -19,6 +19,7 @@ import 'data/repositories/firestore_workspace_repository.dart';
 import 'domain/entities/user_profile.dart';
 import 'domain/entities/workspace.dart';
 import 'domain/repositories/workspace_repository.dart';
+import 'presentation/controllers/workspace_switch_controller.dart';
 
 /// The `FirebaseFirestore` instance, behind a provider so a test can override
 /// it and so nothing in a feature reaches for the singleton.
@@ -147,6 +148,38 @@ final Provider<WorkspaceContext?> workspaceContextProvider =
         uid: uid,
       );
     });
+
+final NotifierProvider<WorkspaceSwitchController, void>
+workspaceSwitchControllerProvider =
+    NotifierProvider<WorkspaceSwitchController, void>(
+      WorkspaceSwitchController.new,
+    );
+
+/// Every business this person belongs to, for the switcher.
+///
+/// Folded from `UserProfile.workspaceIds` rather than queried: the security
+/// rules scope member reads to one workspace at a time on purpose, so "which
+/// businesses am I in?" has no server-side answer a client may ask (see
+/// [UserProfile.workspaceIds]).
+///
+/// **Documents still loading are skipped, not rendered as blanks.** The list
+/// fills in as each arrives, which is what stops the sheet flashing a column
+/// of empty rows on open.
+final Provider<List<Workspace>> workspacesProvider = Provider<List<Workspace>>((
+  Ref ref,
+) {
+  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+    return <Workspace>[ref.watch(mockStoreProvider).dataset.workspace];
+  }
+
+  final List<String> ids =
+      ref.watch(userProfileProvider).value?.workspaceIds ?? const <String>[];
+
+  return <Workspace>[
+    for (final String id in ids)
+      if (ref.watch(liveWorkspaceProvider(id)).value case final Workspace w) w,
+  ];
+});
 
 /// Whether there is anything to read from at all.
 ///

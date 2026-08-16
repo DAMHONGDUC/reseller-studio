@@ -49,10 +49,7 @@ class _BulkActionBar extends ConsumerWidget {
               }
             },
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );

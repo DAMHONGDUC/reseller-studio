@@ -46,7 +46,10 @@ class SourcesScreen extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -58,10 +61,9 @@ class SourcesScreen extends ConsumerWidget {
       sourcePerformanceProvider,
     );
 
-    final Map<String, SourcePerformance> byId =
-        <String, SourcePerformance>{
-          for (final SourcePerformance row in performance) row.sourceId: row,
-        };
+    final Map<String, SourcePerformance> byId = <String, SourcePerformance>{
+      for (final SourcePerformance row in performance) row.sourceId: row,
+    };
 
     return AppAddFabScaffold(
       appBar: const SdAppBarV3(title: 'Sources'),
@@ -104,9 +106,7 @@ class SourcesScreen extends ConsumerWidget {
                       Text(
                         context.percent(row?.roi),
                         style: context.textTheme3.bodyMedium!.semiBold3.tabular3
-                            .copyWith(
-                              color: _roiColour(context, row?.roi),
-                            ),
+                            .copyWith(color: _roiColour(context, row?.roi)),
                       ),
                       Text(
                         'ROI',

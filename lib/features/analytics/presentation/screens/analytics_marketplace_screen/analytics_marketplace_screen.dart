@@ -57,10 +57,7 @@ class AnalyticsMarketplaceScreen extends ConsumerWidget {
                             ? context.sdTheme3.loss
                             : context.sdTheme3.profit,
                       ),
-                      MetricRow(
-                        label: 'Fees',
-                        value: context.money(row.fees),
-                      ),
+                      MetricRow(label: 'Fees', value: context.money(row.fees)),
                       MetricRow(
                         label: 'Fee rate',
                         value: context.percent(row.feeRate, decimals: 1),

@@ -224,6 +224,26 @@
   "@authPrivacyNote": {
     "description": "Reassurance under the two sign-in buttons. There is no email/password option — Apple and Google are the only ways in."
   },
+  "workspaceSwitchTitle": "Switch business",
+  "@workspaceSwitchTitle": {
+    "description": "Title of the workspace switcher sheet, opened from Home's title."
+  },
+  "workspaceCreateNew": "Create new business",
+  "@workspaceCreateNew": {
+    "description": "Last row of the workspace switcher — starts an additional business."
+  },
+  "workspaceAddTitle": "Add a business",
+  "@workspaceAddTitle": {
+    "description": "App bar title when creating an additional business rather than the first."
+  },
+  "workspaceSignInPrompt": "Sign in to see your business",
+  "@workspaceSignInPrompt": {
+    "description": "Empty-state line shown on the five tabs before anyone signs in."
+  },
+  "workspaceSignInAction": "Sign in",
+  "@workspaceSignInAction": {
+    "description": "Button on the signed-out empty state."
+  },
   "workspaceSetupTitle": "Set up your business",
   "@workspaceSetupTitle": {
     "description": "App bar title on the onboarding screen between sign-in and Home."

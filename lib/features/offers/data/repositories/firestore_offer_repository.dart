@@ -22,20 +22,19 @@ class FirestoreOfferRepository implements OfferRepository {
   );
 
   @override
-  Future<void> save(Offer offer) =>
-      FailureMapper.guard('save offer', () async {
-        await _context.collections.offers
-            .doc(offer.id)
-            .set(
-              OfferDto.toMap(offer, createdBy: _context.uid),
-              SetOptions(merge: true),
-            );
+  Future<void> save(Offer offer) => FailureMapper.guard('save offer', () async {
+    await _context.collections.offers
+        .doc(offer.id)
+        .set(
+          OfferDto.toMap(offer, createdBy: _context.uid),
+          SetOptions(merge: true),
+        );
 
-        AppLogger.info('Offer saved', <String, Object>{
-          'offerId': offer.id,
-          'status': offer.status.name,
-        });
-      });
+    AppLogger.info('Offer saved', <String, Object>{
+      'offerId': offer.id,
+      'status': offer.status.name,
+    });
+  });
 
   Offer _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
       OfferDto.toEntity(doc, fallbackCurrency: _context.currency);

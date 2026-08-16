@@ -36,17 +36,17 @@ class WorkspaceCollections {
       _sub('marketplaces');
   CollectionReference<Map<String, Object?>> get activity => _sub('activity');
 
-  CollectionReference<Map<String, Object?>> _sub(String name) =>
-      workspace.collection(name).withConverter<Map<String, Object?>>(
-        fromFirestore: (
-          DocumentSnapshot<Map<String, dynamic>> snapshot,
-          SnapshotOptions? _,
-        ) => snapshot.data() ?? <String, Object?>{},
-        toFirestore: (Map<String, Object?> data, SetOptions? _) =>
-            data.map(
-              (String key, Object? value) =>
-                  MapEntry<String, dynamic>(key, value),
-            ),
+  CollectionReference<Map<String, Object?>> _sub(String name) => workspace
+      .collection(name)
+      .withConverter<Map<String, Object?>>(
+        fromFirestore:
+            (
+              DocumentSnapshot<Map<String, dynamic>> snapshot,
+              SnapshotOptions? _,
+            ) => snapshot.data() ?? <String, Object?>{},
+        toFirestore: (Map<String, Object?> data, SetOptions? _) => data.map(
+          (String key, Object? value) => MapEntry<String, dynamic>(key, value),
+        ),
       );
 
   static const String _workspaces = 'workspaces';

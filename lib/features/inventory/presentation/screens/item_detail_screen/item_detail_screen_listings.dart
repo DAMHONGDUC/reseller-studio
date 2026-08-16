@@ -27,8 +27,7 @@ class _Listings extends ConsumerWidget {
         children: <Widget>[
           for (int i = 0; i < listings.length; i++) ...<Widget>[
             _ListingRow(listing: listings[i]),
-            if (i != listings.length - 1)
-              const SdDividerV3(),
+            if (i != listings.length - 1) const SdDividerV3(),
           ],
         ],
       ),

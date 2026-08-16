@@ -105,23 +105,24 @@ class _PurchaseEvaluatorScreenState
                       '${_marketplace.displayName} · '
                       '${(_marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% fee',
                   onTap: () async {
-                    final Marketplace? picked =
-                        await OptionPickerSheet.show<Marketplace>(
-                          context,
-                          title: 'Marketplace',
-                          selected: _marketplace,
-                          options: Marketplace.values
-                              .map(
-                                (Marketplace marketplace) =>
-                                    PickerOption<Marketplace>(
-                                      value: marketplace,
-                                      label: marketplace.displayName,
-                                      caption:
-                                          '${(marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% estimated fee',
-                                    ),
-                              )
-                              .toList(),
-                        );
+                    final Marketplace?
+                    picked = await OptionPickerSheet.show<Marketplace>(
+                      context,
+                      title: 'Marketplace',
+                      selected: _marketplace,
+                      options: Marketplace.values
+                          .map(
+                            (
+                              Marketplace marketplace,
+                            ) => PickerOption<Marketplace>(
+                              value: marketplace,
+                              label: marketplace.displayName,
+                              caption:
+                                  '${(marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% estimated fee',
+                            ),
+                          )
+                          .toList(),
+                    );
 
                     if (picked == null) return;
 

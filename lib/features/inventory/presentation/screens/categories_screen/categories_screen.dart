@@ -37,9 +37,8 @@ class CategoriesScreen extends ConsumerWidget {
 
     await _write(
       context,
-      () => ref.read(catalogControllerProvider.notifier).saveCategory(
-        name: name,
-      ),
+      () =>
+          ref.read(catalogControllerProvider.notifier).saveCategory(name: name),
       context.l10n.categoryAdded,
     );
   }
@@ -60,11 +59,13 @@ class CategoriesScreen extends ConsumerWidget {
 
     await _write(
       context,
-      () => ref.read(catalogControllerProvider.notifier).saveCategory(
-        name: name,
-        id: category.id,
-        parentId: category.parentId,
-      ),
+      () => ref
+          .read(catalogControllerProvider.notifier)
+          .saveCategory(
+            name: name,
+            id: category.id,
+            parentId: category.parentId,
+          ),
       context.l10n.commonRenamed,
     );
   }
@@ -95,10 +96,7 @@ class CategoriesScreen extends ConsumerWidget {
               context.l10n.commonDeleted,
             ),
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );
@@ -120,15 +118,16 @@ class CategoriesScreen extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<ItemCategory>> source = ref.watch(
-      categoriesProvider,
-    );
+    final AsyncValue<List<ItemCategory>> source = ref.watch(categoriesProvider);
     final List<ItemCategory> categories =
         source.value ?? const <ItemCategory>[];
     final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];

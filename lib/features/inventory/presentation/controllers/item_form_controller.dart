@@ -291,6 +291,4 @@ class ItemFormController extends Notifier<ItemFormState> {
 
 final NotifierProvider<ItemFormController, ItemFormState>
 itemFormControllerProvider =
-    NotifierProvider<ItemFormController, ItemFormState>(
-      ItemFormController.new,
-    );
+    NotifierProvider<ItemFormController, ItemFormState>(ItemFormController.new);

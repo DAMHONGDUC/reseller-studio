@@ -64,11 +64,7 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
     try {
       await ref
           .read(itemActionsControllerProvider.notifier)
-          .listItem(
-            widget.item,
-            marketplace: _marketplace,
-            price: price,
-          );
+          .listItem(widget.item, marketplace: _marketplace, price: price);
 
       if (!mounted) return;
 
@@ -81,7 +77,10 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 

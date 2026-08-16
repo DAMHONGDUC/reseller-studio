@@ -30,12 +30,15 @@ class QuickAddState {
   /// A title with something in it is the whole of the validation.
   bool get canSubmit => title.trim().isNotEmpty && !isSaving;
 
-  QuickAddState copyWith({String? title, bool? isSaving, String? savedItemId}) =>
-      QuickAddState(
-        title: title ?? this.title,
-        isSaving: isSaving ?? this.isSaving,
-        savedItemId: savedItemId ?? this.savedItemId,
-      );
+  QuickAddState copyWith({
+    String? title,
+    bool? isSaving,
+    String? savedItemId,
+  }) => QuickAddState(
+    title: title ?? this.title,
+    isSaving: isSaving ?? this.isSaving,
+    savedItemId: savedItemId ?? this.savedItemId,
+  );
 }
 
 /// Creating an item from a title alone.

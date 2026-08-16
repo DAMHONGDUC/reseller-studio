@@ -65,10 +65,7 @@ class ItemActionsSheet extends ConsumerWidget {
     final Map<String, String> paths = ref.read(locationPathsProvider);
 
     if (locations.isEmpty) {
-      SdSnackBarUtilsV3.info(
-        context,
-        context.l10n.itemAddLocationFirst,
-      );
+      SdSnackBarUtilsV3.info(context, context.l10n.itemAddLocationFirst);
 
       return;
     }
@@ -92,9 +89,9 @@ class ItemActionsSheet extends ConsumerWidget {
     await _run(
       context,
       ref,
-      () => ref
-          .read(itemActionsControllerProvider.notifier)
-          .move(<Item>[item], picked),
+      () => ref.read(itemActionsControllerProvider.notifier).move(<Item>[
+        item,
+      ], picked),
       context.l10n.itemMoved,
     );
   }
@@ -102,18 +99,16 @@ class ItemActionsSheet extends ConsumerWidget {
   Future<void> _archive(BuildContext context, WidgetRef ref) => _run(
     context,
     ref,
-    () => ref
-        .read(itemActionsControllerProvider.notifier)
-        .archive(<Item>[item]),
+    () =>
+        ref.read(itemActionsControllerProvider.notifier).archive(<Item>[item]),
     context.l10n.itemArchived,
   );
 
   Future<void> _restore(BuildContext context, WidgetRef ref) => _run(
     context,
     ref,
-    () => ref
-        .read(itemActionsControllerProvider.notifier)
-        .restore(<Item>[item]),
+    () =>
+        ref.read(itemActionsControllerProvider.notifier).restore(<Item>[item]),
     context.l10n.itemRestored,
   );
 
@@ -137,10 +132,7 @@ class ItemActionsSheet extends ConsumerWidget {
               context.l10n.commonDeleted,
             ),
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );
@@ -170,7 +162,10 @@ class ItemActionsSheet extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -227,9 +222,8 @@ class ItemActionsSheet extends ConsumerWidget {
             label: isArchived
                 ? context.l10n.itemActionRestore
                 : context.l10n.itemActionArchive,
-            onTap: () => isArchived
-                ? _restore(context, ref)
-                : _archive(context, ref),
+            onTap: () =>
+                isArchived ? _restore(context, ref) : _archive(context, ref),
           ),
           _ActionRow(
             icon: Symbols.delete_rounded,

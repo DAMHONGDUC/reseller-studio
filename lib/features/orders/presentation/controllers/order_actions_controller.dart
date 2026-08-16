@@ -40,14 +40,14 @@ class OrderActionsController extends Notifier<bool> {
     AppAnalytics.instance.orderShipped(hasTracking: trackingNumber != null);
 
     return _save(
-    'Ship order',
-    order.copyWith(
-      status: OrderStatus.shipped,
-      carrier: carrier,
-      trackingNumber: trackingNumber,
-      shippingCost: shippingCost,
-      shippedAt: shippedAt ?? DateTime.now(),
-    ),
+      'Ship order',
+      order.copyWith(
+        status: OrderStatus.shipped,
+        carrier: carrier,
+        trackingNumber: trackingNumber,
+        shippingCost: shippingCost,
+        shippedAt: shippedAt ?? DateTime.now(),
+      ),
       <String, Object>{
         'hasTracking': trackingNumber != null,
         'hasCarrier': carrier != null,
@@ -57,10 +57,7 @@ class OrderActionsController extends Notifier<bool> {
 
   Future<void> markDelivered(Order order) => _save(
     'Deliver order',
-    order.copyWith(
-      status: OrderStatus.delivered,
-      deliveredAt: DateTime.now(),
-    ),
+    order.copyWith(status: OrderStatus.delivered, deliveredAt: DateTime.now()),
     const <String, Object>{},
   );
 
@@ -69,18 +66,12 @@ class OrderActionsController extends Notifier<bool> {
   /// **The one stored figure that is not derived** (hard rule 3): it is a fact
   /// the platform reported, and it is what the seller reconciles their bank
   /// against.
-  Future<void> recordSettlement(
-    Order order, {
-    Money? fees,
-    Money? payout,
-  }) => _save(
-    'Record settlement',
-    order.copyWith(fees: fees, payout: payout),
-    <String, Object>{
-      'hasFees': fees != null,
-      'hasPayout': payout != null,
-    },
-  );
+  Future<void> recordSettlement(Order order, {Money? fees, Money? payout}) =>
+      _save(
+        'Record settlement',
+        order.copyWith(fees: fees, payout: payout),
+        <String, Object>{'hasFees': fees != null, 'hasPayout': payout != null},
+      );
 
   Future<void> requestReturn(Order order) {
     AppAnalytics.instance.returnOpened();
@@ -184,7 +175,6 @@ class OrderActionsController extends Notifier<bool> {
 }
 
 final NotifierProvider<OrderActionsController, bool>
-orderActionsControllerProvider =
-    NotifierProvider<OrderActionsController, bool>(
-      OrderActionsController.new,
-    );
+orderActionsControllerProvider = NotifierProvider<OrderActionsController, bool>(
+  OrderActionsController.new,
+);

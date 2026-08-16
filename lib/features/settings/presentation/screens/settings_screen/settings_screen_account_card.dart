@@ -26,10 +26,7 @@ class _AccountCard extends ConsumerWidget {
               () => ref.read(authControllerProvider.notifier).signOut(),
             ),
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );
@@ -51,10 +48,7 @@ class _AccountCard extends ConsumerWidget {
               () => ref.read(authControllerProvider.notifier).deleteAccount(),
             ),
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );
@@ -72,7 +66,10 @@ class _AccountCard extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 

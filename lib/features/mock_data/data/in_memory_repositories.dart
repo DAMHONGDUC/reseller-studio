@@ -344,9 +344,7 @@ class InMemoryCategoryRepository implements CategoryRepository {
         _store.categories
             .where((ItemCategory category) => !category.isDeleted)
             .toList()
-          ..sort(
-            (ItemCategory a, ItemCategory b) => a.name.compareTo(b.name),
-          );
+          ..sort((ItemCategory a, ItemCategory b) => a.name.compareTo(b.name));
 
     return live;
   });

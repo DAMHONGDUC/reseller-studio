@@ -113,11 +113,9 @@ class LocationsScreen extends ConsumerWidget {
 
     await _write(
       context,
-      () => ref.read(catalogControllerProvider.notifier).saveLocation(
-        name: name,
-        kind: kind,
-        parentId: parentId,
-      ),
+      () => ref
+          .read(catalogControllerProvider.notifier)
+          .saveLocation(name: name, kind: kind, parentId: parentId),
       context.l10n.locationAdded,
     );
   }
@@ -148,10 +146,7 @@ class LocationsScreen extends ConsumerWidget {
               context.l10n.commonDeleted,
             ),
           ),
-          SdDialogActionV3(
-            label: context.l10n.actionCancel,
-            onPressed: () {},
-          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
         ],
       ),
     );
@@ -172,7 +167,10 @@ class LocationsScreen extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -213,9 +211,7 @@ class LocationsScreen extends ConsumerWidget {
                     (StorageLocation location) => _LocationRow(
                       location: location,
                       itemCount: items
-                          .where(
-                            (Item item) => item.locationId == location.id,
-                          )
+                          .where((Item item) => item.locationId == location.id)
                           .length,
                       onDelete: (int count) =>
                           _confirmDelete(context, ref, location, count),
@@ -242,8 +238,9 @@ final class LocationTreeOrder {
     void addChildren(String? parentId) {
       final List<StorageLocation> children =
           locations
-              .where((StorageLocation location) =>
-                  location.parentId == parentId)
+              .where(
+                (StorageLocation location) => location.parentId == parentId,
+              )
               .toList()
             ..sort(
               (StorageLocation a, StorageLocation b) =>

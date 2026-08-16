@@ -115,5 +115,6 @@ class SubscriptionController extends Notifier<bool> {
 }
 
 final NotifierProvider<SubscriptionController, bool>
-subscriptionControllerProvider =
-    NotifierProvider<SubscriptionController, bool>(SubscriptionController.new);
+subscriptionControllerProvider = NotifierProvider<SubscriptionController, bool>(
+  SubscriptionController.new,
+);

@@ -78,11 +78,7 @@ class ShippingQueueScreen extends ConsumerWidget {
   }
 
   /// "Due in 2d" reads as an instruction; a date reads as a fact to work out.
-  static String _deadlineLine(
-    BuildContext context,
-    Order order,
-    DateTime now,
-  ) {
+  static String _deadlineLine(BuildContext context, Order order, DateTime now) {
     final DateTime? deadline = order.shipByDate;
     final String marketplace = order.marketplace.displayName;
 

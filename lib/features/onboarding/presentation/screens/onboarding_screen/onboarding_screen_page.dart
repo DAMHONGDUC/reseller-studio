@@ -15,9 +15,7 @@ class _OnboardingPageView extends StatelessWidget {
     final Color accent = context.colorScheme3.primary;
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: SdContentPaddingV3.horizontal,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -28,9 +26,7 @@ class _OnboardingPageView extends StatelessWidget {
             decoration: BoxDecoration(
               // The same wash `SdIconTileV3` puts behind a row glyph, read
               // from it rather than retyped, so the two never drift.
-              color: accent.withValues(
-                alpha: SdIconTileV3.backgroundOpacity,
-              ),
+              color: accent.withValues(alpha: SdIconTileV3.backgroundOpacity),
               shape: BoxShape.circle,
             ),
             child: SdIconV3(

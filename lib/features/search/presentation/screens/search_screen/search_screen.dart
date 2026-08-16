@@ -90,9 +90,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           Expanded(
             child: switch (hits) {
-              _
-                  when query.trim().length <
-                      SearchConstant.minimumQueryLength =>
+              _ when query.trim().length < SearchConstant.minimumQueryLength =>
                 const SdEmptyStateV3(
                   icon: Symbols.search_rounded,
                   title: 'Search everything',
