@@ -20,6 +20,14 @@ portability is the whole reason the design system is a submodule.
 - `melos run gen` — after editing any ARB file.
 - `melos run analyze` — always-apply; see the root `CLAUDE.md` under
   "Definition of done". Not repeated here.
+- **CI runs these same scripts, it does not retype them.**
+  `.github/workflows/ci.yml` calls `tool/analyze.sh` and `tool/test.sh`, and
+  reads the SDK version out of `.fvmrc` rather than pinning its own. Both
+  scripts fall back from `fvm flutter` to plain `flutter` when fvm is absent,
+  which is the only difference between a runner and a laptop.
+  **CI needs the `packages/system_design` submodule pushed** — it checks out
+  the commit the app's gitlink names, and a commit that only exists locally
+  fails the checkout before anything is analyzed.
 - `melos run test` — the Flutter test suite. **Exclude `*_tmp_test.dart`** —
   the scratch harnesses hang the runner by design, and `flutter test` with no
   arguments picks them up.
