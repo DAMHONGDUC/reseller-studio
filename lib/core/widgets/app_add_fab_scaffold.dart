@@ -56,12 +56,32 @@ class AppAddFabScaffold extends StatefulWidget {
   /// wrong one gets tapped.
   final bool showAdd;
 
+  /// Where the button's top edge sits, measured up from the bottom of the
+  /// window.
+  ///
+  /// **Three terms, and dropping any one of them puts a row behind the
+  /// button.** What the button itself clears — the glass bar on a tab screen,
+  /// the device's safe area anywhere else — plus `Scaffold`'s own FAB margin,
+  /// plus the button. That margin is the term this used to miss: `Scaffold`
+  /// adds it whatever the caller does, so a clearance computed without it is
+  /// short by exactly 16 and the last row of Expenses sat under the button.
+  static double fabInset(BuildContext context, {bool floatingNav = false}) =>
+      (floatingNav
+          ? SdContentPaddingV3.floatingBarInset(context)
+          : SdContentPaddingV3.detailBottom(context)) +
+      kFloatingActionButtonMargin +
+      SdFabV3.size;
+
   /// Screen padding with room for the button underneath it.
   ///
   /// Belongs here rather than at each call site: the button is this widget's
   /// doing, so the clearance it needs is too. Without it the last row of every
   /// list sits under the FAB and cannot be tapped — which only shows up when
   /// the list is long enough to scroll to the end.
+  ///
+  /// Clears the button and then leaves `bottomGap` above it, the same air the
+  /// last row gets over the nav bar — owner's rule that no content is ever
+  /// covered by the chrome at the bottom of the screen.
   static EdgeInsets listPadding(
     BuildContext context, {
     bool floatingNav = false,
@@ -70,8 +90,8 @@ class AppAddFabScaffold extends StatefulWidget {
     floatingNav: floatingNav,
   ).copyWith(
     bottom:
-        SdContentPaddingV3.bottom(context, floatingNav: floatingNav) +
-        SdFabV3.size,
+        fabInset(context, floatingNav: floatingNav) +
+        SdContentPaddingV3.bottomGap,
   );
 
   @override

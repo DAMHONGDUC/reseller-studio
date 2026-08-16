@@ -44,6 +44,7 @@ import '../../features/workspace/providers.dart';
 import '../logging/app_logger.dart';
 import '../widgets/app_shell.dart';
 import '../widgets/splash_screen.dart';
+import 'app_navigator_key.dart';
 import 'app_routes.dart';
 
 /// The app's router.
@@ -69,6 +70,7 @@ import 'app_routes.dart';
 /// user's own taps.
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
   final GoRouter router = GoRouter(
+    navigatorKey: AppNavigatorKey.root,
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: false,
     redirect: (BuildContext context, GoRouterState state) {
@@ -155,26 +157,31 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     const InventoryScreen(),
                 routes: <RouteBase>[
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'quick-add',
                     builder: (BuildContext context, GoRouterState state) =>
                         const QuickAddScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'add',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ItemFormScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'scanner',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ScannerScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'locations',
                     builder: (BuildContext context, GoRouterState state) =>
                         const LocationsScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'item/:itemId',
                     builder: (BuildContext context, GoRouterState state) =>
                         ItemDetailScreen(
@@ -184,6 +191,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         ),
                     routes: <RouteBase>[
                       GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
                         path: 'edit',
                         builder: (BuildContext context, GoRouterState state) =>
                             ItemFormScreen(
@@ -204,11 +212,13 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     const OrdersScreen(),
                 routes: <RouteBase>[
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'shipping-queue',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ShippingQueueScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'offers',
                     builder: (BuildContext context, GoRouterState state) =>
                         const OffersScreen(),
@@ -217,6 +227,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                   // segment declared after `:orderId` would be swallowed by
                   // the parameter, so every fixed path must come first.
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: ':orderId',
                     builder: (BuildContext context, GoRouterState state) =>
                         OrderDetailScreen(
@@ -235,31 +246,37 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     const AnalyticsScreen(),
                 routes: <RouteBase>[
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'sales',
                     builder: (BuildContext context, GoRouterState state) =>
                         const AnalyticsSalesScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'profit',
                     builder: (BuildContext context, GoRouterState state) =>
                         const AnalyticsProfitScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'inventory',
                     builder: (BuildContext context, GoRouterState state) =>
                         const AnalyticsInventoryScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'marketplace',
                     builder: (BuildContext context, GoRouterState state) =>
                         const AnalyticsMarketplaceScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'categories',
                     builder: (BuildContext context, GoRouterState state) =>
                         const AnalyticsCategoriesScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'sources',
                     builder: (BuildContext context, GoRouterState state) =>
                         const AnalyticsSourcesScreen(),
@@ -280,31 +297,37 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 // come back to where they were.
                 routes: <RouteBase>[
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'settings',
                     builder: (BuildContext context, GoRouterState state) =>
                         const SettingsScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'sourcing',
                     builder: (BuildContext context, GoRouterState state) =>
                         const SourcingScreen(),
                     routes: <RouteBase>[
                       GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
                         path: 'evaluate',
                         builder: (BuildContext context, GoRouterState state) =>
                             const PurchaseEvaluatorScreen(),
                       ),
                       GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
                         path: 'sources',
                         builder: (BuildContext context, GoRouterState state) =>
                             const SourcesScreen(),
                       ),
                       GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
                         path: 'purchases',
                         builder: (BuildContext context, GoRouterState state) =>
                             const PurchasesScreen(),
                         routes: <RouteBase>[
                           GoRoute(
+                            parentNavigatorKey: AppNavigatorKey.root,
                             path: ':purchaseId',
                             builder:
                                 (
@@ -320,46 +343,55 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     ],
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'listings',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ListingsScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'expenses',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ExpensesScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'reports',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ReportsScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'receipts',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ReceiptsScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'categories',
                     builder: (BuildContext context, GoRouterState state) =>
                         const CategoriesScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'marketplaces',
                     builder: (BuildContext context, GoRouterState state) =>
                         const MarketplacesScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'team',
                     builder: (BuildContext context, GoRouterState state) =>
                         const TeamScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'subscription',
                     builder: (BuildContext context, GoRouterState state) =>
                         const SubscriptionScreen(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'tax',
                     builder: (BuildContext context, GoRouterState state) =>
                         const TaxScreen(),

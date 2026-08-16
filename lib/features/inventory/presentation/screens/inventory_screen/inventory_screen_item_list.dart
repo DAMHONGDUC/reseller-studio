@@ -19,7 +19,10 @@ class _ItemList extends ConsumerWidget {
         SdContentPaddingV3.horizontal,
         // Clears the floating tab bar AND the FAB stacked above it —
         // otherwise the last row sits under "Quick Add" and cannot be tapped.
-        SdContentPaddingV3.bottom(context, floatingNav: true) + SdFabV3.size,
+        // The same arithmetic every other create screen uses, rather than a
+        // second copy of it here: this list is a sliver, so it takes the
+        // number instead of the whole `EdgeInsets`.
+        AppAddFabScaffold.listPadding(context, floatingNav: true).bottom,
       ),
       sliver: SliverList.separated(
         itemCount: items.length,
