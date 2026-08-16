@@ -174,23 +174,27 @@ because they are about the shell, not the bar:
   and the Search screen's plain autofocused field. That is a recorded decision,
   not a duplication to clean up: `DECISIONS.md`.
 
-## Home carries Quick Access, and it must stay complete
+## Home carries Quick Action, and it must stay complete
 
 Owner's rule. The create actions are scattered by design — each lives on the
 screen owning the records it makes, behind that screen's own `SdFabV3`. That
 is right for a seller already on the screen and wrong for one who opened the
 app holding a receipt, so Home lists **every** one of them.
 
-`QuickAccessConstant.actions` is that list and the only one. A row pushes the
+`QuickActionConstant.actions` is that list and the only one. A row pushes the
 screen that owns the action; it never opens a form Home would then have to
 know how to save.
 
-**About is the one row here that is not a create action, and it goes last** —
-owner's call. It sits two levels deep under Settings, and the seller most
-likely to want "how does this work" is the one still learning where things
-are. Last in the list, so the create actions above it keep the section's
-shape and a seller scanning for "add" does not step over it. Nothing else
-non-create joins them without the same decision.
+**Quick Action holds create actions and nothing else** — owner's rule, and
+the reason there are two sections rather than one. A seller scanning it must
+never step over a row that adds nothing. Anything worth *reading* rather than
+doing goes in **Quick Access**, the section directly under it, which is where
+About lives. The split is also what lets `QuickActionConstant` say "only
+create actions" and mean it.
+
+The shortcut card at the top of Home is named after the section it lands on
+and scrolls to the end, which reaches both — a card that said something other
+than where it goes is a card that lies.
 
 **Rows, and always last on the screen** — owner's rule. Home answers "what
 needs attention today" first, so a launcher sitting above the figures makes
