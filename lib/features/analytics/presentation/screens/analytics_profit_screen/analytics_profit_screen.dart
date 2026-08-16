@@ -71,11 +71,7 @@ class AnalyticsProfitScreen extends ConsumerWidget {
                 value: context.money(overheads),
                 caption: 'Overheads not charged to an order',
               ),
-              Divider(
-                height: SdSpacingConstant.h16,
-                thickness: 1,
-                color: context.sdTheme3.divider,
-              ),
+              SdDividerV3(gap: SdSpacingConstant.h8),
               MetricRow(
                 label: 'Net profit',
                 value: context.money(profit),

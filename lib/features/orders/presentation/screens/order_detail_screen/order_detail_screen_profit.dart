@@ -52,11 +52,7 @@ class _ProfitStatement extends StatelessWidget {
             label: context.l10n.orderOtherExpenses,
             value: context.money(profit.otherExpenses),
           ),
-          Divider(
-            height: SdSpacingConstant.h16,
-            thickness: 1,
-            color: context.sdTheme3.divider,
-          ),
+          SdDividerV3(gap: SdSpacingConstant.h8),
           _OrderDetailRow(
             label: context.l10n.commonNetProfit,
             value: context.money(net),

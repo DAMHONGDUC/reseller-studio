@@ -30,14 +30,7 @@ class _ProfitStatement extends StatelessWidget {
           value: context.money(summary.totalExpenses),
           isDeduction: true,
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: SdSpacingConstant.h8),
-          child: Divider(
-            height: 1,
-            thickness: 1,
-            color: context.sdTheme3.divider,
-          ),
-        ),
+        SdDividerV3(gap: SdSpacingConstant.h8),
         Row(
           children: <Widget>[
             Expanded(

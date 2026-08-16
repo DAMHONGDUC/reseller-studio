@@ -45,7 +45,7 @@ class _MoreRow extends StatelessWidget {
           ),
         ),
         if (!isLast)
-          Divider(height: 1, thickness: 1, color: context.sdTheme3.divider),
+          const SdDividerV3(),
       ],
     );
   }

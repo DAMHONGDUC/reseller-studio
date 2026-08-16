@@ -33,11 +33,7 @@ class _RecentActivity extends ConsumerWidget {
                         SdIconTileSizeV3.small.box +
                         SdSpacingConstant.w12,
                   ),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: context.sdTheme3.divider,
-                  ),
+                  child: const SdDividerV3(),
                 ),
             ],
           ],

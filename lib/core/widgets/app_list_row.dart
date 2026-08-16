@@ -128,7 +128,7 @@ class AppListCard extends StatelessWidget {
         for (int i = 0; i < children.length; i++) ...<Widget>[
           children[i],
           if (i != children.length - 1)
-            Divider(height: 1, thickness: 1, color: context.sdTheme3.divider),
+            const SdDividerV3(),
         ],
       ],
     ),

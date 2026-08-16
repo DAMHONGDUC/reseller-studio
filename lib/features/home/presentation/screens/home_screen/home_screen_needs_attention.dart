@@ -75,11 +75,7 @@ class _NeedsAttention extends ConsumerWidget {
                               SdIconTileSizeV3.medium.box +
                               SdSpacingConstant.w12,
                         ),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: context.sdTheme3.divider,
-                        ),
+                        child: const SdDividerV3(),
                       ),
                   ],
                 ],

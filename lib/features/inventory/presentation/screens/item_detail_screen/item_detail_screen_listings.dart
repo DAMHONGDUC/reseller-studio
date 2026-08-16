@@ -28,7 +28,7 @@ class _Listings extends ConsumerWidget {
           for (int i = 0; i < listings.length; i++) ...<Widget>[
             _ListingRow(listing: listings[i]),
             if (i != listings.length - 1)
-              Divider(height: 1, thickness: 1, color: context.sdTheme3.divider),
+              const SdDividerV3(),
           ],
         ],
       ),
