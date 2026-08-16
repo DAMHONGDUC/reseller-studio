@@ -49,13 +49,17 @@ dash -n tool/<script>.sh
 a `--build-name`/`--build-number` flag.** A build whose version exists nowhere
 in git is one the repo cannot account for afterwards.
 
-Running the app before Firebase exists — the app is otherwise stuck on a
-login screen that cannot succeed (hard rule 1). `env/dev.json` carries
-`BYPASS_AUTH` and `MOCK_DATA_DEFAULT`, so this is all it takes:
+Running the app before Firebase exists — sign-in cannot succeed yet, so
+`env/dev.json` carries `BYPASS_AUTH` to get past it:
 
 ```sh
 melos run run
 ```
+
+**Mock data does not come on with it** — owner's rule. `MOCK_DATA_DEFAULT` is
+off unless the env file sets it, so a dev run opens the app a new seller would
+see: five tabs with nothing in them. Turn the fake business on in
+More → Settings when you want it, or set the key.
 
 VS Code users: the **"Seller OS (dev)"** launch configuration does the same.
 **Never run the app bare** — with no `--dart-define-from-file` every `AppEnv`
