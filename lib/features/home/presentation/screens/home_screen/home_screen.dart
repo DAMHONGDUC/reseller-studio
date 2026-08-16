@@ -23,6 +23,7 @@ part 'home_screen_all_clear.dart';
 part 'home_screen_attention_row.dart';
 part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
+part 'home_screen_quick_access.dart';
 part 'home_screen_recent_activity.dart';
 
 /// Home — "what do I need to do today?".
@@ -69,6 +70,11 @@ class HomeScreen extends ConsumerWidget {
           SizedBox(height: SdContentPaddingV3.topGap),
           const SdSectionHeaderV3(title: 'Needs Attention', first: true),
           const _NeedsAttention(),
+          SdSectionHeaderV3(
+            title: context.l10n.homeQuickAccess,
+            subtitle: context.l10n.homeQuickAccessSubtitle,
+          ),
+          const _QuickAccess(),
           const SdSectionHeaderV3(title: 'Performance'),
           const _PerformanceBlock(),
           const SdSectionHeaderV3(title: 'Recent Activity'),

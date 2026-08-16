@@ -4,12 +4,13 @@ import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
-/// The current tab is marked by a **shape**, not only by a colour.
+/// The current tab is marked the way iOS marks it: the **glyph fills in**,
+/// and nothing appears behind it.
 ///
-/// Hue alone is unreadable to a colour-blind seller, and this bar is glass
-/// with a moving list showing through it — the one place in the app where a
-/// tint has the least to work with. The indicator pill is what makes the
-/// current tab findable at a glance.
+/// A shape behind the icon is Material's idiom and reads as a foreign control
+/// sitting inside iOS chrome. `FILL` is a variable-font axis, so weight is a
+/// real second signal alongside colour — which colour alone must never be,
+/// least of all on glass with a moving list showing through it.
 void main() {
   const List<SdNavDestinationV3> destinations = <SdNavDestinationV3>[
     SdNavDestinationV3(icon: Icons.home, label: 'Home'),
@@ -32,39 +33,63 @@ void main() {
     ),
   );
 
-  /// The pill behind each glyph, in destination order.
-  List<Color?> indicators(WidgetTester tester) => tester
-      .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
-      .map(
-        (AnimatedContainer container) =>
-            (container.decoration! as BoxDecoration).color,
+  /// How filled each destination's glyph is, in destination order.
+  List<double?> fills(WidgetTester tester) => tester
+      .widgetList<Icon>(
+        find.descendant(
+          of: find.byType(SdGlassNavBarV3),
+          matching: find.byType(Icon),
+        ),
       )
+      .map((Icon icon) => icon.fill)
       .toList();
 
-  testWidgets('exactly one destination carries the pill', (
+  testWidgets('exactly one destination is filled in', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 2);
 
-    final List<Color?> filled = indicators(tester)
-        .where((Color? color) => color != null && color.a > 0)
-        .toList();
-
-    expect(filled, hasLength(1));
+    expect(fills(tester).where((double? fill) => fill == 1), hasLength(1));
+    expect(fills(tester)[2], 1);
   });
 
-  testWidgets('the pill moves with the selection', (
+  testWidgets('the fill moves with the selection', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 0);
 
-    expect(indicators(tester).first!.a, greaterThan(0));
-    expect(indicators(tester).last!.a, 0);
+    expect(fills(tester).first, 1);
+    expect(fills(tester).last, 0);
 
     await pumpBar(tester, destinations.length - 1);
 
-    expect(indicators(tester).first!.a, 0);
-    expect(indicators(tester).last!.a, greaterThan(0));
+    expect(fills(tester).first, 0);
+    expect(fills(tester).last, 1);
+  });
+
+  testWidgets('nothing is drawn behind the current glyph', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 0);
+
+    // The Material indicator pill was tried and removed: iOS does not put a
+    // shape behind a tab bar glyph, and one here read as a foreign control.
+    final Iterable<BoxDecoration> painted = tester
+        .widgetList<DecoratedBox>(
+          find.descendant(
+            of: find.byType(SdGlassNavBarV3),
+            matching: find.byType(DecoratedBox),
+          ),
+        )
+        .map((DecoratedBox box) => box.decoration as BoxDecoration);
+
+    expect(
+      painted.where(
+        (BoxDecoration decoration) =>
+            decoration.color != null && decoration.color!.a > 0,
+      ),
+      isEmpty,
+    );
   });
 
   testWidgets('every destination still shows its label', (

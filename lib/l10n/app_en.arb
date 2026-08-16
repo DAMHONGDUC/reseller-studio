@@ -344,6 +344,26 @@
   "@moreTeam": {
     "description": "More destination: who can see this workspace."
   },
+  "homeQuickAccess": "Quick Access",
+  "@homeQuickAccess": {
+    "description": "Home section holding every create action in the app."
+  },
+  "homeQuickAccessSubtitle": "Everything you can add, from here",
+  "@homeQuickAccessSubtitle": {
+    "description": "Supporting line under the Quick Access section header."
+  },
+  "homeQuickRecordPurchase": "Record a purchase",
+  "@homeQuickRecordPurchase": {
+    "description": "Quick Access tile: log a buy from a source."
+  },
+  "homeQuickAddExpense": "Add an expense",
+  "@homeQuickAddExpense": {
+    "description": "Quick Access tile: record a business cost."
+  },
+  "homeQuickAddSource": "Add a source",
+  "@homeQuickAddSource": {
+    "description": "Quick Access tile: add a place stock is bought from."
+  },
   "moreTax": "Tax",
   "@moreTax": {
     "description": "More destination: the year-end tax summary."
