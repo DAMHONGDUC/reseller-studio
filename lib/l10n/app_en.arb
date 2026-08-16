@@ -348,9 +348,13 @@
   "@homeQuickAccess": {
     "description": "Home section holding every create action in the app."
   },
-  "homeQuickAccessSubtitle": "Everything you can add, from here",
+  "homeQuickAccessSubtitle": "Everything you can add, and how it all fits",
   "@homeQuickAccessSubtitle": {
     "description": "Supporting line under the Quick Access section header."
+  },
+  "homeShortcutSearch": "Search",
+  "@homeShortcutSearch": {
+    "description": "Home shortcut card, and the app bar tooltip, for global search."
   },
   "homeQuickRecordPurchase": "Record a purchase",
   "@homeQuickRecordPurchase": {
@@ -363,6 +367,10 @@
   "homeQuickAddSource": "Add a source",
   "@homeQuickAddSource": {
     "description": "Quick Access tile: add a place stock is bought from."
+  },
+  "settingsApp": "App",
+  "@settingsApp": {
+    "description": "Settings section holding what the app is and how it works."
   },
   "moreAbout": "About Seller OS",
   "@moreAbout": {

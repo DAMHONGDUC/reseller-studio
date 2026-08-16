@@ -17,6 +17,11 @@ part of 'home_screen.dart';
 /// screen open on a launcher instead of on the answer. At the bottom it is
 /// where a seller who came to *add* something scrolls to, and it costs the
 /// seller who came to *read* nothing.
+///
+/// **The shortcut card at the top scrolls here rather than duplicating this**
+/// — one card, not a second copy of nine rows. It aims at the end of the
+/// list because this section is last, so moving it breaks that card
+/// (`lib/features/home/CLAUDE.md`).
 class _QuickAccess extends StatelessWidget {
   const _QuickAccess();
 
@@ -25,9 +30,9 @@ class _QuickAccess extends StatelessWidget {
     padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
     child: AppListCard(
       children: <Widget>[
-        for (final QuickAddAction action in QuickAddConstant.actions)
+        for (final QuickAccessAction action in QuickAccessConstant.actions)
           AppListRow(
-            title: QuickAddLabel.of(context, action.kind),
+            title: QuickAccessLabel.of(context, action.kind),
             icon: action.icon,
             onTap: () => context.push(action.route),
           ),

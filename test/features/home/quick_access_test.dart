@@ -8,7 +8,8 @@ import 'package:seller_os/features/home/presentation/screens/home_screen/home_sc
 
 import '../../support/pump_app.dart';
 
-/// Quick Access is the one place that lists everything this app can create.
+/// Quick Access lists everything this app can create, and — last — the page
+/// explaining how it fits together.
 ///
 /// **Its whole value is being complete.** A section that shows six of the
 /// eight create actions is worse than none: a seller who has learned to look
@@ -34,9 +35,9 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
-    for (final QuickAddAction action in QuickAddConstant.actions) {
+    for (final QuickAccessAction action in QuickAccessConstant.actions) {
       expect(
-        find.text(QuickAddLabel.of(context, action.kind)),
+        find.text(QuickAccessLabel.of(context, action.kind)),
         findsWidgets,
         reason: '${action.kind.name} is in the list but not on Home',
       );
@@ -56,7 +57,7 @@ void main() {
     final double sectionTop = tester
         .getRect(
           find.text(
-            QuickAddLabel.of(context, QuickAddConstant.actions.first.kind),
+            QuickAccessLabel.of(context, QuickAccessConstant.actions.first.kind),
           ),
         )
         .top;
@@ -83,7 +84,28 @@ void main() {
         of: find.byType(AppListCard),
         matching: find.byType(AppListRow),
       ),
-      findsNWidgets(QuickAddConstant.actions.length),
+      findsNWidgets(QuickAccessConstant.actions.length),
+    );
+  });
+
+  test('About rides along, and it rides last', () {
+    // Owner's call. It is the one row here that is not a create action, so
+    // it goes at the end — the eight above it keep the section's shape, and
+    // a seller scanning for "add" does not have to step over it.
+    expect(QuickAccessConstant.actions.last.kind, QuickAccessKind.about);
+    expect(QuickAccessConstant.actions.first.kind, isNot(QuickAccessKind.about));
+  });
+
+  test('adding About displaced none of the create actions', () {
+    final Set<QuickAccessKind> creates = QuickAccessKind.values.toSet()
+      ..remove(QuickAccessKind.about);
+
+    expect(
+      QuickAccessConstant.actions
+          .map((QuickAccessAction a) => a.kind)
+          .toSet()
+          .containsAll(creates),
+      isTrue,
     );
   });
 
@@ -91,18 +113,18 @@ void main() {
     // The enum and the list are two halves of the same fact. Adding a case
     // without a tile compiles, and this is what stops it shipping.
     expect(
-      QuickAddConstant.actions.map((QuickAddAction a) => a.kind).toSet(),
-      QuickAddKind.values.toSet(),
+      QuickAccessConstant.actions.map((QuickAccessAction a) => a.kind).toSet(),
+      QuickAccessKind.values.toSet(),
     );
     expect(
-      QuickAddConstant.actions.length,
-      QuickAddKind.values.length,
+      QuickAccessConstant.actions.length,
+      QuickAccessKind.values.length,
       reason: 'a kind is listed twice',
     );
   });
 
   test('no tile points at a route that does not exist', () {
-    for (final QuickAddAction action in QuickAddConstant.actions) {
+    for (final QuickAccessAction action in QuickAccessConstant.actions) {
       expect(action.route, startsWith('/'));
       // A parameterised path cannot be pushed without its argument, so a
       // Quick Access tile must never be given one.
@@ -138,8 +160,8 @@ void main() {
     // Sanity: the audit is worthless if it found nothing to audit.
     expect(screens, isNotEmpty);
 
-    final Set<String> routes = QuickAddConstant.actions
-        .map((QuickAddAction action) => action.route)
+    final Set<String> routes = QuickAccessConstant.actions
+        .map((QuickAccessAction action) => action.route)
         .toSet();
 
     // Each create screen's own route has to be one Quick Access opens, or the

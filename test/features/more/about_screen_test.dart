@@ -5,6 +5,7 @@ import 'package:seller_os/core/router/app_routes.dart';
 import 'package:seller_os/features/more/more_constant.dart';
 import 'package:seller_os/features/more/presentation/screens/about_screen/about_screen.dart';
 import 'package:seller_os/features/more/workflow_constant.dart';
+import 'package:seller_os/features/settings/presentation/screens/settings_screen/settings_screen.dart';
 
 import '../../support/pump_app.dart';
 
@@ -82,16 +83,20 @@ void main() {
     }
   });
 
-  test('About is reachable from More', () {
+  testWidgets('About is reached from Settings, not from the More list', (
+    WidgetTester tester,
+  ) async {
+    // Owner's call: More is a long list already, and "what is this app" is a
+    // question asked once rather than a destination worked from.
     expect(
       MoreConstant.destinations.map((MoreDestination d) => d.route),
-      contains(AppRoutes.about),
+      isNot(contains(AppRoutes.about)),
     );
-    expect(
-      MoreConstant.destinations
-          .firstWhere((MoreDestination d) => d.route == AppRoutes.about)
-          .isBuilt,
-      isTrue,
-    );
+
+    await pumpScreen(tester, const SettingsScreen());
+
+    final BuildContext context = tester.element(find.byType(SettingsScreen));
+
+    expect(find.text(context.l10n.moreAbout), findsOneWidget);
   });
 }

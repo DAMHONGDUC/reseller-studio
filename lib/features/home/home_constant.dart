@@ -16,26 +16,79 @@ final class HomeConstant {
 
 }
 
+/// One of the three cards at the top of Home.
+///
+/// **No route on it, unlike [QuickAccessAction].** Only two of the three are
+/// a navigation at all — the first scrolls this screen — so the card asks
+/// [HomeShortcutKind] what to do rather than pushing a path it was handed.
+class HomeShortcut {
+  const HomeShortcut({required this.kind, required this.icon});
+
+  final HomeShortcutKind kind;
+  final IconData icon;
+}
+
+/// The three ways out of Home.
+enum HomeShortcutKind { quickAccess, search, analytics }
+
+/// **The three cards that open Home** — owner's rule.
+///
+/// Home's own content answers "what needs attention today", and everything
+/// that answers it is *inside* this screen. These three are the ways out: down
+/// to Quick Access, sideways into global search, across to Analytics. They sit
+/// first because a seller who opened the app to *go somewhere* should not have
+/// to read a dashboard on the way.
+///
+/// **Three, and the list is closed.** A fourth would make this a launcher,
+/// which is exactly what keeping Quick Access at the bottom exists to avoid —
+/// the row works because it is short enough to take in without reading.
+final class HomeShortcutConstant {
+  static const List<HomeShortcut> shortcuts = <HomeShortcut>[
+    HomeShortcut(
+      kind: HomeShortcutKind.quickAccess,
+      icon: Symbols.bolt_rounded,
+    ),
+    HomeShortcut(kind: HomeShortcutKind.search, icon: Symbols.search_rounded),
+    HomeShortcut(
+      kind: HomeShortcutKind.analytics,
+      icon: Symbols.bar_chart_rounded,
+    ),
+  ];
+}
+
+/// The words for a Home shortcut card.
+///
+/// Each reuses the key its destination already owns — a card that said
+/// something other than the section it lands on is a card that lies.
+final class HomeShortcutLabel {
+  static String of(BuildContext context, HomeShortcutKind kind) =>
+      switch (kind) {
+        HomeShortcutKind.quickAccess => context.l10n.homeQuickAccess,
+        HomeShortcutKind.search => context.l10n.homeShortcutSearch,
+        HomeShortcutKind.analytics => context.l10n.navAnalytics,
+      };
+}
+
 /// One create action, as Quick Access offers it.
 ///
 /// **The label is not here.** A label is a user-facing string (hard rule 7),
-/// so the tile carries a [kind] and `QuickAddLabel` turns it into words —
+/// so the tile carries a [kind] and `QuickAccessLabel` turns it into words —
 /// which is also what keeps the list below `const`. The same shape
 /// `MoreDestination` has, for the same reason.
-class QuickAddAction {
-  const QuickAddAction({
+class QuickAccessAction {
+  const QuickAccessAction({
     required this.kind,
     required this.icon,
     required this.route,
   });
 
-  final QuickAddKind kind;
+  final QuickAccessKind kind;
   final IconData icon;
   final String route;
 }
 
 /// Every create action in the app.
-enum QuickAddKind {
+enum QuickAccessKind {
   quickAddItem,
   addItem,
   scan,
@@ -44,9 +97,11 @@ enum QuickAddKind {
   addSource,
   addCategory,
   addLocation,
+  about,
 }
 
-/// **The one list of everything this app can create.**
+/// **Everything this app can create, plus the page explaining how it fits
+/// together.**
 ///
 /// Quick Access exists because the create actions are scattered by design —
 /// each lives on the screen that owns the records it makes, behind that
@@ -54,67 +109,80 @@ enum QuickAddKind {
 /// on the screen and wrong for one who opened the app to add something: it is
 /// three taps to record an expense from Home.
 ///
+/// **About rides along at the end** — owner's call. It is not a create
+/// action, and it is the one row here that is not: it sits two levels deep
+/// under Settings, and the seller most likely to want "how does this work"
+/// is the one still learning where everything is. Last in the list, so the
+/// eight actions above it keep the section's shape.
+///
 /// **Adding a create action anywhere means adding it here.**
 /// `test/features/home/quick_access_test.dart` fails when a screen grows an
-/// `AppAddFabScaffold` this list does not know about, so the two cannot drift.
-final class QuickAddConstant {
-  static const List<QuickAddAction> actions = <QuickAddAction>[
+/// `AppAddFabScaffold` this list does not know about, so the two cannot
+/// drift.
+final class QuickAccessConstant {
+  static const List<QuickAccessAction> actions = <QuickAccessAction>[
     // Ordered by how often a reseller reaches for it, not alphabetically.
     // Quick Add is first because hard rule 2 says the product's speed rests
     // on it.
-    QuickAddAction(
-      kind: QuickAddKind.quickAddItem,
+    QuickAccessAction(
+      kind: QuickAccessKind.quickAddItem,
       icon: Symbols.bolt_rounded,
       route: AppRoutes.quickAdd,
     ),
-    QuickAddAction(
-      kind: QuickAddKind.scan,
+    QuickAccessAction(
+      kind: QuickAccessKind.scan,
       icon: Symbols.barcode_scanner_rounded,
       route: AppRoutes.scanner,
     ),
-    QuickAddAction(
-      kind: QuickAddKind.addItem,
+    QuickAccessAction(
+      kind: QuickAccessKind.addItem,
       icon: Symbols.add_box_rounded,
       route: AppRoutes.addItem,
     ),
-    QuickAddAction(
-      kind: QuickAddKind.recordPurchase,
+    QuickAccessAction(
+      kind: QuickAccessKind.recordPurchase,
       icon: Symbols.shopping_bag_rounded,
       route: AppRoutes.addPurchase,
     ),
-    QuickAddAction(
-      kind: QuickAddKind.addExpense,
+    QuickAccessAction(
+      kind: QuickAccessKind.addExpense,
       icon: Symbols.receipt_rounded,
       route: AppRoutes.expenses,
     ),
-    QuickAddAction(
-      kind: QuickAddKind.addSource,
+    QuickAccessAction(
+      kind: QuickAccessKind.addSource,
       icon: Symbols.storefront_rounded,
       route: AppRoutes.sources,
     ),
-    QuickAddAction(
-      kind: QuickAddKind.addCategory,
+    QuickAccessAction(
+      kind: QuickAccessKind.addCategory,
       icon: Symbols.category_rounded,
       route: AppRoutes.categories,
     ),
-    QuickAddAction(
-      kind: QuickAddKind.addLocation,
+    QuickAccessAction(
+      kind: QuickAccessKind.addLocation,
       icon: Symbols.shelves,
       route: AppRoutes.locations,
+    ),
+    QuickAccessAction(
+      kind: QuickAccessKind.about,
+      icon: Symbols.info_rounded,
+      route: AppRoutes.about,
     ),
   ];
 }
 
 /// The words for a Quick Access tile.
-final class QuickAddLabel {
-  static String of(BuildContext context, QuickAddKind kind) => switch (kind) {
-    QuickAddKind.quickAddItem => context.l10n.quickAddTitle,
-    QuickAddKind.addItem => context.l10n.inventoryAddItem,
-    QuickAddKind.scan => context.l10n.inventoryScan,
-    QuickAddKind.recordPurchase => context.l10n.homeQuickRecordPurchase,
-    QuickAddKind.addExpense => context.l10n.homeQuickAddExpense,
-    QuickAddKind.addSource => context.l10n.homeQuickAddSource,
-    QuickAddKind.addCategory => context.l10n.categoryAdd,
-    QuickAddKind.addLocation => context.l10n.locationAdd,
+final class QuickAccessLabel {
+  static String of(BuildContext context, QuickAccessKind kind) => switch (kind) {
+    QuickAccessKind.quickAddItem => context.l10n.quickAddTitle,
+    QuickAccessKind.addItem => context.l10n.inventoryAddItem,
+    QuickAccessKind.scan => context.l10n.inventoryScan,
+    QuickAccessKind.recordPurchase => context.l10n.homeQuickRecordPurchase,
+    QuickAccessKind.addExpense => context.l10n.homeQuickAddExpense,
+    QuickAccessKind.addSource => context.l10n.homeQuickAddSource,
+    QuickAccessKind.addCategory => context.l10n.categoryAdd,
+    QuickAccessKind.addLocation => context.l10n.locationAdd,
+    QuickAccessKind.about => context.l10n.moreAbout,
   };
 }

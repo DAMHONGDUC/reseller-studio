@@ -39,7 +39,6 @@ enum MoreDestinationKind {
   team,
   tax,
   subscription,
-  about,
   settings,
 }
 
@@ -58,7 +57,6 @@ final class MoreLabel {
         MoreDestinationKind.team => context.l10n.moreTeam,
         MoreDestinationKind.tax => context.l10n.moreTax,
         MoreDestinationKind.subscription => context.l10n.moreSubscription,
-        MoreDestinationKind.about => context.l10n.moreAbout,
         MoreDestinationKind.settings => context.l10n.moreSettings,
       };
 }
@@ -138,12 +136,6 @@ final class MoreConstant {
       kind: MoreDestinationKind.subscription,
       icon: Symbols.workspace_premium_rounded,
       route: AppRoutes.subscription,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.about,
-      icon: Symbols.info_rounded,
-      route: AppRoutes.about,
       isBuilt: true,
     ),
     MoreDestination(

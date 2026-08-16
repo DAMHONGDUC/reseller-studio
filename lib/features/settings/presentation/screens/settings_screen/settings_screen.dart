@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
@@ -6,6 +7,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/config/dev_flags.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
@@ -89,6 +91,22 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
+            ),
+          ),
+          SdSectionHeaderV3(title: context.l10n.settingsApp),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: AppListCard(
+              children: <Widget>[
+                AppListRow(
+                  title: context.l10n.moreAbout,
+                  subtitle: context.l10n.aboutTagline,
+                  icon: Symbols.info_rounded,
+                  onTap: () => context.push(AppRoutes.about),
+                ),
+              ],
             ),
           ),
           if (DevFlags.isDebugOrProfile) ...<Widget>[

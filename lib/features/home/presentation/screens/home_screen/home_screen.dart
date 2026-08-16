@@ -9,6 +9,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/utils/scroll_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
@@ -26,6 +27,7 @@ part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
 part 'home_screen_quick_access.dart';
 part 'home_screen_recent_activity.dart';
+part 'home_screen_shortcuts.dart';
 
 /// Home — "what do I need to do today?".
 ///
@@ -40,11 +42,37 @@ part 'home_screen_recent_activity.dart';
 /// profit as a filled hero, then three quiet tiles. Four equal tiles said
 /// four things mattered equally, which on a dashboard means none of them
 /// does.
-class HomeScreen extends ConsumerWidget {
+///
+/// **Three shortcut cards sit above even Needs Attention** — owner's rule,
+/// and the one thing on this screen that outranks it. They are ways *out* of
+/// Home rather than content, so they are read in a glance and skipped by
+/// anyone who came to read the dashboard. See `HomeShortcutConstant`.
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  /// Owned here because the Quick Access card scrolls this list, and a
+  /// controller a child created is one the screen cannot drive.
+  final ScrollController _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  /// Quick Access is the last section (owner's rule, held by
+  /// `test/features/home/quick_access_test.dart`), so the end of the list is
+  /// where it is — no key to keep in sync with the section that moved.
+  void _toQuickAccess() => ScrollUtils.toEnd(_controller);
+
+  @override
+  Widget build(BuildContext context) {
     final Workspace? workspace = ref.watch(currentWorkspaceProvider);
 
     return SdScaffoldV3(
@@ -60,16 +88,20 @@ class HomeScreen extends ConsumerWidget {
             // the shell so it can send them into any tab.
             onPressed: () => context.push(AppRoutes.search),
             icon: const Icon(Symbols.search_rounded),
-            tooltip: 'Search',
+            tooltip: context.l10n.homeShortcutSearch,
           ),
           SizedBox(width: SdSpacingConstant.w8),
         ],
       ),
       body: ListView(
+        controller: _controller,
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          const SdSectionHeaderV3(title: 'Needs Attention', first: true),
+          _HomeShortcuts(onQuickAccess: _toQuickAccess),
+          // Not `first` any more: the shortcut row is above it now, and this
+          // heading needs the gap that separates two sections.
+          const SdSectionHeaderV3(title: 'Needs Attention'),
           const _NeedsAttention(),
           const SdSectionHeaderV3(title: 'Performance'),
           const _PerformanceBlock(),
