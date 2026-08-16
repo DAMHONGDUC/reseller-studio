@@ -42,6 +42,16 @@ follow, and missing any one of them looks like a bug:
    the FAB in the body's coordinate space rather than stacking it above the
    bottom slot, so without the lift it renders *behind* the glass.
 
+**A detail screen has no bottom nav at all.** Owner's rule. A route nested in
+a `StatefulShellBranch` is pushed onto that *branch's* navigator by default,
+so the shell and its bar stay drawn over it — "pushed route" is not the same
+as "no bar", and that is exactly why Expenses and Categories had rows sitting
+under the glass. Every route under a tab therefore names
+`parentNavigatorKey: AppNavigatorKey.root`, which pushes it above the shell.
+Only the five branch roots keep the bar.
+`test/core/router/detail_routes_leave_the_shell_test.dart` walks the route
+tree and names any route that forgot.
+
 **No content in this app is ever covered by the bottom nav — the screens with
 the floating add button included.** Owner's rule, and it is the *outcome* the
 three points above exist to produce, stated separately because they are the
@@ -49,9 +59,14 @@ mechanism and this is the promise. The clearance under the last row is
 `bottomGap`, which is the same value `SdContentPaddingV2.bottomGap` uses so
 the two generations end a list with identical air.
 
-- A screen with the FAB clears the button **as well as** the bar:
-  `AppAddFabScaffold.listPadding` is `bottom(floatingNav:) + SdFabV3.size` and
-  every such screen uses it rather than padding by hand.
+- A screen with the FAB clears the button **as well as** whatever is under it,
+  through `AppAddFabScaffold.listPadding` — every such screen uses it rather
+  than padding by hand, Inventory's sliver included.
+  **`kFloatingActionButtonMargin` is a term in that sum, not a rounding
+  error.** `Scaffold` adds its own margin under a FAB whatever the caller
+  does, so a clearance of `inset + SdFabV3.size` is short by exactly 16 — that
+  is what put the last row of Expenses behind the button while four sibling
+  screens with shorter lists looked fine.
 - **A centred widget has to be told too.** `SdEmptyStateV3` centres itself,
   and on a tab screen the body it centres in runs under the glass — so it
   reads `SdFloatingBarScopeV3` and pads its own bottom by `floatingBarInset`.
