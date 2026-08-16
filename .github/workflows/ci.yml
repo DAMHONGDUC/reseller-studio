@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+# A second push to the same branch cancels the first: the only run whose
+# result matters is the one for the current head.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # `packages/system_design` is a submodule and the analyze step compiles
+      # it standalone, so a shallow checkout without it fails on the first
+      # command rather than the last.
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Read from `.fvmrc` rather than pinned here. The version is a number,
+      # and a number belongs in one place — repeating it in this file is how a
+      # CI job ends up testing a different SDK from the one people develop on.
+      - name: Read the pinned Flutter version
+        id: sdk
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.sdk.outputs.version }}
+          channel: stable
+          cache: true
+
+      # Both packages: the app, and the design system on its own, because it
+      # is analyzed on its own.
+      - name: Dependencies
+        run: |
+          flutter pub get
+          (cd packages/system_design && flutter pub get)
+
+      # `lib/l10n/gen/` is gitignored, so nothing compiles until it is built.
+      - name: Localizations
+        run: flutter gen-l10n
+
+      # The scripts, not their contents retyped here. `tool/analyze.sh` calls
+      # itself "exactly what CI runs" and this is what makes that true.
+      - name: Analyze
+        run: sh tool/analyze.sh
+
+      - name: Test
+        run: sh tool/test.sh
