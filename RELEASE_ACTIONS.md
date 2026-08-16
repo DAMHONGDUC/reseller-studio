@@ -53,8 +53,13 @@ blocks the external half.
    `melos run deploy-firebase` cannot run today.
 7. Deploy the rules and indexes:
    ```sh
-   firebase deploy --only firestore:rules,firestore:indexes,storage
+   melos run deploy-firebase
    ```
+   Use the script rather than a hand-typed `firebase deploy`: it confirms the
+   project first, and it is the one place the list of what ships is written
+   down. A command copied into a document is a command that drifts from the
+   one people actually run — that is how `storage` came to be missing from
+   the script while this page still named it.
 
 **Then turn the dev bypass off.** `env/dev.json` has `BYPASS_AUTH: true`; once
 sign-in works, set it to `false`, confirm you can get in for real, and delete

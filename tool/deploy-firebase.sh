@@ -13,4 +13,6 @@ case "$PROJECT" in
   *) echo "✗ mismatch — aborted"; exit 1 ;;
 esac
 
-firebase deploy --only firestore:rules,firestore:indexes,functions
+# Storage belongs in this list: the app uploads item photos, receipts and the
+# workspace logo, and storage.rules is never applied if it ships separately.
+firebase deploy --only firestore:rules,firestore:indexes,storage,functions
