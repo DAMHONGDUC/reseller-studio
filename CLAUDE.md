@@ -178,7 +178,9 @@ tool/                      # melos script bodies
 docs/
 ```
 
-Features, from the plan's navigation tree (§38): `auth`, `workspace`, `home`,
+`onboarding` is the one feature the plan does not name — it is the pre-auth
+intro flow, added by the owner, and hard rule 1 governs it. The rest come from
+the plan's navigation tree (§38): `auth`, `workspace`, `home`,
 `inventory`, `orders`, `analytics`, `more`, and later `sourcing`, `listings`,
 `expenses`, `reports`, `search`, `notifications`, `team`, `settings`,
 `marketplaces`, `subscription`.
@@ -212,6 +214,26 @@ directly.
    While auth state is still resolving the app shows the splash, never the
    login form: flashing a login screen at a returning user is the most common
    way this gets it wrong.
+
+   **One screen comes before the gate: the intro flow.** Owner's rule.
+   `/onboarding` runs once per install and then hands over to `/login` — it
+   describes the product and reads nothing, so it is not a way in and does not
+   soften this rule. Three things keep it that way, and a change to any of
+   them is a change to the gate:
+   - it is only ever shown to someone **not signed in**, so a returning seller
+     is never re-introduced to a product they already pay for;
+   - it navigates nowhere itself — finishing flips
+     `onboardingStatusProvider` and the same `redirect` decides what happens
+     next, so there is still exactly one place that knows where a person lands;
+   - **skipping counts as finishing.** A seller who does not want the tour is
+     not asked twice, and the flag is device-local
+     (`PrefsKeyConstant.onboardingSeen`) because it is about this install, not
+     this account.
+
+   Until preferences resolve the status is `loading` and the app shows the
+   splash — the same reason as auth above, in the other direction: defaulting
+   to "not seen" would flash the intro on every cold start.
+   `test/core/router/onboarding_precedes_login_test.dart` pins the order.
 
    **The development bypass is not a guest mode and must never become one.**
    `DevFlags.bypassAuth` — `BYPASS_AUTH` in `env/dev.json` — enters the app as
