@@ -12,16 +12,35 @@ part of 'home_screen.dart';
 /// them, so every row pushes the screen that owns the action rather than
 /// opening a form Home would then have to know how to save.
 ///
-/// **Rows, and last on the screen** — owner's rule. Home answers "what needs
-/// attention today" first; a grid of eight tiles above the figures made the
-/// screen open on a launcher instead of on the answer. At the bottom it is
-/// where a seller who came to *add* something scrolls to, and it costs the
-/// seller who came to *read* nothing.
+/// **Rows, and near the bottom** — owner's rule. Home answers "what needs
+/// attention today" first; a launcher above the figures made the screen open
+/// on the wrong thing. The shortcut card at the top is what keeps it one tap
+/// away for a seller who came to add something.
+class _QuickAction extends StatelessWidget {
+  const _QuickAction();
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
+    child: AppListCard(
+      children: <Widget>[
+        for (final QuickAction action in QuickActionConstant.actions)
+          AppListRow(
+            title: QuickActionLabel.of(context, action.kind),
+            icon: action.icon,
+            onTap: () => context.push(action.route),
+          ),
+      ],
+    ),
+  );
+}
+
+/// What is worth *reading* rather than doing.
 ///
-/// **The shortcut card at the top scrolls here rather than duplicating this**
-/// — one card, not a second copy of nine rows. It aims at the end of the
-/// list because this section is last, so moving it breaks that card
-/// (`lib/features/home/CLAUDE.md`).
+/// **Its own section, under the actions** — owner's rule. About is not a
+/// create action, and putting it among them would make a seller scanning for
+/// "add" step over a row that adds nothing. Separating the two is also what
+/// keeps `QuickActionConstant` able to say "only create actions" and mean it.
 class _QuickAccess extends StatelessWidget {
   const _QuickAccess();
 
@@ -30,12 +49,12 @@ class _QuickAccess extends StatelessWidget {
     padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
     child: AppListCard(
       children: <Widget>[
-        for (final QuickAccessAction action in QuickAccessConstant.actions)
-          AppListRow(
-            title: QuickAccessLabel.of(context, action.kind),
-            icon: action.icon,
-            onTap: () => context.push(action.route),
-          ),
+        AppListRow(
+          title: context.l10n.moreAbout,
+          subtitle: context.l10n.aboutTagline,
+          icon: Symbols.info_rounded,
+          onTap: () => context.push(AppRoutes.about),
+        ),
       ],
     ),
   );

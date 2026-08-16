@@ -7,11 +7,11 @@ part of 'home_screen.dart';
 /// a list the seller has to scan. Quick Access stays rows at the bottom for
 /// the opposite reason: nine of anything is a list.
 class _HomeShortcuts extends StatelessWidget {
-  const _HomeShortcuts({required this.onQuickAccess});
+  const _HomeShortcuts({required this.onQuickAction});
 
   /// Quick Access is on this screen, so its card scrolls rather than
   /// navigates — and the screen owns the controller, not this widget.
-  final VoidCallback onQuickAccess;
+  final VoidCallback onQuickAction;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -29,7 +29,7 @@ class _HomeShortcuts extends StatelessWidget {
             Expanded(
               child: _HomeShortcutCard(
                 shortcut: HomeShortcutConstant.shortcuts[i],
-                onQuickAccess: onQuickAccess,
+                onQuickAction: onQuickAction,
               ),
             ),
           ],
@@ -41,10 +41,10 @@ class _HomeShortcuts extends StatelessWidget {
 
 /// One shortcut: a tinted glyph over its label.
 class _HomeShortcutCard extends StatelessWidget {
-  const _HomeShortcutCard({required this.shortcut, required this.onQuickAccess});
+  const _HomeShortcutCard({required this.shortcut, required this.onQuickAction});
 
   final HomeShortcut shortcut;
-  final VoidCallback onQuickAccess;
+  final VoidCallback onQuickAction;
 
   @override
   Widget build(BuildContext context) {
@@ -78,8 +78,8 @@ class _HomeShortcutCard extends StatelessWidget {
   /// Home would leave the seller on the wrong tab with a back button.
   void _open(BuildContext context) {
     switch (shortcut.kind) {
-      case HomeShortcutKind.quickAccess:
-        onQuickAccess();
+      case HomeShortcutKind.quickAction:
+        onQuickAction();
       case HomeShortcutKind.search:
         context.push(AppRoutes.search);
       case HomeShortcutKind.analytics:

@@ -344,11 +344,19 @@
   "@moreTeam": {
     "description": "More destination: who can see this workspace."
   },
-  "homeQuickAccess": "Quick Access",
-  "@homeQuickAccess": {
+  "homeQuickAction": "Quick Action",
+  "@homeQuickAction": {
     "description": "Home section holding every create action in the app."
   },
-  "homeQuickAccessSubtitle": "Everything you can add, and how it all fits",
+  "homeQuickActionSubtitle": "Everything you can add, from here",
+  "@homeQuickActionSubtitle": {
+    "description": "Supporting line under the Quick Action section header."
+  },
+  "homeQuickAccess": "Quick Access",
+  "@homeQuickAccess": {
+    "description": "Home section holding what is worth reading rather than doing."
+  },
+  "homeQuickAccessSubtitle": "How the app fits together",
   "@homeQuickAccessSubtitle": {
     "description": "Supporting line under the Quick Access section header."
   },

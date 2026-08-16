@@ -45,7 +45,7 @@ void main() {
     // Owner's rule: ways *out* of Home come before Home's own content, and
     // that includes Needs Attention, which outranks everything else here.
     final double cardsBottom = tester
-        .getRect(cardFor(context, HomeShortcutKind.quickAccess))
+        .getRect(cardFor(context, HomeShortcutKind.quickAction))
         .bottom;
 
     expect(
@@ -66,7 +66,7 @@ void main() {
 
     expect(scrollable.position.pixels, 0);
 
-    await tester.tap(cardFor(context, HomeShortcutKind.quickAccess));
+    await tester.tap(cardFor(context, HomeShortcutKind.quickAction));
     await tester.pumpAndSettle();
 
     // Quick Access is the last section, so landing on it means landing on the
@@ -75,7 +75,7 @@ void main() {
     expect(scrollable.position.pixels, scrollable.position.maxScrollExtent);
     expect(
       find.text(
-        QuickAccessLabel.of(context, QuickAccessConstant.actions.last.kind),
+        QuickActionLabel.of(context, QuickActionConstant.actions.last.kind),
       ),
       findsWidgets,
     );

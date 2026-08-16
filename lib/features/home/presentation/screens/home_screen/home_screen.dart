@@ -66,10 +66,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  /// Quick Access is the last section (owner's rule, held by
-  /// `test/features/home/quick_access_test.dart`), so the end of the list is
-  /// where it is — no key to keep in sync with the section that moved.
-  void _toQuickAccess() => ScrollUtils.toEnd(_controller);
+  /// Quick Action and the Quick Access section under it are the last two
+  /// (owner's rule, held by `test/features/home/quick_access_test.dart`), so
+  /// the end of the list reaches both — no key to keep in sync with a section
+  /// that moved.
+  void _toQuickAction() => ScrollUtils.toEnd(_controller);
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          _HomeShortcuts(onQuickAccess: _toQuickAccess),
+          _HomeShortcuts(onQuickAction: _toQuickAction),
           // Not `first` any more: the shortcut row is above it now, and this
           // heading needs the gap that separates two sections.
           const SdSectionHeaderV3(title: 'Needs Attention'),
@@ -107,6 +108,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const _PerformanceBlock(),
           const SdSectionHeaderV3(title: 'Recent Activity'),
           const _RecentActivity(),
+          SdSectionHeaderV3(
+            title: context.l10n.homeQuickAction,
+            subtitle: context.l10n.homeQuickActionSubtitle,
+          ),
+          const _QuickAction(),
           SdSectionHeaderV3(
             title: context.l10n.homeQuickAccess,
             subtitle: context.l10n.homeQuickAccessSubtitle,
