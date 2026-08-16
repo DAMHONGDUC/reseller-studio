@@ -87,4 +87,60 @@ void main() {
       moreOrLessEquals(orders, epsilon: 0.5),
     );
   });
+
+  testWidgets('Inventory keeps its chips pinned while the list scrolls', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const InventoryScreen());
+
+    final double before = stripRect(tester).top;
+
+    // The list, not the strip: dragging a horizontal scrollable vertically
+    // moves nothing and the assertion would pass for the wrong reason.
+    await tester.drag(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is Scrollable && widget.axis == Axis.vertical,
+      ),
+      const Offset(0, -600),
+    );
+    await tester.pumpAndSettle();
+
+    // Owner's rule: the chips stay reachable 300 rows down, the way Orders'
+    // do. They move up as the search field docks, and then they stop.
+    expect(find.byType(AppFilterStrip), findsOneWidget);
+    expect(stripRect(tester).top, lessThan(before));
+
+    final double pinned = stripRect(tester).top;
+
+    await tester.drag(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is Scrollable && widget.axis == Axis.vertical,
+      ),
+      const Offset(0, -600),
+    );
+    await tester.pumpAndSettle();
+
+    expect(stripRect(tester).top, moreOrLessEquals(pinned, epsilon: 0.5));
+  });
+
+  testWidgets('pinned, Inventory holds its chips where Orders holds theirs', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const OrdersScreen());
+
+    final double orders = stripRect(tester).top;
+
+    await pumpScreen(tester, const InventoryScreen());
+    await tester.drag(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is Scrollable && widget.axis == Axis.vertical,
+      ),
+      const Offset(0, -600),
+    );
+    await tester.pumpAndSettle();
+
+    // Both are `topGap` under a full app-bar row — one screen reaches it by
+    // docking a search field, the other was always there.
+    expect(stripRect(tester).top, moreOrLessEquals(orders, epsilon: 0.5));
+  });
 }

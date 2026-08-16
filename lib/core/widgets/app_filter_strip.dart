@@ -25,6 +25,13 @@ class AppFilterStrip extends StatelessWidget {
   /// The chips, in the order they are offered. Pass `SdFilterChipV3`s.
   final List<Widget> children;
 
+  /// What the strip measures — its chips and nothing else.
+  ///
+  /// Stated so a `SliverPersistentHeader` can pin it: a pinned sliver has to
+  /// give its extent before it lays anything out. Inventory reads this;
+  /// screens that simply stack the strip in a `Column` never need it.
+  static double get height => SdFilterChipV3.height;
+
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,

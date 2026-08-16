@@ -54,7 +54,7 @@ class OrdersScreen extends ConsumerWidget {
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          Container(color: Colors.red, child: const _OrderFilterStrip()),
+          const _OrderFilterStrip(),
           SizedBox(height: SdContentPaddingV3.topGap),
           Expanded(
             child: switch (source) {

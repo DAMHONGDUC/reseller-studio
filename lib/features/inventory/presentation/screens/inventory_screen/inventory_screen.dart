@@ -127,14 +127,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               ),
             ],
           ),
-          // The filter strip is never part of the app bar (owner's rule):
-          // its own widget in the body, one topGap below the chrome.
-          SliverToBoxAdapter(
-            child: SizedBox(height: SdContentPaddingV3.topGap),
-          ),
-          const SliverToBoxAdapter(child: _FilterStrip()),
-          SliverToBoxAdapter(
-            child: SizedBox(height: SdContentPaddingV3.topGap),
+          // Pinned, so the chips stay reachable 300 rows down — and still
+          // not part of the app bar (owner's rules, both). The band carries
+          // its own topGap above and below, so the screen places neither.
+          const SliverPersistentHeader(
+            pinned: true,
+            delegate: _PinnedFilterStrip(),
           ),
           switch (source) {
             // A screen that has not loaded is not empty — saying "No items"
