@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/brand_asset_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../controllers/auth_controller.dart';
+import '../../widgets/auth_brand_mark.dart';
 import '../../widgets/auth_form_shell.dart';
 
 /// Login — the gate. **There is no guest mode** (plan principle 1), so this is
@@ -19,10 +20,9 @@ import '../../widgets/auth_form_shell.dart';
 /// and never has to secure a reset flow.
 ///
 /// Apple is not optional beside Google: App Store guideline 4.8 requires it
-/// wherever a third-party sign-in is offered. **Both brand marks are still
-/// placeholders** and must be the real ones before submission — Apple and
-/// Google each require their own logo and forbid a substitute
-/// (`RELEASE_ACTIONS.md`).
+/// wherever a third-party sign-in is offered. Both marks are the vendors' own
+/// files from `assets/brand/` (`BrandAssetConstant`) — neither may be redrawn,
+/// and Google's may not be recoloured.
 ///
 /// The screen navigates nowhere on success: the router's redirect watches auth
 /// state and moves the seller on by itself.
@@ -49,6 +49,12 @@ class LoginScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthFormState state = ref.watch(authControllerProvider);
+    // Apple's guidelines want the mark in the label's colour, so it is read
+    // from the variant rather than assumed.
+    final Color appleForeground = SdButtonStyleV3.of(
+      context,
+      SdButtonVariantV3.primary,
+    ).foreground;
 
     return AuthFormShell(
       title: context.l10n.appTitle,
@@ -57,7 +63,10 @@ class LoginScreen extends ConsumerWidget {
         SdButtonV3(
           variant: SdButtonVariantV3.primary,
           label: context.l10n.authContinueWithApple,
-          icon: Symbols.person_rounded,
+          leading: AuthBrandMark(
+            asset: BrandAssetConstant.appleLogo,
+            tint: appleForeground,
+          ),
           expand: true,
           busy: state.isBusyWith(AuthProviderKind.apple),
           onPressed: state.isBusy
@@ -68,7 +77,9 @@ class LoginScreen extends ConsumerWidget {
         SdButtonV3(
           variant: SdButtonVariantV3.outlined,
           label: context.l10n.authContinueWithGoogle,
-          icon: Symbols.g_mobiledata_rounded,
+          // Untinted on purpose — the four-colour "G" is the only form
+          // Google's branding guidelines allow.
+          leading: const AuthBrandMark(asset: BrandAssetConstant.googleG),
           expand: true,
           busy: state.isBusyWith(AuthProviderKind.google),
           onPressed: state.isBusy
