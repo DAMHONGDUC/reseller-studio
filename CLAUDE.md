@@ -209,11 +209,30 @@ directly.
 
 ## Hard rules
 
-1. **Login is mandatory. There is no guest mode.** Plan principle 1. The
-   router's `redirect` is the entire gate — no screen checks auth for itself.
-   While auth state is still resolving the app shows the splash, never the
-   login form: flashing a login screen at a returning user is the most common
-   way this gets it wrong.
+1. **Login is mandatory to _use_ the app. There is no guest mode.** Plan
+   principle 1. While auth state is still resolving the app shows the splash,
+   never the login form: flashing a login screen at a returning user is the
+   most common way this gets it wrong.
+
+   **The gate moved from the route to the action** — owner's rule, and it is
+   the one place this hard rule has ever been rewritten rather than extended.
+   The five tabs now render *before* sign-in, empty, so a visitor can see what
+   the app is before committing. What that changed and what it did not:
+   - **`NavigationUtils.requireSignIn` is now the whole enforcement.** Every
+     action calls it and stops on false. **Never write `if (isSignedIn)` at a
+     call site** — one function decides what "signed in enough to act" means,
+     and the old rule's point survives intact: no screen decides for itself.
+   - **The router still refuses anything that names a record.** `_previewRoutes`
+     is the five tab roots plus the gate; a detail route, search or workspace
+     setup all need an account, so a signed-out visitor is bounced to Home.
+   - **No business data is readable, and that is enforced below the UI.**
+     `WorkspaceGuard` keeps every business stream empty without a workspace,
+     so an empty tab is empty because there is nothing to read — not because a
+     widget decided to hide something.
+   - **`firestore.rules` is unchanged and is still the real boundary.** The
+     preview shell is a UI state, never a permission.
+
+   `test/core/router/onboarding_precedes_login_test.dart` pins the order.
 
    **One screen comes before the gate: the intro flow.** Owner's rule.
    `/onboarding` runs once per install and then hands over to `/login` — it
