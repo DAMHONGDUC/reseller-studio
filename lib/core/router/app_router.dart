@@ -44,8 +44,10 @@ import '../../features/tax/presentation/screens/tax_screen/tax_screen.dart';
 import '../../features/workspace/presentation/screens/team_screen/team_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
 import '../../features/workspace/providers.dart';
+import '../extensions/context_extensions.dart';
 import '../logging/app_logger.dart';
 import '../widgets/app_shell.dart';
+import '../widgets/signed_out_view.dart';
 import '../widgets/splash_screen.dart';
 import 'app_navigator_key.dart';
 import 'app_routes.dart';
@@ -178,7 +180,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.home,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const HomeScreen(),
+                    AuthedTab(
+                      title: context.l10n.navHome,
+                      child: const HomeScreen(),
+                    ),
               ),
             ],
           ),
@@ -187,7 +192,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.inventory,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const InventoryScreen(),
+                    AuthedTab(
+                      title: context.l10n.navInventory,
+                      child: const InventoryScreen(),
+                    ),
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -242,7 +250,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.orders,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const OrdersScreen(),
+                    AuthedTab(
+                      title: context.l10n.navOrders,
+                      child: const OrdersScreen(),
+                    ),
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -276,7 +287,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.analytics,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const AnalyticsScreen(),
+                    AuthedTab(
+                      title: context.l10n.navAnalytics,
+                      child: const AnalyticsScreen(),
+                    ),
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -483,6 +497,9 @@ const Set<String> _previewRoutes = <String>{
   AppRoutes.orders,
   AppRoutes.analytics,
   AppRoutes.more,
+  // Settings is the one screen below a tab that works without an account:
+  // theme and language are device preferences, not business data.
+  AppRoutes.settings,
 };
 
 /// Bridges the two providers the redirect reads to go_router's

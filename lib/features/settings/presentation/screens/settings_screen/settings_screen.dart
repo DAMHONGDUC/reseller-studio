@@ -17,6 +17,7 @@ import '../../../../workspace/providers.dart';
 import '../../../../workspace/workspace_option_label.dart';
 
 part 'settings_screen_account_card.dart';
+part 'settings_screen_appearance_card.dart';
 part 'settings_screen_mock_data_card.dart';
 part 'settings_screen_mock_summary.dart';
 part 'settings_screen_setting_row.dart';
@@ -44,7 +45,14 @@ class SettingsScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.fullBleed(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SdSectionHeaderV3(title: context.l10n.settingsAccount, first: true),
+          SdSectionHeaderV3(title: context.l10n.settingsAppearance, first: true),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: const _AppearanceCard(),
+          ),
+          SdSectionHeaderV3(title: context.l10n.settingsAccount),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,

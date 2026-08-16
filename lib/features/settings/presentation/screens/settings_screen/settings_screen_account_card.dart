@@ -77,6 +77,27 @@ class _AccountCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final String? email = ref.watch(authUserProvider).value?.email;
     final String? name = ref.watch(authUserProvider).value?.displayName;
+    final bool signedIn = ref.watch(isSignedInProvider) ?? false;
+
+    // Settings is reachable without an account (owner's rule), so this card
+    // has to have something to say in that state — and "Sign out" is not it.
+    if (!signedIn) {
+      return AppListCard(
+        children: <Widget>[
+          AppListRow(
+            title: context.l10n.settingsSignedOut,
+            subtitle: context.l10n.settingsSignedOutBody,
+            icon: Symbols.person_rounded,
+            showChevron: false,
+          ),
+          AppListRow(
+            title: context.l10n.workspaceSignInAction,
+            icon: Symbols.login_rounded,
+            onTap: () => context.push(AppRoutes.login),
+          ),
+        ],
+      );
+    }
 
     return AppListCard(
       children: <Widget>[

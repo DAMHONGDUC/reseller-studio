@@ -15,7 +15,6 @@ import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
-import '../../../../auth/providers.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
@@ -77,7 +76,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final Workspace? workspace = ref.watch(currentWorkspaceProvider);
-    final bool signedIn = ref.watch(isSignedInProvider) ?? false;
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
@@ -93,17 +91,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         // second row of chrome on the one screen whose content — what needs
         // attention — is the reason the app was opened.
         actions: <Widget>[
-          // The one plain way in while the tabs are being browsed empty.
-          // Without it the only route to sign-in is tapping a create button
-          // and being redirected, which is a thing to discover rather than a
-          // thing to see.
-          if (!signedIn)
-            SdButtonV3(
-              variant: SdButtonVariantV3.text,
-              label: context.l10n.workspaceSignInAction,
-              size: SdButtonSizeV3.small,
-              onPressed: () => context.push(AppRoutes.login),
-            ),
           IconButton(
             // Global search is reached from Home because Home is where a
             // seller starts (plan §5's global entry points). It sits outside

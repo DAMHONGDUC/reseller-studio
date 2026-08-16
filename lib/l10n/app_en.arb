@@ -585,6 +585,38 @@
   "@settingsDeveloperNote": {
     "description": "Explains that the developer block is compiled out of a release build."
   },
+  "settingsAppearance": "Appearance",
+  "@settingsAppearance": {
+    "description": "Settings section for device preferences that need no account."
+  },
+  "settingsTheme": "Theme",
+  "@settingsTheme": {
+    "description": "Settings row for light/dark/system choice."
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "Current theme value — follows the device setting."
+  },
+  "settingsLanguage": "Language",
+  "@settingsLanguage": {
+    "description": "Settings row for the app's language."
+  },
+  "settingsLanguageEnglish": "English",
+  "@settingsLanguageEnglish": {
+    "description": "Current language value. Only English ships until release (hard rule 7)."
+  },
+  "settingsNotYet": "Soon",
+  "@settingsNotYet": {
+    "description": "Badge on a setting that is listed but not changeable yet."
+  },
+  "settingsSignedOut": "Not signed in",
+  "@settingsSignedOut": {
+    "description": "Account row title before anyone signs in."
+  },
+  "settingsSignedOutBody": "Sign in to load your business.",
+  "@settingsSignedOutBody": {
+    "description": "Account row subtitle before anyone signs in."
+  },
   "settingsSignedIn": "Signed in",
   "@settingsSignedIn": {
     "description": "Fallback account row title when the provider gave no name or email."
