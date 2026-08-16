@@ -7,6 +7,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/listing.dart';
 import '../../../domain/enums/listing_status.dart';
@@ -45,35 +46,26 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SizedBox(
-            height: SdContentPaddingV3.filterStrip,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(
-                horizontal: SdContentPaddingV3.horizontal,
-                vertical: SdContentPaddingV3.filterStripGap,
+          AppFilterStrip(
+            children: <Widget>[
+              _StatusChip(
+                label: 'All',
+                count: all.length,
+                selected: _filter == null,
+                onSelected: () => setState(() => _filter = null),
               ),
-              children: <Widget>[
+              for (final ListingStatus status in ListingStatus.values)
                 _StatusChip(
-                  label: 'All',
-                  count: all.length,
-                  selected: _filter == null,
-                  onSelected: () => setState(() => _filter = null),
+                  label: ListingStatusLabel.of(status),
+                  count: all
+                      .where((Listing listing) => listing.status == status)
+                      .length,
+                  selected: _filter == status,
+                  onSelected: () => setState(() => _filter = status),
                 ),
-                for (final ListingStatus status in ListingStatus.values) ...[
-                  SizedBox(width: SdSpacingConstant.w8),
-                  _StatusChip(
-                    label: ListingStatusLabel.of(status),
-                    count: all
-                        .where((Listing listing) => listing.status == status)
-                        .length,
-                    selected: _filter == status,
-                    onSelected: () => setState(() => _filter = status),
-                  ),
-                ],
-              ],
-            ),
+            ],
           ),
+          SizedBox(height: SdContentPaddingV3.topGap),
           Expanded(
             child: switch (source) {
               AsyncLoading<List<Listing>>() when !source.hasValue =>

@@ -1,65 +1,89 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:seller_os/core/widgets/app_filter_strip.dart';
 import 'package:seller_os/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:seller_os/features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import 'package:seller_os/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
-/// **Every spacing refers to one value** — owner's rule.
+/// **A filter strip carries no gap of its own and fits its chips** — owner's
+/// rule — **and the screen places `topGap` above it and the same below.**
 ///
-/// A filter strip sits the same distance under the chrome above it on every
-/// screen, and that distance is `topGap` plus the strip's own
-/// `filterStripGap`. Two screens drifting apart here is what the rule exists
-/// to stop: Inventory's chips sat 8 points lower than Orders' because the
-/// search header reserved a gap for the strip *and* the screen placed one,
-/// and neither file looked wrong on its own.
+/// One boundary, one owner, one value. It was two: the strip had an internal
+/// vertical inset *and* the screen placed a gap, which is how Inventory's
+/// chips ended up sitting lower than Orders' with neither file looking wrong
+/// on its own.
 void main() {
-  /// What the eye actually measures: the top of the chrome's last pixel to
-  /// the top of the first chip.
-  double gapToChip(WidgetTester tester, Finder above) =>
-      tester.getRect(find.byType(SdFilterChipV3).first).top -
-      tester.getRect(above).bottom;
+  Rect stripRect(WidgetTester tester) =>
+      tester.getRect(find.byType(AppFilterStrip));
 
-  testWidgets('Orders sets the reference', (WidgetTester tester) async {
+  Rect chipRect(WidgetTester tester) =>
+      tester.getRect(find.byType(SdFilterChipV3).first);
+
+  for (final (String name, Widget screen) in <(String, Widget)>[
+    ('Inventory', const InventoryScreen()),
+    ('Orders', const OrdersScreen()),
+    ('Offers', const OffersScreen()),
+  ]) {
+    testWidgets('$name — the strip fits its chips, top and bottom', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, screen);
+
+      final Rect strip = stripRect(tester);
+      final Rect chip = chipRect(tester);
+
+      // No daylight inside the strip. Anything here is a gap with a second
+      // owner, and it stops being visible in either file.
+      expect(
+        chip.top - strip.top,
+        moreOrLessEquals(0, epsilon: 0.5),
+        reason: '$name has ${chip.top - strip.top} of padding above its chips',
+      );
+      expect(
+        strip.bottom - chip.bottom,
+        moreOrLessEquals(0, epsilon: 0.5),
+        reason: '$name has ${strip.bottom - chip.bottom} below its chips',
+      );
+    });
+  }
+
+  testWidgets('the screen places topGap above the strip and below it', (
+    WidgetTester tester,
+  ) async {
     await pumpScreen(tester, const OrdersScreen());
 
+    final Rect bar = tester.getRect(find.byType(SdAppBarV3).first);
+    final Rect strip = stripRect(tester);
+    final Rect list = tester.getRect(find.byType(ListView).first);
+
     expect(
-      gapToChip(tester, find.byType(SdAppBarV3).first),
-      moreOrLessEquals(
-        SdContentPaddingV3.topGap + SdContentPaddingV3.filterStripGap,
-        epsilon: 0.5,
-      ),
+      strip.top - bar.bottom,
+      moreOrLessEquals(SdContentPaddingV3.topGap, epsilon: 0.5),
+    );
+    expect(
+      list.top - strip.bottom,
+      moreOrLessEquals(SdContentPaddingV3.topGap, epsilon: 0.5),
     );
   });
 
-  testWidgets('Inventory matches it, under a docking search header', (
-    WidgetTester tester,
-  ) async {
-    await pumpScreen(tester, const InventoryScreen());
-
-    // Measured from the search field rather than an app bar: Inventory has
-    // no `appBar`, because `SdSearchHeaderV3` is a sliver that has to live in
-    // the scroll view to dock as the list moves.
-    expect(
-      gapToChip(tester, find.byType(SdSearchFieldV3)),
-      moreOrLessEquals(
-        SdContentPaddingV3.topGap + SdContentPaddingV3.filterStripGap,
-        epsilon: 0.5,
-      ),
-    );
-  });
-
-  testWidgets('the two screens agree to the pixel', (
+  testWidgets('Inventory and Orders put their chips at the same distance', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
 
-    final double orders = gapToChip(tester, find.byType(SdAppBarV3).first);
+    final double orders =
+        chipRect(tester).top - tester.getRect(find.byType(SdAppBarV3).first).bottom;
 
     await pumpScreen(tester, const InventoryScreen());
 
+    // Measured from the search field rather than an app bar: Inventory has no
+    // `appBar`, because `SdSearchHeaderV3` is a sliver that has to live in the
+    // scroll view to dock as the list moves.
     expect(
-      gapToChip(tester, find.byType(SdSearchFieldV3)),
+      chipRect(tester).top - tester.getRect(find.byType(SdSearchFieldV3)).bottom,
       moreOrLessEquals(orders, epsilon: 0.5),
     );
   });

@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
@@ -53,7 +54,8 @@ class OrdersScreen extends ConsumerWidget {
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          const _OrderFilterStrip(),
+          Container(color: Colors.red, child: const _OrderFilterStrip()),
+          SizedBox(height: SdContentPaddingV3.topGap),
           Expanded(
             child: switch (source) {
               AsyncLoading<List<Order>>() when !source.hasValue =>

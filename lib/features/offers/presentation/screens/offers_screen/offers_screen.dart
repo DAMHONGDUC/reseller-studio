@@ -10,6 +10,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';
@@ -47,30 +48,19 @@ class OffersScreen extends ConsumerWidget {
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SizedBox(
-            height: SdContentPaddingV3.filterStrip,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(
-                horizontal: SdContentPaddingV3.horizontal,
-                vertical: SdContentPaddingV3.filterStripGap,
-              ),
-              itemCount: OfferFilter.values.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  SizedBox(width: SdSpacingConstant.w8),
-              itemBuilder: (BuildContext context, int index) {
-                final OfferFilter filter = OfferFilter.values[index];
-
-                return SdFilterChipV3(
+          AppFilterStrip(
+            children: <Widget>[
+              for (final OfferFilter filter in OfferFilter.values)
+                SdFilterChipV3(
                   label: OfferFilterLabel.of(context, filter),
                   count: counts[filter],
                   selected: filter == selected,
                   onSelected: () =>
                       ref.read(offerFilterProvider.notifier).select(filter),
-                );
-              },
-            ),
+                ),
+            ],
           ),
+          SizedBox(height: SdContentPaddingV3.topGap),
           Expanded(
             child: switch (source) {
               AsyncLoading<List<Offer>>() when !source.hasValue =>

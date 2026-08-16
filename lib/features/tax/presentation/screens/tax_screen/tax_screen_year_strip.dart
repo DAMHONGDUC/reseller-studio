@@ -13,24 +13,16 @@ class _YearStrip extends ConsumerWidget {
     final List<TaxYear> years = ref.watch(selectableTaxYearsProvider);
     final TaxYear selected = ref.watch(selectedTaxYearProvider);
 
-    return SizedBox(
-      height: SdContentPaddingV3.filterStrip,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(
-          vertical: SdContentPaddingV3.filterStripGap,
-        ),
-        itemCount: years.length,
-        separatorBuilder: (BuildContext context, int index) =>
-            SizedBox(width: SdSpacingConstant.w8),
-        itemBuilder: (BuildContext context, int index) => SdFilterChipV3(
-          label: years[index].label,
-          selected: years[index] == selected,
-          onSelected: () => ref
-              .read(selectedTaxYearProvider.notifier)
-              .select(years[index]),
-        ),
-      ),
+    return AppFilterStrip(
+      children: <Widget>[
+        for (final TaxYear year in years)
+          SdFilterChipV3(
+            label: year.label,
+            selected: year == selected,
+            onSelected: () =>
+                ref.read(selectedTaxYearProvider.notifier).select(year),
+          ),
+      ],
     );
   }
 }

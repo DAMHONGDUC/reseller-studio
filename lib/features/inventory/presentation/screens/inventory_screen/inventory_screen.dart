@@ -11,6 +11,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
+import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -132,6 +133,9 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             child: SizedBox(height: SdContentPaddingV3.topGap),
           ),
           const SliverToBoxAdapter(child: _FilterStrip()),
+          SliverToBoxAdapter(
+            child: SizedBox(height: SdContentPaddingV3.topGap),
+          ),
           switch (source) {
             // A screen that has not loaded is not empty — saying "No items"
             // to a seller with four hundred is worse than a spinner.

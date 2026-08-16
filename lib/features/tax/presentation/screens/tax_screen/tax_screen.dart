@@ -5,6 +5,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/tax_summary.dart';
 import '../../../domain/entities/tax_year.dart';
@@ -43,7 +44,10 @@ class TaxScreen extends ConsumerWidget {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           const _YearStrip(),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
+          // The strip's own bottom gap, and the only one — owner's rule. The
+          // section header below it does not add `sectionGap` on top: that
+          // would be the same boundary paid for twice.
+          SizedBox(height: SdContentPaddingV3.topGap),
           SdSectionHeaderV3(
             title: 'Year ${summary.year.label}',
             subtitle: _period(context, summary.year),
