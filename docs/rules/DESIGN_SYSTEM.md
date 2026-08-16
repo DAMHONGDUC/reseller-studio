@@ -79,6 +79,15 @@ the two generations end a list with identical air.
   list, so `find.byType(Scrollable).first` is that strip, dragging it
   vertically scrolls nothing, and the assertion passes for the wrong reason.
 
+**The bar is the most present piece of chrome in the app** — owner's rule. It
+wears `SdElevationV3.modal`, not `.raised`: it floats over every screen and
+never scrolls away, so it belongs in the same depth band as a sheet rather
+than at the height of the cards passing under it. **The current tab is marked
+by a shape, not only a colour** — a tinted pill behind the glyph. Hue alone is
+unreadable to a colour-blind seller, and this is glass with a moving list
+showing through it, which is the least a tint ever has to work with.
+`test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds both.
+
 `navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
 call, so both apps' floating bars sit identically. `maxNavBarOffset` lands
 short of a portrait iPhone's home-indicator inset, which trades system
