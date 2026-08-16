@@ -214,23 +214,32 @@ behind it.
    never the login form: flashing a login screen at a returning user is the
    most common way this gets it wrong.
 
-   **The gate moved from the route to the action** — owner's rule, and it is
-   the one place this hard rule has ever been rewritten rather than extended.
-   The five tabs now render *before* sign-in, empty, so a visitor can see what
-   the app is before committing. What that changed and what it did not:
-   - **`NavigationUtils.requireSignIn` is now the whole enforcement.** Every
-     action calls it and stops on false. **Never write `if (isSignedIn)` at a
-     call site** — one function decides what "signed in enough to act" means,
-     and the old rule's point survives intact: no screen decides for itself.
-   - **The router still refuses anything that names a record.** `_previewRoutes`
-     is the five tab roots plus the gate; a detail route, search or workspace
-     setup all need an account, so a signed-out visitor is bounced to Home.
+   **The shell renders before sign-in, and four of the five tabs show one
+   shared view** — owner's rule, and the one place this hard rule has been
+   rewritten rather than extended:
+   - **Home, Inventory, Orders and Analytics are wrapped in `AuthedTab`** and
+     show `SignedOutView` — a single centred sign-in prompt. **Never let one
+     of them render its own empty state instead.** "You have no orders" is a
+     claim about the seller's business; the truth is that nobody has said
+     whose business to show. Same idea as hard rule 5, one level up.
+   - **More is deliberately not wrapped**, and signed out it lists **Settings
+     alone** — every other destination is a view onto a business that has not
+     been named. Settings is in `_previewRoutes` because theme and language
+     belong to the device, not to an account.
+   - **`NavigationUtils.requireSignIn` guards the actions that survive**, and
+     is the only thing that may. **Never write `if (isSignedIn)` at a call
+     site** — the old rule's point holds: no screen decides for itself.
+   - **The router refuses anything that names a record.** A detail route,
+     search and workspace setup all need an account, so a signed-out visitor
+     is bounced to Home.
    - **No business data is readable, and that is enforced below the UI.**
      `WorkspaceGuard` keeps every business stream empty without a workspace,
-     so an empty tab is empty because there is nothing to read — not because a
-     widget decided to hide something.
+     so nothing depends on a widget having remembered to hide something.
    - **`firestore.rules` is unchanged and is still the real boundary.** The
-     preview shell is a UI state, never a permission.
+     signed-out shell is a UI state, never a permission.
+
+   `test/core/router/signed_out_shell_test.dart` pins which tabs are wrapped
+   and what More offers.
 
    `test/core/router/onboarding_precedes_login_test.dart` pins the order.
 
