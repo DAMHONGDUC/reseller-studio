@@ -311,6 +311,14 @@ void main() {
     ) async {
       await pumpScreen(tester, const SettingsScreen());
 
+      // Appearance now heads the screen — theme and language are the block
+      // that works with no account — so the developer card is below the fold.
+      await tester.scrollUntilVisible(
+        find.text('Mock data'),
+        SdSpacingConstant.h200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
       expect(find.text('Mock data'), findsOneWidget);
       expect(find.text('Showing a seeded demo business.'), findsOneWidget);
       expect(find.textContaining('11 items'), findsOneWidget);
