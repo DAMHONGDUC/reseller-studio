@@ -42,6 +42,28 @@ follow, and missing any one of them looks like a bug:
    the FAB in the body's coordinate space rather than stacking it above the
    bottom slot, so without the lift it renders *behind* the glass.
 
+**No content in this app is ever covered by the bottom nav — the screens with
+the floating add button included.** Owner's rule, and it is the *outcome* the
+three points above exist to produce, stated separately because they are the
+mechanism and this is the promise. The clearance under the last row is
+`bottomGap`, which is the same value `SdContentPaddingV2.bottomGap` uses so
+the two generations end a list with identical air.
+
+- A screen with the FAB clears the button **as well as** the bar:
+  `AppAddFabScaffold.listPadding` is `bottom(floatingNav:) + SdFabV3.size` and
+  every such screen uses it rather than padding by hand.
+- **A centred widget has to be told too.** `SdEmptyStateV3` centres itself,
+  and on a tab screen the body it centres in runs under the glass — so it
+  reads `SdFloatingBarScopeV3` and pads its own bottom by `floatingBarInset`.
+  Nothing centred in a tab body may skip this; centring against a height the
+  seller cannot fully see puts the message low and its last line behind the
+  bar.
+- `test/core/widgets/content_clears_nav_bar_test.dart` scrolls all five tabs
+  to the end and measures the last row. **It picks the *vertical* `Scrollable`
+  on purpose** — Orders and Inventory put a horizontal chip row above the
+  list, so `find.byType(Scrollable).first` is that strip, dragging it
+  vertically scrolls nothing, and the assertion passes for the wrong reason.
+
 `navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
 call, so both apps' floating bars sit identically. `maxNavBarOffset` lands
 short of a portrait iPhone's home-indicator inset, which trades system
@@ -87,6 +109,17 @@ Owner's rules, all of them read from one place so no screen types them:
   app bar with a field under it.** The field docks into the title's row as
   the list scrolls and the filter strip pins under it, so scrolled chrome
   costs one bar instead of three. Inventory is the reference implementation.
+- **`SdSearchFieldV3` draws its own pill; the fill, border and radius are not
+  an `InputDecoration`.** They were, and `InputDecorator` sizes its content to
+  itself: stretched from outside by a `SizedBox` it painted the full height
+  but laid the text and the magnifier out at the *top*, ten points above the
+  middle of a docked field — which is what made the bar look mis-set against
+  the actions beside it. `textAlignVertical` cannot fix that; with
+  `isCollapsed` there is no spare space for it to centre within. A plain `Row`
+  in a box the widget owns centres its children and needs no persuading.
+  The glyph sits `height / 2` from the edge, so it lands in the middle of the
+  stadium's round cap and mirrors the clear button on the right at whatever
+  height the field is currently drawn at.
 - **The search field shrinks as it docks:
   `SdSearchFieldV3.expandedHeight` in its own row,
   `SdSearchFieldV3.dockedHeight` once it is in the bar.** Owner's rule. The
