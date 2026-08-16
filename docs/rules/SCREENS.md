@@ -185,16 +185,15 @@ app holding a receipt, so Home lists **every** one of them.
 screen that owns the action; it never opens a form Home would then have to
 know how to save.
 
-**Quick Action holds create actions and nothing else** — owner's rule, and
-the reason there are two sections rather than one. A seller scanning it must
-never step over a row that adds nothing. Anything worth *reading* rather than
-doing goes in **Quick Access**, the section directly under it, which is where
-About lives. The split is also what lets `QuickActionConstant` say "only
-create actions" and mean it.
+**About is the one row here that does not create something, and it goes
+last** — owner's rule. It lives two levels deep under Settings, so this is
+what keeps it findable, and putting it at the end is what stops a seller
+scanning for "add" from stepping over it. Nothing else non-create joins it
+without the same decision.
 
 The shortcut card at the top of Home is named after the section it lands on
-and scrolls to the end, which reaches both — a card that said something other
-than where it goes is a card that lies.
+and scrolls to the end — a card that said something other than where it goes
+is a card that lies.
 
 **Rows, and always last on the screen** — owner's rule. Home answers "what
 needs attention today" first, so a launcher sitting above the figures makes
@@ -203,7 +202,7 @@ came to *add* something scrolls to, and it costs the seller who came to
 *read* nothing.
 
 **Adding a create action anywhere means adding it here.**
-`test/features/home/quick_access_test.dart` reads `lib/features/` for screens
+`test/features/home/quick_action_test.dart` reads `lib/features/` for screens
 wearing `AppAddFabScaffold` and fails on any the section cannot start — a
 section that lists six of eight is worse than none, because a seller who has
 learned to look here stops being able to tell "missing" from "the app cannot
@@ -215,7 +214,8 @@ Owner's rule: the app carries an About screen holding what it is plus the
 workflow, so a seller can see how the parts connect. **It lives under
 Settings, not in the top-level More list** — More is a long list of places
 work is done, and "what is this app" is asked once rather than worked from.
-Home's Quick Access carries the shortcut so it stays one tap away.
+Home's Quick Action list carries the shortcut, last, so it stays one tap
+away.
 
 `WorkflowConstant.steps` is the chain `CLAUDE.md` writes as one line, as data.
 It is drawn **vertically** — nine links across a phone is either unreadable or
