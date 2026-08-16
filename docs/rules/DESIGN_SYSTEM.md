@@ -79,14 +79,21 @@ the two generations end a list with identical air.
   list, so `find.byType(Scrollable).first` is that strip, dragging it
   vertically scrolls nothing, and the assertion passes for the wrong reason.
 
-**The bar is the most present piece of chrome in the app** — owner's rule. It
-wears `SdElevationV3.modal`, not `.raised`: it floats over every screen and
-never scrolls away, so it belongs in the same depth band as a sheet rather
-than at the height of the cards passing under it. **The current tab is marked
-by a shape, not only a colour** — a tinted pill behind the glyph. Hue alone is
-unreadable to a colour-blind seller, and this is glass with a moving list
-showing through it, which is the least a tint ever has to work with.
-`test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds both.
+**The bar follows the iOS system Liquid Glass tab bar** — owner's rule, and it
+decides the arguments the look would otherwise keep re-opening:
+
+- It wears `SdElevationV3.modal`, not `.raised`. It floats over every screen
+  and never scrolls away, so it belongs in the same depth band as a sheet
+  rather than at the height of the cards passing under it.
+- **The current tab is marked by the glyph filling in, and by nothing behind
+  it.** `SdIconV3.fill` drives the font's `FILL` axis, so one glyph morphs
+  rather than two swapping — weight is a real second signal alongside colour,
+  which colour alone must never be. **An indicator pill was tried and
+  removed**: a shape behind the icon is Material's idiom and reads as a
+  foreign control sitting inside iOS chrome. Do not put it back.
+- The corner stays a `LiquidRoundedSuperellipse`, not a circular radius.
+
+`test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds all three.
 
 `navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
 call, so both apps' floating bars sit identically. `maxNavBarOffset` lands

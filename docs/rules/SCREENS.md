@@ -173,3 +173,21 @@ because they are about the shell, not the bar:
 - **There are two search entry points on purpose** — Inventory's docking header
   and the Search screen's plain autofocused field. That is a recorded decision,
   not a duplication to clean up: `DECISIONS.md`.
+
+## Home carries Quick Access, and it must stay complete
+
+Owner's rule. The create actions are scattered by design — each lives on the
+screen owning the records it makes, behind that screen's own `SdFabV3`. That
+is right for a seller already on the screen and wrong for one who opened the
+app holding a receipt, so Home lists **every** one of them.
+
+`QuickAddConstant.actions` is that list and the only one. A tile pushes the
+screen that owns the action; it never opens a form Home would then have to
+know how to save.
+
+**Adding a create action anywhere means adding it here.**
+`test/features/home/quick_access_test.dart` reads `lib/features/` for screens
+wearing `AppAddFabScaffold` and fails on any the section cannot start — a
+section that lists six of eight is worse than none, because a seller who has
+learned to look here stops being able to tell "missing" from "the app cannot
+do it".
