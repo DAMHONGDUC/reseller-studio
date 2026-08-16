@@ -22,6 +22,7 @@ import '../../features/inventory/presentation/screens/quick_add_screen/quick_add
 import '../../features/inventory/presentation/screens/scanner_screen/scanner_screen.dart';
 import '../../features/listings/presentation/screens/listings_screen/listings_screen.dart';
 import '../../features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
+import '../../features/more/presentation/screens/about_screen/about_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
 import '../../features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
@@ -383,6 +384,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'team',
                     builder: (BuildContext context, GoRouterState state) =>
                         const TeamScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'about',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AboutScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

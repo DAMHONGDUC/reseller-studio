@@ -6,9 +6,11 @@
 /// particular row.
 ///
 /// The shape mirrors the master plan's final navigation tree (§38): five
-/// shell branches, and everything else pushed on top of whichever branch it
-/// belongs to. A detail screen is a child of its tab, not a sibling — that is
-/// what keeps the tab bar visible and the back stack per-tab.
+/// shell branches, and everything else nested under whichever branch it
+/// belongs to. **Nesting decides the path, not the chrome** — every route
+/// under a tab names `AppNavigatorKey.root` as its parent navigator, so it is
+/// pushed above the shell and carries no bottom nav. Only the five branch
+/// roots keep the bar (owner's rule, `docs/rules/DESIGN_SYSTEM.md`).
 final class AppRoutes {
   // --- Outside the shell: nothing here shows the tab bar. ---
 
@@ -83,6 +85,7 @@ final class AppRoutes {
   static const String marketplaces = '/more/marketplaces';
   static const String team = '/more/team';
   static const String settings = '/more/settings';
+  static const String about = '/more/about';
 
   /// Plan §25's Subscription block, over §27's tiers. Under More rather than
   /// nested in Settings: a blocked action pushes straight here, and a paywall

@@ -364,6 +364,123 @@
   "@homeQuickAddSource": {
     "description": "Quick Access tile: add a place stock is bought from."
   },
+  "moreAbout": "About Seller OS",
+  "@moreAbout": {
+    "description": "More destination: what the app is and how it works."
+  },
+  "aboutTitle": "About",
+  "@aboutTitle": {
+    "description": "App bar title of the About screen."
+  },
+  "aboutTagline": "The operating system for resellers",
+  "@aboutTagline": {
+    "description": "One-line description of the app, under its name."
+  },
+  "aboutIntro": "Seller OS is not an inventory tracker. It follows one item all the way from the shelf you found it on to what it actually earned you — so the next thing you buy is a decision instead of a guess.",
+  "@aboutIntro": {
+    "description": "Paragraph introducing what the app is for."
+  },
+  "aboutPrinciple": "Open the app and it tells you what needs attention today, then makes that action fast.",
+  "@aboutPrinciple": {
+    "description": "The product's core principle, quoted on the About screen."
+  },
+  "aboutWorkflowTitle": "How it works",
+  "@aboutWorkflowTitle": {
+    "description": "Section header above the workflow diagram."
+  },
+  "aboutWorkflowSubtitle": "Nine steps, and the last one feeds the first",
+  "@aboutWorkflowSubtitle": {
+    "description": "Supporting line under the workflow section header."
+  },
+  "aboutWorkflowLoop": "Better sourcing is the point of everything above it. What sold, at what margin, from which source — that is what makes the next buy a decision.",
+  "@aboutWorkflowLoop": {
+    "description": "Closing note under the workflow diagram explaining the loop."
+  },
+  "aboutWorkflowTapHint": "Tap any step to go there.",
+  "@aboutWorkflowTapHint": {
+    "description": "Tells the user the diagram steps are navigable."
+  },
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "description": "App version line.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "workflowSource": "Source",
+  "@workflowSource": {
+    "description": "Workflow step 1: find stock worth buying."
+  },
+  "workflowSourceDetail": "Find stock worth buying, and keep track of which places actually pay off.",
+  "@workflowSourceDetail": {
+    "description": "Workflow step 1 explanation."
+  },
+  "workflowPurchase": "Purchase",
+  "@workflowPurchase": {
+    "description": "Workflow step 2: record the buy."
+  },
+  "workflowPurchaseDetail": "Record what you paid and where. Cost recorded now is profit you can prove later.",
+  "@workflowPurchaseDetail": {
+    "description": "Workflow step 2 explanation."
+  },
+  "workflowInventory": "Inventory",
+  "@workflowInventory": {
+    "description": "Workflow step 3: what you hold."
+  },
+  "workflowInventoryDetail": "Everything you hold, with its cost, its photos and where it is stored.",
+  "@workflowInventoryDetail": {
+    "description": "Workflow step 3 explanation."
+  },
+  "workflowList": "List",
+  "@workflowList": {
+    "description": "Workflow step 4: put it up for sale."
+  },
+  "workflowListDetail": "Put it up — on one marketplace or several — and watch what goes stale.",
+  "@workflowListDetail": {
+    "description": "Workflow step 4 explanation."
+  },
+  "workflowSell": "Sell",
+  "@workflowSell": {
+    "description": "Workflow step 5: it sold."
+  },
+  "workflowSellDetail": "Mark it sold and the order is created for you, with the fees and the payout.",
+  "@workflowSellDetail": {
+    "description": "Workflow step 5 explanation."
+  },
+  "workflowShip": "Ship",
+  "@workflowShip": {
+    "description": "Workflow step 6: post it."
+  },
+  "workflowShipDetail": "Post it before the deadline. The queue is sorted by what breaches first.",
+  "@workflowShipDetail": {
+    "description": "Workflow step 6 explanation."
+  },
+  "workflowProfit": "Profit",
+  "@workflowProfit": {
+    "description": "Workflow step 7: what was left."
+  },
+  "workflowProfitDetail": "What was actually left after cost, fees, postage and overheads.",
+  "@workflowProfitDetail": {
+    "description": "Workflow step 7 explanation."
+  },
+  "workflowAnalyze": "Analyze",
+  "@workflowAnalyze": {
+    "description": "Workflow step 8: read the numbers."
+  },
+  "workflowAnalyzeDetail": "Which categories, which marketplaces and which sources are worth your time.",
+  "@workflowAnalyzeDetail": {
+    "description": "Workflow step 8 explanation."
+  },
+  "workflowSourceBetter": "Source better",
+  "@workflowSourceBetter": {
+    "description": "Workflow step 9: the loop closes."
+  },
+  "workflowSourceBetterDetail": "Go back out knowing what sold, at what margin, and where it came from.",
+  "@workflowSourceBetterDetail": {
+    "description": "Workflow step 9 explanation, closing the loop."
+  },
   "moreTax": "Tax",
   "@moreTax": {
     "description": "More destination: the year-end tax summary."
