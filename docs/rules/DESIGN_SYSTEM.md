@@ -118,8 +118,9 @@ Owner's rules, all of them read from one place so no screen types them:
   mis-set in a row whose height nobody can point at. A box in the tree can be
   seen, moved and skipped. `SdSearchHeaderV3` keeps its own internal spacing
   on `SdSearchHeaderMetricsV3` for the same reason — the distance between two
-  things the header draws is not the screen's `topGap`, even at the same
-  value.
+  things **the header itself draws** is not the screen's `topGap`, even at the
+  same value. Read the emphasis: it once carried a `stripGap` for the filter
+  strip, which the header does *not* draw, and that gap was then placed twice.
 - **A filter strip is never part of the app bar.** Owner's rule. It is its own
   widget in the body, `topGap` below the chrome, and it scrolls away with the
   content. `SdSearchHeaderV3` holds the title, the search field and the
