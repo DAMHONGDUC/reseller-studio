@@ -24,6 +24,21 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   labelled `SdFabV3`, same button, same place, every screen. That is an
   always-apply rule and it lives in the root `CLAUDE.md`; the design-system
   half is in `DESIGN_SYSTEM.md`.
+- **A form screen pins its commit action to the bottom** — owner's rule,
+  stated about workspace setup. Only the fields scroll; the button holds the
+  bottom edge, so a seller never scrolls to find out how to finish. **This is
+  not the `SdFabV3` rule above and does not compete with it**: that one is for
+  a list screen creating a new row, this one is for a screen whose single
+  action commits the screen itself.
+  - The action sits **below** the scroll view, never floating over it, so
+    content can never pass behind it. That is why it wears no surface and no
+    blur — `SdContentPaddingV3.pinnedActionsGap` above it is the whole
+    separation, and `SdContentPaddingV3.bottom(context)` below it clears the
+    home indicator.
+  - It goes in its own widget in a `part` file, watching the controller
+    itself, so a keystroke rebuilds the button and not the fields above it.
+  - `WorkspaceSetupScreen` is the worked example; v2 recorded the same idea in
+    `SdActionViewV2`'s pinned mode.
 
 ## The device status bar — one source, and the two platforms disagree
 
