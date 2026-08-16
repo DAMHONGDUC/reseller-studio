@@ -181,9 +181,16 @@ screen owning the records it makes, behind that screen's own `SdFabV3`. That
 is right for a seller already on the screen and wrong for one who opened the
 app holding a receipt, so Home lists **every** one of them.
 
-`QuickAddConstant.actions` is that list and the only one. A row pushes the
+`QuickAccessConstant.actions` is that list and the only one. A row pushes the
 screen that owns the action; it never opens a form Home would then have to
 know how to save.
+
+**About is the one row here that is not a create action, and it goes last** —
+owner's call. It sits two levels deep under Settings, and the seller most
+likely to want "how does this work" is the one still learning where things
+are. Last in the list, so the create actions above it keep the section's
+shape and a seller scanning for "add" does not step over it. Nothing else
+non-create joins them without the same decision.
 
 **Rows, and always last on the screen** — owner's rule. Home answers "what
 needs attention today" first, so a launcher sitting above the figures makes
@@ -200,8 +207,11 @@ do it".
 
 ## About draws the workflow, and the diagram is navigable
 
-Owner's rule: More carries an About entry holding what the app is plus the
-workflow, so a seller can see how the parts connect.
+Owner's rule: the app carries an About screen holding what it is plus the
+workflow, so a seller can see how the parts connect. **It lives under
+Settings, not in the top-level More list** — More is a long list of places
+work is done, and "what is this app" is asked once rather than worked from.
+Home's Quick Access carries the shortcut so it stays one tap away.
 
 `WorkflowConstant.steps` is the chain `CLAUDE.md` writes as one line, as data.
 It is drawn **vertically** — nine links across a phone is either unreadable or
