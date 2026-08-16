@@ -156,9 +156,13 @@ wrong. If you would rather keep the package, say so and I will switch it back.
   (item photos) and Storage. `Info.plist` needs `NSCameraUsageDescription` and
   `NSPhotoLibraryUsageDescription` in wording a reviewer will accept — "to scan
   barcodes on your inventory", not "for camera access".
-- **Privacy policy URL** and both stores' data-safety questionnaires. You
-  collect: email and name (from Apple/Google), item photos, and business
-  records. No third-party analytics beyond Firebase.
+- **Privacy policy URL** and both stores' data-safety questionnaires.
+  **`docs/STORE_PRIVACY.md` has the answers already worked out** — the app was
+  audited against its own code, so every row is filled in for both forms,
+  along with a policy draft to host. Two findings that save an argument with a
+  reviewer: no buyer address is stored anywhere, and nothing is "used for
+  tracking" in Apple's sense, so the app needs no ATT prompt. What is left is
+  filling the brackets, a legal read, and hosting it.
 - **App Store**: screenshots at every required size, description, keywords,
   support URL, age rating.
 - **TestFlight / internal testing** before submitting. Both sign-in flows must
