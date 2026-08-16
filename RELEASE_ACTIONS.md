@@ -16,7 +16,7 @@ Ordered by what blocks what. Work top to bottom.
 | 2 | Google Sign-In OAuth clients | One of only two ways into the app. | 30 min |
 | 3 | Sign in with Apple (Services ID + key) | The other way in, and **App Store review rejects** an app offering Google without it. | 45 min |
 | 4 | Deploy `firestore.rules`, `firestore.indexes.json`, `storage.rules` | Without rules, Firestore is either locked shut or wide open. | 10 min |
-| 5 | Apple and Google brand marks on the login buttons | Both vendors require their own artwork and forbid a substitute. The buttons still carry placeholder glyphs, which fails Beta App Review. | 20 min |
+| 5 | Apple's logo mark in `assets/brand/apple_logo.svg` | Only Apple's design resources supply it, and a redrawn one fails Beta App Review. Google's is shipped and the button slot is built, so this file is all that is left. **The Apple button throws on the login screen until it exists.** | 10 min |
 | 6 | Bundle id, signing, App Store / Play listings | No build can be uploaded. | 2–3 h |
 | 7 | Privacy policy URL + data-safety answers | Both stores refuse the listing without them. | 1 h |
 
@@ -115,27 +115,38 @@ blocking rather than nice-to-have.
 5. `APPLE_SIGN_IN_SERVICE_ID` in `env/*.json` is for reference; the app itself
    goes through `FirebaseAuth.signInWithProvider`, which handles the nonce.
 
-### Brand marks — blocker 5, and the only one of these that is code
+### Brand marks — blocker 5, mostly closed
 
-The two buttons on the login screen use **placeholder glyphs**
-(`Symbols.person_rounded` and `Symbols.g_mobiledata_rounded`). Apple and Google
-each require their own logo and explicitly forbid a substitute, so this cannot
-be drawn from scratch — an approximated trademark is worse than an obvious
-placeholder, because it looks finished. The artwork has to come from them:
+The code is done and Google's mark ships. **One file is left, and only Apple
+can hand it to you.**
+
+What was built: `SdButtonV3` gained a `leading` slot — `icon` is an `IconData`
+and cannot take an image — so both buttons stay the same widget, the same size
+and the same shape as every other button in the app. `AuthBrandMark` paints
+the artwork and `BrandAssetConstant` holds the paths.
+
+| Mark | State |
+|---|---|
+| Google | **Shipped.** `assets/brand/google_g.svg`, Google's own `logo_googleg_48dp` file, byte-for-byte. Rendered untinted — recolouring it breaches their guidelines. |
+| Apple | **Missing.** Download the design resources and save the logo as `assets/brand/apple_logo.svg`. It is tinted to the button's label colour, which is what Apple's guidelines ask for. |
 
 - Apple: <https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple>
 - Google: <https://developers.google.com/identity/branding-guidelines>
 
-Two things to know before wiring it up:
+Neither mark may be redrawn — an approximated trademark is worse than an
+obvious placeholder, because it looks finished. That is why Apple's is a gap
+rather than a best guess.
 
-1. Drop the assets in `assets/brand/` and declare that folder in
-   `pubspec.yaml`. Declaring it before the files exist fails the build.
-2. **`SdButtonV3.icon` is an `IconData`, so it cannot take an image.** Either
-   add a `leading` widget slot to `SdButtonV3` in the design-system submodule,
-   or build the two rows by hand in
-   `lib/features/auth/presentation/screens/login_screen/login_screen.dart`.
-   The submodule change is the one that keeps the buttons consistent with
-   every other button in the app.
+### ⚠️ The Apple button is the wrong colour for Apple's guidelines
+
+Separate from the missing file, and it will be read at review. "Continue with
+Apple" renders as `SdButtonVariantV3.primary`, which is the app's indigo
+(`AppColors.brand`). **Apple allows three button styles and no others: black,
+white, or white with an outline.** An indigo one is a rejection risk.
+
+It is a design decision, not a bug, so it has been left alone. The two ways
+out: give the Apple button the `outlined` variant, so both buttons match and
+both are white-with-outline; or add a black variant for it alone.
 
 ### I removed a dependency
 

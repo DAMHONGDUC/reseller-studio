@@ -82,12 +82,12 @@ Nothing started. Listed with what already exists to build on.
   `PlanLimits.byPlan` holds every ceiling; changing one is a one-line edit and
   the paywall copy follows, because it reads the table rather than repeating
   it. Nobody has priced these against what a reseller will pay.
-- **The Apple and Google brand marks are still placeholder glyphs.** The one
-  remaining code-side blocker, and it cannot be done from this repo: both
-  vendors require their own artwork and forbid a substitute, so the files have
-  to be downloaded. `SdButtonV3.icon` is an `IconData` and cannot take an
-  image, so it also needs a `leading` slot on the submodule's button.
-  `RELEASE_ACTIONS.md` blocker 5 has the detail.
+- **Apple's brand mark is the one asset still missing.** The code is done —
+  `SdButtonV3` has its `leading` slot and Google's own file ships in
+  `assets/brand/` — but Apple's logo can only come from Apple, and the login
+  screen throws until `assets/brand/apple_logo.svg` exists. The Apple button
+  also renders in the app's indigo, which Apple's guidelines do not allow.
+  `RELEASE_ACTIONS.md` blocker 5 has both.
 - **`selleros://` deep links work on iOS only.** `Info.plist` declares the
   scheme and `FlutterDeepLinkingEnabled`; `AndroidManifest.xml` has neither,
   so the notification taps the plan calls for (§22) will not open a record on
