@@ -150,9 +150,13 @@ Apple" renders as `SdButtonVariantV3.primary`, which is the app's indigo
 (`AppColors.brand`). **Apple allows three button styles and no others: black,
 white, or white with an outline.** An indigo one is a rejection risk.
 
-It is a design decision, not a bug, so it has been left alone. The two ways
-out: give the Apple button the `outlined` variant, so both buttons match and
-both are white-with-outline; or add a black variant for it alone.
+It is a design decision, not a bug, so it has been left alone — **and the
+login redesign made it more visible, not less**: the two buttons now sit
+pinned together at the bottom, so an indigo Apple button beside an outlined
+Google one is the first thing a reviewer looks at. The two ways out: give the
+Apple button the `outlined` variant, so both match and both are
+white-with-outline; or add a black variant for it alone. Say which and it is a
+few minutes.
 
 ### I removed a dependency
 
