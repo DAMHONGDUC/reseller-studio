@@ -319,6 +319,26 @@ the port".
 `SdFloatingBarScopeV3` is the one that *was* ported, because leaving it out
 cost a real bug: see the snackbar entry under "Snackbars, dialogs and sheets".
 
+### Every spacing refers to one value, and exactly one owner places it
+
+Owner's rule, and the widest of the spacing rules — the ones below sharpen it
+rather than compete with it. **No gap is ever built by adding two numbers
+that both mean "the space here".** A distance with two owners is a distance
+that drifts, and it drifts invisibly: each file looks right on its own.
+
+- **A boundary belongs to one side of it.** The filter strip sits in the
+  body, so the *screen* places `topGap` in front of it.
+  `SdSearchHeaderV3` used to reserve a second gap of its own for the same
+  boundary, and Inventory's chips sat 8 points below every other screen's
+  while both files read correctly. The header now reserves the field and
+  nothing under it.
+- **Reach for the token, never the literal that equals it.** `h8` in two
+  places is one value; `h8` in one and `8` in the other is two, and only one
+  of them moves when the scale does.
+- `test/core/widgets/filter_strip_gap_test.dart` holds two screens against
+  each other, because "looks about right" is exactly the judgement that let
+  this through.
+
 ### The traps — each one cost a real bug
 
 - **Insets come off the view, not the ambient `MediaQuery`.** `Scaffold` wraps
