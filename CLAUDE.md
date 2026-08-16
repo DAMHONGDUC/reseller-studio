@@ -377,6 +377,26 @@ directly.
     member could promote themselves to owner, and every other rule is decided
     by that document.
 
+11b. **A seller can belong to several businesses, and switching is a write —
+    never local state.** Owner's rule. `setLastWorkspace` writes
+    `lastWorkspaceId` on the user's own document; the profile stream carries it
+    back and `resolvedWorkspaceId` picks it up, which every business provider
+    is already watching. A "currently selected workspace" held in a controller
+    would be a second answer to the same question, and a teammate removing you
+    from a business could contradict it.
+    - **`UserProfile.workspaceIds` is the list, and it is not queryable.**
+      `firestore.rules` scopes member reads to one workspace at a time on
+      purpose, so "which businesses am I in?" has no server-side answer a
+      client may ask. A Cloud Function keeps the list in step.
+    - A pointer at a business the seller has left **falls back to the first
+      they still belong to** rather than stranding them on one every rule
+      denies. `test/features/workspace/resolved_workspace_test.dart`.
+    - The switcher is Home's title (`SdAppBarV3.onTitleTap`) opening
+      `WorkspaceSwitcherSheet`. Creating an additional business is
+      `AppRoutes.workspaceCreate`, a **pushed** route — deliberately not
+      `workspaceSetup`, which the redirect forces new accounts through and
+      then bounces them off.
+
 12. **The audit log is append-only and written only by Cloud Functions.** Plan
     §23. An entry a client can write can name any actor it likes, which makes
     it worthless as an audit log. `allow create, update, delete: if false`.
