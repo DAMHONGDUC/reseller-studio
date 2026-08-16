@@ -55,11 +55,14 @@ The spacing rulebook (`SdContentPaddingV2`) **was** ported in full. Two
 neighbouring v2 patterns were not, and this is the standing answer:
 
 - **`SdCollapsingFilterScaffoldV2` + `SdPinnedFilterBarV2`.** v2 lifts the
-  whole filter row into the app bar as the list scrolls. v3 does the opposite
-  and it is a recorded owner's rule: a filter strip is never part of the app
-  bar, it is its own widget in the body, and it scrolls away with the content.
-  What stays pinned is search and the actions. These are mutually exclusive
-  designs, not two halves of one — v3's stands.
+  whole filter row *into the app bar* as the list scrolls. v3 does not, and
+  that is the recorded owner's rule: a filter strip is never part of the app
+  bar, it is its own widget in the body with the body's background.
+  **What changed since:** the strip now *pins* below the chrome rather than
+  scrolling away, because chips a seller cannot reach 300 rows down are chips
+  they scroll back up for. Pinned below is not the same as lifted inside —
+  v2's component is still not what v3 wants, and v3 pins with a plain
+  `SliverPersistentHeader` it owns.
 - **`SdContentPaddingV3.belowPinnedFilterBar`.** Follows from the above: it is
   `appBarInset` plus the strip's height, the first term is zero under an
   opaque bar, and nothing pins a strip over a list anyway.

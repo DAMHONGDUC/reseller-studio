@@ -121,12 +121,21 @@ Owner's rules, all of them read from one place so no screen types them:
   things **the header itself draws** is not the screen's `topGap`, even at the
   same value. Read the emphasis: it once carried a `stripGap` for the filter
   strip, which the header does *not* draw, and that gap was then placed twice.
-- **A filter strip is never part of the app bar.** Owner's rule. It is its own
-  widget in the body, `topGap` below the chrome, and it scrolls away with the
-  content. `SdSearchHeaderV3` holds the title, the search field and the
-  actions — there is no `bottom` slot on it, deliberately. What stays pinned
-  300 rows down is search and the actions; a filter row is content, and
-  content scrolls.
+- **A filter strip is never part of the app bar, and it stays put while the
+  list scrolls.** Owner's rules, and they are not in tension: the strip is its
+  own widget below the chrome with the body's background, and it is *pinned*
+  there rather than lifted into the bar. `SdSearchHeaderV3` still holds only
+  the title, the search field and the actions — there is no `bottom` slot on
+  it, deliberately.
+  - Orders gets this for free: its strip sits in a `Column` above an
+    `Expanded` list, so it was never inside the scrollable.
+  - Inventory's list *is* the scrollable — the search header has to live in it
+    to dock — so its strip is a `SliverPersistentHeader(pinned: true)` whose
+    extent is `topGap * 2 + AppFilterStrip.height`. That band carries both
+    gaps, so the screen places neither.
+  - **This reverses the earlier "a filter row is content, and content
+    scrolls".** Chips a seller cannot reach 300 rows down are chips they
+    scroll back up for, which is the cost the docking header exists to avoid.
 - **A filter strip carries no gap of its own and fits its chips exactly, and
   the screen places `topGap` above it and the same below.** Owner's rule, and
   it is the one-owner rule applied to the one widget that kept breaking it.
