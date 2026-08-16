@@ -181,9 +181,15 @@ screen owning the records it makes, behind that screen's own `SdFabV3`. That
 is right for a seller already on the screen and wrong for one who opened the
 app holding a receipt, so Home lists **every** one of them.
 
-`QuickAddConstant.actions` is that list and the only one. A tile pushes the
+`QuickAddConstant.actions` is that list and the only one. A row pushes the
 screen that owns the action; it never opens a form Home would then have to
 know how to save.
+
+**Rows, and always last on the screen** — owner's rule. Home answers "what
+needs attention today" first, so a launcher sitting above the figures makes
+the screen open on the wrong thing. At the bottom it is where a seller who
+came to *add* something scrolls to, and it costs the seller who came to
+*read* nothing.
 
 **Adding a create action anywhere means adding it here.**
 `test/features/home/quick_access_test.dart` reads `lib/features/` for screens
