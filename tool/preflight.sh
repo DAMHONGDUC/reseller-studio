@@ -60,12 +60,12 @@ warn "env/dev.json has BYPASS_AUTH false — the bypass is deletable" \
   "$(grep -q '"BYPASS_AUTH": *false' env/dev.json 2>/dev/null && echo 0 || echo 1)"
 
 echo "→ 5    Store assets and brand marks"
-# The Flutter default icon is 1024x1024 and ~19KB; ours is far larger. A size
-# floor is cruder than a checksum but survives the icon being redesigned.
+# Checksum, not file size: the icon can be redesigned to any size, but there
+# is exactly one byte sequence that means "nobody replaced the template".
+FLUTTER_DEFAULT_ICON=7770183009e914112de7d8ef1d235a6a30c5834424858e0d2f8253f6b8d31926
 ICON=ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png
 if [ -f "$ICON" ]; then
-  SIZE=$(wc -c < "$ICON" | tr -d ' ')
-  [ "$SIZE" -gt 40000 ]
+  [ "$(shasum -a 256 "$ICON" | cut -d' ' -f1)" != "$FLUTTER_DEFAULT_ICON" ]
   blocker "the app icon is not Flutter's default" "$?"
 else
   blocker "the 1024 app icon exists" 1

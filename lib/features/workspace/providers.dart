@@ -10,6 +10,7 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/config/dev_flags.dart';
 import '../../core/firestore/workspace_collections.dart';
 import '../../core/firestore/workspace_context.dart';
 import '../auth/providers.dart';
@@ -39,7 +40,8 @@ final StreamProvider<UserProfile?> userProfileProvider =
     StreamProvider<UserProfile?>((Ref ref) {
       final String? uid = ref.watch(currentUidProvider);
 
-      if (uid == null || ref.watch(dataModeProvider).isMock) {
+      if (uid == null ||
+          (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock)) {
         return Stream<UserProfile?>.value(null);
       }
 
@@ -50,7 +52,7 @@ final StreamProvider<UserProfile?> userProfileProvider =
 final Provider<String?> currentWorkspaceIdProvider = Provider<String?>((
   Ref ref,
 ) {
-  if (ref.watch(dataModeProvider).isMock) {
+  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
     return ref.watch(mockStoreProvider).dataset.workspace.id;
   }
 
@@ -73,7 +75,7 @@ final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>((
 final Provider<Workspace?> currentWorkspaceProvider = Provider<Workspace?>((
   Ref ref,
 ) {
-  if (ref.watch(dataModeProvider).isMock) {
+  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
     return ref.watch(mockStoreProvider).dataset.workspace;
   }
 
@@ -103,7 +105,9 @@ enum WorkspaceStatus {
 
 final Provider<WorkspaceStatus> workspaceStatusProvider =
     Provider<WorkspaceStatus>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) return WorkspaceStatus.ready;
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return WorkspaceStatus.ready;
+      }
 
       final AsyncValue<UserProfile?> profile = ref.watch(userProfileProvider);
 
@@ -163,7 +167,7 @@ final Provider<Duration> staleThresholdProvider = Provider<Duration>((Ref ref) {
 final Provider<List<Member>> workspaceMembersProvider = Provider<List<Member>>((
   Ref ref,
 ) {
-  if (ref.watch(dataModeProvider).isMock) {
+  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
     return ref.watch(mockStoreProvider).dataset.members;
   }
 
