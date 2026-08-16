@@ -28,8 +28,26 @@ portability is the whole reason the design system is a submodule.
   icon not being Flutter's, the iOS usage strings, and a clean analyze. Exits
   non-zero on an unmet blocker, so it is the check `RELEASE_ACTIONS.md` cannot
   be. Run it after the account setup, before `flutter build ipa`.
-- `melos run deploy-firebase` — rules, indexes and functions. Confirms the
-  project first; this reaches real users.
+- `melos run deploy-firebase` — firestore rules, indexes, **storage rules**
+  and functions. Confirms the project first; this reaches real users.
+  **The script is the one place that list is written.** Never copy the
+  `firebase deploy` line into a document: `storage` went missing from the
+  script while `RELEASE_ACTIONS.md` still named it, and the bucket the app
+  uploads photos and receipts to was the one nobody was deploying rules for.
+
+**Every script body lives in `tool/`, and is POSIX `sh`.** The runner config
+only names it. `[[ ]]`, `local` and `set -o pipefail` are syntax errors under
+dash, and macOS will not catch it because its `/bin/sh` is bash wearing
+another name — so a script that works here fails on CI. Check before
+committing:
+
+```bash
+dash -n tool/<script>.sh
+```
+
+**The version and build number are edited in `pubspec.yaml`, never passed as
+a `--build-name`/`--build-number` flag.** A build whose version exists nowhere
+in git is one the repo cannot account for afterwards.
 
 Running the app before Firebase exists — the app is otherwise stuck on a
 login screen that cannot succeed (hard rule 1). `env/dev.json` carries

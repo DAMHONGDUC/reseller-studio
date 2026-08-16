@@ -98,6 +98,20 @@ Owner's rules, all of them read from one place so no screen types them:
   misalignment even when both are centred. The leftover splits evenly top and
   bottom. **A control docking into the bar pads itself; it does not fill the
   bar.**
+- **The rule between two rows is `SdDividerV3`, never Material's `Divider`.**
+  Material reserves a whole `height` around a rule only `thickness` tall, and
+  defaults that height to 16 — so a call site asking for a hairline silently
+  pays 16 of vertical space that nothing nearby explains, and the gap cannot
+  be reconciled with the spacing ladder. `SdDividerV3` occupies exactly the
+  line it draws, takes its breathing room as an explicit `gap`, and resolves
+  its own colour. **Between items only** — a rule on a container's own edge
+  reads as a border it does not have.
+- **A message is `SdSnackBarUtilsV3`, never `ScaffoldMessenger`.**
+  `ScaffoldMessenger` renders into the nearest `Scaffold`, so a message
+  raised from a pushed route or a sheet cannot see `SdFloatingBarScopeV3` and
+  lands inside the glass tab bar instead of above it. The presenter draws
+  into the root overlay, which is also what lets a message outlive the route
+  that raised it — pop first, then call it.
 - **The FAB is `SdFabV3`, never Material's.** It is shorter than Material's
   and sheds its label while the list is moving — but it never hides. A create
   action a seller has to hunt for is one they stop using.
