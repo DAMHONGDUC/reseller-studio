@@ -197,3 +197,19 @@ wearing `AppAddFabScaffold` and fails on any the section cannot start — a
 section that lists six of eight is worse than none, because a seller who has
 learned to look here stops being able to tell "missing" from "the app cannot
 do it".
+
+## About draws the workflow, and the diagram is navigable
+
+Owner's rule: More carries an About entry holding what the app is plus the
+workflow, so a seller can see how the parts connect.
+
+`WorkflowConstant.steps` is the chain `CLAUDE.md` writes as one line, as data.
+It is drawn **vertically** — nine links across a phone is either unreadable or
+a horizontal scroll nobody finds — and **each step opens the screen that
+performs it**, because a page explaining a workflow you cannot enter is the
+screen this rulebook says will be redesigned.
+
+The order carries the meaning. `test/features/more/about_screen_test.dart`
+pins the sequence against the lifecycle and fails on a step pointing at a
+parameterised route, which cannot be pushed and would be a dead link inside
+the one screen that exists to explain the app.
