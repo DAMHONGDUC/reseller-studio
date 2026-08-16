@@ -234,11 +234,12 @@ void main() {
         0,
       );
 
-      // Search and the scanner stay reachable 300 rows down — they are the
-      // chrome. The filter strip deliberately does NOT: it is a widget in the
-      // body, never part of the app bar, so it scrolls away with the content.
+      // Search, the scanner and the filter strip all stay reachable 300 rows
+      // down — owner's rule, and the strip earns it the same way Orders' does.
+      // It is still not *part* of the app bar: it pins as its own sliver
+      // below the chrome, which the next test measures.
       expect(find.byTooltip('Scan'), findsOneWidget);
-      expect(find.text('All'), findsNothing);
+      expect(find.text('All'), findsOneWidget);
     });
 
     testWidgets('Inventory keeps the filter strip out of the app bar', (
@@ -251,6 +252,16 @@ void main() {
 
       // Below the chrome, not inside it.
       expect(strip.top, greaterThan(field.bottom));
+
+      // Still below it once the field has docked — pinning moved the strip
+      // up with the chrome, it did not move it *into* it.
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getRect(find.text('All')).top,
+        greaterThan(tester.getRect(find.byType(SdSearchFieldV3)).bottom),
+      );
     });
 
     testWidgets('Quick Add sheds its label only while the list is moving', (
@@ -299,6 +310,14 @@ void main() {
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const SettingsScreen());
+
+      // Appearance now heads the screen — theme and language are the block
+      // that works with no account — so the developer card is below the fold.
+      await tester.scrollUntilVisible(
+        find.text('Mock data'),
+        SdSpacingConstant.h200,
+        scrollable: find.byType(Scrollable).first,
+      );
 
       expect(find.text('Mock data'), findsOneWidget);
       expect(find.text('Showing a seeded demo business.'), findsOneWidget);

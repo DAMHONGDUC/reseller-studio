@@ -24,6 +24,30 @@ melos run run -- prod    # env/prod.json
   still compiles. That is what keeps `melos run test` working without a
   flavour.
 
+**`REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY` are public SDK
+keys and belong here**, the same category as the Firebase ids: they identify
+the app to RevenueCat and are protected by the store's receipt verification,
+not by being unreadable. The **webhook auth header is the secret half** and
+must never appear in `env/` — it is read only by the Cloud Function that
+mirrors entitlement into Firestore (hard rule 10). An empty key is a
+supported state: `AppEnv.hasBillingConfig` is false, billing is skipped at
+bootstrap, and every seller reads as Free.
+
+**`MOCK_DATA_DEFAULT` is off, and no other flag turns it on** — owner's rule.
+It used to be ORed with `BYPASS_AUTH` in `DevFlags`, so any dev run opened onto
+a fake business. It no longer is, and the two are independent:
+
+- A dev run now opens on **what a new seller sees** — five tabs with nothing in
+  them (hard rule 1). That is a real shipped state, and a default that replaced
+  it with seeded data meant nobody was looking at it.
+- Turning it on is deliberate: `"MOCK_DATA_DEFAULT": true` in the env file, or
+  the switch in More → Settings, which is the path it is designed to be reached
+  by — the stored preference is what `DataModeController` reads.
+- The release guard is unchanged and is the part that matters:
+  `DevFlags.mockDataDefault` is still ANDed with `!kReleaseMode`, and
+  `DataModeController.build` refuses `mock` in release whatever is stored.
+  `test/core/config/app_env_test.dart` holds both.
+
 The two secret-handling rules for `env/` — that nothing in it is secret, and
 that `AppEnv` states the request while `DevFlags` states the permission — are
 always-apply and live in the root `CLAUDE.md` under "Configuration and

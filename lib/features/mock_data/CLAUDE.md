@@ -8,9 +8,12 @@ a stream of permission errors.
 
 - `DataMode` is **persisted** (unlike the auth bypass, which is a build flag),
   because it is a setting a developer toggles from inside the running app. It
-  therefore carries its own guard: `DataModeController` refuses to return
-  `mock` in a release build whatever is stored, and the Settings card is
-  tree-shaken out entirely. Showing a user a fake business as if it were
+  therefore carries two guards. `DataModeController` refuses to return `mock`
+  in a release build whatever is stored; and every repository provider tests
+  `DevFlags.isDebugOrProfile` **before** it reads the mode, which is `const`
+  false in release, so the whole mock branch folds away and the seed leaves
+  the binary. Keep that test first when adding a provider — put it second and
+  the fake business ships again. Showing a user a fake business as if it were
   theirs is worse than any crash.
 - **The seed is coherent, not random.** Every item traces to a purchase, every
   purchase to a source, every order to items that existed, and the totals add

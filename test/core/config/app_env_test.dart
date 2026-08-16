@@ -36,7 +36,10 @@ void main() {
     test('prod never ships the development switches on', () {
       final Map<String, dynamic> prod = readEnv('prod');
 
-      expect(prod['BYPASS_AUTH'], isFalse);
+      // BYPASS_AUTH is no longer read by the app — the flag is deleted. The
+      // key may still sit in the templates until they are tidied, and false
+      // is the only value that was ever right for prod.
+      expect(prod['BYPASS_AUTH'] ?? false, isFalse);
       expect(prod['MOCK_DATA_DEFAULT'], isFalse);
       expect(prod['FLAVOR'], 'prod');
     });
@@ -83,24 +86,21 @@ void main() {
 
   group('DevFlags guards AppEnv', () {
     test('is off by default, whatever the env file could say', () {
-      expect(DevFlags.bypassAuth, isFalse);
       expect(DevFlags.mockDataDefault, isFalse);
     });
 
     test('every flag is const-evaluable, so release can shed the branches', () {
       // These only compile if the values fold at compile time, which is what
-      // lets the tree-shaker delete `if (DevFlags.bypassAuth)` entirely.
-      const bool bypass = DevFlags.bypassAuth;
+      // lets the tree-shaker delete the branch entirely.
       const bool mock = DevFlags.mockDataDefault;
       const bool verbose = DevFlags.verboseLogging;
 
-      expect(<bool>[bypass, mock, verbose], everyElement(isFalse));
+      expect(<bool>[mock, verbose], everyElement(isFalse));
     });
 
     test('no flag can be true in a release build, however it was defined', () {
       // Restated here so that removing a `!kReleaseMode` fails a test rather
       // than silently arming a config file against a store build.
-      expect(DevFlags.bypassAuth && !DevFlags.isDebugOrProfile, isFalse);
       expect(DevFlags.mockDataDefault && !DevFlags.isDebugOrProfile, isFalse);
       expect(DevFlags.verboseLogging && !DevFlags.isDebugOrProfile, isFalse);
     });

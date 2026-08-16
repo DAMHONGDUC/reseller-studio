@@ -866,9 +866,7 @@ Roles:
 ```text
 Splash
  ↓
-Login / Sign Up
- ↓
-Verification where required
+Sign in with Apple / Google
  ↓
 Create/select Workspace
  ↓
@@ -877,12 +875,12 @@ Initial settings
 Home
 ```
 
-Authentication:
-- Email/password
+Authentication is **Sign in with Apple and Google Sign-In only** (owner's
+decision). No email/password, no sign-up form, no password reset, no email
+verification — the identity provider owns all of that.
+
 - Sign in with Apple
 - Google Sign-In
-- Forgot password
-- Email verification
 - Session persistence
 - Logout
 - Account deletion
@@ -923,15 +921,10 @@ Core rule:
 
 > **Create = minimum required data. Transition = additional required validation.**
 
-### Sign Up
-- Email — required
-- Password — required
-- Confirm password — required
-- Display name — optional
-
-### Login
-- Email — required
-- Password — required
+### Sign in
+Apple or Google only — the app asks for nothing. Name, email and avatar come
+from whichever provider the seller chose, and the account is created on first
+sign-in. There is no sign-up form and no password.
 
 ### Workspace
 - Name — required

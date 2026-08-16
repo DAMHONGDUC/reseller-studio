@@ -8,8 +8,9 @@ or before assuming a piece of infrastructure exists.
   absent. Run `flutterfire configure` once the project exists. Until then
   `bootstrap` catches the init failure and the app runs without a backend —
   deliberately, so a missing config is a warning line rather than a white
-  screen. `melos run run` gets past login meanwhile (hard rule 1), and
-  **delete the bypass when real sign-in works.**
+  screen. **There is no auth bypass any more** (hard rule 1): the app opens on
+  the signed-out shell — five empty tabs — and mock data in More → Settings is
+  how it is developed against until sign-in works.
   The `FIREBASE_*` keys in `env/*.json` are empty until then; `bootstrap` logs
   one clean warning rather than a Firebase stack trace when it sees that.
 - **`.firebaserc` does not exist**, so `melos run deploy-firebase` cannot run.

@@ -18,7 +18,7 @@ class _PriceLine extends StatelessWidget {
     children: <Widget>[
       Flexible(
         child: _PriceCell(
-          label: 'Cost',
+          label: context.l10n.itemCost,
           value: context.money(item.purchasePrice),
           color: context.sdTheme3.textSecondary,
         ),
@@ -26,7 +26,7 @@ class _PriceLine extends StatelessWidget {
       SizedBox(width: SdSpacingConstant.w12),
       Flexible(
         child: _PriceCell(
-          label: 'Asking',
+          label: context.l10n.itemAsking,
           value: context.money(item.askingPrice),
           color: context.sdTheme3.textPrimary,
         ),
@@ -35,7 +35,7 @@ class _PriceLine extends StatelessWidget {
         SizedBox(width: SdSpacingConstant.w12),
         Flexible(
           child: _PriceCell(
-            label: 'Profit',
+            label: context.l10n.itemProfit,
             value: context.money(item.expectedProfit),
             color: item.expectedProfit!.isNegative
                 ? context.sdTheme3.loss

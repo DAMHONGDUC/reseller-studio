@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:system_design/index.dart';
 
 import 'app_colors.dart';
@@ -85,6 +86,38 @@ final class AppTheme {
     textColor: AppColors.textPrimaryDark,
   );
 
+  /// The status bar style for a resolved theme brightness.
+  ///
+  /// **The two platform fields are inverted, and both are set every time.**
+  /// `statusBarIconBrightness` (Android) describes the *icons*;
+  /// `statusBarBrightness` (iOS) describes the *background behind them*. A
+  /// style that names one field looks correct on the platform it was tested on
+  /// and renders invisible icons on the other.
+  ///
+  /// Derived from [brightness] rather than written out as two constants that
+  /// can disagree with the palette they are meant to match — and therefore not
+  /// a `const`, because this app follows the system theme and a device
+  /// switching to light mode would otherwise keep light icons on a light bar.
+  ///
+  /// `statusBarColor` is Android-only and stays transparent: iOS ignores it,
+  /// so painting it reads as "fixed on Android, still broken on iOS". The
+  /// navigation bar goes with it — the glass tab pill floats over an
+  /// edge-to-edge body, so a painted system bar behind it is a band of dead
+  /// colour.
+  static SystemUiOverlayStyle statusBarStyle(Brightness brightness) {
+    final bool isDark = brightness == Brightness.dark;
+
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark,
+    );
+  }
+
   static ThemeData _build({
     required Brightness brightness,
     required ColorScheme colorScheme,
@@ -98,6 +131,11 @@ final class AppTheme {
     extensions: <ThemeExtension<dynamic>>[sdTheme],
     textTheme: _textTheme(textColor),
     splashFactory: InkSparkle.splashFactory,
+    // The one place the status bar style is decided. `SdAppBarV3` builds a
+    // real `AppBar`, which turns this into the `AnnotatedRegion` covering the
+    // top of every route that has a bar; `SellerOsApp` reads it back out for
+    // the routes that do not. No screen ever calls `SystemChrome`.
+    appBarTheme: AppBarTheme(systemOverlayStyle: statusBarStyle(brightness)),
   );
 
   /// The text face used everywhere.

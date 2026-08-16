@@ -4,9 +4,13 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/time/app_clock.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/item.dart';
+import 'domain/entities/item_category.dart';
+import 'domain/entities/storage_location.dart';
 import 'domain/enums/item_status.dart';
 
 /// The tabs across the top of Inventory (plan §7).
@@ -51,7 +55,10 @@ enum InventoryFilter {
 final StreamProvider<List<Item>> itemsProvider = StreamProvider<List<Item>>((
   Ref ref,
 ) {
-  return ref.watch(itemRepositoryProvider).watchItems();
+  return WorkspaceGuard.listOrEmpty<Item>(
+    ref,
+    () => ref.watch(itemRepositoryProvider).watchItems(),
+  );
 });
 
 /// One item, live — what the detail screen watches so an edit made on another
@@ -63,7 +70,10 @@ final StreamProvider<List<Item>> itemsProvider = StreamProvider<List<Item>>((
 // information.
 // ignore: type_annotate_public_apis
 final itemProvider = StreamProvider.family<Item?, String>((Ref ref, String id) {
-  return ref.watch(itemRepositoryProvider).watchItem(id);
+  return WorkspaceGuard.oneOrNull<Item>(
+    ref,
+    () => ref.watch(itemRepositoryProvider).watchItem(id),
+  );
 });
 
 /// Which tab is selected.
@@ -102,7 +112,7 @@ inventorySearchProvider = NotifierProvider<InventorySearchController, String>(
 final Provider<Map<InventoryFilter, int>> inventoryCountsProvider =
     Provider<Map<InventoryFilter, int>>((Ref ref) {
       final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
-      final DateTime now = DateTime.now();
+      final DateTime now = ref.watch(clockProvider).now();
 
       return <InventoryFilter, int>{
         for (final InventoryFilter filter in InventoryFilter.values)
@@ -112,6 +122,146 @@ final Provider<Map<InventoryFilter, int>> inventoryCountsProvider =
       };
     });
 
+/// Which rows are ticked for a bulk action.
+///
+/// **Bulk is a first-class requirement, not a later nicety** (hard rule 16):
+/// reprice, relist and archive are things a seller does to forty rows at
+/// once, and a screen that only edits one item at a time is why people keep
+/// using spreadsheets.
+///
+/// Selection lives in a provider rather than the screen's `State` so the
+/// action sheet — a different subtree, pushed on the root navigator — can read
+/// it without the screen passing it down.
+class InventorySelectionController extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => const <String>{};
+
+  bool get isActive => state.isNotEmpty;
+
+  void toggle(String itemId) {
+    final Set<String> next = Set<String>.of(state);
+
+    if (!next.remove(itemId)) next.add(itemId);
+
+    state = next;
+  }
+
+  void selectAll(Iterable<String> itemIds) => state = Set<String>.of(itemIds);
+
+  void clear() => state = const <String>{};
+}
+
+final NotifierProvider<InventorySelectionController, Set<String>>
+inventorySelectionProvider =
+    NotifierProvider<InventorySelectionController, Set<String>>(
+      InventorySelectionController.new,
+    );
+
+/// The selected items themselves, resolved from the visible list.
+///
+/// Derived rather than stored alongside the ids: an item edited by a teammate
+/// while a bulk selection is open must reach the action with its new values,
+/// and a copy taken at tick time would not.
+final Provider<List<Item>> selectedItemsProvider = Provider<List<Item>>((
+  Ref ref,
+) {
+  final Set<String> ids = ref.watch(inventorySelectionProvider);
+
+  if (ids.isEmpty) return const <Item>[];
+
+  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
+
+  return items.where((Item item) => ids.contains(item.id)).toList();
+});
+
+/// Every category in the workspace — small, slow-changing reference data, so
+/// one live stream that every picker and every row folds over.
+final StreamProvider<List<ItemCategory>> categoriesProvider =
+    StreamProvider<List<ItemCategory>>((Ref ref) {
+      return WorkspaceGuard.listOrEmpty<ItemCategory>(
+        ref,
+        () => ref.watch(categoryRepositoryProvider).watchCategories(),
+      );
+    });
+
+final StreamProvider<List<StorageLocation>> locationsProvider =
+    StreamProvider<List<StorageLocation>>((Ref ref) {
+      return WorkspaceGuard.listOrEmpty<StorageLocation>(
+        ref,
+        () => ref.watch(locationRepositoryProvider).watchLocations(),
+      );
+    });
+
+/// Category id → name, for rendering a row without looking one up per item.
+final Provider<Map<String, String>> categoryNamesProvider =
+    Provider<Map<String, String>>((Ref ref) {
+      final List<ItemCategory> categories =
+          ref.watch(categoriesProvider).value ?? const <ItemCategory>[];
+
+      return <String, String>{
+        for (final ItemCategory category in categories)
+          category.id: category.name,
+      };
+    });
+
+/// Location id → its full path, `Garage · Shelf A · Bin A1`.
+///
+/// The path rather than the leaf, because "Bin A1" alone does not tell a
+/// seller which room to walk into — and that is the entire question the
+/// Locations feature answers.
+final Provider<Map<String, String>> locationPathsProvider =
+    Provider<Map<String, String>>((Ref ref) {
+      final List<StorageLocation> locations =
+          ref.watch(locationsProvider).value ?? const <StorageLocation>[];
+
+      final Map<String, StorageLocation> byId = <String, StorageLocation>{
+        for (final StorageLocation location in locations) location.id: location,
+      };
+
+      return <String, String>{
+        for (final StorageLocation location in locations)
+          location.id: LocationPathBuilder.pathOf(location, byId),
+      };
+    });
+
+/// Walks a location up to its warehouse and joins the names.
+///
+/// Its own class rather than a closure inside the provider: it is string
+/// building over a tree, which is not what a provider is for, and the
+/// Locations screen needs the same walk.
+final class LocationPathBuilder {
+  /// How deep the walk is allowed to go before it gives up.
+  ///
+  /// The tree is warehouse → shelf → bin, so four is already generous. The
+  /// cap exists because a corrupted `parentId` cycle would otherwise hang the
+  /// UI thread rather than render a slightly wrong label.
+  static const int maxDepth = 4;
+
+  static const String separator = ' · ';
+
+  static String pathOf(
+    StorageLocation location,
+    Map<String, StorageLocation> byId,
+  ) {
+    final List<String> parts = <String>[location.name];
+
+    String? parentId = location.parentId;
+    int depth = 0;
+
+    while (parentId != null && depth < maxDepth) {
+      final StorageLocation? parent = byId[parentId];
+
+      if (parent == null) break;
+
+      parts.insert(0, parent.name);
+      parentId = parent.parentId;
+      depth++;
+    }
+
+    return parts.join(separator);
+  }
+}
+
 /// The rows actually shown: the selected tab, narrowed by the search box.
 final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   Ref ref,
@@ -119,7 +269,7 @@ final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
   final InventoryFilter filter = ref.watch(inventoryFilterProvider);
   final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
-  final DateTime now = DateTime.now();
+  final DateTime now = ref.watch(clockProvider).now();
 
   return items.where((Item item) {
     if (!filter.matches(item, now: now)) return false;

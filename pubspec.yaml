@@ -35,9 +35,9 @@ dependencies:
   material_symbols_icons: ^4.2960.0
   mobile_scanner: ^7.1.4
   package_info_plus: ^10.2.1
+  purchases_flutter: ^10.9.0
   share_plus: ^13.2.0
   shared_preferences: ^2.5.5
-  sign_in_with_apple: ^8.1.0
   # The shared design system. Its own git repo, checked out here as a
   # submodule — tokens, theme and string-free widgets live there, not in
   # lib/core. Seller OS renders on its v3 generation and never touches v2.
@@ -58,6 +58,12 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+
+  # Vendor brand marks for the two sign-in buttons, shipped as the vendors
+  # publish them. Apple and Google each forbid a redrawn substitute, so these
+  # files are copied in, never authored here. See RELEASE_ACTIONS.md.
+  assets:
+    - assets/brand/
 
   # Inter, bundled rather than fetched at runtime.
   #

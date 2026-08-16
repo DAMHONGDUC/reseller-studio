@@ -3,7 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../analytics/app_analytics.dart';
+import '../constants/nav_tab_constant.dart';
 import '../extensions/context_extensions.dart';
+import '../logging/app_logger.dart';
 
 /// The five-tab frame every signed-in screen lives in.
 ///
@@ -21,22 +24,74 @@ import '../extensions/context_extensions.dart';
 /// **The bar floats and the body runs underneath it** — `extendBody`, plus
 /// every tab screen padding by `SdContentPaddingV3.floatingBarInset`. Without
 /// both, the glass has nothing moving behind it to refract and the last row
-/// of every list hides under the bar.
-class AppShell extends StatelessWidget {
+/// of every list hides under the bar. The body is wrapped in
+/// `SdFloatingBarScopeV3` for the one thing that cannot pad itself: a
+/// snackbar, which renders into the root overlay above the whole app.
+///
+/// **Screen views for the five tabs are logged here and nowhere else.**
+/// Switching a branch pushes no route, so a navigator observer sees nothing
+/// and the router cannot report it. This is a widget lifecycle rather than a
+/// controller only because there is no controller between a tab tap and the
+/// shell — the event still goes through [AppAnalytics] and sits next to its
+/// [AppLogger.action], and it is never raised from `build`.
+class AppShell extends StatefulWidget {
   const AppShell({required this.shell, super.key});
 
   final StatefulNavigationShell shell;
 
   @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> {
+  @override
+  void initState() {
+    super.initState();
+
+    // The tab the app opens on is a screen view like any other; without this
+    // the first one of every session is missing.
+    _logTab(widget.shell.currentIndex);
+  }
+
+  @override
+  void didUpdateWidget(AppShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final int index = widget.shell.currentIndex;
+
+    // Re-tapping the active tab pops it to root and leaves the index alone —
+    // that is not a new screen view.
+    if (index != oldWidget.shell.currentIndex) _logTab(index);
+  }
+
+  void _logTab(int index) {
+    final String? tab = NavTabConstant.nameAt(index);
+
+    if (tab == null) {
+      AppLogger.warning('Tab index outside NavTabConstant', <String, Object>{
+        'index': index,
+      });
+
+      return;
+    }
+
+    AppLogger.action('Tab viewed', <String, Object>{'tab': tab});
+    AppAnalytics.instance.tabViewed(tab: tab);
+  }
+
+  @override
   Widget build(BuildContext context) => SdScaffoldV3(
     extendBody: true,
-    body: shell,
+    // Marks everything under the tabs as having the glass bar below it. The
+    // only reader is the snackbar, which draws into the root overlay above
+    // the shell and could not otherwise tell the bar is there.
+    body: SdFloatingBarScopeV3(child: widget.shell),
     bottomNavigationBar: SdGlassNavBarV3(
-      selectedIndex: shell.currentIndex,
-      onSelected: (int index) => shell.goBranch(
+      selectedIndex: widget.shell.currentIndex,
+      onSelected: (int index) => widget.shell.goBranch(
         index,
         // Re-tapping the active tab pops that branch to its root.
-        initialLocation: index == shell.currentIndex,
+        initialLocation: index == widget.shell.currentIndex,
       ),
       destinations: <SdNavDestinationV3>[
         SdNavDestinationV3(

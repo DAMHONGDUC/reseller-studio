@@ -1,14 +1,16 @@
 part of 'inventory_screen.dart';
 
-class _ItemList extends StatelessWidget {
+class _ItemList extends ConsumerWidget {
   const _ItemList({required this.items});
 
   final List<Item> items;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // One `now` for the whole list, so every row agrees on what stale means.
-    final DateTime now = DateTime.now();
+    final DateTime now = ref.watch(clockProvider).now();
+    final Set<String> selected = ref.watch(inventorySelectionProvider);
+    final bool isSelecting = selected.isNotEmpty;
 
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(
@@ -17,7 +19,10 @@ class _ItemList extends StatelessWidget {
         SdContentPaddingV3.horizontal,
         // Clears the floating tab bar AND the FAB stacked above it —
         // otherwise the last row sits under "Quick Add" and cannot be tapped.
-        SdContentPaddingV3.bottom(context, floatingNav: true) + SdFabV3.size,
+        // The same arithmetic every other create screen uses, rather than a
+        // second copy of it here: this list is a sliver, so it takes the
+        // number instead of the whole `EdgeInsets`.
+        AppAddFabScaffold.listPadding(context, floatingNav: true).bottom,
       ),
       sliver: SliverList.separated(
         itemCount: items.length,
@@ -29,7 +34,18 @@ class _ItemList extends StatelessWidget {
           return ItemCard(
             item: item,
             now: now,
-            onTap: () => context.push(AppRoutes.item(item.id)),
+            isSelecting: isSelecting,
+            isSelected: selected.contains(item.id),
+            // While a selection is open a tap ticks rather than opens: a
+            // seller mid-bulk-edit who lands on a detail screen has lost the
+            // forty rows they had just picked.
+            onTap: isSelecting
+                ? () => ref
+                      .read(inventorySelectionProvider.notifier)
+                      .toggle(item.id)
+                : () => context.push(AppRoutes.item(item.id)),
+            onLongPress: () =>
+                ref.read(inventorySelectionProvider.notifier).toggle(item.id),
           );
         },
       ),

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AppColors.brand. Flat rather than the gradient the PNG icons carry: an
+     adaptive background is parallaxed and masked, and a gradient banding
+     under that movement is more visible than the gradient is worth. -->
+<resources>
+    <color name="ic_launcher_background">#3D50DF</color>
+</resources>

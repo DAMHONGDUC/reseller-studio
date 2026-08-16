@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'core/config/dev_flags.dart';
 import 'core/router/app_router.dart';
-import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/gen/app_localizations.dart';
 
@@ -61,36 +60,16 @@ class SellerOsApp extends ConsumerWidget {
         ],
         supportedLocales: AppLocalizations.supportedLocales,
         builder: (BuildContext context, Widget? child) =>
-            _DevBanner(child: child ?? const SizedBox.shrink()),
+            AnnotatedRegion<SystemUiOverlayStyle>(
+              // Covers the routes with no app bar — splash, login, a
+              // full-screen sheet — which would otherwise keep whatever the
+              // platform last set. Same derivation the app bar theme uses, so
+              // there is still one place the style is decided, and it unwinds
+              // with the route rather than leaking like `SystemChrome` does.
+              value: AppTheme.statusBarStyle(Theme.of(context).brightness),
+              child: child ?? const SizedBox.shrink(),
+            ),
       ),
-    );
-  }
-}
-
-/// Marks a build whose authentication has been bypassed.
-///
-/// Wraps at `MaterialApp.builder`, so it covers every route including the
-/// ones pushed over the shell — a marker that only appears on Home is a
-/// marker you scroll past.
-///
-/// `DevFlags.bypassAuth` is a compile-time constant, so in a release build
-/// this is `if (false)` and the tree-shaker removes both the branch and
-/// [Banner] with it. The widget still sits in the tree in that case and costs
-/// one pass-through build, which is the price of not writing two app widgets.
-class _DevBanner extends StatelessWidget {
-  const _DevBanner({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    if (!DevFlags.bypassAuth) return child;
-
-    return Banner(
-      message: 'AUTH OFF',
-      location: BannerLocation.topEnd,
-      color: AppColors.warning,
-      child: child,
     );
   }
 }

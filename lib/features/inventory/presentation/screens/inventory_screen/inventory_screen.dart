@@ -1,16 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_add_fab_scaffold.dart';
+import '../../../../../core/widgets/app_filter_strip.dart';
+import '../../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../domain/entities/item.dart';
+import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
+import '../../controllers/item_actions_controller.dart';
 import '../../widgets/item_card.dart';
+import '../../widgets/reprice_sheet.dart';
 
+part 'inventory_screen_bulk_bar.dart';
 part 'inventory_screen_empty_inventory.dart';
 part 'inventory_screen_filter_strip.dart';
 part 'inventory_screen_item_list.dart';
@@ -33,6 +46,14 @@ part 'inventory_screen_item_list.dart';
 /// three. The screen owns the controller for the same reason: the field is
 /// inside a sliver that rebuilds on every scroll frame, and a controller
 /// created there would be a new one each time.
+///
+/// **Long-press starts a bulk selection** (hard rule 16). While one is open
+/// the Quick Add button is replaced by the action bar: two floating controls
+/// competing for one corner is how the wrong one gets tapped.
+///
+/// This is the reference implementation of the create button every other
+/// screen copies — see `AppAddFabScaffold` and the owner's rule in
+/// `CLAUDE.md`.
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
 
@@ -43,110 +64,101 @@ class InventoryScreen extends ConsumerStatefulWidget {
 class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   final TextEditingController _search = TextEditingController();
 
-  /// Whether Quick Add shows its label. A notifier rather than `setState`:
-  /// the direction of a scroll changes several times a second, and rebuilding
-  /// the whole list for the width of a button is exactly the cost this screen
-  /// cannot pay.
-  final ValueNotifier<bool> _quickAddExpanded = ValueNotifier<bool>(true);
-
   @override
   void dispose() {
     _search.dispose();
-    _quickAddExpanded.dispose();
     super.dispose();
   }
 
-  /// Collapses the button while the list is moving away under the thumb, and
-  /// brings the label back the moment it stops or reverses. `idle` counts as
-  /// expanded — a seller who has stopped scrolling is a seller reading, and
-  /// that is when they decide to add something.
+  /// Opens the create flow, or explains why it cannot.
   ///
-  /// Vertical only: the filter strip is a horizontal `ListView` inside the
-  /// header, and swiping to reach "Stale" is not a reason to shrink the
-  /// button.
-  bool _onUserScroll(UserScrollNotification notification) {
-    if (notification.metrics.axis != Axis.vertical) return false;
+  /// **Checked before the form opens, never after the seller has typed.**
+  /// Refusing a title someone has already entered is the worst moment to
+  /// mention a plan limit, and it loses their work.
+  Future<void> _add(String route) async {
+    final PlanBlock block = ref.read(addItemBlockProvider);
 
-    _quickAddExpanded.value = notification.direction != ScrollDirection.reverse;
+    if (block == PlanBlock.none) {
+      unawaited(context.push(route));
 
-    return false;
+      return;
+    }
+
+    await PlanBlockSheet.show(
+      context,
+      block: block,
+      plan: ref.read(currentPlanProvider),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final List<Item> items = ref.watch(visibleItemsProvider);
     final AsyncValue<List<Item>> source = ref.watch(itemsProvider);
+    final bool isSelecting = ref.watch(inventorySelectionProvider).isNotEmpty;
 
-    return SdScaffoldV3(
-      // Lifted clear of the floating tab bar. `extendBody` keeps the FAB in
-      // the body's coordinate space rather than stacking it above the bottom
-      // slot, so without this the button renders *behind* the glass — which
-      // looks like a bug and makes it hard to tap.
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(
-          bottom: SdContentPaddingV3.floatingBarInset(context),
-        ),
-        child: ValueListenableBuilder<bool>(
-          valueListenable: _quickAddExpanded,
-          builder: (BuildContext context, bool expanded, Widget? _) => SdFabV3(
-            icon: Symbols.add_rounded,
-            label: context.l10n.quickAddTitle,
-            expanded: expanded,
-            onPressed: () => context.push(AppRoutes.quickAdd),
+    return AppAddFabScaffold(
+      addLabel: context.l10n.quickAddTitle,
+      onAdd: () => _add(AppRoutes.quickAdd),
+      floatingNav: true,
+      showAdd: !isSelecting,
+      bottomNavigationBar: isSelecting ? const _BulkActionBar() : null,
+      // No `appBar`: `SdSearchHeaderV3` is a sliver and has to live in the
+      // scroll view to dock into the title's row as the list moves.
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SdSearchHeaderV3(
+            title: context.l10n.navInventory,
+            controller: _search,
+            hint: context.l10n.inventorySearchHint,
+            clearTooltip: context.l10n.inventoryClearSearch,
+            onChanged: (String value) =>
+                ref.read(inventorySearchProvider.notifier).update(value),
+            actions: <SdAppBarActionV3>[
+              SdAppBarActionV3(
+                icon: Symbols.add_box_rounded,
+                tooltip: context.l10n.inventoryAddItem,
+                onPressed: () => _add(AppRoutes.addItem),
+              ),
+              SdAppBarActionV3(
+                icon: Symbols.qr_code_scanner_rounded,
+                tooltip: context.l10n.inventoryScan,
+                onPressed: () => context.push(AppRoutes.scanner),
+              ),
+            ],
           ),
-        ),
-      ),
-      body: NotificationListener<UserScrollNotification>(
-        onNotification: _onUserScroll,
-        child: CustomScrollView(
-          slivers: <Widget>[
-            SdSearchHeaderV3(
-              title: 'Inventory',
-              controller: _search,
-              hint: 'Title, SKU or barcode',
-              clearTooltip: 'Clear search',
-              onChanged: (String value) =>
-                  ref.read(inventorySearchProvider.notifier).update(value),
-              actions: <SdAppBarActionV3>[
-                SdAppBarActionV3(
-                  icon: Symbols.qr_code_scanner_rounded,
-                  tooltip: 'Scan',
-                  onPressed: () {},
-                ),
-              ],
-            ),
-            // The filter strip is never part of the app bar (owner's rule):
-            // its own widget in the body, one topGap below the chrome.
-            SliverToBoxAdapter(
-              child: SizedBox(height: SdContentPaddingV3.topGap),
-            ),
-            const SliverToBoxAdapter(child: _FilterStrip()),
-            switch (source) {
-              // A screen that has not loaded is not empty — saying "No items"
-              // to a seller with four hundred is worse than a spinner.
-              AsyncLoading<List<Item>>() when !source.hasValue =>
-                const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: SdLoadingV3Page(),
-                ),
-              AsyncError<List<Item>>() => const SliverFillRemaining(
+          // Pinned, so the chips stay reachable 300 rows down — and still
+          // not part of the app bar (owner's rules, both). The band carries
+          // its own topGap above and below, so the screen places neither.
+          const SliverPersistentHeader(
+            pinned: true,
+            delegate: _PinnedFilterStrip(),
+          ),
+          switch (source) {
+            // A screen that has not loaded is not empty — saying "No items"
+            // to a seller with four hundred is worse than a spinner.
+            AsyncLoading<List<Item>>() when !source.hasValue =>
+              const SliverFillRemaining(
                 hasScrollBody: false,
-                child: SdEmptyStateV3(
-                  icon: Symbols.error_rounded,
-                  title: 'Could not load inventory',
-                  message: 'Please try again.',
-                ),
+                child: SdLoadingV3Page(),
               ),
-              _ when items.isEmpty => SliverFillRemaining(
-                hasScrollBody: false,
-                child: _EmptyInventory(
-                  hasAnyItems: (source.value ?? const <Item>[]).isNotEmpty,
-                ),
+            AsyncError<List<Item>>() => SliverFillRemaining(
+              hasScrollBody: false,
+              child: SdEmptyStateV3(
+                icon: Symbols.error_rounded,
+                title: context.l10n.inventoryLoadFailed,
+                message: context.l10n.commonCouldNotLoad,
               ),
-              _ => _ItemList(items: items),
-            },
-          ],
-        ),
+            ),
+            _ when items.isEmpty => SliverFillRemaining(
+              hasScrollBody: false,
+              child: _EmptyInventory(
+                hasAnyItems: (source.value ?? const <Item>[]).isNotEmpty,
+              ),
+            ),
+            _ => _ItemList(items: items),
+          },
+        ],
       ),
     );
   }

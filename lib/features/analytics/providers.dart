@@ -9,6 +9,7 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/money/money.dart';
+import '../../core/time/app_clock.dart';
 import '../expenses/domain/entities/expense.dart';
 import '../expenses/providers.dart';
 import '../inventory/domain/entities/item.dart';
@@ -19,6 +20,7 @@ import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
+import 'domain/entities/analytics_breakdowns.dart';
 import 'domain/entities/analytics_summary.dart';
 
 /// The headline figures — Home's overview tiles and the top of Analytics.
@@ -37,6 +39,94 @@ final Provider<AnalyticsSummary> analyticsSummaryProvider =
         expenses: expenses,
         currency: currency,
       );
+    });
+
+/// What the business sold — the Sales sub-screen (plan §9).
+final Provider<SalesMetrics> salesMetricsProvider = Provider<SalesMetrics>((
+  Ref ref,
+) {
+  return SalesMetrics.from(
+    orders: ref.watch(ordersProvider).value ?? const <Order>[],
+    currency: ref.watch(workspaceCurrencyProvider),
+  );
+});
+
+/// What the business is holding and how fast it moves — the Inventory
+/// sub-screen (plan §9).
+final Provider<InventoryMetrics> inventoryMetricsProvider =
+    Provider<InventoryMetrics>((Ref ref) {
+      return InventoryMetrics.from(
+        items: ref.watch(itemsProvider).value ?? const <Item>[],
+        now: ref.watch(clockProvider).now(),
+        staleThreshold: ref.watch(staleThresholdProvider),
+      );
+    });
+
+/// Every category, with what it returned — the Categories sub-screen.
+///
+/// **Revenue is joined from the orders, item by item.** A category's asking
+/// prices say what the seller hoped for; only the sales say what it is worth.
+/// Items with no category are deliberately absent rather than lumped into an
+/// "Other" row: that row would be the biggest one on the screen and would say
+/// nothing except that the seller has not categorised their stock.
+final Provider<List<CategoryPerformance>> categoryPerformanceProvider =
+    Provider<List<CategoryPerformance>>((Ref ref) {
+      final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
+      final List<Order> orders =
+          ref.watch(ordersProvider).value ?? const <Order>[];
+
+      final Map<String, Money> soldFor = <String, Money>{};
+
+      for (final Order order in orders) {
+        if (!order.status.countsAsRevenue) continue;
+
+        for (final OrderLine line in order.lines) {
+          soldFor[line.itemId] = line.lineTotal;
+        }
+      }
+
+      final Map<String, List<Item>> grouped = <String, List<Item>>{};
+
+      for (final Item item in items) {
+        final String? categoryId = item.categoryId;
+
+        if (categoryId == null) continue;
+
+        grouped.putIfAbsent(categoryId, () => <Item>[]).add(item);
+      }
+
+      final List<CategoryPerformance> rows =
+          grouped.entries.map((MapEntry<String, List<Item>> entry) {
+            final List<Item> sold = entry.value
+                .where((Item item) => item.status == ItemStatus.sold)
+                .toList();
+
+            final Money? revenue = sold
+                .map((Item item) => soldFor[item.id])
+                .totalOfKnown();
+
+            final List<Money?> costs = sold
+                .map((Item item) => item.purchasePrice)
+                .toList();
+
+            // Null when any sold item has no recorded cost: a partial cost
+            // makes the profit above it overstated (hard rule 5).
+            final Money? cost = costs.allKnown ? costs.totalOfKnown() : null;
+
+            return CategoryPerformance(
+              categoryId: entry.key,
+              itemCount: entry.value.length,
+              soldCount: sold.length,
+              revenue: revenue,
+              cost: cost,
+              profit: (revenue == null || cost == null) ? null : revenue - cost,
+            );
+          }).toList()..sort(
+            (CategoryPerformance a, CategoryPerformance b) =>
+                b.itemCount.compareTo(a.itemCount),
+          );
+
+      return rows;
     });
 
 /// Revenue and profit broken down by platform (plan §9).
@@ -78,7 +168,7 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
 final Provider<List<Item>> staleItemsProvider = Provider<List<Item>>((Ref ref) {
   final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
   final Duration threshold = ref.watch(staleThresholdProvider);
-  final DateTime now = DateTime.now();
+  final DateTime now = ref.watch(clockProvider).now();
 
   final List<Item> stale =
       items

@@ -4,10 +4,33 @@ Read `SELLER_OS_FINAL_MASTER_PLAN.md` for the full product spec before making
 any architectural decision. It is the product authority; this file is the
 engineering one. `docs/DATA_MODEL.md` is the authority on what is stored.
 
-**Every rule the owner states goes into this file, in the same turn it is
+**Every rule the owner states goes into the rulebook, in the same turn it is
 stated.** A rule that lives only in a chat is gone by the next session — write
-it into the section it belongs to, with the reason, before doing the work it
-governs.
+it with its reason, before doing the work it governs. Which file it goes in
+depends on how wide it is:
+
+| The rule applies to | It goes in |
+|---|---|
+| every change in the repo | this file |
+| one topic — tests, commands, the design system | `docs/rules/<TOPIC>.md` |
+| one feature | `lib/features/<feature>/CLAUDE.md` |
+
+**Any edit to this file or to anything under `docs/rules/` gets its own
+commit, immediately** — never folded into the change it governs. A rule that
+arrives inside a 40-file feature commit is a rule nobody reviewed.
+Message: `docs: update docs - detail is <what changed>`.
+
+**A hard rule is cited by number, never restated.** Write "hard rule 9", not
+the rule again in your own words. One list, one number, referenced from
+everywhere — that is what stops the same constraint living in four files and
+drifting in three of them. A file that repeats one says why it is repeating it,
+the way `docs/rules/PRIVACY_AND_SECURITY.md` does.
+
+**Numbers live in code; a document points at the field and never repeats the
+value.** Write `` `listItemGap` ``, never `` `listItemGap` (12) ``, anywhere
+outside the class that defines it. A number copied into a sentence goes stale
+silently — the sibling app's prose still claims a gap the code stopped using,
+and nobody noticed because prose does not fail to compile.
 
 **Every document in this repo is written in English, in full.** `CLAUDE.md`,
 everything under `docs/`, every `README.md`. No mixed-language paragraphs and
@@ -34,11 +57,15 @@ in the left.
 | Working on | Read |
 |---|---|
 | `packages/system_design/`, or any screen or widget rendering `Sd*` v3 components | `docs/rules/DESIGN_SYSTEM.md` |
+| a screen's app bar, status bar, scrolling list, empty state or search mode | `docs/rules/SCREENS.md` |
+| `firestore.rules`, `firestore.indexes.json`, `functions/`, or a `data/` method that queries or calls out | `docs/rules/BACKEND.md` |
 | a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
 | running, building, generating or deploying | `docs/rules/COMMANDS.md` |
 | writing or fixing a test | `docs/rules/TESTING.md` |
+| anything that reads a key, logs, exports or uploads | `docs/rules/PRIVACY_AND_SECURITY.md` |
 | anything that looks like missing infrastructure — Firebase, signing, icons | `docs/rules/SETUP.md` |
 | asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
+| asking what is already built, or what is left and why | `docs/DONE_WORK.md`, `docs/REMAINING_WORK.md` |
 | anything in `lib/features/mock_data/` | `lib/features/mock_data/CLAUDE.md` (loads on its own) |
 
 ## What this project is
@@ -59,6 +86,15 @@ The core UX principle, from the plan:
 **Do not build Seller OS as a collection of screens.** Build connected
 workflows. A screen that shows data but does not lead to the next step in that
 chain is a screen that will be redesigned.
+
+**The launch markets are the United States and the United Kingdom.** Owner's
+rule, and it is the answer to every "which country?" question the plan leaves
+open — most of all §20, whose tax rules it says must stay country-specific.
+Two jurisdictions ship: `us` and `uk`. The point of the rule is not that
+others are forbidden; it is that a third one is **added as data behind the
+same interface**, never by widening an `if` at a call site. Anything that
+hardcodes one country's category names, its tax year boundary or its mileage
+rate is the bug this rule exists to stop.
 
 ## Tech stack
 
@@ -98,7 +134,9 @@ chain is a screen that will be redesigned.
   15.0`). Lowering it back breaks the iOS build outright.
 - Prefer boring, well-maintained pub.dev packages (>1k likes, recent commits)
   over clever ones. **Ask before adding any new third-party service, SDK or
-  analytics tool.**
+  analytics tool.** An exception to that bar is fine and gets its reason
+  written into `docs/rules/DECISIONS.md` in the same turn — otherwise the next
+  session reads an odd dependency as an accident and swaps it.
 
 ## Repo layout
 
@@ -140,7 +178,9 @@ tool/                      # melos script bodies
 docs/
 ```
 
-Features, from the plan's navigation tree (§38): `auth`, `workspace`, `home`,
+`onboarding` is the one feature the plan does not name — it is the pre-auth
+intro flow, added by the owner, and hard rule 1 governs it. The rest come from
+the plan's navigation tree (§38): `auth`, `workspace`, `home`,
 `inventory`, `orders`, `analytics`, `more`, and later `sourcing`, `listings`,
 `expenses`, `reports`, `search`, `notifications`, `team`, `settings`,
 `marketplaces`, `subscription`.
@@ -163,35 +203,101 @@ whose name contains `SECRET` or `PRIVATE`.
 
 **`AppEnv` says what was asked for; `DevFlags` says what is allowed.** The
 dev switches are read from the env file but every one is ANDed with
-`!kReleaseMode` in `DevFlags`, so a `prod.json` with `"BYPASS_AUTH": true`
-still ships an app with no bypass. Never read `AppEnv.bypassAuthRequested`
-directly.
+`!kReleaseMode` in `DevFlags`, so a `prod.json` with a switch turned on still
+ships an app without it. Read the guarded flag, never the raw `AppEnv` value
+behind it.
 
 ## Hard rules
 
-1. **Login is mandatory. There is no guest mode.** Plan principle 1. The
-   router's `redirect` is the entire gate — no screen checks auth for itself.
-   While auth state is still resolving the app shows the splash, never the
-   login form: flashing a login screen at a returning user is the most common
-   way this gets it wrong.
+1. **Login is mandatory to _use_ the app. There is no guest mode.** Plan
+   principle 1. While auth state is still resolving the app shows the splash,
+   never the login form: flashing a login screen at a returning user is the
+   most common way this gets it wrong.
 
-   **The development bypass is not a guest mode and must never become one.**
-   `DevFlags.bypassAuth` — `BYPASS_AUTH` in `env/dev.json` — enters the app as
-   a fake user. It exists because there is no Firebase project yet, so the
-   login screen is otherwise a dead end and none of the app can be looked at.
-   Three properties keep it honest, and a change that weakens any of them is
-   a change that ships a guest mode:
-   - it is `const` and ANDed with `!kReleaseMode`, so a release build contains
-     `if (false)` and the tree-shaker deletes the branch — the bypass is
-     *absent* from a shipped binary, not disabled in it;
-   - a `prod.json` that says `"BYPASS_AUTH": true` still ships an app with no
-     bypass, so the guarantee does not depend on the contents of a config
-     file or on who typed the build command;
-   - the app wears an `AUTH OFF` banner on every route while it is on.
+   **The shell renders before sign-in, and four of the five tabs show one
+   shared view** — owner's rule, and the one place this hard rule has been
+   rewritten rather than extended:
+   - **Home, Inventory, Orders and Analytics are wrapped in `AuthedTab`** and
+     show `SignedOutView` — a single centred sign-in prompt. **Never let one
+     of them render its own empty state instead.** "You have no orders" is a
+     claim about the seller's business; the truth is that nobody has said
+     whose business to show. Same idea as hard rule 5, one level up.
+   - **More is deliberately not wrapped**, and signed out it lists **Settings
+     alone** — every other destination is a view onto a business that has not
+     been named. Settings is in `_previewRoutes` because theme and language
+     belong to the device, not to an account.
+   - **`NavigationUtils.requireSignIn` guards the actions that survive**, and
+     is the only thing that may. **Never write `if (isSignedIn)` at a call
+     site** — the old rule's point holds: no screen decides for itself.
+   - **The router refuses anything that names a record.** A detail route,
+     search and workspace setup all need an account, so a signed-out visitor
+     is bounced to Home.
+   - **No business data is readable, and that is enforced below the UI.**
+     `WorkspaceGuard` keeps every business stream empty without a workspace,
+     so nothing depends on a widget having remembered to hide something.
+   - **`firestore.rules` is unchanged and is still the real boundary.** The
+     signed-out shell is a UI state, never a permission.
 
-   `test/core/config/dev_flags_test.dart` asserts the flag is off by default.
-   **Delete this bypass once real sign-in works** — it is scaffolding, and its
-   reason to exist expires with "Pending setup".
+   `test/core/router/signed_out_shell_test.dart` pins which tabs are wrapped
+   and what More offers.
+
+   `test/core/router/onboarding_precedes_login_test.dart` pins the order.
+
+   **One screen comes before the gate: the intro flow.** Owner's rule.
+   `/onboarding` runs once per install and then hands over to `/login` — it
+   describes the product and reads nothing, so it is not a way in and does not
+   soften this rule. Three things keep it that way, and a change to any of
+   them is a change to the gate:
+   - it is only ever shown to someone **not signed in**, so a returning seller
+     is never re-introduced to a product they already pay for;
+   - it navigates nowhere itself — finishing flips
+     `onboardingStatusProvider` and the same `redirect` decides what happens
+     next, so there is still exactly one place that knows where a person lands;
+   - **skipping counts as finishing.** A seller who does not want the tour is
+     not asked twice, and the flag is device-local
+     (`PrefsKeyConstant.onboardingSeen`) because it is about this install, not
+     this account.
+
+   Until preferences resolve the status is `loading` and the app shows the
+   splash — the same reason as auth above, in the other direction: defaulting
+   to "not seen" would flash the intro on every cold start.
+   `test/core/router/onboarding_precedes_login_test.dart` pins the order.
+
+   **The development bypass is gone, and nothing replaces it.** It entered
+   the app as a fake signed-in user because the login screen was otherwise a
+   dead end before Firebase existed. The five tabs now render empty without an
+   account, so that reason expired and the flag went with it — `bypassAuth`,
+   `bypassUid`, `BYPASS_AUTH` and the `AUTH OFF` banner are all deleted. **Do
+   not reintroduce one.** To develop without a backend, turn on mock data in
+   More → Settings, which is reachable in the signed-out shell.
+
+   **A build with no Firebase resolves to signed OUT, never signed in.**
+   `firebaseReadyProvider` is checked before anything touches
+   `FirebaseAuth.instance`, which throws `[core/no-app]` when
+   `Firebase.initializeApp` has not run — and `AppBootstrap` skips that when
+   the build carries no config. Without the guard the first read of auth state
+   takes the app down before its first frame; with it, an unconfigured build is
+   simply a signed-out one. `test/core/config/dev_flags_test.dart` holds both
+   halves: no fake uid anywhere, and no path that answers "signed in" without
+   an account.
+
+   **There are exactly two ways in: Sign in with Apple and Google Sign-In.**
+   Owner's rule, and it narrows plan §26. There is **no email/password**, no
+   sign-up form, no password reset and no email verification — so there is no
+   password for this app to store, no reset flow to secure, and no "forgot
+   password" support load. It also removes the two screens (sign-up, reset)
+   that the plan's §28 field lists were written for; those lists no longer
+   apply to authentication.
+   - Both providers ship, and Apple is not optional: App Store guideline 4.8
+     requires Sign in with Apple wherever a third-party sign-in is offered.
+     Shipping Google alone is a review rejection.
+   - **Neither works until the owner configures it** — an OAuth client for
+     Google, a Services ID and key for Apple. Until then the buttons are the
+     only way in and no account can be created; the app opens on the
+     signed-out shell, and mock data in More → Settings is how it is developed
+     against. See `RELEASE_ACTIONS.md`.
+   - A cancelled sign-in is **not** an error: the seller closed a sheet. It is
+     logged as info and shows no message.
 
 2. **Create takes the minimum; a state transition takes the rest.** Plan §28
    and §29, and it is the rule the whole product's speed rests on. Quick Add
@@ -240,6 +346,19 @@ directly.
    `AppLocalizations.of(context)` directly. Tooltips and semantics labels are
    user-facing strings too.
 
+   **Until release, write English only, and do not hand-translate.** Owner's
+   rule. New keys go into `app_en.arb`; `app_vi.arb` is filled in **once, in
+   one pass, at release**, and every other locale with it. The reason is that
+   translating a screen that is about to be redesigned pays for the same
+   string twice, and a half-translated app reads worse than an English one.
+   - **The ARB indirection still applies to every new string** — the rule
+     above is unchanged. What is deferred is the *translation*, never the key.
+     A string hardcoded in a widget now is a string nobody finds at release.
+   - The keys already in `app_vi.arb` stay. Do not delete them and do not add
+     more by hand.
+   - `vi` translations written before this rule are unreviewed machine work.
+     They are on the release checklist in `RELEASE_ACTIONS.md`, not trusted.
+
 8. **Every `catch` logs — handling an error is not the same as knowing it
    happened.** Call
    `AppLogger.error('<what failed>', error: error, stackTrace: stackTrace)`.
@@ -267,6 +386,26 @@ directly.
     `workspaces/{id}/members/{uid}.role`. Without that self-edit clause a
     member could promote themselves to owner, and every other rule is decided
     by that document.
+
+11b. **A seller can belong to several businesses, and switching is a write —
+    never local state.** Owner's rule. `setLastWorkspace` writes
+    `lastWorkspaceId` on the user's own document; the profile stream carries it
+    back and `resolvedWorkspaceId` picks it up, which every business provider
+    is already watching. A "currently selected workspace" held in a controller
+    would be a second answer to the same question, and a teammate removing you
+    from a business could contradict it.
+    - **`UserProfile.workspaceIds` is the list, and it is not queryable.**
+      `firestore.rules` scopes member reads to one workspace at a time on
+      purpose, so "which businesses am I in?" has no server-side answer a
+      client may ask. A Cloud Function keeps the list in step.
+    - A pointer at a business the seller has left **falls back to the first
+      they still belong to** rather than stranding them on one every rule
+      denies. `test/features/workspace/resolved_workspace_test.dart`.
+    - The switcher is Home's title (`SdAppBarV3.onTitleTap`) opening
+      `WorkspaceSwitcherSheet`. Creating an additional business is
+      `AppRoutes.workspaceCreate`, a **pushed** route — deliberately not
+      `workspaceSetup`, which the redirect forces new accounts through and
+      then bounces them off.
 
 12. **The audit log is append-only and written only by Cloud Functions.** Plan
     §23. An entry a client can write can name any actor it likes, which makes
@@ -318,6 +457,17 @@ feature's own `CLAUDE.md`.
   exempt). Name child files `<main_file>_<widget>.dart` — e.g.
   `home_screen.dart` + `home_screen_needs_attention.dart` with
   `part of 'home_screen.dart';`.
+- **Every screen with a create action uses the same button Inventory does.**
+  Owner's rule. That is `SdFabV3` in the floating-action slot — a labelled
+  button that sheds its label while the list is moving and brings it back the
+  moment it stops — via `AppAddFabScaffold` (`core/widgets/`), never an
+  `IconButton` in the app bar. An add hidden behind a 24pt glyph in the corner
+  is one a seller has to hunt for, and a create action that is hard to find is
+  one they stop using. Same button, same place, every screen: Inventory,
+  Categories, Locations, Sources, Purchases, Expenses.
+  - `floatingNav: true` **only on the five tab screens** — a pushed route has
+    nothing floating over it, and adding the inset there leaves the button
+    hovering in dead space (`docs/rules/DESIGN_SYSTEM.md`).
 - **One folder per screen under `presentation/screens/`.** Each screen gets
   its own subfolder named after the screen file:
   `presentation/screens/<name>_screen/` holds `<name>_screen.dart` and all of
@@ -395,6 +545,17 @@ feature's own `CLAUDE.md`.
     stays.
   - **`packages/system_design` is out of scope** — it is a separate repo with
     its own `WIDGET_RULES.md`, and its statics are widget-intrinsic.
+- **Read-time "now" comes from `clockProvider`, never `DateTime.now()`**
+  (`core/time/app_clock.dart`). Anything a screen or a provider *derives* —
+  what is overdue, what is stale, whether an offer has expired, how many days
+  are left — reads the clock, so a test pins it with `FixedClock` and the same
+  assertion cannot pass in June and fail in August. That is exactly how
+  `test/features/screens_with_mock_data_test.dart` broke: the seed was placed
+  against a fixed instant and Home read the wall clock.
+  - **A recorded timestamp is the opposite and stays `DateTime.now()`**:
+    `createdAt`, `deletedAt`, the instant an order shipped, the default date
+    on a form. Those are facts about when something happened, not figures
+    computed from it, and pinning them in a test would prove nothing.
 - **All date and time arithmetic goes in `DateTimeUtils`, never a second
   date-shaped utils class.** Owner's rule: clock formatting, month arithmetic
   and the time axis of a chart are one subject, and two classes is how the
@@ -516,8 +677,24 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
 
 ## Git
 
+- **Conventional commits, and the scope goes inline — never in parentheses.**
+  Owner's rule. `feat: inventory - bulk reprice on the selection bar`, never
+  `feat(inventory): …`. The scope names the part of the app that changed, and
+  it never names the tool that changed it.
+  - Types: `feat:`, `fix:`, `chore:`, `docs:`.
+  - Commits before this rule use `feat(scope):`. History is not rewritten;
+    everything from here follows the form above.
+- **Commit freely; never push.** Owner's rule. Committing costs nothing and is
+  local; pushing is the irreversible half and it is the owner's to call. That
+  includes the `packages/system_design` submodule — commit there too, and
+  leave it unpushed unless told otherwise.
 - **Never add a `Co-Authored-By` trailer to a commit.** Owner's rule. The
   commit message describes the change, not who or what typed it.
+- **No tool, agent or model is ever named in a commit message or a PR.**
+  Owner's rule, and it is the same reason as the trailer above: no attribution
+  footer, no "Generated with", no tool name anywhere in the title, the body or
+  a comment. A PR describes the change; who typed it is not a fact about the
+  change.
 - **A PR title and description are short, plain and written as bullets.**
   Owner's rule. No prose paragraphs, no essay: a one-line title and a body
   that is a list. A reviewer opens a PR to find out what changed and what to

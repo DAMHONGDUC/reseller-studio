@@ -1,10 +1,15 @@
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../analytics/app_analytics.dart';
 import '../config/app_env.dart';
 import '../logging/app_logger.dart';
 import '../logging/crash_reporter.dart';
@@ -36,23 +41,58 @@ final class AppBootstrap {
   /// does not show an error screen — it stops the app from starting at all —
   /// so every step needs a fallback that leaves the app usable.
   static Future<void> init(Widget Function() builder) async {
-    await runZonedGuarded<Future<void>>(() async {
-      WidgetsFlutterBinding.ensureInitialized();
+    await runZonedGuarded<Future<void>>(
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
 
-      await _initializeFirebase();
+        await _initializeFirebase();
 
-      _logEnvironment();
+        await _initializeGoogleSignIn();
 
-      _installErrorHooks();
+        await _initializeBilling();
 
-      runApp(builder());
-    }, (Object error, StackTrace stackTrace) {
+        await _goEdgeToEdge();
+
+        _logEnvironment();
+
+        _installErrorHooks();
+
+        runApp(builder());
+      },
+      (Object error, StackTrace stackTrace) {
+        AppLogger.error(
+          'Uncaught zone error',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      },
+    );
+  }
+
+  /// Let the app draw under the system bars.
+  ///
+  /// Android only in effect — iOS is already edge to edge. Without it the
+  /// floating glass tab bar has an opaque system strip under it instead of the
+  /// content it is supposed to refract, and `extendBody` buys nothing.
+  ///
+  /// The *style* of those bars is not set here: that is
+  /// `AppTheme.statusBarStyle`, read through the theme, because a
+  /// `SystemChrome` call made once at startup cannot follow a device switching
+  /// between light and dark.
+  static Future<void> _goEdgeToEdge() async {
+    try {
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+      AppLogger.info('Edge-to-edge enabled');
+    } catch (error, stackTrace) {
+      // Cosmetic, so it must never stop the app starting — but a silent
+      // failure here is a layout bug nobody can trace back (hard rule 8).
       AppLogger.error(
-        'Uncaught zone error',
+        'Failed to enable edge-to-edge',
         error: error,
         stackTrace: stackTrace,
       );
-    });
+    }
   }
 
   /// Bring Firebase up, and attach Crashlytics if it comes up.
@@ -86,16 +126,92 @@ final class AppBootstrap {
       await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
 
       CrashReporter.attach(crashlytics);
+      AppAnalytics.attach(FirebaseAnalytics.instance);
 
       AppLogger.info('Firebase initialized');
     } catch (error, stackTrace) {
       // Cannot use AppLogger.error's Crashlytics half — that is what just
       // failed. The console line is the whole report.
-      AppLogger.warning('Firebase failed to initialize — running without backend', <
-        String,
-        String
-      >{'error': error.toString()});
+      AppLogger.warning(
+        'Firebase failed to initialize — running without backend',
+        <String, String>{'error': error.toString()},
+      );
       debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  /// Configure Google Sign-In before any button can call it.
+  ///
+  /// `google_sign_in` 7 requires `initialize` to have completed before
+  /// `authenticate`, and sign-in is one of only two ways into this app
+  /// (`CLAUDE.md` hard rule 1) — so doing it lazily on the first tap would put
+  /// a round trip in front of the seller at the worst moment.
+  ///
+  /// Guards itself like every other step: a failure here leaves the Google
+  /// button broken and the Apple one working, which is a far better outcome
+  /// than an app that does not start.
+  static Future<void> _initializeGoogleSignIn() async {
+    try {
+      await GoogleSignIn.instance.initialize(
+        // Empty means "read it from the platform config file"
+        // (`GoogleService-Info.plist` / `google-services.json`), which is what
+        // `flutterfire configure` writes. The env keys exist to override that
+        // for a build whose bundle id differs from the Firebase app's.
+        clientId: AppEnv.googleSignInIosClientId.isEmpty
+            ? null
+            : AppEnv.googleSignInIosClientId,
+        serverClientId: AppEnv.googleSignInServerClientId.isEmpty
+            ? null
+            : AppEnv.googleSignInServerClientId,
+      );
+
+      AppLogger.info('Google Sign-In initialized');
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Google Sign-In failed to initialize',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Configure RevenueCat, if this build has a key for it.
+  ///
+  /// Skipped silently-but-logged when it does not, which is the app's normal
+  /// condition until the owner sets billing up: `subscriptionRepositoryProvider`
+  /// then hands out the unconfigured implementation and every seller reads as
+  /// Free. Configuring with an empty key would throw here instead.
+  ///
+  /// **No user identifier is passed.** RevenueCat generates an anonymous id;
+  /// linking it to the Firebase uid is a `logIn` call that belongs after
+  /// sign-in, not at startup where there is no user yet.
+  static Future<void> _initializeBilling() async {
+    final String key = defaultTargetPlatform == TargetPlatform.android
+        ? AppEnv.revenueCatAndroidApiKey
+        : AppEnv.revenueCatIosApiKey;
+
+    if (key.isEmpty) {
+      AppLogger.warning(
+        'No RevenueCat key in this build — every seller reads as Free. '
+        'Fill REVENUECAT_*_API_KEY in env/${AppEnv.flavor.name}.json.',
+      );
+
+      return;
+    }
+
+    try {
+      await Purchases.configure(PurchasesConfiguration(key));
+
+      AppLogger.info('Billing initialized');
+    } catch (error, stackTrace) {
+      // The app must still start: a seller who cannot reach RevenueCat keeps
+      // the free tier, which is worse than what they paid for but is not a
+      // reason to show them nothing.
+      AppLogger.error(
+        'Billing failed to initialize — falling back to Free',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -127,7 +243,11 @@ final class AppBootstrap {
     };
 
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-      AppLogger.error('Uncaught platform error', error: error, stackTrace: stack);
+      AppLogger.error(
+        'Uncaught platform error',
+        error: error,
+        stackTrace: stack,
+      );
 
       // True means "handled" — the process stays alive. It is already
       // reported, and killing the app would lose the user's unsaved work over

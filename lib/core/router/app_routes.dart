@@ -6,32 +6,54 @@
 /// particular row.
 ///
 /// The shape mirrors the master plan's final navigation tree (§38): five
-/// shell branches, and everything else pushed on top of whichever branch it
-/// belongs to. A detail screen is a child of its tab, not a sibling — that is
-/// what keeps the tab bar visible and the back stack per-tab.
+/// shell branches, and everything else nested under whichever branch it
+/// belongs to. **Nesting decides the path, not the chrome** — every route
+/// under a tab names `AppNavigatorKey.root` as its parent navigator, so it is
+/// pushed above the shell and carries no bottom nav. Only the five branch
+/// roots keep the bar (owner's rule, `docs/rules/DESIGN_SYSTEM.md`).
 final class AppRoutes {
   // --- Outside the shell: nothing here shows the tab bar. ---
 
   static const String splash = '/';
+
+  /// The intro flow, shown once per install and only before sign-in.
+  ///
+  /// It describes the product and reads nothing — hard rule 1 is untouched,
+  /// because the only way out of it is [login].
+  static const String onboarding = '/onboarding';
+
+  /// The only route that can *enter* the app unauthenticated. There is no
+  /// sign-up and no password reset: sign-in is Apple or Google, and both
+  /// create the account themselves on first use (owner's rule, `CLAUDE.md`
+  /// hard rule 1).
   static const String login = '/login';
-  static const String signUp = '/sign-up';
-  static const String forgotPassword = '/forgot-password';
 
   /// Chosen or created after sign-in and before Home. Login is mandatory and
   /// there is no guest mode (plan principle 1), so no route below this point
   /// is reachable without a workspace.
   static const String workspaceSetup = '/workspace-setup';
 
+  /// Creating an *additional* business, pushed from the switcher.
+  ///
+  /// A separate path from [workspaceSetup] on purpose: that one is a gate the
+  /// redirect forces a new account through and then bounces them off again,
+  /// so a seller who already has a business would be thrown straight back out
+  /// of it. This one is an ordinary pushed route that pops when it is done.
+  static const String workspaceCreate = '/workspace/new';
+
   // --- Shell branch 1: Home ---
 
+  // `/home/notifications` (§22) and `/home/activity` (§23) are deliberately
+  // absent: both features are blocked on Cloud Functions, and a constant
+  // whose path no route serves is a deep link that fails silently. They come
+  // back with their screens.
   static const String home = '/home';
-  static const String notifications = '/home/notifications';
-  static const String activity = '/home/activity';
 
   // --- Shell branch 2: Inventory ---
 
   static const String inventory = '/inventory';
   static const String itemDetail = '/inventory/item/:itemId';
+  static const String editItemPath = '/inventory/item/:itemId/edit';
   static const String addItem = '/inventory/add';
   static const String quickAdd = '/inventory/quick-add';
   static const String scanner = '/inventory/scanner';
@@ -43,7 +65,8 @@ final class AppRoutes {
   static const String orderDetail = '/orders/:orderId';
   static const String shippingQueue = '/orders/shipping-queue';
   static const String offers = '/orders/offers';
-  static const String returns = '/orders/returns';
+  // No `/orders/returns`: returns are opened and closed from order detail
+  // (plan §16), so the screen that constant was reserved for does not exist.
 
   // --- Shell branch 4: Analytics ---
 
@@ -60,15 +83,29 @@ final class AppRoutes {
   static const String more = '/more';
   static const String sourcing = '/more/sourcing';
   static const String purchases = '/more/sourcing/purchases';
+  static const String purchaseDetail = '/more/sourcing/purchases/:purchaseId';
+  static const String addPurchase = '/more/sourcing/purchases/new';
   static const String sources = '/more/sourcing/sources';
+  static const String sourceDetail = '/more/sourcing/sources/:sourceId';
+
+  /// The calculation a reseller does standing in a shop (plan §11). Its own
+  /// route because it is reached mid-hunt, not from a record.
+  static const String purchaseEvaluator = '/more/sourcing/evaluate';
   static const String listings = '/more/listings';
   static const String expenses = '/more/expenses';
   static const String reports = '/more/reports';
   static const String receipts = '/more/receipts';
+  static const String tax = '/more/tax';
   static const String categories = '/more/categories';
   static const String marketplaces = '/more/marketplaces';
   static const String team = '/more/team';
   static const String settings = '/more/settings';
+  static const String about = '/more/about';
+
+  /// Plan §25's Subscription block, over §27's tiers. Under More rather than
+  /// nested in Settings: a blocked action pushes straight here, and a paywall
+  /// two levels deep is one nobody reaches from the moment it matters.
+  static const String subscription = '/more/subscription';
 
   // --- Global, reachable from anywhere ---
 
@@ -79,5 +116,9 @@ final class AppRoutes {
   /// `AppRoutes.item('abc')` rather than `'/inventory/item/abc'`, so the one
   /// place that knows the segment layout is this file.
   static String item(String itemId) => '/inventory/item/$itemId';
+  static String editItem(String itemId) => '/inventory/item/$itemId/edit';
   static String order(String orderId) => '/orders/$orderId';
+  static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
+  static String purchase(String purchaseId) =>
+      '/more/sourcing/purchases/$purchaseId';
 }

@@ -12,14 +12,14 @@ class _EmptyInventory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => hasAnyItems
-      ? const SdEmptyStateV3(
+      ? SdEmptyStateV3(
           icon: Symbols.filter_alt_off_rounded,
-          title: 'Nothing here',
-          message: 'No items match this filter.',
+          title: context.l10n.commonNothingHere,
+          message: context.l10n.inventoryNoMatch,
         )
-      : const SdEmptyStateV3(
+      : SdEmptyStateV3(
           icon: Symbols.inventory_2_rounded,
-          title: 'No items yet',
-          message: 'Add your first item to start tracking inventory.',
+          title: context.l10n.inventoryEmptyTitle,
+          message: context.l10n.inventoryEmptyBody,
         );
 }

@@ -35,8 +35,6 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   /// this only decides what the seller sees.
   Future<void> _submit() async {
     final NavigatorState navigator = Navigator.of(context);
-    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-    final String saved = context.l10n.quickAddSaved;
 
     try {
       final String? id = await ref
@@ -46,15 +44,13 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       if (id == null || !mounted) return;
 
       navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(saved)));
+      SdSnackBarUtilsV3.success(context, context.l10n.quickAddSaved);
     } catch (_) {
       // Already logged by the controller; the seller gets the one message
       // hard rule 6 allows.
       if (!mounted) return;
 
-      messenger.showSnackBar(
-        SnackBar(content: Text(context.l10n.errorGenericMessage)),
-      );
+      SdSnackBarUtilsV3.error(context, context.l10n.errorGenericMessage);
     }
   }
 

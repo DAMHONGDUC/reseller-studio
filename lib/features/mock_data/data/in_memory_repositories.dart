@@ -3,14 +3,23 @@ import 'dart:async';
 import '../../expenses/domain/entities/expense.dart';
 import '../../expenses/domain/repositories/expense_repository.dart';
 import '../../inventory/domain/entities/item.dart';
+import '../../inventory/domain/entities/item_category.dart';
+import '../../inventory/domain/entities/storage_location.dart';
+import '../../inventory/domain/repositories/catalog_repository.dart';
 import '../../inventory/domain/repositories/item_repository.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/repositories/listing_repository.dart';
+import '../../offers/domain/entities/offer.dart';
+import '../../offers/domain/repositories/offer_repository.dart';
 import '../../orders/domain/entities/order.dart';
 import '../../orders/domain/repositories/order_repository.dart';
 import '../../sourcing/domain/entities/purchase.dart';
 import '../../sourcing/domain/entities/source.dart';
 import '../../sourcing/domain/repositories/sourcing_repository.dart';
+import '../../subscription/domain/entities/plan_offering.dart';
+import '../../subscription/domain/entities/subscription_status.dart';
+import '../../subscription/domain/enums/seller_plan.dart';
+import '../../subscription/domain/repositories/subscription_repository.dart';
 import '../domain/mock_dataset.dart';
 
 /// The mutable world behind every in-memory repository.
@@ -30,7 +39,10 @@ class MockStore {
       listings = List<Listing>.of(dataset.listings),
       sources = List<Source>.of(dataset.sources),
       purchases = List<Purchase>.of(dataset.purchases),
-      expenses = List<Expense>.of(dataset.expenses);
+      expenses = List<Expense>.of(dataset.expenses),
+      categories = List<ItemCategory>.of(dataset.categories),
+      locations = List<StorageLocation>.of(dataset.locations),
+      offers = List<Offer>.of(dataset.offers);
 
   /// Seeded from the current clock, so the demo data is always recent.
   factory MockStore.seeded({DateTime? now}) =>
@@ -44,6 +56,14 @@ class MockStore {
   final List<Source> sources;
   final List<Purchase> purchases;
   final List<Expense> expenses;
+  final List<ItemCategory> categories;
+  final List<StorageLocation> locations;
+  final List<Offer> offers;
+
+  /// The demo business starts on the free tier, so the limits and the paywall
+  /// are what a developer sees first. `InMemorySubscriptionRepository` moves
+  /// it; nothing else does.
+  SellerPlan plan = SellerPlan.free;
 
   // Broadcast because several screens watch the same collection at once —
   // Home counts orders while the Orders tab lists them. A single-subscription
@@ -292,6 +312,103 @@ class InMemoryPurchaseRepository implements PurchaseRepository {
   }
 }
 
+class InMemoryOfferRepository implements OfferRepository {
+  const InMemoryOfferRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<Offer>> watchOffers() => _store.watch(() {
+    final List<Offer> sorted = List<Offer>.of(_store.offers)
+      ..sort((Offer a, Offer b) => b.createdAt.compareTo(a.createdAt));
+
+    return sorted;
+  });
+
+  @override
+  Future<void> save(Offer offer) async => _store.upsert(
+    _store.offers,
+    offer,
+    (Offer other) => other.id == offer.id,
+  );
+}
+
+class InMemoryCategoryRepository implements CategoryRepository {
+  const InMemoryCategoryRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<ItemCategory>> watchCategories() => _store.watch(() {
+    final List<ItemCategory> live =
+        _store.categories
+            .where((ItemCategory category) => !category.isDeleted)
+            .toList()
+          ..sort((ItemCategory a, ItemCategory b) => a.name.compareTo(b.name));
+
+    return live;
+  });
+
+  @override
+  Future<void> save(ItemCategory category) => Future<void>.sync(
+    () => _store.upsert(
+      _store.categories,
+      category,
+      (ItemCategory other) => other.id == category.id,
+    ),
+  );
+
+  @override
+  Future<void> delete(String id) async {
+    final int index = _store.categories.indexWhere(
+      (ItemCategory category) => category.id == id,
+    );
+
+    if (index == -1) return;
+
+    _store.categories[index] = _store.categories[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
+class InMemoryLocationRepository implements LocationRepository {
+  const InMemoryLocationRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<StorageLocation>> watchLocations() => _store.watch(
+    () => _store.locations
+        .where((StorageLocation location) => !location.isDeleted)
+        .toList(),
+  );
+
+  @override
+  Future<void> save(StorageLocation location) => Future<void>.sync(
+    () => _store.upsert(
+      _store.locations,
+      location,
+      (StorageLocation other) => other.id == location.id,
+    ),
+  );
+
+  @override
+  Future<void> delete(String id) async {
+    final int index = _store.locations.indexWhere(
+      (StorageLocation location) => location.id == id,
+    );
+
+    if (index == -1) return;
+
+    _store.locations[index] = _store.locations[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
 class InMemoryExpenseRepository implements ExpenseRepository {
   const InMemoryExpenseRepository(this._store);
 
@@ -323,4 +440,84 @@ class InMemoryExpenseRepository implements ExpenseRepository {
     _store.expenses.removeWhere((Expense expense) => expense.id == id);
     _store.notifyChanged();
   }
+}
+
+/// A billing backend with no store behind it.
+///
+/// **Purchases succeed here, and that is the point.** Every other in-memory
+/// repository exists so a screen can be looked at before Firebase; this one
+/// exists so the *paywall and the limits* can be walked end to end before
+/// RevenueCat — hit the free item cap, upgrade, watch the cap lift. A mock
+/// that refused to buy would leave the whole gating path unexercised until
+/// the day the store is live.
+///
+/// Nothing is persisted, so a restart puts the demo business back on Free.
+class InMemorySubscriptionRepository implements SubscriptionRepository {
+  const InMemorySubscriptionRepository(this._store);
+
+  /// What the fake store sells. Prices are formatted strings for the same
+  /// reason the real ones are — see `PlanOffering`.
+  static const List<PlanOffering> catalogue = <PlanOffering>[
+    PlanOffering(
+      productId: 'mock_pro_monthly',
+      plan: SellerPlan.pro,
+      period: BillingPeriod.monthly,
+      formattedPrice: r'$9.99',
+    ),
+    PlanOffering(
+      productId: 'mock_pro_yearly',
+      plan: SellerPlan.pro,
+      period: BillingPeriod.yearly,
+      formattedPrice: r'$89.99',
+    ),
+    PlanOffering(
+      productId: 'mock_business_monthly',
+      plan: SellerPlan.business,
+      period: BillingPeriod.monthly,
+      formattedPrice: r'$24.99',
+    ),
+    PlanOffering(
+      productId: 'mock_business_yearly',
+      plan: SellerPlan.business,
+      period: BillingPeriod.yearly,
+      formattedPrice: r'$229.99',
+    ),
+  ];
+
+  final MockStore _store;
+
+  @override
+  Stream<SubscriptionStatus> watchStatus() => _store.watch(_read);
+
+  @override
+  Future<List<PlanOffering>> offerings() async => catalogue;
+
+  @override
+  Future<SubscriptionStatus> purchase(PlanOffering offering) async {
+    _store.plan = offering.plan;
+    _store.notifyChanged();
+
+    return _read();
+  }
+
+  /// Nothing to restore from — the fake store has no history, and returning
+  /// the current plan is the honest answer rather than a reset to Free.
+  @override
+  Future<SubscriptionStatus> restore() async => _read();
+
+  SubscriptionStatus _read() => _store.plan.isPaid
+      ? SubscriptionStatus(
+          plan: _store.plan,
+          source: SubscriptionSource.appStore,
+          renewsAt: DateTime.now().add(MockPlanConstant.mockRenewal),
+          willRenew: true,
+        )
+      : SubscriptionStatus.free;
+}
+
+/// The one number the fake subscription needs.
+final class MockPlanConstant {
+  /// How far out a mock purchase renews. A month, so the Subscription screen
+  /// has a plausible date to render rather than an empty row.
+  static const Duration mockRenewal = Duration(days: 30);
 }

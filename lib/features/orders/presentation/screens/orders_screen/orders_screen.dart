@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
+import '../../order_filter_label.dart';
+import '../../order_status_label.dart';
 
 part 'orders_screen_order_card.dart';
 part 'orders_screen_order_filter_strip.dart';
@@ -30,24 +36,39 @@ class OrdersScreen extends ConsumerWidget {
     final AsyncValue<List<Order>> source = ref.watch(ordersProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Orders'),
+      appBar: SdAppBarV3(
+        title: context.l10n.navOrders,
+        actions: <Widget>[
+          IconButton(
+            icon: const SdIconV3(Symbols.local_offer_rounded),
+            tooltip: context.l10n.offersTitle,
+            onPressed: () => context.push(AppRoutes.offers),
+          ),
+          IconButton(
+            icon: const SdIconV3(Symbols.local_shipping_rounded),
+            tooltip: context.l10n.shippingQueueTitle,
+            onPressed: () => context.push(AppRoutes.shippingQueue),
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           const _OrderFilterStrip(),
+          SizedBox(height: SdContentPaddingV3.topGap),
           Expanded(
             child: switch (source) {
               AsyncLoading<List<Order>>() when !source.hasValue =>
                 const SdLoadingV3Page(),
-              AsyncError<List<Order>>() => const SdEmptyStateV3(
+              AsyncError<List<Order>>() => SdEmptyStateV3(
                 icon: Symbols.error_rounded,
-                title: 'Could not load orders',
-                message: 'Please try again.',
+                title: context.l10n.ordersLoadFailed,
+                message: context.l10n.commonCouldNotLoad,
               ),
-              _ when orders.isEmpty => const SdEmptyStateV3(
+              _ when orders.isEmpty => SdEmptyStateV3(
                 icon: Symbols.receipt_long_rounded,
-                title: 'Nothing here',
-                message: 'No orders match this filter.',
+                title: context.l10n.commonNothingHere,
+                message: context.l10n.ordersNoMatch,
               ),
               _ => _OrderList(orders: orders),
             },

@@ -1,10 +1,13 @@
 import '../../../core/money/money.dart';
 import '../../expenses/domain/entities/expense.dart';
 import '../../inventory/domain/entities/item.dart';
+import '../../inventory/domain/entities/item_category.dart';
+import '../../inventory/domain/entities/storage_location.dart';
 import '../../inventory/domain/enums/item_status.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/enums/listing_status.dart';
 import '../../marketplaces/domain/enums/marketplace.dart';
+import '../../offers/domain/entities/offer.dart';
 import '../../orders/domain/entities/order.dart';
 import '../../orders/domain/enums/order_status.dart';
 import '../../sourcing/domain/entities/purchase.dart';
@@ -44,6 +47,9 @@ class MockDataset {
     required this.listings,
     required this.orders,
     required this.expenses,
+    required this.categories,
+    required this.locations,
+    required this.offers,
   });
 
   /// Build the world.
@@ -581,6 +587,104 @@ class MockDataset {
       ),
     ];
 
+    // Reference data. Short lists on purpose: a demo taxonomy with forty
+    // categories teaches nothing the four below do not, and the pickers that
+    // read it are easier to judge at a realistic size.
+    final List<ItemCategory> categories = <ItemCategory>[
+      ItemCategory(
+        id: 'cat-outerwear',
+        name: 'Outerwear',
+        createdAt: daysAgo(400),
+      ),
+      ItemCategory(
+        id: 'cat-footwear',
+        name: 'Footwear',
+        createdAt: daysAgo(400),
+      ),
+      ItemCategory(
+        id: 'cat-glassware',
+        name: 'Glassware',
+        createdAt: daysAgo(150),
+      ),
+      ItemCategory(
+        id: 'cat-electronics',
+        name: 'Electronics',
+        createdAt: daysAgo(88),
+      ),
+    ];
+
+    final List<StorageLocation> locations = <StorageLocation>[
+      StorageLocation(
+        id: 'loc-garage',
+        name: 'Garage',
+        kind: LocationKind.warehouse,
+        createdAt: daysAgo(400),
+        address: 'Home',
+      ),
+      StorageLocation(
+        id: 'loc-shelf-a',
+        name: 'Shelf A',
+        kind: LocationKind.shelf,
+        parentId: 'loc-garage',
+        createdAt: daysAgo(400),
+      ),
+      StorageLocation(
+        id: 'loc-bin-a1',
+        name: 'Bin A1',
+        kind: LocationKind.bin,
+        parentId: 'loc-shelf-a',
+        createdAt: daysAgo(400),
+        barcode: 'BIN-A1',
+      ),
+      StorageLocation(
+        id: 'loc-bin-a2',
+        name: 'Bin A2',
+        kind: LocationKind.bin,
+        parentId: 'loc-shelf-a',
+        createdAt: daysAgo(400),
+        barcode: 'BIN-A2',
+      ),
+    ];
+
+    // Two pending offers, because Needs Attention has to have something in
+    // it and an expiring offer is the most time-sensitive thing in the app.
+    // One is a lowball worth declining; the other is close enough to accept.
+    final List<Offer> offers = <Offer>[
+      Offer(
+        id: 'off-1',
+        itemId: items.first.id,
+        itemTitle: items.first.title,
+        marketplace: Marketplace.ebay,
+        amount: money(2200),
+        status: OfferStatus.pending,
+        createdAt: daysAgo(1),
+        expiresAt: now.add(const Duration(hours: 20)),
+        buyerName: 'thrift_hunter_88',
+        message: 'Would you take this?',
+      ),
+      Offer(
+        id: 'off-2',
+        itemId: items.last.id,
+        itemTitle: items.last.title,
+        marketplace: Marketplace.depop,
+        amount: money(900),
+        status: OfferStatus.pending,
+        createdAt: daysAgo(3),
+        expiresAt: now.add(const Duration(days: 2)),
+        buyerName: 'k.nguyen',
+      ),
+      Offer(
+        id: 'off-3',
+        itemId: items.first.id,
+        itemTitle: items.first.title,
+        marketplace: Marketplace.ebay,
+        amount: money(1500),
+        status: OfferStatus.declined,
+        createdAt: daysAgo(12),
+        respondedAt: daysAgo(12),
+      ),
+    ];
+
     return MockDataset._(
       workspace: workspace,
       members: members,
@@ -590,6 +694,9 @@ class MockDataset {
       listings: listings,
       orders: orders,
       expenses: expenses,
+      categories: categories,
+      locations: locations,
+      offers: offers,
     );
   }
 
@@ -601,4 +708,7 @@ class MockDataset {
   final List<Listing> listings;
   final List<Order> orders;
   final List<Expense> expenses;
+  final List<ItemCategory> categories;
+  final List<StorageLocation> locations;
+  final List<Offer> offers;
 }

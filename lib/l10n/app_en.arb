@@ -1,11 +1,9 @@
 {
   "@@locale": "en",
-
   "appTitle": "Seller OS",
   "@appTitle": {
     "description": "The app's own name. Not translated in either locale."
   },
-
   "navHome": "Home",
   "@navHome": {
     "description": "Bottom tab 1 — answers 'what do I need to do today?'"
@@ -26,7 +24,6 @@
   "@navMore": {
     "description": "Bottom tab 5 — everything else."
   },
-
   "actionSave": "Save",
   "@actionSave": {
     "description": "Primary confirm on any create/edit form."
@@ -43,7 +40,6 @@
   "@actionDelete": {
     "description": "Destructive confirm."
   },
-
   "errorGenericTitle": "Something went wrong",
   "@errorGenericTitle": {
     "description": "The only failure headline a user ever sees. Raw exceptions are never shown — see CLAUDE.md hard rule 6."
@@ -60,12 +56,30 @@
   "@errorOfflineMessage": {
     "description": "Reassurance that an offline write is not lost — Firestore's local cache holds it."
   },
-
+  "errorSignedOutMessage": "Please sign in again to continue.",
+  "@errorSignedOutMessage": {
+    "description": "AppFailureKind.unauthenticated — the session expired, the credential was rejected, or an action needs a recent sign-in."
+  },
+  "errorNoAccessMessage": "You don't have access to do that in this workspace.",
+  "@errorNoAccessMessage": {
+    "description": "AppFailureKind.permissionDenied — signed in, but the member's role does not allow it."
+  },
+  "errorNotFoundMessage": "That's no longer there. It may have been deleted.",
+  "@errorNotFoundMessage": {
+    "description": "AppFailureKind.notFound — a stale link, or a row a teammate deleted while the screen was open."
+  },
+  "errorInvalidDataMessage": "Some details are missing or not valid.",
+  "@errorInvalidDataMessage": {
+    "description": "AppFailureKind.invalidData — the server rejected the write."
+  },
+  "errorLimitReachedMessage": "You've reached the limit on your current plan.",
+  "@errorLimitReachedMessage": {
+    "description": "AppFailureKind.limitReached — a free-tier cap was hit."
+  },
   "emptyValuePlaceholder": "—",
   "@emptyValuePlaceholder": {
     "description": "Shown instead of a number when there is not enough data to compute it — profit with no cost entered, ROI with no sale. Never render 0 here: 0 is a claim, — is an absence. See the master plan §15."
   },
-
   "quickAddTitle": "Quick Add",
   "@quickAddTitle": {
     "description": "Screen title for the fastest create path, and the label on the Inventory FAB that opens it."
@@ -90,7 +104,6 @@
   "@quickAddEmptyTitleError": {
     "description": "Shown when Save is pressed with an empty Quick Add title."
   },
-
   "itemBlockMissingPrice": "Add an asking price to list this",
   "@itemBlockMissingPrice": {
     "description": "Why an item cannot move to Listed — plan §29 state validation."
@@ -106,5 +119,1869 @@
   "itemBlockNoQuantity": "Nothing left in stock to move",
   "@itemBlockNoQuantity": {
     "description": "Why a transition is refused because quantity is zero."
+  },
+  "actionAdd": "Add",
+  "@actionAdd": {
+    "description": "Generic create action."
+  },
+  "actionEdit": "Edit",
+  "@actionEdit": {
+    "description": "Open a record for editing."
+  },
+  "actionRemove": "Remove",
+  "@actionRemove": {
+    "description": "Detach something without deleting the record it was on — a photo, a receipt."
+  },
+  "actionChoose": "Choose",
+  "@actionChoose": {
+    "description": "Pick a file from the photo library."
+  },
+  "actionPhotograph": "Photograph",
+  "@actionPhotograph": {
+    "description": "Take a new photo with the camera."
+  },
+  "actionNotSet": "Not set",
+  "@actionNotSet": {
+    "description": "Placeholder in a picker field the seller has not filled in. Never rendered as an empty string — a blank field looks broken."
+  },
+  "commonNameRequired": "Give it a name first",
+  "@commonNameRequired": {
+    "description": "Shown when a name-entry sheet is submitted empty."
+  },
+  "receiptLabel": "Receipt",
+  "@receiptLabel": {
+    "description": "Field label for the document attached to a purchase or expense."
+  },
+  "receiptAttached": "Attached",
+  "@receiptAttached": {
+    "description": "Shown beside the thumbnail once a receipt is on the record."
+  },
+  "receiptRemoveTooltip": "Remove receipt",
+  "@receiptRemoveTooltip": {
+    "description": "Tooltip on the button that detaches a receipt."
+  },
+  "onboardingInventoryTitle": "Know what you own",
+  "@onboardingInventoryTitle": {
+    "description": "Intro page 1 heading — the inventory half of the product."
+  },
+  "onboardingInventoryBody": "Add an item in seconds with just a title. Photos, cost and category can wait until you have them.",
+  "@onboardingInventoryBody": {
+    "description": "Intro page 1 body. States the Quick Add promise — a title is the only required field (hard rule 2)."
+  },
+  "onboardingSellTitle": "List it, sell it, ship it",
+  "@onboardingSellTitle": {
+    "description": "Intro page 2 heading — the selling half of the product."
+  },
+  "onboardingSellBody": "Track every listing and order in one place, and see what needs packing today.",
+  "@onboardingSellBody": {
+    "description": "Intro page 2 body. 'Needs packing today' is the app's core principle: say what needs attention, then make it fast."
+  },
+  "onboardingProfitTitle": "See what actually earned",
+  "@onboardingProfitTitle": {
+    "description": "Intro page 3 heading — the analytics half of the product."
+  },
+  "onboardingProfitBody": "Fees, shipping and cost come off automatically, so you know your real profit and where to source next.",
+  "@onboardingProfitBody": {
+    "description": "Intro page 3 body. Profit is derived, never stored (hard rule 3), which is why it stays right when a fee is corrected."
+  },
+  "onboardingSkip": "Skip",
+  "@onboardingSkip": {
+    "description": "Dismisses the intro and goes straight to the sign-in gate."
+  },
+  "onboardingNext": "Next",
+  "@onboardingNext": {
+    "description": "Advances to the next intro page."
+  },
+  "onboardingStart": "Get started",
+  "@onboardingStart": {
+    "description": "The action on the last intro page. Leads to sign-in, which is mandatory (hard rule 1)."
+  },
+  "onboardingPageSemantics": "Page {current} of {total}",
+  "@onboardingPageSemantics": {
+    "description": "Screen-reader label for the dots indicator, which is decorative on its own.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "authTagline": "Source, list, sell, ship, profit.",
+  "@authTagline": {
+    "description": "The line under the app name on the login screen — the product's lifecycle in five words."
+  },
+  "authContinueWithApple": "Continue with Apple",
+  "@authContinueWithApple": {
+    "description": "Sign in with Apple button. The brand name is never translated."
+  },
+  "authContinueWithGoogle": "Continue with Google",
+  "@authContinueWithGoogle": {
+    "description": "Google Sign-In button. The brand name is never translated."
+  },
+  "authPrivacyNote": "We only use your account to sign you in. Your inventory stays yours.",
+  "@authPrivacyNote": {
+    "description": "Reassurance under the two sign-in buttons. There is no email/password option — Apple and Google are the only ways in."
+  },
+  "workspaceSwitchTitle": "Switch business",
+  "@workspaceSwitchTitle": {
+    "description": "Title of the workspace switcher sheet, opened from Home's title."
+  },
+  "workspaceCreateNew": "Create new business",
+  "@workspaceCreateNew": {
+    "description": "Last row of the workspace switcher — starts an additional business."
+  },
+  "workspaceAddTitle": "Add a business",
+  "@workspaceAddTitle": {
+    "description": "App bar title when creating an additional business rather than the first."
+  },
+  "workspaceSignInPrompt": "Sign in to see your business",
+  "@workspaceSignInPrompt": {
+    "description": "Empty-state line shown on the five tabs before anyone signs in."
+  },
+  "workspaceSignInAction": "Sign in",
+  "@workspaceSignInAction": {
+    "description": "Button on the signed-out empty state."
+  },
+  "workspaceSetupTitle": "Set up your business",
+  "@workspaceSetupTitle": {
+    "description": "App bar title on the onboarding screen between sign-in and Home."
+  },
+  "workspaceSetupIntro": "Everything you track lives under a business. You can rename it later; the currency you pick is what every figure is reported in.",
+  "@workspaceSetupIntro": {
+    "description": "Explains why the workspace step exists. The currency warning matters: changing it later does not convert existing records."
+  },
+  "workspaceNameLabel": "Business name",
+  "@workspaceNameLabel": {
+    "description": "The one required field at workspace setup."
+  },
+  "workspaceNameHint": "Duc Vintage",
+  "@workspaceNameHint": {
+    "description": "Example business name. A concrete example, not the word \"Name\"."
+  },
+  "workspaceCurrency": "Currency",
+  "@workspaceCurrency": {
+    "description": "Currency field label and its picker title."
+  },
+  "workspaceCountry": "Country",
+  "@workspaceCountry": {
+    "description": "Country field label and its picker title."
+  },
+  "workspaceBusinessType": "Business type",
+  "@workspaceBusinessType": {
+    "description": "Business type picker title."
+  },
+  "workspaceBusinessTypeOptional": "Business type (optional)",
+  "@workspaceBusinessTypeOptional": {
+    "description": "Business type field label. Optional per the plan §28."
+  },
+  "workspaceCreate": "Create business",
+  "@workspaceCreate": {
+    "description": "Submit button at workspace setup."
+  },
+  "workspaceStaleAfter": "Stale after",
+  "@workspaceStaleAfter": {
+    "description": "Settings row: how long a listing sits before this workspace calls it stale."
+  },
+  "workspaceNoneLoaded": "No workspace loaded.",
+  "@workspaceNoneLoaded": {
+    "description": "Shown in Settings when there is no workspace to describe."
+  },
+  "businessTypeSoleTrader": "Sole trader",
+  "@businessTypeSoleTrader": {
+    "description": "Business type option."
+  },
+  "businessTypePartnership": "Partnership",
+  "@businessTypePartnership": {
+    "description": "Business type option."
+  },
+  "businessTypeLimitedCompany": "Limited company",
+  "@businessTypeLimitedCompany": {
+    "description": "Business type option."
+  },
+  "businessTypeHobbySeller": "Hobby seller",
+  "@businessTypeHobbySeller": {
+    "description": "Business type option."
+  },
+  "currencyUsd": "US Dollar ($)",
+  "@currencyUsd": {
+    "description": "Currency option shown at workspace setup."
+  },
+  "currencyEur": "Euro (€)",
+  "@currencyEur": {
+    "description": "Currency option."
+  },
+  "currencyGbp": "British Pound (£)",
+  "@currencyGbp": {
+    "description": "Currency option."
+  },
+  "currencyVnd": "Vietnamese Dong (₫)",
+  "@currencyVnd": {
+    "description": "Currency option. Has no minor unit — see CurrencyDecimals."
+  },
+  "currencyAud": "Australian Dollar",
+  "@currencyAud": {
+    "description": "Currency option."
+  },
+  "currencyCad": "Canadian Dollar",
+  "@currencyCad": {
+    "description": "Currency option."
+  },
+  "currencyJpy": "Japanese Yen (¥)",
+  "@currencyJpy": {
+    "description": "Currency option. Has no minor unit."
+  },
+  "currencySgd": "Singapore Dollar",
+  "@currencySgd": {
+    "description": "Currency option."
+  },
+  "countryUs": "United States",
+  "@countryUs": {
+    "description": "Country option."
+  },
+  "countryGb": "United Kingdom",
+  "@countryGb": {
+    "description": "Country option."
+  },
+  "countryVn": "Vietnam",
+  "@countryVn": {
+    "description": "Country option."
+  },
+  "countryAu": "Australia",
+  "@countryAu": {
+    "description": "Country option."
+  },
+  "countryCa": "Canada",
+  "@countryCa": {
+    "description": "Country option."
+  },
+  "countryDe": "Germany",
+  "@countryDe": {
+    "description": "Country option."
+  },
+  "countryFr": "France",
+  "@countryFr": {
+    "description": "Country option."
+  },
+  "countryJp": "Japan",
+  "@countryJp": {
+    "description": "Country option."
+  },
+  "countrySg": "Singapore",
+  "@countrySg": {
+    "description": "Country option."
+  },
+  "moreManage": "Manage",
+  "@moreManage": {
+    "description": "Section header above the More screen list."
+  },
+  "moreSourcing": "Sourcing",
+  "@moreSourcing": {
+    "description": "More destination: where stock comes from and what it returned."
+  },
+  "moreListings": "Listings",
+  "@moreListings": {
+    "description": "More destination: everything live on a marketplace."
+  },
+  "moreExpenses": "Expenses",
+  "@moreExpenses": {
+    "description": "More destination: business costs that are not the cost of an item."
+  },
+  "moreReports": "Reports",
+  "@moreReports": {
+    "description": "More destination: the numbers, and CSV export."
+  },
+  "moreReceipts": "Receipts",
+  "@moreReceipts": {
+    "description": "More destination: every attached document."
+  },
+  "moreCategories": "Categories",
+  "@moreCategories": {
+    "description": "More destination: item categories."
+  },
+  "moreLocations": "Locations",
+  "@moreLocations": {
+    "description": "More destination: warehouse, shelf and bin."
+  },
+  "moreMarketplaces": "Marketplaces",
+  "@moreMarketplaces": {
+    "description": "More destination: marketplace connection status."
+  },
+  "moreTeam": "Team",
+  "@moreTeam": {
+    "description": "More destination: who can see this workspace."
+  },
+  "homeQuickAction": "Quick Action",
+  "@homeQuickAction": {
+    "description": "Home section holding every create action in the app."
+  },
+  "homeQuickActionSubtitle": "Everything you can add, and how it all fits",
+  "@homeQuickActionSubtitle": {
+    "description": "Supporting line under the Quick Action section header."
+  },
+  "homeShortcutSearch": "Search",
+  "@homeShortcutSearch": {
+    "description": "Home shortcut card, and the app bar tooltip, for global search."
+  },
+  "homeQuickRecordPurchase": "Record a purchase",
+  "@homeQuickRecordPurchase": {
+    "description": "Quick Access tile: log a buy from a source."
+  },
+  "homeQuickAddExpense": "Add an expense",
+  "@homeQuickAddExpense": {
+    "description": "Quick Access tile: record a business cost."
+  },
+  "homeQuickAddSource": "Add a source",
+  "@homeQuickAddSource": {
+    "description": "Quick Access tile: add a place stock is bought from."
+  },
+  "settingsApp": "App",
+  "@settingsApp": {
+    "description": "Settings section holding what the app is and how it works."
+  },
+  "moreAbout": "About Seller OS",
+  "@moreAbout": {
+    "description": "More destination: what the app is and how it works."
+  },
+  "aboutTitle": "About",
+  "@aboutTitle": {
+    "description": "App bar title of the About screen."
+  },
+  "aboutTagline": "The operating system for resellers",
+  "@aboutTagline": {
+    "description": "One-line description of the app, under its name."
+  },
+  "aboutIntro": "Seller OS is not an inventory tracker. It follows one item all the way from the shelf you found it on to what it actually earned you — so the next thing you buy is a decision instead of a guess.",
+  "@aboutIntro": {
+    "description": "Paragraph introducing what the app is for."
+  },
+  "aboutPrinciple": "Open the app and it tells you what needs attention today, then makes that action fast.",
+  "@aboutPrinciple": {
+    "description": "The product's core principle, quoted on the About screen."
+  },
+  "aboutWorkflowTitle": "How it works",
+  "@aboutWorkflowTitle": {
+    "description": "Section header above the workflow diagram."
+  },
+  "aboutWorkflowSubtitle": "Nine steps, and the last one feeds the first",
+  "@aboutWorkflowSubtitle": {
+    "description": "Supporting line under the workflow section header."
+  },
+  "aboutWorkflowLoop": "Better sourcing is the point of everything above it. What sold, at what margin, from which source — that is what makes the next buy a decision.",
+  "@aboutWorkflowLoop": {
+    "description": "Closing note under the workflow diagram explaining the loop."
+  },
+  "aboutWorkflowTapHint": "Tap any step to go there.",
+  "@aboutWorkflowTapHint": {
+    "description": "Tells the user the diagram steps are navigable."
+  },
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "description": "App version line.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "workflowSource": "Source",
+  "@workflowSource": {
+    "description": "Workflow step 1: find stock worth buying."
+  },
+  "workflowSourceDetail": "Find stock worth buying, and keep track of which places actually pay off.",
+  "@workflowSourceDetail": {
+    "description": "Workflow step 1 explanation."
+  },
+  "workflowPurchase": "Purchase",
+  "@workflowPurchase": {
+    "description": "Workflow step 2: record the buy."
+  },
+  "workflowPurchaseDetail": "Record what you paid and where. Cost recorded now is profit you can prove later.",
+  "@workflowPurchaseDetail": {
+    "description": "Workflow step 2 explanation."
+  },
+  "workflowInventory": "Inventory",
+  "@workflowInventory": {
+    "description": "Workflow step 3: what you hold."
+  },
+  "workflowInventoryDetail": "Everything you hold, with its cost, its photos and where it is stored.",
+  "@workflowInventoryDetail": {
+    "description": "Workflow step 3 explanation."
+  },
+  "workflowList": "List",
+  "@workflowList": {
+    "description": "Workflow step 4: put it up for sale."
+  },
+  "workflowListDetail": "Put it up — on one marketplace or several — and watch what goes stale.",
+  "@workflowListDetail": {
+    "description": "Workflow step 4 explanation."
+  },
+  "workflowSell": "Sell",
+  "@workflowSell": {
+    "description": "Workflow step 5: it sold."
+  },
+  "workflowSellDetail": "Mark it sold and the order is created for you, with the fees and the payout.",
+  "@workflowSellDetail": {
+    "description": "Workflow step 5 explanation."
+  },
+  "workflowShip": "Ship",
+  "@workflowShip": {
+    "description": "Workflow step 6: post it."
+  },
+  "workflowShipDetail": "Post it before the deadline. The queue is sorted by what breaches first.",
+  "@workflowShipDetail": {
+    "description": "Workflow step 6 explanation."
+  },
+  "workflowProfit": "Profit",
+  "@workflowProfit": {
+    "description": "Workflow step 7: what was left."
+  },
+  "workflowProfitDetail": "What was actually left after cost, fees, postage and overheads.",
+  "@workflowProfitDetail": {
+    "description": "Workflow step 7 explanation."
+  },
+  "workflowAnalyze": "Analyze",
+  "@workflowAnalyze": {
+    "description": "Workflow step 8: read the numbers."
+  },
+  "workflowAnalyzeDetail": "Which categories, which marketplaces and which sources are worth your time.",
+  "@workflowAnalyzeDetail": {
+    "description": "Workflow step 8 explanation."
+  },
+  "workflowSourceBetter": "Source better",
+  "@workflowSourceBetter": {
+    "description": "Workflow step 9: the loop closes."
+  },
+  "workflowSourceBetterDetail": "Go back out knowing what sold, at what margin, and where it came from.",
+  "@workflowSourceBetterDetail": {
+    "description": "Workflow step 9 explanation, closing the loop."
+  },
+  "moreTax": "Tax",
+  "@moreTax": {
+    "description": "More destination: the year-end tax summary."
+  },
+  "moreSubscription": "Subscription",
+  "@moreSubscription": {
+    "description": "More destination: the current plan and the other tiers."
+  },
+  "moreSettings": "Settings",
+  "@moreSettings": {
+    "description": "More destination: account and workspace settings."
+  },
+  "settingsAccount": "Account",
+  "@settingsAccount": {
+    "description": "Settings section header."
+  },
+  "settingsWorkspace": "Workspace",
+  "@settingsWorkspace": {
+    "description": "Settings section header."
+  },
+  "settingsDeveloper": "Developer",
+  "@settingsDeveloper": {
+    "description": "Settings section header for the debug-only block."
+  },
+  "settingsDeveloperNote": "Debug builds only — not present in a release build.",
+  "@settingsDeveloperNote": {
+    "description": "Explains that the developer block is compiled out of a release build."
+  },
+  "settingsAppearance": "Appearance",
+  "@settingsAppearance": {
+    "description": "Settings section for device preferences that need no account."
+  },
+  "settingsTheme": "Theme",
+  "@settingsTheme": {
+    "description": "Settings row for light/dark/system choice."
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "Current theme value — follows the device setting."
+  },
+  "settingsLanguage": "Language",
+  "@settingsLanguage": {
+    "description": "Settings row for the app's language."
+  },
+  "settingsLanguageEnglish": "English",
+  "@settingsLanguageEnglish": {
+    "description": "Current language value. Only English ships until release (hard rule 7)."
+  },
+  "settingsNotYet": "Soon",
+  "@settingsNotYet": {
+    "description": "Badge on a setting that is listed but not changeable yet."
+  },
+  "settingsSignedOut": "Not signed in",
+  "@settingsSignedOut": {
+    "description": "Account row title before anyone signs in."
+  },
+  "settingsSignedOutBody": "Sign in to load your business.",
+  "@settingsSignedOutBody": {
+    "description": "Account row subtitle before anyone signs in."
+  },
+  "settingsSignedIn": "Signed in",
+  "@settingsSignedIn": {
+    "description": "Fallback account row title when the provider gave no name or email."
+  },
+  "settingsBypassAccount": "Development bypass — no real account",
+  "@settingsBypassAccount": {
+    "description": "Shown on the account row while the auth bypass is on."
+  },
+  "settingsSignOut": "Sign out",
+  "@settingsSignOut": {
+    "description": "Ends the session."
+  },
+  "settingsSignOutConfirmTitle": "Sign out?",
+  "@settingsSignOutConfirmTitle": {
+    "description": "Confirmation dialog title."
+  },
+  "settingsSignOutConfirmBody": "Your data stays where it is. Sign back in any time.",
+  "@settingsSignOutConfirmBody": {
+    "description": "Reassurance in the sign-out dialog."
+  },
+  "settingsDeleteAccount": "Delete account",
+  "@settingsDeleteAccount": {
+    "description": "Row that opens the irreversible account deletion dialog."
+  },
+  "settingsDeleteAccountPermanent": "Permanent",
+  "@settingsDeleteAccountPermanent": {
+    "description": "Caption under the delete account row."
+  },
+  "settingsDeleteAccountConfirmTitle": "Delete your account?",
+  "@settingsDeleteAccountConfirmTitle": {
+    "description": "Confirmation dialog title for account deletion."
+  },
+  "settingsDeleteAccountConfirmBody": "This cannot be undone. Your sign-in is removed and you lose access to every workspace you own.",
+  "@settingsDeleteAccountConfirmBody": {
+    "description": "Says exactly what is lost. Deletion is irreversible."
+  },
+  "settingsDeleteAccountConfirm": "Delete my account",
+  "@settingsDeleteAccountConfirm": {
+    "description": "The destructive confirm button."
+  },
+  "teamTitle": "Team",
+  "@teamTitle": {
+    "description": "Team screen title."
+  },
+  "teamAloneTitle": "Just you",
+  "@teamAloneTitle": {
+    "description": "Empty state when nobody else has access."
+  },
+  "teamAloneBody": "Nobody else has access to this workspace.",
+  "@teamAloneBody": {
+    "description": "Empty state body on the Team screen."
+  },
+  "teamInvitesOffTitle": "Inviting people is not switched on yet",
+  "@teamInvitesOffTitle": {
+    "description": "Explains why there is no invite button."
+  },
+  "teamInvitesOffBody": "Invites are handled on the server so a seat limit cannot be bypassed and the last owner cannot be removed. It arrives with the backend functions.",
+  "@teamInvitesOffBody": {
+    "description": "Why invites need a Cloud Function rather than a client write."
+  },
+  "roleOwner": "Owner",
+  "@roleOwner": {
+    "description": "Workspace role. Can delete or transfer the workspace."
+  },
+  "roleAdmin": "Admin",
+  "@roleAdmin": {
+    "description": "Workspace role. Can change the workspace, its members and their roles."
+  },
+  "roleMember": "Member",
+  "@roleMember": {
+    "description": "Workspace role. Can create and edit business records."
+  },
+  "roleViewer": "Viewer",
+  "@roleViewer": {
+    "description": "Workspace role. Read-only."
+  },
+  "marketplacesTitle": "Marketplaces",
+  "@marketplacesTitle": {
+    "description": "Marketplaces screen title."
+  },
+  "marketplacesSyncOffTitle": "Syncing is not switched on yet",
+  "@marketplacesSyncOffTitle": {
+    "description": "Explains why nothing is connected."
+  },
+  "marketplacesSyncOffBody": "Connections run on the server so your marketplace passwords and tokens never touch this app. Until that is live, list and sell manually — everything else in Seller OS works the same either way.",
+  "@marketplacesSyncOffBody": {
+    "description": "Why marketplace OAuth is server-side. Hard rule 10: no secret ships in the Flutter binary."
+  },
+  "marketplacesConnected": "Connected",
+  "@marketplacesConnected": {
+    "description": "Connection status badge."
+  },
+  "marketplacesComingSoon": "Coming soon",
+  "@marketplacesComingSoon": {
+    "description": "Connection status badge for a platform with no integration yet."
+  },
+  "marketplacesEstimatedFee": "Estimated fee",
+  "@marketplacesEstimatedFee": {
+    "description": "Caption on a marketplace row. A published rate for planning, never used as accounting."
+  },
+  "moreComingSoon": "Soon",
+  "@moreComingSoon": {
+    "description": "Badge on a More row whose screen is not built yet. Shown rather than hidden: hiding it would make the app look finished."
+  },
+  "commonDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@commonDays": {
+    "description": "A number of days. Plural on purpose: English needs \"1 day\" and \"60 days\", Vietnamese needs neither.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonName": "Name",
+  "@commonName": {
+    "description": "Field label for the name of a category, location or source."
+  },
+  "commonCategory": "Category",
+  "@commonCategory": {
+    "description": "Field label and picker title for an item category."
+  },
+  "commonLocation": "Location",
+  "@commonLocation": {
+    "description": "Field label and picker title for where an item is stored."
+  },
+  "commonSource": "Source",
+  "@commonSource": {
+    "description": "Field label and picker title for where stock came from."
+  },
+  "commonMarketplace": "Marketplace",
+  "@commonMarketplace": {
+    "description": "Field label and picker title for a selling platform."
+  },
+  "commonNotes": "Notes",
+  "@commonNotes": {
+    "description": "Section heading for free text on a record."
+  },
+  "commonDescription": "Description",
+  "@commonDescription": {
+    "description": "Section heading for an item description."
+  },
+  "commonBarcode": "Barcode",
+  "@commonBarcode": {
+    "description": "Field label for the code a scanner reads."
+  },
+  "commonSku": "SKU",
+  "@commonSku": {
+    "description": "The seller's own stock code. Not translated — SKU is the term resellers use in every language."
+  },
+  "commonQuantity": "Quantity",
+  "@commonQuantity": {
+    "description": "How many of an item are on hand."
+  },
+  "commonTitle": "Title",
+  "@commonTitle": {
+    "description": "An item's name. The only field Quick Add requires."
+  },
+  "commonSaved": "Saved",
+  "@commonSaved": {
+    "description": "Confirmation after a form writes."
+  },
+  "commonDeleted": "Deleted",
+  "@commonDeleted": {
+    "description": "Confirmation after a record is removed."
+  },
+  "commonRenamed": "Renamed",
+  "@commonRenamed": {
+    "description": "Confirmation after a rename."
+  },
+  "commonClear": "Clear",
+  "@commonClear": {
+    "description": "Drops a bulk selection."
+  },
+  "commonNoneYet": "None yet",
+  "@commonNoneYet": {
+    "description": "Picker placeholder when the list it would show is empty."
+  },
+  "commonCouldNotLoad": "Please try again.",
+  "@commonCouldNotLoad": {
+    "description": "Body under any \"could not load\" empty state."
+  },
+  "commonMayHaveBeenDeleted": "It may have been deleted.",
+  "@commonMayHaveBeenDeleted": {
+    "description": "Body when a record a link pointed at is gone — usually a teammate deleted it, which is not a failure."
+  },
+  "commonNothingHere": "Nothing here",
+  "@commonNothingHere": {
+    "description": "Empty state title when a filter matches nothing but the collection is not empty."
+  },
+  "itemStatusDraft": "Draft",
+  "@itemStatusDraft": {
+    "description": "Item status: created but not yet sellable inventory. What Quick Add produces."
+  },
+  "itemStatusInStock": "In stock",
+  "@itemStatusInStock": {
+    "description": "Item status: on the shelf, not listed anywhere."
+  },
+  "itemStatusListed": "Listed",
+  "@itemStatusListed": {
+    "description": "Item status: live on at least one marketplace."
+  },
+  "itemStatusReserved": "Reserved",
+  "@itemStatusReserved": {
+    "description": "Item status: an offer was accepted but the sale has not completed."
+  },
+  "itemStatusSold": "Sold",
+  "@itemStatusSold": {
+    "description": "Item status: sold."
+  },
+  "itemStatusArchived": "Archived",
+  "@itemStatusArchived": {
+    "description": "Item status: withdrawn from inventory without a sale."
+  },
+  "itemStale": "Stale",
+  "@itemStale": {
+    "description": "Badge on an item that has been listed longer than the workspace threshold. A query, not a status."
+  },
+  "conditionNewWithTags": "New with tags",
+  "@conditionNewWithTags": {
+    "description": "Item condition, in the vocabulary the marketplaces share."
+  },
+  "conditionNewWithoutTags": "New without tags",
+  "@conditionNewWithoutTags": {
+    "description": "Item condition."
+  },
+  "conditionLikeNew": "Like new",
+  "@conditionLikeNew": {
+    "description": "Item condition."
+  },
+  "conditionGood": "Good",
+  "@conditionGood": {
+    "description": "Item condition."
+  },
+  "conditionFair": "Fair",
+  "@conditionFair": {
+    "description": "Item condition."
+  },
+  "conditionPoor": "Poor",
+  "@conditionPoor": {
+    "description": "Item condition."
+  },
+  "conditionForParts": "For parts",
+  "@conditionForParts": {
+    "description": "Item condition: sold for components, not to use."
+  },
+  "itemCondition": "Condition",
+  "@itemCondition": {
+    "description": "Field label and picker title for an item condition."
+  },
+  "inventorySearchHint": "Title, SKU or barcode",
+  "@inventorySearchHint": {
+    "description": "Placeholder in the Inventory search field. Names the three things a seller has to hand when looking for an item."
+  },
+  "inventoryClearSearch": "Clear search",
+  "@inventoryClearSearch": {
+    "description": "Tooltip on the search field clear button."
+  },
+  "inventoryAddItem": "Add item",
+  "@inventoryAddItem": {
+    "description": "Opens the full Add Item form. Quick Add is the other, faster path."
+  },
+  "inventoryScan": "Scan",
+  "@inventoryScan": {
+    "description": "Opens the barcode scanner."
+  },
+  "inventoryLoadFailed": "Could not load inventory",
+  "@inventoryLoadFailed": {
+    "description": "Error empty state on the Inventory tab."
+  },
+  "inventoryNoMatch": "No items match this filter.",
+  "@inventoryNoMatch": {
+    "description": "Shown when a tab is empty but the seller does have inventory. Distinguished from having none at all — telling someone with 400 items they have none is good news reported as an empty screen."
+  },
+  "inventoryEmptyTitle": "No items yet",
+  "@inventoryEmptyTitle": {
+    "description": "Empty state when the workspace has no inventory at all."
+  },
+  "inventoryEmptyBody": "Add your first item to start tracking inventory.",
+  "@inventoryEmptyBody": {
+    "description": "Body of the first-run inventory empty state."
+  },
+  "inventorySelected": "Selected",
+  "@inventorySelected": {
+    "description": "Semantics label on a ticked row in a bulk selection."
+  },
+  "inventoryNotSelected": "Not selected",
+  "@inventoryNotSelected": {
+    "description": "Semantics label on an unticked row in a bulk selection."
+  },
+  "inventorySelectedCount": "{count} selected",
+  "@inventorySelectedCount": {
+    "description": "Count on the bulk action bar.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemCost": "Cost",
+  "@itemCost": {
+    "description": "What the seller paid. Null renders as an em dash, never zero."
+  },
+  "itemAsking": "Asking",
+  "@itemAsking": {
+    "description": "Short form of asking price, for a dense row."
+  },
+  "itemAskingPrice": "Asking price",
+  "@itemAskingPrice": {
+    "description": "What the item is listed at, or intended to be."
+  },
+  "itemMinimumPrice": "Minimum price",
+  "@itemMinimumPrice": {
+    "description": "The floor for offers and bulk repricing."
+  },
+  "itemMinimumPriceHelp": "The floor for offers and bulk repricing",
+  "@itemMinimumPriceHelp": {
+    "description": "Helper under the minimum price field."
+  },
+  "itemProfit": "Profit",
+  "@itemProfit": {
+    "description": "Short form of expected profit, for a dense row."
+  },
+  "itemExpectedProfit": "Expected profit",
+  "@itemExpectedProfit": {
+    "description": "Asking price minus cost. Ignores fees and shipping, which depend on where it sells."
+  },
+  "itemCostHelp": "What you paid. Leave empty if you do not know.",
+  "@itemCostHelp": {
+    "description": "Helper under the cost field. Leaving it empty is a supported answer — hard rule 2."
+  },
+  "itemTitleFallback": "Item",
+  "@itemTitleFallback": {
+    "description": "App bar title while the item is still loading."
+  },
+  "itemActions": "Actions",
+  "@itemActions": {
+    "description": "Tooltip on the button that opens the item action sheet."
+  },
+  "itemLoadFailed": "Could not load this item",
+  "@itemLoadFailed": {
+    "description": "Error state on the item detail screen."
+  },
+  "itemNotFound": "Item not found",
+  "@itemNotFound": {
+    "description": "Shown when the item behind a link is gone."
+  },
+  "itemPricing": "Pricing",
+  "@itemPricing": {
+    "description": "Section heading on item detail."
+  },
+  "itemProvenance": "Provenance",
+  "@itemProvenance": {
+    "description": "Section heading: where the item came from and where it is. The Source to Purchase to Item chain made visible."
+  },
+  "itemListings": "Listings",
+  "@itemListings": {
+    "description": "Section heading: every marketplace this item is live on."
+  },
+  "itemNotListed": "Not listed anywhere yet.",
+  "@itemNotListed": {
+    "description": "Shown in the Listings block when an item has no listings."
+  },
+  "itemPurchased": "Purchased",
+  "@itemPurchased": {
+    "description": "When the item was bought."
+  },
+  "itemPhotos": "Photos",
+  "@itemPhotos": {
+    "description": "Section heading on the item form."
+  },
+  "itemRemovePhoto": "Remove photo",
+  "@itemRemovePhoto": {
+    "description": "Semantics label on the photo delete affordance."
+  },
+  "itemTakePhoto": "Take a photo",
+  "@itemTakePhoto": {
+    "description": "Semantics label on the camera button in the photo strip."
+  },
+  "itemChoosePhoto": "Choose a photo",
+  "@itemChoosePhoto": {
+    "description": "Semantics label on the library button in the photo strip."
+  },
+  "itemFormEditTitle": "Edit item",
+  "@itemFormEditTitle": {
+    "description": "App bar title when editing."
+  },
+  "itemFormBasics": "Basics",
+  "@itemFormBasics": {
+    "description": "Form section heading."
+  },
+  "itemFormOnlyRequired": "The only field this needs",
+  "@itemFormOnlyRequired": {
+    "description": "Helper under the title field. Hard rule 2: create takes the minimum."
+  },
+  "itemFormWhereFrom": "Where it came from",
+  "@itemFormWhereFrom": {
+    "description": "Form section heading for source and purchase date."
+  },
+  "itemFormWhereIs": "Where it is",
+  "@itemFormWhereIs": {
+    "description": "Form section heading for location."
+  },
+  "itemFormIdentifiers": "Identifiers",
+  "@itemFormIdentifiers": {
+    "description": "Form section heading for SKU and barcode."
+  },
+  "itemFormPrivateNotes": "Private notes",
+  "@itemFormPrivateNotes": {
+    "description": "Notes only the seller sees — never sent to a marketplace."
+  },
+  "itemPurchaseDate": "Purchase date",
+  "@itemPurchaseDate": {
+    "description": "When the item was bought."
+  },
+  "itemCategoryEmptyHint": "None yet — add one in More",
+  "@itemCategoryEmptyHint": {
+    "description": "Placeholder on the category picker when no categories exist."
+  },
+  "itemLocationEmptyHint": "None yet — add one in Locations",
+  "@itemLocationEmptyHint": {
+    "description": "Placeholder on the location picker when none exist."
+  },
+  "itemSourceEmptyHint": "None yet — add one in Sourcing",
+  "@itemSourceEmptyHint": {
+    "description": "Placeholder on the source picker when none exist."
+  },
+  "itemAddCategoryFirst": "Add a category first: More → Categories",
+  "@itemAddCategoryFirst": {
+    "description": "Says where to go when the picker has nothing to offer."
+  },
+  "itemAddLocationFirst": "Add a location first: More → Locations",
+  "@itemAddLocationFirst": {
+    "description": "Says where to go when the location picker is empty."
+  },
+  "itemAddSourceFirst": "Add a source first: More → Sourcing",
+  "@itemAddSourceFirst": {
+    "description": "Says where to go when the source picker is empty."
+  },
+  "itemActionList": "List on a marketplace",
+  "@itemActionList": {
+    "description": "Opens the sheet that puts an item on a marketplace."
+  },
+  "itemActionReprice": "Reprice",
+  "@itemActionReprice": {
+    "description": "Set a new asking price."
+  },
+  "itemActionMove": "Move",
+  "@itemActionMove": {
+    "description": "Put an item on a different shelf."
+  },
+  "itemActionMoveTo": "Move to",
+  "@itemActionMoveTo": {
+    "description": "Title of the location picker opened by Move."
+  },
+  "itemActionMarkSold": "Mark as sold",
+  "@itemActionMarkSold": {
+    "description": "Records a sale. Creates the order too — profit is derived from orders."
+  },
+  "itemActionArchive": "Archive",
+  "@itemActionArchive": {
+    "description": "Withdraw from inventory without a sale."
+  },
+  "itemActionRestore": "Put back in stock",
+  "@itemActionRestore": {
+    "description": "Undo an archive."
+  },
+  "itemMoved": "Moved",
+  "@itemMoved": {
+    "description": "Confirmation after a move."
+  },
+  "itemArchived": "Archived",
+  "@itemArchived": {
+    "description": "Confirmation after an archive."
+  },
+  "itemRestored": "Back in stock",
+  "@itemRestored": {
+    "description": "Confirmation after a restore."
+  },
+  "itemDeleteConfirmTitle": "Delete this item?",
+  "@itemDeleteConfirmTitle": {
+    "description": "Destructive confirmation title."
+  },
+  "itemDeleteConfirmBody": "It disappears from your inventory. Orders and purchases that reference it keep working.",
+  "@itemDeleteConfirmBody": {
+    "description": "Explains that deleting is soft — hard rule 15 keeps the row joinable."
+  },
+  "listItemTitle": "List this item",
+  "@listItemTitle": {
+    "description": "Sheet title."
+  },
+  "listItemPrice": "Listing price",
+  "@listItemPrice": {
+    "description": "What the item goes up at."
+  },
+  "listItemSubmit": "List it",
+  "@listItemSubmit": {
+    "description": "Confirm button on the listing sheet."
+  },
+  "listItemPriceRequired": "Enter a listing price first",
+  "@listItemPriceRequired": {
+    "description": "Plan §29: listing needs a price, and this is where it is asked for."
+  },
+  "listItemDone": "Listed on {marketplace}",
+  "@listItemDone": {
+    "description": "Confirmation after a listing is created.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceManualCaption": "Manual — no sync yet",
+  "@marketplaceManualCaption": {
+    "description": "Caption on a marketplace with no integration. The app must not claim to have published anything."
+  },
+  "markSoldTitle": "Mark as sold",
+  "@markSoldTitle": {
+    "description": "Sheet title."
+  },
+  "markSoldPrice": "Sale price",
+  "@markSoldPrice": {
+    "description": "What the buyer paid."
+  },
+  "markSoldOn": "Sold on",
+  "@markSoldOn": {
+    "description": "Which marketplace the sale happened on."
+  },
+  "markSoldDate": "Sale date",
+  "@markSoldDate": {
+    "description": "When it sold."
+  },
+  "markSoldBuyer": "Buyer (optional)",
+  "@markSoldBuyer": {
+    "description": "The buyer's name. Optional, and never sent to analytics."
+  },
+  "markSoldSubmit": "Record the sale",
+  "@markSoldSubmit": {
+    "description": "Confirm button."
+  },
+  "markSoldPriceRequired": "Enter what it sold for",
+  "@markSoldPriceRequired": {
+    "description": "Plan §29: selling needs sale information."
+  },
+  "markSoldDone": "Sold — the order is in Orders",
+  "@markSoldDone": {
+    "description": "Confirmation. Says where the order went, because marking sold creates one."
+  },
+  "repriceTitle": "Reprice",
+  "@repriceTitle": {
+    "description": "Sheet title for a single item."
+  },
+  "repriceTitleBulk": "Reprice {count} items",
+  "@repriceTitleBulk": {
+    "description": "Sheet title for a bulk reprice.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repriceNewPrice": "New asking price",
+  "@repriceNewPrice": {
+    "description": "The field on the reprice sheet."
+  },
+  "repriceBulkHelp": "Applied to every selected item",
+  "@repriceBulkHelp": {
+    "description": "Helper on a bulk reprice, so nobody is surprised."
+  },
+  "repriceSubmit": "Update price",
+  "@repriceSubmit": {
+    "description": "Confirm button."
+  },
+  "repriceRequired": "Enter the new price",
+  "@repriceRequired": {
+    "description": "Shown when the reprice sheet is submitted empty."
+  },
+  "repriceDone": "Price updated",
+  "@repriceDone": {
+    "description": "Confirmation after repricing one item."
+  },
+  "repriceDoneBulk": "Repriced {count} items",
+  "@repriceDoneBulk": {
+    "description": "Confirmation after a bulk reprice.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkArchiveConfirmTitle": "Archive {count} items?",
+  "@bulkArchiveConfirmTitle": {
+    "description": "Bulk archive confirmation title.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkArchiveConfirmBody": "They leave your inventory and stop counting toward its value. You can put them back at any time.",
+  "@bulkArchiveConfirmBody": {
+    "description": "Bulk archive confirmation body. Archiving is reversible and says so."
+  },
+  "bulkArchiveDone": "Archived {count} items",
+  "@bulkArchiveDone": {
+    "description": "Confirmation after a bulk archive.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkMoveTitle": "Move {count} items to",
+  "@bulkMoveTitle": {
+    "description": "Title of the location picker in a bulk move.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkMoveDone": "Moved {count} items",
+  "@bulkMoveDone": {
+    "description": "Confirmation after a bulk move.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoriesTitle": "Categories",
+  "@categoriesTitle": {
+    "description": "Screen title."
+  },
+  "categoryNew": "New category",
+  "@categoryNew": {
+    "description": "Sheet title for creating one."
+  },
+  "categoryRename": "Rename category",
+  "@categoryRename": {
+    "description": "Sheet title for renaming."
+  },
+  "categoryNameHint": "Outerwear",
+  "@categoryNameHint": {
+    "description": "Example category name."
+  },
+  "categoryAdd": "Add a category",
+  "@categoryAdd": {
+    "description": "The create button, and the empty state action."
+  },
+  "categoryAdded": "Category added",
+  "@categoryAdded": {
+    "description": "Confirmation."
+  },
+  "categoriesEmptyTitle": "No categories yet",
+  "@categoriesEmptyTitle": {
+    "description": "Empty state title."
+  },
+  "categoriesEmptyBody": "Group your stock so analytics can tell you what sells.",
+  "@categoriesEmptyBody": {
+    "description": "Empty state body — says why categories are worth the effort."
+  },
+  "categoryDeleteConfirmTitle": "Delete \"{name}\"?",
+  "@categoryDeleteConfirmTitle": {
+    "description": "Destructive confirmation title, naming the category.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryDeleteUnused": "Nothing is using it.",
+  "@categoryDeleteUnused": {
+    "description": "Shown when the category has no items."
+  },
+  "categoryDeleteInUse": "{count} items are in it. They keep working — they just stop having a category.",
+  "@categoryDeleteInUse": {
+    "description": "Shown when the category is in use. Deleting is soft (hard rule 15).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryItemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@categoryItemCount": {
+    "description": "How many items are in a category.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationsTitle": "Locations",
+  "@locationsTitle": {
+    "description": "Screen title."
+  },
+  "locationAdd": "Add a location",
+  "@locationAdd": {
+    "description": "The create button, and the empty state action."
+  },
+  "locationAdded": "Location added",
+  "@locationAdded": {
+    "description": "Confirmation."
+  },
+  "locationsEmptyTitle": "No locations yet",
+  "@locationsEmptyTitle": {
+    "description": "Empty state title."
+  },
+  "locationsEmptyBody": "Add a warehouse, then shelves and bins inside it.",
+  "@locationsEmptyBody": {
+    "description": "Empty state body, naming the three levels."
+  },
+  "locationKindQuestion": "What kind?",
+  "@locationKindQuestion": {
+    "description": "Picker title: warehouse, shelf or bin."
+  },
+  "locationWarehouse": "Warehouse",
+  "@locationWarehouse": {
+    "description": "Top level of the storage tree."
+  },
+  "locationWarehouseCaption": "A room, a unit, a garage",
+  "@locationWarehouseCaption": {
+    "description": "What a warehouse means here — it does not have to be a warehouse."
+  },
+  "locationShelf": "Shelf",
+  "@locationShelf": {
+    "description": "Middle level of the storage tree."
+  },
+  "locationShelfCaption": "Inside a warehouse",
+  "@locationShelfCaption": {
+    "description": "Where a shelf sits."
+  },
+  "locationBin": "Bin",
+  "@locationBin": {
+    "description": "Bottom level of the storage tree — where items actually sit."
+  },
+  "locationBinCaption": "Inside a shelf — where items actually sit",
+  "@locationBinCaption": {
+    "description": "Where a bin sits."
+  },
+  "locationNeedWarehouse": "Add a warehouse first",
+  "@locationNeedWarehouse": {
+    "description": "A shelf or bin needs a parent."
+  },
+  "locationParentQuestion": "Inside which one?",
+  "@locationParentQuestion": {
+    "description": "Picker title for a location parent."
+  },
+  "locationNewTitle": "New {kind}",
+  "@locationNewTitle": {
+    "description": "Sheet title when creating a location of a given kind.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "locationNameLabel": "Name or code",
+  "@locationNameLabel": {
+    "description": "A bin is usually a code, a warehouse usually a name."
+  },
+  "locationBinHint": "Bin A1",
+  "@locationBinHint": {
+    "description": "Example bin name."
+  },
+  "locationWarehouseHint": "Garage",
+  "@locationWarehouseHint": {
+    "description": "Example warehouse name."
+  },
+  "locationDeleteConfirmTitle": "Delete \"{name}\"?",
+  "@locationDeleteConfirmTitle": {
+    "description": "Destructive confirmation title, naming the location.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "locationDeleteUnused": "Nothing is stored there.",
+  "@locationDeleteUnused": {
+    "description": "Shown when the location holds nothing."
+  },
+  "locationDeleteInUse": "{count} items are there. They keep working — they just stop having a location.",
+  "@locationDeleteInUse": {
+    "description": "Shown when the location is in use.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationItemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@locationItemCount": {
+    "description": "How many items are at a location.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scannerTitle": "Scan",
+  "@scannerTitle": {
+    "description": "Screen title."
+  },
+  "scannerTorch": "Torch",
+  "@scannerTorch": {
+    "description": "Tooltip on the torch toggle."
+  },
+  "scannerSwitchCamera": "Switch camera",
+  "@scannerSwitchCamera": {
+    "description": "Tooltip on the camera flip."
+  },
+  "scannerHint": "Point at a barcode, a SKU label or a bin tag.",
+  "@scannerHint": {
+    "description": "Names the three things a scan can match."
+  },
+  "scannerFoundLocation": "That is {name}",
+  "@scannerFoundLocation": {
+    "description": "Shown when a scanned code matched a bin rather than an item.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scannerNoMatchTitle": "Nothing has that code",
+  "@scannerNoMatchTitle": {
+    "description": "Dialog title when a scan matched nothing."
+  },
+  "scannerNoMatchBody": "Add an item and keep the code on it?",
+  "@scannerNoMatchBody": {
+    "description": "The useful branch: an unknown code usually means something new is in the seller’s hand."
+  },
+  "scannerAddItem": "Add an item",
+  "@scannerAddItem": {
+    "description": "Confirm on the unknown-code dialog."
+  },
+  "scannerScanAgain": "Scan again",
+  "@scannerScanAgain": {
+    "description": "Dismiss on the unknown-code dialog."
+  },
+  "commonOther": "Other",
+  "@commonOther": {
+    "description": "Catch-all option in a picker — a carrier or a marketplace that is not on the list."
+  },
+  "commonAll": "All",
+  "@commonAll": {
+    "description": "The unfiltered tab in a filter strip."
+  },
+  "commonRevenue": "Revenue",
+  "@commonRevenue": {
+    "description": "What buyers paid, after refunds."
+  },
+  "commonProfit": "Profit",
+  "@commonProfit": {
+    "description": "What was left after every cost."
+  },
+  "commonNetProfit": "Net profit",
+  "@commonNetProfit": {
+    "description": "The bottom line of a profit statement."
+  },
+  "commonMargin": "Margin",
+  "@commonMargin": {
+    "description": "Profit as a share of revenue — whether the price is right."
+  },
+  "commonRoi": "ROI",
+  "@commonRoi": {
+    "description": "Profit as a share of cost — whether the buy was right. Kept as the acronym: it is what resellers say in both languages."
+  },
+  "commonFees": "Fees",
+  "@commonFees": {
+    "description": "What the marketplace took."
+  },
+  "commonShipping": "Shipping",
+  "@commonShipping": {
+    "description": "What postage cost."
+  },
+  "commonExpenses": "Expenses",
+  "@commonExpenses": {
+    "description": "Costs that are not the cost of an item."
+  },
+  "commonCostOfGoods": "Cost of goods",
+  "@commonCostOfGoods": {
+    "description": "What the sold items cost. Null when any is unknown — profit is then an em dash."
+  },
+  "commonPartial": "Partial",
+  "@commonPartial": {
+    "description": "Badge on a figure computed from incomplete data. Never presented as the whole truth."
+  },
+  "commonItems": "Items",
+  "@commonItems": {
+    "description": "Section heading for a list of items."
+  },
+  "commonOrders": "Orders",
+  "@commonOrders": {
+    "description": "A count of orders."
+  },
+  "commonDate": "Date",
+  "@commonDate": {
+    "description": "A date field label."
+  },
+  "commonAmount": "Amount",
+  "@commonAmount": {
+    "description": "A money field label."
+  },
+  "commonSellThrough": "Sell-through",
+  "@commonSellThrough": {
+    "description": "Sold as a share of everything ever held."
+  },
+  "orderStatusAwaitingPayment": "Awaiting payment",
+  "@orderStatusAwaitingPayment": {
+    "description": "Order status: sold, money not cleared. Do not ship on this."
+  },
+  "orderStatusToShip": "To ship",
+  "@orderStatusToShip": {
+    "description": "Order status: paid and waiting on the seller. The status the whole Orders tab exists to drain."
+  },
+  "orderStatusShipped": "Shipped",
+  "@orderStatusShipped": {
+    "description": "Order status: with the carrier."
+  },
+  "orderStatusDelivered": "Delivered",
+  "@orderStatusDelivered": {
+    "description": "Order status: arrived."
+  },
+  "orderStatusReturnRequested": "Return requested",
+  "@orderStatusReturnRequested": {
+    "description": "Order status: the buyer asked to send it back."
+  },
+  "orderStatusReturned": "Returned",
+  "@orderStatusReturned": {
+    "description": "Order status: physically back with the seller."
+  },
+  "orderStatusRefunded": "Refunded",
+  "@orderStatusRefunded": {
+    "description": "Order status: money returned to the buyer."
+  },
+  "orderStatusCancelled": "Cancelled",
+  "@orderStatusCancelled": {
+    "description": "Order status: never happened. Does not count as revenue."
+  },
+  "ordersLoadFailed": "Could not load orders",
+  "@ordersLoadFailed": {
+    "description": "Error empty state on the Orders tab."
+  },
+  "ordersNoMatch": "No orders match this filter.",
+  "@ordersNoMatch": {
+    "description": "Empty state when a tab is empty."
+  },
+  "orderFilterToShip": "To Ship",
+  "@orderFilterToShip": {
+    "description": "Orders tab. Folds in awaiting-payment: from the seller’s point of view both are \"not gone yet\"."
+  },
+  "orderFilterReturns": "Returns",
+  "@orderFilterReturns": {
+    "description": "Orders tab covering return requested, returned and refunded."
+  },
+  "orderLate": "Late",
+  "@orderLate": {
+    "description": "Badge on an order past its shipping deadline. The one thing here with an external penalty."
+  },
+  "orderProfitPrefix": "Profit",
+  "@orderProfitPrefix": {
+    "description": "Prefix on the profit figure of an order row."
+  },
+  "orderFallbackTitle": "Order {id}",
+  "@orderFallbackTitle": {
+    "description": "Row title when an order has no line items to name it by.",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTitleFallback": "Order",
+  "@orderTitleFallback": {
+    "description": "App bar title while the order loads."
+  },
+  "orderTitle": "{marketplace} order",
+  "@orderTitle": {
+    "description": "App bar title on order detail.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "orderLoadFailed": "Could not load this order",
+  "@orderLoadFailed": {
+    "description": "Error state on order detail."
+  },
+  "orderNotFound": "Order not found",
+  "@orderNotFound": {
+    "description": "Shown when the order behind a link is gone."
+  },
+  "orderOverdue": "Overdue",
+  "@orderOverdue": {
+    "description": "Badge when the shipping deadline has passed."
+  },
+  "orderTimeline": "Timeline",
+  "@orderTimeline": {
+    "description": "Section heading: what has happened to this order."
+  },
+  "orderOrdered": "Ordered",
+  "@orderOrdered": {
+    "description": "Timeline entry: when the sale happened."
+  },
+  "orderCarrier": "Carrier",
+  "@orderCarrier": {
+    "description": "Who is carrying the parcel."
+  },
+  "orderTracking": "Tracking",
+  "@orderTracking": {
+    "description": "The tracking number."
+  },
+  "orderShipBy": "Ship by",
+  "@orderShipBy": {
+    "description": "The platform's shipping deadline."
+  },
+  "orderShippingCost": "Shipping cost",
+  "@orderShippingCost": {
+    "description": "What postage cost the seller."
+  },
+  "orderLineCost": "Cost {amount}",
+  "@orderLineCost": {
+    "description": "Subtitle on an order line: what the item cost.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderLineQuantityCost": "×{quantity} · cost {amount}",
+  "@orderLineQuantityCost": {
+    "description": "Subtitle on an order line with more than one unit.",
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPlatformFees": "Platform fees",
+  "@orderPlatformFees": {
+    "description": "What the marketplace took, on the profit statement."
+  },
+  "orderOtherExpenses": "Other expenses",
+  "@orderOtherExpenses": {
+    "description": "Costs attributed to this sale from the Expenses feature."
+  },
+  "orderProfitIncomplete": "No cost recorded for one of these items, so profit cannot be worked out. Add it on the item and this fills in.",
+  "@orderProfitIncomplete": {
+    "description": "Says why the bottom line is an em dash, and how to fix it. Never guesses."
+  },
+  "orderShipIt": "Ship it",
+  "@orderShipIt": {
+    "description": "Primary action on an unshipped order."
+  },
+  "orderMarkDelivered": "Mark delivered",
+  "@orderMarkDelivered": {
+    "description": "Moves a shipped order to delivered."
+  },
+  "orderMarkedDelivered": "Marked delivered",
+  "@orderMarkedDelivered": {
+    "description": "Confirmation."
+  },
+  "orderOpenReturn": "Open a return",
+  "@orderOpenReturn": {
+    "description": "Starts the return flow."
+  },
+  "orderReturnOpened": "Return opened",
+  "@orderReturnOpened": {
+    "description": "Confirmation."
+  },
+  "orderItemCameBack": "It came back",
+  "@orderItemCameBack": {
+    "description": "Closes a return: the item is physically back."
+  },
+  "orderReturnDialogTitle": "The item came back",
+  "@orderReturnDialogTitle": {
+    "description": "Dialog title when closing a return."
+  },
+  "orderReturnDialogBody": "Put it back on the shelf, or keep it out of inventory if it came back damaged.",
+  "@orderReturnDialogBody": {
+    "description": "Restocking is a choice: a damaged return must not be silently sold twice."
+  },
+  "orderRestock": "Restock it",
+  "@orderRestock": {
+    "description": "Return the item to sellable inventory."
+  },
+  "orderRestocked": "Returned and restocked",
+  "@orderRestocked": {
+    "description": "Confirmation."
+  },
+  "orderDoNotRestock": "Do not restock",
+  "@orderDoNotRestock": {
+    "description": "Keep a damaged return out of inventory."
+  },
+  "orderReturnedDone": "Returned",
+  "@orderReturnedDone": {
+    "description": "Confirmation after closing a return without restocking."
+  },
+  "orderRecordSettlement": "Record fees and payout",
+  "@orderRecordSettlement": {
+    "description": "Opens the sheet for what the platform took and paid."
+  },
+  "shipTitle": "Ship this order",
+  "@shipTitle": {
+    "description": "Sheet title."
+  },
+  "shipCarrierOptional": "Carrier (optional)",
+  "@shipCarrierOptional": {
+    "description": "Nothing on this sheet is required — a seller who posted it with no tracking still needs the order out of their queue."
+  },
+  "shipTrackingOptional": "Tracking number (optional)",
+  "@shipTrackingOptional": {
+    "description": "Optional tracking number."
+  },
+  "shipCostOptional": "Shipping cost (optional)",
+  "@shipCostOptional": {
+    "description": "Optional postage cost."
+  },
+  "shipCostHelp": "What postage cost you — it comes off the profit",
+  "@shipCostHelp": {
+    "description": "Why the shipping cost is worth entering."
+  },
+  "shipSubmit": "Mark as shipped",
+  "@shipSubmit": {
+    "description": "Confirm button."
+  },
+  "shipDone": "Shipped",
+  "@shipDone": {
+    "description": "Confirmation."
+  },
+  "settleTitle": "Fees and payout",
+  "@settleTitle": {
+    "description": "Sheet title."
+  },
+  "settleFeesHelp": "What the marketplace took",
+  "@settleFeesHelp": {
+    "description": "Helper under the fees field."
+  },
+  "settlePayout": "Payout",
+  "@settlePayout": {
+    "description": "What actually landed in the seller’s account. The one stored figure that is not derived."
+  },
+  "settlePayoutHelp": "What actually landed in your account",
+  "@settlePayoutHelp": {
+    "description": "Helper under the payout field. This is what a bank statement is reconciled against."
+  },
+  "offersTitle": "Offers",
+  "@offersTitle": {
+    "description": "Screen title, and the tooltip on the Orders app bar action that opens it."
+  },
+  "offersLoadFailed": "Could not load offers",
+  "@offersLoadFailed": {
+    "description": "Error state title on the Offers list."
+  },
+  "offersNoMatch": "No offers under this tab.",
+  "@offersNoMatch": {
+    "description": "Empty state body when a filter matches nothing."
+  },
+  "offerFilterPending": "Pending",
+  "@offerFilterPending": {
+    "description": "Offers filter chip."
+  },
+  "offerFilterAccepted": "Accepted",
+  "@offerFilterAccepted": {
+    "description": "Offers filter chip."
+  },
+  "offerFilterDeclined": "Declined",
+  "@offerFilterDeclined": {
+    "description": "Offers filter chip."
+  },
+  "offerFilterExpired": "Expired",
+  "@offerFilterExpired": {
+    "description": "Offers filter chip, and the badge on an offer whose window closed."
+  },
+  "offerUnderAnHourLeft": "Under an hour left",
+  "@offerUnderAnHourLeft": {
+    "description": "Countdown badge when the offer is about to lapse."
+  },
+  "offerHoursLeft": "{hours}h left",
+  "@offerHoursLeft": {
+    "description": "Countdown badge, hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "offerDaysLeft": "{days}d left",
+  "@offerDaysLeft": {
+    "description": "Countdown badge, days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "offerAsking": "asking {amount}",
+  "@offerAsking": {
+    "description": "Fragment on the offer card: what the item is listed at.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerBelowAsking": "{percent} below",
+  "@offerBelowAsking": {
+    "description": "Fragment on the offer card: how far under the asking price the buyer came.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "offerMessageQuote": "“{message}”",
+  "@offerMessageQuote": {
+    "description": "The buyer's note, quoted.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "offerCountered": "Countered {amount}",
+  "@offerCountered": {
+    "description": "Badge showing what the seller came back with.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerAccept": "Accept",
+  "@offerAccept": {
+    "description": "Button and dialog action."
+  },
+  "offerAcceptTitle": "Accept {amount}?",
+  "@offerAcceptTitle": {
+    "description": "Confirmation dialog title.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerAcceptBody": "This records the sale and creates the order, so the item leaves your inventory.",
+  "@offerAcceptBody": {
+    "description": "Confirmation dialog body. Says what accepting actually changes."
+  },
+  "offerAccepted": "Sold — the order is in Orders",
+  "@offerAccepted": {
+    "description": "Snackbar after accepting. Names where the order went."
+  },
+  "offerCounter": "Counter",
+  "@offerCounter": {
+    "description": "Button."
+  },
+  "offerDecline": "Decline",
+  "@offerDecline": {
+    "description": "Button."
+  },
+  "offerDeclined": "Declined",
+  "@offerDeclined": {
+    "description": "Snackbar after declining."
+  },
+  "offerCounterTitle": "Counter {amount}",
+  "@offerCounterTitle": {
+    "description": "Counter sheet title, naming the offer being answered.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerCounterAmount": "What you would accept",
+  "@offerCounterAmount": {
+    "description": "Label on the counter amount field."
+  },
+  "offerCounterRequired": "Enter what you would accept",
+  "@offerCounterRequired": {
+    "description": "Validation snackbar when the counter sheet is submitted empty."
+  },
+  "offerCounterNote": "This is saved for your records. Send the counter on the marketplace itself — nothing is connected yet.",
+  "@offerCounterNote": {
+    "description": "Note under the counter field. A seller who thinks the counter was sent will wait for an answer that never comes."
+  },
+  "offerCounterSubmit": "Record counter",
+  "@offerCounterSubmit": {
+    "description": "Counter sheet submit button."
+  },
+  "offerCounterRecorded": "Counter recorded",
+  "@offerCounterRecorded": {
+    "description": "Snackbar after recording a counter."
+  },
+  "shippingQueueTitle": "Shipping queue",
+  "@shippingQueueTitle": {
+    "description": "Screen title."
+  },
+  "shippingQueueCount": "{count} to send",
+  "@shippingQueueCount": {
+    "description": "Subtitle counting what is left.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shippingQueueEmptyTitle": "Nothing to ship",
+  "@shippingQueueEmptyTitle": {
+    "description": "Empty state title."
+  },
+  "shippingQueueEmptyBody": "Every paid order is on its way.",
+  "@shippingQueueEmptyBody": {
+    "description": "Empty state body."
+  },
+  "shippingQueueShip": "Ship",
+  "@shippingQueueShip": {
+    "description": "The per-row action, so posting a parcel is one tap rather than two."
+  },
+  "shippingNoDeadline": "{marketplace} · no deadline",
+  "@shippingNoDeadline": {
+    "description": "Row subtitle when the platform gave no shipping deadline.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "shippingOverdueBy": "{marketplace} · {days}d overdue",
+  "@shippingOverdueBy": {
+    "description": "Row subtitle for a late order.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "shippingDueToday": "{marketplace} · due today",
+  "@shippingDueToday": {
+    "description": "Row subtitle for an order due today.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "shippingDueIn": "{marketplace} · due in {days}d",
+  "@shippingDueIn": {
+    "description": "Row subtitle counting down to the deadline.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
   }
 }
