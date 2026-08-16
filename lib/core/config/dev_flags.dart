@@ -55,13 +55,20 @@ final class DevFlags {
   /// because an invisible dev flag is one you demo to someone by accident.
   static const bool bypassAuth = AppEnv.bypassAuthRequested && !kReleaseMode;
 
-  /// Whether mock data starts switched on.
+  /// Whether mock data starts switched on. **Off unless the env file asks for
+  /// it** — owner's rule.
   ///
-  /// Defaults to following [bypassAuth] when the env file says nothing: a
-  /// bypassed session has no project and no user, so live mode would show an
-  /// empty app and a stream of permission errors. The two belong together.
+  /// It used to follow [bypassAuth], on the grounds that a bypassed session
+  /// has no project and would otherwise show an empty app. That reasoning is
+  /// now the argument against it: the app renders its five tabs empty before
+  /// sign-in by design (hard rule 1), so an empty app is a real state worth
+  /// looking at — and a default that quietly replaced it with a fake business
+  /// meant nobody was developing against what a new seller actually sees.
+  ///
+  /// Turning it on is `"MOCK_DATA_DEFAULT": true` in the env file, or the
+  /// switch in More → Settings, which is where it is meant to be reached from.
   static const bool mockDataDefault =
-      (AppEnv.mockDataDefault || AppEnv.bypassAuthRequested) && !kReleaseMode;
+      AppEnv.mockDataDefault && !kReleaseMode;
 
   /// Fine-grained console output. Debug builds only, whatever the env says.
   static const bool verboseLogging = AppEnv.verboseLogging && !kReleaseMode;

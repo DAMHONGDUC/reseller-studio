@@ -77,12 +77,11 @@ class DataModeController extends Notifier<DataMode> {
 
   /// What mock mode starts as before anyone touches the switch.
   ///
-  /// `DevFlags.mockDataDefault` follows the auth bypass unless the env file
-  /// overrides it, because the two go together: a bypassed session has no
-  /// Firebase project and no signed-in user, so live mode would show an empty
-  /// app and a stream of permission errors. Turning both on at once is what
-  /// makes `--dart-define-from-file=env/dev.json` produce something worth
-  /// looking at.
+  /// **Off unless the env file asks for it** (owner's rule) — it no longer
+  /// follows the auth bypass. An empty app is now a real state the product
+  /// ships: the five tabs render before sign-in with nothing in them, so a
+  /// default that swapped that for a fake business hid the screen every new
+  /// seller actually meets. Turn it on in More → Settings.
   static DataMode get _default =>
       DevFlags.mockDataDefault ? DataMode.mock : DataMode.live;
 
