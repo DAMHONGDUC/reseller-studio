@@ -14,14 +14,6 @@ final class HomeConstant {
   /// turning Home into a second Orders screen.
   static const int recentActivityMaxRows = 3;
 
-  /// How many Quick Access tiles fit across the row.
-  static const int quickAccessColumns = 4;
-
-  /// Width over height of one tile. Taller than square because the label
-  /// under the glyph runs to two lines — "Record a purchase" does not fit on
-  /// one at this width, and a tile that clips its own label is worse than a
-  /// slightly tall grid.
-  static const double quickAccessTileRatio = 0.78;
 }
 
 /// One create action, as Quick Access offers it.

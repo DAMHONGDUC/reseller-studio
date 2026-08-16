@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:seller_os/core/widgets/app_list_row.dart';
 import 'package:seller_os/features/home/home_constant.dart';
 import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
 
@@ -14,20 +15,76 @@ import '../../support/pump_app.dart';
 /// here stops finding what they need and cannot tell whether the action is
 /// missing or the app cannot do it.
 void main() {
+  /// Quick Access sits at the bottom, so nothing in it is built until the
+  /// list is scrolled there — `find.text` matches built widgets only.
+  Future<void> toEnd(WidgetTester tester) async {
+    for (int i = 0; i < 12; i++) {
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -600));
+      await tester.pump();
+    }
+
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('every action in the list is on screen', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const HomeScreen());
+    await toEnd(tester);
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
 
     for (final QuickAddAction action in QuickAddConstant.actions) {
-      final BuildContext context = tester.element(find.byType(HomeScreen));
-
       expect(
         find.text(QuickAddLabel.of(context, action.kind)),
         findsWidgets,
         reason: '${action.kind.name} is in the list but not on Home',
       );
     }
+  });
+
+  testWidgets('every action is a row, and they are the last thing on Home', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const HomeScreen());
+    await toEnd(tester);
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+
+    // Owner's rule. Home answers "what needs attention today" first; a
+    // launcher above the figures makes the screen open on the wrong thing.
+    final double sectionTop = tester
+        .getRect(
+          find.text(
+            QuickAddLabel.of(context, QuickAddConstant.actions.first.kind),
+          ),
+        )
+        .top;
+
+    for (final String earlier in <String>[
+      'Needs Attention',
+      'Performance',
+      'Recent Activity',
+    ]) {
+      final Finder header = find.text(earlier);
+
+      if (header.evaluate().isEmpty) continue;
+
+      expect(
+        tester.getRect(header).top,
+        lessThan(sectionTop),
+        reason: '$earlier is below Quick Access',
+      );
+    }
+
+    // One `AppListRow` per action — rows, not tiles.
+    expect(
+      find.descendant(
+        of: find.byType(AppListCard),
+        matching: find.byType(AppListRow),
+      ),
+      findsNWidgets(QuickAddConstant.actions.length),
+    );
   });
 
   test('every kind has a tile, and every tile a kind', () {

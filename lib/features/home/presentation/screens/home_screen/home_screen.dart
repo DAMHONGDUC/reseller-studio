@@ -9,6 +9,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
 import '../../../../inventory/domain/entities/item.dart';
@@ -70,15 +71,15 @@ class HomeScreen extends ConsumerWidget {
           SizedBox(height: SdContentPaddingV3.topGap),
           const SdSectionHeaderV3(title: 'Needs Attention', first: true),
           const _NeedsAttention(),
+          const SdSectionHeaderV3(title: 'Performance'),
+          const _PerformanceBlock(),
+          const SdSectionHeaderV3(title: 'Recent Activity'),
+          const _RecentActivity(),
           SdSectionHeaderV3(
             title: context.l10n.homeQuickAccess,
             subtitle: context.l10n.homeQuickAccessSubtitle,
           ),
           const _QuickAccess(),
-          const SdSectionHeaderV3(title: 'Performance'),
-          const _PerformanceBlock(),
-          const SdSectionHeaderV3(title: 'Recent Activity'),
-          const _RecentActivity(),
         ],
       ),
     );

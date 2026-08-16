@@ -9,69 +9,29 @@ part of 'home_screen.dart';
 /// Home is three taps otherwise.
 ///
 /// This does not replace those buttons and must not: it is a shortcut into
-/// them, so every tile pushes the screen that owns the action rather than
+/// them, so every row pushes the screen that owns the action rather than
 /// opening a form Home would then have to know how to save.
+///
+/// **Rows, and last on the screen** — owner's rule. Home answers "what needs
+/// attention today" first; a grid of eight tiles above the figures made the
+/// screen open on a launcher instead of on the answer. At the bottom it is
+/// where a seller who came to *add* something scrolls to, and it costs the
+/// seller who came to *read* nothing.
 class _QuickAccess extends StatelessWidget {
   const _QuickAccess();
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-    child: SdCardV3(
-      child: GridView.count(
-        crossAxisCount: HomeConstant.quickAccessColumns,
-        shrinkWrap: true,
-        // The card is inside Home's own list, so this grid must not scroll on
-        // its own — two nested scrollables on one axis is how a drag ends up
-        // moving the wrong one.
-        physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero,
-        mainAxisSpacing: SdSpacingConstant.h12,
-        crossAxisSpacing: SdSpacingConstant.w8,
-        childAspectRatio: HomeConstant.quickAccessTileRatio,
-        children: <Widget>[
-          for (final QuickAddAction action in QuickAddConstant.actions)
-            _QuickAccessTile(action: action),
-        ],
-      ),
-    ),
-  );
-}
-
-/// One tile: a glyph and what it makes.
-///
-/// The label is not optional. Eight glyphs with no words is a memory test,
-/// and "add a source" and "add a category" have no icon a seller would tell
-/// apart at 24 points.
-class _QuickAccessTile extends StatelessWidget {
-  const _QuickAccessTile({required this.action});
-
-  final QuickAddAction action;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: QuickAddLabel.of(context, action.kind),
-    child: InkWell(
-      onTap: () => context.push(action.route),
-      borderRadius: SdRadiusV3.cardAll,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SdIconTileV3(icon: action.icon, tint: context.colorScheme3.primary),
-          SizedBox(height: SdSpacingConstant.h6),
-          Text(
-            QuickAddLabel.of(context, action.kind),
-            style: context.textTheme3.labelSmall!.copyWith(
-              color: context.sdTheme3.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+    child: AppListCard(
+      children: <Widget>[
+        for (final QuickAddAction action in QuickAddConstant.actions)
+          AppListRow(
+            title: QuickAddLabel.of(context, action.kind),
+            icon: action.icon,
+            onTap: () => context.push(action.route),
           ),
-        ],
-      ),
+      ],
     ),
   );
 }
