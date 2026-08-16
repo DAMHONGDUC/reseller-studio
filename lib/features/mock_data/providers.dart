@@ -53,10 +53,14 @@ enum DataMode {
 /// a shipped binary, whereas this is a *setting* a developer toggles from
 /// inside the running app and expects to still be set tomorrow.
 ///
-/// That makes it the weaker of the two guarantees, so it carries its own:
-/// **[build] refuses to return [DataMode.mock] in a release build**, whatever
-/// is stored. A user who somehow had the flag set could otherwise be shown a
-/// fake business as if it were theirs — which is worse than any crash.
+/// That makes it the weaker of the two guarantees, so it carries two of its
+/// own. **[build] refuses to return [DataMode.mock] in a release build**,
+/// whatever is stored — a user who somehow had the flag set could otherwise
+/// be shown a fake business as if it were theirs, which is worse than any
+/// crash. And every repository provider below tests
+/// `DevFlags.isDebugOrProfile` *first*, which is `const` false in release, so
+/// the mock branch folds away and the in-memory repositories and their seed
+/// leave the shipped binary rather than merely going unreachable inside it.
 class DataModeController extends Notifier<DataMode> {
   @override
   DataMode build() {
@@ -192,7 +196,7 @@ final class LiveRepositoryGuard {
 
 final Provider<ItemRepository> itemRepositoryProvider =
     Provider<ItemRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryItemRepository(ref.watch(mockStoreProvider));
       }
 
@@ -205,7 +209,7 @@ final Provider<ItemRepository> itemRepositoryProvider =
 
 final Provider<OrderRepository> orderRepositoryProvider =
     Provider<OrderRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryOrderRepository(ref.watch(mockStoreProvider));
       }
 
@@ -218,7 +222,7 @@ final Provider<OrderRepository> orderRepositoryProvider =
 
 final Provider<OfferRepository> offerRepositoryProvider =
     Provider<OfferRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryOfferRepository(ref.watch(mockStoreProvider));
       }
 
@@ -231,7 +235,7 @@ final Provider<OfferRepository> offerRepositoryProvider =
 
 final Provider<ListingRepository> listingRepositoryProvider =
     Provider<ListingRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryListingRepository(ref.watch(mockStoreProvider));
       }
 
@@ -246,7 +250,7 @@ final Provider<ListingRepository> listingRepositoryProvider =
 
 final Provider<SourceRepository> sourceRepositoryProvider =
     Provider<SourceRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemorySourceRepository(ref.watch(mockStoreProvider));
       }
 
@@ -259,7 +263,7 @@ final Provider<SourceRepository> sourceRepositoryProvider =
 
 final Provider<PurchaseRepository> purchaseRepositoryProvider =
     Provider<PurchaseRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryPurchaseRepository(ref.watch(mockStoreProvider));
       }
 
@@ -279,7 +283,9 @@ final Provider<PurchaseRepository> purchaseRepositoryProvider =
 final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>((
   Ref ref,
 ) {
-  if (ref.watch(dataModeProvider).isMock) return const LocalFileUploader();
+  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+    return const LocalFileUploader();
+  }
 
   final WorkspaceContext? context = ref.watch(workspaceContextProvider);
 
@@ -290,7 +296,7 @@ final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>((
 
 final Provider<CategoryRepository> categoryRepositoryProvider =
     Provider<CategoryRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryCategoryRepository(ref.watch(mockStoreProvider));
       }
 
@@ -305,7 +311,7 @@ final Provider<CategoryRepository> categoryRepositoryProvider =
 
 final Provider<LocationRepository> locationRepositoryProvider =
     Provider<LocationRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryLocationRepository(ref.watch(mockStoreProvider));
       }
 
@@ -320,7 +326,7 @@ final Provider<LocationRepository> locationRepositoryProvider =
 
 final Provider<ExpenseRepository> expenseRepositoryProvider =
     Provider<ExpenseRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemoryExpenseRepository(ref.watch(mockStoreProvider));
       }
 
@@ -343,7 +349,7 @@ final Provider<ExpenseRepository> expenseRepositoryProvider =
 /// not to a workspace.
 final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
     Provider<SubscriptionRepository>((Ref ref) {
-      if (ref.watch(dataModeProvider).isMock) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
         return InMemorySubscriptionRepository(ref.watch(mockStoreProvider));
       }
 
