@@ -105,10 +105,10 @@ Nothing started. Listed with what already exists to build on.
   screen throws until `assets/brand/apple_logo.svg` exists. The Apple button
   also renders in the app's indigo, which Apple's guidelines do not allow.
   `RELEASE_ACTIONS.md` blocker 5 has both.
-- **`selleros://` deep links work on iOS only.** `Info.plist` declares the
-  scheme and `FlutterDeepLinkingEnabled`; `AndroidManifest.xml` has neither,
-  so the notification taps the plan calls for (§22) will not open a record on
-  Android. Not on the TestFlight path, which is iOS.
+- **`selleros://` deep links now work on both platforms.** `AndroidManifest.xml`
+  declares the scheme in a `VIEW` intent filter and sets
+  `flutter_deeplinking_enabled`, matching what `Info.plist` has always had.
+  Untested end to end — that needs a device and a real notification.
 - **Entitlement is not mirrored into Firestore yet.** The client reads
   RevenueCat, which is a cache for rendering. `firestore.rules` cannot ask an
   SDK a question, so the server-side half — a Cloud Function on RevenueCat's

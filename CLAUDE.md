@@ -123,8 +123,10 @@ rate is the bug this rule exists to stop.
   headline styles only, because a text face set at 28sp reads loose and a
   display face at 12sp reads cramped. The scale, its optical tracking and its
   line heights are in `AppTheme._textTheme`.
-- **Deep links use the `selleros://` scheme** (`ios/Runner/Info.plist`,
-  `FlutterDeepLinkingEnabled`). `selleros:///orders/ord-4` opens that order —
+- **Deep links use the `selleros://` scheme**, declared on both platforms —
+  `ios/Runner/Info.plist` (`FlutterDeepLinkingEnabled`) and
+  `android/app/src/main/AndroidManifest.xml`
+  (`flutter_deeplinking_enabled` plus a `VIEW` intent filter). `selleros:///orders/ord-4` opens that order —
   what the plan's notification taps (§22) need.
   why: see `docs/rules/DECISIONS.md` § Deep links hard-crash until Firebase
   is configured
