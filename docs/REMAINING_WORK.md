@@ -27,9 +27,19 @@ it happens in one pass at release. See hard rule 7.
 sourcing, expenses, reports, tax, home, subscription, search, listings and
 receipts, reusing an existing key wherever one already held the same English.
 
-**15 interpolated strings are deliberately left** (`'${count} views'`,
-`'Year ${label}'`). Each needs an ARB placeholder and a decision about
-plurals, so they are a judgement call per string rather than a sweep.
+The interpolated ones are done too — 13 keys carrying placeholders, with real
+`plural` forms where a count is shown (`analyticsOrderCount`,
+`listingViewCount`), because "1 orders" is the kind of thing nobody fixes
+after launch.
+
+**Three literals are left on purpose**, and each should stay:
+
+- `'$count'` on Home's attention row — a bare number, with no text to
+  translate.
+- `'${context.l10n.orderProfitPrefix} '` — already an ARB key; the trailing
+  space is layout, not language.
+- The mock-data summary in Settings — developer-only, behind `DevFlags`, and
+  absent from a release build.
 
 At release, translate `app_vi.arb` in one pass **and review the 388 keys
 already there**, which were written without a native speaker. The backfill
