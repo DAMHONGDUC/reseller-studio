@@ -43,10 +43,9 @@ final class AppRoutes {
 
   // --- Shell branch 1: Home ---
 
-  // `/home/notifications` (§22) and `/home/activity` (§23) are deliberately
-  // absent: both features are blocked on Cloud Functions, and a constant
-  // whose path no route serves is a deep link that fails silently. They come
-  // back with their screens.
+  // `/home/notifications` (§22) is still deliberately absent: nothing writes
+  // a notification yet, and a constant whose path no route serves is a deep
+  // link that fails silently. It comes back with its screen.
   static const String home = '/home';
 
   // --- Shell branch 2: Inventory ---
@@ -100,6 +99,10 @@ final class AppRoutes {
   static const String marketplaces = '/more/marketplaces';
   static const String team = '/more/team';
   static const String settings = '/more/settings';
+
+  /// The audit log (§23). Under More rather than under Home: it is something
+  /// you go and check, not something you are told.
+  static const String activity = '/more/activity';
   static const String about = '/more/about';
 
   /// Plan §25's Subscription block, over §27's tiers. Under More rather than

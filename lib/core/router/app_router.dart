@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../features/activity/presentation/screens/activity_screen/activity_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_categories_screen/analytics_categories_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_inventory_screen/analytics_inventory_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_marketplace_screen/analytics_marketplace_screen.dart';
@@ -428,6 +429,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'team',
                     builder: (BuildContext context, GoRouterState state) =>
                         const TeamScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'activity',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const ActivityScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

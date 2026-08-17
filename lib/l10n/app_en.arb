@@ -2587,5 +2587,69 @@
         "type": "String"
       }
     }
+  },
+  "activityTitle": "Activity",
+  "@activityTitle": {
+    "description": "App bar title of the audit log screen."
+  },
+  "activityEmptyTitle": "No activity yet",
+  "@activityEmptyTitle": {
+    "description": "Empty state heading on the activity screen."
+  },
+  "activityEmptyMessage": "Changes your team makes to items, orders and listings show up here.",
+  "@activityEmptyMessage": {
+    "description": "Empty state body. Written for the normal case — a new workspace — not for the missing-backend case."
+  },
+  "activityItemCreated": "Item added",
+  "@activityItemCreated": {
+    "description": "Audit line: an item was created."
+  },
+  "activityItemUpdated": "Item changed",
+  "@activityItemUpdated": {
+    "description": "Audit line: an item was edited."
+  },
+  "activityItemDeleted": "Item removed",
+  "@activityItemDeleted": {
+    "description": "Audit line: an item was deleted or archived."
+  },
+  "activityOrderCreated": "Order added",
+  "@activityOrderCreated": {
+    "description": "Audit line: an order was created."
+  },
+  "activityOrderUpdated": "Order changed",
+  "@activityOrderUpdated": {
+    "description": "Audit line: an order was edited."
+  },
+  "activityOrderDeleted": "Order removed",
+  "@activityOrderDeleted": {
+    "description": "Audit line: an order was deleted."
+  },
+  "activityListingCreated": "Listing added",
+  "@activityListingCreated": {
+    "description": "Audit line: a listing was created."
+  },
+  "activityListingUpdated": "Listing changed",
+  "@activityListingUpdated": {
+    "description": "Audit line: a listing was edited."
+  },
+  "activityListingDeleted": "Listing removed",
+  "@activityListingDeleted": {
+    "description": "Audit line: a listing was deleted."
+  },
+  "activityRecordChanged": "Record changed",
+  "@activityRecordChanged": {
+    "description": "Audit line for an entry written by a newer build, whose type or action this build does not recognise."
+  },
+  "activityByTeammate": "By a teammate",
+  "@activityByTeammate": {
+    "description": "Shown when an entry names an actor who is not the signed-in seller."
+  },
+  "activityBySystem": "Automatic",
+  "@activityBySystem": {
+    "description": "Shown when an entry has no human actor — a sync job or a trigger."
+  },
+  "moreActivity": "Activity",
+  "@moreActivity": {
+    "description": "More screen row leading to the audit log."
   }
 }
