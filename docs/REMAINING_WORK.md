@@ -22,25 +22,22 @@ backfill below is the prerequisite.
 New strings still go through ARB keys; only the *translation* is deferred, and
 it happens in one pass at release. See hard rule 7.
 
-| Feature | Strings still inline |
-|---|---|
-| Analytics | ~51 |
-| Sourcing | ~46 |
-| Expenses | ~13 |
-| Home | ~11 |
-| Reports | ~9 |
-| Receipts, Search, Settings, Listings, Inventory | ~21 combined |
+**The backfill is done.** Every plain user-facing string in
+`presentation/` now goes through ARB — 142 keys were added across analytics,
+sourcing, expenses, reports, tax, home, subscription, search, listings and
+receipts, reusing an existing key wherever one already held the same English.
 
-Roughly **150 user-facing strings**, counted over `presentation/screens/` and
-`presentation/widgets/` only — log lines in `presentation/controllers/` stay
-English forever (hard rule 8).
+**15 interpolated strings are deliberately left** (`'${count} views'`,
+`'Year ${label}'`). Each needs an ARB placeholder and a decision about
+plurals, so they are a judgement call per string rather than a sweep.
 
-At release, in this order: backfill the ~150 into `app_en.arb`, then translate
-`app_vi.arb` in one pass **and review the 388 keys already there**, which were
-written without a native speaker. The product vocabulary is what needs
-arguing about, not the buttons: `Offers → "Đề nghị giá"`,
-`Counter → "Trả giá"`, `Sell-through → "Tỷ lệ bán hết"`. A half-translated
-`vi` is worse than an English one, so do not advertise `vi` in the store
+At release, translate `app_vi.arb` in one pass **and review the 388 keys
+already there**, which were written without a native speaker. The backfill
+widened the gap on purpose: English is complete, `vi` is filled in once. The
+product vocabulary is what needs arguing about, not the buttons:
+`Offers → "Đề nghị giá"`, `Counter → "Trả giá"`,
+`Sell-through → "Tỷ lệ bán hết"`. A half-translated `vi` is worse than an
+English one, so do not advertise `vi` in the store listing until that is done.
 listing until that is done.
 
 ### v3 keeps its own chrome
