@@ -85,8 +85,12 @@ Nothing started. Listed with what already exists to build on.
 | Plan § | Feature | What is there today |
 |---|---|---|
 | 13 | Cross-listing | `listings` feature and the `Listing` entity exist; there is no cross-list flow |
-| 22 | Notifications — the in-app inbox | nothing. Its route constant was deleted rather than left resolving to no screen — `docs/rules/DECISIONS.md` |
-| 23 | Activity / audit log — the screen | Home has a recent-activity block reading order and item timestamps; there is no `activity/` collection and no screen. Its route constant was deleted with §22's |
+
+**Activity (§23) is built** — More → Activity, read-only, fed by the triggers
+in `functions/`. It is empty in every environment until those are deployed,
+and its empty state is written for the ordinary reason a workspace has no
+history rather than for the missing backend.
+| 22 | Notifications — the in-app inbox | nothing writes a notification yet, so an inbox would be permanently empty. Its route constant is still deliberately absent — `docs/rules/DECISIONS.md` |
 
 ## 4. Loose ends found in the code
 
