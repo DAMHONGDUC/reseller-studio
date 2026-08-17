@@ -46,18 +46,21 @@ autofocused field) also differ on purpose. `docs/rules/DECISIONS.md` has the
 reasoning; do not "finish the port". `SdFloatingBarScopeV3` is the one that
 *was* ported — it is what keeps a snackbar off the glass bar.
 
-## 2. Blocked on Cloud Functions
+## 2. Cloud Functions
 
-`functions/` has never had `npm ci` run in it and nothing is deployed. Each of
-these says so on screen rather than failing.
+**Written, not deployed.** `functions/` builds and lints in CI; nothing has
+been pushed to a project because that needs the Firebase setup.
 
-| Plan § | Feature | What it needs |
+| Plan § | Feature | State |
 |---|---|---|
-| 13 | Cross-listing | one item pushed to several marketplaces — every call that carries a token runs server-side (hard rule 10) |
-| 14 | Marketplace integrations | OAuth and sync. `marketplaces/{id}` holds status only and is `allow write: if false` |
-| 22 | Notifications | FCM sends, and the triggers that decide when |
-| 23 | Activity / audit log | Firestore triggers. `activity/` is append-only and never client-writable, so a client-written log would be worthless as an audit trail |
-| 24 | Team invites | server-side, so a member cap cannot be bypassed and the last owner cannot be removed |
+| 24 | Team invites | **Written** — `inviteMember`, `acceptInvite`, `removeMember`. Seat limit and last-owner check both need a count rules cannot take |
+| 23 | Activity / audit log | **Written** — triggers on items, orders and listings. `actorId` is read from the document, never from a client |
+| — | `workspaceIds` upkeep | **Written** — `onMemberWritten`. Until it is deployed, a seller only sees businesses they created, never ones they were invited to |
+| 22 | Notifications | not written. FCM sends and the triggers that decide when |
+| 13 | Cross-listing | not written. Every call carrying a token runs server-side (hard rule 10) |
+| 14 | Marketplace integrations | not written, and blocked on per-marketplace developer accounts |
+| 27 | Entitlement mirror | not written. The RevenueCat webhook is what makes a plan gate a boundary rather than a UI decision |
+| — | `deleteWorkspace` | not written. Firestore does not cascade |
 
 Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 
