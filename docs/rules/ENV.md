@@ -33,6 +33,12 @@ mirrors entitlement into Firestore (hard rule 10). An empty key is a
 supported state: `AppEnv.hasBillingConfig` is false, billing is skipped at
 bootstrap, and every seller reads as Free.
 
+**Theme is a preference, not a build flag.** `ThemeModeController` reads
+`PrefsKeyConstant.themeMode` and is device-local on purpose: a seller on a
+bright shop floor and the same seller packing at 1am want opposite answers on
+two devices, so syncing it to the account would make one of them wrong. The
+same reasoning puts the intro flag in preferences.
+
 **`MOCK_DATA_DEFAULT` is off, and no other flag turns it on** — owner's rule.
 It used to be ORed with `BYPASS_AUTH` in `DevFlags`, so any dev run opened onto
 a fake business. It no longer is, and the two are independent:

@@ -10,6 +10,13 @@ Anything needing an account, a key or a card is not here — that is
 
 Owner has ruled on each of these. They are not oversights.
 
+### Theme is built; language is not
+
+Theme switching works (Settings → Appearance, light/dark/system, device-local).
+**Language is listed with a "Soon" badge and no picker**, and that is the right
+order: a picker offering a half-translated Vietnamese is worse than none. The
+backfill below is the prerequisite.
+
 ### Localization — English only until release
 
 New strings still go through ARB keys; only the *translation* is deferred, and
