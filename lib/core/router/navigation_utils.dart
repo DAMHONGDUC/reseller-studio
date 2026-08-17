@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../features/auth/providers.dart';
-import '../logging/app_logger.dart';
+import '../constants/log_tag_constant.dart';
 import 'app_routes.dart';
 
 /// Moves that carry a rule, so a second caller cannot reimplement one without
@@ -34,9 +35,11 @@ final class NavigationUtils {
 
     if (signedIn) return true;
 
-    AppLogger.action('Sign-in required before action', <String, String>{
-      'from': GoRouterState.of(context).matchedLocation,
-    });
+    SdLogger.action(
+      LogTagConstant.navigation,
+      'Sign-in required before action',
+      <String, String>{'from': GoRouterState.of(context).matchedLocation},
+    );
     // Pushed, not `go`: cancelling sign-in returns the visitor to the tab
     // they were looking at rather than dropping them on Home.
     context.push(AppRoutes.login);

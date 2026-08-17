@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/storage_location.dart';
 import '../../domain/repositories/catalog_repository.dart';
@@ -36,9 +37,11 @@ class FirestoreCategoryRepository implements CategoryRepository {
               SetOptions(merge: true),
             );
 
-        AppLogger.info('Category saved', <String, Object>{
-          'categoryId': category.id,
-        });
+        SdLogger.info(
+          LogTagConstant.catalog,
+          'Category saved',
+          <String, Object>{'categoryId': category.id},
+        );
       });
 
   @override
@@ -49,9 +52,11 @@ class FirestoreCategoryRepository implements CategoryRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
-        AppLogger.info('Category soft-deleted', <String, Object>{
-          'categoryId': id,
-        });
+        SdLogger.info(
+          LogTagConstant.catalog,
+          'Category soft-deleted',
+          <String, Object>{'categoryId': id},
+        );
       });
 }
 
@@ -73,20 +78,22 @@ class FirestoreLocationRepository implements LocationRepository {
       );
 
   @override
-  Future<void> save(StorageLocation location) =>
-      FailureMapper.guard('save location', () async {
-        await _context.collections.locations
-            .doc(location.id)
-            .set(
-              StorageLocationDto.toMap(location, createdBy: _context.uid),
-              SetOptions(merge: true),
-            );
+  Future<void> save(StorageLocation location) => FailureMapper.guard(
+    'save location',
+    () async {
+      await _context.collections.locations
+          .doc(location.id)
+          .set(
+            StorageLocationDto.toMap(location, createdBy: _context.uid),
+            SetOptions(merge: true),
+          );
 
-        AppLogger.info('Location saved', <String, Object>{
-          'locationId': location.id,
-          'kind': location.kind.name,
-        });
+      SdLogger.info(LogTagConstant.catalog, 'Location saved', <String, Object>{
+        'locationId': location.id,
+        'kind': location.kind.name,
       });
+    },
+  );
 
   @override
   Future<void> delete(String id) =>
@@ -96,8 +103,10 @@ class FirestoreLocationRepository implements LocationRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
-        AppLogger.info('Location soft-deleted', <String, Object>{
-          'locationId': id,
-        });
+        SdLogger.info(
+          LogTagConstant.catalog,
+          'Location soft-deleted',
+          <String, Object>{'locationId': id},
+        );
       });
 }

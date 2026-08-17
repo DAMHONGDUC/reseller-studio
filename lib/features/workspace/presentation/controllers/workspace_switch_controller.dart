@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../auth/providers.dart';
 import '../../providers.dart';
 
@@ -23,7 +24,8 @@ class WorkspaceSwitchController extends Notifier<void> {
     final String? uid = ref.read(currentUidProvider);
 
     if (uid == null) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.workspace,
         'Workspace switch with nobody signed in',
         error: StateError('No uid at workspace switch'),
         data: <String, String>{'workspaceId': workspaceId},
@@ -34,19 +36,24 @@ class WorkspaceSwitchController extends Notifier<void> {
 
     if (workspaceId == ref.read(currentWorkspaceIdProvider)) return;
 
-    AppLogger.action('Workspace switch requested', <String, String>{
-      'workspaceId': workspaceId,
-    });
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Workspace switch requested',
+      <String, String>{'workspaceId': workspaceId},
+    );
 
     try {
       await ref
           .read(workspaceRepositoryProvider)
           .setLastWorkspace(uid: uid, workspaceId: workspaceId);
-      AppLogger.info('Workspace switched', <String, String>{
-        'workspaceId': workspaceId,
-      });
+      SdLogger.info(
+        LogTagConstant.workspace,
+        'Workspace switched',
+        <String, String>{'workspaceId': workspaceId},
+      );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.workspace,
         'Workspace switch failed',
         error: error,
         stackTrace: stackTrace,

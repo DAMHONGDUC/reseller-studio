@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 
+import 'package:system_design/common.dart';
+
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/repositories/order_repository.dart';
 import '../dtos/order_dto.dart';
@@ -53,7 +55,7 @@ class FirestoreOrderRepository implements OrderRepository {
           SetOptions(merge: true),
         );
 
-    AppLogger.info('Order saved', <String, Object>{
+    SdLogger.info(LogTagConstant.order, 'Order saved', <String, Object>{
       'orderId': order.id,
       'status': order.status.name,
       'lines': order.lines.length,

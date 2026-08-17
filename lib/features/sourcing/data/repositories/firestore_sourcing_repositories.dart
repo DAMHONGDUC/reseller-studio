@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Source;
 
+import 'package:system_design/common.dart';
+
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/purchase.dart';
 import '../../domain/entities/source.dart';
 import '../../domain/repositories/sourcing_repository.dart';
@@ -49,7 +51,9 @@ class FirestoreSourceRepository implements SourceRepository {
               SetOptions(merge: true),
             );
 
-        AppLogger.info('Source saved', <String, Object>{'sourceId': source.id});
+        SdLogger.info(LogTagConstant.sourcing, 'Source saved', <String, Object>{
+          'sourceId': source.id,
+        });
       });
 
   @override
@@ -62,7 +66,11 @@ class FirestoreSourceRepository implements SourceRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
-        AppLogger.info('Source soft-deleted', <String, Object>{'sourceId': id});
+        SdLogger.info(
+          LogTagConstant.sourcing,
+          'Source soft-deleted',
+          <String, Object>{'sourceId': id},
+        );
       });
 }
 
@@ -102,20 +110,22 @@ class FirestorePurchaseRepository implements PurchaseRepository {
       });
 
   @override
-  Future<void> save(Purchase purchase) =>
-      FailureMapper.guard('save purchase', () async {
-        await _context.collections.purchases
-            .doc(purchase.id)
-            .set(
-              PurchaseDto.toMap(purchase, createdBy: _context.uid),
-              SetOptions(merge: true),
-            );
+  Future<void> save(Purchase purchase) => FailureMapper.guard(
+    'save purchase',
+    () async {
+      await _context.collections.purchases
+          .doc(purchase.id)
+          .set(
+            PurchaseDto.toMap(purchase, createdBy: _context.uid),
+            SetOptions(merge: true),
+          );
 
-        AppLogger.info('Purchase saved', <String, Object>{
-          'purchaseId': purchase.id,
-          'itemCount': purchase.itemCount,
-        });
+      SdLogger.info(LogTagConstant.sourcing, 'Purchase saved', <String, Object>{
+        'purchaseId': purchase.id,
+        'itemCount': purchase.itemCount,
       });
+    },
+  );
 
   @override
   Future<void> delete(String id) =>
@@ -125,9 +135,11 @@ class FirestorePurchaseRepository implements PurchaseRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
-        AppLogger.info('Purchase soft-deleted', <String, Object>{
-          'purchaseId': id,
-        });
+        SdLogger.info(
+          LogTagConstant.sourcing,
+          'Purchase soft-deleted',
+          <String, Object>{'purchaseId': id},
+        );
       });
 
   Purchase _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>

@@ -1,5 +1,7 @@
+import 'package:system_design/common.dart';
+
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/app_failure.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/plan_offering.dart';
 import '../../domain/entities/subscription_status.dart';
 import '../../domain/repositories/subscription_repository.dart';
@@ -24,7 +26,8 @@ class UnconfiguredSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<SubscriptionStatus> purchase(PlanOffering offering) async {
-    AppLogger.warning(
+    SdLogger.warning(
+      LogTagConstant.subscription,
       'Purchase attempted with billing not configured',
       <String, String>{'productId': offering.productId},
     );

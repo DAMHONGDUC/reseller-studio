@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-// `FirebaseException` and `FirebaseAuthException` both arrive through this
-// one import — firebase_auth re-exports firebase_core's base type, and
-// importing cloud_firestore/firebase_core as well is flagged as unnecessary.
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:system_design/common.dart';
 
-import '../logging/app_logger.dart';
+import '../constants/log_tag_constant.dart';
 import 'app_failure.dart';
 
 /// Turns anything thrown by the Firebase SDKs into an [AppFailure].
@@ -41,7 +39,8 @@ final class FailureMapper {
     } catch (error, stackTrace) {
       final AppFailure failure = map(error);
 
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.failure,
         'Failed to $operation',
         error: error,
         stackTrace: stackTrace,

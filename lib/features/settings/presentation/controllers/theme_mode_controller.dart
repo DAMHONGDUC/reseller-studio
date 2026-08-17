@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/prefs_key_constant.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../../mock_data/providers.dart';
 
 /// Light, dark, or whatever the device says.
@@ -44,19 +45,27 @@ class ThemeModeController extends Notifier<ThemeMode> {
     final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
 
     if (prefs == null) {
-      AppLogger.warning('Could not persist theme — preferences not ready');
+      SdLogger.warning(
+        LogTagConstant.settings,
+        'Could not persist theme — preferences not ready',
+      );
 
       return;
     }
 
     try {
       await prefs.setString(PrefsKeyConstant.themeMode, mode.name);
-      AppLogger.action('Theme changed', <String, String>{'mode': mode.name});
+      SdLogger.action(
+        LogTagConstant.settings,
+        'Theme changed',
+        <String, String>{'mode': mode.name},
+      );
     } catch (error, stackTrace) {
       // Logged rather than rethrown: the theme has already changed on screen
       // and the route the caller came from may be gone. The cost of the failed
       // write is one launch in the old theme.
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.settings,
         'Persist theme failed',
         error: error,
         stackTrace: stackTrace,

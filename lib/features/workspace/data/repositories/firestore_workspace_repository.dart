@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_collections.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/user_profile.dart';
@@ -75,7 +76,9 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
           SetOptions(merge: true),
         );
 
-    AppLogger.info('Profile ensured', <String, Object>{'uid': uid});
+    SdLogger.info(LogTagConstant.workspace, 'Profile ensured', <String, Object>{
+      'uid': uid,
+    });
   });
 
   @override
@@ -131,11 +134,15 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
       'updatedAt': FirestoreMapper.serverTimestamp,
     }, SetOptions(merge: true));
 
-    AppLogger.action('Workspace created', <String, Object>{
-      'workspaceId': id,
-      'currency': currency,
-      'country': country,
-    });
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Workspace created',
+      <String, Object>{
+        'workspaceId': id,
+        'currency': currency,
+        'country': country,
+      },
+    );
 
     return id;
   });
@@ -147,9 +154,11 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
             .doc(workspace.id)
             .set(WorkspaceDto.toUpdateMap(workspace), SetOptions(merge: true));
 
-        AppLogger.info('Workspace updated', <String, Object>{
-          'workspaceId': workspace.id,
-        });
+        SdLogger.info(
+          LogTagConstant.workspace,
+          'Workspace updated',
+          <String, Object>{'workspaceId': workspace.id},
+        );
       });
 
   @override
@@ -162,9 +171,11 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
       'updatedAt': FirestoreMapper.serverTimestamp,
     }, SetOptions(merge: true));
 
-    AppLogger.action('Workspace switched', <String, Object>{
-      'workspaceId': workspaceId,
-    });
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Workspace switched',
+      <String, Object>{'workspaceId': workspaceId},
+    );
   });
 
   CollectionReference<Map<String, Object?>> get _users =>

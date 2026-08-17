@@ -1,8 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/prefs_key_constant.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../../mock_data/providers.dart';
 import '../../onboarding_status.dart';
 
@@ -43,18 +44,24 @@ class OnboardingController extends Notifier<OnboardingStatus> {
     final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
 
     if (prefs == null) {
-      AppLogger.warning('Could not persist onboarding — preferences not ready');
+      SdLogger.warning(
+        LogTagConstant.onboarding,
+        'Could not persist onboarding — preferences not ready',
+      );
 
       return;
     }
 
     try {
       await prefs.setBool(PrefsKeyConstant.onboardingSeen, true);
-      AppLogger.action('Onboarding completed', <String, bool>{
-        'persisted': true,
-      });
+      SdLogger.action(
+        LogTagConstant.onboarding,
+        'Onboarding completed',
+        <String, bool>{'persisted': true},
+      );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.onboarding,
         'Persist onboarding flag failed',
         error: error,
         stackTrace: stackTrace,

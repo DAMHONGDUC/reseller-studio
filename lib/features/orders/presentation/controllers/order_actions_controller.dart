@@ -1,7 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
 import '../../../inventory/domain/enums/item_status.dart';
@@ -112,14 +113,16 @@ class OrderActionsController extends Notifier<bool> {
 
       await items.saveAll(restocked);
 
-      AppLogger.info('Returned items restocked', <String, Object>{
-        'orderId': order.id,
-        'count': restocked.length,
-      });
+      SdLogger.info(
+        LogTagConstant.order,
+        'Returned items restocked',
+        <String, Object>{'orderId': order.id, 'count': restocked.length},
+      );
     } catch (error, stackTrace) {
       // The order is already back; failing to restock is a second, smaller
       // problem and must not report the whole return as failed.
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.order,
         'Failed to restock returned items',
         error: error,
         stackTrace: stackTrace,
@@ -149,7 +152,7 @@ class OrderActionsController extends Notifier<bool> {
     Order order,
     Map<String, Object> data,
   ) async {
-    AppLogger.action(describe, <String, Object>{
+    SdLogger.action(LogTagConstant.order, describe, <String, Object>{
       'orderId': order.id,
       'status': order.status.name,
       ...data,
@@ -160,7 +163,8 @@ class OrderActionsController extends Notifier<bool> {
     try {
       await ref.read(orderRepositoryProvider).save(order);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.order,
         'Failed to $describe',
         error: error,
         stackTrace: stackTrace,

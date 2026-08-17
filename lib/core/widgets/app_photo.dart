@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
-import '../logging/app_logger.dart';
+import '../constants/log_tag_constant.dart';
 
 /// Renders a stored photo, whichever kind of URL it turned out to be.
 ///
@@ -75,7 +75,8 @@ class AppPhoto extends StatelessWidget {
     StackTrace? stackTrace,
     BorderRadius radius,
   ) {
-    AppLogger.error(
+    SdLogger.error(
+      LogTagConstant.photo,
       'Could not load photo',
       error: error,
       stackTrace: stackTrace,

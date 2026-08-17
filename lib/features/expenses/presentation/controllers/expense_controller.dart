@@ -1,8 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/document_picker.dart';
 import '../../../../core/storage/file_uploader.dart';
@@ -45,7 +46,7 @@ class ExpenseController extends Notifier<bool> {
     if (parsed == null) return;
 
     state = true;
-    AppLogger.action('Save expense', <String, Object>{
+    SdLogger.action(LogTagConstant.expense, 'Save expense', <String, Object>{
       'expenseId': expenseId,
       'category': category.name,
       'amountMinor': parsed.minor,
@@ -72,7 +73,8 @@ class ExpenseController extends Notifier<bool> {
             ),
           );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.expense,
         'Failed to save expense',
         error: error,
         stackTrace: stackTrace,
@@ -107,7 +109,8 @@ class ExpenseController extends Notifier<bool> {
         fromCamera: fromCamera,
       );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.expense,
         'Failed to attach a receipt',
         error: error,
         stackTrace: stackTrace,
@@ -122,12 +125,15 @@ class ExpenseController extends Notifier<bool> {
 
   Future<void> delete(String id) async {
     state = true;
-    AppLogger.action('Delete expense', <String, Object>{'expenseId': id});
+    SdLogger.action(LogTagConstant.expense, 'Delete expense', <String, Object>{
+      'expenseId': id,
+    });
 
     try {
       await ref.read(expenseRepositoryProvider).delete(id);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.expense,
         'Failed to delete expense',
         error: error,
         stackTrace: stackTrace,

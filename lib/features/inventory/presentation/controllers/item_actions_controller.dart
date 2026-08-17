@@ -1,8 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../listings/domain/enums/listing_status.dart';
@@ -59,7 +60,7 @@ class ItemActionsController extends Notifier<bool> {
     final DateTime now = DateTime.now();
     final String listingId = _uuid.v4();
 
-    AppLogger.action('List item', <String, Object>{
+    SdLogger.action(LogTagConstant.item, 'List item', <String, Object>{
       'itemId': item.id,
       'marketplace': marketplace.name,
       'priceMinor': price.minor,
@@ -90,13 +91,14 @@ class ItemActionsController extends Notifier<bool> {
         ItemTransition.apply(priced, ItemStatus.listed, now: now),
       );
 
-      AppLogger.info('Item listed', <String, Object>{
+      SdLogger.info(LogTagConstant.item, 'Item listed', <String, Object>{
         'itemId': item.id,
         'listingId': listingId,
       });
       AppAnalytics.instance.itemListed(marketplace: marketplace.name);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to list item',
         error: error,
         stackTrace: stackTrace,
@@ -128,7 +130,7 @@ class ItemActionsController extends Notifier<bool> {
     final ItemRepository items = ref.read(itemRepositoryProvider);
     final String orderId = _uuid.v4();
 
-    AppLogger.action('Mark item sold', <String, Object>{
+    SdLogger.action(LogTagConstant.item, 'Mark item sold', <String, Object>{
       'itemId': item.id,
       'marketplace': marketplace.name,
       'salePriceMinor': salePrice.minor,
@@ -167,7 +169,7 @@ class ItemActionsController extends Notifier<bool> {
         ),
       );
 
-      AppLogger.info('Item sold', <String, Object>{
+      SdLogger.info(LogTagConstant.item, 'Item sold', <String, Object>{
         'itemId': item.id,
         'orderId': orderId,
       });
@@ -180,7 +182,8 @@ class ItemActionsController extends Notifier<bool> {
 
       return orderId;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to mark item sold',
         error: error,
         stackTrace: stackTrace,
@@ -232,14 +235,17 @@ class ItemActionsController extends Notifier<bool> {
   /// Soft delete (hard rule 15) — the row stays joinable by the orders and
   /// purchases that reference it.
   Future<void> delete(String itemId) async {
-    AppLogger.action('Delete item', <String, Object>{'itemId': itemId});
+    SdLogger.action(LogTagConstant.item, 'Delete item', <String, Object>{
+      'itemId': itemId,
+    });
 
     state = true;
 
     try {
       await ref.read(itemRepositoryProvider).delete(itemId);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to delete item',
         error: error,
         stackTrace: stackTrace,
@@ -265,7 +271,7 @@ class ItemActionsController extends Notifier<bool> {
   ) async {
     if (items.isEmpty) return;
 
-    AppLogger.action(describe, <String, Object>{
+    SdLogger.action(LogTagConstant.item, describe, <String, Object>{
       'count': items.length,
       ...data,
     });
@@ -278,7 +284,8 @@ class ItemActionsController extends Notifier<bool> {
           .read(itemRepositoryProvider)
           .saveAll(items.map(change).toList());
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to $describe',
         error: error,
         stackTrace: stackTrace,

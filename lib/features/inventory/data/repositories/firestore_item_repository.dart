@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/repositories/item_repository.dart';
 import '../dtos/item_dto.dart';
@@ -66,7 +67,7 @@ class FirestoreItemRepository implements ItemRepository {
           SetOptions(merge: true),
         );
 
-    AppLogger.info('Item saved', <String, Object>{
+    SdLogger.info(LogTagConstant.item, 'Item saved', <String, Object>{
       'itemId': item.id,
       'status': item.status.name,
     });
@@ -92,9 +93,11 @@ class FirestoreItemRepository implements ItemRepository {
 
         await batch.commit();
 
-        AppLogger.info('Items saved in bulk', <String, Object>{
-          'count': items.length,
-        });
+        SdLogger.info(
+          LogTagConstant.item,
+          'Items saved in bulk',
+          <String, Object>{'count': items.length},
+        );
       });
 
   @override
@@ -107,7 +110,11 @@ class FirestoreItemRepository implements ItemRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
-        AppLogger.info('Item soft-deleted', <String, Object>{'itemId': id});
+        SdLogger.info(
+          LogTagConstant.item,
+          'Item soft-deleted',
+          <String, Object>{'itemId': id},
+        );
       });
 
   Item _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>

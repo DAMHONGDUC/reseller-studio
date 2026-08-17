@@ -8,11 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:system_design/common.dart';
 
 import '../analytics/app_analytics.dart';
 import '../config/app_env.dart';
-import '../logging/app_logger.dart';
-import '../logging/crash_reporter.dart';
+import '../constants/log_tag_constant.dart';
+import '../logging/firebase_crash_reporter.dart';
 
 /// Everything that happens before `runApp`, so `main.dart` stays a list of
 /// what happens rather than how.
@@ -60,7 +61,8 @@ final class AppBootstrap {
         runApp(builder());
       },
       (Object error, StackTrace stackTrace) {
-        AppLogger.error(
+        SdLogger.error(
+          LogTagConstant.bootstrap,
           'Uncaught zone error',
           error: error,
           stackTrace: stackTrace,
@@ -83,11 +85,12 @@ final class AppBootstrap {
     try {
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-      AppLogger.info('Edge-to-edge enabled');
+      SdLogger.info(LogTagConstant.bootstrap, 'Edge-to-edge enabled');
     } catch (error, stackTrace) {
       // Cosmetic, so it must never stop the app starting — but a silent
       // failure here is a layout bug nobody can trace back (hard rule 8).
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.bootstrap,
         'Failed to enable edge-to-edge',
         error: error,
         stackTrace: stackTrace,
@@ -106,7 +109,8 @@ final class AppBootstrap {
       // Distinct from a thrown init failure on purpose: "no project
       // configured" and "configured but unreachable" look identical from the
       // exception and want completely different responses.
-      AppLogger.warning(
+      SdLogger.warning(
+        LogTagConstant.bootstrap,
         'No Firebase config in this build — running without a backend. '
         'Fill the FIREBASE_* keys in env/${AppEnv.flavor.name}.json once '
         '`flutterfire configure` has been run.',
@@ -125,14 +129,15 @@ final class AppBootstrap {
       // buries the real ones from real users.
       await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
 
-      CrashReporter.attach(crashlytics);
+      SdCrashReporter.attach(FirebaseCrashReporter(crashlytics));
       AppAnalytics.attach(FirebaseAnalytics.instance);
 
-      AppLogger.info('Firebase initialized');
+      SdLogger.info(LogTagConstant.bootstrap, 'Firebase initialized');
     } catch (error, stackTrace) {
-      // Cannot use AppLogger.error's Crashlytics half — that is what just
+      // Cannot use SdLogger.error's Crashlytics half — that is what just
       // failed. The console line is the whole report.
-      AppLogger.warning(
+      SdLogger.warning(
+        LogTagConstant.bootstrap,
         'Firebase failed to initialize — running without backend',
         <String, String>{'error': error.toString()},
       );
@@ -165,9 +170,10 @@ final class AppBootstrap {
             : AppEnv.googleSignInServerClientId,
       );
 
-      AppLogger.info('Google Sign-In initialized');
+      SdLogger.info(LogTagConstant.bootstrap, 'Google Sign-In initialized');
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.bootstrap,
         'Google Sign-In failed to initialize',
         error: error,
         stackTrace: stackTrace,
@@ -191,7 +197,8 @@ final class AppBootstrap {
         : AppEnv.revenueCatIosApiKey;
 
     if (key.isEmpty) {
-      AppLogger.warning(
+      SdLogger.warning(
+        LogTagConstant.bootstrap,
         'No RevenueCat key in this build — every seller reads as Free. '
         'Fill REVENUECAT_*_API_KEY in env/${AppEnv.flavor.name}.json.',
       );
@@ -202,12 +209,13 @@ final class AppBootstrap {
     try {
       await Purchases.configure(PurchasesConfiguration(key));
 
-      AppLogger.info('Billing initialized');
+      SdLogger.info(LogTagConstant.bootstrap, 'Billing initialized');
     } catch (error, stackTrace) {
       // The app must still start: a seller who cannot reach RevenueCat keeps
       // the free tier, which is worse than what they paid for but is not a
       // reason to show them nothing.
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.bootstrap,
         'Billing failed to initialize — falling back to Free',
         error: error,
         stackTrace: stackTrace,
@@ -219,13 +227,16 @@ final class AppBootstrap {
   ///
   /// **Names keys, never values** — hard rule 9.
   static void _logEnvironment() {
-    AppLogger.info('Environment', <String, String>{'config': AppEnv.summary});
+    SdLogger.info(LogTagConstant.bootstrap, 'Environment', <String, String>{
+      'config': AppEnv.summary,
+    });
 
     if (kReleaseMode && AppEnv.missingReleaseKeys.isNotEmpty) {
       // A release build with no Firebase config will fail on every screen.
       // Say so once, naming every missing key at once rather than one per
       // rebuild.
-      AppLogger.warning(
+      SdLogger.warning(
+        LogTagConstant.bootstrap,
         'Release build is missing required env keys',
         <String, String>{'keys': AppEnv.missingReleaseKeys.join(', ')},
       );
@@ -235,7 +246,8 @@ final class AppBootstrap {
   /// Route the framework's two error channels into [AppLogger].
   static void _installErrorHooks() {
     FlutterError.onError = (FlutterErrorDetails details) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.bootstrap,
         'Flutter framework error',
         error: details.exception,
         stackTrace: details.stack,
@@ -243,7 +255,8 @@ final class AppBootstrap {
     };
 
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.bootstrap,
         'Uncaught platform error',
         error: error,
         stackTrace: stack,

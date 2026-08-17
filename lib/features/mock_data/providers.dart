@@ -5,12 +5,13 @@ library;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_design/common.dart';
 
 import '../../core/config/app_env.dart';
 import '../../core/config/dev_flags.dart';
+import '../../core/constants/log_tag_constant.dart';
 import '../../core/constants/prefs_key_constant.dart';
 import '../../core/firestore/workspace_context.dart';
-import '../../core/logging/app_logger.dart';
 import '../../core/storage/file_uploader.dart';
 import '../../core/storage/firebase_file_uploader.dart';
 import '../../core/storage/local_file_uploader.dart';
@@ -87,7 +88,10 @@ class DataModeController extends Notifier<DataMode> {
 
   static DataMode _guarded(DataMode mode) {
     if (mode.isMock && !DevFlags.isDebugOrProfile) {
-      AppLogger.warning('Mock data requested in a release build — ignoring');
+      SdLogger.warning(
+        LogTagConstant.mockData,
+        'Mock data requested in a release build — ignoring',
+      );
 
       return DataMode.live;
     }
@@ -103,15 +107,20 @@ class DataModeController extends Notifier<DataMode> {
     final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
 
     if (prefs == null) {
-      AppLogger.warning('Could not persist data mode — preferences not ready');
+      SdLogger.warning(
+        LogTagConstant.mockData,
+        'Could not persist data mode — preferences not ready',
+      );
 
       return;
     }
 
     await prefs.setBool(PrefsKeyConstant.dataModeMock, resolved.isMock);
-    AppLogger.action('Data mode changed', <String, String>{
-      'mode': resolved.name,
-    });
+    SdLogger.action(
+      LogTagConstant.mockData,
+      'Data mode changed',
+      <String, String>{'mode': resolved.name},
+    );
   }
 
   Future<void> toggle() =>
@@ -136,7 +145,7 @@ final Provider<MockStore> mockStoreProvider = Provider<MockStore>((Ref ref) {
   final MockStore store = MockStore.seeded();
 
   ref.onDispose(store.dispose);
-  AppLogger.info('Mock dataset seeded', <String, int>{
+  SdLogger.info(LogTagConstant.mockData, 'Mock dataset seeded', <String, int>{
     'items': store.items.length,
     'orders': store.orders.length,
   });

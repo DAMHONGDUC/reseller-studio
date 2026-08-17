@@ -5,8 +5,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/log_tag_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/logging/app_logger.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
@@ -61,7 +61,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   /// failure is logged rather than swallowed (hard rule 8).
   void unawaitedDispose() {
     _controller.dispose().catchError((Object error, StackTrace stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.scanner,
         'Scanner failed to dispose',
         error: error,
         stackTrace: stackTrace,
@@ -80,7 +81,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     if (_handled || code == null) return;
 
     _handled = true;
-    AppLogger.action('Barcode scanned', <String, Object>{
+    SdLogger.action(LogTagConstant.scanner, 'Barcode scanned', <String, Object>{
       'length': code.length,
     });
 

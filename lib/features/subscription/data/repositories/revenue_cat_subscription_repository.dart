@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/app_failure.dart';
 import '../../../../core/error/failure_mapper.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/plan_offering.dart';
 import '../../domain/entities/subscription_status.dart';
 import '../../domain/enums/seller_plan.dart';
@@ -54,10 +55,11 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
             .nonNulls
             .toList();
 
-        AppLogger.info('Subscription offerings loaded', <String, Object>{
-          'packages': packages.length,
-          'mapped': rows.length,
-        });
+        SdLogger.info(
+          LogTagConstant.subscription,
+          'Subscription offerings loaded',
+          <String, Object>{'packages': packages.length, 'mapped': rows.length},
+        );
 
         return rows;
       });
@@ -74,10 +76,14 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
           );
         }
 
-        AppLogger.action('Subscription purchase started', <String, String>{
-          'productId': offering.productId,
-          'plan': offering.plan.name,
-        });
+        SdLogger.action(
+          LogTagConstant.subscription,
+          'Subscription purchase started',
+          <String, String>{
+            'productId': offering.productId,
+            'plan': offering.plan.name,
+          },
+        );
 
         final PurchaseResult result = await Purchases.purchase(
           PurchaseParams.package(package),
@@ -85,7 +91,11 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
 
         final SubscriptionStatus status = _statusFrom(result.customerInfo);
 
-        AppLogger.action('Subscription purchase finished', status.toLogData());
+        SdLogger.action(
+          LogTagConstant.subscription,
+          'Subscription purchase finished',
+          status.toLogData(),
+        );
 
         return status;
       });
@@ -96,7 +106,11 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
         final CustomerInfo info = await Purchases.restorePurchases();
         final SubscriptionStatus status = _statusFrom(info);
 
-        AppLogger.action('Purchases restored', status.toLogData());
+        SdLogger.action(
+          LogTagConstant.subscription,
+          'Purchases restored',
+          status.toLogData(),
+        );
 
         return status;
       });
@@ -117,7 +131,8 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
 
       controller.add(_statusFrom(info));
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.subscription,
         'Failed to read entitlement — falling back to Free',
         error: error,
         stackTrace: stackTrace,

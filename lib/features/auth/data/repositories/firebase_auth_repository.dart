@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/app_failure.dart';
 import '../../../../core/error/failure_mapper.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 /// Apple and Google sign-in, behind the domain interface.
@@ -92,7 +93,8 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       await GoogleSignIn.instance.signOut();
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.logout,
         'Google sign-out failed',
         error: error,
         stackTrace: stackTrace,
@@ -101,7 +103,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
     await _auth.signOut();
 
-    AppLogger.action('Signed out');
+    SdLogger.action(LogTagConstant.logout, 'Signed out');
   });
 
   @override
@@ -117,7 +119,11 @@ class FirebaseAuthRepository implements AuthRepository {
 
         await user.delete();
 
-        AppLogger.action('Account deleted', <String, Object>{'uid': uid});
+        SdLogger.action(
+          LogTagConstant.deleteAccount,
+          'Account deleted',
+          <String, Object>{'uid': uid},
+        );
       });
 
   /// Firebase types the user on a credential as nullable even on success.
@@ -134,7 +140,7 @@ class FirebaseAuthRepository implements AuthRepository {
       );
     }
 
-    AppLogger.action('Signed in', <String, Object>{
+    SdLogger.action(LogTagConstant.login, 'Signed in', <String, Object>{
       'uid': uid,
       'provider': provider.name,
       'isNewAccount': credential.additionalUserInfo?.isNewUser ?? false,
@@ -146,7 +152,7 @@ class FirebaseAuthRepository implements AuthRepository {
   /// A cancelled sign-in is logged as what it is — the seller closing a sheet
   /// — and never as an error (owner's rule).
   static SignInResult _cancelled(AuthProviderKind provider) {
-    AppLogger.info('Sign-in cancelled', <String, Object>{
+    SdLogger.info(LogTagConstant.login, 'Sign-in cancelled', <String, Object>{
       'provider': provider.name,
     });
 

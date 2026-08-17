@@ -2,9 +2,10 @@ import 'dart:io';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../expenses/domain/entities/expense.dart';
@@ -50,7 +51,9 @@ class ReportController extends Notifier<bool> {
   /// would mean managing an export folder nobody asked for.
   Future<void> export(ReportKind kind) async {
     state = true;
-    AppLogger.action('Export report', <String, Object>{'kind': kind.name});
+    SdLogger.action(LogTagConstant.report, 'Export report', <String, Object>{
+      'kind': kind.name,
+    });
     AppAnalytics.instance.reportExported(kind: kind.name);
 
     try {
@@ -78,12 +81,13 @@ class ReportController extends Notifier<bool> {
         ),
       );
 
-      AppLogger.info('Report exported', <String, Object>{
+      SdLogger.info(LogTagConstant.report, 'Report exported', <String, Object>{
         'kind': kind.name,
         'bytes': csv.length,
       });
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.report,
         'Failed to export report',
         error: error,
         stackTrace: stackTrace,

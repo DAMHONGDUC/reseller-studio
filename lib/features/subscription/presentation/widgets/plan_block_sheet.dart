@@ -5,8 +5,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../domain/enums/seller_plan.dart';
 import '../../domain/services/plan_gate.dart';
@@ -37,10 +37,14 @@ class PlanBlockSheet extends ConsumerWidget {
   }) {
     if (block == PlanBlock.none) return Future<void>.value();
 
-    AppLogger.action('Paywall shown', <String, String>{
-      'reason': SubscriptionLabels.blockKey(block),
-      'fromPlan': plan.name,
-    });
+    SdLogger.action(
+      LogTagConstant.subscription,
+      'Paywall shown',
+      <String, String>{
+        'reason': SubscriptionLabels.blockKey(block),
+        'fromPlan': plan.name,
+      },
+    );
     AppAnalytics.instance.paywallShown(
       reason: SubscriptionLabels.blockKey(block),
       fromPlan: plan.name,

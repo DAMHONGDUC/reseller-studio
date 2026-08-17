@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../features/activity/presentation/screens/activity_screen/activity_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_categories_screen/analytics_categories_screen.dart';
@@ -45,8 +46,8 @@ import '../../features/tax/presentation/screens/tax_screen/tax_screen.dart';
 import '../../features/workspace/presentation/screens/team_screen/team_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
 import '../../features/workspace/providers.dart';
+import '../constants/log_tag_constant.dart';
 import '../extensions/context_extensions.dart';
-import '../logging/app_logger.dart';
 import '../widgets/app_shell.dart';
 import '../widgets/signed_out_view.dart';
 import '../widgets/splash_screen.dart';
@@ -465,7 +466,8 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       // A route that does not exist is a bug in the app, not something to
       // show the user a stack trace about. Log it and put them somewhere
       // real. Plan §31: never expose a raw technical error.
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.navigation,
         'Navigate to unknown route',
         error: StateError('No route for ${state.uri}'),
       );

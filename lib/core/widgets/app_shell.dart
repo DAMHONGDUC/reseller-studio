@@ -4,9 +4,9 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../analytics/app_analytics.dart';
+import '../constants/log_tag_constant.dart';
 import '../constants/nav_tab_constant.dart';
 import '../extensions/context_extensions.dart';
-import '../logging/app_logger.dart';
 
 /// The five-tab frame every signed-in screen lives in.
 ///
@@ -33,7 +33,7 @@ import '../logging/app_logger.dart';
 /// and the router cannot report it. This is a widget lifecycle rather than a
 /// controller only because there is no controller between a tab tap and the
 /// shell — the event still goes through [AppAnalytics] and sits next to its
-/// [AppLogger.action], and it is never raised from `build`.
+/// [SdLogger.action], and it is never raised from `build`.
 class AppShell extends StatefulWidget {
   const AppShell({required this.shell, super.key});
 
@@ -68,14 +68,18 @@ class _AppShellState extends State<AppShell> {
     final String? tab = NavTabConstant.nameAt(index);
 
     if (tab == null) {
-      AppLogger.warning('Tab index outside NavTabConstant', <String, Object>{
-        'index': index,
-      });
+      SdLogger.warning(
+        LogTagConstant.navigation,
+        'Tab index outside NavTabConstant',
+        <String, Object>{'index': index},
+      );
 
       return;
     }
 
-    AppLogger.action('Tab viewed', <String, Object>{'tab': tab});
+    SdLogger.action(LogTagConstant.navigation, 'Tab viewed', <String, Object>{
+      'tab': tab,
+    });
     AppAnalytics.instance.tabViewed(tab: tab);
   }
 

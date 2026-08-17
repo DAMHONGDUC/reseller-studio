@@ -1,4 +1,6 @@
-import '../logging/app_logger.dart';
+import 'package:system_design/common.dart';
+
+import '../constants/log_tag_constant.dart';
 import 'file_uploader.dart';
 
 /// The mock-mode uploader: it stores nothing and hands back the file's own
@@ -21,10 +23,11 @@ class LocalFileUploader implements FileUploader {
     required String recordId,
     required String filePath,
   }) async {
-    AppLogger.info('File kept locally (mock mode)', <String, Object>{
-      'folder': folder.folderName,
-      'recordId': recordId,
-    });
+    SdLogger.info(
+      LogTagConstant.storage,
+      'File kept locally (mock mode)',
+      <String, Object>{'folder': folder.folderName, 'recordId': recordId},
+    );
 
     return filePath;
   }
@@ -33,6 +36,6 @@ class LocalFileUploader implements FileUploader {
   Future<void> delete(String url) async {
     // Nothing was uploaded, so there is nothing to remove. The file itself
     // belongs to the photo library and is not this app's to delete.
-    AppLogger.info('File delete skipped (mock mode)');
+    SdLogger.info(LogTagConstant.storage, 'File delete skipped (mock mode)');
   }
 }

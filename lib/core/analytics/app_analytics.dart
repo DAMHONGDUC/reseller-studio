@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:system_design/common.dart';
 
-import '../logging/app_logger.dart';
+import '../constants/log_tag_constant.dart';
 
 /// Every analytics event the app sends, as a typed method.
 ///
@@ -24,7 +25,7 @@ abstract class AppAnalytics {
 
   static void attach(FirebaseAnalytics analytics) {
     instance = _FirebaseAppAnalytics(analytics);
-    AppLogger.info('Analytics attached');
+    SdLogger.info(LogTagConstant.analytics, 'Analytics attached');
   }
 
   // --- Navigation ---
@@ -249,7 +250,8 @@ class _FirebaseAppAnalytics implements AppAnalytics {
   /// nobody can fix (hard rule 8).
   void _report(String name, Future<void> sent) {
     sent.catchError((Object error, StackTrace stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.analytics,
         'Analytics event failed',
         error: error,
         stackTrace: stackTrace,

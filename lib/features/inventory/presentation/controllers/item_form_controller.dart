@@ -1,9 +1,10 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/file_uploader.dart';
 import '../../../mock_data/providers.dart';
@@ -177,12 +178,14 @@ class ItemFormController extends Notifier<ItemFormState> {
         photoUrls: <String>[...state.photoUrls, url],
       );
 
-      AppLogger.info('Item photo attached', <String, Object>{
-        'recordId': recordId,
-        'count': state.photoUrls.length,
-      });
+      SdLogger.info(
+        LogTagConstant.item,
+        'Item photo attached',
+        <String, Object>{'recordId': recordId, 'count': state.photoUrls.length},
+      );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to attach item photo',
         error: error,
         stackTrace: stackTrace,
@@ -219,11 +222,15 @@ class ItemFormController extends Notifier<ItemFormState> {
     if (trimmed.isEmpty || state.isSaving) return null;
 
     state = state.copyWith(isSaving: true);
-    AppLogger.action('Item form submitted', <String, Object>{
-      'itemId': id,
-      'isEditing': state.isEditing,
-      'photos': state.photoUrls.length,
-    });
+    SdLogger.action(
+      LogTagConstant.item,
+      'Item form submitted',
+      <String, Object>{
+        'itemId': id,
+        'isEditing': state.isEditing,
+        'photos': state.photoUrls.length,
+      },
+    );
 
     try {
       final Item item = Item(
@@ -252,7 +259,7 @@ class ItemFormController extends Notifier<ItemFormState> {
 
       await ref.read(itemRepositoryProvider).save(item);
 
-      AppLogger.info('Item form saved', <String, Object>{
+      SdLogger.info(LogTagConstant.item, 'Item form saved', <String, Object>{
         'itemId': id,
         'status': item.status.name,
       });
@@ -266,7 +273,8 @@ class ItemFormController extends Notifier<ItemFormState> {
 
       return id;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Item form failed to save',
         error: error,
         stackTrace: stackTrace,

@@ -1,7 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/plan_offering.dart';
 import '../../domain/entities/subscription_status.dart';
@@ -23,13 +24,16 @@ class SubscriptionController extends Notifier<bool> {
           .read(subscriptionRepositoryProvider)
           .offerings();
 
-      AppLogger.info('Offerings loaded', <String, int>{
-        'count': offerings.length,
-      });
+      SdLogger.info(
+        LogTagConstant.subscription,
+        'Offerings loaded',
+        <String, int>{'count': offerings.length},
+      );
 
       return offerings;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.subscription,
         'Failed to load offerings',
         error: error,
         stackTrace: stackTrace,
@@ -46,11 +50,15 @@ class SubscriptionController extends Notifier<bool> {
   /// unchanged status and the screen says nothing.
   Future<SubscriptionStatus> purchase(PlanOffering offering) async {
     state = true;
-    AppLogger.action('Purchase subscription', <String, String>{
-      'productId': offering.productId,
-      'plan': offering.plan.name,
-      'period': offering.period.name,
-    });
+    SdLogger.action(
+      LogTagConstant.subscription,
+      'Purchase subscription',
+      <String, String>{
+        'productId': offering.productId,
+        'plan': offering.plan.name,
+        'period': offering.period.name,
+      },
+    );
     AppAnalytics.instance.subscriptionPurchaseStarted(
       plan: offering.plan.name,
       period: offering.period.name,
@@ -61,7 +69,11 @@ class SubscriptionController extends Notifier<bool> {
           .read(subscriptionRepositoryProvider)
           .purchase(offering);
 
-      AppLogger.action('Purchase finished', status.toLogData());
+      SdLogger.action(
+        LogTagConstant.subscription,
+        'Purchase finished',
+        status.toLogData(),
+      );
 
       // Only when it actually took: an unchanged plan means the seller closed
       // the store's sheet, and reporting that as an activation makes the
@@ -72,7 +84,8 @@ class SubscriptionController extends Notifier<bool> {
 
       return status;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.subscription,
         'Failed to purchase subscription',
         error: error,
         stackTrace: stackTrace,
@@ -90,18 +103,23 @@ class SubscriptionController extends Notifier<bool> {
   /// paying again.
   Future<SubscriptionStatus> restore() async {
     state = true;
-    AppLogger.action('Restore purchases');
+    SdLogger.action(LogTagConstant.subscription, 'Restore purchases');
 
     try {
       final SubscriptionStatus status = await ref
           .read(subscriptionRepositoryProvider)
           .restore();
 
-      AppLogger.action('Restore finished', status.toLogData());
+      SdLogger.action(
+        LogTagConstant.subscription,
+        'Restore finished',
+        status.toLogData(),
+      );
 
       return status;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.subscription,
         'Failed to restore purchases',
         error: error,
         stackTrace: stackTrace,

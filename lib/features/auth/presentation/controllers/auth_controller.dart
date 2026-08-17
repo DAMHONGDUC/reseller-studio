@@ -1,8 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
-import '../../../../core/logging/crash_reporter.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -53,13 +53,14 @@ class AuthController extends Notifier<AuthFormState> {
 
       if (uid == null) return false;
 
-      CrashReporter.instance.setUserId(uid);
+      SdCrashReporter.instance.setUserId(uid);
       AppAnalytics.instance.signedIn(provider: provider.name);
       await _ensureProfile(uid);
 
       return true;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.login,
         'Sign in failed',
         error: error,
         stackTrace: stackTrace,
@@ -75,10 +76,15 @@ class AuthController extends Notifier<AuthFormState> {
   Future<void> signOut() async {
     try {
       await ref.read(authRepositoryProvider).signOut();
-      CrashReporter.instance.setUserId(null);
+      SdCrashReporter.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
     } catch (error, stackTrace) {
-      AppLogger.error('Sign out failed', error: error, stackTrace: stackTrace);
+      SdLogger.error(
+        LogTagConstant.logout,
+        'Sign out failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
 
       rethrow;
     }
@@ -87,9 +93,10 @@ class AuthController extends Notifier<AuthFormState> {
   Future<void> deleteAccount() async {
     try {
       await ref.read(authRepositoryProvider).deleteAccount();
-      CrashReporter.instance.setUserId(null);
+      SdCrashReporter.instance.setUserId(null);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.deleteAccount,
         'Account deletion failed',
         error: error,
         stackTrace: stackTrace,
@@ -122,7 +129,8 @@ class AuthController extends Notifier<AuthFormState> {
         photoUrl: ref.read(authUserProvider).value?.photoURL,
       );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.login,
         'Could not write user profile after sign in',
         error: error,
         stackTrace: stackTrace,
