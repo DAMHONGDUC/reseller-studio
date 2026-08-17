@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
+import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../domain/enums/seller_plan.dart';
@@ -56,7 +57,7 @@ class PlanBlockSheet extends ConsumerWidget {
     final SellerPlan? target = PlanGate.upgradeFor(block, from: plan);
 
     return SdBottomSheetV3(
-      title: 'Upgrade to continue',
+      title: context.l10n.subscriptionUpgradeToContinue,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -110,7 +111,7 @@ class PlanBlockSheet extends ConsumerWidget {
           SizedBox(height: SdSpacingConstant.h8),
           SdButtonV3(
             variant: SdButtonVariantV3.text,
-            label: 'Not now',
+            label: context.l10n.subscriptionNotNow,
             expand: true,
             onPressed: () => Navigator.of(context).pop(),
           ),

@@ -34,8 +34,8 @@ class ExpensesScreen extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Delete this expense?',
-        message: 'It stops counting against your profit.',
+        title: context.l10n.expensesDeleteThisExpense,
+        message: context.l10n.expensesItStopsCountingAgainstYourProfit,
         icon: Symbols.warning_rounded,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
@@ -80,7 +80,7 @@ class ExpensesScreen extends ConsumerWidget {
         .totalOrNull();
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Expenses'),
+      appBar: SdAppBarV3(title: context.l10n.commonExpenses),
       addLabel: 'Add an expense',
       onAdd: () => _add(context),
       body: switch (source) {
@@ -88,13 +88,11 @@ class ExpensesScreen extends ConsumerWidget {
           const SdLoadingV3Page(),
         _ when expenses.isEmpty => SdEmptyStateV3(
           icon: Symbols.receipt_rounded,
-          title: 'No expenses yet',
-          message:
-              'Packaging, postage, storage, mileage — the costs that come off '
-              'your profit but do not belong to one item.',
+          title: context.l10n.expensesNoExpensesYet,
+          message: context.l10n.expensesPackagingPostageStorageMileageTheCosts,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Add an expense',
+            label: context.l10n.homeQuickAddExpense,
             onPressed: () => _add(context),
           ),
         ),
@@ -103,14 +101,17 @@ class ExpensesScreen extends ConsumerWidget {
           children: <Widget>[
             SizedBox(height: SdContentPaddingV3.topGap),
             SdStatTileV3(
-              label: 'Total recorded',
+              label: context.l10n.expensesTotalRecorded,
               value: context.money(total),
               caption: '${expenses.length} entries',
               icon: Symbols.savings_rounded,
             ),
             if (totals.isNotEmpty) ...<Widget>[
               SizedBox(height: SdContentPaddingV3.sectionGap),
-              const SdSectionHeaderV3(title: 'By category', first: true),
+              SdSectionHeaderV3(
+                title: context.l10n.analyticsByCategory,
+                first: true,
+              ),
               AppListCard(
                 children: totals
                     .map(
@@ -124,7 +125,10 @@ class ExpensesScreen extends ConsumerWidget {
               ),
             ],
             SizedBox(height: SdContentPaddingV3.sectionGap),
-            const SdSectionHeaderV3(title: 'Everything', first: true),
+            SdSectionHeaderV3(
+              title: context.l10n.expensesEverything,
+              first: true,
+            ),
             AppListCard(
               children: expenses
                   .map(

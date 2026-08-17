@@ -33,26 +33,26 @@ class AnalyticsScreen extends ConsumerWidget {
     final AnalyticsSummary summary = ref.watch(analyticsSummaryProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Analytics'),
+      appBar: SdAppBarV3(title: context.l10n.navAnalytics),
       body: ListView(
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          const SdSectionHeaderV3(title: 'Overview', first: true),
+          SdSectionHeaderV3(title: context.l10n.analyticsOverview, first: true),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
             ),
             child: _ProfitStatement(summary: summary),
           ),
-          const SdSectionHeaderV3(
-            title: 'By marketplace',
-            subtitle: 'Where the money actually comes from',
+          SdSectionHeaderV3(
+            title: context.l10n.analyticsByMarketplace,
+            subtitle: context.l10n.analyticsWhereTheMoneyActuallyComesFrom,
           ),
           const _MarketplaceBreakdown(),
-          const SdSectionHeaderV3(
-            title: 'Go deeper',
-            subtitle: 'The same figures, one question at a time',
+          SdSectionHeaderV3(
+            title: context.l10n.analyticsGoDeeper,
+            subtitle: context.l10n.analyticsTheSameFiguresOneQuestionAt,
           ),
           Padding(
             padding: EdgeInsets.symmetric(

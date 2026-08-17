@@ -35,7 +35,7 @@ class ReceiptsScreen extends ConsumerWidget {
     final int missing = ref.watch(missingReceiptCountProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Receipts'),
+      appBar: SdAppBarV3(title: context.l10n.moreReceipts),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
@@ -44,7 +44,7 @@ class ReceiptsScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Attached',
+                  label: context.l10n.receiptAttached,
                   value: '${receipts.length}',
                   icon: Symbols.description_rounded,
                 ),
@@ -52,7 +52,7 @@ class ReceiptsScreen extends ConsumerWidget {
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Missing',
+                  label: context.l10n.receiptsMissing,
                   value: '$missing',
                   caption: 'Purchases and expenses with no document',
                   tone: missing > 0 ? SdStatToneV3.loss : SdStatToneV3.neutral,
@@ -63,12 +63,10 @@ class ReceiptsScreen extends ConsumerWidget {
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           if (receipts.isEmpty)
-            const SdEmptyStateV3(
+            SdEmptyStateV3(
               icon: Symbols.description_rounded,
-              title: 'No receipts yet',
-              message:
-                  'Photograph a receipt when you record a purchase or an '
-                  'expense and it shows up here.',
+              title: context.l10n.receiptsNoReceiptsYet,
+              message: context.l10n.receiptsPhotographAReceiptWhenYouRecord,
             )
           else
             for (final ReceiptEntry receipt in receipts) ...<Widget>[

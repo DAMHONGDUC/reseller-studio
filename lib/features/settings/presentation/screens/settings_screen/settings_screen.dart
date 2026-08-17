@@ -47,7 +47,10 @@ class SettingsScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.fullBleed(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SdSectionHeaderV3(title: context.l10n.settingsAppearance, first: true),
+          SdSectionHeaderV3(
+            title: context.l10n.settingsAppearance,
+            first: true,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,

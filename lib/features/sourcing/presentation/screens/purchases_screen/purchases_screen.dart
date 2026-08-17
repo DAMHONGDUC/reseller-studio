@@ -44,7 +44,7 @@ class PurchasesScreen extends ConsumerWidget {
     final Map<String, String> sourceNames = ref.watch(sourceNamesProvider);
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Purchases'),
+      appBar: SdAppBarV3(title: context.l10n.sourcingPurchases),
       addLabel: 'Record a purchase',
       onAdd: () => _add(context, ref),
       body: switch (source) {
@@ -52,13 +52,11 @@ class PurchasesScreen extends ConsumerWidget {
           const SdLoadingV3Page(),
         _ when purchases.isEmpty => SdEmptyStateV3(
           icon: Symbols.local_mall_rounded,
-          title: 'No purchases yet',
-          message:
-              'Record a buying trip and every item you add to it traces back '
-              'to what you paid.',
+          title: context.l10n.sourcingNoPurchasesYet,
+          message: context.l10n.sourcingRecordABuyingTripAndEvery,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Record a purchase',
+            label: context.l10n.homeQuickRecordPurchase,
             onPressed: () => _add(context, ref),
           ),
         ),

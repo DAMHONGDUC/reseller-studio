@@ -16,17 +16,17 @@ class _ProfitStatement extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _StatementRow(
-          label: 'Revenue',
+          label: context.l10n.commonRevenue,
           value: context.money(summary.revenue),
           isTotal: true,
         ),
         _StatementRow(
-          label: 'Cost of goods',
+          label: context.l10n.commonCostOfGoods,
           value: context.money(summary.costOfGoodsSold),
           isDeduction: true,
         ),
         _StatementRow(
-          label: 'Expenses',
+          label: context.l10n.commonExpenses,
           value: context.money(summary.totalExpenses),
           isDeduction: true,
         ),
@@ -35,7 +35,7 @@ class _ProfitStatement extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: Text(
-                'Net profit',
+                context.l10n.commonNetProfit,
                 style: context.textTheme3.titleSmall!.semiBold3.copyWith(
                   color: context.sdTheme3.textPrimary,
                 ),
@@ -66,8 +66,8 @@ class _ProfitStatement extends StatelessWidget {
             // Saying the figure is partial is the difference between a number
             // a seller can act on and one that quietly misleads.
             if (!summary.isProfitComplete)
-              const SdBadgeV3(
-                label: 'Partial',
+              SdBadgeV3(
+                label: context.l10n.commonPartial,
                 tone: SdBadgeToneV3.warning,
                 icon: Symbols.info_rounded,
               ),

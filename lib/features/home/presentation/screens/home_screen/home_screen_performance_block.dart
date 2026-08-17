@@ -15,7 +15,7 @@ class _PerformanceBlock extends ConsumerWidget {
       child: Column(
         children: <Widget>[
           SdHeroStatV3(
-            label: 'Net profit',
+            label: context.l10n.commonNetProfit,
             value: summary.netProfit == null
                 ? null
                 : context.money(summary.netProfit),
@@ -32,8 +32,8 @@ class _PerformanceBlock extends ConsumerWidget {
                 : 'Partial — some item costs are missing',
             trailing: summary.isProfitComplete
                 ? null
-                : const SdBadgeV3(
-                    label: 'Partial',
+                : SdBadgeV3(
+                    label: context.l10n.commonPartial,
                     tone: SdBadgeToneV3.warning,
                     icon: Symbols.info_rounded,
                   ),
@@ -48,7 +48,7 @@ class _PerformanceBlock extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Revenue',
+                  label: context.l10n.commonRevenue,
                   value: summary.revenue == null
                       ? null
                       : context.money(summary.revenue, compact: true),
@@ -57,14 +57,14 @@ class _PerformanceBlock extends ConsumerWidget {
               SizedBox(width: SdContentPaddingV3.listItemGap),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Sold',
+                  label: context.l10n.itemStatusSold,
                   value: '${summary.unitsSold}',
                 ),
               ),
               SizedBox(width: SdContentPaddingV3.listItemGap),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Stock',
+                  label: context.l10n.homeStock,
                   value: summary.inventoryValue == null
                       ? null
                       : context.money(summary.inventoryValue, compact: true),

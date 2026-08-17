@@ -35,7 +35,10 @@ class TaxScreen extends ConsumerWidget {
     final TaxJurisdiction jurisdiction = ref.watch(taxJurisdictionProvider);
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(title: 'Tax', subtitle: _authority(jurisdiction)),
+      appBar: SdAppBarV3(
+        title: context.l10n.moreTax,
+        subtitle: _authority(jurisdiction),
+      ),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
@@ -54,7 +57,7 @@ class TaxScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Sales',
+                  label: context.l10n.analyticsSales,
                   value: context.money(summary.revenue, compact: true),
                   icon: Symbols.point_of_sale_rounded,
                 ),
@@ -62,7 +65,7 @@ class TaxScreen extends ConsumerWidget {
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Cost of goods',
+                  label: context.l10n.commonCostOfGoods,
                   value: context.money(summary.costOfGoods, compact: true),
                   icon: Symbols.inventory_2_rounded,
                 ),
@@ -74,7 +77,7 @@ class TaxScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Deductions',
+                  label: context.l10n.taxDeductions,
                   value: context.money(summary.totalDeductions, compact: true),
                   icon: Symbols.receipt_rounded,
                 ),
@@ -82,7 +85,7 @@ class TaxScreen extends ConsumerWidget {
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Net before tax',
+                  label: context.l10n.taxNetBeforeTax,
                   value: context.money(summary.netBeforeTax, compact: true),
                   icon: Symbols.savings_rounded,
                 ),
@@ -95,9 +98,7 @@ class TaxScreen extends ConsumerWidget {
           _MileageCard(summary: summary, jurisdiction: jurisdiction),
           SizedBox(height: SdSpacingConstant.h16),
           Text(
-            'These are your own records grouped into the lines your return '
-            'asks for. Nothing here applies allowances, thresholds or rates, '
-            'and it is not tax advice — check it with whoever files for you.',
+            context.l10n.taxTheseAreYourOwnRecordsGrouped,
             style: context.textTheme3.bodySmall!.copyWith(
               color: context.sdTheme3.textSecondary,
             ),

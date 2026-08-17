@@ -42,14 +42,14 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
     final DateTime now = ref.watch(clockProvider).now();
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Listings'),
+      appBar: SdAppBarV3(title: context.l10n.itemListings),
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           AppFilterStrip(
             children: <Widget>[
               _StatusChip(
-                label: 'All',
+                label: context.l10n.commonAll,
                 count: all.length,
                 selected: _filter == null,
                 onSelected: () => setState(() => _filter = null),
@@ -70,10 +70,10 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
             child: switch (source) {
               AsyncLoading<List<Listing>>() when !source.hasValue =>
                 const SdLoadingV3Page(),
-              _ when listings.isEmpty => const SdEmptyStateV3(
+              _ when listings.isEmpty => SdEmptyStateV3(
                 icon: Symbols.sell_rounded,
-                title: 'Nothing here',
-                message: 'List an item from its detail screen and it shows up.',
+                title: context.l10n.commonNothingHere,
+                message: context.l10n.listingsListAnItemFromItsDetail,
               ),
               _ => ListView(
                 padding: SdContentPaddingV3.screen(context),

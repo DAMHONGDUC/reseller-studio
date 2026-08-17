@@ -1991,5 +1991,473 @@
         "type": "int"
       }
     }
+  },
+  "analyticsByCategory": "By category",
+  "@analyticsByCategory": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNothingIsCategorisedYet": "Nothing is categorised yet",
+  "@analyticsNothingIsCategorisedYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsPutYourItemsIntoCategoriesAnd": "Put your items into categories and this tells you which ones actually earn.",
+  "@analyticsPutYourItemsIntoCategoriesAnd": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhatYouHold": "What you hold",
+  "@analyticsWhatYouHold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsInventoryValue": "Inventory value",
+  "@analyticsInventoryValue": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsItemsOnHand": "Items on hand",
+  "@analyticsItemsOnHand": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsHowFastItMoves": "How fast it moves",
+  "@analyticsHowFastItMoves": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsItemsSold": "Items sold",
+  "@analyticsItemsSold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageDaysToSell": "Average days to sell",
+  "@analyticsAverageDaysToSell": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageAgeOfStock": "Average age of stock",
+  "@analyticsAverageAgeOfStock": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsByMarketplace": "By marketplace",
+  "@analyticsByMarketplace": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNothingHasSoldYet": "Nothing has sold yet",
+  "@analyticsNothingHasSoldYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsRecordASaleAndThisRanks": "Record a sale and this ranks your platforms by return.",
+  "@analyticsRecordASaleAndThisRanks": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsFeeRate": "Fee rate",
+  "@analyticsFeeRate": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsTheStatement": "The statement",
+  "@analyticsTheStatement": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsCostOfGoodsSold": "Cost of goods sold",
+  "@analyticsCostOfGoodsSold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSomeSoldItemsHaveNoRecorded": "Some sold items have no recorded cost, so profit cannot be worked out for them. Add the cost on those items and this fills in — it is never guessed.",
+  "@analyticsSomeSoldItemsHaveNoRecorded": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSales": "Sales",
+  "@analyticsSales": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsVolume": "Volume",
+  "@analyticsVolume": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsUnitsSold": "Units sold",
+  "@analyticsUnitsSold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverages": "Averages",
+  "@analyticsAverages": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageOrderValue": "Average order value",
+  "@analyticsAverageOrderValue": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageSellingPrice": "Average selling price",
+  "@analyticsAverageSellingPrice": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsCancelledAndRefundedOrdersAreLeft": "Cancelled and refunded orders are left out. Counting either would make these figures disagree with your bank.",
+  "@analyticsCancelledAndRefundedOrdersAreLeft": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsOverview": "Overview",
+  "@analyticsOverview": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhereTheMoneyActuallyComesFrom": "Where the money actually comes from",
+  "@analyticsWhereTheMoneyActuallyComesFrom": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsGoDeeper": "Go deeper",
+  "@analyticsGoDeeper": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsTheSameFiguresOneQuestionAt": "The same figures, one question at a time",
+  "@analyticsTheSameFiguresOneQuestionAt": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsRevenueOrdersUnitsAverages": "Revenue, orders, units, averages",
+  "@analyticsRevenueOrdersUnitsAverages": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsTheFullStatementLineByLine": "The full statement, line by line",
+  "@analyticsTheFullStatementLineByLine": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsValueSellThroughDaysToSell": "Value, sell-through, days to sell, stale stock",
+  "@analyticsValueSellThroughDaysToSell": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhatEachPlatformReallyTook": "What each platform really took",
+  "@analyticsWhatEachPlatformReallyTook": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhichKindsOfStockEarn": "Which kinds of stock earn",
+  "@analyticsWhichKindsOfStockEarn": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSources": "Sources",
+  "@analyticsSources": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhereToGoBackToRanked": "Where to go back to — ranked by ROI",
+  "@analyticsWhereToGoBackToRanked": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNoSalesYet": "No sales yet",
+  "@analyticsNoSalesYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsMarketplacePerformanceAppearsOnceYouHave": "Marketplace performance appears once you have orders.",
+  "@analyticsMarketplacePerformanceAppearsOnceYouHave": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsBySource": "By source",
+  "@analyticsBySource": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNoSourcesYet": "No sources yet",
+  "@analyticsNoSourcesYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsRecordWhereStockComesFromAnd": "Record where stock comes from and this ranks the places worth going back to.",
+  "@analyticsRecordWhereStockComesFromAnd": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSpent": "Spent",
+  "@analyticsSpent": {
+    "description": "Shown on the analytics screens."
+  },
+  "sourcingPurchaseNotFound": "Purchase not found",
+  "@sourcingPurchaseNotFound": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingReceiptTotal": "Receipt total",
+  "@sourcingReceiptTotal": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingApportioned": "Apportioned",
+  "@sourcingApportioned": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNothingIsLinkedToThisPurchase": "Nothing is linked to this purchase yet. Add items and set their purchase on the item form.",
+  "@sourcingNothingIsLinkedToThisPurchase": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingEveryPennyOfThisReceiptIs": "Every penny of this receipt is on an item.",
+  "@sourcingEveryPennyOfThisReceiptIs": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingShouldIBuyThis": "Should I buy this?",
+  "@sourcingShouldIBuyThis": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingBuyPrice": "Buy price",
+  "@sourcingBuyPrice": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingWhatYouThinkItSellsFor": "What you think it sells for",
+  "@sourcingWhatYouThinkItSellsFor": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingPostageYouWillPay": "Postage you will pay",
+  "@sourcingPostageYouWillPay": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingExpectedRoi": "Expected ROI",
+  "@sourcingExpectedRoi": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingMostYouShouldPay": "Most you should pay",
+  "@sourcingMostYouShouldPay": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingEnterWhatItWouldSellFor": "Enter what it would sell for and this fills in.",
+  "@sourcingEnterWhatItWouldSellFor": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingPurchases": "Purchases",
+  "@sourcingPurchases": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNoPurchasesYet": "No purchases yet",
+  "@sourcingNoPurchasesYet": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingRecordABuyingTripAndEvery": "Record a buying trip and every item you add to it traces back to what you paid.",
+  "@sourcingRecordABuyingTripAndEvery": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNewSource": "New source",
+  "@sourcingNewSource": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingGoodwillRiverside": "Goodwill — Riverside",
+  "@sourcingGoodwillRiverside": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingRecordWhereStockComesFromAnd": "Record where stock comes from and the app can tell you which places are worth going back to.",
+  "@sourcingRecordWhereStockComesFromAnd": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingBuyingTrips": "Buying trips",
+  "@sourcingBuyingTrips": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingEveryBuyingTripAndWhatIt": "Every buying trip and what it cost",
+  "@sourcingEveryBuyingTripAndWhatIt": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingWorkOutProfitRoiAndThe": "Work out profit, ROI and the most you should pay",
+  "@sourcingWorkOutProfitRoiAndThe": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNewPurchase": "New purchase",
+  "@sourcingNewPurchase": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingSourceOptional": "Source (optional)",
+  "@sourcingSourceOptional": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingTotalPaidOptional": "Total paid (optional)",
+  "@sourcingTotalPaidOptional": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNotesOptional": "Notes (optional)",
+  "@sourcingNotesOptional": {
+    "description": "Shown on the sourcing screens."
+  },
+  "expensesDeleteThisExpense": "Delete this expense?",
+  "@expensesDeleteThisExpense": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesItStopsCountingAgainstYourProfit": "It stops counting against your profit.",
+  "@expensesItStopsCountingAgainstYourProfit": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesNoExpensesYet": "No expenses yet",
+  "@expensesNoExpensesYet": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesPackagingPostageStorageMileageTheCosts": "Packaging, postage, storage, mileage — the costs that come off your profit but do not belong to one item.",
+  "@expensesPackagingPostageStorageMileageTheCosts": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesTotalRecorded": "Total recorded",
+  "@expensesTotalRecorded": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesEverything": "Everything",
+  "@expensesEverything": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesNewExpense": "New expense",
+  "@expensesNewExpense": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesVendorOptional": "Vendor (optional)",
+  "@expensesVendorOptional": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesHappensEveryMonth": "Happens every month",
+  "@expensesHappensEveryMonth": {
+    "description": "Shown on the expenses screens."
+  },
+  "reportsEverythingToDate": "Everything to date",
+  "@reportsEverythingToDate": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsExport": "Export",
+  "@reportsExport": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsCsvReadyForASpreadsheetOr": "CSV, ready for a spreadsheet or an accountant",
+  "@reportsCsvReadyForASpreadsheetOr": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsOneRowPerItemSoldWith": "One row per item sold, with fees and payout",
+  "@reportsOneRowPerItemSoldWith": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsEverythingYouHoldWithCostAnd": "Everything you hold, with cost and location",
+  "@reportsEverythingYouHoldWithCostAnd": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsEveryCostByCategoryAndDate": "Every cost, by category and date",
+  "@reportsEveryCostByCategoryAndDate": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsAmountsExportAsPlainNumbersSo": "Amounts export as plain numbers so a spreadsheet can add them up. Anything you have not recorded exports as an empty cell, never as zero.",
+  "@reportsAmountsExportAsPlainNumbersSo": {
+    "description": "Shown on the reports screens."
+  },
+  "taxDeductions": "Deductions",
+  "@taxDeductions": {
+    "description": "Shown on the tax screens."
+  },
+  "taxNetBeforeTax": "Net before tax",
+  "@taxNetBeforeTax": {
+    "description": "Shown on the tax screens."
+  },
+  "taxTheseAreYourOwnRecordsGrouped": "These are your own records grouped into the lines your return asks for. Nothing here applies allowances, thresholds or rates, and it is not tax advice — check it with whoever files for you.",
+  "@taxTheseAreYourOwnRecordsGrouped": {
+    "description": "Shown on the tax screens."
+  },
+  "taxExpensesByLine": "Expenses by line",
+  "@taxExpensesByLine": {
+    "description": "Shown on the tax screens."
+  },
+  "taxYourCategoriesGroupedTheWayThe": "Your categories, grouped the way the form asks",
+  "@taxYourCategoriesGroupedTheWayThe": {
+    "description": "Shown on the tax screens."
+  },
+  "taxMileage": "Mileage",
+  "@taxMileage": {
+    "description": "Shown on the tax screens."
+  },
+  "taxDeductedAtThePublishedRateNot": "Deducted at the published rate, not at what you spent",
+  "@taxDeductedAtThePublishedRateNot": {
+    "description": "Shown on the tax screens."
+  },
+  "taxDistance": "Distance",
+  "@taxDistance": {
+    "description": "Shown on the tax screens."
+  },
+  "taxDeduction": "Deduction",
+  "@taxDeduction": {
+    "description": "Shown on the tax screens."
+  },
+  "homeNeedsAttention": "Needs Attention",
+  "@homeNeedsAttention": {
+    "description": "Shown on the home screens."
+  },
+  "homePerformance": "Performance",
+  "@homePerformance": {
+    "description": "Shown on the home screens."
+  },
+  "homeRecentActivity": "Recent Activity",
+  "@homeRecentActivity": {
+    "description": "Shown on the home screens."
+  },
+  "homeAllClear": "All clear",
+  "@homeAllClear": {
+    "description": "Shown on the home screens."
+  },
+  "homeNothingNeedsYourAttentionRightNow": "Nothing needs your attention right now.",
+  "@homeNothingNeedsYourAttentionRightNow": {
+    "description": "Shown on the home screens."
+  },
+  "homeOrdersToShip": "Orders to ship",
+  "@homeOrdersToShip": {
+    "description": "Shown on the home screens."
+  },
+  "homeItemsToList": "Items to list",
+  "@homeItemsToList": {
+    "description": "Shown on the home screens."
+  },
+  "homeStaleInventory": "Stale inventory",
+  "@homeStaleInventory": {
+    "description": "Shown on the home screens."
+  },
+  "homeStock": "Stock",
+  "@homeStock": {
+    "description": "Shown on the home screens."
+  },
+  "subscriptionPlans": "Plans",
+  "@subscriptionPlans": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionChangeAnyTimeTheStoreHandles": "Change any time — the store handles the proration",
+  "@subscriptionChangeAnyTimeTheStoreHandles": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionRestorePurchases": "Restore purchases",
+  "@subscriptionRestorePurchases": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionIfYouAlreadyPaidOnAnother": "If you already paid on another device",
+  "@subscriptionIfYouAlreadyPaidOnAnother": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionManageBilling": "Manage billing",
+  "@subscriptionManageBilling": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionYourPlan": "Your plan",
+  "@subscriptionYourPlan": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionUpgradeToContinue": "Upgrade to continue",
+  "@subscriptionUpgradeToContinue": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionNotNow": "Not now",
+  "@subscriptionNotNow": {
+    "description": "Shown on the subscription screens."
+  },
+  "searchTitleSkuBarcodeOrderOrTracking": "Title, SKU, barcode, order or tracking number",
+  "@searchTitleSkuBarcodeOrderOrTracking": {
+    "description": "Shown on the search screens."
+  },
+  "searchSearchEverything": "Search everything",
+  "@searchSearchEverything": {
+    "description": "Shown on the search screens."
+  },
+  "searchItemsOrdersListingsAndSourcesType": "Items, orders, listings and sources — type at least two characters.",
+  "@searchItemsOrdersListingsAndSourcesType": {
+    "description": "Shown on the search screens."
+  },
+  "searchNothingMatches": "Nothing matches",
+  "@searchNothingMatches": {
+    "description": "Shown on the search screens."
+  },
+  "searchTryAShorterPieceOfThe": "Try a shorter piece of the name or code.",
+  "@searchTryAShorterPieceOfThe": {
+    "description": "Shown on the search screens."
+  },
+  "listingsListAnItemFromItsDetail": "List an item from its detail screen and it shows up.",
+  "@listingsListAnItemFromItsDetail": {
+    "description": "Shown on the listings screens."
+  },
+  "receiptsMissing": "Missing",
+  "@receiptsMissing": {
+    "description": "Shown on the receipts screens."
+  },
+  "receiptsNoReceiptsYet": "No receipts yet",
+  "@receiptsNoReceiptsYet": {
+    "description": "Shown on the receipts screens."
+  },
+  "receiptsPhotographAReceiptWhenYouRecord": "Photograph a receipt when you record a purchase or an expense and it shows up here.",
+  "@receiptsPhotographAReceiptWhenYouRecord": {
+    "description": "Shown on the receipts screens."
   }
 }

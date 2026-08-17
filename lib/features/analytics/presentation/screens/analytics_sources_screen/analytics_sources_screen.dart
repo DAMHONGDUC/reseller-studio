@@ -40,14 +40,12 @@ class AnalyticsSourcesScreen extends ConsumerWidget {
           });
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'By source'),
+      appBar: SdAppBarV3(title: context.l10n.analyticsBySource),
       body: rows.isEmpty
-          ? const SdEmptyStateV3(
+          ? SdEmptyStateV3(
               icon: Symbols.storefront_rounded,
-              title: 'No sources yet',
-              message:
-                  'Record where stock comes from and this ranks the places '
-                  'worth going back to.',
+              title: context.l10n.analyticsNoSourcesYet,
+              message: context.l10n.analyticsRecordWhereStockComesFromAnd,
             )
           : ListView(
               padding: SdContentPaddingV3.screen(context),
@@ -58,7 +56,7 @@ class AnalyticsSourcesScreen extends ConsumerWidget {
                     title: names[row.sourceId] ?? row.sourceId,
                     rows: <Widget>[
                       MetricRow(
-                        label: 'ROI',
+                        label: context.l10n.commonRoi,
                         value: context.percent(row.roi),
                         isEmphasis: true,
                         valueColor: row.roi == null
@@ -68,19 +66,19 @@ class AnalyticsSourcesScreen extends ConsumerWidget {
                             : context.sdTheme3.profit,
                       ),
                       MetricRow(
-                        label: 'Spent',
+                        label: context.l10n.analyticsSpent,
                         value: context.money(row.spend),
                       ),
                       MetricRow(
-                        label: 'Revenue',
+                        label: context.l10n.commonRevenue,
                         value: context.money(row.revenue),
                       ),
                       MetricRow(
-                        label: 'Profit',
+                        label: context.l10n.orderProfitPrefix,
                         value: context.money(row.profit),
                       ),
                       MetricRow(
-                        label: 'Items',
+                        label: context.l10n.commonItems,
                         value: '${row.itemsSold} / ${row.itemsBought}',
                         caption: 'Sold of bought',
                       ),

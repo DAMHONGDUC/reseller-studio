@@ -73,7 +73,10 @@ class _PlanCard extends ConsumerWidget {
                 ),
               ),
               if (isCurrent)
-                const SdBadgeV3(label: 'Your plan', tone: SdBadgeToneV3.info),
+                SdBadgeV3(
+                  label: context.l10n.subscriptionYourPlan,
+                  tone: SdBadgeToneV3.info,
+                ),
             ],
           ),
           SizedBox(height: SdSpacingConstant.h8),

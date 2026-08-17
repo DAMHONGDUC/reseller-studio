@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../providers.dart';
@@ -69,7 +70,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final List<SearchHit> hits = ref.watch(searchResultsProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Search'),
+      appBar: SdAppBarV3(title: context.l10n.homeShortcutSearch),
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
@@ -82,7 +83,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               // The screen exists to be typed into; a keyboard the seller has
               // to summon costs a tap on every search.
               autofocus: true,
-              hint: 'Title, SKU, barcode, order or tracking number',
+              hint: context.l10n.searchTitleSkuBarcodeOrderOrTracking,
               clearTooltip: 'Clear search',
               onChanged: (String value) =>
                   ref.read(searchQueryProvider.notifier).update(value),
@@ -91,17 +92,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Expanded(
             child: switch (hits) {
               _ when query.trim().length < SearchConstant.minimumQueryLength =>
-                const SdEmptyStateV3(
+                SdEmptyStateV3(
                   icon: Symbols.search_rounded,
-                  title: 'Search everything',
-                  message:
-                      'Items, orders, listings and sources — type at least '
-                      'two characters.',
+                  title: context.l10n.searchSearchEverything,
+                  message: context.l10n.searchItemsOrdersListingsAndSourcesType,
                 ),
-              _ when hits.isEmpty => const SdEmptyStateV3(
+              _ when hits.isEmpty => SdEmptyStateV3(
                 icon: Symbols.search_off_rounded,
-                title: 'Nothing matches',
-                message: 'Try a shorter piece of the name or code.',
+                title: context.l10n.searchNothingMatches,
+                message: context.l10n.searchTryAShorterPieceOfThe,
               ),
               _ => ListView(
                 padding: SdContentPaddingV3.screen(context),

@@ -72,7 +72,7 @@ class _PurchaseEvaluatorScreenState
           );
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Should I buy this?'),
+      appBar: SdAppBarV3(title: context.l10n.sourcingShouldIBuyThis),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
@@ -83,7 +83,7 @@ class _PurchaseEvaluatorScreenState
             child: Column(
               children: <Widget>[
                 MoneyField(
-                  label: 'Buy price',
+                  label: context.l10n.sourcingBuyPrice,
                   controller: _buy,
                   currency: currency,
                   textInputAction: TextInputAction.next,
@@ -91,7 +91,7 @@ class _PurchaseEvaluatorScreenState
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 MoneyField(
-                  label: 'What you think it sells for',
+                  label: context.l10n.sourcingWhatYouThinkItSellsFor,
                   controller: _sale,
                   currency: currency,
                   textInputAction: TextInputAction.next,
@@ -99,7 +99,7 @@ class _PurchaseEvaluatorScreenState
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
-                  label: 'Marketplace',
+                  label: context.l10n.commonMarketplace,
                   icon: Symbols.storefront_rounded,
                   value:
                       '${_marketplace.displayName} · '
@@ -108,7 +108,7 @@ class _PurchaseEvaluatorScreenState
                     final Marketplace?
                     picked = await OptionPickerSheet.show<Marketplace>(
                       context,
-                      title: 'Marketplace',
+                      title: context.l10n.commonMarketplace,
                       selected: _marketplace,
                       options: Marketplace.values
                           .map(
@@ -131,7 +131,7 @@ class _PurchaseEvaluatorScreenState
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 MoneyField(
-                  label: 'Postage you will pay',
+                  label: context.l10n.sourcingPostageYouWillPay,
                   controller: _shipping,
                   currency: currency,
                   textInputAction: TextInputAction.done,
@@ -169,7 +169,7 @@ class _Verdict extends StatelessWidget {
     if (row == null) {
       return SdCardV3(
         child: Text(
-          'Enter what it would sell for and this fills in.',
+          context.l10n.sourcingEnterWhatItWouldSellFor,
           style: context.textTheme3.bodyMedium!.muted3(context),
         ),
       );
@@ -190,18 +190,18 @@ class _Verdict extends StatelessWidget {
           ),
           SizedBox(height: SdSpacingConstant.h12),
           _EvaluationRow(
-            label: 'Expected profit',
+            label: context.l10n.itemExpectedProfit,
             value: context.money(row.expectedProfit),
             valueColor: row.expectedProfit.isNegative
                 ? context.sdTheme3.loss
                 : context.sdTheme3.profit,
           ),
           _EvaluationRow(
-            label: 'Expected ROI',
+            label: context.l10n.sourcingExpectedRoi,
             value: context.percent(row.expectedRoi),
           ),
           _EvaluationRow(
-            label: 'Most you should pay',
+            label: context.l10n.sourcingMostYouShouldPay,
             value: context.money(row.maximumBuyPrice),
             isEmphasis: true,
           ),

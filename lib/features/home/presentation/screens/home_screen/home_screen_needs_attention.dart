@@ -23,7 +23,7 @@ class _NeedsAttention extends ConsumerWidget {
       if (pending.isNotEmpty)
         _AttentionRow(
           icon: Symbols.local_shipping_rounded,
-          label: 'Orders to ship',
+          label: context.l10n.homeOrdersToShip,
           count: pending.length,
           // An overdue order is a different problem from a pending one: the
           // penalty has already started. Saying so on the row is the whole
@@ -37,7 +37,7 @@ class _NeedsAttention extends ConsumerWidget {
       if (unlisted.isNotEmpty)
         _AttentionRow(
           icon: Symbols.sell_rounded,
-          label: 'Items to list',
+          label: context.l10n.homeItemsToList,
           count: unlisted.length,
           detail: 'in stock, not listed anywhere',
           tint: context.sdTheme3.info,
@@ -46,7 +46,7 @@ class _NeedsAttention extends ConsumerWidget {
       if (stale.isNotEmpty)
         _AttentionRow(
           icon: Symbols.hourglass_bottom_rounded,
-          label: 'Stale inventory',
+          label: context.l10n.homeStaleInventory,
           count: stale.length,
           detail: 'listed over 60 days',
           tint: context.sdTheme3.warning,

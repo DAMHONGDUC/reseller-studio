@@ -15,10 +15,10 @@ class _MarketplaceBreakdown extends ConsumerWidget {
     );
 
     if (rows.isEmpty) {
-      return const SdEmptyStateV3(
+      return SdEmptyStateV3(
         icon: Symbols.bar_chart_rounded,
-        title: 'No sales yet',
-        message: 'Marketplace performance appears once you have orders.',
+        title: context.l10n.analyticsNoSalesYet,
+        message: context.l10n.analyticsMarketplacePerformanceAppearsOnceYouHave,
       );
     }
 

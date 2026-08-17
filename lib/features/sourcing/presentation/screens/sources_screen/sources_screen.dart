@@ -27,9 +27,9 @@ class SourcesScreen extends ConsumerWidget {
   Future<void> _add(BuildContext context, WidgetRef ref) async {
     final String? name = await NameEntrySheet.show(
       context,
-      title: 'New source',
-      label: 'Name',
-      hint: 'Goodwill — Riverside',
+      title: context.l10n.sourcingNewSource,
+      label: context.l10n.commonName,
+      hint: context.l10n.sourcingGoodwillRiverside,
     );
 
     if (name == null || !context.mounted) return;
@@ -66,7 +66,7 @@ class SourcesScreen extends ConsumerWidget {
     };
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Sources'),
+      appBar: SdAppBarV3(title: context.l10n.analyticsSources),
       addLabel: 'Add a source',
       onAdd: () => _add(context, ref),
       body: switch (source) {
@@ -74,13 +74,11 @@ class SourcesScreen extends ConsumerWidget {
           const SdLoadingV3Page(),
         _ when sources.isEmpty => SdEmptyStateV3(
           icon: Symbols.storefront_rounded,
-          title: 'No sources yet',
-          message:
-              'Record where stock comes from and the app can tell you which '
-              'places are worth going back to.',
+          title: context.l10n.analyticsNoSourcesYet,
+          message: context.l10n.sourcingRecordWhereStockComesFromAnd,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Add a source',
+            label: context.l10n.homeQuickAddSource,
             onPressed: () => _add(context, ref),
           ),
         ),
@@ -109,7 +107,7 @@ class SourcesScreen extends ConsumerWidget {
                             .copyWith(color: _roiColour(context, row?.roi)),
                       ),
                       Text(
-                        'ROI',
+                        context.l10n.commonRoi,
                         style: context.textTheme3.bodySmall!.faint3(context),
                       ),
                     ],

@@ -114,11 +114,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           _HomeShortcuts(onQuickAction: _toQuickAction),
           // Not `first` any more: the shortcut row is above it now, and this
           // heading needs the gap that separates two sections.
-          const SdSectionHeaderV3(title: 'Needs Attention'),
+          SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
           const _NeedsAttention(),
-          const SdSectionHeaderV3(title: 'Performance'),
+          SdSectionHeaderV3(title: context.l10n.homePerformance),
           const _PerformanceBlock(),
-          const SdSectionHeaderV3(title: 'Recent Activity'),
+          SdSectionHeaderV3(title: context.l10n.homeRecentActivity),
           const _RecentActivity(),
           SdSectionHeaderV3(
             title: context.l10n.homeQuickAction,

@@ -69,16 +69,16 @@ class SubscriptionScreen extends ConsumerWidget {
     final bool isBusy = ref.watch(subscriptionControllerProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Subscription'),
+      appBar: SdAppBarV3(title: context.l10n.moreSubscription),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           _CurrentPlanCard(plan: plan, status: status),
           SizedBox(height: SdContentPaddingV3.sectionGap),
-          const SdSectionHeaderV3(
-            title: 'Plans',
-            subtitle: 'Change any time — the store handles the proration',
+          SdSectionHeaderV3(
+            title: context.l10n.subscriptionPlans,
+            subtitle: context.l10n.subscriptionChangeAnyTimeTheStoreHandles,
             first: true,
           ),
           _Offerings(currentPlan: plan, isBusy: isBusy),
@@ -86,15 +86,15 @@ class SubscriptionScreen extends ConsumerWidget {
           AppListCard(
             children: <Widget>[
               AppListRow(
-                title: 'Restore purchases',
-                subtitle: 'If you already paid on another device',
+                title: context.l10n.subscriptionRestorePurchases,
+                subtitle: context.l10n.subscriptionIfYouAlreadyPaidOnAnother,
                 icon: Symbols.restore_rounded,
                 showChevron: false,
                 onTap: isBusy ? null : () => _restore(context, ref),
               ),
               if (status != null && status.source != SubscriptionSource.none)
                 AppListRow(
-                  title: 'Manage billing',
+                  title: context.l10n.subscriptionManageBilling,
                   subtitle: _billingHome(status.source),
                   icon: Symbols.credit_card_rounded,
                   showChevron: false,

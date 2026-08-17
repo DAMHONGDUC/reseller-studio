@@ -116,12 +116,12 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
     final DateTime now = DateTime.now();
 
     return SdBottomSheetV3(
-      title: 'New purchase',
+      title: context.l10n.sourcingNewPurchase,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           PickerField(
-            label: 'Date',
+            label: context.l10n.commonDate,
             icon: Symbols.calendar_month_rounded,
             value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
             onTap: () async {
@@ -141,7 +141,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Source (optional)',
+            label: context.l10n.sourcingSourceOptional,
             icon: Symbols.storefront_rounded,
             value: names[_sourceId],
             placeholder: sources.isEmpty ? 'None yet' : 'Not set',
@@ -153,7 +153,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
                 : () async {
                     final String? picked = await OptionPickerSheet.show<String>(
                       context,
-                      title: 'Source',
+                      title: context.l10n.commonSource,
                       selected: _sourceId,
                       options: sources
                           .map(
@@ -172,7 +172,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           MoneyField(
-            label: 'Total paid (optional)',
+            label: context.l10n.sourcingTotalPaidOptional,
             controller: _total,
             currency: ref.watch(workspaceCurrencyProvider),
             helperText: 'What the receipt says, not the sum of the items',
@@ -180,7 +180,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
-            label: 'Notes (optional)',
+            label: context.l10n.sourcingNotesOptional,
             controller: _notes,
             maxLines: 2,
             textInputAction: TextInputAction.done,

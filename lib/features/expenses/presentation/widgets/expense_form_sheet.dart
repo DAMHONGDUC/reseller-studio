@@ -120,19 +120,19 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
     final DateTime now = DateTime.now();
 
     return SdBottomSheetV3(
-      title: 'New expense',
+      title: context.l10n.expensesNewExpense,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           PickerField(
-            label: 'Category',
+            label: context.l10n.commonCategory,
             icon: Symbols.category_rounded,
             value: ExpenseCategoryLabel.of(_category),
             onTap: () async {
               final ExpenseCategory? picked =
                   await OptionPickerSheet.show<ExpenseCategory>(
                     context,
-                    title: 'Category',
+                    title: context.l10n.commonCategory,
                     selected: _category,
                     options: ExpenseCategory.values
                         .map(
@@ -152,14 +152,14 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           MoneyField(
-            label: 'Amount',
+            label: context.l10n.commonAmount,
             controller: _amount,
             currency: ref.watch(workspaceCurrencyProvider),
             textInputAction: TextInputAction.next,
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Date',
+            label: context.l10n.commonDate,
             icon: Symbols.calendar_month_rounded,
             value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
             onTap: () async {
@@ -177,13 +177,13 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
-            label: 'Vendor (optional)',
+            label: context.l10n.expensesVendorOptional,
             controller: _vendor,
             textInputAction: TextInputAction.next,
           ),
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
-            label: 'Notes (optional)',
+            label: context.l10n.sourcingNotesOptional,
             controller: _notes,
             maxLines: 2,
           ),
@@ -201,7 +201,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
             value: _isRecurring,
             onChanged: (bool value) => setState(() => _isRecurring = value),
             title: Text(
-              'Happens every month',
+              context.l10n.expensesHappensEveryMonth,
               style: context.textTheme3.bodyMedium!.copyWith(
                 color: context.sdTheme3.textPrimary,
               ),

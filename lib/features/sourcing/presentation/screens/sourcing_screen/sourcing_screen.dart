@@ -35,7 +35,7 @@ class SourcingScreen extends ConsumerWidget {
         .totalOfKnown();
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Sourcing'),
+      appBar: SdAppBarV3(title: context.l10n.moreSourcing),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
@@ -44,7 +44,7 @@ class SourcingScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Spent',
+                  label: context.l10n.analyticsSpent,
                   value: context.money(spend, compact: true),
                   icon: Symbols.payments_rounded,
                 ),
@@ -52,7 +52,7 @@ class SourcingScreen extends ConsumerWidget {
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Buying trips',
+                  label: context.l10n.sourcingBuyingTrips,
                   value: '${purchases.length}',
                   icon: Symbols.local_mall_rounded,
                 ),
@@ -63,13 +63,13 @@ class SourcingScreen extends ConsumerWidget {
           AppListCard(
             children: <Widget>[
               AppListRow(
-                title: 'Purchases',
-                subtitle: 'Every buying trip and what it cost',
+                title: context.l10n.sourcingPurchases,
+                subtitle: context.l10n.sourcingEveryBuyingTripAndWhatIt,
                 icon: Symbols.local_mall_rounded,
                 onTap: () => context.push(AppRoutes.purchases),
               ),
               AppListRow(
-                title: 'Sources',
+                title: context.l10n.analyticsSources,
                 subtitle: sources.isEmpty
                     ? 'Add the shops worth going back to'
                     : '${sources.length} places, ranked by what they return',
@@ -77,8 +77,8 @@ class SourcingScreen extends ConsumerWidget {
                 onTap: () => context.push(AppRoutes.sources),
               ),
               AppListRow(
-                title: 'Should I buy this?',
-                subtitle: 'Work out profit, ROI and the most you should pay',
+                title: context.l10n.sourcingShouldIBuyThis,
+                subtitle: context.l10n.sourcingWorkOutProfitRoiAndThe,
                 icon: Symbols.calculate_rounded,
                 onTap: () => context.push(AppRoutes.purchaseEvaluator),
               ),

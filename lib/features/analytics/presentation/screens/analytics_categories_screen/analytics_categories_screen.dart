@@ -30,14 +30,12 @@ class AnalyticsCategoriesScreen extends ConsumerWidget {
     final Map<String, String> names = ref.watch(categoryNamesProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'By category'),
+      appBar: SdAppBarV3(title: context.l10n.analyticsByCategory),
       body: rows.isEmpty
-          ? const SdEmptyStateV3(
+          ? SdEmptyStateV3(
               icon: Symbols.category_rounded,
-              title: 'Nothing is categorised yet',
-              message:
-                  'Put your items into categories and this tells you which '
-                  'ones actually earn.',
+              title: context.l10n.analyticsNothingIsCategorisedYet,
+              message: context.l10n.analyticsPutYourItemsIntoCategoriesAnd,
             )
           : ListView(
               padding: SdContentPaddingV3.screen(context),
@@ -48,12 +46,12 @@ class AnalyticsCategoriesScreen extends ConsumerWidget {
                     title: names[row.categoryId] ?? row.categoryId,
                     rows: <Widget>[
                       MetricRow(
-                        label: 'Revenue',
+                        label: context.l10n.commonRevenue,
                         value: context.money(row.revenue),
                         isEmphasis: true,
                       ),
                       MetricRow(
-                        label: 'Profit',
+                        label: context.l10n.orderProfitPrefix,
                         value: context.money(row.profit),
                         valueColor: row.profit == null
                             ? null
@@ -62,12 +60,12 @@ class AnalyticsCategoriesScreen extends ConsumerWidget {
                             : context.sdTheme3.profit,
                       ),
                       MetricRow(
-                        label: 'ROI',
+                        label: context.l10n.commonRoi,
                         value: context.percent(row.roi),
                         caption: 'Return on what these items cost',
                       ),
                       MetricRow(
-                        label: 'Sell-through',
+                        label: context.l10n.commonSellThrough,
                         value: context.percent(row.sellThrough, decimals: 1),
                         caption: '${row.soldCount} of ${row.itemCount} sold',
                       ),

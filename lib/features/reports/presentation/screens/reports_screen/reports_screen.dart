@@ -50,13 +50,13 @@ class ReportsScreen extends ConsumerWidget {
     final DateTime now = ref.watch(clockProvider).now();
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Reports'),
+      appBar: SdAppBarV3(title: context.l10n.moreReports),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           SdSectionHeaderV3(
-            title: 'Everything to date',
+            title: context.l10n.reportsEverythingToDate,
             subtitle:
                 'As of ${DateTimeUtils.mediumDate(now, locale: context.localeTag)}',
             first: true,
@@ -65,7 +65,7 @@ class ReportsScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Revenue',
+                  label: context.l10n.commonRevenue,
                   value: context.money(summary.revenue, compact: true),
                   icon: Symbols.trending_up_rounded,
                 ),
@@ -73,7 +73,7 @@ class ReportsScreen extends ConsumerWidget {
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Net profit',
+                  label: context.l10n.commonNetProfit,
                   value: context.money(summary.netProfit, compact: true),
                   tone: _profitTone(summary.netProfit),
                   caption: summary.isProfitComplete
@@ -89,7 +89,7 @@ class ReportsScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Orders',
+                  label: context.l10n.commonOrders,
                   value: '${summary.orderCount}',
                   icon: Symbols.receipt_long_rounded,
                 ),
@@ -97,7 +97,7 @@ class ReportsScreen extends ConsumerWidget {
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Inventory value',
+                  label: context.l10n.analyticsInventoryValue,
                   value: context.money(summary.inventoryValue, compact: true),
                   icon: Symbols.inventory_2_rounded,
                 ),
@@ -105,32 +105,32 @@ class ReportsScreen extends ConsumerWidget {
             ],
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
-          const SdSectionHeaderV3(
-            title: 'Export',
-            subtitle: 'CSV, ready for a spreadsheet or an accountant',
+          SdSectionHeaderV3(
+            title: context.l10n.reportsExport,
+            subtitle: context.l10n.reportsCsvReadyForASpreadsheetOr,
             first: true,
           ),
           AppListCard(
             children: <Widget>[
               AppListRow(
-                title: 'Sales',
-                subtitle: 'One row per item sold, with fees and payout',
+                title: context.l10n.analyticsSales,
+                subtitle: context.l10n.reportsOneRowPerItemSoldWith,
                 icon: Symbols.point_of_sale_rounded,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.sales),
               ),
               AppListRow(
-                title: 'Inventory',
-                subtitle: 'Everything you hold, with cost and location',
+                title: context.l10n.workflowInventory,
+                subtitle: context.l10n.reportsEverythingYouHoldWithCostAnd,
                 icon: Symbols.inventory_2_rounded,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.inventory),
               ),
               AppListRow(
-                title: 'Expenses',
-                subtitle: 'Every cost, by category and date',
+                title: context.l10n.commonExpenses,
+                subtitle: context.l10n.reportsEveryCostByCategoryAndDate,
                 icon: Symbols.receipt_rounded,
                 onTap: isBusy
                     ? null
@@ -140,9 +140,7 @@ class ReportsScreen extends ConsumerWidget {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           Text(
-            'Amounts export as plain numbers so a spreadsheet can add them '
-            'up. Anything you have not recorded exports as an empty cell, '
-            'never as zero.',
+            context.l10n.reportsAmountsExportAsPlainNumbersSo,
             style: context.textTheme3.bodySmall!.faint3(context),
           ),
         ],
