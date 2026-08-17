@@ -6,49 +6,48 @@ Grouped by *what is stopping it*, because that is what decides the order.
 Anything needing an account, a key or a card is not here — that is
 `RELEASE_ACTIONS.md`, and it blocks more than this file does.
 
+## Where to start
+
+Ordered by what unblocks the most, not by size:
+
+1. **Deploy `functions/`** (owner). Seven are written and idle; one of them is
+   the only thing that keeps `users/{uid}.workspaceIds` correct.
+2. **FCM sends and their triggers**, then the notifications inbox — in that
+   order, because an inbox with no writer is a permanently empty screen.
+3. **Cross-listing**, last: it needs marketplace OAuth, which needs a
+   developer account per platform.
+
 ## 1. Deferred by decision
 
 Owner has ruled on each of these. They are not oversights.
 
-### Theme is built; language is not
+### Language switching waits for the Vietnamese pass
 
-Theme switching works (Settings → Appearance, light/dark/system, device-local).
-**Language is listed with a "Soon" badge and no picker**, and that is the right
-order: a picker offering a half-translated Vietnamese is worse than none. The
-backfill below is the prerequisite.
+Theme is built and works (Settings → Appearance, light/dark/system,
+device-local). **Language is listed with a "Soon" badge and no picker.**
 
-### Localization — English only until release
-
-New strings still go through ARB keys; only the *translation* is deferred, and
-it happens in one pass at release. See hard rule 7.
-
-**The backfill is done.** Every plain user-facing string in
-`presentation/` now goes through ARB — 142 keys were added across analytics,
-sourcing, expenses, reports, tax, home, subscription, search, listings and
-receipts, reusing an existing key wherever one already held the same English.
-
-The interpolated ones are done too — 13 keys carrying placeholders, with real
-`plural` forms where a count is shown (`analyticsOrderCount`,
-`listingViewCount`), because "1 orders" is the kind of thing nobody fixes
-after launch.
+The English side is finished: every plain user-facing string in
+`presentation/` goes through ARB, and the interpolated ones carry placeholders
+with real `plural` forms where a count is shown (`analyticsOrderCount`,
+`listingViewCount`) — "1 orders" is the kind of thing nobody fixes after
+launch.
 
 **Three literals are left on purpose**, and each should stay:
 
-- `'$count'` on Home's attention row — a bare number, with no text to
-  translate.
+- `'$count'` on Home's attention row — a bare number, no text to translate.
 - `'${context.l10n.orderProfitPrefix} '` — already an ARB key; the trailing
   space is layout, not language.
 - The mock-data summary in Settings — developer-only, behind `DevFlags`, and
   absent from a release build.
 
-At release, translate `app_vi.arb` in one pass **and review the 388 keys
-already there**, which were written without a native speaker. The backfill
-widened the gap on purpose: English is complete, `vi` is filled in once. The
+**The backfill widened the en/vi gap on purpose.** English is complete;
+`app_vi.arb` is filled in once, at release, and the 388 keys already there
+were written without a native speaker and need reviewing with the rest. The
 product vocabulary is what needs arguing about, not the buttons:
 `Offers → "Đề nghị giá"`, `Counter → "Trả giá"`,
-`Sell-through → "Tỷ lệ bán hết"`. A half-translated `vi` is worse than an
-English one, so do not advertise `vi` in the store listing until that is done.
-listing until that is done.
+`Sell-through → "Tỷ lệ bán hết"`. Turning the picker on before that ships a
+half-Vietnamese app, which is worse than an English one — so do not advertise
+`vi` in the store listing either.
 
 ### v3 keeps its own chrome
 
@@ -62,59 +61,69 @@ reasoning; do not "finish the port". `SdFloatingBarScopeV3` is the one that
 
 ## 2. Cloud Functions
 
-**Written, not deployed.** `functions/` builds and lints in CI; nothing has
-been pushed to a project because that needs the Firebase setup.
+`functions/` builds, lints and typechecks in CI. **Nothing is deployed** —
+that needs the Firebase project, which is `RELEASE_ACTIONS.md` blocker 1.
 
-| Plan § | Feature | State |
+| Plan § | Function | State |
 |---|---|---|
-| 24 | Team invites | **Written** — `inviteMember`, `acceptInvite`, `removeMember`. Seat limit and last-owner check both need a count rules cannot take |
-| 23 | Activity / audit log | **Written** — triggers on items, orders and listings. `actorId` is read from the document, never from a client |
-| — | `workspaceIds` upkeep | **Written** — `onMemberWritten`. Until it is deployed, a seller only sees businesses they created, never ones they were invited to |
-| 22 | Notifications | not written. FCM sends and the triggers that decide when |
-| 13 | Cross-listing | not written. Every call carrying a token runs server-side (hard rule 10) |
-| 14 | Marketplace integrations | not written, and blocked on per-marketplace developer accounts |
-| 27 | Entitlement mirror | not written. The RevenueCat webhook is what makes a plan gate a boundary rather than a UI decision |
-| — | `deleteWorkspace` | not written. Firestore does not cascade |
+| — | `onMemberWritten` | **Written.** Keeps `users/{uid}.workspaceIds` in step. Until deployed, a seller sees only businesses they created — never one they were invited to |
+| 24 | `inviteMember`, `acceptInvite`, `removeMember` | **Written.** The seat limit and the last-owner check each need a count, and rules read one document |
+| 23 | `onItemWritten`, `onOrderWritten`, `onListingWritten` | **Written.** `actorId` is read from the document, never from a client (hard rule 12) |
+| 22 | FCM sends and their triggers | not written |
+| 27 | RevenueCat webhook | not written. It is what makes a plan gate a boundary rather than a UI decision |
+| — | `deleteWorkspace` | not written. Firestore does not cascade, so the subcollections have to be walked |
+| 14 | Marketplace OAuth and sync | not written, and blocked on a developer account per marketplace |
+| 13 | Cross-listing push | not written. Every call carrying a token runs server-side (hard rule 10) |
 
 Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 
 ## 3. Not built at all
 
-Nothing started. Listed with what already exists to build on.
-
 | Plan § | Feature | What is there today |
 |---|---|---|
-| 13 | Cross-listing | `listings` feature and the `Listing` entity exist; there is no cross-list flow |
-
-**Activity (§23) is built** — More → Activity, read-only, fed by the triggers
-in `functions/`. It is empty in every environment until those are deployed,
-and its empty state is written for the ordinary reason a workspace has no
-history rather than for the missing backend.
-| 22 | Notifications — the in-app inbox | nothing writes a notification yet, so an inbox would be permanently empty. Its route constant is still deliberately absent — `docs/rules/DECISIONS.md` |
+| 22 | Notifications — the in-app inbox | nothing writes a notification, so an inbox would be permanently empty. Its route constant is deliberately absent: a constant no route serves is a deep link that fails silently |
+| 13 | Cross-listing | the `listings` feature and the `Listing` entity exist; there is no flow that pushes one item to several marketplaces |
 
 ## 4. Loose ends found in the code
 
-- **`team` and `marketplaces` are read-only screens.** Both render and both
-  explain why they cannot do more yet; neither is a stub that fails.
-- **`lib/features/mock_data/` ships in the binary.** It is gated behind
-  `DevFlags`, but it is a whole fake backend inside the app. Worth deciding
-  before release whether it is compiled out.
-- **The plan limits are a first proposal, not a priced decision.**
-  `PlanLimits.byPlan` holds every ceiling; changing one is a one-line edit and
-  the paywall copy follows, because it reads the table rather than repeating
-  it. Nobody has priced these against what a reseller will pay.
 - **Apple's brand mark is the one asset still missing.** The code is done —
   `SdButtonV3` has its `leading` slot and Google's own file ships in
-  `assets/brand/` — but Apple's logo can only come from Apple, and the login
-  screen throws until `assets/brand/apple_logo.svg` exists. The Apple button
+  `assets/brand/` — but Apple's logo can only come from Apple, and **the login
+  screen throws until `assets/brand/apple_logo.svg` exists**. The Apple button
   also renders in the app's indigo, which Apple's guidelines do not allow.
   `RELEASE_ACTIONS.md` blocker 5 has both.
-- **`selleros://` deep links now work on both platforms.** `AndroidManifest.xml`
-  declares the scheme in a `VIEW` intent filter and sets
-  `flutter_deeplinking_enabled`, matching what `Info.plist` has always had.
-  Untested end to end — that needs a device and a real notification.
-- **Entitlement is not mirrored into Firestore yet.** The client reads
-  RevenueCat, which is a cache for rendering. `firestore.rules` cannot ask an
-  SDK a question, so the server-side half — a Cloud Function on RevenueCat's
-  webhook — is blocked with the rest of `functions/` above. Until it exists,
-  the gates are a UI decision and not a security boundary.
+- **Entitlement is not mirrored into Firestore.** The client reads RevenueCat,
+  which is a cache for rendering. `firestore.rules` cannot ask an SDK a
+  question, so until the webhook function exists the plan gates are a UI
+  decision and not a security boundary.
+- **`NavigationUtils.requireSignIn` is unreachable today**, and that is
+  recorded rather than removed. Every screen with a create action sits behind
+  `AuthedTab` or outside `_previewRoutes`, which
+  `test/core/router/signed_out_shell_test.dart` proves. It stays as the
+  backstop for the day a tab is unwrapped.
+- **`lib/features/mock_data/` ships in the binary.** Gated behind `DevFlags`
+  and tree-shaken from release, but it is still a whole fake backend inside
+  the repo's binary. Worth an explicit decision before submission.
+- **The plan limits are a first proposal, not a priced decision.**
+  `PlanLimits.byPlan` holds every ceiling, and `seatsByPlan` in
+  `functions/src/lib/firestore.ts` is its **one deliberate duplicate** — rules
+  cannot count a collection, so the seat number has to exist somewhere a
+  modified client cannot reach. Changing one means changing the other.
+- **`selleros://` deep links are declared on both platforms but untested end
+  to end.** That needs a device and a real notification.
+- **CI follows the design system's `main`, not the pinned gitlink.** A green
+  run proves the app builds against the tip, not against the commit this repo
+  records — so CI and a laptop can disagree, and that gap is the first thing
+  to check when they do.
+- **`test/features/shot_tmp_test.dart` hangs the runner for 20 minutes.** It
+  is gitignored and local-only; the cause is a font loader doing real file I/O
+  inside a widget test's fake-async zone. Excluding `*_tmp_test.dart` takes the
+  full suite from 20 minutes to 8 seconds.
+- **`team` and `marketplaces` are read-only screens.** Both render and both
+  explain why they cannot do more yet; neither is a stub that fails.
+
+## 5. `DONE_WORK.md` is behind
+
+It does not yet mention onboarding, the signed-out shell, multi-workspace
+switching, the Activity screen, theme switching, the ARB backfill or CI.
+Bring it up to date before using it to judge what exists.
