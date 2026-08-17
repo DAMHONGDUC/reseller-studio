@@ -9,12 +9,14 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
 import '../../../../mock_data/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
 import '../../../../workspace/workspace_option_label.dart';
+import '../../controllers/theme_mode_controller.dart';
 
 part 'settings_screen_account_card.dart';
 part 'settings_screen_appearance_card.dart';

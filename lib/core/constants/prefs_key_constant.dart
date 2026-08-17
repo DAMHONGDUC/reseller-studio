@@ -19,4 +19,8 @@ final class PrefsKeyConstant {
   /// reinstalls sees the intro again, which is the right answer — nothing
   /// about their business is behind it.
   static const String onboardingSeen = 'onboarding_seen';
+
+  /// Light, dark or system. Device-local on purpose — see
+  /// `ThemeModeController`.
+  static const String themeMode = 'theme_mode';
 }

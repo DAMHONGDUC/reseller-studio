@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/settings/presentation/controllers/theme_mode_controller.dart';
 import 'l10n/gen/app_localizations.dart';
 
 /// The app widget.
@@ -49,9 +50,9 @@ class SellerOsApp extends ConsumerWidget {
             AppLocalizations.of(context).appTitle,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        // Follows the system until Settings ships its own theme control
-        // (plan §25). That control writes to a provider watched here.
-        themeMode: ThemeMode.system,
+        // Settings owns this now (plan §25). Device-local, so it is read from
+        // preferences rather than from the account — see `ThemeModeController`.
+        themeMode: ref.watch(themeModeProvider),
         localizationsDelegates: const <LocalizationsDelegate<Object>>[
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

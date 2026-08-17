@@ -595,7 +595,15 @@
   },
   "settingsThemeSystem": "System",
   "@settingsThemeSystem": {
-    "description": "Current theme value — follows the device setting."
+    "description": "Theme option — follows the device setting."
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Theme option — always the light palette."
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Theme option — always the dark palette."
   },
   "settingsLanguage": "Language",
   "@settingsLanguage": {
