@@ -228,9 +228,13 @@ behind it.
      alone** — every other destination is a view onto a business that has not
      been named. Settings is in `_previewRoutes` because theme and language
      belong to the device, not to an account.
-   - **`NavigationUtils.requireSignIn` guards the actions that survive**, and
-     is the only thing that may. **Never write `if (isSignedIn)` at a call
-     site** — the old rule's point holds: no screen decides for itself.
+   - **`NavigationUtils.requireSignIn` is a backstop, not the gate.** Nothing
+     reaches it today: every screen with a create action is behind `AuthedTab`
+     or outside `_previewRoutes`, which
+     `test/core/router/signed_out_shell_test.dart` proves. It stays because
+     the day a tab is unwrapped or a signed-out action is added, one guard is
+     what stops that becoming a hole. **Never write `if (isSignedIn)` at a
+     call site** — the old rule's point holds: no screen decides for itself.
    - **The router refuses anything that names a record.** A detail route,
      search and workspace setup all need an account, so a signed-out visitor
      is bounced to Home.
