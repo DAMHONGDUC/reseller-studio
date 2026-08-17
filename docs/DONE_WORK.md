@@ -12,6 +12,7 @@ are there and the mock backend drives them end to end.
 
 | § | Feature | State |
 |---|---|---|
+| — | Onboarding — a three-page intro, once per install, before the gate | built |
 | 5 | Navigation — five tabs, `StatefulShellRoute.indexedStack` | built |
 | 6 | Home — needs-attention, overview figures, recent activity | built |
 | 7 | Inventory — list, item detail, add/edit, Quick Add, scanner, locations, categories | built |
@@ -27,16 +28,30 @@ are there and the mock backend drives them end to end.
 | 19 | Reports — CSV export of sales, inventory and expenses via the share sheet | built |
 | 20 | Tax — year-end summary by form line, mileage at the published rate | built for US and UK, rates verified 16 Aug 2026 |
 | 21 | Search — items, orders, listings and sources in one list | built |
-| 24 | Workspace / team — team screen is read-only | partial |
-| 25 | Settings — account, workspace, mock-data switch (debug only) | built |
-| 26 | Authentication — Apple and Google, sign out, delete account | built, unconfigured |
+| 23 | Activity — the audit log, read-only, under More | screen built; empty until the triggers are deployed |
+| 24 | Workspace — create, switch between several from Home's title | built |
+| 24 | Team — the screen is read-only; the invite callables are written, not deployed | partial |
+| 25 | Settings — account, workspace, theme, mock-data switch (debug only) | built |
+| 26 | Authentication — Apple and Google, sign out, delete account, signed-out shell | built, unconfigured |
 | 27 | Monetization — Free / Pro / Business, limits, paywall, Subscription screen | built, unconfigured |
 
 ## What the flows actually cover
 
+- **First run**: onboarding (three pages, skippable, once per install) → the
+  five tabs, empty → sign-in → workspace setup → Home.
+- **Signed out**: the shell renders. Home, Inventory, Orders and Analytics all
+  show one `SignedOutView` with a sign-in button rather than their own empty
+  states; More stays itself and offers Settings alone, because theme and
+  language belong to the device rather than to an account.
 - **Auth**: Apple + Google sign-in, sign out, delete account, profile document
   written on first sign-in, workspace setup before Home. No email/password
-  anywhere, by rule.
+  anywhere, and **no dev bypass** — it was deleted once the signed-out shell
+  made it unnecessary. A build with no Firebase resolves to signed out rather
+  than throwing.
+- **Workspaces**: several per seller, switched from Home's title through a
+  Slack-style sheet. Switching is a write to `lastWorkspaceId`, never local
+  state, so a teammate's change cannot contradict it. Creating an additional
+  business is its own pushed route.
 - **Inventory**: Quick Add takes a title and nothing else. Full add/edit form
   with photos, item detail, list on a marketplace, mark sold (which creates
   the order), reprice, move, archive, restore, soft delete, **bulk reprice /
@@ -64,9 +79,14 @@ are there and the mock backend drives them end to end.
   reaches a widget.
 - **Logging** through `AppLogger`, analytics through `AppAnalytics` — a typed
   method per event, no credential or buyer detail as a parameter.
-- **Localization**: 388 ARB keys in `en` and `vi` covering shared, auth,
-  workspace, More, Inventory, Orders and Offers. The rest is deliberately
-  deferred — `REMAINING_WORK.md`.
+- **Localization**: **596 ARB keys in `en`** — every plain user-facing string
+  in `presentation/` goes through ARB, and the interpolated ones carry
+  placeholders with real `plural` forms where a count is shown. `app_vi.arb`
+  is still at 388 and is filled in once, at release, by rule — so the language
+  picker is deliberately not offered yet. `REMAINING_WORK.md` has the three
+  literals that stay hardcoded and why.
+- **Theme**: light, dark or system from Settings, stored device-local. A
+  business is shared; a phone's brightness is not.
 - **Design system**: v3 on its own generation, spacing owned entirely by
   `SdContentPaddingV3`, no `MediaQuery` read for spacing anywhere in `lib/`.
   `SdFloatingBarScopeV3` wraps the shell body so a snackbar — which draws into
@@ -92,7 +112,15 @@ are there and the mock backend drives them end to end.
   stale, expired, days left — asks, so a test pins the instant with
   `FixedClock`. Recorded timestamps (`createdAt`, `deletedAt`, when an order
   shipped) deliberately still call `DateTime.now()`.
-- **Tests**: 143 passing, none known-failing. Profit/margin/ROI including the
+- **Cloud Functions**: seven written and idle — membership upkeep, the three
+  team callables, and the three audit-log triggers. They build, lint and
+  typecheck in CI; none is deployed. `REMAINING_WORK.md` has what is not
+  written.
+- **CI**: `.github/workflows/ci.yml` analyzes and tests the app on every pull
+  request and builds `functions/` in a separate job. It calls `tool/analyze.sh`
+  and `tool/test.sh` rather than retyping them, and reads the SDK version out
+  of `.fvmrc`.
+- **Tests**: 205 passing, none known-failing. Profit/margin/ROI including the
   plan §11 worked example, plus screen-level tests asserting rendered figures
   against the mock seed. `test/features/shot_tmp_test.dart` is the gitignored
   scratch harness and is excluded — it hangs by design.
@@ -113,3 +141,10 @@ are there and the mock backend drives them end to end.
 - An item with **no cost** — profit, margin and ROI must all read `—`.
 - A bulk action on 20+ items.
 - Airplane mode: Firestore queues the write and the app says so.
+- **A `selleros://` deep link on Android.** The scheme is declared on both
+  platforms now but has never been opened end to end.
+- **The invite flow, once the functions are deployed** — invite, accept from a
+  second account, and check the new business appears in the switcher. That
+  last step is `onMemberWritten` doing its job.
+- **Theme on a device set to dark**, from a cold start: the launch screen
+  should not flash light before the app resolves the stored preference.
