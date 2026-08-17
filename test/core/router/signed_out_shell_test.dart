@@ -110,6 +110,30 @@ void main() {
     }
   });
 
+  testWidgets('no create route is reachable, so no action needs guarding', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester);
+
+    // The reason `NavigationUtils.requireSignIn` never fires today: every
+    // screen with a create button sits behind `AuthedTab` or outside
+    // `_previewRoutes`, so a signed-out visitor cannot reach one to tap it.
+    for (final String create in <String>[
+      AppRoutes.quickAdd,
+      AppRoutes.addItem,
+      AppRoutes.expenses,
+      AppRoutes.search,
+    ]) {
+      await goTo(tester, create);
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.home,
+        reason: '$create must not open without an account',
+      );
+    }
+  });
+
   testWidgets('Settings opens without an account and carries Appearance', (
     WidgetTester tester,
   ) async {

@@ -9,12 +9,18 @@ import 'app_routes.dart';
 /// Moves that carry a rule, so a second caller cannot reimplement one without
 /// it. A plain "push this route" belongs at its call site.
 final class NavigationUtils {
-  /// The gate, now that the five tabs render before anyone signs in.
+  /// The backstop behind hard rule 1, not the gate itself.
   ///
-  /// **This is the whole of hard rule 1's enforcement inside the app**, the
-  /// way the router's `redirect` used to be. A signed-out visitor may look at
-  /// empty tabs; the moment they try to *do* something, this sends them to
-  /// sign in and answers false so the caller stops.
+  /// **Nothing reaches it today.** Four of the five tabs render `SignedOutView`
+  /// through `AuthedTab`, and every screen with a create action sits outside
+  /// `_previewRoutes` — so a signed-out visitor has nothing to tap. It is kept
+  /// because that is a property of the current route table rather than of the
+  /// app: unwrap a tab, or put an action on the signed-out shell, and this is
+  /// the one thing standing between that and a hole.
+  ///
+  /// A signed-out visitor may look at empty tabs; the moment they try to *do*
+  /// something, this sends them to sign in and answers false so the caller
+  /// stops.
   ///
   /// ```dart
   /// if (!NavigationUtils.requireSignIn(context, ref)) return;
