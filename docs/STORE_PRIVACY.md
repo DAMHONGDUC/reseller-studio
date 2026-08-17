@@ -37,7 +37,7 @@ where a reviewer expects to find shipping addresses.
 
 | Data | Collector | Note |
 |---|---|---|
-| Crash traces, device model, OS version | Firebase Crashlytics | `CrashReporter.setUserId` sends the Firebase UID **and nothing else** (hard rule 9) |
+| Crash traces, device model, OS version | Firebase Crashlytics | `SdCrashReporter.setUserId` sends the Firebase UID **and nothing else** (hard rule 9) |
 | Product-interaction events | Firebase Analytics | the full list is `lib/core/analytics/app_analytics.dart`, one typed method per event |
 | App instance id, device and OS, coarse region from IP | Firebase Analytics | the SDK's own baseline, not something the app sends |
 | Subscription and purchase state | RevenueCat | plan tier only |

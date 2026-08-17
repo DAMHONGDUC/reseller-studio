@@ -7,11 +7,19 @@ or widget that renders `Sd*` v3 components.
 
 Tokens and string-free widgets live in `packages/system_design`, a **separate
 git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired
-in as a path dependency. There is exactly one import, and it is the index:
+in as a path dependency. There are two imports and no others — the index for
+anything with a look, and `common.dart` for the shared app infrastructure that
+has none:
 
 ```dart
-import 'package:system_design/index.dart';
+import 'package:system_design/index.dart';   // tokens and widgets
+import 'package:system_design/common.dart';  // SdLogger, SdCrashReporter
 ```
+
+**`common.dart` is pure Dart on purpose** — it exports no widget, so a
+feature's `domain/` can log without importing Flutter. `index.dart` re-exports
+it, so a widget file that already imports the index has `SdLogger` and never
+needs both lines.
 
 **The package holds two generations and Seller OS renders on v3.**
 

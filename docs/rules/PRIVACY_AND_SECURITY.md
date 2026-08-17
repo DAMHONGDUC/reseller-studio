@@ -49,11 +49,11 @@ This is hard rule 9 in the root `CLAUDE.md` and it is repeated here because
 this is the file people read when they are thinking about it:
 
 - No password, OAuth token, API key, session cookie or buyer address.
-- `AppLogger.error` reports to Crashlytics in release, so a log line is the
+- `SdLogger.error` reports to Crashlytics in release, so a log line is the
   shortest path from this codebase to a third-party dashboard.
 - Log the **shape** of a failure — `'marketplace token refresh failed'`, the
   key name, the count, the collection — never the contents.
-- `CrashReporter.setUserId` takes a Firebase UID and nothing else.
+- `SdCrashReporter.setUserId` takes a Firebase UID and nothing else.
 
 ## Buyer data
 

@@ -151,7 +151,7 @@ lib/
     bootstrap/             # guarded zone + Firebase init
     error/                 # AppFailure, FailureMapper
     extensions/            # context.l10n
-    logging/               # AppLogger, CrashReporter
+    logging/               # FirebaseCrashReporter — the logger is shared
     router/                # AppRoutes, app_router.dart
     theme/                 # AppColors, AppTheme — the app owns the palette
     widgets/               # AppShell, SplashScreen
@@ -367,20 +367,21 @@ behind it.
 
 8. **Every `catch` logs — handling an error is not the same as knowing it
    happened.** Call
-   `AppLogger.error('<what failed>', error: error, stackTrace: stackTrace)`.
+   `SdLogger.error(LogTagConstant.<flow>, '<what failed>', error: error,
+   stackTrace: stackTrace)`.
    A block that turns a failure into `null` or `false` is holding the only
    copy of what actually went wrong. Catch `catch (error, stackTrace)`, not
    `on Exception` — `Error` subtypes (a `TypeError` from a malformed document,
    a `StateError`) are not `Exception`s, so `on Exception` lets exactly the
    unexpected failures through unlogged. Never `print(...)`.
-   Notable successes are logged too (`AppLogger.info` / `.action`), so an
+   Notable successes are logged too (`SdLogger.info` / `.action`), so an
    empty console means nothing ran rather than everything worked.
 
 9. **Never log a credential.** No password, OAuth token, API key, or buyer
-   address. `AppLogger.error` reports to Crashlytics in release, so a log line
+   address. `SdLogger.error` reports to Crashlytics in release, so a log line
    is the easiest way for a secret to reach a third-party dashboard. Log the
    *shape* of a failure ('marketplace token refresh failed'), never its
-   contents. `CrashReporter.setUserId` takes a Firebase UID and nothing else.
+   contents. `SdCrashReporter.setUserId` takes a Firebase UID and nothing else.
 
 10. **No secret ships in the Flutter binary.** Plan §14 and §32. Marketplace
     OAuth, and every call that uses a token, happens in a Cloud Function.
@@ -485,7 +486,7 @@ feature's own `CLAUDE.md`.
   `main()` in `main.dart`, a Riverpod provider declaration in a feature's
   `providers.dart`, and a widget's `.show()` extension.
 - **No `abstract final class` — plain `final class`.** Static-only holders
-  (`AppLogger`, `AppColors`, `AppTheme`, `AppEnv`, `AppRoutes`, `DevFlags`,
+  (`AppColors`, `AppTheme`, `AppEnv`, `AppRoutes`, `DevFlags`,
   `FailureMapper`, `SdSpacingConstant`, …) are declared `final class`.
   `abstract` is reserved for contracts that are actually implemented: every
   `domain/repositories/` and `domain/services/` interface stays
@@ -590,13 +591,29 @@ feature's own `CLAUDE.md`.
   lands.** Every `presentation/controllers/` method that touches a repository,
   service or platform plugin wraps its work in `try` /
   `catch (error, stackTrace)`, calls
-  `AppLogger.error('<what failed>', error: error, stackTrace: stackTrace)`
-  (`core/logging/app_logger.dart`), then `rethrow`s — the log is an extra pair
+  `SdLogger.error(LogTagConstant.<flow>, '<what failed>', error: error,
+  stackTrace: stackTrace)`, then `rethrow`s — the log is an extra pair
   of eyes, never a replacement for the caller's error handling. Plain
   `try`/`catch` inline, always: no closure-taking wrapper (an
-  `AppLogger.guard(action)`-style combinator hides the flow), and never
+  `SdLogger.guard(action)`-style combinator hides the flow), and never
   `print(...)`. Cancellation is not a failure. Controllers that only hold
   state have nothing to catch and stay bare.
+- **The logger is `SdLogger`, it comes from the design system, and every call
+  names its flow first.** Owner's rule. It lives in
+  `packages/system_design/lib/core/common/` and is imported from
+  `package:system_design/common.dart` — a pure-Dart entrypoint, so a
+  `domain/` file can log without pulling Flutter in. The app owns no logger of
+  its own; what it owns is the vendor half (`FirebaseCrashReporter`) and the
+  flow list.
+  - **The first argument is a required tag from `LogTagConstant`**
+    (`core/constants/log_tag_constant.dart`), printed ahead of the message:
+    `Login - Signed in — {uid: 3f9…}`. A console interleaves every flow at
+    once, and the tag is what lets one be read back on its own.
+  - **A tag names the flow, never the verb.** The message already says what
+    happened ('Delete item'); `Item - Delete item` is the pair that makes
+    filtering on `Item - ` return the whole story.
+  - **Never type a tag at a call site.** 'Login' and 'login' are one flow to a
+    reader and two to a text filter. A new flow gets a constant first.
 - **Every action in the app logs, and it logs the DATA with it.** Owner's
   rule, and it is the widest of the logging rules — the ones below sharpen it
   rather than compete with it. Every API call, every user tap, every submit: a
@@ -605,12 +622,12 @@ feature's own `CLAUDE.md`.
   - **A log without its data is a log that cannot answer anything.** "Sync
     failed" tells you a sync failed; "Sync failed — {collection: orders,
     pushed: 12}" tells you which one and how far it got. So
-    `AppLogger.action('…', data)` and `AppLogger.info('…', data)` always carry
+    `SdLogger.action('…', data)` and `SdLogger.info('…', data)` always carry
     the payload, the id, the count — whatever the next person would have to
     reproduce the run to find out. **Never the value of a credential or a
     buyer address** (hard rule 9): log the shape, the key name, the count.
   - **An error logs the FULL error and the response**, not a message about it.
-    `AppLogger.error(message, error: …, stackTrace: …, data: …)` — `data` is
+    `SdLogger.error(message, error: …, stackTrace: …, data: …)` — `data` is
     what the call was doing (the arguments, the collection, the record id) and
     `error` is the thing that was thrown, unmodified. A
     `FirebaseFunctionsException`'s `code`/`details` and an
@@ -624,7 +641,7 @@ feature's own `CLAUDE.md`.
   `domain/services/`, launchers, deep-link listeners. A block that turns a
   failure into `null`, `false` or a domain enum is holding the only copy of
   what actually went wrong, so it calls
-  `AppLogger.error('<what failed>', error: error, stackTrace: stackTrace)`
+  `SdLogger.error('<what failed>', error: error, stackTrace: stackTrace)`
   before returning the substitute.
   - Catch `catch (error, stackTrace)`, not `on Exception` — `Error` subtypes
     (`StateError`, `TypeError`, a failed cast) are not `Exception`s, so
@@ -635,16 +652,19 @@ feature's own `CLAUDE.md`.
     failure.
   - why: see `docs/rules/DECISIONS.md` § Why a caught error must still be
     logged
-- **Crash reporting goes through `CrashReporter`**
-  (`core/logging/crash_reporter.dart`): `recordError` for a caught failure
-  worth seeing in production, alongside the `AppLogger.error` that serves the
-  debug console. `domain/` stays pure Dart — report from the presentation or
-  data layer that catches it.
+- **Crash reporting goes through `SdCrashReporter`**
+  (from `package:system_design/common.dart`, wired to Crashlytics by
+  `core/logging/firebase_crash_reporter.dart`): `recordError` for a caught
+  failure worth seeing in production, alongside the `SdLogger.error` that
+  serves the debug console. **The vendor half is the app's, and it is the only
+  file that imports the Crashlytics SDK** — swapping reporters is that file
+  and the one `SdCrashReporter.attach` call in `AppBootstrap`. `domain/` stays
+  pure Dart — report from the presentation or data layer that catches it.
 - **Analytics: every event goes through `AppAnalytics`**
   (`core/analytics/app_analytics.dart`) — a typed method per event, so the
   full inventory of what we send is one file. Never call `FirebaseAnalytics`
   directly and never type an event name at a call site. Events live next to
-  the matching `AppLogger.action` in a `presentation/controllers/` Notifier,
+  the matching `SdLogger.action` in a `presentation/controllers/` Notifier,
   never in a widget's build. A credential, a buyer address or a marketplace
   token never becomes a parameter (hard rule 9).
 
