@@ -58,9 +58,10 @@ class MarketplacesScreen extends ConsumerWidget {
               .map(
                 (Marketplace marketplace) => AppListRow(
                   title: marketplace.displayName,
-                  subtitle:
-                      '${(marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% '
-                      '${context.l10n.marketplacesEstimatedFee}',
+                  subtitle: context.l10n.marketplacesEstimatedFeeLine(
+                    (marketplace.estimatedFeeRate * 100).toStringAsFixed(1),
+                    context.l10n.marketplacesEstimatedFee,
+                  ),
                   icon: Symbols.hub_rounded,
                   showChevron: false,
                   trailing: SdBadgeV3(

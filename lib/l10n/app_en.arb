@@ -2459,5 +2459,133 @@
   "receiptsPhotographAReceiptWhenYouRecord": "Photograph a receipt when you record a purchase or an expense and it shows up here.",
   "@receiptsPhotographAReceiptWhenYouRecord": {
     "description": "Shown on the receipts screens."
+  },
+  "analyticsOrderCount": "{count, plural, =1{1 order} other{{count} orders}}",
+  "@analyticsOrderCount": {
+    "description": "Order count beside a figure. Plural because one order is common on a new account.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsMarginValue": "Margin {value}",
+  "@analyticsMarginValue": {
+    "description": "Margin percentage under the profit statement. The value arrives already formatted.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsMarketplaceRowDetail": "{orders} · fees {fees} ({rate}) · profit {profit}",
+  "@analyticsMarketplaceRowDetail": {
+    "description": "One marketplace's line under its bar. Every value arrives formatted.",
+    "placeholders": {
+      "orders": {
+        "type": "String"
+      },
+      "fees": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "profit": {
+        "type": "String"
+      }
+    }
+  },
+  "listingViewCount": "{count, plural, =1{1 view} other{{count} views}}",
+  "@listingViewCount": {
+    "description": "Views on a marketplace listing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemQuantityTimes": "×{quantity}",
+  "@itemQuantityTimes": {
+    "description": "How many of an item. The × is a multiplication sign, not the letter x.",
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "reportsAsOf": "As of {date}",
+  "@reportsAsOf": {
+    "description": "When the figures on the Reports screen were taken. The date arrives formatted for the locale.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taxYearLabel": "Year {year}",
+  "@taxYearLabel": {
+    "description": "App bar title on the tax screen. The label is a tax year, which is not a calendar year in every country.",
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplacesEstimatedFeeLine": "{rate}% {label}",
+  "@marketplacesEstimatedFeeLine": {
+    "description": "A marketplace's estimated fee rate. Replaces composing the number and the words at the call site.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptKindPurchase": "Purchase",
+  "@receiptKindPurchase": {
+    "description": "A receipt attached to a purchase."
+  },
+  "receiptKindExpense": "Expense",
+  "@receiptKindExpense": {
+    "description": "A receipt attached to an expense."
+  },
+  "receiptSubtitle": "{kind} · {date}",
+  "@receiptSubtitle": {
+    "description": "Second line of a receipt row.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingTargetRoiNote": "To clear {rate}% ROI after {marketplace} fees and postage.",
+  "@sourcingTargetRoiNote": {
+    "description": "Explains the maximum buy price on the purchase evaluator.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "subscriptionPriceLine": "{price} {period}",
+  "@subscriptionPriceLine": {
+    "description": "A plan button: the store's formatted price and the billing period.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
   }
 }

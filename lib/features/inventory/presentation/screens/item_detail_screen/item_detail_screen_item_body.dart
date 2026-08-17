@@ -34,7 +34,10 @@ class _ItemBody extends StatelessWidget {
                   SdBadgeV3(
                     label: ItemConditionLabel.of(context, item.condition!),
                   ),
-                if (item.quantity > 1) SdBadgeV3(label: '×${item.quantity}'),
+                if (item.quantity > 1)
+                  SdBadgeV3(
+                    label: context.l10n.itemQuantityTimes(item.quantity),
+                  ),
               ],
             ),
           ],

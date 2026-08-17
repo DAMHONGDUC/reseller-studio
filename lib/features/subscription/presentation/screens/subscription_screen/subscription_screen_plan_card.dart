@@ -114,9 +114,10 @@ class _PlanCard extends ConsumerWidget {
                   variant: offering.period == BillingPeriod.yearly
                       ? SdButtonVariantV3.primary
                       : SdButtonVariantV3.outlined,
-                  label:
-                      '${offering.formattedPrice} '
-                      '${SubscriptionLabels.period(offering.period)}',
+                  label: context.l10n.subscriptionPriceLine(
+                    offering.formattedPrice,
+                    SubscriptionLabels.period(offering.period),
+                  ),
                   expand: true,
                   busy: isBusy,
                   onPressed: () => _buy(context, ref, offering),

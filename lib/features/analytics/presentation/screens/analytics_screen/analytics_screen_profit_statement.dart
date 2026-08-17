@@ -61,8 +61,14 @@ class _ProfitStatement extends StatelessWidget {
           spacing: SdSpacingConstant.w6,
           runSpacing: SdSpacingConstant.h4,
           children: <Widget>[
-            SdBadgeV3(label: 'Margin ${context.percent(summary.margin)}'),
-            SdBadgeV3(label: '${summary.orderCount} orders'),
+            SdBadgeV3(
+              label: context.l10n.analyticsMarginValue(
+                context.percent(summary.margin),
+              ),
+            ),
+            SdBadgeV3(
+              label: context.l10n.analyticsOrderCount(summary.orderCount),
+            ),
             // Saying the figure is partial is the difference between a number
             // a seller can act on and one that quietly misleads.
             if (!summary.isProfitComplete)

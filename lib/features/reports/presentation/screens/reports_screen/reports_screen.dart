@@ -57,8 +57,9 @@ class ReportsScreen extends ConsumerWidget {
           SizedBox(height: SdContentPaddingV3.topGap),
           SdSectionHeaderV3(
             title: context.l10n.reportsEverythingToDate,
-            subtitle:
-                'As of ${DateTimeUtils.mediumDate(now, locale: context.localeTag)}',
+            subtitle: context.l10n.reportsAsOf(
+              DateTimeUtils.mediumDate(now, locale: context.localeTag),
+            ),
             first: true,
           ),
           Row(

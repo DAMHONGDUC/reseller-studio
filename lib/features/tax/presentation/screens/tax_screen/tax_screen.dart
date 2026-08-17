@@ -49,7 +49,7 @@ class TaxScreen extends ConsumerWidget {
           // would be the same boundary paid for twice.
           SizedBox(height: SdContentPaddingV3.topGap),
           SdSectionHeaderV3(
-            title: 'Year ${summary.year.label}',
+            title: context.l10n.taxYearLabel(summary.year.label),
             subtitle: _period(context, summary.year),
             first: true,
           ),

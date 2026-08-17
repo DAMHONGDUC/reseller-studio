@@ -207,8 +207,10 @@ class _Verdict extends StatelessWidget {
           ),
           SizedBox(height: SdSpacingConstant.h8),
           Text(
-            'To clear ${(PurchaseEvaluation.defaultTargetRoi * 100).round()}% '
-            'ROI after ${marketplace.displayName} fees and postage.',
+            context.l10n.sourcingTargetRoiNote(
+              (PurchaseEvaluation.defaultTargetRoi * 100).round().toString(),
+              marketplace.displayName,
+            ),
             style: context.textTheme3.bodySmall!.faint3(context),
           ),
         ],
