@@ -25,9 +25,12 @@ portability is the whole reason the design system is a submodule.
   reads the SDK version out of `.fvmrc` rather than pinning its own. Both
   scripts fall back from `fvm flutter` to plain `flutter` when fvm is absent,
   which is the only difference between a runner and a laptop.
-  **CI needs the `packages/system_design` submodule pushed** — it checks out
-  the commit the app's gitlink names, and a commit that only exists locally
-  fails the checkout before anything is analyzed.
+  **CI follows the design system's `main`, not the pinned gitlink** (owner's
+  call) — `git submodule update --remote` after checkout, taking the branch
+  `.gitmodules` names. So a widget change needs no gitlink bump here, and the
+  submodule must be **pushed** for CI to see it. The trade: a green run proves
+  the app builds against the tip, not against the commit this repo records, so
+  CI and a laptop can disagree — check that gap first when they do.
 - `melos run test` — the Flutter test suite. **Exclude `*_tmp_test.dart`** —
   the scratch harnesses hang the runner by design, and `flutter test` with no
   arguments picks them up.
