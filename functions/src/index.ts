@@ -31,10 +31,25 @@ import { initializeApp } from 'firebase-admin/app';
 
 initializeApp();
 
-// Nothing is deployed yet. Add each function as its own module and re-export
-// it here, e.g.:
-//
-//   export { connectMarketplace } from './marketplaces/connectMarketplace';
-//   export { onOrderWritten } from './activity/onOrderWritten';
-//   export { deleteWorkspace } from './workspace/deleteWorkspace';
-export {};
+// Membership. `onMemberWritten` is what keeps `users/{uid}.workspaceIds` in
+// step — without it a seller only sees the businesses they created, never the
+// ones they were invited to.
+export { onMemberWritten } from './workspace/onMemberWritten';
+
+// Team. All three are callables because `firestore.rules` denies clients
+// `invites/` and anyone's own membership document, and because the seat limit
+// and the last-owner check both need a count rules cannot take.
+export { inviteMember } from './team/inviteMember';
+export { acceptInvite } from './team/acceptInvite';
+export { removeMember } from './team/removeMember';
+
+// Audit log. Written only here, so `actorId` cannot be forged (hard rule 12).
+export {
+  onItemWritten,
+  onOrderWritten,
+  onListingWritten,
+} from './activity/onRecordWritten';
+
+// Still to write: marketplace OAuth and sync, the RevenueCat webhook that
+// mirrors entitlement into Firestore, FCM sends, and the cascading
+// `deleteWorkspace`.
