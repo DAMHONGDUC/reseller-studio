@@ -1,10 +1,15 @@
 # Mock data — the app runs fully before Firebase exists
 
 **More → Settings → Mock data** swaps every repository for an in-memory one
-seeded with a coherent demo business (`features/mock_data/`). It is on by
-default whenever auth is bypassed, because the two go together: a bypassed
-session has no project and no user, so live mode would show an empty app and
-a stream of permission errors.
+seeded with a coherent demo business (`features/mock_data/`). It is off unless
+`MOCK_DATA_DEFAULT` says otherwise (`docs/rules/COMMANDS.md`), so a dev run
+opens the app a new seller would see.
+
+**It is not visible while signed out, and that is not a bug to fix here.**
+Four tabs render `SignedOutView` (hard rule 1) and `WorkspaceGuard` keeps
+every business stream empty without a workspace — so mock data needs a session
+and a workspace exactly like live data does. The switch is reachable signed
+out because Settings is; what it changes is not.
 
 - `DataMode` is **persisted** (unlike the auth bypass, which is a build flag),
   because it is a setting a developer toggles from inside the running app. It
@@ -26,9 +31,19 @@ a stream of permission errors.
   renders somewhere).
 - **Nothing is persisted.** A restart re-seeds, so the dataset stays the
   known-good one the tests are written against.
-- Live mode throws `UnimplementedError` from any repository provider — the
-  Firestore implementations do not exist yet. That is a named, explanatory
-  failure rather than a null-check crash three frames later.
+- **Live mode is real now.** Every repository provider hands out its Firestore
+  implementation; what it throws on is a missing workspace, which is a routing
+  bug and says so out loud.
+- **`DemoDataSeeder` is the other direction and the reason this feature earns
+  its keep beyond development.** It takes the same seed and writes it through
+  whatever repositories are live, so a brand new account can be demonstrated
+  instead of showing five empty tabs — More → Settings → Seed demo data, debug
+  builds only. Ids come from the seed and every write is an upsert, so running
+  it twice replaces the demo business rather than doubling it. It is also the
+  only thing that drives every live write path in one run, which makes it the
+  fastest way to find out whether `data/` actually works against Firestore.
+  `test/features/mock_data/demo_data_seeder_test.dart`.
 
-Delete this feature when the real data layer is done, the same way the auth
-bypass goes.
+Delete this feature when the real data layer is trusted — but note that
+`DemoDataSeeder` outlives the switch: it is about filling a real workspace,
+not about faking one.
