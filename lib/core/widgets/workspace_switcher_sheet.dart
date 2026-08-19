@@ -9,6 +9,7 @@ import '../../features/workspace/providers.dart';
 import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../router/app_routes.dart';
+import 'app_selectable_row.dart';
 
 /// Slack's workspace switcher, in the shape a five-tab app can hold it.
 ///
@@ -63,9 +64,11 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
         children: <Widget>[
           ConstrainedBox(
             constraints: BoxConstraints(maxHeight: SdSpacingConstant.h200 * 2),
-            child: ListView.builder(
+            child: ListView.separated(
               shrinkWrap: true,
               itemCount: workspaces.length,
+              separatorBuilder: (BuildContext context, int index) =>
+                  SizedBox(height: SdSpacingConstant.h4),
               itemBuilder: (BuildContext context, int index) {
                 final Workspace workspace = workspaces[index];
 
@@ -105,44 +108,45 @@ class _WorkspaceRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color accent = context.colorScheme3.primary;
 
-    return InkWell(
+    final TextStyle name = isCurrent
+        ? context.textTheme3.bodyMedium!.semiBold3.copyWith(color: accent)
+        : context.textTheme3.bodyMedium!.copyWith(
+            color: context.sdTheme3.textPrimary,
+          );
+
+    return AppSelectableRow(
       // Tapping the one already open is a no-op the controller short-circuits,
       // but leaving it tappable keeps the row heights and hit targets uniform.
+      isSelected: isCurrent,
       onTap: onTap,
-      borderRadius: SdRadiusV3.cardAll,
-      child: Padding(
-        padding: SdContentPaddingV3.row,
-        child: Row(
-          children: <Widget>[
-            SdIconTileV3(
-              icon: Symbols.storefront_rounded,
-              tint: accent,
-              filled: isCurrent,
+      child: Row(
+        children: <Widget>[
+          SdIconTileV3(
+            icon: Symbols.storefront_rounded,
+            tint: accent,
+            filled: isCurrent,
+          ),
+          SizedBox(width: SdSpacingConstant.w12),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  workspace.name,
+                  style: name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  workspace.currency,
+                  style: context.textTheme3.bodySmall!.muted3(context),
+                ),
+              ],
             ),
-            SizedBox(width: SdSpacingConstant.w12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    workspace.name,
-                    style: context.textTheme3.bodyMedium!.copyWith(
-                      color: context.sdTheme3.textPrimary,
-                      fontWeight: isCurrent ? FontWeight.w600 : null,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    workspace.currency,
-                    style: context.textTheme3.bodySmall!.muted3(context),
-                  ),
-                ],
-              ),
-            ),
-            if (isCurrent) SdIconV3(Symbols.check_rounded, color: accent),
-          ],
-        ),
+          ),
+          if (isCurrent) SdIconV3(Symbols.check_rounded, color: accent),
+        ],
       ),
     );
   }
@@ -154,23 +158,21 @@ class _CreateWorkspaceRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => AppSelectableRow(
+    // Never the selected one — it is an action, not a business you can be in.
+    isSelected: false,
     onTap: onTap,
-    borderRadius: SdRadiusV3.cardAll,
-    child: Padding(
-      padding: SdContentPaddingV3.row,
-      child: Row(
-        children: <Widget>[
-          SdIconV3(Symbols.add_rounded, color: context.colorScheme3.primary),
-          SizedBox(width: SdSpacingConstant.w12),
-          Text(
-            context.l10n.workspaceCreateNew,
-            style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
-              color: context.colorScheme3.primary,
-            ),
+    child: Row(
+      children: <Widget>[
+        SdIconV3(Symbols.add_rounded, color: context.colorScheme3.primary),
+        SizedBox(width: SdSpacingConstant.w12),
+        Text(
+          context.l10n.workspaceCreateNew,
+          style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
+            color: context.colorScheme3.primary,
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
 }

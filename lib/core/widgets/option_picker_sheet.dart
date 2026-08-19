@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import 'app_selectable_row.dart';
+
 /// One row in an [OptionPickerSheet].
 ///
 /// [label] is a finished, localized string — the sheet does no formatting and
@@ -68,9 +70,14 @@ class OptionPickerSheet<T> extends StatelessWidget {
       // Capped so a long list — every currency, say — scrolls inside the
       // sheet instead of growing it past the top of the screen.
       constraints: BoxConstraints(maxHeight: SdSpacingConstant.h200 * 2),
-      child: ListView.builder(
+      child: ListView.separated(
         shrinkWrap: true,
         itemCount: options.length,
+        // A gap rather than a hairline: each row carries its own rounded
+        // ground when chosen, and a divider cutting through that reads as two
+        // competing shapes.
+        separatorBuilder: (BuildContext context, int index) =>
+            SizedBox(height: SdSpacingConstant.h4),
         itemBuilder: (BuildContext context, int index) {
           final PickerOption<T> option = options[index];
 
@@ -97,44 +104,53 @@ class _PickerRow<T> extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    borderRadius: SdRadiusV3.cardAll,
-    child: Padding(
-      padding: SdContentPaddingV3.row,
+  Widget build(BuildContext context) {
+    final Color accent = context.colorScheme3.primary;
+
+    return AppSelectableRow(
+      isSelected: isSelected,
+      onTap: onTap,
       child: Row(
         children: <Widget>[
           if (option.icon != null) ...<Widget>[
-            SdIconV3(option.icon!, color: context.sdTheme3.textSecondary),
+            SdIconV3(
+              option.icon!,
+              color: isSelected ? accent : context.sdTheme3.textSecondary,
+            ),
             SizedBox(width: SdSpacingConstant.w12),
           ],
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   option.label,
-                  style: context.textTheme3.bodyMedium!.copyWith(
-                    color: context.sdTheme3.textPrimary,
-                  ),
+                  // Weight as well as colour: the chosen row has to be
+                  // findable by someone who cannot tell the two apart.
+                  style: isSelected
+                      ? context.textTheme3.bodyMedium!.semiBold3.copyWith(
+                          color: accent,
+                        )
+                      : context.textTheme3.bodyMedium!.copyWith(
+                          color: context.sdTheme3.textPrimary,
+                        ),
                 ),
-                if (option.caption != null)
+                if (option.caption != null) ...<Widget>[
+                  SizedBox(height: SdSpacingConstant.h2),
                   Text(
                     option.caption!,
                     style: context.textTheme3.bodySmall!.faint3(context),
                   ),
+                ],
               ],
             ),
           ),
-          // A tick as well as the accent colour: colour is never the only
-          // signal for a state.
-          if (isSelected)
-            SdIconV3(
-              Symbols.check_rounded,
-              color: context.colorScheme3.primary,
-            ),
+          // A tick as well as the ground and the weight: colour is never the
+          // only signal for a state.
+          if (isSelected) SdIconV3(Symbols.check_rounded, color: accent),
         ],
       ),
-    ),
-  );
+    );
+  }
 }
