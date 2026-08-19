@@ -8,6 +8,7 @@ import '../../../../../core/constants/brand_asset_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../domain/repositories/auth_repository.dart';
+import '../../../providers.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/auth_brand_mark.dart';
 

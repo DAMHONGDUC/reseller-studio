@@ -10,6 +10,11 @@ part of 'login_screen.dart';
 /// It watches the controller itself rather than taking the state down as a
 /// prop, so a sign-in in flight rebuilds these two buttons and not the feature
 /// list above them.
+///
+/// **Apple's button is drawn only when Apple's own mark is bundled**
+/// ([appleBrandMarkProvider]). It is missing until the owner adds it, and a
+/// button whose logo fails to load throws while this screen builds — which
+/// would cost the seller Google as well.
 class _LoginActions extends ConsumerWidget {
   const _LoginActions({required this.onSignIn});
 
@@ -18,6 +23,10 @@ class _LoginActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthFormState state = ref.watch(authControllerProvider);
+    // False while the bundle is still being asked: showing the button and
+    // then pulling it away reads worse than it arriving a frame late.
+    final bool hasAppleMark =
+        ref.watch(appleBrandMarkProvider).value ?? false;
     // Apple's guidelines want the mark in the label's colour, so it is read
     // from the variant rather than assumed.
     final Color appleForeground = SdButtonStyleV3.of(
@@ -35,20 +44,22 @@ class _LoginActions extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
-            label: context.l10n.authContinueWithApple,
-            leading: AuthBrandMark(
-              asset: BrandAssetConstant.appleLogo,
-              tint: appleForeground,
+          if (hasAppleMark) ...<Widget>[
+            SdButtonV3(
+              variant: SdButtonVariantV3.primary,
+              label: context.l10n.authContinueWithApple,
+              leading: AuthBrandMark(
+                asset: BrandAssetConstant.appleLogo,
+                tint: appleForeground,
+              ),
+              expand: true,
+              busy: state.isBusyWith(AuthProviderKind.apple),
+              onPressed: state.isBusy
+                  ? null
+                  : () => onSignIn(AuthProviderKind.apple),
             ),
-            expand: true,
-            busy: state.isBusyWith(AuthProviderKind.apple),
-            onPressed: state.isBusy
-                ? null
-                : () => onSignIn(AuthProviderKind.apple),
-          ),
-          SizedBox(height: SdSpacingConstant.h12),
+            SizedBox(height: SdSpacingConstant.h12),
+          ],
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,
             label: context.l10n.authContinueWithGoogle,
