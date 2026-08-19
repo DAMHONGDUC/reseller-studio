@@ -302,6 +302,15 @@ behind it.
      only way in and no account can be created; the app opens on the
      signed-out shell, and mock data in More → Settings is how it is developed
      against. See `RELEASE_ACTIONS.md`.
+   - **The Apple button is hidden while Apple's own mark is missing**, and
+     comes back on its own the moment `assets/brand/apple_logo.svg` lands
+     (`appleBrandMarkProvider`). The mark may not be redrawn, and
+     `SvgPicture.asset` on an absent file throws *while the login screen
+     builds* — so an un-hidden button costs the seller Google as well, which
+     is the whole gate. Hiding it is also honest: Apple sign-in has no
+     Services ID yet either. `tool/preflight.sh` is what stops a release
+     shipping without the file, so this never softens App Store guideline
+     4.8. `test/features/auth/login_screen_test.dart` pins it.
    - A cancelled sign-in is **not** an error: the seller closed a sheet. It is
      logged as info and shows no message.
 
