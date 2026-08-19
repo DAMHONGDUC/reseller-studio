@@ -102,3 +102,11 @@ jobs:
       - name: Typecheck
         working-directory: functions
         run: npx tsc --noEmit
+
+      # The rules are the real access boundary — the signed-out shell and every
+      # `WorkspaceGuard` are UI states, never permissions. Run from the repo
+      # root: `firebase.json` and `firestore.rules` both live there, and the
+      # script uses the CLI `npm ci` just installed. The runner already has
+      # the Java the emulator needs.
+      - name: Firestore rules
+        run: sh tool/test-rules.sh

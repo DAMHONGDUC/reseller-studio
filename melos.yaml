@@ -50,6 +50,12 @@ scripts:
     description: Run the Flutter test suite.
     run: sh tool/test.sh
 
+  test-rules:
+    description: >
+      Run firestore.rules against the emulator. Needs Java; starts and stops
+      the emulator itself.
+    run: sh tool/test-rules.sh
+
   preflight:
     description: >
       Check everything that must be true before a build is worth uploading.
