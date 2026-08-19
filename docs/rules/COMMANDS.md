@@ -34,6 +34,12 @@ portability is the whole reason the design system is a submodule.
 - `melos run test` — the Flutter test suite. **Exclude `*_tmp_test.dart`** —
   the scratch harnesses hang the runner by design, and `flutter test` with no
   arguments picks them up.
+- `melos run test-rules` — `firestore.rules` against the emulator. Starts and
+  stops it itself, so nothing is left running, and it needs **Java**. Uses the
+  `firebase` CLI from `functions/node_modules`, deliberately not whatever is on
+  PATH: a globally installed CLI is a `pkg` bundle carrying its own node, and
+  the child process it spawns resolves `node` to that bundle, which does not
+  understand `--test`.
 - `melos run preflight` — everything that must be true before a build is
   worth uploading: the Firebase and sign-in files, no auth bypass in `lib/`, the
   icon not being Flutter's, the iOS usage strings, and a clean analyze. Exits

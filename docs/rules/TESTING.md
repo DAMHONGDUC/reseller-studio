@@ -26,12 +26,21 @@ Done: **(1) profit, margin, ROI and max-buy-price**, including the plan §11
 worked example, and screen-level tests that assert the figures rendered
 against the mock seed rather than eyeballing a screenshot.
 
+**Done: (3) permissions.** `functions/test/firestore_rules.test.mjs` runs the
+deployed `firestore.rules` against the emulator — `melos run test-rules`, which
+starts and stops it itself and needs Java. It covers what the file cannot be
+read to prove: that a viewer cannot write, that nobody edits their own
+membership document (hard rule 11), that the first-member bootstrap clause
+admits only the uid the workspace names as `ownerId` and only as `owner`, and
+that the audit log, marketplace and subscription documents refuse every client
+write (hard rules 10 and 12). **It lives under `functions/` because that is the
+repo's only Node toolchain and CI already has the job** — rules are not
+functions, and the directory is the only thing they share.
+
 Still to do, in order:
 
 2. **State transitions** (plan §29) — that listing an item without a price is
    refused, and that Quick Add with only a title is not.
-3. **Permissions** — that a `viewer` cannot write and that nobody can edit
-   their own membership document. Firestore rules tests against the emulator.
 4. **Repository boundary** — that every `data/` method maps its failures to
    `AppFailure` rather than leaking a `FirebaseException`.
 5. **Widget tests** for forms and error states.

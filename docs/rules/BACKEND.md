@@ -31,7 +31,10 @@ about how the backend is written.
   rule 12.
 - **Run the real rules against the emulator in CI.** A rules test that mocks
   the evaluation proves nothing; the emulator runs the same engine production
-  does. This is item 3 on the testing list (`TESTING.md`).
+  does. Built: `melos run test-rules`, and CI's `functions` job runs it.
+  **The suite reads `firestore.rules` itself, never a copy** — a copy would let
+  the two drift, which is the one way a rules test fails: passing while
+  production is open.
 
 ## Queries
 
