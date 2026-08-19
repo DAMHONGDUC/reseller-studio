@@ -191,6 +191,17 @@ Owner's rules, all of them read from one place so no screen types them:
   misalignment even when both are centred. The leftover splits evenly top and
   bottom. **A control docking into the bar pads itself; it does not fill the
   bar.**
+- **A row in a sheet that can be the chosen one is `AppSelectableRow`**
+  (`core/widgets/`). It owns the ground, the corner and the hit target, and
+  nothing else — what "chosen" looks like inside stays the sheet's, because
+  the picker ticks the row while the workspace switcher fills its icon tile.
+  Two things it settles that a hand-rolled `InkWell` kept getting wrong: a
+  one-line row is otherwise only as tall as its text, which is under the 44pt
+  Apple asks for; and the chosen row said so only with a tick at the far right,
+  which is a long way from the label somebody is actually reading. **Colour is
+  never the only signal** — the ground comes with a weight change and a glyph.
+  Rows separated by a gap rather than a hairline: each carries its own rounded
+  ground, and a rule cutting through that reads as two competing shapes.
 - **The rule between two rows is `SdDividerV3`, never Material's `Divider`.**
   Material reserves a whole `height` around a rule only `thickness` tall, and
   defaults that height to 16 — so a call site asking for a hairline silently
