@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:simple_icons/simple_icons.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_feature_constant.dart';
-import '../../../../../core/constants/brand_asset_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../domain/repositories/auth_repository.dart';
-import '../../../providers.dart';
 import '../../controllers/auth_controller.dart';
-import '../../widgets/auth_brand_mark.dart';
 
 part 'login_screen_actions.dart';
 part 'login_screen_features.dart';
@@ -30,9 +28,9 @@ part 'login_screen_header.dart';
 /// and never has to secure a reset flow.
 ///
 /// Apple is not optional beside Google: App Store guideline 4.8 requires it
-/// wherever a third-party sign-in is offered. Both marks are the vendors' own
-/// files from `assets/brand/` (`BrandAssetConstant`) — neither may be redrawn,
-/// and Google's may not be recoloured.
+/// wherever a third-party sign-in is offered. Both marks come from
+/// `SimpleIcons` (owner's rule); swapping them for the vendors' own artwork is
+/// a submission task, not a build one — `RELEASE_ACTIONS.md` blocker 5.
 ///
 /// The screen navigates nowhere on success: the router's redirect watches auth
 /// state and moves the seller on by itself.

@@ -11,10 +11,10 @@ part of 'login_screen.dart';
 /// prop, so a sign-in in flight rebuilds these two buttons and not the feature
 /// list above them.
 ///
-/// **Apple's button is drawn only when Apple's own mark is bundled**
-/// ([appleBrandMarkProvider]). It is missing until the owner adds it, and a
-/// button whose logo fails to load throws while this screen builds — which
-/// would cost the seller Google as well.
+/// **Both marks are `SimpleIcons` glyphs** (owner's rule) — a font, not the
+/// vendors' own artwork, so nothing here can fail to load and take the only
+/// way into the app down with it. `SdButtonV3.icon` sizes and tints them from
+/// the variant, which is why neither button needs the `leading` slot.
 class _LoginActions extends ConsumerWidget {
   const _LoginActions({required this.onSignIn});
 
@@ -23,16 +23,6 @@ class _LoginActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthFormState state = ref.watch(authControllerProvider);
-    // False while the bundle is still being asked: showing the button and
-    // then pulling it away reads worse than it arriving a frame late.
-    final bool hasAppleMark =
-        ref.watch(appleBrandMarkProvider).value ?? false;
-    // Apple's guidelines want the mark in the label's colour, so it is read
-    // from the variant rather than assumed.
-    final Color appleForeground = SdButtonStyleV3.of(
-      context,
-      SdButtonVariantV3.primary,
-    ).foreground;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -44,28 +34,21 @@ class _LoginActions extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          if (hasAppleMark) ...<Widget>[
-            SdButtonV3(
-              variant: SdButtonVariantV3.primary,
-              label: context.l10n.authContinueWithApple,
-              leading: AuthBrandMark(
-                asset: BrandAssetConstant.appleLogo,
-                tint: appleForeground,
-              ),
-              expand: true,
-              busy: state.isBusyWith(AuthProviderKind.apple),
-              onPressed: state.isBusy
-                  ? null
-                  : () => onSignIn(AuthProviderKind.apple),
-            ),
-            SizedBox(height: SdSpacingConstant.h12),
-          ],
+          SdButtonV3(
+            variant: SdButtonVariantV3.primary,
+            label: context.l10n.authContinueWithApple,
+            icon: SimpleIcons.apple,
+            expand: true,
+            busy: state.isBusyWith(AuthProviderKind.apple),
+            onPressed: state.isBusy
+                ? null
+                : () => onSignIn(AuthProviderKind.apple),
+          ),
+          SizedBox(height: SdSpacingConstant.h12),
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,
             label: context.l10n.authContinueWithGoogle,
-            // Untinted on purpose — the four-colour "G" is the only form
-            // Google's branding guidelines allow.
-            leading: const AuthBrandMark(asset: BrandAssetConstant.googleG),
+            icon: SimpleIcons.google,
             expand: true,
             busy: state.isBusyWith(AuthProviderKind.google),
             onPressed: state.isBusy

@@ -4,12 +4,8 @@ library;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/common.dart';
 
-import '../../core/constants/brand_asset_constant.dart';
-import '../../core/constants/log_tag_constant.dart';
 import 'data/repositories/firebase_auth_repository.dart';
 import 'domain/repositories/auth_repository.dart';
 
@@ -88,35 +84,3 @@ final Provider<String?> currentUidProvider = Provider<String?>((Ref ref) {
   return ref.watch(authUserProvider).value?.uid;
 });
 
-/// Whether the Apple button may be drawn at all.
-///
-/// **It asks whether Apple's own mark is bundled, not whether Apple sign-in
-/// is configured** — because the mark is what the screen crashes on.
-/// `assets/brand/apple_logo.svg` can only come from Apple's design resources
-/// and may not be redrawn ([BrandAssetConstant]), so until the owner adds it
-/// the widget throws while building the login screen and takes Google — the
-/// only other way in — down with it.
-///
-/// Hiding the button is also the honest state: Apple sign-in has no Services
-/// ID yet either, so a button that rendered would fail on tap. It comes back
-/// on its own the moment the file lands, and `tool/preflight.sh` is what stops
-/// a build shipping without it (`RELEASE_ACTIONS.md` blocker 5).
-final FutureProvider<bool> appleBrandMarkProvider = FutureProvider<bool>((
-  Ref ref,
-) async {
-  try {
-    await rootBundle.load(BrandAssetConstant.appleLogo);
-
-    return true;
-  } catch (error, stackTrace) {
-    SdLogger.error(
-      LogTagConstant.login,
-      'Apple brand mark is not bundled — hiding the Apple button',
-      error: error,
-      stackTrace: stackTrace,
-      data: <String, String>{'asset': BrandAssetConstant.appleLogo},
-    );
-
-    return false;
-  }
-});

@@ -3,22 +3,23 @@ import 'package:seller_os/features/auth/presentation/screens/login_screen/login_
 
 import '../../support/pump_app.dart';
 
-/// **The login screen must render with Apple's mark missing** — it is the only
-/// way into the app, and until the owner adds
-/// `assets/brand/apple_logo.svg` there is nothing for that button to draw.
+/// **The login screen must always render both ways in.** It is the only gate
+/// into the app (`CLAUDE.md` hard rule 1), so anything that can throw while it
+/// builds costs a seller the product entirely.
 ///
-/// The bug this pins is not cosmetic: `SvgPicture.asset` on an absent file
-/// throws while the screen builds, which takes Google — the other way in —
-/// down with it. So the Apple button is hidden while its mark is, and the
-/// screen still offers a way to sign in.
+/// That is not hypothetical: the marks used to be vendor SVGs loaded from
+/// `assets/brand/`, and the Apple file has never existed — `SvgPicture.asset`
+/// threw during build and took Google down with it. Both marks are now
+/// `SimpleIcons` glyphs, which are compiled into a font and cannot fail to
+/// load. This pins the outcome rather than the mechanism.
 void main() {
-  testWidgets('with no Apple mark bundled, only Google is offered', (
+  testWidgets('both sign-in buttons render, and nothing throws', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const LoginScreen());
 
     expect(tester.takeException(), isNull);
+    expect(find.text('Continue with Apple'), findsOneWidget);
     expect(find.text('Continue with Google'), findsOneWidget);
-    expect(find.text('Continue with Apple'), findsNothing);
   });
 }

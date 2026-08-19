@@ -41,6 +41,7 @@ dependencies:
   # The shared design system. Its own git repo, checked out here as a
   # submodule — tokens, theme and string-free widgets live there, not in
   # lib/core. Seller OS renders on its v3 generation and never touches v2.
+  simple_icons: ^16.23.0
   system_design:
     path: packages/system_design
   uuid: ^4.5.3
