@@ -16,10 +16,12 @@ import '../../../../mock_data/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
 import '../../../../workspace/workspace_option_label.dart';
+import '../../controllers/demo_seed_controller.dart';
 import '../../controllers/theme_mode_controller.dart';
 
 part 'settings_screen_account_card.dart';
 part 'settings_screen_appearance_card.dart';
+part 'settings_screen_demo_seed_card.dart';
 part 'settings_screen_mock_data_card.dart';
 part 'settings_screen_mock_summary.dart';
 part 'settings_screen_setting_row.dart';
@@ -132,6 +134,13 @@ class SettingsScreen extends ConsumerWidget {
                 horizontal: SdContentPaddingV3.horizontal,
               ),
               child: const _MockDataCard(),
+            ),
+            SizedBox(height: SdSpacingConstant.h12),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: SdContentPaddingV3.horizontal,
+              ),
+              child: const _DemoSeedCard(),
             ),
           ],
         ],

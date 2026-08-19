@@ -34,6 +34,7 @@ import '../subscription/data/repositories/unconfigured_subscription_repository.d
 import '../subscription/domain/repositories/subscription_repository.dart';
 import '../workspace/providers.dart';
 import 'data/in_memory_repositories.dart';
+import 'domain/services/demo_data_seeder.dart';
 
 /// Where the app's data comes from.
 enum DataMode {
@@ -367,3 +368,25 @@ final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
 
       return RevenueCatSubscriptionRepository();
     });
+
+/// Writes the demo business through whatever repositories are live.
+///
+/// Deliberately built from the same repository providers every screen reads,
+/// not from the Firestore classes directly: pointed at mock mode it fills the
+/// in-memory store and proves the seeder itself, and pointed at live mode it
+/// fills the seller's real workspace. See [DemoDataSeeder] for why that
+/// second use exists at all.
+final Provider<DemoDataSeeder> demoDataSeederProvider =
+    Provider<DemoDataSeeder>(
+      (Ref ref) => DemoDataSeeder(
+        items: ref.watch(itemRepositoryProvider),
+        listings: ref.watch(listingRepositoryProvider),
+        orders: ref.watch(orderRepositoryProvider),
+        offers: ref.watch(offerRepositoryProvider),
+        expenses: ref.watch(expenseRepositoryProvider),
+        categories: ref.watch(categoryRepositoryProvider),
+        locations: ref.watch(locationRepositoryProvider),
+        sources: ref.watch(sourceRepositoryProvider),
+        purchases: ref.watch(purchaseRepositoryProvider),
+      ),
+    );
