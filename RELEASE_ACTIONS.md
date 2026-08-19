@@ -16,7 +16,7 @@ Ordered by what blocks what. Work top to bottom.
 | 2 | Google Sign-In OAuth clients | One of only two ways into the app. | 30 min |
 | 3 | Sign in with Apple (Services ID + key) | The other way in, and **App Store review rejects** an app offering Google without it. | 45 min |
 | 4 | Deploy `firestore.rules`, `firestore.indexes.json`, `storage.rules` | Without rules, Firestore is either locked shut or wide open. | 10 min |
-| 5 | Apple's logo mark in `assets/brand/apple_logo.svg` | Only Apple's design resources supply it, and a redrawn one fails Beta App Review. Google's is shipped and the button slot is built, so this file is all that is left. **Until it exists the Apple button is hidden**, so the screen still offers Google — drop the file in and the button returns. | 10 min |
+| 5 | The vendors' own artwork on the sign-in buttons | The buttons currently draw `SimpleIcons` glyphs (owner's rule), which is a **redrawn trademark** — Beta App Review rejects that, and Google's guidelines require their four-colour "G". Nothing is blocked from running; this blocks external TestFlight and submission only. | 30 min |
 | 6 | Bundle id, signing, App Store / Play listings | No build can be uploaded. | 2–3 h |
 | 7 | Privacy policy URL + data-safety answers | Both stores refuse the listing without them. | 1 h |
 
@@ -121,20 +121,26 @@ blocking rather than nice-to-have.
 5. `APPLE_SIGN_IN_SERVICE_ID` in `env/*.json` is for reference; the app itself
    goes through `FirebaseAuth.signInWithProvider`, which handles the nonce.
 
-### Brand marks — blocker 5, mostly closed
+### Brand marks — blocker 5, deferred to submission
 
-The code is done and Google's mark ships. **One file is left, and only Apple
-can hand it to you.**
+**Both buttons draw a `SimpleIcons` glyph today** (owner's rule), passed as
+`SdButtonV3.icon` so the button sizes and tints them like any other icon
+button. That is what unblocked the demo: the previous version loaded vendor
+SVGs from `assets/brand/`, Apple's file has never existed, and
+`SvgPicture.asset` threw *while the login screen built* — which cost the
+seller Google as well, and with it the only way into the app.
 
-What was built: `SdButtonV3` gained a `leading` slot — `icon` is an `IconData`
-and cannot take an image — so both buttons stay the same widget, the same size
-and the same shape as every other button in the app. `AuthBrandMark` paints
-the artwork and `BrandAssetConstant` holds the paths.
+**It is still a redrawn trademark, and that is a review risk, not a style
+preference.** Two things have to happen before an external build:
 
-| Mark | State |
+| Mark | What submission needs |
 |---|---|
-| Google | **Shipped.** `assets/brand/google_g.svg`, Google's own `logo_googleg_48dp` file, byte-for-byte. Rendered untinted — recolouring it breaches their guidelines. |
-| Apple | **Missing.** Download the design resources and save the logo as `assets/brand/apple_logo.svg`. It is tinted to the button's label colour, which is what Apple's guidelines ask for. |
+| Apple | Apple's own logo from the Sign in with Apple design resources. A substitute fails Beta App Review. |
+| Google | Google's four-colour "G", untinted. `assets/brand/google_g.svg` is already in the repo — their own `logo_googleg_48dp` file, byte-for-byte. |
+
+Swapping back is a small change: `SdButtonV3` still has its `leading` slot for
+artwork that cannot be an `IconData`, which is the slot both buttons used
+before.
 
 - Apple: <https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple>
 - Google: <https://developers.google.com/identity/branding-guidelines>

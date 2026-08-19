@@ -71,10 +71,12 @@ else
   blocker "the 1024 app icon exists" 1
 fi
 
-grep -q "Symbols.person_rounded\|Symbols.g_mobiledata_rounded" \
-  lib/features/auth/presentation/screens/login_screen/login_screen.dart
-[ $? -eq 0 ] && MARKS=1 || MARKS=0
-blocker "the login buttons carry real Apple and Google marks" "$MARKS"
+# The buttons draw SimpleIcons glyphs by owner's decision, which runs fine and
+# fails Beta App Review — a redrawn trademark. A blocker here would stop every
+# internal build for a submission-only problem, so it warns and names itself.
+! grep -q "SimpleIcons" \
+  lib/features/auth/presentation/screens/login_screen/login_screen_actions.dart
+warn "the login marks are the vendors' own artwork, not SimpleIcons glyphs" "$?"
 
 echo "→ 6    iOS build settings"
 grep -q "NSCameraUsageDescription" ios/Runner/Info.plist

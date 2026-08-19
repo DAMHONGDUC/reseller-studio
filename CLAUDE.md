@@ -302,15 +302,17 @@ behind it.
      only way in and no account can be created; the app opens on the
      signed-out shell, and mock data in More → Settings is how it is developed
      against. See `RELEASE_ACTIONS.md`.
-   - **The Apple button is hidden while Apple's own mark is missing**, and
-     comes back on its own the moment `assets/brand/apple_logo.svg` lands
-     (`appleBrandMarkProvider`). The mark may not be redrawn, and
-     `SvgPicture.asset` on an absent file throws *while the login screen
-     builds* — so an un-hidden button costs the seller Google as well, which
-     is the whole gate. Hiding it is also honest: Apple sign-in has no
-     Services ID yet either. `tool/preflight.sh` is what stops a release
-     shipping without the file, so this never softens App Store guideline
-     4.8. `test/features/auth/login_screen_test.dart` pins it.
+   - **Both marks are `SimpleIcons` glyphs, passed as `SdButtonV3.icon`** —
+     owner's rule. A font cannot fail to load, and that is the point: the
+     buttons previously drew vendor SVGs from `assets/brand/`, Apple's file
+     has never existed, and `SvgPicture.asset` threw *while the login screen
+     built*, costing the seller Google as well — the whole gate, over one
+     missing asset. `test/features/auth/login_screen_test.dart` pins that both
+     buttons render and nothing throws.
+     **A glyph is a redrawn trademark and does not pass Beta App Review**, so
+     the vendors' own artwork goes back before an external build.
+     `RELEASE_ACTIONS.md` blocker 5 holds both links, and `SdButtonV3.leading`
+     is the slot that takes them.
    - A cancelled sign-in is **not** an error: the seller closed a sheet. It is
      logged as info and shows no message.
 
