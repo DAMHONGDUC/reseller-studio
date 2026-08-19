@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
+import '../../../../core/constants/photo_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/file_uploader.dart';
 import '../../../mock_data/providers.dart';
@@ -95,14 +96,6 @@ class ItemFormState {
 class ItemFormController extends Notifier<ItemFormState> {
   static const Uuid _uuid = Uuid();
 
-  /// How wide a photo is stored at.
-  ///
-  /// 1600 is enough for a marketplace listing and small enough that a seller
-  /// on a phone plan is not uploading eight megabytes per item — the Storage
-  /// rules cap at 15MB, and that cap is a backstop, not a target.
-  static const double photoMaxWidth = 1600;
-  static const int photoQuality = 85;
-
   @override
   ItemFormState build() => const ItemFormState();
 
@@ -158,8 +151,8 @@ class ItemFormController extends Notifier<ItemFormState> {
     try {
       final XFile? picked = await ImagePicker().pickImage(
         source: fromCamera ? ImageSource.camera : ImageSource.gallery,
-        maxWidth: photoMaxWidth,
-        imageQuality: photoQuality,
+        maxWidth: PhotoConstant.maxWidth,
+        imageQuality: PhotoConstant.quality,
       );
 
       if (picked == null) {
