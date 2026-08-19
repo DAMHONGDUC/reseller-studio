@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/date_time_utils.dart';
@@ -34,9 +35,6 @@ class PurchaseFormSheet extends ConsumerStatefulWidget {
 }
 
 class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
-  /// How far back the date picker opens. Five years covers the tax records a
-  /// reseller keeps.
-  static const int pickerYearsBack = 5;
 
   final TextEditingController _total = TextEditingController();
   final TextEditingController _notes = TextEditingController();
@@ -128,7 +126,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
               final DateTime? picked = await showDatePicker(
                 context: context,
                 initialDate: _date,
-                firstDate: DateTime(now.year - pickerYearsBack),
+                firstDate: DateTime(now.year - DatePickerConstant.taxRecordYearsBack),
                 // A purchase cannot be from next month, and one filed there
                 // breaks every period report it lands in.
                 lastDate: now,

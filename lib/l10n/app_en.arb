@@ -2651,5 +2651,38 @@
   "moreActivity": "Activity",
   "@moreActivity": {
     "description": "More screen row leading to the audit log."
+  },
+  "listingStatusDraft": "Draft",
+  "@listingStatusDraft": {
+    "description": "A listing that has not been published to its marketplace yet."
+  },
+  "listingStatusActive": "Active",
+  "@listingStatusActive": {
+    "description": "A listing that is live on its marketplace."
+  },
+  "listingStatusPaused": "Paused",
+  "@listingStatusPaused": {
+    "description": "A listing the seller has temporarily taken down."
+  },
+  "listingStatusEnded": "Ended",
+  "@listingStatusEnded": {
+    "description": "A listing that ran out of time or was withdrawn."
+  },
+  "listingStatusSold": "Sold",
+  "@listingStatusSold": {
+    "description": "A listing whose item has sold."
+  },
+  "listingStatusError": "Needs attention",
+  "@listingStatusError": {
+    "description": "A listing that failed to publish or sync."
+  },
+  "listingDaysLive": "live {count}d",
+  "@listingDaysLive": {
+    "description": "How many days a listing has been live, shown compactly beside its marketplace.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

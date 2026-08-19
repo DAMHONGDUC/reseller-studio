@@ -28,7 +28,8 @@ class SearchHit {
     required this.kind,
     required this.id,
     required this.title,
-    this.subtitle,
+    this.detail,
+    this.status,
   });
 
   final SearchHitKind kind;
@@ -39,7 +40,19 @@ class SearchHit {
   final String id;
 
   final String title;
-  final String? subtitle;
+
+  /// The part of the second line that is already words — a SKU, a marketplace
+  /// name. Never a status: see [status].
+  final String? detail;
+
+  /// The record's status, still an enum.
+  ///
+  /// **Deliberately not turned into a string here.** A provider has no
+  /// `BuildContext`, so a status resolved in this file could only be
+  /// `status.name` — which is a Dart identifier, and putting `partiallyRefunded`
+  /// in front of a seller is both hard rule 7 and simply wrong. `SearchSubtitle`
+  /// does it where the context exists.
+  final Enum? status;
 }
 
 /// What is typed in the search box.
@@ -83,10 +96,8 @@ searchResultsProvider = Provider<List<SearchHit>>((Ref ref) {
           kind: SearchHitKind.item,
           id: item.id,
           title: item.title,
-          subtitle: <String>[
-            item.status.name,
-            if (item.sku != null) item.sku!,
-          ].join(' · '),
+          status: item.status,
+          detail: item.sku,
         ),
       );
     }
@@ -107,7 +118,8 @@ searchResultsProvider = Provider<List<SearchHit>>((Ref ref) {
           title: order.lines.isEmpty
               ? order.marketplace.displayName
               : order.lines.first.title,
-          subtitle: '${order.marketplace.displayName} · ${order.status.name}',
+          status: order.status,
+          detail: order.marketplace.displayName,
         ),
       );
     }
@@ -124,8 +136,8 @@ searchResultsProvider = Provider<List<SearchHit>>((Ref ref) {
           kind: SearchHitKind.listing,
           id: listing.itemId,
           title: listing.title,
-          subtitle:
-              '${listing.marketplace.displayName} · ${listing.status.name}',
+          status: listing.status,
+          detail: listing.marketplace.displayName,
         ),
       );
     }
@@ -139,7 +151,7 @@ searchResultsProvider = Provider<List<SearchHit>>((Ref ref) {
           kind: SearchHitKind.source,
           id: source.id,
           title: source.name,
-          subtitle: source.address,
+          detail: source.address,
         ),
       );
     }

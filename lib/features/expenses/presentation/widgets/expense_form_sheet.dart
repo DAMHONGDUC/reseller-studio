@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/date_time_utils.dart';
@@ -29,9 +30,6 @@ class ExpenseFormSheet extends ConsumerStatefulWidget {
 }
 
 class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
-  /// How far back the date picker opens. Two years covers the current and
-  /// previous tax year, which is as far back as an expense is normally filed.
-  static const int pickerYearsBack = 2;
 
   final TextEditingController _amount = TextEditingController();
   final TextEditingController _vendor = TextEditingController();
@@ -166,7 +164,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
               final DateTime? picked = await showDatePicker(
                 context: context,
                 initialDate: _date,
-                firstDate: DateTime(now.year - pickerYearsBack),
+                firstDate: DateTime(now.year - DatePickerConstant.recentEntryYearsBack),
                 lastDate: now,
               );
 

@@ -11,6 +11,7 @@ import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/listing.dart';
 import '../../../domain/enums/listing_status.dart';
+import '../../../listing_label.dart';
 import '../../../providers.dart';
 
 /// Listings — everything live, everywhere (plan §12).
@@ -56,7 +57,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
               ),
               for (final ListingStatus status in ListingStatus.values)
                 _StatusChip(
-                  label: ListingStatusLabel.of(status),
+                  label: ListingStatusLabel.of(context, status),
                   count: all
                       .where((Listing listing) => listing.status == status)
                       .length,
@@ -83,7 +84,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
                         .map(
                           (Listing listing) => AppListRow(
                             title: listing.title,
-                            subtitle: _subtitle(listing, now),
+                            subtitle: _subtitle(context, listing, now),
                             icon: Symbols.sell_rounded,
                             iconTint: _tint(context, listing.status),
                             trailingText: context.money(listing.price),
@@ -104,7 +105,11 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
 
   /// The platform's own rejection message is surfaced deliberately: it is the
   /// seller's action item, not the kind of internal error hard rule 6 forbids.
-  static String _subtitle(Listing listing, DateTime now) {
+  static String _subtitle(
+    BuildContext context,
+    Listing listing,
+    DateTime now,
+  ) {
     if (listing.lastError != null) {
       return '${listing.marketplace.displayName} · ${listing.lastError}';
     }
@@ -113,9 +118,10 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
 
     return <String>[
       listing.marketplace.displayName,
-      ListingStatusLabel.of(listing.status),
-      if (days != null) 'live ${days}d',
-      if (listing.viewCount != null) '${listing.viewCount} views',
+      ListingStatusLabel.of(context, listing.status),
+      if (days != null) context.l10n.listingDaysLive(days),
+      if (listing.viewCount != null)
+        context.l10n.listingViewCount(listing.viewCount!),
     ].join(' · ');
   }
 
@@ -150,16 +156,4 @@ class _StatusChip extends StatelessWidget {
     selected: selected,
     onSelected: onSelected,
   );
-}
-
-/// The words for a listing status. `domain/` holds none (hard rule 7).
-final class ListingStatusLabel {
-  static String of(ListingStatus status) => switch (status) {
-    ListingStatus.draft => 'Draft',
-    ListingStatus.active => 'Active',
-    ListingStatus.paused => 'Paused',
-    ListingStatus.ended => 'Ended',
-    ListingStatus.sold => 'Sold',
-    ListingStatus.error => 'Needs attention',
-  };
 }

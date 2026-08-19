@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
@@ -36,9 +37,6 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
 }
 
 class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
-  /// How far back the sale date picker opens. A sale being filed more than a
-  /// year late is a data-entry mistake, not a workflow.
-  static const int pickerYearsBack = 2;
 
   late final TextEditingController _price = TextEditingController(
     text: widget.item.askingPrice?.toInputString() ?? '',
@@ -144,7 +142,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
               final DateTime? picked = await showDatePicker(
                 context: context,
                 initialDate: _soldAt,
-                firstDate: DateTime(now.year - pickerYearsBack),
+                firstDate: DateTime(now.year - DatePickerConstant.recentEntryYearsBack),
                 lastDate: now,
               );
 

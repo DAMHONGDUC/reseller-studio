@@ -218,11 +218,6 @@ class _PurchaseDateField extends ConsumerWidget {
 
   final ItemFormState state;
 
-  /// How far back the date picker opens.
-  ///
-  /// Five years covers the tax records a reseller keeps; a picker that opens
-  /// at 1970 makes reaching last Tuesday a scroll.
-  static const int pickerYearsBack = 5;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -241,7 +236,7 @@ class _PurchaseDateField extends ConsumerWidget {
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: state.purchaseDate ?? now,
-          firstDate: DateTime(now.year - pickerYearsBack),
+          firstDate: DateTime(now.year - DatePickerConstant.taxRecordYearsBack),
           // No future purchase dates: a receipt cannot be from next month, and
           // one filed there breaks every period report it lands in.
           lastDate: now,

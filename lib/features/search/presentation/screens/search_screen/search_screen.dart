@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../providers.dart';
+import '../../search_subtitle.dart';
 
 /// Global search (plan §21) — items, orders, listings and sources at once.
 ///
@@ -110,7 +111,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         .map(
                           (SearchHit hit) => AppListRow(
                             title: hit.title,
-                            subtitle: hit.subtitle,
+                            subtitle: SearchSubtitle.of(context, hit),
                             icon: _iconFor(hit.kind),
                             onTap: () => _open(hit),
                           ),
