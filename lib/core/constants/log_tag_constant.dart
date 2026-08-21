@@ -26,6 +26,7 @@ final class LogTagConstant {
   static const String navigation = 'Navigation';
   static const String analytics = 'Analytics';
   static const String photo = 'Photo';
+  static const String link = 'Link';
 
   // --- Auth ---
   static const String login = 'Login';

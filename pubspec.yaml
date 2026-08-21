@@ -44,6 +44,10 @@ dependencies:
   simple_icons: ^16.23.0
   system_design:
     path: packages/system_design
+  # Flutter team's own plugin, and the only way to open the policy pages the
+  # App Store requires a link to. No service behind it — it hands the URL to
+  # the OS.
+  url_launcher: ^6.3.1
   uuid: ^4.5.3
 
 dev_dependencies:

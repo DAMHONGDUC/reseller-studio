@@ -2684,5 +2684,33 @@
         "type": "int"
       }
     }
+  },
+  "legalSection": "Legal",
+  "@legalSection": {
+    "description": "Section header above the terms and privacy links."
+  },
+  "legalTermsOfUse": "Terms of Use",
+  "@legalTermsOfUse": {
+    "description": "Row that opens the terms of use in a browser."
+  },
+  "legalTermsOfUseNote": "What you agree to by using Seller OS.",
+  "@legalTermsOfUseNote": {
+    "description": "Supporting line under the terms of use row."
+  },
+  "legalPrivacyPolicy": "Privacy Policy",
+  "@legalPrivacyPolicy": {
+    "description": "Row that opens the privacy policy in a browser."
+  },
+  "legalPrivacyPolicyNote": "What we store, and what we never do with it.",
+  "@legalPrivacyPolicyNote": {
+    "description": "Supporting line under the privacy policy row."
+  },
+  "legalCouldNotOpen": "Could not open that page.",
+  "@legalCouldNotOpen": {
+    "description": "Shown when no browser handled a legal link."
+  },
+  "subscriptionRenewalTerms": "Plans renew automatically at the price shown until you cancel. Your store account is charged when a period ends, and you can cancel any time from its subscription settings.",
+  "@subscriptionRenewalTerms": {
+    "description": "Auto-renew disclosure on the paywall. App Store guideline 3.1.2 requires it in the binary."
   }
 }

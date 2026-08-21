@@ -10,6 +10,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/legal_links_card.dart';
 import '../../../domain/entities/plan_offering.dart';
 import '../../../domain/entities/subscription_status.dart';
 import '../../../domain/enums/seller_plan.dart';
@@ -112,6 +113,18 @@ class SubscriptionScreen extends ConsumerWidget {
               color: context.sdTheme3.textSecondary,
             ),
           ),
+          // App Store guideline 3.1.2: the renewal terms and both policy
+          // links have to be on the page that sells the subscription, not
+          // only in the store listing.
+          SizedBox(height: SdSpacingConstant.h12),
+          Text(
+            context.l10n.subscriptionRenewalTerms,
+            style: context.textTheme3.bodySmall!.copyWith(
+              color: context.sdTheme3.textSecondary,
+            ),
+          ),
+          SdSectionHeaderV3(title: context.l10n.legalSection),
+          const LegalLinksCard(),
           SizedBox(height: SdContentPaddingV3.bottomGap),
         ],
       ),

@@ -68,6 +68,34 @@ final class AppEnv {
     defaultValue: 'support@selleros.app',
   );
 
+  // --- Legal ---
+  //
+  // Owner's rule: the policy addresses are build-time configuration, not
+  // constants, because a staging build points at a draft nobody has had a
+  // lawyer read. See `docs/rules/ENV.md`.
+  //
+  // **No default on purpose.** Every other getter here falls back to
+  // something usable; these two fall back to nothing, because a guessed URL
+  // is a link a reviewer clicks and finds a 404 behind. Empty means the row
+  // is not drawn at all, and `missingReleaseKeys` names the key.
+
+  static const String privacyPolicyUrl = String.fromEnvironment(
+    'PRIVACY_POLICY_URL',
+  );
+
+  static const String termsOfServiceUrl = String.fromEnvironment(
+    'TERMS_OF_SERVICE_URL',
+  );
+
+  /// Whether either policy address was configured.
+  ///
+  /// What a legal card reads to decide between drawing itself and staying
+  /// out of the layout — App Store review requires both links (guideline
+  /// 3.1.2), and a half-configured build should show the one it has rather
+  /// than an empty card.
+  static bool get hasLegalLinks =>
+      privacyPolicyUrl.isNotEmpty || termsOfServiceUrl.isNotEmpty;
+
   // --- Development switches ---
   //
   // Raw, unguarded values. **Read them through `DevFlags`, never directly**:
@@ -212,6 +240,10 @@ final class AppEnv {
     if (firebaseAndroidAppId.isEmpty) 'FIREBASE_ANDROID_APP_ID',
     if (firebaseMessagingSenderId.isEmpty) 'FIREBASE_MESSAGING_SENDER_ID',
     if (firebaseStorageBucket.isEmpty) 'FIREBASE_STORAGE_BUCKET',
+    // Not a backend key, and still a blocker: App Store review wants both
+    // links reachable from inside the binary (guideline 3.1.2).
+    if (privacyPolicyUrl.isEmpty) 'PRIVACY_POLICY_URL',
+    if (termsOfServiceUrl.isEmpty) 'TERMS_OF_SERVICE_URL',
   ];
 
   /// One line for the log and the Settings diagnostics card.
