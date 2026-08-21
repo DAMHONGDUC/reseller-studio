@@ -92,6 +92,11 @@ final class AppRoutes {
   static const String purchaseEvaluator = '/more/sourcing/evaluate';
   static const String listings = '/more/listings';
   static const String expenses = '/more/expenses';
+
+  /// What each marketplace owes against what it paid (plan §8). Under More
+  /// rather than inside Orders: it is a weekly reconciliation against a bank
+  /// statement, not part of draining today's queue.
+  static const String payouts = '/more/payouts';
   static const String reports = '/more/reports';
   static const String receipts = '/more/receipts';
   static const String tax = '/more/tax';

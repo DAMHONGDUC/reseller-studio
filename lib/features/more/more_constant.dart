@@ -31,6 +31,7 @@ enum MoreDestinationKind {
   sourcing,
   listings,
   expenses,
+  payouts,
   reports,
   receipts,
   categories,
@@ -50,6 +51,7 @@ final class MoreLabel {
         MoreDestinationKind.sourcing => context.l10n.moreSourcing,
         MoreDestinationKind.listings => context.l10n.moreListings,
         MoreDestinationKind.expenses => context.l10n.moreExpenses,
+        MoreDestinationKind.payouts => context.l10n.payoutsTitle,
         MoreDestinationKind.reports => context.l10n.moreReports,
         MoreDestinationKind.receipts => context.l10n.moreReceipts,
         MoreDestinationKind.categories => context.l10n.moreCategories,
@@ -90,6 +92,12 @@ final class MoreConstant {
       kind: MoreDestinationKind.expenses,
       icon: Symbols.receipt_rounded,
       route: AppRoutes.expenses,
+      isBuilt: true,
+    ),
+    MoreDestination(
+      kind: MoreDestinationKind.payouts,
+      icon: Symbols.account_balance_rounded,
+      route: AppRoutes.payouts,
       isBuilt: true,
     ),
     MoreDestination(

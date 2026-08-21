@@ -7,6 +7,7 @@ import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
 import 'domain/enums/order_status.dart';
+import 'domain/services/payout_reconciliation.dart';
 
 /// The tabs across the top of Orders (plan §8).
 enum OrderFilter {
@@ -114,3 +115,28 @@ final Provider<List<Order>> ordersNeedingActionProvider = Provider<List<Order>>(
     return pending;
   },
 );
+
+/// What each marketplace has settled and what it still owes.
+///
+/// Derived at read time like every other figure (hard rule 3): a fee
+/// corrected next week changes what this says a platform owes, which is
+/// exactly what reconciling a bank statement needs.
+final Provider<List<MarketplacePayout>> marketplacePayoutsProvider =
+    Provider<List<MarketplacePayout>>((Ref ref) {
+      return PayoutReconciliation.byMarketplace(
+        ref.watch(ordersProvider).value ?? const <Order>[],
+      );
+    });
+
+/// How many orders across every marketplace are still missing a payout.
+///
+/// What a badge on the More row reads, so a seller sees there is money
+/// outstanding without opening the screen.
+final Provider<int> ordersAwaitingPayoutProvider = Provider<int>((Ref ref) {
+  return ref
+      .watch(marketplacePayoutsProvider)
+      .fold(
+        0,
+        (int running, MarketplacePayout row) => running + row.awaiting.length,
+      );
+});

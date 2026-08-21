@@ -2774,5 +2774,95 @@
   "expensesRecurringRecorded": "Recorded",
   "@expensesRecurringRecorded": {
     "description": "Confirmation after posting a recurring cost."
+  },
+  "payoutsTitle": "Payouts",
+  "@payoutsTitle": {
+    "description": "Screen that reconciles what each marketplace owes against what it paid."
+  },
+  "payoutsTagline": "What each marketplace still owes you",
+  "@payoutsTagline": {
+    "description": "Supporting line under the Payouts row in More."
+  },
+  "payoutsAwaiting": "Awaiting",
+  "@payoutsAwaiting": {
+    "description": "Stat label for money a marketplace has not paid out yet."
+  },
+  "payoutsSettled": "Settled",
+  "@payoutsSettled": {
+    "description": "Stat label for payouts the seller has already recorded."
+  },
+  "payoutsOrdersAwaiting": "{count, plural, =1{1 order} other{{count} orders}} with no payout recorded",
+  "@payoutsOrdersAwaiting": {
+    "description": "Caption under a marketplace's awaiting total.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "payoutsEstimatedNote": "Includes an estimated fee where the platform has not reported one",
+  "@payoutsEstimatedNote": {
+    "description": "Warns that part of the awaiting figure is a guess."
+  },
+  "payoutsNothingOutstanding": "Everything is settled",
+  "@payoutsNothingOutstanding": {
+    "description": "Empty state when no order is missing a payout."
+  },
+  "payoutsNothingOutstandingNote": "Every order that earned money has a payout recorded against it.",
+  "@payoutsNothingOutstandingNote": {
+    "description": "Supporting line on the settled-up empty state."
+  },
+  "payoutsRecordSettlement": "Record settlement",
+  "@payoutsRecordSettlement": {
+    "description": "Title of the sheet that records what a marketplace paid."
+  },
+  "payoutsRecorded": "Settlement recorded",
+  "@payoutsRecorded": {
+    "description": "Confirmation after recording a payout."
+  },
+  "payoutsExpected": "Expected",
+  "@payoutsExpected": {
+    "description": "What an order should pay out: sale price less refund, fees and postage."
+  },
+  "payoutsFeeIsEstimated": "Fee estimated — the platform has not reported one",
+  "@payoutsFeeIsEstimated": {
+    "description": "Caption when the expected figure leans on the marketplace's estimated rate."
+  },
+  "payoutsFeeIsReported": "Fee as the platform reported it",
+  "@payoutsFeeIsReported": {
+    "description": "Caption when the expected figure uses a real reported fee."
+  },
+  "payoutsFeesOptional": "Platform fee (optional)",
+  "@payoutsFeesOptional": {
+    "description": "Field for the commission the marketplace took."
+  },
+  "payoutsFeesHelp": "What the platform took. Replaces the estimate everywhere it is used.",
+  "@payoutsFeesHelp": {
+    "description": "Helper under the fee field."
+  },
+  "payoutsPaidOut": "Paid out",
+  "@payoutsPaidOut": {
+    "description": "Field for what actually landed in the seller's bank."
+  },
+  "payoutsPaidOutHelp": "What actually landed in your bank. This is what you reconcile against.",
+  "@payoutsPaidOutHelp": {
+    "description": "Helper under the payout field."
+  },
+  "payoutsOrderedOn": "Ordered {date}",
+  "@payoutsOrderedOn": {
+    "description": "When an order awaiting settlement was placed.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutsNoSalesYet": "Nothing has sold yet",
+  "@payoutsNoSalesYet": {
+    "description": "Empty state on Payouts when no order has earned money."
+  },
+  "payoutsNoSalesYetNote": "Once an order is paid for, what the marketplace owes you shows up here.",
+  "@payoutsNoSalesYetNote": {
+    "description": "Supporting line on the no-sales empty state."
   }
 }
