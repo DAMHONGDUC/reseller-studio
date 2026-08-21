@@ -17,6 +17,11 @@ Ordered by what unblocks the most, not by size:
 3. **Cross-listing**, last: it needs marketplace OAuth, which needs a
    developer account per platform.
 
+**`firebase_messaging` is a dependency nothing in `lib/` imports.** It is
+there for §22 and reads as dead weight until the FCM work above lands — worth
+either building or removing before submission, so the store questionnaire has
+one fewer thing to explain.
+
 ## 1. Deferred by decision
 
 Owner has ruled on each of these. They are not oversights.
@@ -71,7 +76,8 @@ that needs the Firebase project, which is `RELEASE_ACTIONS.md` blocker 1.
 | 23 | `onItemWritten`, `onOrderWritten`, `onListingWritten` | **Written.** `actorId` is read from the document, never from a client (hard rule 12) |
 | 22 | FCM sends and their triggers | not written |
 | 27 | RevenueCat webhook | not written. It is what makes a plan gate a boundary rather than a UI decision |
-| — | `deleteWorkspace` | not written. Firestore does not cascade, so the subcollections have to be walked |
+| — | `deleteAccount` | **Written.** Guideline 5.1.1(v) — deletes the workspaces the seller solely owns, their Storage objects and the Auth user; refuses a sign-in older than five minutes |
+| — | `deleteWorkspace` | not written. `deleteAccount` walks the subcollections already; what is missing is deleting **one** business without deleting the account with it |
 | 14 | Marketplace OAuth and sync | not written, and blocked on a developer account per marketplace |
 | 13 | Cross-listing push | not written. Every call carrying a token runs server-side (hard rule 10) |
 
@@ -86,12 +92,13 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 
 ## 4. Loose ends found in the code
 
-- **Apple's brand mark is the one asset still missing.** The code is done —
-  `SdButtonV3` has its `leading` slot and Google's own file ships in
-  `assets/brand/` — but Apple's logo can only come from Apple, and **the login
-  screen throws until `assets/brand/apple_logo.svg` exists**. The Apple button
-  also renders in the app's indigo, which Apple's guidelines do not allow.
-  `RELEASE_ACTIONS.md` blocker 5 has both.
+- **Apple's brand mark is the one asset still missing.** Google's own file now
+  draws through `SdButtonV3.leading`, and both buttons wear
+  `SdButtonVariantV3.vendor` — black on light, white on dark, never the app's
+  indigo. Apple's logo can only come from Apple, so that button keeps a
+  `SimpleIcons` glyph: a redrawn trademark that renders, rather than a missing
+  asset that throws while the login screen builds. `RELEASE_ACTIONS.md`
+  blocker 5 is the one-line swap.
 - **Entitlement is not mirrored into Firestore.** The client reads RevenueCat,
   which is a cache for rendering. `firestore.rules` cannot ask an SDK a
   question, so until the webhook function exists the plan gates are a UI

@@ -59,6 +59,12 @@ echo "→ 4    Auth is real, not bypassed"
 ! grep -rq "bypassAuth\|bypassUid" lib/
 blocker "no auth bypass in lib/" "$?"
 
+echo "→ 4b   Account deletion is real"
+# App Store guideline 5.1.1(v): the account AND its data. The client calls a
+# callable; a build where that export went missing deletes nothing.
+grep -q "deleteAccount" functions/src/index.ts
+blocker "the deleteAccount callable is exported" "$?"
+
 echo "→ 5    Store assets and brand marks"
 # Checksum, not file size: the icon can be redesigned to any size, but there
 # is exactly one byte sequence that means "nobody replaced the template".
@@ -71,12 +77,15 @@ else
   blocker "the 1024 app icon exists" 1
 fi
 
-# The buttons draw SimpleIcons glyphs by owner's decision, which runs fine and
-# fails Beta App Review — a redrawn trademark. A blocker here would stop every
-# internal build for a submission-only problem, so it warns and names itself.
+# Google draws its own file; Apple's logo can only come from Apple and the
+# button keeps a SimpleIcons glyph until it exists — a redrawn trademark, which
+# runs fine and fails Beta App Review. A blocker here would stop every internal
+# build for a submission-only problem, so it warns and names itself.
 ! grep -q "SimpleIcons" \
   lib/features/auth/presentation/screens/login_screen/login_screen_actions.dart
 warn "the login marks are the vendors' own artwork, not SimpleIcons glyphs" "$?"
+blocker "assets/brand/google_g.svg — Google's own four-colour G" \
+  "$(exists assets/brand/google_g.svg)"
 
 echo "→ 6    iOS build settings"
 grep -q "NSCameraUsageDescription" ios/Runner/Info.plist
@@ -84,7 +93,22 @@ blocker "NSCameraUsageDescription — the scanner crashes without it" "$?"
 grep -q "NSPhotoLibraryUsageDescription" ios/Runner/Info.plist
 blocker "NSPhotoLibraryUsageDescription" "$?"
 
-echo "→ 7    Listing"
+# Sign in with Apple does not work on device without the entitlement, and the
+# build setting has to name it on all three configurations.
+blocker "ios/Runner/Runner.entitlements" "$(exists ios/Runner/Runner.entitlements)"
+grep -q "com.apple.developer.applesignin" ios/Runner/Runner.entitlements 2>/dev/null
+blocker "the entitlement declares Sign in with Apple" "$?"
+[ "$(grep -c 'CODE_SIGN_ENTITLEMENTS' ios/Runner.xcodeproj/project.pbxproj)" = "3" ]
+blocker "CODE_SIGN_ENTITLEMENTS on Debug, Release and Profile" "$?"
+
+echo "→ 7    Listing and legal"
+# Guideline 3.1.2 wants both links reachable from inside the binary, so the
+# paywall and About read them from env. Empty means the rows are not drawn.
+for KEY in PRIVACY_POLICY_URL TERMS_OF_SERVICE_URL; do
+  grep -q "\"$KEY\"[[:space:]]*:[[:space:]]*\"http" env/prod.json 2>/dev/null
+  blocker "$KEY is set in env/prod.json" "$?"
+done
+
 warn "docs/STORE_PRIVACY.md still has [brackets] to fill" \
   "$(grep -q '\[date\]\|\[support email\]\|\[region\]' docs/STORE_PRIVACY.md \
     2>/dev/null && echo 1 || echo 0)"

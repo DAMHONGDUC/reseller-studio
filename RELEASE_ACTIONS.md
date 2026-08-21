@@ -18,10 +18,12 @@ Ordered by what blocks what. Work top to bottom.
 | 4 | Deploy `firestore.rules`, `firestore.indexes.json`, `storage.rules` | Without rules, Firestore is either locked shut or wide open. | 10 min |
 | 5 | The vendors' own artwork on the sign-in buttons | The buttons currently draw `SimpleIcons` glyphs (owner's rule), which is a **redrawn trademark** — Beta App Review rejects that, and Google's guidelines require their four-colour "G". Nothing is blocked from running; this blocks external TestFlight and submission only. | 30 min |
 | 6 | Bundle id, signing, App Store / Play listings | No build can be uploaded. | 2–3 h |
-| 7 | Privacy policy URL + data-safety answers | Both stores refuse the listing without them. | 1 h |
+| 7 | Privacy policy + terms URLs, hosted, then in `env/*.json` | Both stores refuse the listing without them, and guideline 3.1.2 wants both links **inside** the app — the paywall and About read `PRIVACY_POLICY_URL` and `TERMS_OF_SERVICE_URL` and draw nothing when they are empty. | 1 h |
 
-App icons, the launch screen and the iOS permission strings **are done** and
-are no longer on this list.
+App icons, the launch screen, the iOS permission strings, the **Sign in with
+Apple entitlement** and **account deletion with its data** are done and are no
+longer on this list. `melos run preflight` checks every row above and exits
+non-zero on the ones still unmet — run it rather than reading this table.
 
 ### TestFlight: internal and external are not the same gate
 
@@ -118,6 +120,10 @@ blocking rather than nice-to-have.
    Sign in with Apple. Note the Key ID and Team ID.
 3. Paste all of it into Firebase Console → Authentication → Apple.
 4. In Xcode, add the **Sign in with Apple** capability to the Runner target.
+   **The repo half is done** — `ios/Runner/Runner.entitlements` declares
+   `com.apple.developer.applesignin` and `CODE_SIGN_ENTITLEMENTS` names it on
+   Debug, Release and Profile. What is left is enabling the capability on the
+   app id in the developer portal so the provisioning profile carries it.
 5. `APPLE_SIGN_IN_SERVICE_ID` in `env/*.json` is for reference; the app itself
    goes through `FirebaseAuth.signInWithProvider`, which handles the nonce.
 
@@ -149,20 +155,29 @@ Neither mark may be redrawn — an approximated trademark is worse than an
 obvious placeholder, because it looks finished. That is why Apple's is a gap
 rather than a best guess.
 
-### ⚠️ The Apple button is the wrong colour for Apple's guidelines
+### The Apple button's colour is fixed
 
-Separate from the missing file, and it will be read at review. "Continue with
-Apple" renders as `SdButtonVariantV3.primary`, which is the app's indigo
-(`AppColors.brand`). **Apple allows three button styles and no others: black,
-white, or white with an outline.** An indigo one is a rejection risk.
+**Was:** `SdButtonVariantV3.primary`, which is the app's indigo. Apple allows
+three styles and no others — black, white, or white with an outline — so an
+indigo one was a rejection risk sitting on the first screen a reviewer opens.
 
-It is a design decision, not a bug, so it has been left alone — **and the
-login redesign made it more visible, not less**: the two buttons now sit
-pinned together at the bottom, so an indigo Apple button beside an outlined
-Google one is the first thing a reviewer looks at. The two ways out: give the
-Apple button the `outlined` variant, so both match and both are
-white-with-outline; or add a black variant for it alone. Say which and it is a
-few minutes.
+**Now:** both buttons wear `SdButtonVariantV3.vendor`, a variant whose colours
+the app's palette cannot reach: black on a light theme, white on a dark one.
+Google's neutral button is the same shape, so the two match without either
+being tinted. The one place the design system hardcodes a colour, and
+`WIDGET_RULES.md` §4 says why.
+
+**Google now draws its own artwork.** `assets/brand/google_g.svg` — their own
+`logo_googleg_48dp` file — goes through `SdButtonV3.leading`, which never
+tints it.
+
+**Apple's logo is still the one asset missing**, and it is the whole of
+blocker 5. The button keeps `SimpleIcons.apple` until
+`assets/brand/apple_logo.svg` exists, because a glyph renders and a missing
+file throws while the login screen builds — which once cost Google as well.
+Swapping it is one line: `icon:` becomes
+`leading: SvgPicture.asset(BrandAssetConstant.appleLogo)`, and the constant
+goes next to `googleG`.
 
 ### I removed a dependency
 
@@ -175,8 +190,8 @@ wrong. If you would rather keep the package, say so and I will switch it back.
 
 ## 3. Store and platform
 
-- **App icons and launch screens are still Flutter's defaults.** Every size,
-  both platforms, plus the adaptive icon on Android.
+- **App icons and launch screens are done** on iOS. Confirm the Android
+  adaptive icon before uploading a Play build.
 - **Bundle id / application id**: iOS is `com.dd.seller.os`. Confirm the
   Android one matches what you registered.
 - **Signing**: an iOS distribution certificate and provisioning profile; an
@@ -267,6 +282,41 @@ keep deducting at the rate that applied to it.
 The jurisdiction comes from the workspace's country, and only `US` and `GB`
 are recognised; anything else falls back to the US. That matches the launch
 markets in `CLAUDE.md`.
+
+## 4d. Account deletion — done, and it needs the functions deployed
+
+**App Store guideline 5.1.1(v) wants the account *and its data* gone.** The
+old delete removed the login with `user.delete()` and left every document
+where it was, which is the reading Apple rejects.
+
+- `functions/src/account/deleteAccount.ts` is the callable. It deletes the
+  workspaces the seller **solely owns** — subcollections and Storage objects
+  with them — removes only the membership from a business somebody else owns,
+  clears their pending invites, then deletes the Auth user last.
+- **It refuses a stale session.** The Admin SDK does not enforce Firebase's
+  `requires-recent-login`, so the function reads `auth_time` off the token and
+  wants a sign-in inside five minutes. Same guard as before, made explicit.
+- **Until `functions/` is deployed, the Delete account row fails** with the
+  one message hard rule 6 allows. That is section 1 blocker 4's deploy, not a
+  separate task.
+
+## 4e. Legal URLs — two env keys only you can fill
+
+`env/` is not editable from this repo, so both keys are yours to add to
+`env/dev.json`, `env/prod.json` **and both `.example.json` templates** — a key
+in one flavour and not the other fails `test/core/config/app_env_test.dart`:
+
+```json
+"PRIVACY_POLICY_URL": "https://…/privacy",
+"TERMS_OF_SERVICE_URL": "https://…/terms"
+```
+
+- Both are on `AppEnv.missingReleaseKeys`, so a release build without them
+  says so by name in the bootstrap log, and `melos run preflight` blocks.
+- **Empty draws nothing** — no row, no dead link. A reviewer clicking through
+  to a 404 is a worse outcome than an app with no link.
+- `docs/STORE_PRIVACY.md` holds the policy draft to host. Filling its
+  brackets and hosting it is what produces the first URL.
 
 ## 5. Decisions I need from you
 
