@@ -92,13 +92,13 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 
 ## 4. Loose ends found in the code
 
-- **Apple's brand mark is the one asset still missing.** Google's own file now
-  draws through `SdButtonV3.leading`, and both buttons wear
-  `SdButtonVariantV3.vendor` — black on light, white on dark, never the app's
-  indigo. Apple's logo can only come from Apple, so that button keeps a
-  `SimpleIcons` glyph: a redrawn trademark that renders, rather than a missing
-  asset that throws while the login screen builds. `RELEASE_ACTIONS.md`
-  blocker 5 is the one-line swap.
+- **Apple's brand mark is the one asset still missing.** Both buttons draw
+  `SimpleIcons` glyphs (hard rule 1) — redrawn trademarks that render, rather
+  than a missing file that throws while the login screen builds. Google's own
+  SVG ships in `assets/brand/` and stays unused until Apple's arrives, so the
+  swap is one change and not two. The colour half is fixed:
+  `SdButtonVariantV3.vendor` is black on light and white on dark, never the
+  app's indigo. `RELEASE_ACTIONS.md` blocker 5.
 - **Entitlement is not mirrored into Firestore.** The client reads RevenueCat,
   which is a cache for rendering. `firestore.rules` cannot ask an SDK a
   question, so until the webhook function exists the plan gates are a UI

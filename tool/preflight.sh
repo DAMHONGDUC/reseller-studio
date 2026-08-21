@@ -77,15 +77,16 @@ else
   blocker "the 1024 app icon exists" 1
 fi
 
-# Google draws its own file; Apple's logo can only come from Apple and the
-# button keeps a SimpleIcons glyph until it exists — a redrawn trademark, which
-# runs fine and fails Beta App Review. A blocker here would stop every internal
-# build for a submission-only problem, so it warns and names itself.
+# Both buttons draw SimpleIcons glyphs by owner's decision (hard rule 1), which
+# runs fine and fails Beta App Review — a redrawn trademark. A blocker here
+# would stop every internal build for a submission-only problem, so it warns
+# and names itself. Google's own file already ships; Apple's is the one that
+# has to arrive before either can be swapped.
 ! grep -q "SimpleIcons" \
   lib/features/auth/presentation/screens/login_screen/login_screen_actions.dart
 warn "the login marks are the vendors' own artwork, not SimpleIcons glyphs" "$?"
-blocker "assets/brand/google_g.svg — Google's own four-colour G" \
-  "$(exists assets/brand/google_g.svg)"
+warn "assets/brand/apple_logo.svg — the mark only Apple can supply" \
+  "$(exists assets/brand/apple_logo.svg)"
 
 echo "→ 6    iOS build settings"
 grep -q "NSCameraUsageDescription" ios/Runner/Info.plist

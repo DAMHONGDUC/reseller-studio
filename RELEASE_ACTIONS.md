@@ -167,17 +167,16 @@ Google's neutral button is the same shape, so the two match without either
 being tinted. The one place the design system hardcodes a colour, and
 `WIDGET_RULES.md` §4 says why.
 
-**Google now draws its own artwork.** `assets/brand/google_g.svg` — their own
-`logo_googleg_48dp` file — goes through `SdButtonV3.leading`, which never
-tints it.
+**Both marks stay `SimpleIcons` glyphs** — owner's rule, restated after
+Google's own SVG was wired in and taken back out. Google's file ships in
+`assets/brand/` and is deliberately unused: two buttons drawn two different
+ways is the state where only one of them can break, and the one that breaks
+takes the whole gate with it.
 
-**Apple's logo is still the one asset missing**, and it is the whole of
-blocker 5. The button keeps `SimpleIcons.apple` until
-`assets/brand/apple_logo.svg` exists, because a glyph renders and a missing
-file throws while the login screen builds — which once cost Google as well.
-Swapping it is one line: `icon:` becomes
-`leading: SvgPicture.asset(BrandAssetConstant.appleLogo)`, and the constant
-goes next to `googleG`.
+**Apple's logo is the asset still missing**, and it is what unblocks the swap
+— both buttons move to `SdButtonV3.leading` in the same change, once
+`assets/brand/apple_logo.svg` exists. Until then blocker 5 stands and the
+glyphs render.
 
 ### I removed a dependency
 

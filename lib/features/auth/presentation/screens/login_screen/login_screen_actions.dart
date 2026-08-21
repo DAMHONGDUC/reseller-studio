@@ -17,12 +17,12 @@ part of 'login_screen.dart';
 /// old `primary` styling was a rejection waiting at review rather than a
 /// style preference. Google's neutral button is the same shape.
 ///
-/// **Google draws its own artwork; Apple still draws a glyph.** The
-/// four-colour "G" is `assets/brand/google_g.svg`, Google's own file, passed
-/// through `leading` so nothing tints it. Apple's logo can only come from
-/// Apple, and `assets/brand/apple_logo.svg` does not exist yet — so that
-/// button keeps `SimpleIcons.apple`, which renders and is a redrawn
-/// trademark. `RELEASE_ACTIONS.md` blocker 5 is the swap, and it is one line.
+/// **Both marks are `SimpleIcons` glyphs** (owner's rule, hard rule 1) — a
+/// font, not the vendors' own artwork, so nothing here can fail to load and
+/// take the only way into the app down with it. Google's real file exists and
+/// is deliberately not used: two buttons drawn two different ways is the state
+/// where only one of them can break. Both swap to `leading` at once, before an
+/// external build — `RELEASE_ACTIONS.md` blocker 5.
 class _LoginActions extends ConsumerWidget {
   const _LoginActions({required this.onSignIn});
 
@@ -56,7 +56,7 @@ class _LoginActions extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.vendor,
             label: context.l10n.authContinueWithGoogle,
-            leading: SvgPicture.asset(BrandAssetConstant.googleG),
+            icon: SimpleIcons.google,
             expand: true,
             busy: state.isBusyWith(AuthProviderKind.google),
             onPressed: state.isBusy
