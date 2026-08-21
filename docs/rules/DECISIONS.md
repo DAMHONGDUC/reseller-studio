@@ -197,3 +197,34 @@ The rule was written after three features failed silently at once: WeatherKit
 answered every call `401` and the app said "no weather", `sendTestPush` was
 refused by the backend, and neither left a line anywhere. The reason to log a
 caught error is that a caught error is invisible by construction.
+
+## A recurring expense is proposed, never posted on its own
+
+`Expense.isRecurring` was written to Firestore and read by nothing, so the
+switch on the form ("Happens every month") changed no behaviour at all. Two
+ways to make it mean something, and the app takes the second:
+
+1. **Post it automatically** each month — a scheduled Cloud Function, or the
+   client writing the missing occurrences the next time it opens.
+2. **Show it as due and let the seller confirm**, which is what ships.
+
+The reason is that an expense is a tax record. Storage rent that was
+cancelled in March keeps posting in April under option 1, and nobody notices
+until the figure it inflated is on a return. A wrong number a seller has to
+find is worse than a right one they had to tap — and the tap is one tap, on a
+row the app has already filled in.
+
+It is also the cheaper half of the same decision: option 1 needs a deploy
+before the feature exists at all (`functions/` is not deployed), and a client
+that writes the backfill on open makes the same write twice from two devices.
+
+**A series is a field, not an inference.** `recurringSeriesId` points every
+occurrence at the first one, because "the same cost as last month" cannot be
+derived from category and vendor — the vendor is optional and the amount
+moves. A row written before the field existed falls back to its own id, so
+nothing needs migrating.
+
+**Monthly is the only cadence, and adding another is a data change.** The form
+says "every month" and nothing offers weekly, because a cadence nobody asked
+for is a picker on a create flow (hard rule 2). A second cadence becomes a
+field on the series, never an `if` at the call site.
