@@ -66,3 +66,19 @@ readable from a unit test without a build flag. The stale threshold especially:
 it is per-workspace data in Firestore (`Workspace.staleThresholdDays`), so
 freezing it into a build file would contradict `docs/DATA_MODEL.md`.
 `env/README.md` has the full list and the reasoning.
+
+**The privacy policy and terms URLs are env keys, not constants** — owner's
+rule. `PRIVACY_POLICY_URL` and `TERMS_OF_SERVICE_URL` are read through
+`AppEnv`, the same as every other build-time value, because they differ per
+flavour: a staging build points at a draft nobody has had a lawyer read, and
+a hardcoded production URL in a `final class Constant` is one that ships to
+staging too.
+
+- **Both are on `AppEnv.missingReleaseKeys`.** Apple's guideline 3.1.2 wants
+  a functional link to each from inside the binary, so a release build with
+  either one empty is not shippable and the bootstrap log says so by name.
+- **An empty value renders nothing at all** — no row, no dead link. A link to
+  a 404 is a worse review outcome than an app with no link, because the
+  reviewer clicks it.
+- They are not secret and belong here for the same reason the Firebase ids
+  do: they are public addresses, not credentials.
