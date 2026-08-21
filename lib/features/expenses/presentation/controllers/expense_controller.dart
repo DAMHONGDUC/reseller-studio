@@ -40,9 +40,15 @@ class ExpenseController extends Notifier<bool> {
     bool isRecurring = false,
   }) async {
     final String currency = ref.read(workspaceCurrencyProvider);
-    final Money? parsed = Money.tryParse(amount, currency);
+    final bool isMileage = category == ExpenseCategory.mileage;
+    final Money? typed = Money.tryParse(amount, currency);
+    final Money? parsed = typed ?? (isMileage ? Money.zero(currency) : null);
     final String expenseId = id ?? _uuid.v4();
 
+    // A mileage trip is deducted at the authority's published rate per mile,
+    // not at what the seller spent, so the money is genuinely optional there
+    // — and the tax calculator excludes the category from its own line total,
+    // which is what stops the zero from claiming the trip was free.
     if (parsed == null) return;
 
     state = true;
@@ -50,6 +56,7 @@ class ExpenseController extends Notifier<bool> {
       'expenseId': expenseId,
       'category': category.name,
       'amountMinor': parsed.minor,
+      'mileage': mileage ?? 0,
       'isAttributed': orderId != null,
     });
     AppAnalytics.instance.expenseRecorded(category: category.name);

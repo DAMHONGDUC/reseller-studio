@@ -2712,5 +2712,42 @@
   "subscriptionRenewalTerms": "Plans renew automatically at the price shown until you cancel. Your store account is charged when a period ends, and you can cancel any time from its subscription settings.",
   "@subscriptionRenewalTerms": {
     "description": "Auto-renew disclosure on the paywall. App Store guideline 3.1.2 requires it in the binary."
+  },
+  "mileageUnitMiles": "Miles",
+  "@mileageUnitMiles": {
+    "description": "The distance unit a US or UK mileage rate is set in."
+  },
+  "mileageUnitKilometres": "Kilometres",
+  "@mileageUnitKilometres": {
+    "description": "The distance unit for a jurisdiction that rates by kilometre."
+  },
+  "expensesDistanceDriven": "Distance driven",
+  "@expensesDistanceDriven": {
+    "description": "Label on the mileage field of the expense form."
+  },
+  "expensesDistanceRequired": "Enter how far you drove",
+  "@expensesDistanceRequired": {
+    "description": "Shown when a mileage expense is saved with no distance."
+  },
+  "expensesMileageDeducts": "Deducts about {amount} at this year's published rate",
+  "@expensesMileageDeducts": {
+    "description": "Live estimate under the mileage field.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "expensesMileageNoRate": "No published rate for that date yet",
+  "@expensesMileageNoRate": {
+    "description": "Shown when no mileage rate covers the date on the form."
+  },
+  "expensesAmountOptionalMileage": "Optional — a trip is deducted by distance, not by what you spent",
+  "@expensesAmountOptionalMileage": {
+    "description": "Helper under the amount field while the category is mileage."
+  },
+  "expensesAmountRequired": "Enter what it cost",
+  "@expensesAmountRequired": {
+    "description": "Shown when an expense is saved with no amount."
   }
 }

@@ -7,9 +7,11 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/utils/mileage_unit_label.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
+import '../../../../tax/providers.dart';
 import '../../../domain/entities/expense.dart';
 import '../../../providers.dart';
 import '../../controllers/expense_controller.dart';
@@ -140,6 +142,11 @@ class ExpensesScreen extends ConsumerWidget {
                           locale: context.localeTag,
                         ),
                         if (expense.vendor != null) expense.vendor!,
+                        // The distance is the whole record for a mileage
+                        // trip — its amount is usually zero on purpose.
+                        if (expense.mileage != null)
+                          '${MileageUnitLabel.distance(expense.mileage!)} '
+                              '${MileageUnitLabel.of(context, ref.watch(taxJurisdictionProvider).mileageUnit).toLowerCase()}',
                         if (expense.orderId != null) 'on an order',
                         if (expense.isRecurring) 'recurring',
                       ].join(' · '),
