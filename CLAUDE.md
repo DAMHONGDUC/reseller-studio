@@ -303,16 +303,25 @@ behind it.
      signed-out shell, and mock data in More → Settings is how it is developed
      against. See `RELEASE_ACTIONS.md`.
    - **Both marks are `SimpleIcons` glyphs, passed as `SdButtonV3.icon`** —
-     owner's rule. A font cannot fail to load, and that is the point: the
-     buttons previously drew vendor SVGs from `assets/brand/`, Apple's file
-     has never existed, and `SvgPicture.asset` threw *while the login screen
-     built*, costing the seller Google as well — the whole gate, over one
-     missing asset. `test/features/auth/login_screen_test.dart` pins that both
-     buttons render and nothing throws.
+     owner's rule, restated after Google's own SVG was wired in and taken back
+     out. A font cannot fail to load, and that is the point: the buttons once
+     drew vendor SVGs from `assets/brand/`, Apple's file has never existed,
+     and `SvgPicture.asset` threw *while the login screen built*, costing the
+     seller Google as well — the whole gate, over one missing asset. Neither
+     button is an exception, including the one whose artwork does ship:
+     **two buttons drawn two different ways is the state where only one of
+     them can break.** `test/features/auth/login_screen_test.dart` pins that
+     both render and nothing throws.
      **A glyph is a redrawn trademark and does not pass Beta App Review**, so
-     the vendors' own artwork goes back before an external build.
-     `RELEASE_ACTIONS.md` blocker 5 holds both links, and `SdButtonV3.leading`
-     is the slot that takes them.
+     the vendors' own artwork goes back before an external build — both at
+     once. `RELEASE_ACTIONS.md` blocker 5 holds both links, and
+     `SdButtonV3.leading` is the slot that takes them.
+   - **Both buttons wear `SdButtonVariantV3.vendor`, never `primary`.** Apple
+     allows its sign-in button in black, white, or white with an outline and
+     nothing else, so the app's indigo was a rejection sitting on the first
+     screen a reviewer opens. The variant's colours are literal black and
+     white and the app's palette cannot reach them — that is what stops a
+     theme change quietly re-tinting somebody else's trademark.
    - A cancelled sign-in is **not** an error: the seller closed a sheet. It is
      logged as info and shows no message.
 
