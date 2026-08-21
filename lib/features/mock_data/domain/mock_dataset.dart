@@ -549,12 +549,15 @@ class MockDataset {
         vendor: 'Uline',
         notes: 'Poly mailers, 200ct.',
       ),
+      // Deliberately older than a month: it is what puts a row in Expenses'
+      // "Due now" block, so the recurring flow is visible in the demo rather
+      // than being a section nobody ever sees populated.
       Expense(
         id: 'exp-2',
         category: ExpenseCategory.software,
         amount: money(2999),
-        date: daysAgo(30),
-        createdAt: daysAgo(30),
+        date: daysAgo(45),
+        createdAt: daysAgo(45),
         vendor: 'Listing tool',
         isRecurring: true,
       ),

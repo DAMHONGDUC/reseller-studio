@@ -24,11 +24,14 @@ out because Settings is; what it changes is not.
   purchase to a source, every order to items that existed, and the totals add
   up by hand — `test/features/screens_with_mock_data_test.dart` asserts the
   arithmetic. Random rows would fill the screens and prove nothing.
-- Three properties of the seed are deliberate and must survive edits to it:
+- Five properties of the seed are deliberate and must survive edits to it:
   **some items have no cost** (so `—` appears and hard rule 5 is exercised),
   **some listings are stale and one failed to publish** (so Needs Attention
-  has something in it), and **one order sold under cost** (so the loss colour
-  renders somewhere).
+  has something in it), **one order sold under cost** (so the loss colour
+  renders somewhere), **one recurring expense is older than a month** (so
+  Expenses' "Due now" block has a row rather than being a section nobody sees
+  populated), and **three sold orders have no payout recorded** (so Payouts has
+  something to reconcile rather than an empty screen).
 - **Nothing is persisted.** A restart re-seeds, so the dataset stays the
   known-good one the tests are written against.
 - **Live mode is real now.** Every repository provider hands out its Firestore
