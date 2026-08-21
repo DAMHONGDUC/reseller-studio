@@ -11,10 +11,18 @@ part of 'login_screen.dart';
 /// prop, so a sign-in in flight rebuilds these two buttons and not the feature
 /// list above them.
 ///
-/// **Both marks are `SimpleIcons` glyphs** (owner's rule) — a font, not the
-/// vendors' own artwork, so nothing here can fail to load and take the only
-/// way into the app down with it. `SdButtonV3.icon` sizes and tints them from
-/// the variant, which is why neither button needs the `leading` slot.
+/// **Both buttons wear `SdButtonVariantV3.vendor`** — black on a light theme,
+/// white on a dark one, and never the app's indigo. Apple allows its sign-in
+/// button in black, white, or white with an outline and nothing else, so the
+/// old `primary` styling was a rejection waiting at review rather than a
+/// style preference. Google's neutral button is the same shape.
+///
+/// **Google draws its own artwork; Apple still draws a glyph.** The
+/// four-colour "G" is `assets/brand/google_g.svg`, Google's own file, passed
+/// through `leading` so nothing tints it. Apple's logo can only come from
+/// Apple, and `assets/brand/apple_logo.svg` does not exist yet — so that
+/// button keeps `SimpleIcons.apple`, which renders and is a redrawn
+/// trademark. `RELEASE_ACTIONS.md` blocker 5 is the swap, and it is one line.
 class _LoginActions extends ConsumerWidget {
   const _LoginActions({required this.onSignIn});
 
@@ -35,7 +43,7 @@ class _LoginActions extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           SdButtonV3(
-            variant: SdButtonVariantV3.primary,
+            variant: SdButtonVariantV3.vendor,
             label: context.l10n.authContinueWithApple,
             icon: SimpleIcons.apple,
             expand: true,
@@ -46,9 +54,9 @@ class _LoginActions extends ConsumerWidget {
           ),
           SizedBox(height: SdSpacingConstant.h12),
           SdButtonV3(
-            variant: SdButtonVariantV3.outlined,
+            variant: SdButtonVariantV3.vendor,
             label: context.l10n.authContinueWithGoogle,
-            icon: SimpleIcons.google,
+            leading: SvgPicture.asset(BrandAssetConstant.googleG),
             expand: true,
             busy: state.isBusyWith(AuthProviderKind.google),
             onPressed: state.isBusy
