@@ -43,6 +43,11 @@ export { inviteMember } from './team/inviteMember';
 export { acceptInvite } from './team/acceptInvite';
 export { removeMember } from './team/removeMember';
 
+// Account deletion. App Store guideline 5.1.1(v) wants the account *and its
+// data* gone, and Firestore does not cascade — so the subcollections and the
+// Storage objects are walked with the Admin SDK.
+export { deleteAccount } from './account/deleteAccount';
+
 // Audit log. Written only here, so `actorId` cannot be forged (hard rule 12).
 export {
   onItemWritten,
@@ -51,5 +56,5 @@ export {
 } from './activity/onRecordWritten';
 
 // Still to write: marketplace OAuth and sync, the RevenueCat webhook that
-// mirrors entitlement into Firestore, FCM sends, and the cascading
-// `deleteWorkspace`.
+// mirrors entitlement into Firestore, FCM sends, and a `deleteWorkspace` a
+// seller can call without deleting their account with it.

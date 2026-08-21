@@ -657,7 +657,7 @@
   "@settingsDeleteAccountConfirmTitle": {
     "description": "Confirmation dialog title for account deletion."
   },
-  "settingsDeleteAccountConfirmBody": "This cannot be undone. Your sign-in is removed and you lose access to every workspace you own.",
+  "settingsDeleteAccountConfirmBody": "This cannot be undone. Your sign-in goes, and so does every business you are the only owner of — its items, orders, receipts and photos. A business somebody else owns keeps its records; you are removed from it.",
   "@settingsDeleteAccountConfirmBody": {
     "description": "Says exactly what is lost. Deletion is irreversible."
   },

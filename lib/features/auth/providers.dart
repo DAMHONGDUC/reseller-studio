@@ -2,10 +2,12 @@
 /// anything under `auth/data/` or `auth/presentation/`.
 library;
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/config/app_env.dart';
 import 'data/repositories/firebase_auth_repository.dart';
 import 'domain/repositories/auth_repository.dart';
 
@@ -30,11 +32,26 @@ final Provider<FirebaseAuth> firebaseAuthProvider = Provider<FirebaseAuth>(
   (Ref ref) => FirebaseAuth.instance,
 );
 
-/// Sign in, sign up, reset, sign out, delete — behind the domain interface,
-/// so nothing in `presentation/` names a Firebase type.
+/// Callables, pinned to the region they were deployed to.
+///
+/// **The region is not optional.** `FirebaseFunctions.instance` defaults to
+/// `us-central1`, and a client that names a different region than the deploy
+/// gets `not-found` on every call — a failure that looks like a bug in the
+/// function rather than in the address.
+final Provider<FirebaseFunctions> firebaseFunctionsProvider =
+    Provider<FirebaseFunctions>(
+      (Ref ref) =>
+          FirebaseFunctions.instanceFor(region: AppEnv.functionsRegion),
+    );
+
+/// Sign in, sign out, delete — behind the domain interface, so nothing in
+/// `presentation/` names a Firebase type.
 final Provider<AuthRepository> authRepositoryProvider =
     Provider<AuthRepository>(
-      (Ref ref) => FirebaseAuthRepository(ref.watch(firebaseAuthProvider)),
+      (Ref ref) => FirebaseAuthRepository(
+        ref.watch(firebaseAuthProvider),
+        ref.watch(firebaseFunctionsProvider),
+      ),
     );
 
 /// Who is signed in, as a stream.

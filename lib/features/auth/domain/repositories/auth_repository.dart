@@ -51,10 +51,17 @@ abstract interface class AuthRepository {
   /// what a seller signing out on a shared phone is trying to prevent.
   Future<void> signOut();
 
-  /// Deletes the account (plan §25).
+  /// Deletes the account **and everything it owns** (plan §25).
   ///
-  /// Firebase refuses this on an old session with `requires-recent-login`,
-  /// which arrives as `AppFailureKind.unauthenticated` — the screen asks the
-  /// user to sign in again rather than showing a failure they cannot act on.
+  /// A Cloud Function does the work: App Store guideline 5.1.1(v) wants the
+  /// data gone too, and Firestore does not cascade. The businesses the seller
+  /// solely owns go with the login; the ones they merely belong to lose only
+  /// their membership.
+  ///
+  /// Refused on an old session, which arrives as
+  /// `AppFailureKind.unauthenticated` — the screen asks the user to sign in
+  /// again rather than showing a failure they cannot act on. The check moved
+  /// server-side with the delete: the Admin SDK does not enforce Firebase's
+  /// own `requires-recent-login`, so the function reads `auth_time` itself.
   Future<void> deleteAccount();
 }
