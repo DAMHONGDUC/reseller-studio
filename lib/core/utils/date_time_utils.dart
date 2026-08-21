@@ -60,6 +60,11 @@ final class DateTimeUtils {
     return DateTime(year, month, value.day.clamp(1, lastDay));
   }
 
+  /// The same day-of-month [months] forward, clamped the same way — 31
+  /// January plus one month is 28 February.
+  static DateTime monthsAfter(DateTime value, int months) =>
+      monthsBefore(value, -months);
+
   /// Whether [value] falls inside the half-open range `[from, to)`.
   static bool isWithin(DateTime value, {DateTime? from, DateTime? to}) {
     if (from != null && value.isBefore(from)) return false;

@@ -4,10 +4,12 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/money/money.dart';
+import '../../core/time/app_clock.dart';
 import '../listings/domain/enums/listing_status.dart';
 import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/expense.dart';
+import 'domain/services/recurring_expense_schedule.dart';
 
 final StreamProvider<List<Expense>> expensesProvider =
     StreamProvider<List<Expense>>((Ref ref) {
@@ -61,4 +63,17 @@ expenseTotalsByCategoryProvider =
           );
 
       return rows;
+    });
+
+/// The recurring costs that are owed today.
+///
+/// Reads [clockProvider] rather than `DateTime.now()`: "due" is derived, so a
+/// test pins it and the same assertion cannot pass in one month and fail in
+/// the next.
+final Provider<List<RecurringExpense>> dueRecurringExpensesProvider =
+    Provider<List<RecurringExpense>>((Ref ref) {
+      return RecurringExpenseSchedule.due(
+        expenses: ref.watch(expensesProvider).value ?? const <Expense>[],
+        now: ref.watch(clockProvider).now(),
+      );
     });

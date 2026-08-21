@@ -21,7 +21,8 @@ workspaces/{workspaceId}
   listings/{listingId}
   offers/{offerId}
   orders/{orderId}
-  expenses/{expenseId}
+  expenses/{expenseId}               one row per occurrence; a monthly cost
+                                     links them with `recurringSeriesId`
   receipts/{receiptId}
   categories/{categoryId}
   locations/{locationId}

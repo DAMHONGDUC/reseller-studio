@@ -11,6 +11,7 @@ import '../../../listings/domain/enums/listing_status.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/expense.dart';
+import '../../domain/services/recurring_expense_schedule.dart';
 
 /// Recording business costs that are not the cost of an item (plan §17).
 ///
@@ -38,6 +39,7 @@ class ExpenseController extends Notifier<bool> {
     String? receiptUrl,
     double? mileage,
     bool isRecurring = false,
+    String? recurringSeriesId,
   }) async {
     final String currency = ref.read(workspaceCurrencyProvider);
     final bool isMileage = category == ExpenseCategory.mileage;
@@ -77,6 +79,7 @@ class ExpenseController extends Notifier<bool> {
               mileage: mileage,
               orderId: orderId,
               isRecurring: isRecurring,
+              recurringSeriesId: recurringSeriesId,
             ),
           );
     } catch (error, stackTrace) {
@@ -88,6 +91,67 @@ class ExpenseController extends Notifier<bool> {
         data: <String, Object>{
           'expenseId': expenseId,
           'category': category.name,
+        },
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Post the month a recurring cost is owed for.
+  ///
+  /// **Copied from the latest occurrence, not the first** — a rent rise
+  /// recorded last month carries forward, which is the whole reason the
+  /// series points at the newest row rather than the original.
+  ///
+  /// Two fields are deliberately not copied: the receipt, because next
+  /// month's bill is a different document, and `orderId`, because a cost
+  /// attributed to one sale is not something that recurs.
+  Future<void> recordNext(RecurringExpense series) async {
+    final Expense template = series.latest;
+    final String expenseId = _uuid.v4();
+
+    state = true;
+    SdLogger.action(
+      LogTagConstant.expense,
+      'Record recurring expense',
+      <String, Object>{
+        'expenseId': expenseId,
+        'seriesId': series.seriesId,
+        'category': template.category.name,
+        'amountMinor': template.amount.minor,
+      },
+    );
+    AppAnalytics.instance.expenseRecorded(category: template.category.name);
+
+    try {
+      await ref
+          .read(expenseRepositoryProvider)
+          .save(
+            Expense(
+              id: expenseId,
+              category: template.category,
+              amount: template.amount,
+              date: series.due,
+              createdAt: DateTime.now(),
+              vendor: template.vendor,
+              notes: template.notes,
+              mileage: template.mileage,
+              isRecurring: true,
+              recurringSeriesId: template.seriesId,
+            ),
+          );
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.expense,
+        'Failed to record a recurring expense',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{
+          'expenseId': expenseId,
+          'seriesId': series.seriesId,
         },
       );
 

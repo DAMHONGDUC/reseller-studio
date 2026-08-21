@@ -2749,5 +2749,30 @@
   "expensesAmountRequired": "Enter what it cost",
   "@expensesAmountRequired": {
     "description": "Shown when an expense is saved with no amount."
+  },
+  "expensesRecurringDue": "Due now",
+  "@expensesRecurringDue": {
+    "description": "Section header above the recurring costs waiting to be recorded."
+  },
+  "expensesRecurringDueNote": "Costs you marked as monthly. Nothing is recorded until you tap it.",
+  "@expensesRecurringDueNote": {
+    "description": "Explains that a recurring expense is proposed, never posted on its own."
+  },
+  "expensesRecurringDueOn": "Due {date}",
+  "@expensesRecurringDueOn": {
+    "description": "The date a recurring cost is owed for.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expensesRecurringRecord": "Record",
+  "@expensesRecurringRecord": {
+    "description": "Button that posts the month a recurring cost is owed for."
+  },
+  "expensesRecurringRecorded": "Recorded",
+  "@expensesRecurringRecorded": {
+    "description": "Confirmation after posting a recurring cost."
   }
 }

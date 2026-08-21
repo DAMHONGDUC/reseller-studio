@@ -20,6 +20,7 @@ class Expense {
     this.mileage,
     this.orderId,
     this.isRecurring = false,
+    this.recurringSeriesId,
     this.deletedAt,
   });
 
@@ -47,7 +48,25 @@ class Expense {
   final String? orderId;
 
   final bool isRecurring;
+
+  /// Which recurring cost this occurrence belongs to — the id of the first
+  /// one in the series.
+  ///
+  /// **A field rather than an inference.** "The same cost as last month"
+  /// cannot be derived from category and vendor: the vendor is optional and
+  /// the amount moves. Null on a row written before the field existed, which
+  /// is what [seriesId] falls back for.
+  final String? recurringSeriesId;
+
   final DateTime? deletedAt;
 
   bool get isDeleted => deletedAt != null;
+
+  /// The series this expense belongs to, for a recurring one.
+  ///
+  /// An expense that starts a series is its own series, so the first
+  /// occurrence needs no second write to point at itself — and a row saved
+  /// before the field existed reads as its own series rather than joining
+  /// somebody else's.
+  String get seriesId => recurringSeriesId ?? id;
 }

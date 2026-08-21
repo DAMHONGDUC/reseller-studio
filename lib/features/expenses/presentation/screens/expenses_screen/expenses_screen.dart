@@ -13,9 +13,12 @@ import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../../tax/providers.dart';
 import '../../../domain/entities/expense.dart';
+import '../../../domain/services/recurring_expense_schedule.dart';
 import '../../../providers.dart';
 import '../../controllers/expense_controller.dart';
 import '../../widgets/expense_form_sheet.dart';
+
+part 'expenses_screen_due_recurring.dart';
 
 /// Expenses — every business cost that is not the cost of an item (plan §17).
 ///
@@ -108,6 +111,7 @@ class ExpensesScreen extends ConsumerWidget {
               caption: '${expenses.length} entries',
               icon: Symbols.savings_rounded,
             ),
+            const _DueRecurring(),
             if (totals.isNotEmpty) ...<Widget>[
               SizedBox(height: SdContentPaddingV3.sectionGap),
               SdSectionHeaderV3(
