@@ -133,12 +133,26 @@ class OrderActionsController extends Notifier<bool> {
     }
   }
 
-  /// Money back to the buyer, in part or in full.
-  Future<void> refund(Order order, Money amount) => _save(
-    'Refund order',
-    order.copyWith(status: OrderStatus.refunded, refund: amount),
-    <String, Object>{'refundMinor': amount.minor},
-  );
+  /// Money back to the buyer, in part or in full (plan §16).
+  ///
+  /// **Only a full refund changes the status.** A goodwill £10 off a £100
+  /// order that the buyer kept is still a sale: flipping it to `refunded`
+  /// would make `countsAsRevenue` false and erase the whole £100 from every
+  /// figure, when what actually happened is that £90 was earned. A partial
+  /// refund is carried by `Order.refund`, which every revenue line already
+  /// subtracts.
+  Future<void> refund(Order order, Money amount) {
+    final bool isFull = amount >= order.salePrice;
+
+    return _save(
+      'Refund order',
+      order.copyWith(
+        status: isFull ? OrderStatus.refunded : null,
+        refund: amount,
+      ),
+      <String, Object>{'refundMinor': amount.minor, 'isFull': isFull},
+    );
+  }
 
   Future<void> cancel(Order order) => _save(
     'Cancel order',

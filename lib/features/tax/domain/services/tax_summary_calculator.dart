@@ -22,8 +22,14 @@ final class TaxSummaryCalculator {
     required List<Expense> expenses,
     required String currency,
   }) {
+    // **Net revenue, the same definition Analytics uses.** A cancelled order
+    // never earned anything and a refunded one gave it back, so counting
+    // either would put money on a tax return the seller never kept.
     final List<Order> inYear = orders
-        .where((Order order) => year.contains(order.orderedAt))
+        .where(
+          (Order order) =>
+              order.status.countsAsRevenue && year.contains(order.orderedAt),
+        )
         .toList();
 
     final List<Expense> costs = expenses
@@ -33,8 +39,10 @@ final class TaxSummaryCalculator {
         )
         .toList();
 
+    final Money zero = Money.zero(currency);
+
     final Money? revenue = inYear
-        .map((Order order) => order.salePrice)
+        .map((Order order) => order.salePrice - (order.refund ?? zero))
         .totalOrNull();
 
     final Money? costOfGoods = inYear

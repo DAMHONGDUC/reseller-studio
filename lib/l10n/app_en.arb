@@ -2882,5 +2882,50 @@
         "type": "int"
       }
     }
+  },
+  "refundTitle": "Refund the buyer",
+  "@refundTitle": {
+    "description": "Title of the sheet that records money returned to a buyer."
+  },
+  "refundAmount": "Refund amount",
+  "@refundAmount": {
+    "description": "Field for how much is going back to the buyer."
+  },
+  "refundFullHelp": "The whole sale. This order stops counting as revenue.",
+  "@refundFullHelp": {
+    "description": "Helper when the amount covers the entire sale price."
+  },
+  "refundPartialHelp": "Part of the sale. The rest still counts as revenue.",
+  "@refundPartialHelp": {
+    "description": "Helper when the amount is less than the sale price."
+  },
+  "refundOverHelp": "More than the buyer paid. Check the amount.",
+  "@refundOverHelp": {
+    "description": "Warning when the refund exceeds the sale price."
+  },
+  "refundSoldFor": "Sold for",
+  "@refundSoldFor": {
+    "description": "The sale price, shown above the refund field for comparison."
+  },
+  "refundWholeSale": "Refund the whole sale",
+  "@refundWholeSale": {
+    "description": "Shortcut that fills the field with the full sale price."
+  },
+  "refundAction": "Refund",
+  "@refundAction": {
+    "description": "Button that opens the refund sheet, and its confirm."
+  },
+  "refundRecorded": "Refund recorded",
+  "@refundRecorded": {
+    "description": "Confirmation after recording a refund."
+  },
+  "refundAlreadyRecorded": "{amount} already refunded",
+  "@refundAlreadyRecorded": {
+    "description": "Shown when the order already carries a refund.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   }
 }

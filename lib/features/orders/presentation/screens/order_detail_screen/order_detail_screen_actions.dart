@@ -130,6 +130,22 @@ class _OrderActions extends ConsumerWidget {
             ),
           ),
         ],
+        // Every status where money has actually changed hands. Not
+        // `awaitingPayment` — there is nothing to give back — and not a
+        // cancelled order, which never took the money in the first place.
+        if (order.status.countsAsRevenue ||
+            order.status == OrderStatus.returned ||
+            order.status == OrderStatus.refunded) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h8),
+          SdButtonV3(
+            variant: SdButtonVariantV3.outlined,
+            label: context.l10n.refundAction,
+            icon: Symbols.currency_exchange_rounded,
+            expand: true,
+            busy: isBusy,
+            onPressed: () => RefundSheet.show(context, order),
+          ),
+        ],
         SizedBox(height: SdSpacingConstant.h8),
         SdButtonV3(
           variant: SdButtonVariantV3.secondary,
