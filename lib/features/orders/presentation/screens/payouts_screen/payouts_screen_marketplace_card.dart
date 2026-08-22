@@ -67,7 +67,7 @@ class _MarketplaceCard extends StatelessWidget {
                     PayoutReconciliation.expected(order),
                   ),
                   showChevron: false,
-                  onTap: () => SettlementSheet.show(context, order),
+                  onTap: () => SettleOrderSheet.show(context, order),
                 ),
               )
               .toList(),

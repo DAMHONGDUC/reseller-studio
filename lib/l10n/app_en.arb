@@ -2812,14 +2812,6 @@
   "@payoutsNothingOutstandingNote": {
     "description": "Supporting line on the settled-up empty state."
   },
-  "payoutsRecordSettlement": "Record settlement",
-  "@payoutsRecordSettlement": {
-    "description": "Title of the sheet that records what a marketplace paid."
-  },
-  "payoutsRecorded": "Settlement recorded",
-  "@payoutsRecorded": {
-    "description": "Confirmation after recording a payout."
-  },
   "payoutsExpected": "Expected",
   "@payoutsExpected": {
     "description": "What an order should pay out: sale price less refund, fees and postage."
@@ -2831,22 +2823,6 @@
   "payoutsFeeIsReported": "Fee as the platform reported it",
   "@payoutsFeeIsReported": {
     "description": "Caption when the expected figure uses a real reported fee."
-  },
-  "payoutsFeesOptional": "Platform fee (optional)",
-  "@payoutsFeesOptional": {
-    "description": "Field for the commission the marketplace took."
-  },
-  "payoutsFeesHelp": "What the platform took. Replaces the estimate everywhere it is used.",
-  "@payoutsFeesHelp": {
-    "description": "Helper under the fee field."
-  },
-  "payoutsPaidOut": "Paid out",
-  "@payoutsPaidOut": {
-    "description": "Field for what actually landed in the seller's bank."
-  },
-  "payoutsPaidOutHelp": "What actually landed in your bank. This is what you reconcile against.",
-  "@payoutsPaidOutHelp": {
-    "description": "Helper under the payout field."
   },
   "payoutsOrderedOn": "Ordered {date}",
   "@payoutsOrderedOn": {
