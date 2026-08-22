@@ -5,12 +5,19 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/barcode_scanner_page.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
+import '../../../../inventory/domain/entities/item.dart';
+import '../../../../inventory/providers.dart';
 import '../../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../../orders/domain/entities/order.dart';
+import '../../../../orders/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';
 import '../../../../workspace/providers.dart';
+import '../../../domain/services/sold_before_lookup.dart';
 
 /// "Should I buy this?" — the calculation a reseller does standing in a shop
 /// with the item in their hand (plan §11).
@@ -40,6 +47,49 @@ class _PurchaseEvaluatorScreenState
   final TextEditingController _shipping = TextEditingController();
 
   Marketplace _marketplace = Marketplace.ebay;
+
+  /// The last scan's answer, kept so the card stays on screen while the seller
+  /// adjusts the numbers underneath it.
+  SoldBefore? _soldBefore;
+
+  /// Whether the sale price in the field came from [_soldBefore] rather than
+  /// from the seller. It stops the helper claiming credit for a number they
+  /// typed themselves.
+  bool _saleFromHistory = false;
+
+  /// Opens the camera, then answers the code out of the seller's own records.
+  ///
+  /// **No network, by design.** A comps lookup needs a marketplace API and a
+  /// signal; this needs neither, and "you sold this for £28 in March" is a
+  /// better answer than a stranger's asking price anyway.
+  Future<void> _scan() async {
+    final String? code = await BarcodeScannerPage.show(
+      context,
+      title: context.l10n.sourcingScanTitle,
+      hint: context.l10n.sourcingScanHint,
+    );
+
+    if (code == null || !mounted) return;
+
+    final SoldBefore? found = SoldBeforeLookup.find(
+      code: code,
+      items: ref.read(itemsProvider).value ?? const <Item>[],
+      orders: ref.read(ordersProvider).value ?? const <Order>[],
+    );
+
+    if (found == null) {
+      setState(() => _soldBefore = null);
+      SdSnackBarUtilsV3.info(context, context.l10n.sourcingScanNoHistory);
+
+      return;
+    }
+
+    setState(() {
+      _soldBefore = found;
+      _sale.text = found.salePrice.toInputString();
+      _saleFromHistory = true;
+    });
+  }
 
   @override
   void dispose() {
@@ -79,6 +129,15 @@ class _PurchaseEvaluatorScreenState
           SizedBox(height: SdContentPaddingV3.topGap),
           _Verdict(evaluation: evaluation, marketplace: _marketplace),
           SizedBox(height: SdContentPaddingV3.sectionGap),
+          _SoldBeforeCard(found: _soldBefore),
+          SdButtonV3(
+            variant: SdButtonVariantV3.outlined,
+            label: context.l10n.sourcingScanAction,
+            icon: Symbols.qr_code_scanner_rounded,
+            expand: true,
+            onPressed: _scan,
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
           SdCardV3(
             child: Column(
               children: <Widget>[
@@ -94,8 +153,12 @@ class _PurchaseEvaluatorScreenState
                   label: context.l10n.sourcingWhatYouThinkItSellsFor,
                   controller: _sale,
                   currency: currency,
+                  helperText: _saleFromHistory
+                      ? context.l10n.sourcingSalePriceFilled
+                      : null,
                   textInputAction: TextInputAction.next,
-                  onChanged: (_) => setState(() {}),
+                  onChanged: (_) =>
+                      setState(() => _saleFromHistory = false),
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
@@ -255,4 +318,64 @@ class _EvaluationRow extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// What this thing fetched last time, when a scan found it.
+///
+/// **Absent rather than empty when nothing matched.** A card saying "no
+/// history" on every visit is a row the eye learns to skip, and the snackbar
+/// has already said so once.
+class _SoldBeforeCard extends StatelessWidget {
+  const _SoldBeforeCard({required this.found});
+
+  final SoldBefore? found;
+
+  @override
+  Widget build(BuildContext context) {
+    final SoldBefore? sale = found;
+
+    if (sale == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: SdSpacingConstant.h16),
+      child: SdCardV3(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              context.l10n.sourcingSoldBefore,
+              style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+                color: context.sdTheme3.textPrimary,
+              ),
+            ),
+            SizedBox(height: SdSpacingConstant.h4),
+            Text(
+              context.l10n.sourcingSoldOnceFor(
+                sale.title,
+                context.money(sale.salePrice),
+                DateTimeUtils.mediumDate(
+                  sale.soldAt,
+                  locale: context.localeTag,
+                ),
+              ),
+              style: context.textTheme3.bodyMedium!.copyWith(
+                color: context.sdTheme3.textPrimary,
+              ),
+            ),
+            SizedBox(height: SdSpacingConstant.h4),
+            Text(
+              context.l10n.sourcingSoldTimes(
+                sale.timesSold,
+                DateTimeUtils.mediumDate(
+                  sale.soldAt,
+                  locale: context.localeTag,
+                ),
+              ),
+              style: context.textTheme3.bodySmall!.faint3(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

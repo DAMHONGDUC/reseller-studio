@@ -2969,5 +2969,56 @@
   "orderTrackingCopied": "Tracking number copied",
   "@orderTrackingCopied": {
     "description": "Confirmation after copying a tracking number."
+  },
+  "sourcingScanTitle": "Scan the item",
+  "@sourcingScanTitle": {
+    "description": "Title of the camera opened from the purchase evaluator."
+  },
+  "sourcingScanHint": "Point at the barcode. We check it against what you have sold before.",
+  "@sourcingScanHint": {
+    "description": "Hint over the camera in the purchase evaluator."
+  },
+  "sourcingScanAction": "Scan a barcode",
+  "@sourcingScanAction": {
+    "description": "Button on the evaluator that opens the camera."
+  },
+  "sourcingSoldBefore": "You sold this before",
+  "@sourcingSoldBefore": {
+    "description": "Header of the card showing a past sale of the scanned item."
+  },
+  "sourcingSoldOnceFor": "{title} — {price} on {date}",
+  "@sourcingSoldOnceFor": {
+    "description": "The one past sale that matched a scanned code.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingSoldTimes": "{count, plural, =1{once} other{{count} times}}, most recently {date}",
+  "@sourcingSoldTimes": {
+    "description": "How often the scanned item has sold.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingScanNoHistory": "Nothing in your records carries that code",
+  "@sourcingScanNoHistory": {
+    "description": "Shown when a scanned code matches nothing the seller has sold."
+  },
+  "sourcingSalePriceFilled": "Filled in from your last sale. Change it if this one is different.",
+  "@sourcingSalePriceFilled": {
+    "description": "Explains that the expected sale price came from history."
   }
 }

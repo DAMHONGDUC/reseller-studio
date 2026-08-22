@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:system_design/index.dart';
 
-import '../../../../../core/constants/log_tag_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/widgets/barcode_camera_view.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
@@ -20,9 +19,10 @@ import '../../../providers.dart';
 /// about to add, so it offers to start an item with the code already filled
 /// in rather than saying "not found" and stopping.
 ///
-/// The scanner stops on the first hit. Without that a single label produces
-/// dozens of detections a second and the app pushes the same route dozens of
-/// times.
+/// The camera itself is `BarcodeCameraView` — shared with Sourcing, which
+/// asks a different question of the same code. Stopping on the first hit lives
+/// there, which is why this screen can push a route without guarding against
+/// being called thirty times a second.
 class ScannerScreen extends ConsumerStatefulWidget {
   const ScannerScreen({super.key});
 
@@ -31,60 +31,10 @@ class ScannerScreen extends ConsumerStatefulWidget {
 }
 
 class _ScannerScreenState extends ConsumerState<ScannerScreen> {
-  final MobileScannerController _controller = MobileScannerController(
-    // One format set rather than "everything": retail barcodes and the QR
-    // codes a seller prints for their own bins. Scanning every symbology
-    // slows detection and finds codes on packaging nobody meant to scan.
-    formats: const <BarcodeFormat>[
-      BarcodeFormat.qrCode,
-      BarcodeFormat.ean13,
-      BarcodeFormat.ean8,
-      BarcodeFormat.upcA,
-      BarcodeFormat.upcE,
-      BarcodeFormat.code128,
-      BarcodeFormat.code39,
-    ],
-  );
+  final GlobalKey<BarcodeCameraViewState> _camera =
+      GlobalKey<BarcodeCameraViewState>();
 
-  /// Set once a code has been acted on, so the stream of further detections
-  /// for the same label is ignored.
-  bool _handled = false;
-
-  @override
-  void dispose() {
-    unawaitedDispose();
-    super.dispose();
-  }
-
-  /// `MobileScannerController.dispose` is async; `State.dispose` is not.
-  /// Kicking it off without awaiting is the documented pattern, and the
-  /// failure is logged rather than swallowed (hard rule 8).
-  void unawaitedDispose() {
-    _controller.dispose().catchError((Object error, StackTrace stackTrace) {
-      SdLogger.error(
-        LogTagConstant.scanner,
-        'Scanner failed to dispose',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    });
-  }
-
-  void _onDetect(BarcodeCapture capture) {
-    final String? code = capture.barcodes
-        .map((Barcode barcode) => barcode.rawValue)
-        .firstWhere(
-          (String? value) => value != null && value.isNotEmpty,
-          orElse: () => null,
-        );
-
-    if (_handled || code == null) return;
-
-    _handled = true;
-    SdLogger.action(LogTagConstant.scanner, 'Barcode scanned', <String, Object>{
-      'length': code.length,
-    });
-
+  void _onCode(String code) {
     final Item? item = _findItem(code);
 
     if (item != null) {
@@ -146,7 +96,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
           ),
           SdDialogActionV3(
             label: context.l10n.scannerScanAgain,
-            onPressed: () => setState(() => _handled = false),
+            onPressed: () => _camera.currentState?.resume(),
           ),
         ],
       ),
@@ -155,41 +105,11 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
   @override
   Widget build(BuildContext context) => SdScaffoldV3(
-    appBar: SdAppBarV3(
-      title: context.l10n.scannerTitle,
-      actions: <Widget>[
-        IconButton(
-          icon: const SdIconV3(Symbols.flashlight_on_rounded),
-          tooltip: context.l10n.scannerTorch,
-          onPressed: () => _controller.toggleTorch(),
-        ),
-        IconButton(
-          icon: const SdIconV3(Symbols.cameraswitch_rounded),
-          tooltip: context.l10n.scannerSwitchCamera,
-          onPressed: () => _controller.switchCamera(),
-        ),
-      ],
-    ),
-    body: Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        MobileScanner(controller: _controller, onDetect: _onDetect),
-        Positioned(
-          left: SdContentPaddingV3.horizontal,
-          right: SdContentPaddingV3.horizontal,
-          bottom: SdContentPaddingV3.bottom(context),
-          child: SdCardV3(
-            layer: SdCardLayerV3.elevated,
-            child: Text(
-              context.l10n.scannerHint,
-              textAlign: TextAlign.center,
-              style: context.textTheme3.bodyMedium!.copyWith(
-                color: context.sdTheme3.textPrimary,
-              ),
-            ),
-          ),
-        ),
-      ],
+    appBar: SdAppBarV3(title: context.l10n.scannerTitle),
+    body: BarcodeCameraView(
+      key: _camera,
+      hint: context.l10n.scannerHint,
+      onCode: _onCode,
     ),
   );
 }
