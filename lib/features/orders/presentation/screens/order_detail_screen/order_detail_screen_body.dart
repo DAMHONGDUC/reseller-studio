@@ -128,10 +128,7 @@ class _ShippingCard extends StatelessWidget {
             label: context.l10n.orderCarrier,
             value: order.carrier ?? dash,
           ),
-          _OrderDetailRow(
-            label: context.l10n.orderTracking,
-            value: order.trackingNumber ?? dash,
-          ),
+          _TrackingRow(order: order),
           _OrderDetailRow(
             label: context.l10n.orderShipBy,
             value: order.shipByDate == null
@@ -158,12 +155,16 @@ class _OrderDetailRow extends StatelessWidget {
     required this.label,
     required this.value,
     this.valueColor,
+    this.trailing,
     this.isEmphasis = false,
   });
 
   final String label;
   final String value;
   final Color? valueColor;
+
+  /// An action on the value — opening a tracking page, copying a number.
+  final Widget? trailing;
 
   /// The bottom line of a statement. Heavier, and separated by a rule.
   final bool isEmphasis;
@@ -194,6 +195,7 @@ class _OrderDetailRow extends StatelessWidget {
               color: valueColor ?? context.sdTheme3.textPrimary,
             ),
           ),
+          ?trailing,
         ],
       ),
     );
@@ -215,4 +217,68 @@ class _OrderSectionTitle extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// The tracking number, with the one thing a seller actually wants to do
+/// with it.
+///
+/// **It was a string to read and retype.** Where the carrier's page is known
+/// the number opens it; where it is not — an unrecognised courier, or `Other`
+/// — it copies instead, which works everywhere. One action per row, chosen by
+/// what is possible, rather than two buttons of which one is usually dead.
+class _TrackingRow extends StatelessWidget {
+  const _TrackingRow({required this.order});
+
+  final Order order;
+
+  Future<void> _open(BuildContext context, String url) async {
+    final bool opened = await LinkUtils.open(url);
+
+    // The failure is already logged inside LinkUtils; falling back to the
+    // clipboard means the number is still usable when no browser answered.
+    if (context.mounted && !opened) await _copy(context);
+  }
+
+  Future<void> _copy(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: order.trackingNumber ?? ''));
+
+    if (!context.mounted) return;
+
+    SdSnackBarUtilsV3.success(context, context.l10n.orderTrackingCopied);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String? number = order.trackingNumber;
+
+    if (number == null || number.trim().isEmpty) {
+      return _OrderDetailRow(
+        label: context.l10n.orderTracking,
+        value: context.l10n.emptyValuePlaceholder,
+      );
+    }
+
+    final String? url = OrdersTrackingConstant.url(
+      carrier: order.carrier,
+      number: number,
+    );
+
+    return _OrderDetailRow(
+      label: context.l10n.orderTracking,
+      value: number,
+      trailing: IconButton(
+        icon: SdIconV3(
+          url == null
+              ? Symbols.content_copy_rounded
+              : Symbols.open_in_new_rounded,
+          size: SdIconV3.smallSize,
+          color: context.colorScheme3.primary,
+        ),
+        tooltip: url == null
+            ? context.l10n.orderCopyTracking
+            : context.l10n.orderTrackParcel,
+        onPressed: () => url == null ? _copy(context) : _open(context, url),
+      ),
+    );
+  }
 }

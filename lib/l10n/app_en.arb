@@ -2957,5 +2957,17 @@
   "homeOffersNoDeadline": "no deadline on any of them",
   "@homeOffersNoDeadline": {
     "description": "Shown when no waiting offer carries an expiry."
+  },
+  "orderTrackParcel": "Track this parcel",
+  "@orderTrackParcel": {
+    "description": "Tooltip on the button that opens the carrier's tracking page."
+  },
+  "orderCopyTracking": "Copy tracking number",
+  "@orderCopyTracking": {
+    "description": "Tooltip on the button that copies the tracking number."
+  },
+  "orderTrackingCopied": "Tracking number copied",
+  "@orderTrackingCopied": {
+    "description": "Confirmation after copying a tracking number."
   }
 }
