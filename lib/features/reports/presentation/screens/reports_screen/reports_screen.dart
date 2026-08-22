@@ -11,6 +11,7 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
+import '../../../../tax/providers.dart';
 import '../../controllers/report_controller.dart';
 
 /// Reports — the numbers, and a way to get them out (plan §19).
@@ -136,6 +137,19 @@ class ReportsScreen extends ConsumerWidget {
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.expenses),
+              ),
+              // The one export scoped to a period: a return is filed for one
+              // year, so it follows the year picked on the Tax screen rather
+              // than exporting everything.
+              AppListRow(
+                title: context.l10n.reportsTaxSummary,
+                subtitle: context.l10n.reportsTaxSummaryNote(
+                  ref.watch(selectedTaxYearProvider).label,
+                ),
+                icon: Symbols.receipt_long_rounded,
+                onTap: isBusy
+                    ? null
+                    : () => _export(context, ref, ReportKind.tax),
               ),
             ],
           ),

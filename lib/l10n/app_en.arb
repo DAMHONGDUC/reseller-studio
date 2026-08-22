@@ -2927,5 +2927,18 @@
         "type": "String"
       }
     }
+  },
+  "reportsTaxSummary": "Tax summary",
+  "@reportsTaxSummary": {
+    "description": "Export row for the year-end summary."
+  },
+  "reportsTaxSummaryNote": "{year}, one row per line of your return. Change the year on the Tax screen.",
+  "@reportsTaxSummaryNote": {
+    "description": "Says which year the tax export covers and where to change it.",
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
   }
 }
