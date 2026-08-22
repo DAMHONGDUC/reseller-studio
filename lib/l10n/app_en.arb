@@ -2940,5 +2940,22 @@
         "type": "String"
       }
     }
+  },
+  "homeOffersWaiting": "Offers waiting",
+  "@homeOffersWaiting": {
+    "description": "Needs Attention row for offers the seller has not answered."
+  },
+  "homeOffersClosingIn": "soonest closes in {left}",
+  "@homeOffersClosingIn": {
+    "description": "How long until the most urgent offer lapses.",
+    "placeholders": {
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "homeOffersNoDeadline": "no deadline on any of them",
+  "@homeOffersNoDeadline": {
+    "description": "Shown when no waiting offer carries an expiry."
   }
 }

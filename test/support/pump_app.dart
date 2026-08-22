@@ -14,6 +14,8 @@ import 'package:seller_os/features/listings/providers.dart';
 import 'package:seller_os/features/mock_data/data/in_memory_repositories.dart';
 import 'package:seller_os/features/mock_data/domain/mock_dataset.dart';
 import 'package:seller_os/features/mock_data/providers.dart';
+import 'package:seller_os/features/offers/domain/entities/offer.dart';
+import 'package:seller_os/features/offers/providers.dart';
 import 'package:seller_os/features/orders/domain/entities/order.dart';
 import 'package:seller_os/features/orders/providers.dart';
 import 'package:seller_os/l10n/gen/app_localizations.dart';
@@ -155,6 +157,11 @@ Future<void> warmUp(ProviderContainer container) async {
   container.listen<AsyncValue<List<Listing>>>(
     listingsProvider,
     (AsyncValue<List<Listing>>? previous, AsyncValue<List<Listing>> next) {},
+    fireImmediately: true,
+  );
+  container.listen<AsyncValue<List<Offer>>>(
+    offersProvider,
+    (AsyncValue<List<Offer>>? previous, AsyncValue<List<Offer>> next) {},
     fireImmediately: true,
   );
 

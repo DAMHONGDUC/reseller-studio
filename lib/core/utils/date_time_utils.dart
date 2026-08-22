@@ -88,4 +88,23 @@ final class DateTimeUtils {
 
     return '${days ~/ 365}y';
   }
+
+  /// `4h`, `2d` — how long is left before a deadline.
+  ///
+  /// **Hours matter here and days do not in [compactAge].** An offer that
+  /// lapses this afternoon and one that lapses next week are the same `<1d`
+  /// under the other formatter, and the difference between them is the whole
+  /// reason the row is on Home.
+  ///
+  /// A deadline already past reads as `now`, never as a negative.
+  static String compactRemaining(Duration left) {
+    if (left.isNegative) return 'now';
+
+    final int hours = left.inHours;
+
+    if (hours < 1) return '<1h';
+    if (hours < 48) return '${hours}h';
+
+    return '${left.inDays}d';
+  }
 }
