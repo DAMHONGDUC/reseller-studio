@@ -177,12 +177,19 @@ class PurchaseEvaluation {
 /// that job before the item left the Stale tab.
 final class StaleInventoryPolicy {
   /// How long a listing sits before it counts as stale, when the workspace
-  /// has not set its own.
+  /// has not set its own, in days.
   ///
   /// 60 days: long enough that seasonal stock is not flagged the moment it is
   /// out of season, short enough to catch something before a full quarter's
   /// capital is tied up in it.
-  static const Duration defaultThreshold = Duration(days: 60);
+  ///
+  /// Kept as an `int` as well as a [Duration] because `Workspace` stores days
+  /// and a `const` default cannot call `.inDays`.
+  static const int defaultThresholdDays = 60;
+
+  static const Duration defaultThreshold = Duration(
+    days: defaultThresholdDays,
+  );
 
   /// True when [listedAt] is further back than [threshold].
   ///

@@ -97,6 +97,15 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(SettingsScreen));
 
+    // Below the fold since the workspace block became editable — scrolled to
+    // rather than asserted in place, because where it sits is layout and what
+    // this test is about is that it is there at all.
+    await tester.scrollUntilVisible(
+      find.text(context.l10n.moreAbout),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+
     expect(find.text(context.l10n.moreAbout), findsOneWidget);
   });
 }

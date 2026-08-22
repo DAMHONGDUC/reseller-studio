@@ -48,7 +48,11 @@ class _NeedsAttention extends ConsumerWidget {
           icon: Symbols.hourglass_bottom_rounded,
           label: context.l10n.homeStaleInventory,
           count: stale.length,
-          detail: 'listed over 60 days',
+          // The workspace's own threshold, never a literal: a business that
+          // set 14 days was being told its stock had sat for 60.
+          detail: context.l10n.homeStaleDetail(
+            ref.watch(staleThresholdProvider).inDays,
+          ),
           tint: context.sdTheme3.warning,
           onTap: () => context.go(AppRoutes.inventory),
         ),

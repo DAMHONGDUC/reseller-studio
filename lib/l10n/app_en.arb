@@ -2864,5 +2864,47 @@
   "payoutsNoSalesYetNote": "Once an order is paid for, what the marketplace owes you shows up here.",
   "@payoutsNoSalesYetNote": {
     "description": "Supporting line on the no-sales empty state."
+  },
+  "workspaceEditBusiness": "Business",
+  "@workspaceEditBusiness": {
+    "description": "Section header over the editable workspace settings."
+  },
+  "workspaceEditNote": "Changing the country changes which tax rules this business files under.",
+  "@workspaceEditNote": {
+    "description": "Warns that the country drives the tax jurisdiction."
+  },
+  "workspaceRenameTitle": "Rename this business",
+  "@workspaceRenameTitle": {
+    "description": "Title of the sheet that renames a workspace."
+  },
+  "workspaceCurrencyNote": "Only changes what new amounts default to. Nothing already recorded is converted.",
+  "@workspaceCurrencyNote": {
+    "description": "Warns that changing the currency does not convert stored money."
+  },
+  "workspaceStaleAfterDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@workspaceStaleAfterDays": {
+    "description": "How long a listing sits before it counts as stale.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workspaceSaved": "Saved",
+  "@workspaceSaved": {
+    "description": "Confirmation after changing a workspace setting."
+  },
+  "workspaceReadOnlyNote": "Only an owner or admin can change these.",
+  "@workspaceReadOnlyNote": {
+    "description": "Shown to a member or viewer instead of the editable rows."
+  },
+  "homeStaleDetail": "listed over {count, plural, =1{1 day} other{{count} days}}",
+  "@homeStaleDetail": {
+    "description": "Detail under Home's stale row. The number is the workspace's own threshold.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

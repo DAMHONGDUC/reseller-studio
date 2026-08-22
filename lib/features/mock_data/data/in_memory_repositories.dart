@@ -20,6 +20,9 @@ import '../../subscription/domain/entities/plan_offering.dart';
 import '../../subscription/domain/entities/subscription_status.dart';
 import '../../subscription/domain/enums/seller_plan.dart';
 import '../../subscription/domain/repositories/subscription_repository.dart';
+import '../../workspace/domain/entities/user_profile.dart';
+import '../../workspace/domain/entities/workspace.dart';
+import '../../workspace/domain/repositories/workspace_repository.dart';
 import '../domain/mock_dataset.dart';
 
 /// The mutable world behind every in-memory repository.
@@ -42,7 +45,8 @@ class MockStore {
       expenses = List<Expense>.of(dataset.expenses),
       categories = List<ItemCategory>.of(dataset.categories),
       locations = List<StorageLocation>.of(dataset.locations),
-      offers = List<Offer>.of(dataset.offers);
+      offers = List<Offer>.of(dataset.offers),
+      workspace = dataset.workspace;
 
   /// Seeded from the current clock, so the demo data is always recent.
   factory MockStore.seeded({DateTime? now}) =>
@@ -59,6 +63,13 @@ class MockStore {
   final List<ItemCategory> categories;
   final List<StorageLocation> locations;
   final List<Offer> offers;
+
+  /// The demo business itself, mutable because Settings can now change it.
+  ///
+  /// Copied off the dataset rather than read through it: the dataset is the
+  /// known-good seed every test asserts against, and an edit that reached back
+  /// into it would change what the next screen was checked against.
+  Workspace workspace;
 
   /// The demo business starts on the free tier, so the limits and the paywall
   /// are what a developer sees first. `InMemorySubscriptionRepository` moves
@@ -520,4 +531,63 @@ final class MockPlanConstant {
   /// How far out a mock purchase renews. A month, so the Subscription screen
   /// has a plausible date to render rather than an empty row.
   static const Duration mockRenewal = Duration(days: 30);
+}
+
+/// The demo business, editable the way the real one is.
+///
+/// **The account half is deliberately inert.** Mock mode has no account by
+/// construction (`lib/features/mock_data/CLAUDE.md`), so a profile, a second
+/// workspace and a "reopen this one next time" pointer have nothing to mean.
+/// They are no-ops rather than throws: a demo that crashed on sign-in
+/// bookkeeping would be a worse backend than none.
+class InMemoryWorkspaceRepository implements WorkspaceRepository {
+  const InMemoryWorkspaceRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<Workspace?> watchWorkspace(String workspaceId) =>
+      _store.watch(() => _store.workspace);
+
+  @override
+  Stream<List<Member>> watchMembers(String workspaceId) =>
+      _store.watch(() => _store.dataset.members);
+
+  @override
+  Future<void> updateWorkspace(Workspace workspace) async {
+    _store.workspace = workspace;
+    _store.notifyChanged();
+  }
+
+  @override
+  Stream<UserProfile?> watchProfile(String uid) =>
+      Stream<UserProfile?>.value(null);
+
+  @override
+  Future<void> ensureProfile({
+    required String uid,
+    String? displayName,
+    String? email,
+    String? photoUrl,
+  }) async {}
+
+  /// Returns the demo business rather than making a second one: the mock
+  /// world holds exactly one, and handing back a new id would point every
+  /// repository at a workspace with nothing in it.
+  @override
+  Future<String> createWorkspace({
+    required String name,
+    required String country,
+    required String currency,
+    required String ownerId,
+    String? ownerName,
+    String? ownerEmail,
+    String? businessType,
+  }) async => _store.workspace.id;
+
+  @override
+  Future<void> setLastWorkspace({
+    required String uid,
+    required String workspaceId,
+  }) async {}
 }

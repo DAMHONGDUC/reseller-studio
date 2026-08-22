@@ -48,4 +48,12 @@ final class WorkspaceConstant {
     'limitedCompany',
     'hobbySeller',
   ];
+
+  /// How long a listing may sit before this workspace calls it stale, in days.
+  ///
+  /// A short list of round numbers rather than a free number field: the answer
+  /// is a judgement about how fast the seller's stock moves, and asking them
+  /// to type 63 invites a precision nobody has. `StaleInventoryPolicy` owns
+  /// the default and it is one of these.
+  static const List<int> staleThresholdChoices = <int>[14, 30, 60, 90, 180];
 }

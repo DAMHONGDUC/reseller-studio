@@ -107,7 +107,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
             'businessType': businessType,
             // The policy class owns this number — it is the algorithm the
             // threshold belongs to, not configuration about a workspace.
-            'staleThresholdDays': StaleInventoryPolicy.defaultThreshold.inDays,
+            'staleThresholdDays': StaleInventoryPolicy.defaultThresholdDays,
             'createdAt': FirestoreMapper.serverTimestamp,
             'updatedAt': FirestoreMapper.serverTimestamp,
             'createdBy': ownerId,

@@ -9,12 +9,15 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/name_entry_sheet.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
 import '../../../../mock_data/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
+import '../../../../workspace/presentation/controllers/workspace_edit_controller.dart';
 import '../../../../workspace/providers.dart';
+import '../../../../workspace/workspace_constant.dart';
 import '../../../../workspace/workspace_option_label.dart';
 import '../../controllers/demo_seed_controller.dart';
 import '../../controllers/theme_mode_controller.dart';
@@ -25,6 +28,7 @@ part 'settings_screen_demo_seed_card.dart';
 part 'settings_screen_mock_data_card.dart';
 part 'settings_screen_mock_summary.dart';
 part 'settings_screen_setting_row.dart';
+part 'settings_screen_workspace_card.dart';
 
 /// Settings (plan §25).
 ///
@@ -66,47 +70,22 @@ class SettingsScreen extends ConsumerWidget {
             ),
             child: const _AccountCard(),
           ),
-          SdSectionHeaderV3(title: context.l10n.settingsWorkspace),
+          SdSectionHeaderV3(
+            title: context.l10n.settingsWorkspace,
+            subtitle: workspace == null ? null : context.l10n.workspaceEditNote,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
             ),
-            child: SdCardV3(
-              child: workspace == null
-                  ? Text(
+            child: workspace == null
+                ? SdCardV3(
+                    child: Text(
                       context.l10n.workspaceNoneLoaded,
                       style: context.textTheme3.bodyMedium!.muted3(context),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _SettingRow(
-                          label: context.l10n.workspaceNameLabel,
-                          value: workspace.name,
-                        ),
-                        _SettingRow(
-                          label: context.l10n.workspaceCountry,
-                          value: WorkspaceOptionLabel.country(
-                            context,
-                            workspace.country,
-                          ),
-                        ),
-                        _SettingRow(
-                          label: context.l10n.workspaceCurrency,
-                          value: WorkspaceOptionLabel.currency(
-                            context,
-                            workspace.currency,
-                          ),
-                        ),
-                        _SettingRow(
-                          label: context.l10n.workspaceStaleAfter,
-                          value: context.l10n.commonDays(
-                            workspace.staleThresholdDays,
-                          ),
-                        ),
-                      ],
                     ),
-            ),
+                  )
+                : _WorkspaceCard(workspace: workspace),
           ),
           SdSectionHeaderV3(title: context.l10n.settingsApp),
           Padding(

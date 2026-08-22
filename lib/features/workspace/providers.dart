@@ -14,7 +14,10 @@ import '../../core/config/dev_flags.dart';
 import '../../core/firestore/workspace_collections.dart';
 import '../../core/firestore/workspace_context.dart';
 import '../auth/providers.dart';
+import '../listings/domain/enums/listing_status.dart';
+import '../mock_data/data/in_memory_repositories.dart';
 import '../mock_data/providers.dart';
+import '../pricing/domain/services/profit_calculator.dart';
 import 'data/repositories/firestore_workspace_repository.dart';
 import 'domain/entities/user_profile.dart';
 import 'domain/entities/workspace.dart';
@@ -27,10 +30,15 @@ final Provider<FirebaseFirestore> firebaseFirestoreProvider =
     Provider<FirebaseFirestore>((Ref ref) => FirebaseFirestore.instance);
 
 final Provider<WorkspaceRepository> workspaceRepositoryProvider =
-    Provider<WorkspaceRepository>(
-      (Ref ref) =>
-          FirestoreWorkspaceRepository(ref.watch(firebaseFirestoreProvider)),
-    );
+    Provider<WorkspaceRepository>((Ref ref) {
+      // Mock first, exactly like every business repository: put the Firestore
+      // branch first and a demo run reaches for a backend that is not there.
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return InMemoryWorkspaceRepository(ref.watch(mockStoreProvider));
+      }
+
+      return FirestoreWorkspaceRepository(ref.watch(firebaseFirestoreProvider));
+    });
 
 /// The signed-in person's own record — name, email, and which workspaces they
 /// belong to.
@@ -76,8 +84,13 @@ final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>(
 final Provider<Workspace?> currentWorkspaceProvider = Provider<Workspace?>((
   Ref ref,
 ) {
+  // Both modes go through the same stream on purpose. Reading the seed
+  // directly was simpler and made the demo the one place a workspace could
+  // not be edited — the repository is what Settings writes through.
   if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
-    return ref.watch(mockStoreProvider).dataset.workspace;
+    final Workspace seed = ref.watch(mockStoreProvider).dataset.workspace;
+
+    return ref.watch(liveWorkspaceProvider(seed.id)).value ?? seed;
   }
 
   final String? id = ref.watch(currentWorkspaceIdProvider);
@@ -230,7 +243,7 @@ final Provider<String> workspaceCurrencyProvider = Provider<String>((Ref ref) {
 /// How long a listing sits before this workspace calls it stale.
 final Provider<Duration> staleThresholdProvider = Provider<Duration>((Ref ref) {
   return ref.watch(currentWorkspaceProvider)?.staleThreshold ??
-      const Duration(days: 60);
+      StaleInventoryPolicy.defaultThreshold;
 });
 
 final Provider<List<Member>> workspaceMembersProvider = Provider<List<Member>>((
@@ -253,3 +266,36 @@ final liveMembersProvider = StreamProvider.family<List<Member>, String>(
   (Ref ref, String workspaceId) =>
       ref.watch(workspaceRepositoryProvider).watchMembers(workspaceId),
 );
+
+/// The signed-in person's role in the workspace on screen, or null when it
+/// cannot be told — signed out, or a demo with no account.
+final Provider<MemberRole?> currentMemberRoleProvider = Provider<MemberRole?>((
+  Ref ref,
+) {
+  final String? uid = ref.watch(currentUidProvider);
+
+  if (uid == null) return null;
+
+  final List<Member> members = ref.watch(workspaceMembersProvider);
+
+  for (final Member member in members) {
+    if (member.uid == uid) return member.role;
+  }
+
+  return null;
+});
+
+/// Whether to offer the controls that change the business itself.
+///
+/// **An affordance, never a permission.** `firestore.rules` decides who may
+/// write (hard rule 11) and is unchanged by this; what this stops is drawing
+/// a control that would always fail. A role that cannot be told reads as
+/// allowed on purpose — the demo has no account at all, and hiding the
+/// controls there would hide the feature from the only mode it can be
+/// demonstrated in. A viewer who gets through anyway is refused by rules and
+/// sees the message hard rule 6 allows.
+final Provider<bool> canEditWorkspaceProvider = Provider<bool>((Ref ref) {
+  final MemberRole? role = ref.watch(currentMemberRoleProvider);
+
+  return role == null || role == MemberRole.owner || role == MemberRole.admin;
+});

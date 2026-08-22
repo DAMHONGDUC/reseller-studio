@@ -1,4 +1,5 @@
 import '../../../listings/domain/enums/listing_status.dart';
+import '../../../pricing/domain/services/profit_calculator.dart';
 
 /// A business. **Every business record in Firestore lives under one** (hard
 /// rule 14), so this is the root of everything the app reads or writes.
@@ -17,7 +18,7 @@ class Workspace {
     this.timezone,
     this.businessType,
     this.logoUrl,
-    this.staleThresholdDays = 60,
+    this.staleThresholdDays = StaleInventoryPolicy.defaultThresholdDays,
   });
 
   final String id;
@@ -48,6 +49,35 @@ class Workspace {
   final int staleThresholdDays;
 
   Duration get staleThreshold => Duration(days: staleThresholdDays);
+
+  /// A copy with some fields changed.
+  ///
+  /// **[id], [ownerId] and [createdAt] are deliberately not settable.** They
+  /// are what the business is and when it started — identity, not settings.
+  ///
+  /// **Changing [currency] does not convert anything and must never try**:
+  /// nobody knows what rate applied to a purchase made last March. It changes
+  /// what new money fields default to, and nothing else.
+  Workspace copyWith({
+    String? name,
+    String? country,
+    String? currency,
+    String? timezone,
+    String? businessType,
+    String? logoUrl,
+    int? staleThresholdDays,
+  }) => Workspace(
+    id: id,
+    name: name ?? this.name,
+    ownerId: ownerId,
+    country: country ?? this.country,
+    currency: currency ?? this.currency,
+    createdAt: createdAt,
+    timezone: timezone ?? this.timezone,
+    businessType: businessType ?? this.businessType,
+    logoUrl: logoUrl ?? this.logoUrl,
+    staleThresholdDays: staleThresholdDays ?? this.staleThresholdDays,
+  );
 }
 
 /// Someone's membership of a workspace — the ACL row.
