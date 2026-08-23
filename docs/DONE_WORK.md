@@ -21,6 +21,7 @@ are there and the mock backend drives them end to end.
 | 10 | More | built |
 | 11 | Sourcing — sources ranked by ROI, purchases, purchase detail, buy calculator | built |
 | 12 | Listings — filtered by status, platform rejection messages surfaced | built |
+| 13 | Cross-listing — one item onto several marketplaces, with the fee estimate per platform | built; publishes drafts, since nothing is integrated |
 | 15 | Pricing — profit, margin, ROI, maximum buy price | built, unit-tested |
 | 16 | Returns / refunds — open a return, close it, optional restock | built, no separate screen |
 | 17 | Expenses — add, list, totals by category, delete | built |
@@ -28,12 +29,14 @@ are there and the mock backend drives them end to end.
 | 19 | Reports — CSV export of sales, inventory and expenses via the share sheet | built |
 | 20 | Tax — year-end summary by form line, mileage at the published rate | built for US and UK, rates verified 16 Aug 2026 |
 | 21 | Search — items, orders, listings and sources in one list | built |
+| 22 | Notifications — the inbox, the bell on Home, FCM registration and the sends | built; silent until the functions are deployed |
 | 23 | Activity — the audit log, read-only, under More | screen built; empty until the triggers are deployed |
-| 24 | Workspace — create, switch between several from Home's title | built |
+| 24 | Workspace — create, switch between several from Home's title, delete one | built |
 | 24 | Team — the screen is read-only; the invite callables are written, not deployed | partial |
 | 25 | Settings — account, workspace, theme, mock-data switch (debug only) | built |
 | 26 | Authentication — Apple and Google, sign out, delete account, signed-out shell | built, unconfigured |
 | 27 | Monetization — Free / Pro / Business, limits, paywall, Subscription screen | built, unconfigured |
+| 27 | Entitlement mirrored server-side — the RevenueCat webhook, and the uid it needs | written, not deployed |
 
 ## What the flows actually cover
 
@@ -63,6 +66,15 @@ are there and the mock backend drives them end to end.
 - **Offers**: `Pending | Accepted | Declined | Expired`, accept (creates the
   order), decline, record a counter, and the discount off the asking price
   spelled out on the card.
+- **Cross-listing**: from the item's action sheet — pick the marketplaces it
+  is not already on, confirm one price inherited from the item, and see what
+  each platform's fee would take before publishing. One write for all of
+  them; the ones it is already on are shown and disabled rather than hidden.
+- **Notifications**: the bell on Home carries an unread dot and opens an
+  inbox. A new order, a new offer and a new teammate each write a row and send
+  a push; a daily digest carries the orders past their ship-by date and the
+  listings that have gone stale, one line each rather than one push per row.
+  Tapping a row switches to the business it is about and opens the record.
 - **Analytics**: the overview, the profit statement, the marketplace
   breakdown, and drill-downs for sales, profit, inventory, marketplace,
   categories and sources.
@@ -77,9 +89,11 @@ are there and the mock backend drives them end to end.
 - **Missing data renders `—`, never `0`.**
 - **Failures** map to `AppFailure` at the `data/` boundary; no raw exception
   reaches a widget.
-- **Logging** through `AppLogger`, analytics through `AppAnalytics` — a typed
-  method per event, no credential or buyer detail as a parameter.
-- **Localization**: **596 ARB keys in `en`** — every plain user-facing string
+- **Logging** through `SdLogger` — every call tagged with a flow from
+  `LogTagConstant` and carrying its data — and analytics through
+  `AppAnalytics`, a typed method per event. No credential, FCM token or buyer
+  detail is ever a parameter.
+- **Localization**: **699 ARB keys in `en`** — every plain user-facing string
   in `presentation/` goes through ARB, and the interpolated ones carry
   placeholders with real `plural` forms where a count is shown. `app_vi.arb`
   is still at 388 and is filled in once, at release, by rule — so the language
@@ -112,18 +126,21 @@ are there and the mock backend drives them end to end.
   stale, expired, days left — asks, so a test pins the instant with
   `FixedClock`. Recorded timestamps (`createdAt`, `deletedAt`, when an order
   shipped) deliberately still call `DateTime.now()`.
-- **Cloud Functions**: seven written and idle — membership upkeep, the three
-  team callables, and the three audit-log triggers. They build, lint and
-  typecheck in CI; none is deployed. `REMAINING_WORK.md` has what is not
-  written.
+- **Cloud Functions**: fourteen written and idle — membership upkeep, the
+  three team callables, account and workspace deletion, the three audit-log
+  triggers, the three notification triggers, the daily digest and the
+  RevenueCat webhook. They build, lint and typecheck in CI; none is deployed.
+  `REMAINING_WORK.md` has what is not written.
 - **CI**: `.github/workflows/ci.yml` analyzes and tests the app on every pull
   request and builds `functions/` in a separate job. It calls `tool/analyze.sh`
   and `tool/test.sh` rather than retyping them, and reads the SDK version out
   of `.fvmrc`.
-- **Tests**: 205 passing, none known-failing. Profit/margin/ROI including the
-  plan §11 worked example, plus screen-level tests asserting rendered figures
-  against the mock seed. `test/features/shot_tmp_test.dart` is the gitignored
-  scratch harness and is excluded — it hangs by design.
+- **Tests**: 266 Dart tests passing and 27 under `functions/` — the security
+  rules against the emulator, plus the entitlement mapping as plain node.
+  Profit/margin/ROI including the plan §11 worked example, and screen-level
+  tests asserting rendered figures against the mock seed.
+  `test/features/shot_tmp_test.dart` is the gitignored scratch harness and is
+  excluded — it hangs by design.
 - **Store assets exist.** The app icon is a price tag on the brand indigo, at
   every size iOS and Android ask for, with an Android adaptive foreground; the
   iOS launch screen carries the same mark and follows the theme, so it does
@@ -146,5 +163,11 @@ are there and the mock backend drives them end to end.
 - **The invite flow, once the functions are deployed** — invite, accept from a
   second account, and check the new business appears in the switcher. That
   last step is `onMemberWritten` doing its job.
+- **A push, on a real device.** The simulator has no APNs token, so
+  registration, the notification itself and the tap that deep-links into an
+  order have never run end to end. Check the inbox row appears even with
+  permission denied — that is the design, not a fallback.
+- **Deleting a business you own** while belonging to a second one: the app
+  should land on the other business rather than on workspace setup.
 - **Theme on a device set to dark**, from a cold start: the launch screen
   should not flash light before the app resolves the stored preference.

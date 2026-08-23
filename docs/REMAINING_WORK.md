@@ -10,17 +10,20 @@ Anything needing an account, a key or a card is not here — that is
 
 Ordered by what unblocks the most, not by size:
 
-1. **Deploy `functions/`** (owner). Seven are written and idle; one of them is
-   the only thing that keeps `users/{uid}.workspaceIds` correct.
-2. **FCM sends and their triggers**, then the notifications inbox — in that
-   order, because an inbox with no writer is a permanently empty screen.
-3. **Cross-listing**, last: it needs marketplace OAuth, which needs a
-   developer account per platform.
+1. **Deploy `functions/`** (owner). Fourteen are written and idle, and three
+   of them are the only thing making a whole feature real: `onMemberWritten`
+   keeps `users/{uid}.workspaceIds` correct, the notification triggers are the
+   only writers of the inbox, and `revenueCatWebhook` is what turns a plan
+   gate from a UI decision into a boundary. Deploying needs the Firebase
+   project — `RELEASE_ACTIONS.md` blocker 1.
+2. **Marketplace OAuth and sync**, which is what is left of §13 and §14 and is
+   blocked on a developer account per platform. Cross-listing itself is built;
+   what it writes is a draft, because nothing can publish to eBay yet.
 
-**`firebase_messaging` is a dependency nothing in `lib/` imports.** It is
-there for §22 and reads as dead weight until the FCM work above lands — worth
-either building or removing before submission, so the store questionnaire has
-one fewer thing to explain.
+**Everything the app carries is now used.** `firebase_messaging` was a
+dependency nothing imported; it is wired through `PushMessaging` and the
+notifications feature. Nothing in `pubspec.yaml` is dead weight for the store
+questionnaire to explain.
 
 ## 1. Deferred by decision
 
@@ -74,10 +77,11 @@ that needs the Firebase project, which is `RELEASE_ACTIONS.md` blocker 1.
 | — | `onMemberWritten` | **Written.** Keeps `users/{uid}.workspaceIds` in step. Until deployed, a seller sees only businesses they created — never one they were invited to |
 | 24 | `inviteMember`, `acceptInvite`, `removeMember` | **Written.** The seat limit and the last-owner check each need a count, and rules read one document |
 | 23 | `onItemWritten`, `onOrderWritten`, `onListingWritten` | **Written.** `actorId` is read from the document, never from a client (hard rule 12) |
-| 22 | FCM sends and their triggers | not written |
-| 27 | RevenueCat webhook | not written. It is what makes a plan gate a boundary rather than a UI decision |
+| 22 | `onOrderCreated`, `onOfferCreated`, `onMemberJoined` | **Written.** Each writes an inbox row per member — the actor excluded — and sends a push as a copy of it |
+| 22 | `dailyDigest` | **Written.** One scheduled run: orders past their ship-by date and stale listings, one line per workspace per day. Needs Cloud Scheduler enabled |
+| 27 | `revenueCatWebhook` | **Written.** Needs `REVENUECAT_WEBHOOK_TOKEN` in Secret Manager and the URL in the RevenueCat dashboard. Until it runs, `planFor` reads every workspace as Free however much the seller paid |
 | — | `deleteAccount` | **Written.** Guideline 5.1.1(v) — deletes the workspaces the seller solely owns, their Storage objects and the Auth user; refuses a sign-in older than five minutes |
-| — | `deleteWorkspace` | not written. `deleteAccount` walks the subcollections already; what is missing is deleting **one** business without deleting the account with it |
+| — | `deleteWorkspace` | **Written.** Owner only, recent sign-in required, and it shares its teardown with `deleteAccount` so neither can forget the Storage objects |
 | 14 | Marketplace OAuth and sync | not written, and blocked on a developer account per marketplace |
 | 13 | Cross-listing push | not written. Every call carrying a token runs server-side (hard rule 10) |
 
@@ -87,8 +91,7 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 
 | Plan § | Feature | What is there today |
 |---|---|---|
-| 22 | Notifications — the in-app inbox | nothing writes a notification, so an inbox would be permanently empty. Its route constant is deliberately absent: a constant no route serves is a deep link that fails silently |
-| 13 | Cross-listing | the `listings` feature and the `Listing` entity exist; there is no flow that pushes one item to several marketplaces |
+| 13, 14 | Publishing to a real marketplace | cross-listing writes a **draft** listing per platform, which is everything up to the API call. The call itself needs OAuth per marketplace, which needs a developer account per marketplace |
 
 ## 4. Loose ends found in the code
 
@@ -99,10 +102,13 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
   swap is one change and not two. The colour half is fixed:
   `SdButtonVariantV3.vendor` is black on light and white on dark, never the
   app's indigo. `RELEASE_ACTIONS.md` blocker 5.
-- **Entitlement is not mirrored into Firestore.** The client reads RevenueCat,
-  which is a cache for rendering. `firestore.rules` cannot ask an SDK a
-  question, so until the webhook function exists the plan gates are a UI
-  decision and not a security boundary.
+- **Entitlement is mirrored by a function nobody has deployed.** The client
+  still reads RevenueCat as a cache for rendering; `revenueCatWebhook` writes
+  the server copy `planFor` reads. Until it is deployed *and* the dashboard
+  points at it, the plan gates are still a UI decision. The webhook also needs
+  the app to have identified the seller — `Purchases.logIn(uid)` at sign-in,
+  without which every event arrives under an anonymous id no workspace
+  matches.
 - **`NavigationUtils.requireSignIn` is unreachable today**, and that is
   recorded rather than removed. Every screen with a create action sits behind
   `AuthedTab` or outside `_previewRoutes`, which
@@ -112,12 +118,24 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
   and tree-shaken from release, but it is still a whole fake backend inside
   the repo's binary. Worth an explicit decision before submission.
 - **The plan limits are a first proposal, not a priced decision.**
-  `PlanLimits.byPlan` holds every ceiling, and `seatsByPlan` in
-  `functions/src/lib/firestore.ts` is its **one deliberate duplicate** — rules
-  cannot count a collection, so the seat number has to exist somewhere a
-  modified client cannot reach. Changing one means changing the other.
+  `PlanLimits.byPlan` holds every ceiling. **Two things are deliberately
+  duplicated in `functions/`**, both for the same reason — the backend needs
+  them where a modified client cannot reach: `seatsByPlan` in
+  `lib/firestore.ts` (rules cannot count a collection) and
+  `planByEntitlement` in `subscription/entitlement.ts`, which mirrors
+  `SubscriptionProductConstant`. Changing either means changing its pair;
+  there is no third place.
 - **`selleros://` deep links are declared on both platforms but untested end
-  to end.** That needs a device and a real notification.
+  to end.** There is now something that produces one — a push carries a
+  `route` and `PushController` follows it — but it still needs a device and a
+  real send.
+- **Push has never run on hardware.** A simulator has no APNs token, so
+  registration, delivery and the tap are all untested. The inbox does not
+  depend on any of it: the Firestore row is written first and the push is a
+  copy, so a seller who denies permission still has a notification centre.
+- **The notification inbox never prunes.** It reads the most recent 50 and
+  older rows simply sit there, which is the same call the audit log made.
+  Worth a retention job before a workspace has two years of them.
 - **CI follows the design system's `main`, not the pinned gitlink.** A green
   run proves the app builds against the tip, not against the commit this repo
   records — so CI and a laptop can disagree, and that gap is the first thing
@@ -129,8 +147,9 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 - **`team` and `marketplaces` are read-only screens.** Both render and both
   explain why they cannot do more yet; neither is a stub that fails.
 
-## 5. `DONE_WORK.md` is behind
+## 5. Keep `DONE_WORK.md` beside this file
 
-It does not yet mention onboarding, the signed-out shell, multi-workspace
-switching, the Activity screen, theme switching, the ARB backfill or CI.
-Bring it up to date before using it to judge what exists.
+The two are halves of one answer and they drift apart in one direction: work
+lands, and only this file gets edited. It was last brought level on
+23 August 2026, with notifications, cross-listing, workspace deletion and the
+RevenueCat webhook.

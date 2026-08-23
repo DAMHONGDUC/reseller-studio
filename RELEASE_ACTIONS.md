@@ -218,15 +218,28 @@ wrong. If you would rather keep the package, say so and I will switch it back.
 
 ## 4. Cloud Functions — not deployed, and some features wait on them
 
-`functions/` has never had `npm ci` run in it and nothing is deployed. Three
-things in the app are deliberately switched off until it is, and each says so
-on screen rather than failing:
+Nothing is deployed. Several things in the app are deliberately switched off
+until it is, and each says so on screen rather than failing:
 
 | Feature | What it needs |
 |---|---|
-| Marketplace sync (eBay, Etsy, Depop, Poshmark, Mercari, Shopify) | OAuth per platform, secrets in Secret Manager, sync + webhook functions. **The app never sees a token** (hard rule 10). |
-| Team invites | An `inviteMember` callable — `invites/` is `allow write: if false` because the callable is what enforces the seat limit and stops the last owner being removed. |
-| Activity / audit log | Firestore triggers. `activity/` is append-only and client-writable-never, so a client-written log would be worthless as an audit trail. |
+| Marketplace sync (eBay, Etsy, Depop, Poshmark, Mercari, Shopify) | OAuth per platform, secrets in Secret Manager, sync + webhook functions. **The app never sees a token** (hard rule 10). Not written. |
+| Team invites | The `inviteMember` callable — `invites/` is `allow write: if false` because the callable is what enforces the seat limit and stops the last owner being removed. Written. |
+| Activity / audit log | Firestore triggers. `activity/` is append-only and client-writable-never, so a client-written log would be worthless as an audit trail. Written. |
+| Notifications and pushes | Three triggers plus a scheduled digest. The inbox renders without them and stays empty, because nothing else may write a notification. Written. |
+| The plan being a real limit | `revenueCatWebhook`, below. Written. |
+| Deleting one business | `deleteWorkspace`. Settings offers it to an owner; the delete itself is server-side because Firestore does not cascade. Written. |
+
+### What deploying the notifications needs beyond the deploy
+
+1. **An APNs key in the Firebase console** (Project settings → Cloud
+   Messaging). Without it iOS pushes silently never arrive — the app
+   registers, the send reports success, and no phone rings.
+2. **Cloud Scheduler enabled** on the project. `dailyDigest` is an
+   `onSchedule` function and the first deploy creates the job; the API has to
+   be on for that to succeed.
+3. **Test on a real device.** A simulator has no APNs token, so nothing about
+   push can be checked before you have hardware in your hand.
 
 Marketplace OAuth secrets go in **Secret Manager**, never in `env/*.json` — a
 test in this repo fails any key whose name contains `SECRET` or `PRIVATE`.
@@ -254,11 +267,28 @@ below can be done from this repo.
    `env/`, so these are yours to add to both files and both templates:
    `REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY`. They are public
    SDK keys and belong there (`docs/rules/ENV.md`).
-6. **The webhook secret is NOT an env key.** It goes in Secret Manager and is
-   read only by the Cloud Function that mirrors entitlement into Firestore —
-   which is not written yet, and is why the plan gates are a UI decision and
-   not yet a security boundary.
-7. **Price the tiers.** `PlanLimits.byPlan` holds the ceilings and
+6. **The webhook secret is NOT an env key.** It goes in Secret Manager as
+   `REVENUECAT_WEBHOOK_TOKEN`, and only `revenueCatWebhook` reads it:
+
+   ```sh
+   printf '%s' '<the value you set in RevenueCat>' | \
+     gcloud secrets create REVENUECAT_WEBHOOK_TOKEN --data-file=-
+   ```
+
+   Then in the RevenueCat dashboard, point the webhook at the deployed
+   function's URL and set the **Authorization header** to that same value. The
+   function answers 401 to anything else and never logs what was sent.
+
+   Until both halves are done, `planFor` reads every workspace as Free
+   however much the seller paid — that is what makes a plan gate a UI
+   decision rather than a boundary.
+
+7. **The entitlement follows the person and lands on the businesses they
+   own.** RevenueCat knows an `app_user_id`, which the app sets to the
+   Firebase uid at sign-in; the webhook grants the plan to every workspace
+   where that uid is `owner`. A business somebody else owns is somebody
+   else's to pay for.
+8. **Price the tiers.** `PlanLimits.byPlan` holds the ceilings and
    `InMemorySubscriptionRepository.catalogue` holds the demo prices; both are
    a first proposal nobody has priced.
 
@@ -339,7 +369,7 @@ Nothing is open. Everything that was here is under **Resolved** below.
 - **Receipts** (plan §18) are built, with upload.
 - **Analytics drill-downs** (plan §9) are built.
 - **Analytics events** — `AppAnalytics` now exists with a typed method per
-  event, wired beside each `AppLogger.action` in the controllers. It is a
+  event, wired beside each `SdLogger.action` in the controllers. It is a
   no-op until Firebase is configured. **No item title, buyer name or
   credential is ever a parameter** (hard rule 9). The one number worth
   watching is `item_created.via_quick_add`: hard rule 2 says the product's
