@@ -140,13 +140,60 @@ from, not when it is read.
 
 `AppRoutes.notifications`, `AppRoutes.activity` and `AppRoutes.returns` had
 zero usages and no route serving their paths. Notifications (§22) and the
-activity log (§23) are blocked on Cloud Functions; returns folded into order
+activity log (§23) were blocked on Cloud Functions; returns folded into order
 detail (§16), so its screen was never built.
 
 Deleted rather than left in place, because a constant that resolves to nothing
 reads as a working destination to the next caller and fails as a deep link
-without saying why. A comment sits where each was, so the gap reads as a
-decision. They come back with their screens.
+without saying why. A comment sat where each was, so the gap read as a
+decision. **Two have since come back with their screens** — `activity` and
+`notifications` — which is the rule working as intended. `returns` stays
+deleted: order detail is where a return is opened and closed.
+
+## The notification is the Firestore row; the push is a copy of it
+
+Plan §22 says "use FCM", which is a delivery mechanism and not a design. The
+design is that `users/{uid}/notifications/{id}` is written first and the push
+is sent afterwards, best-effort.
+
+A push cannot be the notification: permission may be off, the token may be
+stale, the phone may be in a field with no signal, and the seller may swipe it
+away half-read. All four are ordinary, and in a push-only design each one is a
+notification that never existed. Writing the row first means a seller who
+never grants permission still has a working notification centre, and it is why
+`PushMessaging` answers rather than throws everywhere.
+
+Three consequences worth keeping:
+
+- **The inbox lives under the user, not the workspace.** A notification is
+  addressed to a reader; two members of one business each get their own row
+  and each marks their own read. A shared document with a `readBy` array would
+  have every reader writing to a document every other reader is watching.
+- **The row's words are rendered in the app, not read from the document.** A
+  Cloud Function cannot know the reader's locale, so the stored `title` and
+  `body` are the English push text and the inbox builds its own line from
+  `type` and `count` through ARB (hard rule 7). Reading the stored strings
+  would make the inbox permanently English whatever the translation pass does.
+- **The reminders are a digest, one per workspace per day.** Forty stale
+  listings is one line. A seller who gets forty notifications turns
+  notifications off, and then the durable half is all that is left working.
+
+## Cross-listing has its own transition check
+
+`ItemTransition.check(item, listed)` refuses an item that is already `listed`,
+which is correct for the action it guards and exactly wrong for cross-listing:
+the item is on eBay and the seller wants it on Depop as well.
+
+So `crossListCheck` is a second, narrower question — has this item left
+inventory, and is there any of it left — rather than a widening of the first.
+It also does **not** require a price, because the cross-list screen is itself
+where the price is entered; requiring one beforehand would block the screen
+that collects it, which is hard rule 2 backwards.
+
+The write moves the item's status only when it has not already moved, and
+never touches `listedAt` on an item that was already live: staleness is
+measured from the first time something went live anywhere, so adding a
+marketplace must not reset that clock.
 
 ## RevenueCat is approved, and the app never sees a receipt
 
