@@ -71,8 +71,9 @@ dash -n tool/<script>.sh
 a `--build-name`/`--build-number` flag.** A build whose version exists nowhere
 in git is one the repo cannot account for afterwards.
 
-Running the app before Firebase exists — sign-in cannot succeed yet, so
-`env/dev.json` carries `BYPASS_AUTH` to get past it:
+Running the app before Firebase exists — sign-in cannot succeed yet, and
+**there is no bypass** (hard rule 1: `BYPASS_AUTH` was deleted and nothing
+replaces it). The app opens on the signed-out shell, which renders:
 
 ```sh
 melos run run
