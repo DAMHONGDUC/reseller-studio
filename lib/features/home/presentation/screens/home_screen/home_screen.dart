@@ -13,6 +13,7 @@ import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/utils/scroll_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/notification_bell.dart';
 import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
@@ -94,6 +95,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         // second row of chrome on the one screen whose content — what needs
         // attention — is the reason the app was opened.
         actions: <Widget>[
+          // The inbox first, then search: one says something happened, the
+          // other is a place to go looking.
+          const NotificationBell(),
           IconButton(
             // Global search is reached from Home because Home is where a
             // seller starts (plan §5's global entry points). It sits outside

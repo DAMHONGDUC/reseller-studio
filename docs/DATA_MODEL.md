@@ -11,6 +11,8 @@ Everything is under a workspace. There is no top-level `items` or `orders`.
 
 ```text
 users/{uid}                          the person, not their business
+  devices/{token}                    FCM tokens, one per signed-in device
+  notifications/{notificationId}     the inbox — written only by functions
 invites/{inviteId}                   pending team invites, keyed by email
 
 workspaces/{workspaceId}
@@ -144,6 +146,41 @@ of lines, they are always read with the order, and they never change after the
 sale — which is exactly when embedding wins. Their `unitPriceMinor` is copied
 at sale time and must never be refreshed from the item: it is what the buyer
 paid, and repricing the item afterwards must not rewrite history.
+
+### `devices/{token}`
+
+`token`, `platform`, `updatedAt`. **The token is the document id**, which is
+what makes registration idempotent — the same phone re-registering on every
+launch rewrites one document instead of growing a collection — and what lets
+the send path delete exactly the entry FCM reported dead.
+
+Under the *user*, not the workspace: a device belongs to whoever is holding
+it, and a seller in three businesses does not have three phones. The token is
+never logged (hard rule 9) — it is a way to push arbitrary text onto somebody's
+phone.
+
+### `notifications/{notificationId}`
+
+`type`, `workspaceId`, `entityId`, `count`, `route`, `title`, `body`,
+`readAt`, `createdAt`. Written only by Cloud Functions; the client may update
+`readAt` and nothing else, which `firestore.rules` enforces field by field.
+
+**Under the user because a notification is addressed to a reader**, not to a
+business — two members of one workspace each get their own row and each marks
+their own read. A shared document with a `readBy` array would have every
+reader writing to a document every other reader is watching.
+
+**`title` and `body` are the English push text, and the app does not read
+them.** A Cloud Function cannot know the reader's locale, so the row is
+rendered in the app from `type` and `count` through ARB (hard rule 7). That is
+what lets the translation pass fix the inbox without rewriting history.
+
+`count` is null for a notification about one record and set for a digest —
+never 0, which would read as a digest of nothing (hard rule 5).
+
+**The id is the dedupe key**: an event id for a trigger, `<type>_<date>` for
+the daily digest. A retried trigger and a digest that runs twice both land on
+one row.
 
 ### `activity/{activityId}`
 

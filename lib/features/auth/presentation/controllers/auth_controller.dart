@@ -3,6 +3,7 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
+import '../../../notifications/providers.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -73,8 +74,14 @@ class AuthController extends Notifier<AuthFormState> {
     }
   }
 
+  /// **The device is unregistered before the session ends, not after.**
+  /// `users/{uid}/devices` is writable only by that uid, so a delete
+  /// attempted a moment later is refused — and a token left registered is one
+  /// that would buzz the next person to hold this phone with the last
+  /// person's orders.
   Future<void> signOut() async {
     try {
+      await ref.read(pushControllerProvider.notifier).unregister();
       await ref.read(authRepositoryProvider).signOut();
       SdCrashReporter.instance.setUserId(null);
       AppAnalytics.instance.signedOut();

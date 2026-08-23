@@ -40,6 +40,15 @@ async function seed() {
     }
 
     await db.doc(`workspaces/${WORKSPACE}/items/item-1`).set({ title: 'Jacket' });
+
+    // One notification, written the way a Cloud Function writes it.
+    await db.doc(`users/${MEMBER}/notifications/n-1`).set({
+      type: 'orderCreated',
+      workspaceId: WORKSPACE,
+      title: 'New order',
+      body: 'Sold: Jacket',
+      readAt: null,
+    });
   });
 }
 
@@ -184,6 +193,39 @@ describe('user profiles', () => {
   it('lets somebody read and write only their own', async () => {
     await assertSucceeds(as(MEMBER).doc(`users/${MEMBER}`).set({ displayName: 'Me' }));
     await assertFails(as(MEMBER).doc(`users/${OWNER}`).get());
+  });
+});
+
+describe('devices and the notification inbox', () => {
+  it('lets somebody register a device token on their own record only', async () => {
+    await assertSucceeds(
+      as(MEMBER).doc(`users/${MEMBER}/devices/d-1`).set({ token: 'abc' }),
+    );
+    // A token is a way to push arbitrary text onto somebody's phone.
+    await assertFails(as(MEMBER).doc(`users/${OWNER}/devices/d-1`).set({ token: 'abc' }));
+    await assertFails(as(MEMBER).doc(`users/${OWNER}/devices/d-1`).get());
+  });
+
+  it('refuses a client creating a notification', async () => {
+    // Same reasoning as the audit log: one a client can write can claim any
+    // business made any sale.
+    await assertFails(
+      as(MEMBER).doc(`users/${MEMBER}/notifications/n-2`).set({ type: 'orderCreated' }),
+    );
+  });
+
+  it('lets the reader mark one read, and nothing else', async () => {
+    await assertSucceeds(
+      as(MEMBER).doc(`users/${MEMBER}/notifications/n-1`).update({ readAt: new Date() }),
+    );
+    await assertFails(
+      as(MEMBER).doc(`users/${MEMBER}/notifications/n-1`).update({ body: 'Sold: a car' }),
+    );
+    await assertFails(as(MEMBER).doc(`users/${MEMBER}/notifications/n-1`).delete());
+  });
+
+  it("refuses reading another person's inbox", async () => {
+    await assertFails(as(OWNER).doc(`users/${MEMBER}/notifications/n-1`).get());
   });
 });
 

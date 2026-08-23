@@ -3045,5 +3045,64 @@
   "workspaceDeleteConfirm": "Delete this business",
   "@workspaceDeleteConfirm": {
     "description": "The destructive confirm button."
+  },
+  "notificationsTitle": "Notifications",
+  "@notificationsTitle": {
+    "description": "Title of the inbox screen, and the bell's tooltip when nothing is unread."
+  },
+  "notificationsUnread": "{count, plural, =1{1 unread notification} other{{count} unread notifications}}",
+  "@notificationsUnread": {
+    "description": "The bell's tooltip and screen-reader label when something is unread.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsMarkAllRead": "Mark all read",
+  "@notificationsMarkAllRead": {
+    "description": "App bar action that clears the unread badge."
+  },
+  "notificationsEmptyTitle": "Nothing to catch up on",
+  "@notificationsEmptyTitle": {
+    "description": "Empty state title for the inbox."
+  },
+  "notificationsEmptyMessage": "New orders, offers and reminders land here.",
+  "@notificationsEmptyMessage": {
+    "description": "Empty state body for the inbox."
+  },
+  "notificationOrderCreated": "You have a new order",
+  "@notificationOrderCreated": {
+    "description": "Inbox row for an order that arrived."
+  },
+  "notificationOfferReceived": "A buyer made an offer",
+  "@notificationOfferReceived": {
+    "description": "Inbox row for an offer received."
+  },
+  "notificationShipmentsDue": "{count, plural, =1{1 order is past its ship-by date} other{{count} orders are past their ship-by date}}",
+  "@notificationShipmentsDue": {
+    "description": "Inbox row for the daily shipping reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationStaleInventory": "{count, plural, =1{1 listing has been up a long time} other{{count} listings have been up a long time}}",
+  "@notificationStaleInventory": {
+    "description": "Inbox row for the daily stale inventory reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMemberJoined": "Somebody joined the business",
+  "@notificationMemberJoined": {
+    "description": "Inbox row for a new teammate."
+  },
+  "notificationSomethingHappened": "Something happened in your business",
+  "@notificationSomethingHappened": {
+    "description": "Fallback row for a notification type this build does not know."
   }
 }

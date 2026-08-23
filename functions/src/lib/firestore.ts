@@ -17,6 +17,15 @@ export const paths = {
   member: (workspaceId: string, uid: string) =>
     `workspaces/${workspaceId}/members/${uid}`,
   activity: (workspaceId: string) => `workspaces/${workspaceId}/activity`,
+  records: (workspaceId: string, collection: string) =>
+    `workspaces/${workspaceId}/${collection}`,
+
+  // Both hang off the person, not the business: a device belongs to whoever
+  // holds it, and an inbox is addressed to a reader. `users/{uid}` is the one
+  // place a client may read without a membership document.
+  devices: (uid: string) => `users/${uid}/devices`,
+  device: (uid: string, deviceId: string) => `users/${uid}/devices/${deviceId}`,
+  notifications: (uid: string) => `users/${uid}/notifications`,
   subscription: (workspaceId: string) =>
     `workspaces/${workspaceId}/subscription/current`,
   invites: 'invites',

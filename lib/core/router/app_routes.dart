@@ -43,10 +43,12 @@ final class AppRoutes {
 
   // --- Shell branch 1: Home ---
 
-  // `/home/notifications` (§22) is still deliberately absent: nothing writes
-  // a notification yet, and a constant whose path no route serves is a deep
-  // link that fails silently. It comes back with its screen.
   static const String home = '/home';
+
+  /// The inbox (§22). Under Home because that is where the bell is, and the
+  /// bell is on Home because Home is the screen a seller opens to find out
+  /// what happened while they were not looking.
+  static const String notifications = '/home/notifications';
 
   // --- Shell branch 2: Inventory ---
 

@@ -60,5 +60,15 @@ export {
   onListingWritten,
 } from './activity/onRecordWritten';
 
-// Still to write: marketplace OAuth and sync, the RevenueCat webhook that
-// mirrors entitlement into Firestore, and FCM sends.
+// Notifications (§22). The inbox document is written first and the push is a
+// copy of it — a push is best-effort, and a design where it *is* the
+// notification is one that turns itself off when permission does.
+export {
+  onOrderCreated,
+  onOfferCreated,
+  onMemberJoined,
+} from './notifications/onRecordCreated';
+export { dailyDigest } from './notifications/dailyDigest';
+
+// Still to write: marketplace OAuth and sync, and the RevenueCat webhook that
+// mirrors entitlement into Firestore.

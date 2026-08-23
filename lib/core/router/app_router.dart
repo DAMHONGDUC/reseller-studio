@@ -26,6 +26,7 @@ import '../../features/listings/presentation/screens/listings_screen/listings_sc
 import '../../features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import '../../features/more/presentation/screens/about_screen/about_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen/notifications_screen.dart';
 import '../../features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen/onboarding_screen.dart';
 import '../../features/onboarding/providers.dart';
@@ -187,6 +188,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                       title: context.l10n.navHome,
                       child: const HomeScreen(),
                     ),
+                routes: <RouteBase>[
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'notifications',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const NotificationsScreen(),
+                  ),
+                ],
               ),
             ],
           ),

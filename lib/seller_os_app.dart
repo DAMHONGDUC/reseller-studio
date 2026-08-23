@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/notifications/providers.dart';
 import 'features/settings/presentation/controllers/theme_mode_controller.dart';
 import 'l10n/gen/app_localizations.dart';
 
@@ -39,6 +40,12 @@ class SellerOsApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final GoRouter router = ref.watch(routerProvider);
+
+    // Watched, not read: a controller nothing watches is one Riverpod never
+    // builds, and this device would never register for pushes. It rebuilds
+    // itself on sign-in and sign-out, which is exactly when registration
+    // has to change.
+    ref.watch(pushControllerProvider);
 
     return ScreenUtilInit(
       designSize: designSize,

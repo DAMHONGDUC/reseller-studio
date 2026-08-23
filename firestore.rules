@@ -9,6 +9,10 @@ rules_version = '2';
 // ownership from a field on the document, which is one forgotten `where`
 // clause away from a data leak between two sellers.
 //
+//   users/{uid}
+//     devices/{deviceId}        ← FCM tokens, written by the app
+//     notifications/{id}        ← the inbox, written only by functions
+//
 //   workspaces/{workspaceId}
 //     members/{uid}          ← the ACL. Role lives here, nowhere else.
 //     items/{itemId}
@@ -70,13 +74,42 @@ service cloud.firestore {
       return isMember(workspaceId) && role(workspaceId) == 'owner';
     }
 
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
     // --- Users -----------------------------------------------------------
 
     // A user's own profile. Nobody reads anyone else's: a team member's name
     // is denormalised onto the membership document, so the team screen never
     // needs to reach across into another user's record.
     match /users/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read, write: if isSelf(uid);
+
+      // The devices this person is signed in on, and the FCM token for each.
+      // Written by the app because only the app can learn the token; read by
+      // the notification functions through the Admin SDK, which bypasses
+      // these rules. Nobody else may read one — a token is a way to push
+      // arbitrary text onto somebody's phone.
+      match /devices/{deviceId} {
+        allow read: if isSelf(uid);
+        allow write: if isSelf(uid);
+      }
+
+      // The notification inbox (plan §22). **Written only by Cloud
+      // Functions**, the same reasoning as the audit log: a notification a
+      // client can create is one that can claim any business made any sale.
+      //
+      // The one thing the reader may do is mark it read, and the rule names
+      // that field rather than trusting the app to send only that — an update
+      // free to rewrite the body would put the create rule back where it
+      // started.
+      match /notifications/{notificationId} {
+        allow read: if isSelf(uid);
+        allow update: if isSelf(uid)
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readAt']);
+        allow create, delete: if false;
+      }
     }
 
     // --- Workspaces ------------------------------------------------------

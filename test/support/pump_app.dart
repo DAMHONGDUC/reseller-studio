@@ -3,6 +3,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+// `Override` is not in the main entrypoint's `show` list; `misc.dart` is
+// where hooks_riverpod exports it.
+import 'package:hooks_riverpod/misc.dart';
 import 'package:seller_os/core/theme/app_theme.dart';
 import 'package:seller_os/core/time/app_clock.dart';
 import 'package:seller_os/features/expenses/domain/entities/expense.dart';
@@ -60,7 +63,15 @@ class _AlwaysMock extends DataModeController {
 /// A test that pumps a bare `MaterialApp` is testing a tree the app never
 /// builds — `context.sdTheme3` asserts without the theme extension and
 /// `SdSpacingConstant` throws without screenutil.
-Future<void> pumpScreen(WidgetTester tester, Widget screen) async {
+///
+/// [overrides] are appended after the mock wiring, so a test can replace one
+/// provider — the inbox, say, which has no mock backend to seed — without
+/// rebuilding the scope by hand.
+Future<void> pumpScreen(
+  WidgetTester tester,
+  Widget screen, {
+  List<Override> overrides = const <Override>[],
+}) async {
   // The default test surface is 800×600 — wider and much shorter than any
   // phone, which makes rows that are fine on device overflow here and hides
   // real overflows behind fake ones. Pin it to the device the layouts were
@@ -84,6 +95,7 @@ Future<void> pumpScreen(WidgetTester tester, Widget screen) async {
         mockStoreProvider.overrideWith(
           (Ref ref) => MockStore(MockDataset.seed(now: testNow)),
         ),
+        ...overrides,
       ],
       child: ScreenUtilInit(
         designSize: SellerOsApp.designSize,
