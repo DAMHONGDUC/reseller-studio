@@ -70,5 +70,9 @@ export {
 } from './notifications/onRecordCreated';
 export { dailyDigest } from './notifications/dailyDigest';
 
-// Still to write: marketplace OAuth and sync, and the RevenueCat webhook that
-// mirrors entitlement into Firestore.
+// Subscription (§27). Until this runs, `firestore.rules` and the seat check
+// read every workspace as Free however much the seller paid — a rule cannot
+// ask an SDK a question.
+export { revenueCatWebhook } from './subscription/revenueCatWebhook';
+
+// Still to write: marketplace OAuth and sync.

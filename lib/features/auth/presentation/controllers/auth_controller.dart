@@ -3,6 +3,7 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
+import '../../../mock_data/providers.dart';
 import '../../../notifications/providers.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../workspace/providers.dart';
@@ -57,6 +58,7 @@ class AuthController extends Notifier<AuthFormState> {
       SdCrashReporter.instance.setUserId(uid);
       AppAnalytics.instance.signedIn(provider: provider.name);
       await _ensureProfile(uid);
+      await _identifyForBilling(uid);
 
       return true;
     } catch (error, stackTrace) {
@@ -82,6 +84,7 @@ class AuthController extends Notifier<AuthFormState> {
   Future<void> signOut() async {
     try {
       await ref.read(pushControllerProvider.notifier).unregister();
+      await ref.read(subscriptionRepositoryProvider).forget();
       await ref.read(authRepositoryProvider).signOut();
       SdCrashReporter.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
@@ -110,6 +113,27 @@ class AuthController extends Notifier<AuthFormState> {
       );
 
       rethrow;
+    }
+  }
+
+  /// Tell the billing provider which account this is.
+  ///
+  /// **Not allowed to fail the sign-in either**, for the same reason as the
+  /// profile write: the session is valid, and a seller blocked at the login
+  /// screen because a billing SDK was unreachable is the wrong trade. The
+  /// cost of it failing is that the webhook cannot connect a payment to this
+  /// account until the next sign-in, which the log names.
+  Future<void> _identifyForBilling(String uid) async {
+    try {
+      await ref.read(subscriptionRepositoryProvider).identify(uid);
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.subscription,
+        'Billing identity not set — entitlement will not reach the backend',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, String>{'uid': uid},
+      );
     }
   }
 

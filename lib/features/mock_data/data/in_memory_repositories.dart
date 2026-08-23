@@ -516,6 +516,14 @@ class InMemorySubscriptionRepository implements SubscriptionRepository {
   @override
   Future<SubscriptionStatus> restore() async => _read();
 
+  /// The demo has no account to identify (`mock_data/CLAUDE.md`) and no
+  /// backend for the webhook to write to, so both are inert.
+  @override
+  Future<void> identify(String uid) async {}
+
+  @override
+  Future<void> forget() async {}
+
   SubscriptionStatus _read() => _store.plan.isPaid
       ? SubscriptionStatus(
           plan: _store.plan,

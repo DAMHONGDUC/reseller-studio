@@ -14,6 +14,11 @@ set -e
 # CLI is a `pkg` bundle carrying its own node, and the child process it spawns
 # resolves `node` to that bundle — which does not understand `--test`, so the
 # suite dies before it runs. The devDependency runs under the real node.
+# The suite imports the COMPILED functions (`functions/lib/`) as well as the
+# rules — plain node cannot read TypeScript. Building first is what stops a
+# stale `lib/` quietly testing last week's code.
+(cd functions && npm run build)
+
 FIREBASE="functions/node_modules/.bin/firebase"
 [ -x "$FIREBASE" ] || FIREBASE="npx --yes firebase-tools"
 

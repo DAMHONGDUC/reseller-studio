@@ -40,4 +40,12 @@ class UnconfiguredSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<SubscriptionStatus> restore() async => SubscriptionStatus.free;
+
+  /// Nothing to identify to. Silent rather than logged: this runs on every
+  /// sign-in of every build without billing, which is most of them.
+  @override
+  Future<void> identify(String uid) async {}
+
+  @override
+  Future<void> forget() async {}
 }

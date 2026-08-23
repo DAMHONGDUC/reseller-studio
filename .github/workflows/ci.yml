@@ -97,11 +97,13 @@ jobs:
         working-directory: functions
         run: npm run lint
 
-      # `tsc` with no emit: the deploy builds its own output, and what CI is
-      # asked to prove is that the source compiles.
-      - name: Typecheck
+      # A real build rather than `tsc --noEmit`. It still proves the source
+      # compiles, and the test suite below imports the compiled output —
+      # `functions/test/*.test.mjs` runs under plain node, which cannot read
+      # TypeScript. The deploy builds its own output either way.
+      - name: Build
         working-directory: functions
-        run: npx tsc --noEmit
+        run: npm run build
 
       # The rules are the real access boundary — the signed-out shell and every
       # `WorkspaceGuard` are UI states, never permissions. Run from the repo

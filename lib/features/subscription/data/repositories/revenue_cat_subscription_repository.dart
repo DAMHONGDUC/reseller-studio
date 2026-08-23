@@ -115,6 +115,34 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
         return status;
       });
 
+  /// **This is what makes the webhook possible.** RevenueCat's `app_user_id`
+  /// becomes the Firebase uid, which is what the Cloud Function looks the
+  /// seller up by when it mirrors entitlement into Firestore. Without it the
+  /// id is anonymous and the backend can never connect a payment to an
+  /// account.
+  ///
+  /// The uid is not a credential — it is already in every document's
+  /// `createdBy` — so logging it is within hard rule 9.
+  @override
+  Future<void> identify(String uid) =>
+      FailureMapper.guard('identify for billing', () async {
+        await Purchases.logIn(uid);
+
+        SdLogger.info(
+          LogTagConstant.subscription,
+          'Billing identified',
+          <String, String>{'uid': uid},
+        );
+      });
+
+  @override
+  Future<void> forget() =>
+      FailureMapper.guard('forget billing identity', () async {
+        await Purchases.logOut();
+
+        SdLogger.info(LogTagConstant.subscription, 'Billing identity cleared');
+      });
+
   /// The first value on the stream.
   ///
   /// Its own try/catch rather than `FailureMapper.guard`: a stream that
