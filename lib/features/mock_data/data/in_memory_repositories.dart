@@ -585,6 +585,13 @@ class InMemoryWorkspaceRepository implements WorkspaceRepository {
     String? businessType,
   }) async => _store.workspace.id;
 
+  /// **Does nothing, and the demo never offers it.** The mock world holds one
+  /// business and no account, so there is no owner to authorise the delete and
+  /// nothing to fall back to afterwards — Settings draws the control only for
+  /// a real owner, which mock mode has no way to be.
+  @override
+  Future<void> deleteWorkspace(String workspaceId) async {}
+
   @override
   Future<void> setLastWorkspace({
     required String uid,

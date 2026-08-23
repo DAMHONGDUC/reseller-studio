@@ -1,22 +1,10 @@
 import { getAuth } from 'firebase-admin/auth';
-import { getStorage } from 'firebase-admin/storage';
 import { logger } from 'firebase-functions';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { onCall } from 'firebase-functions/v2/https';
 
+import { requireFreshUid } from '../lib/caller';
 import { db, paths } from '../lib/firestore';
-
-/**
- * How recently the caller must have signed in, in seconds.
- *
- * The client used to lean on Firebase's own `requires-recent-login`, which
- * disappears the moment the delete moves server-side — the Admin SDK does not
- * ask. This is the same guard, made explicit: a phone left unlocked on a
- * counter must not be one tap away from destroying the business.
- */
-const recentSignInSeconds = 5 * 60;
-
-/** Storage objects are removed a page at a time; the bucket API takes a prefix. */
-const storagePrefix = (workspaceId: string) => `workspaces/${workspaceId}/`;
+import { deleteWorkspaceData } from '../workspace/teardown';
 
 /**
  * Delete the caller's account and everything it owns.
@@ -41,23 +29,7 @@ const storagePrefix = (workspaceId: string) => `workspaces/${workspaceId}/`;
  * than an orphaned login with no data.
  */
 export const deleteAccount = onCall(async (request) => {
-  const uid = request.auth?.uid;
-
-  if (!uid) {
-    throw new HttpsError('unauthenticated', 'Sign in first.');
-  }
-
-  const authTime = request.auth?.token?.auth_time;
-  const staleSignIn =
-    typeof authTime !== 'number' ||
-    Date.now() / 1000 - authTime > recentSignInSeconds;
-
-  if (staleSignIn) {
-    // `unauthenticated` on purpose: the app maps it to "sign in again", which
-    // is the one thing the seller can actually do about it.
-    throw new HttpsError('unauthenticated', 'Sign in again, then delete.');
-  }
-
+  const uid = requireFreshUid(request);
   const userRef = db().doc(paths.user(uid));
   const userSnap = await userRef.get();
   const workspaceIds: string[] = Array.isArray(userSnap.get('workspaceIds'))
@@ -78,8 +50,7 @@ export const deleteAccount = onCall(async (request) => {
     ).length;
 
     if (mine.get('role') === 'owner' && otherOwners === 0) {
-      await db().recursiveDelete(db().doc(paths.workspace(workspaceId)));
-      await deleteWorkspaceFiles(workspaceId);
+      await deleteWorkspaceData(workspaceId);
       deleted += 1;
     } else {
       await db().doc(paths.member(workspaceId, uid)).delete();
@@ -96,22 +67,6 @@ export const deleteAccount = onCall(async (request) => {
 
   return { workspacesDeleted: deleted, workspacesLeft: left };
 });
-
-/**
- * Item photos, receipts and the workspace logo.
- *
- * **A failure here does not fail the delete.** Storage and Firestore are two
- * services, and a bucket that is briefly unavailable must not leave the seller
- * with an account they cannot remove — the log is what makes the leftover
- * objects findable.
- */
-async function deleteWorkspaceFiles(workspaceId: string): Promise<void> {
-  try {
-    await getStorage().bucket().deleteFiles({ prefix: storagePrefix(workspaceId) });
-  } catch (error) {
-    logger.error('workspace files not deleted', { workspaceId, error });
-  }
-}
 
 /**
  * Invitations addressed to this person that nobody accepted.

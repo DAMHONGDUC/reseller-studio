@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/callable_constant.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
@@ -25,11 +27,16 @@ import '../dtos/workspace_dto.dart';
 /// a member of: invisible to them, and re-running onboarding creates a clean
 /// one. That is the recoverable failure of the three.
 class FirestoreWorkspaceRepository implements WorkspaceRepository {
-  const FirestoreWorkspaceRepository(this._firestore);
+  const FirestoreWorkspaceRepository(this._firestore, this._functions);
 
   static const Uuid _uuid = Uuid();
 
   final FirebaseFirestore _firestore;
+
+  /// Only [deleteWorkspace] uses it. Everything else here is a document the
+  /// rules already let the seller write; the cascade is the one thing they
+  /// cannot do from the client at all.
+  final FirebaseFunctions _functions;
 
   @override
   Stream<UserProfile?> watchProfile(String uid) => FirestoreStream.document(
@@ -158,6 +165,36 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
           LogTagConstant.workspace,
           'Workspace updated',
           <String, Object>{'workspaceId': workspace.id},
+        );
+      });
+
+  /// **The function deletes the documents, and the app deletes nothing.**
+  /// `workspaces/{id}` is `allow delete: if false` for clients, so a client
+  /// delete would fail on the parent and leave every subcollection behind —
+  /// invisible to the seller and still billed for.
+  ///
+  /// Nothing here switches workspace afterwards. The membership documents go
+  /// with the business, `onMemberWritten` drops the id from every member's
+  /// `workspaceIds`, and `resolvedWorkspaceId` falls back on its own (hard
+  /// rule 11b) — a switch written here would be a second answer to the same
+  /// question.
+  @override
+  Future<void> deleteWorkspace(String workspaceId) =>
+      FailureMapper.guard('delete workspace', () async {
+        SdLogger.action(
+          LogTagConstant.workspace,
+          'Delete workspace',
+          <String, Object>{'workspaceId': workspaceId},
+        );
+
+        final HttpsCallableResult<Object?> result = await _functions
+            .httpsCallable(CallableConstant.deleteWorkspace)
+            .call<Object?>(<String, Object?>{'workspaceId': workspaceId});
+
+        SdLogger.action(
+          LogTagConstant.workspace,
+          'Workspace deleted',
+          <String, Object?>{'workspaceId': workspaceId, 'result': result.data},
         );
       });
 

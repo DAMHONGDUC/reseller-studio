@@ -88,6 +88,42 @@ class _WorkspaceCard extends ConsumerWidget {
     await _save(context, ref, () => _edit(ref).setStaleThresholdDays(days));
   }
 
+  /// **Asks once, in a dialog that says exactly what goes.** There is no undo
+  /// and no export first — the same shape as deleting the account, which is
+  /// the only other control in the app that destroys records.
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    await showSdDialogV3(
+      context,
+      SdDialogV3(
+        title: context.l10n.workspaceDeleteConfirmTitle,
+        message: context.l10n.workspaceDeleteConfirmBody(workspace.name),
+        icon: Symbols.warning_rounded,
+        actions: <SdDialogActionV3>[
+          SdDialogActionV3(
+            label: context.l10n.workspaceDeleteConfirm,
+            isDestructive: true,
+            onPressed: () => _delete(context, ref),
+          ),
+          SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
+        ],
+      ),
+    );
+  }
+
+  /// No success message: the router replaces the screen the moment the profile
+  /// stream drops the id, so a snackbar would be posted onto a route that is
+  /// already gone.
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    try {
+      await _edit(ref).delete();
+    } catch (error) {
+      // Already logged by the controller.
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+    }
+  }
+
   WorkspaceEditController _edit(WidgetRef ref) =>
       ref.read(workspaceEditControllerProvider.notifier);
 
@@ -113,6 +149,7 @@ class _WorkspaceCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool canEdit = ref.watch(canEditWorkspaceProvider);
+    final bool canDelete = ref.watch(canDeleteWorkspaceProvider);
 
     if (!canEdit) return _WorkspaceReadOnlyCard(workspace: workspace);
 
@@ -144,6 +181,17 @@ class _WorkspaceCard extends ConsumerWidget {
           icon: Symbols.hourglass_bottom_rounded,
           onTap: () => _pickStaleThreshold(context, ref),
         ),
+        // Owner only. An admin runs the business; ending it belongs to
+        // whoever owns it, and the Cloud Function refuses anyone else.
+        if (canDelete)
+          AppListRow(
+            title: context.l10n.workspaceDelete,
+            subtitle: context.l10n.workspaceDeletePermanent,
+            icon: Symbols.delete_forever_rounded,
+            iconTint: context.sdTheme3.danger,
+            showChevron: false,
+            onTap: () => _confirmDelete(context, ref),
+          ),
       ],
     );
   }

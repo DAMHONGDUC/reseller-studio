@@ -42,6 +42,14 @@ abstract interface class WorkspaceRepository {
 
   Future<void> updateWorkspace(Workspace workspace);
 
+  /// Erase one business: its records, its files and the invitations to it.
+  ///
+  /// **A Cloud Function, not a client delete** — Firestore does not cascade,
+  /// so `workspaces/{id}` is `allow delete: if false` and the subcollections
+  /// are walked with the Admin SDK. Owner only, and the function is what
+  /// checks that; the UI only decides whether to draw the control.
+  Future<void> deleteWorkspace(String workspaceId);
+
   /// Remember which workspace to reopen.
   Future<void> setLastWorkspace({
     required String uid,

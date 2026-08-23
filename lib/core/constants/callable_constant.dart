@@ -8,4 +8,8 @@ final class CallableConstant {
   /// Deletes the caller's account, the businesses they solely own, and the
   /// Storage objects under them. See `functions/src/account/deleteAccount.ts`.
   static const String deleteAccount = 'deleteAccount';
+
+  /// Deletes one business and everything under it, leaving the account and
+  /// any other business alone. See `functions/src/workspace/deleteWorkspace.ts`.
+  static const String deleteWorkspace = 'deleteWorkspace';
 }

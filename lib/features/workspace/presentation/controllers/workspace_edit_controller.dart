@@ -63,6 +63,46 @@ class WorkspaceEditController extends Notifier<bool> {
         return current.copyWith(staleThresholdDays: days);
       });
 
+  /// End the business: its records, its files and the invitations to it.
+  ///
+  /// **Not part of [_apply]** — that reads the workspace and writes it back,
+  /// and there is nothing to write back here. The call is a Cloud Function
+  /// (`workspaces/{id}` is `allow delete: if false`), and the owner check is
+  /// the function's, not this one's.
+  ///
+  /// Nothing navigates afterwards. The membership goes with the business, the
+  /// profile stream drops the id, and the router's own redirect decides where
+  /// the seller lands — Home on the business they still have, workspace setup
+  /// when that was the last one.
+  Future<void> delete() async {
+    final Workspace? current = ref.read(currentWorkspaceProvider);
+
+    if (current == null) return;
+
+    state = true;
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Delete workspace',
+      <String, Object>{'workspaceId': current.id},
+    );
+
+    try {
+      await ref.read(workspaceRepositoryProvider).deleteWorkspace(current.id);
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.workspace,
+        'Failed to delete workspace',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'workspaceId': current.id},
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
   /// Reads the workspace, applies [change], writes it back.
   ///
   /// Read at the moment of the write rather than held in state: a teammate

@@ -36,6 +36,11 @@ initializeApp();
 // ones they were invited to.
 export { onMemberWritten } from './workspace/onMemberWritten';
 
+// Deleting one business without deleting the account with it. Firestore does
+// not cascade, so `workspaces/{id}` is `allow delete: if false` for clients
+// and the subcollections are walked here.
+export { deleteWorkspace } from './workspace/deleteWorkspace';
+
 // Team. All three are callables because `firestore.rules` denies clients
 // `invites/` and anyone's own membership document, and because the seat limit
 // and the last-owner check both need a count rules cannot take.
@@ -56,5 +61,4 @@ export {
 } from './activity/onRecordWritten';
 
 // Still to write: marketplace OAuth and sync, the RevenueCat webhook that
-// mirrors entitlement into Firestore, FCM sends, and a `deleteWorkspace` a
-// seller can call without deleting their account with it.
+// mirrors entitlement into Firestore, and FCM sends.

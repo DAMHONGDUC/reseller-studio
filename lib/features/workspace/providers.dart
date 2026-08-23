@@ -37,7 +37,10 @@ final Provider<WorkspaceRepository> workspaceRepositoryProvider =
         return InMemoryWorkspaceRepository(ref.watch(mockStoreProvider));
       }
 
-      return FirestoreWorkspaceRepository(ref.watch(firebaseFirestoreProvider));
+      return FirestoreWorkspaceRepository(
+        ref.watch(firebaseFirestoreProvider),
+        ref.watch(firebaseFunctionsProvider),
+      );
     });
 
 /// The signed-in person's own record — name, email, and which workspaces they
@@ -298,4 +301,15 @@ final Provider<bool> canEditWorkspaceProvider = Provider<bool>((Ref ref) {
   final MemberRole? role = ref.watch(currentMemberRoleProvider);
 
   return role == null || role == MemberRole.owner || role == MemberRole.admin;
+});
+
+/// Whether to offer ending the business altogether.
+///
+/// **Owner only, and a role that cannot be told is a no** — the opposite
+/// default from [canEditWorkspaceProvider], because the two failure modes are
+/// not comparable. Hiding an edit control from the demo hides a feature;
+/// drawing a delete control there offers to destroy the one business the
+/// demo has, with no account behind it to authorise the call.
+final Provider<bool> canDeleteWorkspaceProvider = Provider<bool>((Ref ref) {
+  return ref.watch(currentMemberRoleProvider)?.canOwn ?? false;
 });

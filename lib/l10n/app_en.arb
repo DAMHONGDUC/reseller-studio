@@ -3020,5 +3020,30 @@
   "sourcingSalePriceFilled": "Filled in from your last sale. Change it if this one is different.",
   "@sourcingSalePriceFilled": {
     "description": "Explains that the expected sale price came from history."
+  },
+  "workspaceDelete": "Delete this business",
+  "@workspaceDelete": {
+    "description": "Destructive row in Settings that ends one workspace."
+  },
+  "workspaceDeletePermanent": "Its items, orders, receipts and photos go with it",
+  "@workspaceDeletePermanent": {
+    "description": "Subtitle saying what deleting a business takes with it."
+  },
+  "workspaceDeleteConfirmTitle": "Delete this business?",
+  "@workspaceDeleteConfirmTitle": {
+    "description": "Confirmation dialog title for deleting a workspace."
+  },
+  "workspaceDeleteConfirmBody": "{name} and everything in it goes — items, orders, expenses, receipts and photos, for every member. This cannot be undone. Your account and any other business you belong to are untouched.",
+  "@workspaceDeleteConfirmBody": {
+    "description": "Says exactly what is lost when a business is deleted.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceDeleteConfirm": "Delete this business",
+  "@workspaceDeleteConfirm": {
+    "description": "The destructive confirm button."
   }
 }
