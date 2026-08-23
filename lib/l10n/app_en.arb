@@ -3104,5 +3104,71 @@
   "notificationSomethingHappened": "Something happened in your business",
   "@notificationSomethingHappened": {
     "description": "Fallback row for a notification type this build does not know."
+  },
+  "itemActionCrossList": "Cross-list",
+  "@itemActionCrossList": {
+    "description": "Item action that opens the cross-listing flow."
+  },
+  "crossListTitle": "Cross-list",
+  "@crossListTitle": {
+    "description": "Title of the cross-listing screen."
+  },
+  "crossListPrice": "Asking price",
+  "@crossListPrice": {
+    "description": "The one price every new listing is created at."
+  },
+  "crossListPriceHelper": "Used on every marketplace you pick. Change one later if you need to.",
+  "@crossListPriceHelper": {
+    "description": "Explains that the price is shared across the new listings."
+  },
+  "crossListPickMarketplaces": "Marketplaces",
+  "@crossListPickMarketplaces": {
+    "description": "Heading over the marketplace picker."
+  },
+  "crossListAlreadyListed": "Already on",
+  "@crossListAlreadyListed": {
+    "description": "Badge on a marketplace this item already has a listing on."
+  },
+  "crossListReview": "Review",
+  "@crossListReview": {
+    "description": "Heading over the per-marketplace fee estimate."
+  },
+  "crossListAfterFees": "{fee} fee · {net} left",
+  "@crossListAfterFees": {
+    "description": "One marketplace's estimated fee and what is left of the price.",
+    "placeholders": {
+      "fee": {
+        "type": "String"
+      },
+      "net": {
+        "type": "String"
+      }
+    }
+  },
+  "crossListFeesEstimated": "Fees are estimates for planning. The real figure arrives with the order.",
+  "@crossListFeesEstimated": {
+    "description": "Says the fee rates are not accounting."
+  },
+  "crossListPublish": "Publish",
+  "@crossListPublish": {
+    "description": "The commit action before any marketplace is picked."
+  },
+  "crossListPublishCount": "{count, plural, =1{Publish to 1 marketplace} other{Publish to {count} marketplaces}}",
+  "@crossListPublishCount": {
+    "description": "The commit action, naming how many marketplaces it will create listings on.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "crossListDone": "{count, plural, =1{Listed on 1 marketplace} other{Listed on {count} marketplaces}}",
+  "@crossListDone": {
+    "description": "Confirmation after publishing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

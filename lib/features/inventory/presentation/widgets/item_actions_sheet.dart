@@ -195,6 +195,27 @@ class ItemActionsSheet extends ConsumerWidget {
             }),
           ),
           _ActionRow(
+            icon: Symbols.share_rounded,
+            label: context.l10n.itemActionCrossList,
+            onTap: () {
+              final ItemTransitionCheck check = ref
+                  .read(itemActionsControllerProvider.notifier)
+                  .crossListCheck(item);
+
+              if (!check.isAllowed) {
+                SdSnackBarUtilsV3.error(
+                  context,
+                  ItemBlockPresenter.messages(context, check.blocks),
+                );
+
+                return;
+              }
+
+              Navigator.of(context).pop();
+              context.push(AppRoutes.crossList(item.id));
+            },
+          ),
+          _ActionRow(
             icon: Symbols.price_change_rounded,
             label: context.l10n.itemActionReprice,
             onTap: () {

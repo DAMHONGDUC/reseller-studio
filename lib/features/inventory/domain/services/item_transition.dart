@@ -92,6 +92,33 @@ final class ItemTransition {
         : ItemTransitionCheck.blocked(blocks);
   }
 
+  /// Whether more marketplaces may be added for this item (plan §13).
+  ///
+  /// **Deliberately not `check(item, listed)`.** That one refuses an item
+  /// that is already listed, which is exactly the item cross-listing is for:
+  /// it is on eBay and the seller wants it on Depop as well. What is refused
+  /// here is an item that has left inventory — a sold or archived one — and
+  /// an empty shelf.
+  ///
+  /// **A price is not required at this point** and asking for one would be
+  /// hard rule 2 backwards: the cross-list screen is itself where the price
+  /// is entered, so requiring it beforehand would block the screen that
+  /// collects it.
+  static ItemTransitionCheck crossListCheck(Item item) {
+    final List<ItemTransitionBlock> blocks = <ItemTransitionBlock>[];
+
+    if (item.quantity <= 0) blocks.add(ItemTransitionBlock.noQuantity);
+
+    if (item.status == ItemStatus.sold ||
+        item.status == ItemStatus.archived) {
+      blocks.add(ItemTransitionBlock.wrongStatus);
+    }
+
+    return blocks.isEmpty
+        ? const ItemTransitionCheck.allowed()
+        : ItemTransitionCheck.blocked(blocks);
+  }
+
   /// [item] moved to [target], with the timestamps that move implies.
   ///
   /// **Throws if the move is blocked.** Callers check first; this is the

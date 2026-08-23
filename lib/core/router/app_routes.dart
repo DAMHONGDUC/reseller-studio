@@ -55,6 +55,11 @@ final class AppRoutes {
   static const String inventory = '/inventory';
   static const String itemDetail = '/inventory/item/:itemId';
   static const String editItemPath = '/inventory/item/:itemId/edit';
+
+  /// Cross-listing (§13), nested under the item it publishes. Reached from
+  /// the item's action sheet, never from a list — the flow starts with one
+  /// item already chosen.
+  static const String crossListPath = '/inventory/item/:itemId/cross-list';
   static const String addItem = '/inventory/add';
   static const String quickAdd = '/inventory/quick-add';
   static const String scanner = '/inventory/scanner';
@@ -127,6 +132,8 @@ final class AppRoutes {
   /// place that knows the segment layout is this file.
   static String item(String itemId) => '/inventory/item/$itemId';
   static String editItem(String itemId) => '/inventory/item/$itemId/edit';
+  static String crossList(String itemId) =>
+      '/inventory/item/$itemId/cross-list';
   static String order(String orderId) => '/orders/$orderId';
   static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
   static String purchase(String purchaseId) =>

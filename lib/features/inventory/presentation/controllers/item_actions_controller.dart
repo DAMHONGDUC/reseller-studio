@@ -114,6 +114,98 @@ class ItemActionsController extends Notifier<bool> {
     }
   }
 
+  /// Whether more marketplaces may be added (plan §13).
+  ItemTransitionCheck crossListCheck(Item item) =>
+      ItemTransition.crossListCheck(item);
+
+  /// Put one item on several marketplaces at once (plan §13).
+  ///
+  /// **One `saveAll`, not a loop over [listItem].** Cross-listing is a single
+  /// user intent that must not half-succeed: four separate writes is a state
+  /// where the item is on two marketplaces, the screen showed an error, and
+  /// nobody can tell which two.
+  ///
+  /// **The item's status moves only if it has not already.** An item already
+  /// `listed` is exactly the case this exists for — it is on eBay and the
+  /// seller wants Depop too — and `ItemTransition.apply` would refuse that
+  /// move as `wrongStatus`. What it always gets is the price, because that is
+  /// what every new listing was created at.
+  ///
+  /// Marketplaces the item is already on are the caller's to exclude; the
+  /// screen greys them out, and passing one anyway would create a second
+  /// listing on the same platform.
+  Future<void> crossList(
+    Item item, {
+    required Set<Marketplace> marketplaces,
+    required Money price,
+  }) async {
+    final ListingRepository listings = ref.read(listingRepositoryProvider);
+    final ItemRepository items = ref.read(itemRepositoryProvider);
+    final DateTime now = DateTime.now();
+
+    if (marketplaces.isEmpty) return;
+
+    SdLogger.action(LogTagConstant.listing, 'Cross-list item', <String, Object>{
+      'itemId': item.id,
+      'marketplaces': marketplaces.map((Marketplace m) => m.name).toList(),
+      'priceMinor': price.minor,
+    });
+
+    state = true;
+
+    try {
+      final Item priced = item.copyWith(askingPrice: price);
+
+      await listings.saveAll(<Listing>[
+        for (final Marketplace marketplace in marketplaces)
+          Listing(
+            id: _uuid.v4(),
+            itemId: item.id,
+            marketplace: marketplace,
+            // Per-marketplace titles are the point of the entity, but they
+            // diverge when a seller optimises one — not at creation, where a
+            // second box per platform would be four boxes for one intent.
+            title: item.title,
+            price: price,
+            // Draft, not active: nothing is integrated yet, so claiming the
+            // listing is live on eBay would be a lie the app cannot back up.
+            status: ListingStatus.draft,
+            createdAt: now,
+          ),
+      ]);
+
+      await items.save(
+        item.status.isListable
+            ? ItemTransition.apply(priced, ItemStatus.listed, now: now)
+            : priced,
+      );
+
+      SdLogger.info(LogTagConstant.listing, 'Item cross-listed', <String, Object>{
+        'itemId': item.id,
+        'count': marketplaces.length,
+      });
+      AppAnalytics.instance.bulkAction(
+        action: 'Cross-list item',
+        count: marketplaces.length,
+      );
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.listing,
+        'Failed to cross-list item',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{
+          'itemId': item.id,
+          'marketplaces': marketplaces.map((Marketplace m) => m.name).toList(),
+        },
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
   /// Record a sale (plan §28's manual order).
   ///
   /// **Creates the order as well as moving the item**, because profit is
