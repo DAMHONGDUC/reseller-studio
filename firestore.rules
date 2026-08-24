@@ -161,8 +161,9 @@ service cloud.firestore {
                       && memberUid != request.auth.uid;
 
         // The last owner cannot be demoted or removed, or the workspace
-        // becomes unadministrable. Enforced in the `updateMemberRole`
-        // callable, which can count the owners; a rule cannot.
+        // becomes unadministrable. Enforced in the `removeMember` callable,
+        // which does both jobs because the check is one count either way; a
+        // rule cannot take that count at all.
       }
 
       // --- Business records ----------------------------------------------

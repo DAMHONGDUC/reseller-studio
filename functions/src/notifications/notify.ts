@@ -13,7 +13,21 @@ export type NotificationType =
   | 'offerReceived'
   | 'shipmentsDue'
   | 'staleInventory'
+  | 'lowInventory'
   | 'memberJoined';
+
+/**
+ * How long a read notification is kept, in days.
+ *
+ * **An inbox nobody prunes is a collection that only grows.** 90 days is long
+ * enough that "what happened while I was away" always has an answer, and short
+ * enough that a busy seller's inbox does not become the largest collection in
+ * their workspace.
+ */
+const retentionDays = 90;
+
+/** How many expired rows one delivery clears. */
+const pruneBatch = 20;
 
 /** One notification, before it is addressed to anybody. */
 export interface Notification {
@@ -73,6 +87,7 @@ export async function notifyWorkspace(options: {
 
   await Promise.all(recipients.map((uid) => writeInbox(uid, dedupeKey, notification)));
   await Promise.all(recipients.map((uid) => push(uid, notification)));
+  await Promise.all(recipients.map((uid) => prune(uid)));
 
   logger.info('notification delivered', {
     type: notification.type,
@@ -118,6 +133,44 @@ async function writeInbox(
     });
 
     throw error;
+  }
+}
+
+/**
+ * Drop notifications older than the retention window.
+ *
+ * **Done here, while this user's inbox is already being written to**, rather
+ * than in a scheduled job that walks every user: the work is bounded (one
+ * query, at most [pruneBatch] deletes), it costs nothing on an inbox with
+ * nothing expired, and it needs no collection-group index.
+ *
+ * The cap means a long-dormant inbox is trimmed over several deliveries
+ * instead of one. That is the intended trade — a delivery must not turn into
+ * an unbounded delete.
+ *
+ * **A failure is logged and swallowed.** Tidying is not worth failing a
+ * delivery over, and the platform replaying the trigger would rewrite rows
+ * for everybody who already had theirs.
+ */
+async function prune(uid: string): Promise<void> {
+  const cutoff = new Date();
+
+  cutoff.setDate(cutoff.getDate() - retentionDays);
+
+  try {
+    const expired = await db()
+      .collection(paths.notifications(uid))
+      .where('createdAt', '<', cutoff)
+      .limit(pruneBatch)
+      .get();
+
+    if (expired.empty) return;
+
+    await Promise.all(expired.docs.map((doc) => doc.ref.delete()));
+
+    logger.info('notifications pruned', { uid, count: expired.size });
+  } catch (error) {
+    logger.error('notifications not pruned', { uid, error });
   }
 }
 

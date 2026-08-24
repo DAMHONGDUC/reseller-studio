@@ -19,6 +19,7 @@ class Workspace {
     this.businessType,
     this.logoUrl,
     this.staleThresholdDays = StaleInventoryPolicy.defaultThresholdDays,
+    this.lowStockThreshold = LowStockPolicy.defaultThreshold,
   });
 
   final String id;
@@ -48,6 +49,12 @@ class Workspace {
   /// stale in weeks, furniture does not.
   final int staleThresholdDays;
 
+  /// How few items on hand before this workspace is told it is running low.
+  /// Per workspace for the same reason as [staleThresholdDays]: somebody
+  /// turning over forty items a week and somebody selling furniture do not
+  /// mean the same thing by "low".
+  final int lowStockThreshold;
+
   Duration get staleThreshold => Duration(days: staleThresholdDays);
 
   /// A copy with some fields changed.
@@ -66,6 +73,7 @@ class Workspace {
     String? businessType,
     String? logoUrl,
     int? staleThresholdDays,
+    int? lowStockThreshold,
   }) => Workspace(
     id: id,
     name: name ?? this.name,
@@ -77,6 +85,7 @@ class Workspace {
     businessType: businessType ?? this.businessType,
     logoUrl: logoUrl ?? this.logoUrl,
     staleThresholdDays: staleThresholdDays ?? this.staleThresholdDays,
+    lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
   );
 }
 

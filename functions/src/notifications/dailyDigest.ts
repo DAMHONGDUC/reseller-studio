@@ -12,6 +12,18 @@ const timeZone = 'Etc/UTC';
 /** The default when a workspace has not set its own (`StaleInventoryPolicy`). */
 const defaultStaleThresholdDays = 60;
 
+/** The default when a workspace has not set its own (`LowStockPolicy`). */
+const defaultLowStockThreshold = 10;
+
+/**
+ * Item statuses that count as stock the seller still owns.
+ *
+ * Mirrors `ItemStatus.isOnHand` in the app — `sold` and `archived` are out,
+ * because neither is on the shelf and counting them would tell a seller they
+ * have stock they have already parted with.
+ */
+const onHandStatuses = ['draft', 'inStock', 'listed', 'reserved'];
+
 /**
  * The reminders that are about a record *sitting*, not about one appearing
  * (plan §22: order reminder, shipping reminder, stale inventory).
@@ -37,7 +49,7 @@ export const dailyDigest = onSchedule({ schedule, timeZone }, async () => {
 
   for (const workspace of workspaces.docs) {
     try {
-      sent += await digestFor(workspace.id, workspace.get('staleThresholdDays'), day);
+      sent += await digestFor(workspace.id, workspace.data() ?? {}, day);
     } catch (error) {
       // One workspace failing must not cost every workspace after it its
       // reminders — the loop continues and the log names the one that broke.
@@ -48,23 +60,27 @@ export const dailyDigest = onSchedule({ schedule, timeZone }, async () => {
   logger.info('daily digest complete', { workspaces: workspaces.size, sent });
 });
 
-/** Both counts for one business, and at most one notification each. */
+/** Every count for one business, and at most one notification each. */
 async function digestFor(
   workspaceId: string,
-  staleThresholdDays: unknown,
+  settings: FirebaseFirestore.DocumentData,
   day: string,
 ): Promise<number> {
   const now = new Date();
   const staleBefore = new Date(now);
+  const lowStockThreshold =
+    typeof settings.lowStockThreshold === 'number'
+      ? settings.lowStockThreshold
+      : defaultLowStockThreshold;
 
   staleBefore.setDate(
     staleBefore.getDate() -
-      (typeof staleThresholdDays === 'number'
-        ? staleThresholdDays
+      (typeof settings.staleThresholdDays === 'number'
+        ? settings.staleThresholdDays
         : defaultStaleThresholdDays),
   );
 
-  const [due, stale] = await Promise.all([
+  const [due, stale, onHand] = await Promise.all([
     db()
       .collection(paths.records(workspaceId, 'orders'))
       .where('status', '==', 'toShip')
@@ -77,10 +93,16 @@ async function digestFor(
       .where('listedAt', '<=', Timestamp.fromDate(staleBefore))
       .count()
       .get(),
+    db()
+      .collection(paths.records(workspaceId, 'items'))
+      .where('status', 'in', onHandStatuses)
+      .count()
+      .get(),
   ]);
 
   const dueCount = due.data().count;
   const staleCount = stale.data().count;
+  const onHandCount = onHand.data().count;
 
   let sent = 0;
 
@@ -115,6 +137,27 @@ async function digestFor(
           staleCount === 1
             ? '1 listing has been up a long time. Reprice it?'
             : `${staleCount} listings have been up a long time. Reprice them?`,
+      },
+    });
+    sent += 1;
+  }
+
+  // **Only when there is something left to sell.** An empty workspace is a
+  // new one, and telling somebody who has nothing that they have nothing is
+  // the notification that gets notifications turned off.
+  if (onHandCount > 0 && onHandCount < lowStockThreshold) {
+    await notifyWorkspace({
+      dedupeKey: `lowInventory_${day}`,
+      notification: {
+        type: 'lowInventory',
+        workspaceId,
+        count: onHandCount,
+        route: '/more/sourcing',
+        title: 'Running low',
+        body:
+          onHandCount === 1
+            ? 'Only 1 item left in stock. Time to source.'
+            : `Only ${onHandCount} items left in stock. Time to source.`,
       },
     });
     sent += 1;

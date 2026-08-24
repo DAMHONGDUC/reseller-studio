@@ -21,6 +21,9 @@ class _NotificationRow extends ConsumerWidget {
         ),
         NotificationType.staleInventory => context.l10n
             .notificationStaleInventory(notification.count ?? 0),
+        NotificationType.lowInventory => context.l10n.notificationLowInventory(
+          notification.count ?? 0,
+        ),
         NotificationType.memberJoined => context.l10n.notificationMemberJoined,
         // A build older than the notification that reached it. One honest
         // line beats guessing which of the known types it meant.
@@ -32,6 +35,7 @@ class _NotificationRow extends ConsumerWidget {
     NotificationType.offerReceived => Symbols.local_offer_rounded,
     NotificationType.shipmentsDue => Symbols.local_shipping_rounded,
     NotificationType.staleInventory => Symbols.hourglass_bottom_rounded,
+    NotificationType.lowInventory => Symbols.inventory_2_rounded,
     NotificationType.memberJoined => Symbols.group_add_rounded,
     NotificationType.unknown => Symbols.notifications_rounded,
   };

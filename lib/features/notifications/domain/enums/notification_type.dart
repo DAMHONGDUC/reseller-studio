@@ -19,6 +19,10 @@ enum NotificationType {
   /// workspace's own threshold.
   staleInventory,
 
+  /// The daily digest: not enough left on the shelf to sell. The one
+  /// reminder that points at Sourcing rather than at a record.
+  lowInventory,
+
   /// Somebody joined the business (plan §22's "team activity").
   memberJoined,
 
@@ -31,5 +35,6 @@ enum NotificationType {
   /// ARB key renders the row.
   bool get isDigest =>
       this == NotificationType.shipmentsDue ||
-      this == NotificationType.staleInventory;
+      this == NotificationType.staleInventory ||
+      this == NotificationType.lowInventory;
 }

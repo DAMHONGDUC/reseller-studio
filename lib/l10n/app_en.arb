@@ -3322,5 +3322,27 @@
         "type": "String"
       }
     }
+  },
+  "workspaceLowStock": "Tell me when stock is low",
+  "@workspaceLowStock": {
+    "description": "Settings row for the low-inventory threshold."
+  },
+  "workspaceLowStockItems": "{count, plural, =1{Under 1 item} other{Under {count} items}}",
+  "@workspaceLowStockItems": {
+    "description": "The low-stock threshold, as a count of items on hand.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationLowInventory": "{count, plural, =1{Only 1 item left in stock} other{Only {count} items left in stock}}",
+  "@notificationLowInventory": {
+    "description": "Inbox line for the low-inventory reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

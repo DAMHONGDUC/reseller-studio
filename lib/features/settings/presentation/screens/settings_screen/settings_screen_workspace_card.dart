@@ -88,6 +88,26 @@ class _WorkspaceCard extends ConsumerWidget {
     await _save(context, ref, () => _edit(ref).setStaleThresholdDays(days));
   }
 
+  Future<void> _pickLowStock(BuildContext context, WidgetRef ref) async {
+    final int? items = await OptionPickerSheet.show<int>(
+      context,
+      title: context.l10n.workspaceLowStock,
+      selected: workspace.lowStockThreshold,
+      options: WorkspaceConstant.lowStockChoices
+          .map(
+            (int items) => PickerOption<int>(
+              value: items,
+              label: context.l10n.workspaceLowStockItems(items),
+            ),
+          )
+          .toList(),
+    );
+
+    if (items == null || !context.mounted) return;
+
+    await _save(context, ref, () => _edit(ref).setLowStockThreshold(items));
+  }
+
   /// **Asks once, in a dialog that says exactly what goes.** There is no undo
   /// and no export first — the same shape as deleting the account, which is
   /// the only other control in the app that destroys records.
@@ -181,6 +201,14 @@ class _WorkspaceCard extends ConsumerWidget {
           icon: Symbols.hourglass_bottom_rounded,
           onTap: () => _pickStaleThreshold(context, ref),
         ),
+        AppListRow(
+          title: context.l10n.workspaceLowStock,
+          subtitle: context.l10n.workspaceLowStockItems(
+            workspace.lowStockThreshold,
+          ),
+          icon: Symbols.inventory_2_rounded,
+          onTap: () => _pickLowStock(context, ref),
+        ),
         // Owner only. An admin runs the business; ending it belongs to
         // whoever owns it, and the Cloud Function refuses anyone else.
         if (canDelete)
@@ -228,6 +256,12 @@ class _WorkspaceReadOnlyCard extends StatelessWidget {
           label: context.l10n.workspaceStaleAfter,
           value: context.l10n.workspaceStaleAfterDays(
             workspace.staleThresholdDays,
+          ),
+        ),
+        _SettingRow(
+          label: context.l10n.workspaceLowStock,
+          value: context.l10n.workspaceLowStockItems(
+            workspace.lowStockThreshold,
           ),
         ),
         SizedBox(height: SdSpacingConstant.h8),

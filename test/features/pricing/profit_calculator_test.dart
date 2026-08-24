@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:seller_os/core/money/money.dart';
 import 'package:seller_os/features/pricing/domain/services/profit_calculator.dart';
+import 'package:seller_os/features/workspace/workspace_constant.dart';
 
 /// Testing priority 1. These are the numbers a seller makes buying decisions
 /// with, and hard rule 3 means they are recomputed on every read rather than
@@ -198,6 +199,29 @@ void main() {
           threshold: const Duration(days: 30),
         ),
         isTrue,
+      );
+    });
+  });
+
+  group('LowStockPolicy', () {
+    test('an empty workspace is not low, it is new', () {
+      // Telling somebody who has nothing that they have nothing is the
+      // notification that gets notifications turned off.
+      expect(LowStockPolicy.isLow(0), isFalse);
+    });
+
+    test('low is below the threshold, not at it', () {
+      expect(LowStockPolicy.isLow(9, threshold: 10), isTrue);
+      expect(LowStockPolicy.isLow(10, threshold: 10), isFalse);
+      expect(LowStockPolicy.isLow(11, threshold: 10), isFalse);
+    });
+
+    test('the workspace default is one of the choices it can be set to', () {
+      // The picker cannot show a value it does not offer, or a seller who
+      // opens it sees nothing selected.
+      expect(
+        WorkspaceConstant.lowStockChoices,
+        contains(LowStockPolicy.defaultThreshold),
       );
     });
   });

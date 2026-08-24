@@ -63,6 +63,17 @@ class WorkspaceEditController extends Notifier<bool> {
         return current.copyWith(staleThresholdDays: days);
       });
 
+  /// How few items on hand before the daily digest says so.
+  ///
+  /// **Read by a Cloud Function, not by a screen** — the reminder is sent from
+  /// the backend, so this setting is the only thing the app contributes to it.
+  Future<void> setLowStockThreshold(int items) =>
+      _apply('set low stock threshold', <String, Object>{'items': items}, (
+        Workspace current,
+      ) {
+        return current.copyWith(lowStockThreshold: items);
+      });
+
   /// End the business: its records, its files and the invitations to it.
   ///
   /// **Not part of [_apply]** — that reads the workspace and writes it back,

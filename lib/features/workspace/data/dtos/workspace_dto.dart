@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../listings/domain/enums/listing_status.dart';
+import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/workspace.dart';
 
@@ -21,7 +22,11 @@ final class WorkspaceDto {
       businessType: FirestoreMapper.stringOrNull(data['businessType']),
       logoUrl: FirestoreMapper.stringOrNull(data['logoUrl']),
       staleThresholdDays:
-          FirestoreMapper.intOrNull(data['staleThresholdDays']) ?? 60,
+          FirestoreMapper.intOrNull(data['staleThresholdDays']) ??
+          StaleInventoryPolicy.defaultThresholdDays,
+      lowStockThreshold:
+          FirestoreMapper.intOrNull(data['lowStockThreshold']) ??
+          LowStockPolicy.defaultThreshold,
     );
   }
 
@@ -39,6 +44,7 @@ final class WorkspaceDto {
         'businessType': workspace.businessType,
         'logoUrl': workspace.logoUrl,
         'staleThresholdDays': workspace.staleThresholdDays,
+        'lowStockThreshold': workspace.lowStockThreshold,
         'updatedAt': FirestoreMapper.serverTimestamp,
       });
 }

@@ -56,4 +56,10 @@ final class WorkspaceConstant {
   /// to type 63 invites a precision nobody has. `StaleInventoryPolicy` owns
   /// the default and it is one of these.
   static const List<int> staleThresholdChoices = <int>[14, 30, 60, 90, 180];
+
+  /// How few items on hand before this workspace is told it is running low.
+  ///
+  /// Round numbers for the same reason as the list above, and `LowStockPolicy`
+  /// owns the default — which is one of these.
+  static const List<int> lowStockChoices = <int>[5, 10, 20, 50, 100];
 }
