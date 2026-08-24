@@ -220,7 +220,7 @@ class ItemActionsSheet extends ConsumerWidget {
             label: context.l10n.itemActionReprice,
             onTap: () {
               Navigator.of(context).pop();
-              RepriceSheet.show(context, <Item>[item]);
+              RepriceSheet.show(context, ref, <Item>[item]);
             },
           ),
           _ActionRow(

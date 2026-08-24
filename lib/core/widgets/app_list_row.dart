@@ -21,6 +21,7 @@ class AppListRow extends StatelessWidget {
     this.trailing,
     this.trailingText,
     this.onTap,
+    this.onLongPress,
     this.showChevron = true,
     super.key,
   });
@@ -45,6 +46,11 @@ class AppListRow extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  /// Starts a bulk selection where a screen has one. Long-press rather than a
+  /// tick box in every row: the box would be permanent chrome for a mode most
+  /// sellers open twice a month.
+  final VoidCallback? onLongPress;
+
   /// The chevron says "this opens something". A row that only displays, or
   /// one whose trailing widget is the interaction, must turn it off — an
   /// affordance that leads nowhere is worse than none.
@@ -56,6 +62,7 @@ class AppListRow extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       borderRadius: SdRadiusV3.cardAll,
       child: Padding(
         padding: SdContentPaddingV3.row,

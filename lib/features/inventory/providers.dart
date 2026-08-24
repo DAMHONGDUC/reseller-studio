@@ -4,6 +4,7 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
@@ -122,34 +123,12 @@ final Provider<Map<InventoryFilter, int>> inventoryCountsProvider =
       };
     });
 
-/// Which rows are ticked for a bulk action.
+/// Which items are ticked for a bulk action.
 ///
-/// **Bulk is a first-class requirement, not a later nicety** (hard rule 16):
-/// reprice, relist and archive are things a seller does to forty rows at
-/// once, and a screen that only edits one item at a time is why people keep
-/// using spreadsheets.
-///
-/// Selection lives in a provider rather than the screen's `State` so the
-/// action sheet — a different subtree, pushed on the root navigator — can read
-/// it without the screen passing it down.
-class InventorySelectionController extends Notifier<Set<String>> {
-  @override
-  Set<String> build() => const <String>{};
-
-  bool get isActive => state.isNotEmpty;
-
-  void toggle(String itemId) {
-    final Set<String> next = Set<String>.of(state);
-
-    if (!next.remove(itemId)) next.add(itemId);
-
-    state = next;
-  }
-
-  void selectAll(Iterable<String> itemIds) => state = Set<String>.of(itemIds);
-
-  void clear() => state = const <String>{};
-}
+/// The behaviour is `SelectionController` in `core/state/` — Listings ticks
+/// rows the same way, and one copy is what stops the two drifting. What is
+/// here is the item half: this provider, and [selectedItemsProvider] below.
+class InventorySelectionController extends SelectionController {}
 
 final NotifierProvider<InventorySelectionController, Set<String>>
 inventorySelectionProvider =

@@ -3271,5 +3271,56 @@
   "roleViewerDescription": "Look, but change nothing",
   "@roleViewerDescription": {
     "description": "One line saying what a viewer may do."
+  },
+  "listingSelectedCount": "{count} selected",
+  "@listingSelectedCount": {
+    "description": "How many listings are ticked for a bulk action.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingRepriceTitle": "{count, plural, =1{Reprice this listing} other{Reprice {count} listings}}",
+  "@listingRepriceTitle": {
+    "description": "Title of the bulk reprice sheet on Listings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingRepriceHelp": "The same price goes on every listing you picked. Nothing is sent to a marketplace.",
+  "@listingRepriceHelp": {
+    "description": "Says what a bulk reprice does, and what it does not."
+  },
+  "listingRepriceDone": "{count, plural, =1{Listing repriced} other{{count} listings repriced}}",
+  "@listingRepriceDone": {
+    "description": "Confirmation after a bulk reprice.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingPause": "Pause",
+  "@listingPause": {
+    "description": "Bulk action that hides listings without ending them."
+  },
+  "listingEnd": "End",
+  "@listingEnd": {
+    "description": "Bulk action that takes listings down."
+  },
+  "listingStatusChanged": "{count, plural, =1{Listing is now {status}} other{{count} listings are now {status}}}",
+  "@listingStatusChanged": {
+    "description": "Confirmation after a bulk status change.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
   }
 }

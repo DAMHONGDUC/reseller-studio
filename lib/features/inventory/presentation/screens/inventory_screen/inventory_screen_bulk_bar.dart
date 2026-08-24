@@ -151,6 +151,7 @@ class _BulkActionBar extends ConsumerWidget {
                     expand: true,
                     onPressed: () => RepriceSheet.show(
                       context,
+                      ref,
                       ref.read(selectedItemsProvider),
                     ),
                   ),

@@ -64,6 +64,42 @@ class Listing {
   /// the sense hard rule 6 forbids.
   final String? lastError;
 
+  /// **Null means "leave it alone", never "clear it"** — the same shape
+  /// `Item.copyWith` has. Nothing in the app needs to unset a field on a
+  /// listing, and a copy that could would make an accidental omission erase
+  /// the platform's own listing id.
+  Listing copyWith({
+    String? title,
+    Money? price,
+    ListingStatus? status,
+    String? description,
+    List<String>? photoUrls,
+    String? externalListingId,
+    String? externalUrl,
+    DateTime? publishedAt,
+    DateTime? endedAt,
+    int? viewCount,
+    int? watcherCount,
+    String? lastError,
+  }) => Listing(
+    id: id,
+    itemId: itemId,
+    marketplace: marketplace,
+    title: title ?? this.title,
+    price: price ?? this.price,
+    status: status ?? this.status,
+    createdAt: createdAt,
+    description: description ?? this.description,
+    photoUrls: photoUrls ?? this.photoUrls,
+    externalListingId: externalListingId ?? this.externalListingId,
+    externalUrl: externalUrl ?? this.externalUrl,
+    publishedAt: publishedAt ?? this.publishedAt,
+    endedAt: endedAt ?? this.endedAt,
+    viewCount: viewCount ?? this.viewCount,
+    watcherCount: watcherCount ?? this.watcherCount,
+    lastError: lastError ?? this.lastError,
+  );
+
   /// Days live, or null if never published.
   int? daysLive(DateTime now) {
     final DateTime? published = publishedAt;
