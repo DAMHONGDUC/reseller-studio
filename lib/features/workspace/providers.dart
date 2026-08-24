@@ -18,9 +18,12 @@ import '../listings/domain/enums/listing_status.dart';
 import '../mock_data/data/in_memory_repositories.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
+import 'data/repositories/firestore_team_repository.dart';
 import 'data/repositories/firestore_workspace_repository.dart';
+import 'domain/entities/pending_invite.dart';
 import 'domain/entities/user_profile.dart';
 import 'domain/entities/workspace.dart';
+import 'domain/repositories/team_repository.dart';
 import 'domain/repositories/workspace_repository.dart';
 import 'presentation/controllers/workspace_switch_controller.dart';
 
@@ -41,6 +44,44 @@ final Provider<WorkspaceRepository> workspaceRepositoryProvider =
         ref.watch(firebaseFirestoreProvider),
         ref.watch(firebaseFunctionsProvider),
       );
+    });
+
+/// Inviting, accepting, removing and changing a role.
+///
+/// **No mock branch, the same call the audit log and the inbox made.** Every
+/// write is a Cloud Function and an invitation is addressed to an email
+/// account; the demo has neither, so there is nothing for an in-memory
+/// version to stand in for. Null there and when signed out, and the Team
+/// screen draws no add button rather than offering one that cannot work.
+final Provider<TeamRepository?> teamRepositoryProvider =
+    Provider<TeamRepository?>((Ref ref) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return null;
+      }
+
+      if (ref.watch(currentUidProvider) == null) return null;
+
+      return FirestoreTeamRepository(
+        ref.watch(firebaseFirestoreProvider),
+        ref.watch(firebaseFunctionsProvider),
+      );
+    });
+
+/// Invitations addressed to the signed-in person, across every business.
+///
+/// **Their own address is the only scope the rules allow.** There is no query
+/// for "who have I invited", which is why the Team screen lists members and
+/// never pending invites — see [TeamRepository.watchMyInvites].
+final StreamProvider<List<PendingInvite>> pendingInvitesProvider =
+    StreamProvider<List<PendingInvite>>((Ref ref) {
+      final TeamRepository? repository = ref.watch(teamRepositoryProvider);
+      final String? email = ref.watch(authUserProvider).value?.email;
+
+      if (repository == null || email == null || email.isEmpty) {
+        return Stream<List<PendingInvite>>.value(const <PendingInvite>[]);
+      }
+
+      return repository.watchMyInvites(email);
     });
 
 /// The signed-in person's own record — name, email, and which workspaces they

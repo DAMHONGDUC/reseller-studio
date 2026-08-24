@@ -35,6 +35,7 @@ final class LogTagConstant {
 
   // --- Business ---
   static const String workspace = 'Workspace';
+  static const String team = 'Team';
   static const String quickAdd = 'Quick Add';
   static const String item = 'Item';
   static const String catalog = 'Catalog';

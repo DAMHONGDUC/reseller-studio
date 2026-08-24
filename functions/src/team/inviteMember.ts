@@ -47,7 +47,10 @@ export const inviteMember = onCall(async (request) => {
     throw new HttpsError('invalid-argument', 'Unknown role.');
   }
 
-  const caller = await db().doc(paths.member(workspaceId, uid)).get();
+  const [caller, workspace] = await Promise.all([
+    db().doc(paths.member(workspaceId, uid)).get(),
+    db().doc(paths.workspace(workspaceId)).get(),
+  ]);
   const callerRole = caller.get('role');
 
   if (callerRole !== 'owner' && callerRole !== 'admin') {
@@ -86,6 +89,10 @@ export const inviteMember = onCall(async (request) => {
     .set(
       {
         workspaceId,
+        // Denormalised because the invitee cannot read `workspaces/{id}`
+        // until they have joined it — without the copy the invitation can
+        // only say "a business" and not which one.
+        workspaceName: workspace.get('name') ?? null,
         email,
         role,
         status: 'pending',

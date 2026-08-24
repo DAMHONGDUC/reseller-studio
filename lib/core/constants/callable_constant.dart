@@ -12,4 +12,14 @@ final class CallableConstant {
   /// Deletes one business and everything under it, leaving the account and
   /// any other business alone. See `functions/src/workspace/deleteWorkspace.ts`.
   static const String deleteWorkspace = 'deleteWorkspace';
+
+  // --- Team (plan §24). All three exist because `firestore.rules` cannot
+  // count a collection: the seat limit and the last-owner check both need one.
+
+  static const String inviteMember = 'inviteMember';
+  static const String acceptInvite = 'acceptInvite';
+
+  /// Removes a member, or changes their role when a `role` is passed. One
+  /// callable because the last-owner check is the same count either way.
+  static const String removeMember = 'removeMember';
 }

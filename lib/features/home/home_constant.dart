@@ -97,6 +97,7 @@ enum QuickActionKind {
   addSource,
   addCategory,
   addLocation,
+  inviteTeammate,
   about,
 }
 
@@ -164,6 +165,13 @@ final class QuickActionConstant {
       icon: Symbols.shelves,
       route: AppRoutes.locations,
     ),
+    // Last of the create actions, before About: a seller invites a teammate
+    // once, and everything above it is something they do every week.
+    QuickAction(
+      kind: QuickActionKind.inviteTeammate,
+      icon: Symbols.group_add_rounded,
+      route: AppRoutes.team,
+    ),
     QuickAction(
       kind: QuickActionKind.about,
       icon: Symbols.info_rounded,
@@ -184,6 +192,7 @@ final class QuickActionLabel {
         QuickActionKind.addSource => context.l10n.homeQuickAddSource,
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
+        QuickActionKind.inviteTeammate => context.l10n.teamInvite,
         QuickActionKind.about => context.l10n.moreAbout,
       };
 }

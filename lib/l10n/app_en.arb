@@ -3170,5 +3170,106 @@
         "type": "int"
       }
     }
+  },
+  "teamInvite": "Invite a teammate",
+  "@teamInvite": {
+    "description": "The add button on the Team screen, and its Quick Action row."
+  },
+  "teamInviteTitle": "Invite a teammate",
+  "@teamInviteTitle": {
+    "description": "Title of the invite sheet."
+  },
+  "teamInviteEmail": "Email address",
+  "@teamInviteEmail": {
+    "description": "The one field an invitation needs."
+  },
+  "teamInviteEmailHint": "them@example.com",
+  "@teamInviteEmailHint": {
+    "description": "Placeholder for the invite email field."
+  },
+  "teamInviteEmailInvalid": "That does not look like an email address",
+  "@teamInviteEmailInvalid": {
+    "description": "Shown under the field when the address cannot be sent to."
+  },
+  "teamInviteSend": "Send invitation",
+  "@teamInviteSend": {
+    "description": "The commit action on the invite sheet."
+  },
+  "teamInviteSent": "Invitation sent",
+  "@teamInviteSent": {
+    "description": "Confirmation after inviting somebody."
+  },
+  "teamRole": "Role",
+  "@teamRole": {
+    "description": "Label for the role picker."
+  },
+  "teamChangeRole": "Change role",
+  "@teamChangeRole": {
+    "description": "Action on a teammate that changes what they may do."
+  },
+  "teamRoleChanged": "Role changed",
+  "@teamRoleChanged": {
+    "description": "Confirmation after changing somebody's role."
+  },
+  "teamRemove": "Remove from business",
+  "@teamRemove": {
+    "description": "Destructive action that ends somebody's membership."
+  },
+  "teamRemoveConfirmTitle": "Remove this teammate?",
+  "@teamRemoveConfirmTitle": {
+    "description": "Confirmation dialog title for removing a member."
+  },
+  "teamRemoveConfirmBody": "{name} loses access to this business. Nothing they recorded is deleted, and you can invite them again.",
+  "@teamRemoveConfirmBody": {
+    "description": "Says what removing somebody does and does not do.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRemoved": "Removed from the business",
+  "@teamRemoved": {
+    "description": "Confirmation after removing a member."
+  },
+  "teamMemberFallback": "This teammate",
+  "@teamMemberFallback": {
+    "description": "Stands in when a member has neither a name nor an email recorded."
+  },
+  "teamRolesTitle": "What each role can do",
+  "@teamRolesTitle": {
+    "description": "Heading over the role explanations on the Team screen."
+  },
+  "teamInvitePending": "Invitation waiting for you",
+  "@teamInvitePending": {
+    "description": "Subtitle on an invitation row in the workspace switcher."
+  },
+  "teamInviteAccept": "Join",
+  "@teamInviteAccept": {
+    "description": "Accepts an invitation from the workspace switcher."
+  },
+  "teamInviteAccepted": "You have joined the business",
+  "@teamInviteAccepted": {
+    "description": "Confirmation after accepting an invitation."
+  },
+  "teamInviteUnnamed": "A business",
+  "@teamInviteUnnamed": {
+    "description": "Stands in when an invitation carries no business name."
+  },
+  "roleOwnerDescription": "Everything, including deleting the business",
+  "@roleOwnerDescription": {
+    "description": "One line saying what an owner may do."
+  },
+  "roleAdminDescription": "Change the business, invite and remove people",
+  "@roleAdminDescription": {
+    "description": "One line saying what an admin may do."
+  },
+  "roleMemberDescription": "Create and edit records",
+  "@roleMemberDescription": {
+    "description": "One line saying what a member may do."
+  },
+  "roleViewerDescription": "Look, but change nothing",
+  "@roleViewerDescription": {
+    "description": "One line saying what a viewer may do."
   }
 }
