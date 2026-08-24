@@ -224,7 +224,7 @@ until it is, and each says so on screen rather than failing:
 | Feature | What it needs |
 |---|---|
 | Marketplace sync (eBay, Etsy, Depop, Poshmark, Mercari, Shopify) | OAuth per platform, secrets in Secret Manager, sync + webhook functions. **The app never sees a token** (hard rule 10). Not written. |
-| Team invites | The `inviteMember` callable — `invites/` is `allow write: if false` because the callable is what enforces the seat limit and stops the last owner being removed. Written. |
+| Team invites, roles and removal | The three team callables — `invites/` is `allow write: if false` because a callable is what enforces the seat limit and stops the last owner being removed. Written, **and the app now calls them**: the Team screen has an invite button and a role sheet, so before the deploy a seller taps them and gets the generic failure. That is the same bet delete-account already makes, and it is worth knowing before a demo. |
 | Activity / audit log | Firestore triggers. `activity/` is append-only and client-writable-never, so a client-written log would be worthless as an audit trail. Written. |
 | Notifications and pushes | Three triggers plus a scheduled digest. The inbox renders without them and stays empty, because nothing else may write a notification. Written. |
 | The plan being a real limit | `revenueCatWebhook`, below. Written. |
