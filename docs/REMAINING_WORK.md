@@ -10,12 +10,17 @@ Anything needing an account, a key or a card is not here — that is
 
 Ordered by what unblocks the most, not by size:
 
-1. **Deploy `functions/`** (owner). Fourteen are written and idle, and three
-   of them are the only thing making a whole feature real: `onMemberWritten`
+1. **Deploy `functions/`** (owner). Fourteen are written and idle, and four of
+   them are the only thing making a whole feature real: `onMemberWritten`
    keeps `users/{uid}.workspaceIds` correct, the notification triggers are the
-   only writers of the inbox, and `revenueCatWebhook` is what turns a plan
-   gate from a UI decision into a boundary. Deploying needs the Firebase
-   project — `RELEASE_ACTIONS.md` blocker 1.
+   only writers of the inbox, the three team callables are the only way anyone
+   joins a business, and `revenueCatWebhook` is what turns a plan gate from a
+   UI decision into a boundary. Deploying needs the Firebase project —
+   `RELEASE_ACTIONS.md` blocker 1.
+
+   **This moved up in cost since the team screens landed.** An undeployed
+   function used to be something a developer noticed; the invite button is
+   something a seller taps.
 2. **Marketplace OAuth and sync**, which is what is left of §13 and §14 and is
    blocked on a developer account per platform. Cross-listing itself is built;
    what it writes is a draft, because nothing can publish to eBay yet.
@@ -75,10 +80,10 @@ that needs the Firebase project, which is `RELEASE_ACTIONS.md` blocker 1.
 | Plan § | Function | State |
 |---|---|---|
 | — | `onMemberWritten` | **Written.** Keeps `users/{uid}.workspaceIds` in step. Until deployed, a seller sees only businesses they created — never one they were invited to |
-| 24 | `inviteMember`, `acceptInvite`, `removeMember` | **Written.** The seat limit and the last-owner check each need a count, and rules read one document |
+| 24 | `inviteMember`, `acceptInvite`, `removeMember` | **Written, and now called by the app.** The seat limit and the last-owner check each need a count, and rules read one document. `removeMember` does role changes too — the last-owner check is one count either way |
 | 23 | `onItemWritten`, `onOrderWritten`, `onListingWritten` | **Written.** `actorId` is read from the document, never from a client (hard rule 12) |
 | 22 | `onOrderCreated`, `onOfferCreated`, `onMemberJoined` | **Written.** Each writes an inbox row per member — the actor excluded — and sends a push as a copy of it |
-| 22 | `dailyDigest` | **Written.** One scheduled run: orders past their ship-by date and stale listings, one line per workspace per day. Needs Cloud Scheduler enabled |
+| 22 | `dailyDigest` | **Written.** One scheduled run: orders past their ship-by date, stale listings and stock running low — one line per workspace per day, each keyed by the date so a re-run tells nobody twice. Needs Cloud Scheduler enabled |
 | 27 | `revenueCatWebhook` | **Written.** Needs `REVENUECAT_WEBHOOK_TOKEN` in Secret Manager and the URL in the RevenueCat dashboard. Until it runs, `planFor` reads every workspace as Free however much the seller paid |
 | — | `deleteAccount` | **Written.** Guideline 5.1.1(v) — deletes the workspaces the seller solely owns, their Storage objects and the Auth user; refuses a sign-in older than five minutes |
 | — | `deleteWorkspace` | **Written.** Owner only, recent sign-in required, and it shares its teardown with `deleteAccount` so neither can forget the Storage objects |
@@ -133,9 +138,6 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
   registration, delivery and the tap are all untested. The inbox does not
   depend on any of it: the Firestore row is written first and the push is a
   copy, so a seller who denies permission still has a notification centre.
-- **The notification inbox never prunes.** It reads the most recent 50 and
-  older rows simply sit there, which is the same call the audit log made.
-  Worth a retention job before a workspace has two years of them.
 - **CI follows the design system's `main`, not the pinned gitlink.** A green
   run proves the app builds against the tip, not against the commit this repo
   records — so CI and a laptop can disagree, and that gap is the first thing
@@ -144,12 +146,21 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
   is gitignored and local-only; the cause is a font loader doing real file I/O
   inside a widget test's fake-async zone. Excluding `*_tmp_test.dart` takes the
   full suite from 20 minutes to 8 seconds.
-- **`team` and `marketplaces` are read-only screens.** Both render and both
-  explain why they cannot do more yet; neither is a stub that fails.
+- **`marketplaces` is still a read-only screen.** It renders and explains why
+  it cannot do more yet; it is not a stub that fails. Team is no longer one —
+  inviting, accepting, changing a role and removing all call their callable.
+- **The team screens call functions that are not deployed.** That is the same
+  bet delete-account and delete-workspace already make: the button is drawn,
+  the call fails with the one message hard rule 6 allows, and nothing is
+  special-cased for the undeployed state. It is worth knowing before a demo.
+- **Listing templates are the one thing left in plan §12.** Bulk price update
+  and bulk listing are built — a selection on the Listings screen reprices,
+  pauses and ends. A template is a saved title/description/price preset, and
+  nothing stores one yet.
 
 ## 5. Keep `DONE_WORK.md` beside this file
 
 The two are halves of one answer and they drift apart in one direction: work
 lands, and only this file gets edited. It was last brought level on
-23 August 2026, with notifications, cross-listing, workspace deletion and the
-RevenueCat webhook.
+24 August 2026, with team management, listing bulk actions and the low-stock
+reminder.

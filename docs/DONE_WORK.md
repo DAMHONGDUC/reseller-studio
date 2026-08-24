@@ -20,7 +20,7 @@ are there and the mock backend drives them end to end.
 | 9 | Analytics — overview plus all six drill-downs | built |
 | 10 | More | built |
 | 11 | Sourcing — sources ranked by ROI, purchases, purchase detail, buy calculator | built |
-| 12 | Listings — filtered by status, platform rejection messages surfaced | built |
+| 12 | Listings — filtered by status, platform rejection messages surfaced, bulk reprice / pause / end from a selection | built; templates are the one §12 feature left |
 | 13 | Cross-listing — one item onto several marketplaces, with the fee estimate per platform | built; publishes drafts, since nothing is integrated |
 | 15 | Pricing — profit, margin, ROI, maximum buy price | built, unit-tested |
 | 16 | Returns / refunds — open a return, close it, optional restock | built, no separate screen |
@@ -29,10 +29,10 @@ are there and the mock backend drives them end to end.
 | 19 | Reports — CSV export of sales, inventory and expenses via the share sheet | built |
 | 20 | Tax — year-end summary by form line, mileage at the published rate | built for US and UK, rates verified 16 Aug 2026 |
 | 21 | Search — items, orders, listings and sources in one list | built |
-| 22 | Notifications — the inbox, the bell on Home, FCM registration and the sends | built; silent until the functions are deployed |
+| 22 | Notifications — the inbox, the bell on Home, FCM registration, the sends, and a digest for what is due, stale or running low | built; silent until the functions are deployed |
 | 23 | Activity — the audit log, read-only, under More | screen built; empty until the triggers are deployed |
-| 24 | Workspace — create, switch between several from Home's title, delete one | built |
-| 24 | Team — the screen is read-only; the invite callables are written, not deployed | partial |
+| 24 | Workspace — create, switch between several from Home's title, delete one, and set when it counts stock as low | built |
+| 24 | Team — invite by email, accept from the workspace switcher, change a role, remove a member | built; every action is a callable, so it is silent until they are deployed |
 | 25 | Settings — account, workspace, theme, mock-data switch (debug only) | built |
 | 26 | Authentication — Apple and Google, sign out, delete account, signed-out shell | built, unconfigured |
 | 27 | Monetization — Free / Pro / Business, limits, paywall, Subscription screen | built, unconfigured |
@@ -72,9 +72,22 @@ are there and the mock backend drives them end to end.
   them; the ones it is already on are shown and disabled rather than hidden.
 - **Notifications**: the bell on Home carries an unread dot and opens an
   inbox. A new order, a new offer and a new teammate each write a row and send
-  a push; a daily digest carries the orders past their ship-by date and the
-  listings that have gone stale, one line each rather than one push per row.
-  Tapping a row switches to the business it is about and opens the record.
+  a push; a daily digest carries the orders past their ship-by date, the
+  listings that have gone stale and stock that is running low — one line each
+  rather than one push per row. Tapping a row switches to the business it is
+  about and opens the record. The inbox trims itself: rows past the retention
+  window are dropped a batch at a time while a delivery is already writing to
+  that inbox.
+- **Team**: invite by email with a role, and the invitation appears in the
+  invitee's workspace switcher — the only surface it can appear on, since the
+  rules scope `invites/` to the address it names. Accepting joins the business
+  and opens it. An admin changes a role or removes somebody from the row's own
+  sheet; your own row opens nothing, because nobody edits their own
+  membership. The last owner is refused by the callable, which is the only
+  place that can count the owners.
+- **Listings in bulk**: long-press starts a selection, the bar reprices,
+  pauses or ends every ticked row in one write. Nothing there can mark a
+  listing sold — a sale is an order, and profit is derived from orders.
 - **Analytics**: the overview, the profit statement, the marketplace
   breakdown, and drill-downs for sales, profit, inventory, marketplace,
   categories and sources.
@@ -93,7 +106,7 @@ are there and the mock backend drives them end to end.
   `LogTagConstant` and carrying its data — and analytics through
   `AppAnalytics`, a typed method per event. No credential, FCM token or buyer
   detail is ever a parameter.
-- **Localization**: **699 ARB keys in `en`** — every plain user-facing string
+- **Localization**: **733 ARB keys in `en`** — every plain user-facing string
   in `presentation/` goes through ARB, and the interpolated ones carry
   placeholders with real `plural` forms where a count is shown. `app_vi.arb`
   is still at 388 and is filled in once, at release, by rule — so the language
@@ -135,7 +148,7 @@ are there and the mock backend drives them end to end.
   request and builds `functions/` in a separate job. It calls `tool/analyze.sh`
   and `tool/test.sh` rather than retyping them, and reads the SDK version out
   of `.fvmrc`.
-- **Tests**: 266 Dart tests passing and 27 under `functions/` — the security
+- **Tests**: 278 Dart tests passing and 27 under `functions/` — the security
   rules against the emulator, plus the entitlement mapping as plain node.
   Profit/margin/ROI including the plan §11 worked example, and screen-level
   tests asserting rendered figures against the mock seed.
