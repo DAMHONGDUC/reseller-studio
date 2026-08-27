@@ -12,6 +12,7 @@ transcript, not the size of it.**
 ```text
 env/dev.json
 env/prod.json
+env_assets/**
 ios/Runner/GoogleService-Info.plist
 android/app/google-services.json
 lib/firebase_options.dart
@@ -19,6 +20,21 @@ lib/firebase_options.dart
 functions/.env*
 **/*.p8   **/*.p12   **/*.keystore   **/*.jks
 ```
+
+**`env_assets/` is on that list because it is the same values one step
+upstream.** It was added after an agent listed the keys of `env_assets/dev.json`
+and then printed both flavours' files in full while tidying the templates — the
+list named `env/*.json`, the copies it is made from were not on it, and the
+whole discipline was worth nothing. A path that holds a value blocked here is
+blocked wherever else it lives.
+
+**A script may read one; you may not print one.** `tool/prepare-env.sh` copies
+these files and `_url-scheme.sh` derives from one, which is fine and is why
+`prepare-env.sh` says it copies bytes and never reads them. The line is the
+transcript: a command whose output contains a value from one of these files has
+already done the harm, whether it was `cat`, a `git diff`, a `PlistBuddy Print`
+or a Python script echoing what it just wrote. Redirect to the file, never to
+stdout.
 
 To find out **which** keys exist, read `env/*.example.json` — it is checked in,
 it is the key list, and it carries no values. To find out how a key is used,
