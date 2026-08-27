@@ -59,6 +59,41 @@ they live in Secret Manager and are read only by Cloud Functions (hard rule
 contains `SECRET` or `PRIVATE`, so the discipline is enforced rather than
 trusted.
 
+## Nothing about prod is ever read
+
+Owner's rule, and it is wider than the path list above: **anything belonging to
+the production flavour is not opened, not printed, not inspected.** Not the
+config, not the project's data, not the output of a command that would name
+either. The list above is about values that must not reach a transcript; this
+one is about a whole environment, because prod is the only one where a mistake
+lands on real sellers and there is no undo.
+
+Blocked, whatever the tool:
+
+```text
+env/prod.json                    env_assets/prod.json
+env_assets/prod-*                .firebaserc
+```
+
+…and everything the prod Firebase project holds — Firestore documents, Storage
+objects, function logs, the console. Also every release credential, since they
+exist to reach prod: `ios/fastlane/.env*`, the App Store Connect key, the match
+passphrase.
+
+**Still allowed, and the rule would be unworkable without them:**
+
+- `env/prod.example.json` — checked in, placeholders only, and it is the
+  answer to "which keys does prod have?". `test/core/config/app_env_test.dart`
+  reads it, on purpose.
+- `lib/core/config/app_env.dart`, which is how a key is *used*.
+- `tool/prepare-env.sh prod` and the release scripts. They **copy** prod files
+  and never echo them — the read/print line above applies unchanged. Running
+  one is not reading one.
+
+**A prod-only problem is diagnosed by the owner, not by the agent.** Write the
+command, say what to look for, and ask for the *shape* of the answer back — the
+error code, the count, which branch it took. Never the values.
+
 ## Never log a credential
 
 This is hard rule 9 in the root `CLAUDE.md` and it is repeated here because
