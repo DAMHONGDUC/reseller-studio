@@ -162,11 +162,26 @@ platform :ios do
     flavor
   end
 
+  # Named all at once, and never with `ENV.fetch` alone: an unconfigured
+  # machine deserves the name of the file to create, not a Ruby KeyError and a
+  # stack trace through fastlane's runner. Empty counts as missing — CI sets
+  # every secret it names, empty string included.
   def api_key
+    missing = %w[ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_FILEPATH].reject { |name| ENV[name].to_s.strip != "" }
+
+    unless missing.empty?
+      source = ci? ? "the workflow's Actions secrets" : "ios/fastlane/.env, copied from .env.example"
+      UI.user_error!("no App Store Connect API key: #{missing.join(', ')} unset. Set them in #{source} — see docs/release/CREDENTIALS.md")
+    end
+
+    path = ENV.fetch("ASC_KEY_FILEPATH")
+
+    UI.user_error!("ASC_KEY_FILEPATH points at nothing: #{path}") unless File.exist?(path)
+
     app_store_connect_api_key(
       key_id: ENV.fetch("ASC_KEY_ID"),
       issuer_id: ENV.fetch("ASC_ISSUER_ID"),
-      key_filepath: ENV.fetch("ASC_KEY_FILEPATH"),
+      key_filepath: path,
       in_house: false
     )
   end
