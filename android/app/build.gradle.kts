@@ -2,6 +2,10 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // Turns android/app/google-services.json into the string resources
+    // FirebaseApp reads at startup. Without it Firebase.initializeApp
+    // throws [core/no-app] even though the file is on disk.
+    id("com.google.gms.google-services")
 }
 
 android {
