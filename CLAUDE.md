@@ -60,6 +60,7 @@ in the left.
 | a screen's app bar, status bar, scrolling list, empty state or search mode | `docs/rules/SCREENS.md` |
 | `firestore.rules`, `firestore.indexes.json`, `functions/`, or a `data/` method that queries or calls out | `docs/rules/BACKEND.md` |
 | a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
+| `env_assets/`, `tool/prepare-env.sh`, `tool/build-ipa.sh`, `ios/fastlane/`, the release workflow | `docs/rules/RELEASE.md` |
 | running, building, generating or deploying | `docs/rules/COMMANDS.md` |
 | writing or fixing a test | `docs/rules/TESTING.md` |
 | anything that reads a key, logs, exports or uploads | `docs/rules/PRIVACY_AND_SECURITY.md` |

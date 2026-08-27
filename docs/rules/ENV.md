@@ -13,6 +13,15 @@ melos run run            # env/dev.json
 melos run run -- prod    # env/prod.json
 ```
 
+**There is a second half to a build's configuration, and nothing ties it to
+this one.** `env/<flavour>.json` is the Dart-visible half; the native SDK half
+is `ios/Runner/GoogleService-Info.plist`, `android/app/google-services.json`
+and the sign-in URL scheme in `ios/Runner/Info.plist`. A prod env file beside a
+dev plist compiles, installs, launches and writes into the wrong Firestore.
+`melos run prepare-env-<flavour>` is what keeps them in step and
+`env_assets/` is where your copies live — **`docs/rules/RELEASE.md` is the
+authority on both**, and this file does not repeat it.
+
 - `env/*.example.json` is checked in and is the key list; `env/dev.json` and
   `env/prod.json` are gitignored. `melos run set-up` copies the templates when
   the real files are missing and **never overwrites** an existing one.
