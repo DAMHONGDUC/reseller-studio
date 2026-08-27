@@ -103,6 +103,9 @@ env_assets/
 lib/firebase_options.dart
 **/google-services.json
 **/GoogleService-Info.plist
+# Which project each CLI alias is. Local, like every other file above it:
+# `firebase use --add` writes it, and it names real projects.
+.firebaserc
 .firebase/
 firestore-debug.log
 firebase-debug.log
