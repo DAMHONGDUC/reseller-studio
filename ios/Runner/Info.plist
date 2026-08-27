@@ -71,7 +71,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.dd.seller.os</string>
+			<string>app.dd.reseller.studio</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>selleros</string>
