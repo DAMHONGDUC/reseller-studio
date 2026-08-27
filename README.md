@@ -24,19 +24,6 @@ is no Firebase project checked in and none can be. See **Pending setup** in
 
 `melos run analyze` must pass with zero findings before any change is done.
 
-## App identifiers
-
-Both platforms ship under the same id — it is what `flutterfire configure`,
-App Store Connect and the Play Console all ask for. The right-hand column owns
-the value; change it there, never here.
-
-| | | |
-| --- | --- | --- |
-| iOS bundle id | `com.dd.seller.os` | `ios/Runner.xcodeproj/project.pbxproj` |
-| Android applicationId | `com.dd.seller.os` | `android/app/build.gradle.kts` |
-
-The iOS test target is `com.dd.seller.os.RunnerTests`.
-
 ## Commands
 
 Names only. **`docs/rules/COMMANDS.md` is the one place they are explained** —
