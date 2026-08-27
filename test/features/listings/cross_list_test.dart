@@ -1,16 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/inventory/domain/enums/item_status.dart';
-import 'package:seller_os/features/inventory/domain/services/item_transition.dart';
-import 'package:seller_os/features/inventory/presentation/controllers/item_actions_controller.dart';
-import 'package:seller_os/features/listings/domain/entities/listing.dart';
-import 'package:seller_os/features/listings/domain/enums/listing_status.dart';
-import 'package:seller_os/features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
-import 'package:seller_os/features/listings/providers.dart';
-import 'package:seller_os/features/marketplaces/domain/enums/marketplace.dart';
-import 'package:seller_os/features/mock_data/providers.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/domain/services/item_transition.dart';
+import 'package:reseller_studio/features/inventory/presentation/controllers/item_actions_controller.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
+import 'package:reseller_studio/features/listings/providers.dart';
+import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
+import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';

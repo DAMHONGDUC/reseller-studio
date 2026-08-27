@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/extensions/context_extensions.dart';
-import 'package:seller_os/core/widgets/app_list_row.dart';
-import 'package:seller_os/features/home/home_constant.dart';
-import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/core/extensions/context_extensions.dart';
+import 'package:reseller_studio/core/widgets/app_list_row.dart';
+import 'package:reseller_studio/features/home/home_constant.dart';
+import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 
 import '../../support/pump_app.dart';
 

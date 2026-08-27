@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/mock_data/data/in_memory_repositories.dart';
-import 'package:seller_os/features/mock_data/domain/mock_dataset.dart';
-import 'package:seller_os/features/mock_data/domain/services/demo_data_seeder.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
+import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
+import 'package:reseller_studio/features/mock_data/domain/services/demo_data_seeder.dart';
 
 import '../../support/pump_app.dart';
 

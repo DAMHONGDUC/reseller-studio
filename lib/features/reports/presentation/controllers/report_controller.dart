@@ -88,7 +88,7 @@ class ReportController extends Notifier<bool> {
       await SharePlus.instance.share(
         ShareParams(
           files: <XFile>[XFile(file.path)],
-          subject: 'Seller OS — ${kind.fileStem} export',
+          subject: 'Reseller Studio — ${kind.fileStem} export',
         ),
       );
 

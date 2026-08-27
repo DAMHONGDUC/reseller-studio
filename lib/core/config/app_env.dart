@@ -60,7 +60,7 @@ final class AppEnv {
   /// `Info.plist` and `AndroidManifest.xml` and cannot be set from here.
   static const String appDisplayName = String.fromEnvironment(
     'APP_DISPLAY_NAME',
-    defaultValue: 'Seller OS',
+    defaultValue: 'Reseller Studio',
   );
 
   // --- Legal ---

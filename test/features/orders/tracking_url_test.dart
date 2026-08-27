@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/orders/orders_constant.dart';
-import 'package:seller_os/features/orders/orders_tracking_constant.dart';
+import 'package:reseller_studio/features/orders/orders_constant.dart';
+import 'package:reseller_studio/features/orders/orders_tracking_constant.dart';
 
 /// A row that opens the wrong page is worse than one that does not open: the
 /// seller reads "not found" and starts wondering whether the parcel is lost.

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/constants/nav_tab_constant.dart';
-import 'package:seller_os/core/router/app_routes.dart';
+import 'package:reseller_studio/core/constants/nav_tab_constant.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
 
 /// The tab names are what tab analytics is keyed on, and nothing at runtime
 /// can tell that they have drifted out of the router's branch order — a wrong

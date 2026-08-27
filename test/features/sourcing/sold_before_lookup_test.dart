@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/inventory/domain/enums/item_status.dart';
-import 'package:seller_os/features/marketplaces/domain/enums/marketplace.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/domain/enums/order_status.dart';
-import 'package:seller_os/features/sourcing/domain/services/sold_before_lookup.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
+import 'package:reseller_studio/features/sourcing/domain/services/sold_before_lookup.dart';
 
 /// The answer comes from the seller's own records, so the interesting cases
 /// are a code matching nothing sold and one matching several sales.

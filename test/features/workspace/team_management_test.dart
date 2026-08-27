@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/misc.dart';
-import 'package:seller_os/core/widgets/app_add_fab_scaffold.dart';
-import 'package:seller_os/features/auth/providers.dart';
-import 'package:seller_os/features/listings/domain/enums/listing_status.dart';
-import 'package:seller_os/features/workspace/domain/entities/pending_invite.dart';
-import 'package:seller_os/features/workspace/domain/repositories/team_repository.dart';
-import 'package:seller_os/features/workspace/presentation/screens/team_screen/team_screen.dart';
-import 'package:seller_os/features/workspace/presentation/widgets/invite_member_sheet.dart';
-import 'package:seller_os/features/workspace/providers.dart';
+import 'package:reseller_studio/core/widgets/app_add_fab_scaffold.dart';
+import 'package:reseller_studio/features/auth/providers.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/workspace/domain/entities/pending_invite.dart';
+import 'package:reseller_studio/features/workspace/domain/repositories/team_repository.dart';
+import 'package:reseller_studio/features/workspace/presentation/screens/team_screen/team_screen.dart';
+import 'package:reseller_studio/features/workspace/presentation/widgets/invite_member_sheet.dart';
+import 'package:reseller_studio/features/workspace/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';

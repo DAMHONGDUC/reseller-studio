@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/utils/date_time_utils.dart';
-import 'package:seller_os/features/offers/domain/entities/offer.dart';
-import 'package:seller_os/features/offers/providers.dart';
+import 'package:reseller_studio/core/utils/date_time_utils.dart';
+import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
+import 'package:reseller_studio/features/offers/providers.dart';
 
 import '../../support/pump_app.dart';
 

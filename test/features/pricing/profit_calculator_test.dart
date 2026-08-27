@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/pricing/domain/services/profit_calculator.dart';
-import 'package:seller_os/features/workspace/workspace_constant.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
+import 'package:reseller_studio/features/workspace/workspace_constant.dart';
 
 /// Testing priority 1. These are the numbers a seller makes buying decisions
 /// with, and hard rule 3 means they are recomputed on every read rather than

@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/config/app_env.dart';
-import 'package:seller_os/core/config/dev_flags.dart';
+import 'package:reseller_studio/core/config/app_env.dart';
+import 'package:reseller_studio/core/config/dev_flags.dart';
 
 /// The env files and the class that reads them have to agree, and the guard
 /// between "what the file asked for" and "what the build allows" has to hold.

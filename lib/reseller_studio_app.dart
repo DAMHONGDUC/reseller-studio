@@ -17,7 +17,7 @@ import 'l10n/gen/app_localizations.dart';
 /// dimension in the design system resolves through `SdSpacingConstant`, whose
 /// getters call screenutil at *runtime* — so without this in the tree, the
 /// first `SdSpacingConstant.w16` a widget reads throws. A widget test that
-/// pumps `SellerOsApp` gets it for free; one that pumps a bare `MaterialApp`
+/// pumps `ResellerStudioApp` gets it for free; one that pumps a bare `MaterialApp`
 /// must install it by hand.
 ///
 /// **It must be given `builder:`, never `child:`, and this is not a style
@@ -31,8 +31,8 @@ import 'l10n/gen/app_localizations.dart';
 /// [designSize] is the canvas every spacing number was chosen against. Change
 /// it and every dimension in both the app and the design system rescales at
 /// once, which is a thing to do deliberately and never to fix one screen.
-class SellerOsApp extends ConsumerWidget {
-  const SellerOsApp({super.key});
+class ResellerStudioApp extends ConsumerWidget {
+  const ResellerStudioApp({super.key});
 
   /// iPhone 14 / 15 logical size — the device the layouts were drawn for.
   static const Size designSize = Size(390, 844);

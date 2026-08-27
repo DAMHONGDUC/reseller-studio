@@ -6,23 +6,23 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // `Override` is not in the main entrypoint's `show` list; `misc.dart` is
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
-import 'package:seller_os/core/theme/app_theme.dart';
-import 'package:seller_os/core/time/app_clock.dart';
-import 'package:seller_os/features/expenses/domain/entities/expense.dart';
-import 'package:seller_os/features/expenses/providers.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/inventory/providers.dart';
-import 'package:seller_os/features/listings/domain/entities/listing.dart';
-import 'package:seller_os/features/listings/providers.dart';
-import 'package:seller_os/features/mock_data/data/in_memory_repositories.dart';
-import 'package:seller_os/features/mock_data/domain/mock_dataset.dart';
-import 'package:seller_os/features/mock_data/providers.dart';
-import 'package:seller_os/features/offers/domain/entities/offer.dart';
-import 'package:seller_os/features/offers/providers.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/providers.dart';
-import 'package:seller_os/l10n/gen/app_localizations.dart';
-import 'package:seller_os/seller_os_app.dart';
+import 'package:reseller_studio/core/theme/app_theme.dart';
+import 'package:reseller_studio/core/time/app_clock.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/expenses/providers.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/providers.dart';
+import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
+import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
+import 'package:reseller_studio/features/mock_data/providers.dart';
+import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
+import 'package:reseller_studio/features/offers/providers.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/l10n/gen/app_localizations.dart';
+import 'package:reseller_studio/reseller_studio_app.dart';
 
 /// The instant the seeded dataset is generated against in every test.
 ///
@@ -98,7 +98,7 @@ Future<void> pumpScreen(
         ...overrides,
       ],
       child: ScreenUtilInit(
-        designSize: SellerOsApp.designSize,
+        designSize: ResellerStudioApp.designSize,
         builder: (BuildContext context, Widget? _) => MaterialApp(
           theme: AppTheme.light,
           localizationsDelegates: const <LocalizationsDelegate<Object>>[

@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Seller OS security rules.
+// Reseller Studio security rules.
 //
 // The whole model in one sentence: **every business document lives under a
 // workspace, and access is decided by the caller's membership document in

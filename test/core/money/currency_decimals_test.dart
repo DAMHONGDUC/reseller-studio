@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/currency_decimals.dart';
-import 'package:seller_os/core/money/money.dart';
+import 'package:reseller_studio/core/money/currency_decimals.dart';
+import 'package:reseller_studio/core/money/money.dart';
 
 /// **A đồng has no cents, and getting that wrong is a factor-of-100 error in
 /// every figure the app shows a Vietnamese seller.** These are the tests that

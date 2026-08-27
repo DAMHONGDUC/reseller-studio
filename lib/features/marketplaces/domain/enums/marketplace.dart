@@ -46,7 +46,7 @@ enum Marketplace {
     Marketplace.other => 0,
   };
 
-  /// Whether Seller OS can talk to this platform's API yet.
+  /// Whether Reseller Studio can talk to this platform's API yet.
   ///
   /// All false today — nothing is integrated (see `CLAUDE.md` "Pending
   /// setup"). The UI reads this to decide between "Connect" and "Coming

@@ -133,7 +133,7 @@ final class AppTheme {
     splashFactory: InkSparkle.splashFactory,
     // The one place the status bar style is decided. `SdAppBarV3` builds a
     // real `AppBar`, which turns this into the `AnnotatedRegion` covering the
-    // top of every route that has a bar; `SellerOsApp` reads it back out for
+    // top of every route that has a bar; `ResellerStudioApp` reads it back out for
     // the routes that do not. No screen ever calls `SystemChrome`.
     appBarTheme: AppBarTheme(systemOverlayStyle: statusBarStyle(brightness)),
   );

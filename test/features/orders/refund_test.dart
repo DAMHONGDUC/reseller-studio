@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/domain/enums/order_status.dart';
-import 'package:seller_os/features/orders/presentation/controllers/order_actions_controller.dart';
-import 'package:seller_os/features/orders/providers.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
+import 'package:reseller_studio/features/orders/presentation/controllers/order_actions_controller.dart';
+import 'package:reseller_studio/features/orders/providers.dart';
 
 import '../../support/pump_app.dart';
 

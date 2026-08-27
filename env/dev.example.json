@@ -1,7 +1,7 @@
 {
   "FLAVOR": "dev",
 
-  "APP_DISPLAY_NAME": "Seller OS Dev",
+  "APP_DISPLAY_NAME": "Reseller Studio Dev",
 
   "MOCK_DATA_DEFAULT": false,
   "VERBOSE_LOGGING": true,

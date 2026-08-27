@@ -3,10 +3,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // `Override` is not in the main entrypoint's `show` list; `misc.dart` is
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
-import 'package:seller_os/features/notifications/domain/entities/app_notification.dart';
-import 'package:seller_os/features/notifications/domain/enums/notification_type.dart';
-import 'package:seller_os/features/notifications/presentation/screens/notifications_screen/notifications_screen.dart';
-import 'package:seller_os/features/notifications/providers.dart';
+import 'package:reseller_studio/features/notifications/domain/entities/app_notification.dart';
+import 'package:reseller_studio/features/notifications/domain/enums/notification_type.dart';
+import 'package:reseller_studio/features/notifications/presentation/screens/notifications_screen/notifications_screen.dart';
+import 'package:reseller_studio/features/notifications/providers.dart';
 
 import '../../support/pump_app.dart';
 

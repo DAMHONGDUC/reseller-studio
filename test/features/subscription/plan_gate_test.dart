@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/subscription/domain/entities/plan_limits.dart';
-import 'package:seller_os/features/subscription/domain/enums/plan_feature.dart';
-import 'package:seller_os/features/subscription/domain/enums/seller_plan.dart';
-import 'package:seller_os/features/subscription/domain/services/plan_gate.dart';
+import 'package:reseller_studio/features/subscription/domain/entities/plan_limits.dart';
+import 'package:reseller_studio/features/subscription/domain/enums/plan_feature.dart';
+import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
+import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
 
 /// The gate decides what a plan may do, and the only interesting part of a
 /// limit is its boundary — so that is what is asserted, not the middle.

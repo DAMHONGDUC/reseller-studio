@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/features/mock_data/providers.dart';
-import 'package:seller_os/features/pricing/domain/services/profit_calculator.dart';
-import 'package:seller_os/features/workspace/domain/entities/workspace.dart';
-import 'package:seller_os/features/workspace/presentation/controllers/workspace_edit_controller.dart';
-import 'package:seller_os/features/workspace/providers.dart';
+import 'package:reseller_studio/features/mock_data/providers.dart';
+import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
+import 'package:reseller_studio/features/workspace/domain/entities/workspace.dart';
+import 'package:reseller_studio/features/workspace/presentation/controllers/workspace_edit_controller.dart';
+import 'package:reseller_studio/features/workspace/providers.dart';
 
 import '../../support/pump_app.dart';
 

@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/listings/domain/entities/listing.dart';
-import 'package:seller_os/features/listings/domain/enums/listing_status.dart';
-import 'package:seller_os/features/listings/presentation/controllers/listing_actions_controller.dart';
-import 'package:seller_os/features/listings/providers.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/listings/presentation/controllers/listing_actions_controller.dart';
+import 'package:reseller_studio/features/listings/providers.dart';
 
 import '../../support/pump_app.dart';
 

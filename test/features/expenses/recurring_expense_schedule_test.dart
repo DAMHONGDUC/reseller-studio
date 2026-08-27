@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/expenses/domain/entities/expense.dart';
-import 'package:seller_os/features/expenses/domain/services/recurring_expense_schedule.dart';
-import 'package:seller_os/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/expenses/domain/services/recurring_expense_schedule.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
 
 /// A month boundary and a series with several occurrences are the only
 /// interesting cases here, so every row is placed against one.

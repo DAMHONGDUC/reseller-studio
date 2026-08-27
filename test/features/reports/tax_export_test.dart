@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/features/reports/presentation/controllers/report_controller.dart';
-import 'package:seller_os/features/tax/providers.dart';
+import 'package:reseller_studio/features/reports/presentation/controllers/report_controller.dart';
+import 'package:reseller_studio/features/tax/providers.dart';
 
 import '../../support/pump_app.dart';
 

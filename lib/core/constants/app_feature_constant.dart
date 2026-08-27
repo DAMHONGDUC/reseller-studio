@@ -23,7 +23,7 @@ class AppFeature {
   final String body;
 }
 
-/// **What Seller OS is, in three lines — written once and shown twice.**
+/// **What Reseller Studio is, in three lines — written once and shown twice.**
 ///
 /// The intro flow gives each one a full page; the login screen lists them
 /// compactly under the app name. They are the same three claims either way,

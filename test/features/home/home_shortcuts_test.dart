@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/home/home_constant.dart';
-import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/features/home/home_constant.dart';
+import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';

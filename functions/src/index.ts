@@ -1,5 +1,5 @@
 /**
- * Seller OS Cloud Functions — the trusted half of the app.
+ * Reseller Studio Cloud Functions — the trusted half of the app.
  *
  * Everything here exists because a client must not be able to do it. The test
  * for whether something belongs in this codebase rather than in Flutter is

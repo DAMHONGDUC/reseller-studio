@@ -1,6 +1,6 @@
 {
   "name": "seller-os-functions",
-  "description": "Cloud Functions for Seller OS — the trusted half of the app.",
+  "description": "Cloud Functions for Reseller Studio — the trusted half of the app.",
   "main": "lib/index.js",
   "private": true,
   "engines": {

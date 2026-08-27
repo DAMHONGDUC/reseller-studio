@@ -1,4 +1,4 @@
-# Seller OS
+# Reseller Studio
 
 A seller operating system for resellers — not an inventory tracker.
 
@@ -65,5 +65,5 @@ what each promises, and why the set is shaped this way.
 
 `packages/system_design` is [its own repo](https://github.com/DAMHONGDUC/system_design),
 shared with BaroEase. It carries two widget generations: `v2/` renders
-BaroEase, `v3/` renders Seller OS. **Never modify `v2/`, and never import it
+BaroEase, `v3/` renders Reseller Studio. **Never modify `v2/`, and never import it
 from `v3/`.**

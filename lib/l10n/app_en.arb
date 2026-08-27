@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Seller OS",
+  "appTitle": "Reseller Studio",
   "@appTitle": {
     "description": "The app's own name. Not translated in either locale."
   },
@@ -440,7 +440,7 @@
   "@settingsApp": {
     "description": "Settings section holding what the app is and how it works."
   },
-  "moreAbout": "About Seller OS",
+  "moreAbout": "About Reseller Studio",
   "@moreAbout": {
     "description": "More destination: what the app is and how it works."
   },
@@ -452,7 +452,7 @@
   "@aboutTagline": {
     "description": "One-line description of the app, under its name."
   },
-  "aboutIntro": "Seller OS is not an inventory tracker. It follows one item all the way from the shelf you found it on to what it actually earned you — so the next thing you buy is a decision instead of a guess.",
+  "aboutIntro": "Reseller Studio is not an inventory tracker. It follows one item all the way from the shelf you found it on to what it actually earned you — so the next thing you buy is a decision instead of a guess.",
   "@aboutIntro": {
     "description": "Paragraph introducing what the app is for."
   },
@@ -709,7 +709,7 @@
   "@marketplacesSyncOffTitle": {
     "description": "Explains why nothing is connected."
   },
-  "marketplacesSyncOffBody": "Connections run on the server so your marketplace passwords and tokens never touch this app. Until that is live, list and sell manually — everything else in Seller OS works the same either way.",
+  "marketplacesSyncOffBody": "Connections run on the server so your marketplace passwords and tokens never touch this app. Until that is live, list and sell manually — everything else in Reseller Studio works the same either way.",
   "@marketplacesSyncOffBody": {
     "description": "Why marketplace OAuth is server-side. Hard rule 10: no secret ships in the Flutter binary."
   },
@@ -2693,7 +2693,7 @@
   "@legalTermsOfUse": {
     "description": "Row that opens the terms of use in a browser."
   },
-  "legalTermsOfUseNote": "What you agree to by using Seller OS.",
+  "legalTermsOfUseNote": "What you agree to by using Reseller Studio.",
   "@legalTermsOfUseNote": {
     "description": "Supporting line under the terms of use row."
   },

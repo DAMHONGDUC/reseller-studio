@@ -91,7 +91,7 @@ notificationControllerProvider =
 
 /// Device registration and push taps.
 ///
-/// **Watched by `SellerOsApp` so it is alive for the whole session.** A
+/// **Watched by `ResellerStudioApp` so it is alive for the whole session.** A
 /// controller nothing watches is one Riverpod never builds, and the device
 /// would never register.
 final NotifierProvider<PushController, void> pushControllerProvider =

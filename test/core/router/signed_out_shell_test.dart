@@ -4,13 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/router/app_router.dart';
-import 'package:seller_os/core/router/app_routes.dart';
-import 'package:seller_os/core/theme/app_theme.dart';
-import 'package:seller_os/core/widgets/signed_out_view.dart';
-import 'package:seller_os/features/auth/providers.dart';
-import 'package:seller_os/l10n/gen/app_localizations.dart';
-import 'package:seller_os/seller_os_app.dart';
+import 'package:reseller_studio/core/router/app_router.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
+import 'package:reseller_studio/core/theme/app_theme.dart';
+import 'package:reseller_studio/core/widgets/signed_out_view.dart';
+import 'package:reseller_studio/features/auth/providers.dart';
+import 'package:reseller_studio/l10n/gen/app_localizations.dart';
+import 'package:reseller_studio/reseller_studio_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// **Four tabs share one signed-out view; More does not** — owner's rule.
@@ -51,7 +51,7 @@ void main() {
       UncontrolledProviderScope(
         container: container,
         child: ScreenUtilInit(
-          designSize: SellerOsApp.designSize,
+          designSize: ResellerStudioApp.designSize,
           builder: (BuildContext context, Widget? _) => MaterialApp.router(
             theme: AppTheme.light,
             routerConfig: router,

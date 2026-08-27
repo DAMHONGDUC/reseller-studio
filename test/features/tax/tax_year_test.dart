@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/tax/domain/entities/tax_year.dart';
-import 'package:seller_os/features/tax/domain/enums/tax_jurisdiction.dart';
+import 'package:reseller_studio/features/tax/domain/entities/tax_year.dart';
+import 'package:reseller_studio/features/tax/domain/enums/tax_jurisdiction.dart';
 
 /// The UK tax year is the reason this class exists: it opens on 6 April, so a
 /// quarter of the calendar belongs to the year before the one `date.year`

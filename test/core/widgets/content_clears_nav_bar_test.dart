@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
-import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
-import 'package:seller_os/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
-import 'package:seller_os/features/more/presentation/screens/more_screen/more_screen.dart';
-import 'package:seller_os/features/orders/presentation/screens/orders_screen/orders_screen.dart';
+import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
+import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:reseller_studio/features/more/presentation/screens/more_screen/more_screen.dart';
+import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';

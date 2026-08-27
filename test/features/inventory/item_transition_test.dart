@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/inventory/domain/enums/item_status.dart';
-import 'package:seller_os/features/inventory/domain/services/item_transition.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/domain/services/item_transition.dart';
 
 void main() {
   final DateTime now = DateTime(2026, 8, 12);

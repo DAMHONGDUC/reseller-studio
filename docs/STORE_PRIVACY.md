@@ -112,11 +112,11 @@ bracketed parts and have it reviewed.
 
 ---
 
-### Privacy Policy — Seller OS
+### Privacy Policy — Reseller Studio
 
 _Last updated: [date]_
 
-**Who we are.** [Legal entity name] ("we") provides the Seller OS app. For UK
+**Who we are.** [Legal entity name] ("we") provides the Reseller Studio app. For UK
 and EU data protection law we are the data controller. Contact:
 [support email].
 
@@ -154,7 +154,7 @@ exports your records as CSV, and Settings deletes your account. To exercise
 any other right, or to complain, write to [support email]. In the UK you may
 also complain to the Information Commissioner's Office.
 
-**Children.** Seller OS is for business use and is not directed at anyone
+**Children.** Reseller Studio is for business use and is not directed at anyone
 under 18.
 
 **Changes.** We will post any change here and update the date above.

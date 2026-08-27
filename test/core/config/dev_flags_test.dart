@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/config/dev_flags.dart';
-import 'package:seller_os/features/auth/providers.dart';
+import 'package:reseller_studio/core/config/dev_flags.dart';
+import 'package:reseller_studio/features/auth/providers.dart';
 
 /// **There is no way into this app but Apple or Google** (hard rule 1).
 ///

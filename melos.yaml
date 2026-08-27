@@ -8,7 +8,7 @@
 #
 # Every melos since 3.0.0 needs `melos` in the root dev_dependencies, so that
 # part is unavoidable either way.
-name: seller_os
+name: reseller_studio
 
 packages:
   - .

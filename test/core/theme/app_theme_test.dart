@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/theme/app_colors.dart';
-import 'package:seller_os/core/theme/app_theme.dart';
-import 'package:seller_os/seller_os_app.dart';
+import 'package:reseller_studio/core/theme/app_colors.dart';
+import 'package:reseller_studio/core/theme/app_theme.dart';
+import 'package:reseller_studio/reseller_studio_app.dart';
 import 'package:system_design/index.dart';
 
 /// The two things that silently break the whole UI, tested here because
@@ -22,7 +22,7 @@ void main() {
   /// applied. A test that pumps a bare `MaterialApp` is testing a tree the
   /// app never builds.
   ///
-  /// `builder:` rather than `child:` for the same reason `SellerOsApp` uses
+  /// `builder:` rather than `child:` for the same reason `ResellerStudioApp` uses
   /// it: `AppTheme.light` reads `SdSpacingConstant.sp*`, so evaluating it as
   /// a constructor argument would run it before `ScreenUtilInit` has
   /// initialized and throw. This helper is the regression test for that.
@@ -32,7 +32,7 @@ void main() {
     ThemeData Function()? theme,
   }) => tester.pumpWidget(
     ScreenUtilInit(
-      designSize: SellerOsApp.designSize,
+      designSize: ResellerStudioApp.designSize,
       builder: (BuildContext context, Widget? _) => MaterialApp(
         theme: theme == null ? AppTheme.light : theme(),
         home: child,

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/inventory/domain/enums/item_status.dart';
-import 'package:seller_os/features/inventory/presentation/controllers/quick_add_controller.dart';
-import 'package:seller_os/features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
-import 'package:seller_os/features/inventory/providers.dart';
-import 'package:seller_os/features/mock_data/data/in_memory_repositories.dart';
-import 'package:seller_os/features/mock_data/domain/mock_dataset.dart';
-import 'package:seller_os/features/mock_data/providers.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/presentation/controllers/quick_add_controller.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
+import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
+import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
+import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';

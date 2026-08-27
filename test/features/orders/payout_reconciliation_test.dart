@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/marketplaces/domain/enums/marketplace.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/domain/enums/order_status.dart';
-import 'package:seller_os/features/orders/domain/services/payout_reconciliation.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
+import 'package:reseller_studio/features/orders/domain/services/payout_reconciliation.dart';
 
 /// An unreported fee and a refund landing after the sale are the only
 /// interesting cases here, so every row is placed against one.

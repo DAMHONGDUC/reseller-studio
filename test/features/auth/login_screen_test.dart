@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/auth/presentation/screens/login_screen/login_screen.dart';
+import 'package:reseller_studio/features/auth/presentation/screens/login_screen/login_screen.dart';
 
 import '../../support/pump_app.dart';
 

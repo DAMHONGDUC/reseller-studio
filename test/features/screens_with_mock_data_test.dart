@@ -1,16 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/analytics/domain/entities/analytics_summary.dart';
-import 'package:seller_os/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
-import 'package:seller_os/features/analytics/providers.dart';
-import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
-import 'package:seller_os/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
-import 'package:seller_os/features/inventory/providers.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/providers.dart';
-import 'package:seller_os/features/settings/presentation/screens/settings_screen/settings_screen.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/analytics/domain/entities/analytics_summary.dart';
+import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
+import 'package:reseller_studio/features/analytics/providers.dart';
+import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/settings/presentation/screens/settings_screen/settings_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../support/pump_app.dart';

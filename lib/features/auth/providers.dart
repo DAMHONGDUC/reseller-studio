@@ -59,7 +59,7 @@ final Provider<AuthRepository> authRepositoryProvider =
 /// **`authStateChanges` is the wrong stream for this app and `userChanges` is
 /// the right one.** The first fires only on sign-in and sign-out; the second
 /// also fires when the profile changes — a display name edit, an email
-/// verification landing, a provider being linked. Seller OS shows the account
+/// verification landing, a provider being linked. Reseller Studio shows the account
 /// on Home and in Settings, and with `authStateChanges` those screens keep
 /// rendering the pre-edit user until the app is restarted.
 final StreamProvider<User?> authUserProvider = StreamProvider<User?>((Ref ref) {

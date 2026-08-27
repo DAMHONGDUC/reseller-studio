@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/features/expenses/domain/entities/expense.dart';
-import 'package:seller_os/features/expenses/presentation/controllers/expense_controller.dart';
-import 'package:seller_os/features/expenses/providers.dart';
-import 'package:seller_os/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/expenses/presentation/controllers/expense_controller.dart';
+import 'package:reseller_studio/features/expenses/providers.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
 
 import '../../support/pump_app.dart';
 

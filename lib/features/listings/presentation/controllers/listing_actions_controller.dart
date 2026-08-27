@@ -16,7 +16,7 @@ import '../../domain/enums/listing_status.dart';
 /// bulk price update is one of the three things plan §12 names.
 ///
 /// **Nothing here talks to a marketplace.** No integration exists yet (hard
-/// rule 10 keeps every token server-side), so these change what Seller OS
+/// rule 10 keeps every token server-side), so these change what Reseller Studio
 /// records. The day a platform is connected, the sync is a Cloud Function
 /// reading the same documents — not a call added to this class.
 class ListingActionsController extends Notifier<bool> {

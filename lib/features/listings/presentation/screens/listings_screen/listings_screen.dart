@@ -35,7 +35,7 @@ part 'listings_screen_bulk_bar.dart';
 /// behaviour Inventory has, from the same `SelectionController`.
 ///
 /// **Nothing here reaches a marketplace.** No integration exists (hard rule
-/// 10), so a bulk change edits what Seller OS records; the day eBay is
+/// 10), so a bulk change edits what Reseller Studio records; the day eBay is
 /// connected, the push is a Cloud Function reading these documents.
 class ListingsScreen extends ConsumerStatefulWidget {
   const ListingsScreen({super.key});

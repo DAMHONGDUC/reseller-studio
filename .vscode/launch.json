@@ -18,7 +18,7 @@
         "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
     },
     {
-      "name": "Seller OS (dev)",
+      "name": "Reseller Studio (dev)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
@@ -28,7 +28,7 @@
       ]
     },
     {
-      "name": "Seller OS (prod config)",
+      "name": "Reseller Studio (prod config)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "name": "Seller OS (dev, profile)",
+      "name": "Reseller Studio (dev, profile)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",

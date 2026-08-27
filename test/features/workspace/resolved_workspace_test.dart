@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/workspace/domain/entities/user_profile.dart';
+import 'package:reseller_studio/features/workspace/domain/entities/user_profile.dart';
 
 /// **Switching business is a write to `lastWorkspaceId` and nothing else** —
 /// there is no local "selected workspace" state anywhere in the app, because a

@@ -1,7 +1,7 @@
 {
   "FLAVOR": "prod",
 
-  "APP_DISPLAY_NAME": "Seller OS",
+  "APP_DISPLAY_NAME": "Reseller Studio",
 
   "MOCK_DATA_DEFAULT": false,
   "VERBOSE_LOGGING": false,

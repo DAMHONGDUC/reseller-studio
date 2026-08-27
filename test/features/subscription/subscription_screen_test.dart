@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/features/subscription/domain/entities/plan_limits.dart';
-import 'package:seller_os/features/subscription/domain/enums/seller_plan.dart';
-import 'package:seller_os/features/subscription/presentation/screens/subscription_screen/subscription_screen.dart';
-import 'package:seller_os/features/subscription/providers.dart';
+import 'package:reseller_studio/features/subscription/domain/entities/plan_limits.dart';
+import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
+import 'package:reseller_studio/features/subscription/presentation/screens/subscription_screen/subscription_screen.dart';
+import 'package:reseller_studio/features/subscription/providers.dart';
 
 import '../../support/pump_app.dart';
 
