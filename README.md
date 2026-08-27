@@ -57,32 +57,25 @@ what each promises, and why the set is shaped this way.
 Two commands, and the first is not optional — what a build *carries* and what
 happens to the build afterwards are independent halves (`docs/rules/RELEASE.md`).
 
+### Dev
+
+```sh
+melos run prepare-env-dev
+```
+
+```sh
+cd ios && bundle exec fastlane beta flavor:dev bump:true notes:"dev"
+```
+
+### Prod
+
 ```sh
 melos run prepare-env-prod
 ```
 
 ```sh
-cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"what changed"
+cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"prod"
 ```
-
-- **`prepare-env-<flavour>` installs that flavour's config** — both `env/*.json`
-  and the native files — by replacing each destination whole. Skip it and the
-  build ships whichever flavour was installed last, which compiles, launches
-  and writes into the wrong Firestore.
-- **`bump:true`** settles the build number to `max(pubspec, TestFlight) + 1` and
-  commits it after the upload. Leave it off only against a number you know is
-  free.
-- **`notes:`** is optional and is the only thing on the build that says dev or
-  prod. It costs the wait for processing.
-- **Rehearse first**: `bundle exec fastlane preflight` — three minutes, no
-  build, and every credential failure surfaces in it.
-- **Never archive from Xcode.** Product > Archive skips
-  `--dart-define-from-file` and the binary dies on `[core/no-app]`.
-- `ios/Runner/Info.plist` goes dirty every time `prepare-env` runs; it carries a
-  derived, flavour-specific URL scheme. **Never commit that entry.**
-
-From CI instead: the **Release** workflow, `workflow_dispatch` only.
-`RELEASE_ACTIONS.md` is where "it doesn't work" is answered.
 
 ## Where things are
 
