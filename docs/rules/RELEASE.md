@@ -40,6 +40,17 @@ env_assets/
 `melos run prepare-env-dev` / `-prod` copies them where the build reads them.
 The script's contract, and none of it is optional:
 
+- **Every copy replaces the destination whole.** Owner's rule. The source's
+  bytes land on the destination and nothing of what was there survives — never
+  a merge, never "keep the keys the destination already had", never an edit
+  that adds the flavour's values to somebody else's file. A merged file is the
+  one state this script exists to make impossible: half of it says dev and half
+  says prod, and nothing on disk says which half came from where. A tracked
+  destination (`ios/Runner/Info.plist`) is overwritten like any other.
+  - `melos run set-up` is the opposite and is not in conflict: it seeds
+    `env/*.json` from the templates **only when the file is missing**, so it
+    never touches a real one. `prepare-env` is the command that installs a
+    flavour, and installing means replacing.
 - **Both `env/*.json` every run; only the native pair is flavour-picked.** One
   destination each, so there is nothing to choose at build time.
 - **Destinations carry no `dev-`/`prod-` prefix.** Those exact paths are what
@@ -59,7 +70,10 @@ The script's contract, and none of it is optional:
   `GoogleService-Info.plist` beside `env/prod.json`, one file lower down.
 - **`_url-scheme.sh` runs after the copies, never before.** It writes into the
   plist that was just installed; the other order derives the entry and then
-  overwrites it.
+  overwrites it. It is **not** an exception to the replace rule: it keeps
+  nothing from the file the copy overwrote, and it deletes any existing
+  `google-sign-in` entry before adding this flavour's, so a re-run replaces
+  rather than appends.
 
 **What the flavour plists may differ in: nothing the pipeline derives.** CI has
 no `Info.plist` secret — `.github/workflows/release.yml` builds on the tracked
