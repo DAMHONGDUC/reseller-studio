@@ -18,6 +18,14 @@ import '../../../../core/constants/log_tag_constant.dart';
 /// still logs (hard rule 8) — a silent null here would look exactly like a
 /// seller who said no.
 class PushMessaging {
+  /// How long iOS is given to hand the APNs token over.
+  ///
+  /// The platform delivers it asynchronously after registering for remote
+  /// notifications, so asking FCM for a token straight after the permission
+  /// dialog races it — and `getToken` throws rather than waiting.
+  static const Duration _apnsTokenWait = Duration(seconds: 5);
+  static const Duration _apnsTokenPoll = Duration(milliseconds: 250);
+
   const PushMessaging();
 
   /// iOS shows the system dialog; Android 13+ shows its own. Answers whether
@@ -55,6 +63,18 @@ class PushMessaging {
   /// at all, and a device that has just denied permission has none either.
   Future<String?> token() async {
     try {
+      if (Platform.isIOS && !await _hasApnsToken()) {
+        // - info, not error: a simulator never gets one, and this is not a
+        //   fault the seller or the next release can do anything about
+        // - a device that gets one late is carried by `tokenRefreshes`
+        SdLogger.info(
+          LogTagConstant.notification,
+          'No APNs token — no push token to register',
+        );
+
+        return null;
+      }
+
       return await FirebaseMessaging.instance.getToken();
     } catch (error, stackTrace) {
       SdLogger.error(
@@ -66,6 +86,25 @@ class PushMessaging {
 
       return null;
     }
+  }
+
+  /// Whether iOS has handed the APNs token over, waiting a little for it.
+  ///
+  /// Polled because the plugin exposes no callback for its arrival. Without
+  /// the wait the first launch after granting permission registers no device
+  /// at all, and nothing tries again until the app is restarted.
+  Future<bool> _hasApnsToken() async {
+    final Stopwatch elapsed = Stopwatch()..start();
+
+    while (elapsed.elapsed < _apnsTokenWait) {
+      final String? apns = await FirebaseMessaging.instance.getAPNSToken();
+
+      if (apns != null) return true;
+
+      await Future<void>.delayed(_apnsTokenPoll);
+    }
+
+    return false;
   }
 
   /// A token is rotated by the platform, not only issued once. Missing this

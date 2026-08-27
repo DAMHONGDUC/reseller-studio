@@ -60,8 +60,6 @@ class PushController extends Notifier<void> {
       // the notification is the Firestore row and the push is a copy of it.
       if (!granted) return;
 
-      await _registerCurrentToken(messaging, devices);
-
       _tokenRefreshes = messaging.tokenRefreshes().listen((String token) {
         unawaited(_registerToken(devices, token, messaging.platform));
       });
@@ -72,6 +70,11 @@ class PushController extends Notifier<void> {
       final RemoteMessage? initial = await messaging.initialMessage();
 
       if (initial != null) _open(initial);
+
+      // Last, and deliberately not awaited: on iOS this waits for the APNs
+      // token, and a tapped push must not sit behind that. Everything under
+      // it logs its own failures.
+      unawaited(_registerCurrentToken(messaging, devices));
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.notification,
