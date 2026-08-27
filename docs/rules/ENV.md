@@ -39,6 +39,24 @@ authority on both**, and this file does not repeat it.
   still compiles. That is what keeps `melos run test` working without a
   flavour.
 
+**A key that belongs to one platform ends in `_IOS` or `_ANDROID`, and the
+suffix goes last.** Owner's rule. `REVENUECAT_API_KEY_IOS`, never
+`REVENUECAT_IOS_API_KEY`. The platform is the last thing that varies, so the
+two stores' keys land next to each other in every file that lists them and a
+missing half reads as a gap rather than as two unrelated lines — which is
+exactly the shape `hasBillingConfig` answers questions about.
+
+- A key no platform owns carries no suffix: `FIREBASE_PROJECT_ID`,
+  `GOOGLE_SIGN_IN_SERVER_CLIENT_ID`, `FUNCTIONS_REGION`.
+- **The `AppEnv` getter mirrors the key exactly** — `REVENUECAT_API_KEY_IOS`
+  is `revenueCatApiKeyIos` — so a grep for either name finds both. That is
+  what stops a rename landing in the JSON and not in the Dart, where the
+  getter would silently start returning `''`.
+- The rule reaches every name for the same value, not just the JSON one: the
+  Fastfile's `ENV[...]`, the workflow's `env:` block and the Actions secret it
+  reads. A secret whose name disagrees with the variable it fills is one
+  nobody can grep for.
+
 **`REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY` are public SDK
 keys and belong here**, the same category as the Firebase ids: they identify
 the app to RevenueCat and are protected by the store's receipt verification,
