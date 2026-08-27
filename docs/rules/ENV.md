@@ -57,7 +57,7 @@ exactly the shape `hasBillingConfig` answers questions about.
   reads. A secret whose name disagrees with the variable it fills is one
   nobody can grep for.
 
-**`REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY` are public SDK
+**`REVENUECAT_API_KEY_IOS` and `REVENUECAT_API_KEY_ANDROID` are public SDK
 keys and belong here**, the same category as the Firebase ids: they identify
 the app to RevenueCat and are protected by the store's receipt verification,
 not by being unreadable. The **webhook auth header is the secret half** and
@@ -74,7 +74,7 @@ twice, and the copy nothing read. What stayed:
 
 - `FIREBASE_PROJECT_ID`, because `AppEnv.hasFirebaseConfig` is how bootstrap
   tells "no backend configured" apart from "configured and unreachable";
-- `FIREBASE_IOS_APP_ID`, because `verify_flavor_config` in the beta lane
+- `FIREBASE_APP_ID_IOS`, because `verify_flavor_config` in the beta lane
   cross-checks it against the installed plist — the two are the same fact
   written twice on purpose, and disagreeing means Crashlytics symbols land in
   another project's dashboard.
