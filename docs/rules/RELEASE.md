@@ -34,6 +34,7 @@ env_assets/
   dev.json                          prod.json
   dev-google-services.json          prod-google-services.json
   dev-GoogleService-Info.plist      prod-GoogleService-Info.plist
+  dev-Info.plist                    prod-Info.plist
 ```
 
 `melos run prepare-env-dev` / `-prod` copies them where the build reads them.
@@ -51,9 +52,25 @@ The script's contract, and none of it is optional:
   is the sign-in URL scheme, and that is `tool/_url-scheme.sh` — **one
   implementation, shared with the release workflow**, because two copies of
   derived data is what makes them drift.
+- **`ios/Runner/Info.plist` comes from `env_assets/<flavour>-Info.plist`, like
+  every other native file.** Owner's rule. The Runner target reads one path, so
+  the flavour's plist is copied onto it rather than patched into the tracked
+  one — a hand-edit that survives a flavour switch is the same hazard as a dev
+  `GoogleService-Info.plist` beside `env/prod.json`, one file lower down.
+- **`_url-scheme.sh` runs after the copies, never before.** It writes into the
+  plist that was just installed; the other order derives the entry and then
+  overwrites it.
 
-**`ios/Runner/Info.plist` is tracked, and `prepare-env` writes into it.** That
-is deliberate and it leaves the working tree dirty: the derived entry pins one
+**What the flavour plists may differ in: nothing the pipeline derives.** CI has
+no `Info.plist` secret — `.github/workflows/release.yml` builds on the tracked
+file and calls the same `_url-scheme.sh`. So a local copy that differs from
+`ios/Runner/Info.plist` in anything except the derived `google-sign-in` entry
+is a difference that never reaches a TestFlight build. Real changes — a usage
+string, the `selleros` deep-link scheme, an orientation — go into the tracked
+file first and into `env_assets/` afterwards.
+
+**`ios/Runner/Info.plist` is tracked, and `prepare-env` overwrites it.** That
+is deliberate and it leaves the working tree dirty: the installed file pins one
 flavour, so **never commit it**.
 
 ## No one ever archives from Xcode
