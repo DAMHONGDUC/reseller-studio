@@ -1,20 +1,20 @@
 #!/bin/sh
 # Run the app against a flavour's config. Defaults to dev.
 #
-#   sh tool/run.sh          # env/dev.json
-#   sh tool/run.sh prod     # env/prod.json
+#   melos run run            # env/dev.json
+#   melos run run -- prod    # env/prod.json
 #
-# Never run the app bare: without --dart-define-from-file every AppEnv getter
-# falls back to its default, which means no Firebase config and a silently
-# different app from the one CI builds.
-set -e
+# **Never run the app bare**: with no --dart-define-from-file every AppEnv
+# getter falls back to its default, which is a silently different app from the
+# one CI builds.
+set -eu
+. "$(dirname "$0")/_common.sh"
 
 FLAVOUR=${1:-dev}
-shift 2>/dev/null || true
+if [ $# -gt 0 ]; then shift; fi
 
 if [ ! -f "env/$FLAVOUR.json" ]; then
-  echo "✗ env/$FLAVOUR.json does not exist — run 'melos run set-up' first"
-  exit 1
+  fail "env/$FLAVOUR.json does not exist — run 'melos run set-up' first"
 fi
 
-fvm flutter run --dart-define-from-file="env/$FLAVOUR.json" "$@"
+$FL run --dart-define-from-file="env/$FLAVOUR.json" "$@"

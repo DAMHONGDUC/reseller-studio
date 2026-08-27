@@ -20,6 +20,15 @@ packages:
 ide:
   intellij: false
 
+# **A flavour is a separate command, never a flag on a shared one.** `-dev` and
+# `-prod` are typed on purpose: a prod deploy inherited from whatever the CLI
+# was last pointed at is the failure this prevents. One script serves both and
+# takes the flavour as $1 — these entries are the only thing duplicated.
+#
+# **Underscore-prefixed files in tool/ are not commands.** `_common.sh`,
+# `_clean.sh`, `_url-scheme.sh` are sourced or called by others and are never
+# named here.
+#
 # Each script is one line on purpose. Melos echoes the whole `run:` body
 # before AND after every run, with no flag to turn it off, so a multi-line
 # block buries the output it is meant to introduce. The bodies live in
@@ -27,44 +36,59 @@ ide:
 # shell melos actually uses on Linux, and the one macOS hides from you.
 scripts:
   set-up:
-    description: >
-      Wipe build artefacts, then set up everything a clone needs.
-      Safe to re-run.
+    description: Wipe, then everything a fresh clone needs. Idempotent.
     run: sh tool/set-up.sh
 
+  deep-set-up:
+    description: set-up, plus Xcode's derived data. Costs a cold build.
+    run: sh tool/deep-set-up.sh
+
+  prepare-env-dev:
+    description: Install dev's config — env files and the native files.
+    run: sh tool/prepare-env.sh dev
+
+  prepare-env-prod:
+    description: Install prod's config — env files and the native files.
+    run: sh tool/prepare-env.sh prod
+
   run:
-    description: >
-      Run the app against a flavour's env config. `melos run run -- prod`
-      for release config; defaults to dev.
+    description: Run the app. `melos run run -- prod` for release config.
     run: sh tool/run.sh
 
   gen:
-    description: Regenerate localizations.
+    description: Localizations and codegen, nothing else.
     run: sh tool/gen.sh
 
   analyze:
-    description: Analyze every package. Must pass with zero findings.
+    description: Zero findings, or fail. Exactly what CI runs.
     run: sh tool/analyze.sh
 
   test:
-    description: Run the Flutter test suite.
+    description: The test suite. For CI and full sweeps, not per-change.
     run: sh tool/test.sh
 
   test-rules:
-    description: >
-      Run firestore.rules against the emulator. Needs Java; starts and stops
-      the emulator itself.
+    description: firestore.rules against the emulator. Needs Java.
     run: sh tool/test-rules.sh
 
   preflight:
-    description: >
-      Check everything that must be true before a build is worth uploading.
-      Exits non-zero on an unmet blocker. Run it after the Firebase and
-      signing setup, before `flutter build ipa`.
+    description: Everything that must be true before a build is worth uploading.
     run: sh tool/preflight.sh
 
-  deploy-firebase:
-    description: >
-      Deploy firestore rules, indexes and functions. Confirms the project
-      first — this reaches real users.
-    run: sh tool/deploy-firebase.sh
+  build-ipa-dev:
+    description: The IPA, dev config attached. The only place an archive is made.
+    run: sh tool/build-ipa.sh dev
+
+  build-ipa-prod:
+    description: The IPA, prod config attached. The only place an archive is made.
+    run: sh tool/build-ipa.sh prod
+
+  deploy-firebase-dev:
+    description: Rules, indexes and functions to the dev alias. Confirms first.
+    run: sh tool/deploy-firebase.sh dev
+
+  deploy-firebase-prod:
+    description: Rules, indexes and functions to the prod alias. Confirms first.
+    run: sh tool/deploy-firebase.sh prod
+
+sdkPath: .fvm/flutter_sdk

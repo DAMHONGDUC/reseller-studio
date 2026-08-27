@@ -92,6 +92,12 @@ app.*.map.json
 env/*.json
 !env/*.example.json
 
+# Your own copies of every per-project file, one set per flavour.
+# `melos run prepare-env-dev` copies them to the paths the build reads. Never
+# committed: this is the folder that holds real project identifiers, and one
+# of the two places a mistake here would be invisible (see docs/rules/RELEASE.md).
+env_assets/
+
 # Firebase — generated per-project, and they carry real project identifiers.
 # Regenerate with `flutterfire configure`; see CLAUDE.md "Pending setup".
 lib/firebase_options.dart
@@ -105,6 +111,21 @@ ui-debug.log
 # Cloud Functions
 functions/node_modules/
 functions/lib/
+
+# Runtime config for the emulator and for local function runs. Unlike env/,
+# this one CAN hold a secret (hard rule 10), so only the key list is committed.
+functions/.env
+!functions/.env.example
+
+# Fastlane. `.env` holds the App Store Connect key id, the match passphrase and
+# the certificates-repo token; `*.p8` is the private key itself. Neither ever
+# reaches git — see docs/release/CREDENTIALS.md.
+ios/fastlane/.env*
+!ios/fastlane/.env.example
+ios/fastlane/*.p8
+ios/fastlane/report.xml
+ios/fastlane/Preview.html
+ios/fastlane/ExportOptions.plist
 
 # Melos
 pubspec_overrides.yaml

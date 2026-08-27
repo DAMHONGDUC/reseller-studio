@@ -8,7 +8,8 @@
 #
 # `emulators:exec` starts Firestore, runs the command, and tears down — so the
 # suite leaves nothing running and its exit code is the command's.
-set -e
+set -eu
+. "$(dirname "$0")/_common.sh"
 
 # **The npm copy, not whatever `firebase` is on PATH.** A globally installed
 # CLI is a `pkg` bundle carrying its own node, and the child process it spawns

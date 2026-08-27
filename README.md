@@ -24,6 +24,19 @@ is no Firebase project checked in and none can be. See **Pending setup** in
 
 `melos run analyze` must pass with zero findings before any change is done.
 
+## Commands
+
+Names only. **`docs/rules/COMMANDS.md` is the one place they are explained** —
+what each promises, and why the set is shaped this way.
+
+| | |
+| --- | --- |
+| Setting up | `set-up`, `deep-set-up` |
+| Config | `prepare-env-dev`, `prepare-env-prod` |
+| Developing | `run`, `gen` |
+| Gates | `analyze`, `test`, `test-rules`, `preflight` |
+| Shipping | `build-ipa-dev`, `build-ipa-prod`, `deploy-firebase-dev`, `deploy-firebase-prod` |
+
 ## Where things are
 
 | | |

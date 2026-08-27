@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+# fastlane only. **No cocoapods**: this app has no Podfile — the Firebase SDKs
+# arrive through Swift Package Manager (`FlutterGeneratedPluginSwiftPackage`),
+# which Xcode resolves itself. Adding the gem would pin a version of a tool
+# nothing here runs.
+gem "fastlane"

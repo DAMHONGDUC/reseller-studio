@@ -19,6 +19,8 @@ Ordered by what blocks what. Work top to bottom.
 | 5 | The vendors' own artwork on the sign-in buttons | The buttons currently draw `SimpleIcons` glyphs (owner's rule), which is a **redrawn trademark** — Beta App Review rejects that, and Google's guidelines require their four-colour "G". Nothing is blocked from running; this blocks external TestFlight and submission only. | 30 min |
 | 6 | Bundle id, signing, App Store / Play listings | No build can be uploaded. | 2–3 h |
 | 7 | Privacy policy + terms URLs, hosted, then in `env/*.json` | Both stores refuse the listing without them, and guideline 3.1.2 wants both links **inside** the app — the paywall and About read `PRIVACY_POLICY_URL` and `TERMS_OF_SERVICE_URL` and draw nothing when they are empty. | 1 h |
+| 8 | `.firebaserc`, and `env_assets/` on your machine | Nothing says which Firebase project a flavour is, so `melos run prepare-env-*` has nothing to copy and the release lane's config check cannot run at all. | 20 min |
+| 9 | App Store Connect API key, the private certificates repo, its PAT | No build can be uploaded by anything but a hand-driven Xcode, which this repo forbids. | 1 h |
 
 App icons, the launch screen, the iOS permission strings, the **Sign in with
 Apple entitlement** and **account deletion with its data** are done and are no
@@ -52,10 +54,10 @@ blocks the external half.
    **Firestore**, **Storage**, **Crashlytics**, **Analytics**, **Cloud
    Messaging**.
 6. Create `.firebaserc` (`firebase use --add`) — it does not exist, so
-   `melos run deploy-firebase` cannot run today.
+   `melos run deploy-firebase-*` cannot run today.
 7. Deploy the rules and indexes:
    ```sh
-   melos run deploy-firebase
+   melos run deploy-firebase-prod
    ```
    Use the script rather than a hand-typed `firebase deploy`: it confirms the
    project first, and it is the one place the list of what ships is written
@@ -213,6 +215,54 @@ wrong. If you would rather keep the package, say so and I will switch it back.
   support URL, age rating.
 - **TestFlight / internal testing** before submitting. Both sign-in flows must
   be tested on a real device from a store-signed build.
+
+---
+
+## 3b. The release pipeline — built, unconfigured
+
+Everything in `ios/fastlane/`, `tool/prepare-env.sh`, `tool/build-ipa.sh` and
+`.github/workflows/release.yml` is written and does nothing yet, because every
+one of them needs a credential only you can create.
+`docs/rules/RELEASE.md` is why it is shaped the way it is;
+`docs/release/CREDENTIALS.md` is what each credential does.
+
+In order — each step is what unblocks the next:
+
+1. **`env_assets/` on your machine.** Gitignored, four files per flavour:
+   `dev.json`, `prod.json`, `<flavour>-google-services.json`,
+   `<flavour>-GoogleService-Info.plist`. Then
+   `melos run prepare-env-dev` puts them where the build reads them.
+2. **`.firebaserc`** — `firebase use --add` for each project, so the aliases
+   are `dev` and `prod`. The lane refuses to build without it, because that
+   file is the only thing that can say a plist belongs to the flavour being
+   built.
+3. **App Store Connect API key**, App Manager role. **Downloadable once** —
+   the `.p8` cannot be fetched again. Keep it outside the repo.
+4. **A private certificates repo**, empty, plus a **fine-grained PAT** scoped
+   to that repo alone with **Contents: Read-only**. CI never writes to it.
+5. **`ios/fastlane/.env`** from `.env.example`, then, from a Mac:
+   ```bash
+   cd ios && bundle install && bundle exec fastlane certificates
+   ```
+6. **Rehearse**, still from `ios/`:
+   ```bash
+   bundle exec fastlane preflight
+   ```
+   then `CI=true bundle exec fastlane preflight`. The second is the half most
+   likely to break.
+7. **The Actions secrets** in `docs/release/CREDENTIALS.md`. Set exactly one
+   `MATCH_GIT_*_AUTHORIZATION`; both, even with one empty, gives
+   `Duplicate header: "Authorization"`.
+8. **First run with `bump: false`** against a build number you know is free.
+
+Two things to know before the first run:
+
+- **`ios/Runner/Info.plist` goes dirty** every time `prepare-env` runs — it
+  carries a derived, flavour-specific URL scheme. Never commit that entry.
+- **Nobody archives from Xcode.** Product > Archive skips
+  `--dart-define-from-file` and produces a binary that dies on
+  `[core/no-app] No Firebase App '[DEFAULT]' has been created`, which names
+  nothing to do with the cause.
 
 ---
 
