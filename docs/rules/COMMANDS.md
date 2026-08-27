@@ -243,7 +243,7 @@ the upload.
 
 **Never run the app bare.** With no `--dart-define-from-file` every `AppEnv`
 getter falls back to its default, which is a silently different app from the
-one CI builds. `melos run run` and the **"Seller OS (dev)"** VS Code launch
+one CI builds. `melos run run` and the **"Reseller Studio (dev)"** VS Code launch
 configuration both pass it.
 
 Running before Firebase exists: sign-in cannot succeed, and **there is no

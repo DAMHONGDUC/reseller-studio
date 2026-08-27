@@ -1,4 +1,4 @@
-# CLAUDE.md — Seller OS
+# CLAUDE.md — Reseller Studio
 
 Read `SELLER_OS_FINAL_MASTER_PLAN.md` for the full product spec before making
 any architectural decision. It is the product authority; this file is the
@@ -84,7 +84,7 @@ The core UX principle, from the plan:
 > The app should tell the seller what needs attention today, then make the
 > action fast.
 
-**Do not build Seller OS as a collection of screens.** Build connected
+**Do not build Reseller Studio as a collection of screens.** Build connected
 workflows. A screen that shows data but does not lead to the next step in that
 chain is a screen that will be redesigned.
 

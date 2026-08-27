@@ -21,11 +21,11 @@ feature's `domain/` can log without importing Flutter. `index.dart` re-exports
 it, so a widget file that already imports the index has `SdLogger` and never
 needs both lines.
 
-**The package holds two generations and Seller OS renders on v3.**
+**The package holds two generations and Reseller Studio renders on v3.**
 
 | | `v2/` | `v3/` |
 | --- | --- | --- |
-| Renders | BaroEase | **Seller OS** |
+| Renders | BaroEase | **Reseller Studio** |
 | Palette | dark only | light + dark |
 | App bar | frosted glass, body scrolls behind | opaque, takes layout space |
 | Tab bar | floating glass pill | floating **liquid glass** pill |
@@ -271,7 +271,7 @@ requires the extension. Pass `theme: AppTheme.light`, and install
 also pulls.** That is harmless — BaroEase never imports v3 — but it means a
 change there is not local to this project. Commit the gitlink deliberately.
 
-why: see DECISIONS.md § Seller OS pays for v2's dependencies
+why: see DECISIONS.md § Reseller Studio pays for v2's dependencies
 
 ## Spacing — one class owns it, and nothing else does
 
@@ -434,7 +434,7 @@ that drifts, and it drifts invisibly: each file looks right on its own.
 
 - **Colour is never the only signal.** A state told by colour is also told by
   an icon, a label or a shape. `SdBadgeV3` always carries a label for exactly
-  this reason — Seller OS draws a dozen states across items, listings, orders
+  this reason — Reseller Studio draws a dozen states across items, listings, orders
   and offers, and a colour-only marker is a memory test.
 - **One loud element per screen.** `SdHeroStatV3` is a filled, gradient card
   and a screen gets at most one; everything else is an `SdStatTileV3`. Four
@@ -458,13 +458,13 @@ that drifts, and it drifts invisibly: each file looks right on its own.
 ## Dimensions and colour
 
 - **Responsive sizing via `flutter_screenutil`** (design size 390×844,
-  `minTextAdapt: true` — `SellerOsApp.designSize`), but NEVER as raw literals
+  `minTextAdapt: true` — `ResellerStudioApp.designSize`), but NEVER as raw literals
   in widgets: every dimension goes through `SdSpacingConstant` —
   `w*` horizontal, `h*` vertical, `r*` square/radius, `sp*` font.
   `SdSpacingConstant` lives in the package's generation-neutral `core/`, so it
   is the same class v2 uses; there is no `V3` suffix and none is coming.
 - **Colour comes from `AppColors` (`lib/core/theme/`), never from the
-  package.** This is where Seller OS differs from BaroEase, whose palette
+  package.** This is where Reseller Studio differs from BaroEase, whose palette
   ships inside `system_design`: here the app owns the palette and hands it to
   the design system as an `SdThemeV3` theme extension. So a *screen* reads
   `context.colorScheme3` / `context.sdTheme3` or names an `AppColors` constant;

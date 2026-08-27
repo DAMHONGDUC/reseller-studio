@@ -24,7 +24,7 @@ The app bar deliberately stays opaque: a blur there costs a shader pass on
 every scroll frame of a list that can run to thousands of rows, whereas the
 tab bar is a fixed strip whose cost does not grow with the content.
 
-## Seller OS pays for v2's dependencies, and one of them warns on every Android build
+## Reseller Studio pays for v2's dependencies, and one of them warns on every Android build
 
 Explains why the `Compiled to invalid SkSL` warning is not to be fixed.
 Referenced from `DESIGN_SYSTEM.md`.
@@ -95,7 +95,7 @@ builder, and that part is not a style choice: the root overlay sits above the
 shell, so a scope inside it is invisible from down there and every message
 would read "no bar".
 
-## Two rules from the sibling app that Seller OS deliberately inverts
+## Two rules from the sibling app that Reseller Studio deliberately inverts
 
 The rulebook these files were ported from is BaroEase's. Most of it transfers
 unchanged. Two rules do not, and both would look like bugs to anyone reading
@@ -238,7 +238,7 @@ widget is a wrong deduction the following April.
 
 Explains "Every `catch` logs, wherever it sits" in the root `CLAUDE.md`.
 Inherited from the sibling app (BaroEase), where the rule was written after
-the fact — the reasoning transfers, the incident is not Seller OS's.
+the fact — the reasoning transfers, the incident is not Reseller Studio's.
 
 The rule was written after three features failed silently at once: WeatherKit
 answered every call `401` and the app said "no weather", `sendTestPush` was

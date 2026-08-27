@@ -42,7 +42,7 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
 
 ## The device status bar — one source, and the two platforms disagree
 
-Seller OS ships light **and** dark, so this is not a set-and-forget line: the
+Reseller Studio ships light **and** dark, so this is not a set-and-forget line: the
 wrong value renders invisible icons on exactly one platform in exactly one
 theme, which is the hardest kind of bug to be told about.
 
@@ -78,7 +78,7 @@ theme, which is the hardest kind of bug to be told about.
   after a palette change.
 
 `AppTheme.statusBarStyle(Brightness)` is that one place; `AppTheme._build`
-hands it to `AppBarTheme.systemOverlayStyle`, and `SellerOsApp`'s builder wraps
+hands it to `AppBarTheme.systemOverlayStyle`, and `ResellerStudioApp`'s builder wraps
 the app in an `AnnotatedRegion` of the same value so a route with no app bar —
 splash, login — is covered too. `test/core/theme/app_theme_test.dart` asserts
 both platform fields in both themes. Android also needs
