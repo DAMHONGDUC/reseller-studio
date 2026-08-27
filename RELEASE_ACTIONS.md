@@ -75,8 +75,7 @@ while Firebase is still missing:
 - to develop against data, turn **mock data on in More → Settings**, which is
   reachable without signing in.
 
-`BYPASS_AUTH` may still sit in `env/*.json`; nothing reads it, and the key can
-be deleted from both files and both templates whenever you are next in there.
+`BYPASS_AUTH` is gone from both templates and both env files — nothing read it.
 
 ### ⚠️ Read this before you deploy the rules
 
@@ -127,8 +126,10 @@ blocking rather than nice-to-have.
    `com.apple.developer.applesignin` and `CODE_SIGN_ENTITLEMENTS` names it on
    Debug, Release and Profile. What is left is enabling the capability on the
    app id in the developer portal so the provisioning profile carries it.
-5. `APPLE_SIGN_IN_SERVICE_ID` in `env/*.json` is for reference; the app itself
-   goes through `FirebaseAuth.signInWithProvider`, which handles the nonce.
+5. **Nothing goes in `env/*.json` for this.** The app goes through
+   `FirebaseAuth.signInWithProvider`, which handles the nonce and reads the
+   Services ID from the Firebase console — `APPLE_SIGN_IN_SERVICE_ID` was a
+   key nothing read and has been deleted.
 
 ### Brand marks — blocker 5, deferred to submission
 

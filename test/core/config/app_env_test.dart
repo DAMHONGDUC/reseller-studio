@@ -36,12 +36,37 @@ void main() {
     test('prod never ships the development switches on', () {
       final Map<String, dynamic> prod = readEnv('prod');
 
-      // BYPASS_AUTH is no longer read by the app — the flag is deleted. The
-      // key may still sit in the templates until they are tidied, and false
-      // is the only value that was ever right for prod.
-      expect(prod['BYPASS_AUTH'] ?? false, isFalse);
       expect(prod['MOCK_DATA_DEFAULT'], isFalse);
+      expect(prod['VERBOSE_LOGGING'], isFalse);
       expect(prod['FLAVOR'], 'prod');
+    });
+
+    test('the templates carry exactly the keys AppEnv reads', () {
+      // The list every reader of these files trusts, pinned. A key nothing
+      // reads is a placeholder somebody will spend an afternoon filling in;
+      // a key AppEnv reads and the template omits is a value that silently
+      // defaults to '' — which is how REVENUECAT_* went missing. Dart cannot
+      // reflect over AppEnv, so this list is maintained by hand and failing
+      // loudly is the whole point.
+      const Set<String> read = <String>{
+        'FLAVOR',
+        'APP_DISPLAY_NAME',
+        'MOCK_DATA_DEFAULT',
+        'VERBOSE_LOGGING',
+        'FIREBASE_PROJECT_ID',
+        'FIREBASE_IOS_APP_ID',
+        'FUNCTIONS_REGION',
+        'GOOGLE_SIGN_IN_IOS_CLIENT_ID',
+        'GOOGLE_SIGN_IN_SERVER_CLIENT_ID',
+        'REVENUECAT_IOS_API_KEY',
+        'REVENUECAT_ANDROID_API_KEY',
+        'PRIVACY_POLICY_URL',
+        'TERMS_OF_SERVICE_URL',
+        'DEFAULT_CURRENCY',
+        'DEFAULT_COUNTRY',
+      };
+
+      expect(readEnv('dev').keys.toSet(), read);
     });
 
     test('no template carries anything that looks like a secret', () {

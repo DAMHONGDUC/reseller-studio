@@ -2,25 +2,22 @@
   "FLAVOR": "prod",
 
   "APP_DISPLAY_NAME": "Seller OS",
-  "SUPPORT_EMAIL": "support@selleros.app",
 
-  "BYPASS_AUTH": false,
   "MOCK_DATA_DEFAULT": false,
   "VERBOSE_LOGGING": false,
 
   "FIREBASE_PROJECT_ID": "<firebase_project_id>",
-  "FIREBASE_ANDROID_API_KEY": "<firebase_android_api_key>",
-  "FIREBASE_ANDROID_APP_ID": "<firebase_android_app_id>",
-  "FIREBASE_IOS_API_KEY": "<firebase_ios_api_key>",
   "FIREBASE_IOS_APP_ID": "<firebase_ios_app_id>",
-  "FIREBASE_MESSAGING_SENDER_ID": "<firebase_messaging_sender_id>",
-  "FIREBASE_STORAGE_BUCKET": "<firebase_storage_bucket>",
-  "FIREBASE_IOS_BUNDLE_ID": "app.dd.reseller.studio",
   "FUNCTIONS_REGION": "asia-southeast1",
 
   "GOOGLE_SIGN_IN_IOS_CLIENT_ID": "<google_ios_client_id>",
   "GOOGLE_SIGN_IN_SERVER_CLIENT_ID": "<google_server_client_id>",
-  "APPLE_SIGN_IN_SERVICE_ID": "<apple_services_id>",
+
+  "REVENUECAT_IOS_API_KEY": "<revenuecat_ios_public_sdk_key>",
+  "REVENUECAT_ANDROID_API_KEY": "<revenuecat_android_public_sdk_key>",
+
+  "PRIVACY_POLICY_URL": "<privacy_policy_url>",
+  "TERMS_OF_SERVICE_URL": "<terms_of_service_url>",
 
   "DEFAULT_CURRENCY": "USD",
   "DEFAULT_COUNTRY": "US"

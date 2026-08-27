@@ -63,11 +63,6 @@ final class AppEnv {
     defaultValue: 'Seller OS',
   );
 
-  static const String supportEmail = String.fromEnvironment(
-    'SUPPORT_EMAIL',
-    defaultValue: 'support@selleros.app',
-  );
-
   // --- Legal ---
   //
   // Owner's rule: the policy addresses are build-time configuration, not
@@ -113,42 +108,23 @@ final class AppEnv {
 
   // --- Firebase ---
   //
-  // Mirrors what `flutterfire configure` writes into `firebase_options.dart`.
-  // Both exist on purpose: the generated file is what the SDK reads, and
-  // these are what tooling and the Settings diagnostics screen read without
-  // importing a gitignored file that may not exist yet.
+  // **Two keys, and neither one configures the SDK.** `Firebase.initializeApp`
+  // is called with no options, so the api keys, sender id and buckets come
+  // from `GoogleService-Info.plist` and `google-services.json` — carrying them
+  // here as well was one fact written twice, and the copy nothing read.
+  //
+  // - the project id is how the app tells "no backend configured" apart from
+  //   "configured and unreachable" ([hasFirebaseConfig]);
+  // - the iOS app id is read by `verify_flavor_config` in the beta lane and
+  //   cross-checked against the installed plist, so a build cannot send its
+  //   symbols to another project's Crashlytics.
 
   static const String firebaseProjectId = String.fromEnvironment(
     'FIREBASE_PROJECT_ID',
   );
 
-  static const String firebaseAndroidApiKey = String.fromEnvironment(
-    'FIREBASE_ANDROID_API_KEY',
-  );
-
-  static const String firebaseAndroidAppId = String.fromEnvironment(
-    'FIREBASE_ANDROID_APP_ID',
-  );
-
-  static const String firebaseIosApiKey = String.fromEnvironment(
-    'FIREBASE_IOS_API_KEY',
-  );
-
   static const String firebaseIosAppId = String.fromEnvironment(
     'FIREBASE_IOS_APP_ID',
-  );
-
-  static const String firebaseMessagingSenderId = String.fromEnvironment(
-    'FIREBASE_MESSAGING_SENDER_ID',
-  );
-
-  static const String firebaseStorageBucket = String.fromEnvironment(
-    'FIREBASE_STORAGE_BUCKET',
-  );
-
-  static const String firebaseIosBundleId = String.fromEnvironment(
-    'FIREBASE_IOS_BUNDLE_ID',
-    defaultValue: 'app.dd.reseller.studio',
   );
 
   /// Where callables are deployed. The client must name the same region the
@@ -162,6 +138,10 @@ final class AppEnv {
   //
   // Client *ids*, which are public by design — the OAuth flow shows them in a
   // browser URL. The matching secrets stay server-side.
+  //
+  // Google only. Apple needs nothing in the binary: the app goes through
+  // `FirebaseAuth.signInWithProvider`, and the Services ID lives in the
+  // Firebase console.
 
   static const String googleSignInIosClientId = String.fromEnvironment(
     'GOOGLE_SIGN_IN_IOS_CLIENT_ID',
@@ -169,10 +149,6 @@ final class AppEnv {
 
   static const String googleSignInServerClientId = String.fromEnvironment(
     'GOOGLE_SIGN_IN_SERVER_CLIENT_ID',
-  );
-
-  static const String appleSignInServiceId = String.fromEnvironment(
-    'APPLE_SIGN_IN_SERVICE_ID',
   );
 
   // --- Billing (RevenueCat) ---
@@ -234,12 +210,7 @@ final class AppEnv {
   /// build that fails on the first missing key costs one round trip per key.
   static List<String> get missingReleaseKeys => <String>[
     if (firebaseProjectId.isEmpty) 'FIREBASE_PROJECT_ID',
-    if (firebaseIosApiKey.isEmpty) 'FIREBASE_IOS_API_KEY',
     if (firebaseIosAppId.isEmpty) 'FIREBASE_IOS_APP_ID',
-    if (firebaseAndroidApiKey.isEmpty) 'FIREBASE_ANDROID_API_KEY',
-    if (firebaseAndroidAppId.isEmpty) 'FIREBASE_ANDROID_APP_ID',
-    if (firebaseMessagingSenderId.isEmpty) 'FIREBASE_MESSAGING_SENDER_ID',
-    if (firebaseStorageBucket.isEmpty) 'FIREBASE_STORAGE_BUCKET',
     // Not a backend key, and still a blocker: App Store review wants both
     // links reachable from inside the binary (guideline 3.1.2).
     if (privacyPolicyUrl.isEmpty) 'PRIVACY_POLICY_URL',
