@@ -7,6 +7,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/app_feature_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/navigation_utils.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../controllers/auth_controller.dart';
 
@@ -32,8 +33,12 @@ part 'login_screen_header.dart';
 /// `SimpleIcons` (owner's rule); swapping them for the vendors' own artwork is
 /// a submission task, not a build one — `RELEASE_ACTIONS.md` blocker 5.
 ///
-/// The screen navigates nowhere on success: the router's redirect watches auth
-/// state and moves the seller on by itself.
+/// **On success it asks the router to re-decide, and nothing more.** This
+/// screen is *pushed* over the signed-out shell, and an imperative route sits
+/// on top of whatever the redirect chose — so a seller who signed in from a
+/// tab would keep looking at this form. `NavigationUtils.afterSignIn` names
+/// Home; the redirect is still the one thing that turns that into workspace
+/// setup when the account has no business yet.
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
@@ -43,7 +48,14 @@ class LoginScreen extends ConsumerWidget {
     AuthProviderKind provider,
   ) async {
     try {
-      await ref.read(authControllerProvider.notifier).signIn(provider);
+      final bool signedIn = await ref
+          .read(authControllerProvider.notifier)
+          .signIn(provider);
+
+      // False is a cancelled sheet, not a failure — the seller stays here.
+      if (!signedIn || !context.mounted) return;
+
+      NavigationUtils.afterSignIn(context);
     } catch (error) {
       // Already logged by the controller; the seller gets the one message
       // hard rule 6 allows. A cancellation never reaches here — the

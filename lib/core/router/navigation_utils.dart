@@ -10,6 +10,24 @@ import 'app_routes.dart';
 /// Moves that carry a rule, so a second caller cannot reimplement one without
 /// it. A plain "push this route" belongs at its call site.
 final class NavigationUtils {
+  /// Where a seller goes the moment a session exists.
+  ///
+  /// **Home is a request, not the destination.** The redirect decides between
+  /// Home and workspace setup, so this names the one route that always makes
+  /// it run rather than becoming a second answer to "where does a new account
+  /// land".
+  ///
+  /// It has to exist because login is *pushed* over the signed-out shell —
+  /// `SignedOutView` and [requireSignIn] both push it — and an imperative
+  /// route sits on top of whatever the redirect chose. Without this, a seller
+  /// who signs in from a tab signs in successfully and keeps looking at the
+  /// login form. `go` is what clears that stack.
+  static void afterSignIn(BuildContext context) {
+    SdLogger.action(LogTagConstant.navigation, 'Signed in — routing on');
+
+    context.go(AppRoutes.home);
+  }
+
   /// The backstop behind hard rule 1, not the gate itself.
   ///
   /// **Nothing reaches it today.** Four of the five tabs render `SignedOutView`
