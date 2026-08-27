@@ -7,14 +7,14 @@
   "VERBOSE_LOGGING": false,
 
   "FIREBASE_PROJECT_ID": "<firebase_project_id>",
-  "FIREBASE_IOS_APP_ID": "<firebase_ios_app_id>",
+  "FIREBASE_APP_ID_IOS": "<firebase_ios_app_id>",
   "FUNCTIONS_REGION": "asia-southeast1",
 
-  "GOOGLE_SIGN_IN_IOS_CLIENT_ID": "<google_ios_client_id>",
+  "GOOGLE_SIGN_IN_CLIENT_ID_IOS": "<google_ios_client_id>",
   "GOOGLE_SIGN_IN_SERVER_CLIENT_ID": "<google_server_client_id>",
 
-  "REVENUECAT_IOS_API_KEY": "<revenuecat_ios_public_sdk_key>",
-  "REVENUECAT_ANDROID_API_KEY": "<revenuecat_android_public_sdk_key>",
+  "REVENUECAT_API_KEY_IOS": "<revenuecat_ios_public_sdk_key>",
+  "REVENUECAT_API_KEY_ANDROID": "<revenuecat_android_public_sdk_key>",
 
   "PRIVACY_POLICY_URL": "<privacy_policy_url>",
   "TERMS_OF_SERVICE_URL": "<terms_of_service_url>",

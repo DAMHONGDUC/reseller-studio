@@ -44,7 +44,7 @@ wrong place is the failure mode the whole pipeline is built around.
 | `ASC_KEY_CONTENT` | base64 of the `.p8` | |
 | `MATCH_PASSWORD`, `MATCH_GIT_URL` | Plain | |
 | `MATCH_GIT_BASIC_AUTHORIZATION` | base64 of `user:PAT` | **Set exactly one auth secret.** A `..._BEARER_AUTHORIZATION` variant takes the PAT verbatim. Both set, even with one empty, gives `Duplicate header: "Authorization"`. |
-| `FIREBASE_IOS_APP_ID` | Plain, optional | Unset skips the dSYM upload with a warning. |
+| `FIREBASE_APP_ID_IOS` | Plain, optional | Unset skips the dSYM upload with a warning. |
 
 ## The certificates repo
 

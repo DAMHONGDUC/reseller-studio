@@ -123,8 +123,8 @@ final class AppEnv {
     'FIREBASE_PROJECT_ID',
   );
 
-  static const String firebaseIosAppId = String.fromEnvironment(
-    'FIREBASE_IOS_APP_ID',
+  static const String firebaseAppIdIos = String.fromEnvironment(
+    'FIREBASE_APP_ID_IOS',
   );
 
   /// Where callables are deployed. The client must name the same region the
@@ -143,8 +143,8 @@ final class AppEnv {
   // `FirebaseAuth.signInWithProvider`, and the Services ID lives in the
   // Firebase console.
 
-  static const String googleSignInIosClientId = String.fromEnvironment(
-    'GOOGLE_SIGN_IN_IOS_CLIENT_ID',
+  static const String googleSignInClientIdIos = String.fromEnvironment(
+    'GOOGLE_SIGN_IN_CLIENT_ID_IOS',
   );
 
   static const String googleSignInServerClientId = String.fromEnvironment(
@@ -162,12 +162,12 @@ final class AppEnv {
   // One key per store, because RevenueCat issues one per store and using the
   // wrong one fails at configure time rather than at purchase time.
 
-  static const String revenueCatIosApiKey = String.fromEnvironment(
-    'REVENUECAT_IOS_API_KEY',
+  static const String revenueCatApiKeyIos = String.fromEnvironment(
+    'REVENUECAT_API_KEY_IOS',
   );
 
-  static const String revenueCatAndroidApiKey = String.fromEnvironment(
-    'REVENUECAT_ANDROID_API_KEY',
+  static const String revenueCatApiKeyAndroid = String.fromEnvironment(
+    'REVENUECAT_API_KEY_ANDROID',
   );
 
   /// Whether billing was configured for **either** store.
@@ -176,7 +176,7 @@ final class AppEnv {
   /// "set up and the seller is on Free" — two states that look identical from
   /// an empty offerings list and want very different screens.
   static bool get hasBillingConfig =>
-      revenueCatIosApiKey.isNotEmpty || revenueCatAndroidApiKey.isNotEmpty;
+      revenueCatApiKeyIos.isNotEmpty || revenueCatApiKeyAndroid.isNotEmpty;
 
   // --- Workspace defaults ---
   //
@@ -210,7 +210,7 @@ final class AppEnv {
   /// build that fails on the first missing key costs one round trip per key.
   static List<String> get missingReleaseKeys => <String>[
     if (firebaseProjectId.isEmpty) 'FIREBASE_PROJECT_ID',
-    if (firebaseIosAppId.isEmpty) 'FIREBASE_IOS_APP_ID',
+    if (firebaseAppIdIos.isEmpty) 'FIREBASE_APP_ID_IOS',
     // Not a backend key, and still a blocker: App Store review wants both
     // links reachable from inside the binary (guideline 3.1.2).
     if (privacyPolicyUrl.isEmpty) 'PRIVACY_POLICY_URL',

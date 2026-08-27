@@ -214,11 +214,11 @@ platform :ios do
     # The env file's Crashlytics app id and the plist's are the same fact
     # written twice; when they disagree the symbols go to another project's
     # dashboard and nobody notices for a month.
-    env_app_id = JSON.parse(File.read(env_file))["FIREBASE_IOS_APP_ID"]
+    env_app_id = JSON.parse(File.read(env_file))["FIREBASE_APP_ID_IOS"]
     plist_app_id = plist_value(plist, "GOOGLE_APP_ID")
 
     unless env_app_id.to_s.empty? || env_app_id == plist_app_id
-      UI.user_error!("env/#{flavor}.json FIREBASE_IOS_APP_ID does not match the installed plist")
+      UI.user_error!("env/#{flavor}.json FIREBASE_APP_ID_IOS does not match the installed plist")
     end
 
     UI.success("#{flavor} config is consistent (project #{installed})")
@@ -288,9 +288,9 @@ platform :ios do
   # `upload-symbols` binary sits under DerivedData rather than at a fixed path.
   # Not finding it is a warning, never an error.
   def upload_dsyms(flavor)
-    app_id = ENV["FIREBASE_IOS_APP_ID"].to_s
+    app_id = ENV["FIREBASE_APP_ID_IOS"].to_s
 
-    return UI.important("FIREBASE_IOS_APP_ID is unset — skipping the dSYM upload") if app_id.empty?
+    return UI.important("FIREBASE_APP_ID_IOS is unset — skipping the dSYM upload") if app_id.empty?
 
     dsyms = Dir[File.join(REPO_ROOT, "build/ios/archive/*.xcarchive/dSYMs")].first
     binary = Dir[File.join(Dir.home, "Library/Developer/Xcode/DerivedData/**/upload-symbols")].first

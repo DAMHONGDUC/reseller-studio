@@ -107,7 +107,7 @@ blocking rather than nice-to-have.
    `serverClientId`).
 2. Add the iOS client's reversed client id to `ios/Runner/Info.plist` as a URL
    scheme. `flutterfire configure` does not do this for you.
-3. Put the values in `env/*.json` as `GOOGLE_SIGN_IN_IOS_CLIENT_ID` and
+3. Put the values in `env/*.json` as `GOOGLE_SIGN_IN_CLIENT_ID_IOS` and
    `GOOGLE_SIGN_IN_SERVER_CLIENT_ID` **only if** the bundle id differs from the
    Firebase app's — otherwise leave them empty and the plugin reads the config
    file, which is the normal path.
@@ -256,6 +256,11 @@ In order — each step is what unblocks the next:
 7. **The Actions secrets** in `docs/release/CREDENTIALS.md`. Set exactly one
    `MATCH_GIT_*_AUTHORIZATION`; both, even with one empty, gives
    `Duplicate header: "Authorization"`.
+   - **Rename `FIREBASE_IOS_APP_ID` to `FIREBASE_APP_ID_IOS`** if you already
+     set it — the env key moved (`docs/rules/ENV.md`) and the workflow now
+     reads the new name. A secret nobody renamed is not an error: the value
+     arrives empty and the dSYM upload is skipped with a warning, so
+     Crashlytics silently stops symbolicating.
 8. **First run with `bump: false`** against a build number you know is free.
 
 Two things to know before the first run:
@@ -318,7 +323,7 @@ below can be done from this repo.
    products, with a subscription group per tier.
 5. **Two keys into `env/dev.json` and `env/prod.json`** — I could not edit
    `env/`, so these are yours to add to both files and both templates:
-   `REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY`. They are public
+   `REVENUECAT_API_KEY_IOS` and `REVENUECAT_API_KEY_ANDROID`. They are public
    SDK keys and belong there (`docs/rules/ENV.md`).
 6. **The webhook secret is NOT an env key.** It goes in Secret Manager as
    `REVENUECAT_WEBHOOK_TOKEN`, and only `revenueCatWebhook` reads it:

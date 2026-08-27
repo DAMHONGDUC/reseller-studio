@@ -162,9 +162,9 @@ final class AppBootstrap {
         // (`GoogleService-Info.plist` / `google-services.json`), which is what
         // `flutterfire configure` writes. The env keys exist to override that
         // for a build whose bundle id differs from the Firebase app's.
-        clientId: AppEnv.googleSignInIosClientId.isEmpty
+        clientId: AppEnv.googleSignInClientIdIos.isEmpty
             ? null
-            : AppEnv.googleSignInIosClientId,
+            : AppEnv.googleSignInClientIdIos,
         serverClientId: AppEnv.googleSignInServerClientId.isEmpty
             ? null
             : AppEnv.googleSignInServerClientId,
@@ -193,8 +193,8 @@ final class AppBootstrap {
   /// sign-in, not at startup where there is no user yet.
   static Future<void> _initializeBilling() async {
     final String key = defaultTargetPlatform == TargetPlatform.android
-        ? AppEnv.revenueCatAndroidApiKey
-        : AppEnv.revenueCatIosApiKey;
+        ? AppEnv.revenueCatApiKeyAndroid
+        : AppEnv.revenueCatApiKeyIos;
 
     if (key.isEmpty) {
       SdLogger.warning(
