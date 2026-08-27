@@ -41,9 +41,8 @@ blocks the external half.
 
 1. Create the project (one per environment if you want `dev` and `prod`
    separate; one is fine for launch).
-2. Add an **iOS app** with bundle id `app.dd.reseller.studio` and an **Android
-   app** with application id `com.dd.reseller.studio`. They deliberately differ
-   — register each one exactly as written, not one id for both.
+2. Add an **iOS app** with bundle id `com.dd.seller.os` and an **Android app**
+   with the matching application id.
 3. Run `flutterfire configure` from the repo root. It writes
    `lib/firebase_options.dart`, `ios/Runner/GoogleService-Info.plist` and
    `android/app/google-services.json` — all three are gitignored and all three
@@ -194,9 +193,8 @@ wrong. If you would rather keep the package, say so and I will switch it back.
 
 - **App icons and launch screens are done** on iOS. Confirm the Android
   adaptive icon before uploading a Play build.
-- **Bundle id / application id**: iOS is `app.dd.reseller.studio`, Android is
-  `com.dd.reseller.studio`. They are not the same string — confirm each against
-  what you registered in its own store.
+- **Bundle id / application id**: iOS is `com.dd.seller.os`. Confirm the
+  Android one matches what you registered.
 - **Signing**: an iOS distribution certificate and provisioning profile; an
   Android upload keystore. Keep the keystore and its password somewhere you
   will still have them in two years — losing it means you cannot update the app.

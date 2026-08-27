@@ -1,5 +1,5 @@
 # No `apple_id` on purpose. Every lane authenticates with an App Store Connect
 # API key, so there is no 2FA prompt a runner cannot answer — and no Apple ID
 # password anywhere near this repo.
-app_identifier("app.dd.reseller.studio")
+app_identifier("com.dd.seller.os")
 team_id("WNG5UWNJ6H")

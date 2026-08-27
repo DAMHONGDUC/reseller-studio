@@ -26,18 +26,16 @@ is no Firebase project checked in and none can be. See **Pending setup** in
 
 ## App identifiers
 
-What `flutterfire configure`, App Store Connect and the Play Console all ask
-for. **The two platforms differ — iOS is `app.`, Android is `com.`** — so
-register each store listing against its own row rather than assuming one id
-covers both. The right-hand column owns the value; change it there, never here.
+Both platforms ship under the same id — it is what `flutterfire configure`,
+App Store Connect and the Play Console all ask for. The right-hand column owns
+the value; change it there, never here.
 
 | | | |
 | --- | --- | --- |
-| iOS bundle id | `app.dd.reseller.studio` | `ios/Runner.xcodeproj/project.pbxproj` |
-| Android applicationId | `com.dd.reseller.studio` | `android/app/build.gradle.kts` |
+| iOS bundle id | `com.dd.seller.os` | `ios/Runner.xcodeproj/project.pbxproj` |
+| Android applicationId | `com.dd.seller.os` | `android/app/build.gradle.kts` |
 
-The iOS test target is `app.dd.reseller.studio.RunnerTests`. The Kotlin package
-under `android/app/src/main/kotlin/` tracks the applicationId and moves with it.
+The iOS test target is `com.dd.seller.os.RunnerTests`.
 
 ## Commands
 

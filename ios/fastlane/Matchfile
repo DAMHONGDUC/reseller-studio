@@ -12,4 +12,4 @@ type("appstore")
 # Every bundle id the archive signs. One target today — an app extension added
 # later must be listed here too, or `match` mints no profile for it and
 # `exportArchive` fails after the full build.
-app_identifier(["app.dd.reseller.studio"])
+app_identifier(["com.dd.seller.os"])

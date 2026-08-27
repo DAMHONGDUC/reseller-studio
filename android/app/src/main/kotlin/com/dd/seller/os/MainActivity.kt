@@ -1,4 +1,4 @@
-package com.dd.reseller.studio
+package com.dd.seller.os
 
 import io.flutter.embedding.android.FlutterActivity
 

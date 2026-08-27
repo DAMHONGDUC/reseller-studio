@@ -148,7 +148,7 @@ final class AppEnv {
 
   static const String firebaseIosBundleId = String.fromEnvironment(
     'FIREBASE_IOS_BUNDLE_ID',
-    defaultValue: 'app.dd.reseller.studio',
+    defaultValue: 'com.dd.seller.os',
   );
 
   /// Where callables are deployed. The client must name the same region the
