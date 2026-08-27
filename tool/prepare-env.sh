@@ -15,7 +15,8 @@
 #
 # It copies bytes and never reads them (hard rule 9). The one derived value is
 # the sign-in URL scheme, and that lives in `tool/_url-scheme.sh` because the
-# release workflow needs the same derivation.
+# release workflow needs the same derivation — so it runs after the copies, on
+# the Info.plist this script has just put in place.
 set -eu
 . "$(dirname "$0")/_common.sh"
 
@@ -32,7 +33,8 @@ esac
 PAIRS="env_assets/dev.json:env/dev.json
 env_assets/prod.json:env/prod.json
 env_assets/$FLAVOUR-google-services.json:android/app/google-services.json
-env_assets/$FLAVOUR-GoogleService-Info.plist:ios/Runner/GoogleService-Info.plist"
+env_assets/$FLAVOUR-GoogleService-Info.plist:ios/Runner/GoogleService-Info.plist
+env_assets/$FLAVOUR-Info.plist:ios/Runner/Info.plist"
 
 # Check every source first, copy after. A run that dies on the third file
 # leaves the tree half one environment and half the other, and nothing on disk
@@ -63,7 +65,8 @@ for PAIR in $PAIRS; do
   step "  $DST"
 done
 
-# One implementation of the URL scheme, shared with the release workflow.
+# After the copies, never before: the flavour's Info.plist has just landed and
+# this is what puts the derived entry back into it.
 sh tool/_url-scheme.sh
 
 done_msg "$FLAVOUR config in place — do not commit ios/Runner/Info.plist"
