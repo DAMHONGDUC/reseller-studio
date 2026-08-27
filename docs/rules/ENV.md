@@ -29,6 +29,12 @@ authority on both**, and this file does not repeat it.
   `test/core/config/app_env_test.dart` fails if the two flavours' key sets
   diverge — a key in one and not the other is a build that works locally and
   fails in CI.
+- **The templates carry exactly the keys `AppEnv` reads — no more, no less.**
+  Owner's rule. A key nothing reads is an afternoon somebody spends filling in
+  a value that changes nothing, and a key `AppEnv` reads and the template omits
+  defaults silently to `''` — which is how `REVENUECAT_*` sat missing from both
+  templates while `hasBillingConfig` answered false. The same test pins the
+  list, by hand, because Dart cannot reflect over `AppEnv`.
 - **Every getter has a default**, so a build with no `--dart-define-from-file`
   still compiles. That is what keeps `melos run test` working without a
   flavour.
@@ -42,6 +48,24 @@ mirrors entitlement into Firestore (hard rule 10). An empty key is a
 supported state: `AppEnv.hasBillingConfig` is false, billing is skipped at
 bootstrap, and every seller reads as Free.
 
+**The Firebase keys are down to two, and neither configures the SDK.**
+`Firebase.initializeApp` is called with no options, so the api keys, the sender
+id and the buckets are read from `GoogleService-Info.plist` and
+`google-services.json` — carrying them in `env/` as well was one fact written
+twice, and the copy nothing read. What stayed:
+
+- `FIREBASE_PROJECT_ID`, because `AppEnv.hasFirebaseConfig` is how bootstrap
+  tells "no backend configured" apart from "configured and unreachable";
+- `FIREBASE_IOS_APP_ID`, because `verify_flavor_config` in the beta lane
+  cross-checks it against the installed plist — the two are the same fact
+  written twice on purpose, and disagreeing means Crashlytics symbols land in
+  another project's dashboard.
+
+**`APPLE_SIGN_IN_SERVICE_ID` is not an env key.** Sign in with Apple goes
+through `FirebaseAuth.signInWithProvider`, which needs nothing in the binary;
+the Services ID is configured in the Firebase console. See
+`RELEASE_ACTIONS.md`.
+
 **Theme is a preference, not a build flag.** `ThemeModeController` reads
 `PrefsKeyConstant.themeMode` and is device-local on purpose: a seller on a
 bright shop floor and the same seller packing at 1am want opposite answers on
@@ -49,8 +73,8 @@ two devices, so syncing it to the account would make one of them wrong. The
 same reasoning puts the intro flag in preferences.
 
 **`MOCK_DATA_DEFAULT` is off, and no other flag turns it on** — owner's rule.
-It used to be ORed with `BYPASS_AUTH` in `DevFlags`, so any dev run opened onto
-a fake business. It no longer is, and the two are independent:
+It used to be ORed with the auth bypass in `DevFlags`, so any dev run opened
+onto a fake business. It no longer is, and the two are independent:
 
 - A dev run now opens on **what a new seller sees** — five tabs with nothing in
   them (hard rule 1). That is a real shipped state, and a default that replaced
