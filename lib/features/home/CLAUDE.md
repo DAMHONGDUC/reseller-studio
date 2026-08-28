@@ -7,14 +7,15 @@ below is about protecting that answer from the screen filling up around it.
 
 ## The order of the screen is a product decision, not a layout one
 
-Top to bottom: **the three shortcut cards, Flow overview, Needs Attention,
-Performance, Recent Activity, Quick Action.** Three owner's rules decide it,
-and they are listed in the order they outrank each other.
+Top to bottom: **the three shortcut cards, Performance, Flow overview, Needs
+Attention, Getting started, Recent Activity, Quick Action.** Owner's rules
+decide it, and they are listed in the order they outrank each other.
+`test/features/home/home_section_order_test.dart` holds the top of it.
 
-1. **Three shortcut cards come first, above even Needs Attention.** They are
-   the ways *out* of Home — down to Quick Action, sideways into global search,
-   and into Scan — not content, so a seller who opened the app to
-   go somewhere does not read a dashboard on the way there.
+1. **Three shortcut cards come first, above even the numbers.** They are the
+   ways *out* of Home — down to Quick Action, sideways into global search, and
+   into Scan — not content, so a seller who opened the app to go somewhere
+   does not read a dashboard on the way there.
    - **Scan replaces Flow overview in the row.** It is a frequent action a
      seller starts while holding an item, so it earns the one-tap entry.
    - **Three, and the list is closed.** A fourth makes the row a launcher, and
@@ -24,14 +25,21 @@ and they are listed in the order they outrank each other.
    - `HomeShortcutConstant` is the list;
      `test/features/home/home_shortcuts_test.dart` holds the placement and the
      enum-to-card completeness.
-2. **Flow overview is one full-width card immediately below the shortcuts.**
-   Owner's rule. The card owns both its title and description — there is no
-   section header above it — so the whole explanation reads and taps as one
-   destination. It opens the existing sheet and appears nowhere else on Home.
-3. **Needs Attention sits above the numbers**, inverting the plan's own order
-   (§6). A seller opening the app at 8am needs the orders waiting to ship, not
-   last night's revenue.
-4. **Quick Action is one card of rows, split by titled sections, and stays
+2. **Performance sits directly under the shortcut row.** Owner's rule, and it
+   **reverses the two rules that used to stand here**: Flow overview no longer
+   owns the slot below the shortcuts, and Needs Attention no longer sits above
+   the numbers. The old reason — a seller opening the app at 8am needs the
+   orders waiting to ship, not last night's revenue — is not wrong; it was
+   outranked. Do not restore the old order from that argument alone.
+3. **Flow overview is one full-width card, now below Performance.** The card
+   owns both its title and description — there is no section header above it —
+   so the whole explanation reads and taps as one destination. It opens the
+   existing sheet and appears nowhere else on Home.
+4. **Needs Attention follows Flow overview**, and still renders only the rows
+   that have something in them.
+5. **Getting started rides directly under Needs Attention** — see below. It is
+   the one section that removes itself for good.
+6. **Quick Action is one card of rows, split by titled sections, and stays
    last.** Owner's rule. Inventory holds Quick Add, Scan, Add item, Categories
    and Locations; Operations holds Purchases, Expenses and Sources; Business
    holds Team; App holds Analytics and About. The titles make the long list
@@ -39,8 +47,8 @@ and they are listed in the order they outrank each other.
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
 
-**The shortcut card and those two sections being last are one mechanism.** The
-card scrolls to the end of the list rather than to a key, because a lazy
+**The shortcut card and Quick Action being last are one mechanism.** The card
+scrolls to the end of the list rather than to a key, because a lazy
 `ListView` has not built an off-screen target and `ensureVisible` on a key with
 no `currentContext` does nothing — see `_HomeScreenState._toQuickAction` and
 `ScrollUtils.toEnd`. Moving Quick Action off the bottom breaks that card, and
@@ -69,7 +77,38 @@ stand next to each other claiming different things.
 **A section owns its own header.** Home rendered the "Recent Activity" heading
 and the section under it decided whether to build anything, which on a new
 account left a title over a gap. Whatever answers "does this section exist"
-renders the heading too — see `_RecentActivity`.
+renders the heading too — see `_RecentActivity` and `_GettingStarted`.
+
+## Getting started is a separate section from the Start here card
+
+Owner's rule: **the checklist is its own section, and `_StartHere` stays.**
+They look alike and do different jobs, which is why both are on screen on a
+fresh account:
+
+- **`_StartHere`, inside Needs Attention, names the one next action** and
+  carries the button that performs it. It answers "what do I do now".
+- **`_GettingStarted`, the section below, is the progress report** — three
+  rows, ticked as they are done, with the count in the header. It answers "how
+  far along am I", which is the question a seller with two items and no sale
+  is actually asking, and which a single CTA cannot answer.
+
+**Three steps, and they are the lifecycle's spine** — add an item, list it,
+record the sale. `GettingStartedStep` is the list. Anything the app never
+blocks on stays out; the full nine steps live in the flow overview sheet, and
+a checklist that also asked for a category and a location would be teaching the
+spreadsheet this app replaces.
+
+**A later step ticks the earlier ones.** `GettingStartedProgress` is pure Dart
+and unit-tested for exactly this: a seller can reach a sale this app never saw
+listed — marked sold off the shelf, or an order imported — and "sale recorded"
+above an unticked "list it" reads as broken rather than as flexible.
+
+**It removes itself, header included, and there is no dismiss control.** Once
+all three are done the section is gone for good, so an established seller has
+nothing to scroll past and nothing to remember having hidden. It also renders
+nothing while a source is still loading — `gettingStartedProvider` returns null
+rather than an empty set, for the same reason `workspaceActivityProvider` has
+an `unknown`.
 
 ## Where Home sends the seller
 
