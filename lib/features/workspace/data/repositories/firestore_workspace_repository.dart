@@ -9,6 +9,7 @@ import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_collections.dart';
+import '../../../inventory/domain/entities/item_category.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
@@ -21,7 +22,7 @@ import '../dtos/workspace_dto.dart';
 ///
 /// **Creation is two prerequisite writes and one final batch, forced by the
 /// security rules.** A rules `get()` sees only committed data, so the order is
-/// workspace → membership → batch(default marketplaces + profile pointer).
+/// workspace → membership → batch(default records + profile pointer).
 /// A failure before the last step leaves the workspace unreachable rather
 /// than exposing a business with only part of its default marketplace list.
 class FirestoreWorkspaceRepository implements WorkspaceRepository {
@@ -96,6 +97,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
     String? ownerEmail,
     String? businessType,
     required List<Marketplace> marketplaces,
+    required List<ItemCategory> categories,
   }) => FailureMapper.guard('create workspace', () async {
     final String id = _uuid.v4();
     final DateTime now = DateTime.now();
@@ -153,6 +155,18 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
       );
     }
 
+    for (final ItemCategory category in categories) {
+      finalBatch.set(
+        collections.categories.doc(category.id),
+        FirestoreMapper.pruned(<String, Object?>{
+          'name': category.name,
+          'createdAt': FirestoreMapper.serverTimestamp,
+          'updatedAt': FirestoreMapper.serverTimestamp,
+          'createdBy': ownerId,
+        }),
+      );
+    }
+
     finalBatch.set(_users.doc(ownerId), <String, Object?>{
       'workspaceIds': FieldValue.arrayUnion(<String>[id]),
       'lastWorkspaceId': id,
@@ -168,6 +182,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
         'currency': currency,
         'country': country,
         'marketplaceCount': marketplaces.length,
+        'categoryCount': categories.length,
       },
     );
 

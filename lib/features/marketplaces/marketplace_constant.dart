@@ -15,7 +15,7 @@ class MarketplaceSeed {
   final double feeRate;
 }
 
-/// **The four marketplaces a new business is created with** — owner's rule.
+/// **The five marketplaces a new business is created with** — owner's rule.
 ///
 /// Not a closed list: they are a starting point the seller adds to, renames
 /// and deletes. They exist so a brand-new account can list something without
@@ -31,6 +31,7 @@ final class MarketplaceConstant {
     MarketplaceSeed(id: 'etsy', name: 'Etsy', feeRate: 0.095),
     MarketplaceSeed(id: 'depop', name: 'Depop', feeRate: 0.10),
     MarketplaceSeed(id: 'poshmark', name: 'Poshmark', feeRate: 0.20),
+    MarketplaceSeed(id: 'vinted', name: 'Vinted', feeRate: 0),
   ];
 
   /// A rate is a fraction of the sale price, so anything outside this is a

@@ -1,3 +1,4 @@
+import '../../../inventory/domain/entities/item_category.dart';
 import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../entities/user_profile.dart';
 import '../entities/workspace.dart';
@@ -28,7 +29,7 @@ abstract interface class WorkspaceRepository {
     String? photoUrl,
   });
 
-  /// Create a workspace, its owner membership, marketplace defaults and the
+  /// Create a workspace, its owner membership, default reference data and the
   /// user's pointer. Returns the new workspace id.
   Future<String> createWorkspace({
     required String name,
@@ -39,6 +40,7 @@ abstract interface class WorkspaceRepository {
     String? ownerEmail,
     String? businessType,
     required List<Marketplace> marketplaces,
+    required List<ItemCategory> categories,
   });
 
   Future<void> updateWorkspace(Workspace workspace);

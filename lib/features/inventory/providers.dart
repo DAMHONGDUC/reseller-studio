@@ -13,6 +13,18 @@ import 'domain/entities/item.dart';
 import 'domain/entities/item_category.dart';
 import 'domain/entities/storage_location.dart';
 import 'domain/enums/item_status.dart';
+import 'item_category_constant.dart';
+
+/// The normal category records created for every new business.
+final Provider<List<ItemCategory>> defaultItemCategoriesProvider =
+    Provider<List<ItemCategory>>((Ref ref) {
+      final DateTime createdAt = DateTime.now();
+
+      return <ItemCategory>[
+        for (final ItemCategorySeed seed in ItemCategoryConstant.defaults)
+          ItemCategory(id: seed.id, name: seed.name, createdAt: createdAt),
+      ];
+    });
 
 /// The tabs across the top of Inventory (plan §7).
 ///

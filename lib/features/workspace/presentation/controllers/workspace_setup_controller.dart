@@ -5,6 +5,7 @@ import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/config/app_env.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../auth/providers.dart';
+import '../../../inventory/providers.dart';
 import '../../../marketplaces/providers.dart';
 import '../../domain/repositories/workspace_repository.dart';
 import '../../providers.dart';
@@ -109,6 +110,7 @@ class WorkspaceSetupController extends Notifier<WorkspaceSetupState> {
         ownerEmail: ref.read(authUserProvider).value?.email,
         businessType: state.businessType,
         marketplaces: ref.read(defaultMarketplacesProvider),
+        categories: ref.read(defaultItemCategoriesProvider),
       );
 
       AppAnalytics.instance.workspaceCreated(

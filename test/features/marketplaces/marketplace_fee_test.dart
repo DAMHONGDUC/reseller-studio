@@ -60,7 +60,7 @@ void main() {
   });
 
   group('seller-owned marketplaces', () {
-    test('a new business receives the four defaults with rates', () {
+    test('a new business receives the five defaults with rates', () {
       final ProviderContainer container = mockContainer();
       final List<record.Marketplace> defaults = container.read(
         defaultMarketplacesProvider,
@@ -71,10 +71,19 @@ void main() {
         'Etsy',
         'Depop',
         'Poshmark',
+        'Vinted',
       ]);
       expect(
-        defaults.every((record.Marketplace row) => row.feeRate > 0),
-        isTrue,
+        <String, double>{
+          for (final record.Marketplace row in defaults) row.name: row.feeRate,
+        },
+        <String, double>{
+          'eBay': 0.1325,
+          'Etsy': 0.095,
+          'Depop': 0.10,
+          'Poshmark': 0.20,
+          'Vinted': 0,
+        },
       );
     });
 
@@ -115,14 +124,14 @@ void main() {
 
       controller.startCreate();
       controller.updateFeeRate(0.12);
-      final String? id = await controller.submit(name: 'Vinted');
+      final String? id = await controller.submit(name: 'Mercari');
       final List<record.Marketplace> rows = await repository
           .watchMarketplaces()
           .first;
 
       expect(id, isNotNull);
       expect(
-        rows.where((record.Marketplace row) => row.name == 'Vinted'),
+        rows.where((record.Marketplace row) => row.name == 'Mercari'),
         hasLength(1),
       );
     });
