@@ -88,10 +88,10 @@ them.
 - **A real fee still wins.** The correction is a planning estimate;
   `order.fees` is a fact, and `PayoutReconciliation.expected` falls back to the
   rate only when the order reports none.
-- **Auto-syncing the fee from the platform is not built**, and cannot be until
-  a marketplace integration exists — every call carrying a token runs in a
-  Cloud Function (hard rule 10). When one does, it writes `order.fees`, which
-  already outranks this.
+- **Auto-syncing the fee from the platform is not coming.** Connecting to a
+  marketplace is dropped (hard rule 10), so nothing will ever fetch a rate —
+  the seller's own number and the fee an order reports are the only two
+  sources, and the reported one already wins.
 - **A "Use published rate" toggle per platform decides which it is** —
   owner's rule. On, the row follows the platform and is not editable; a sheet
   that let the seller type a number the row would then ignore is a control
