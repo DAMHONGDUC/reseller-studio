@@ -123,6 +123,25 @@ enum QuickActionKind {
   about,
 }
 
+class QuickActionSection {
+  const QuickActionSection({required this.kind, required this.actions});
+
+  final QuickActionSectionKind kind;
+  final List<QuickAction> actions;
+}
+
+enum QuickActionSectionKind { inventory, operations, business, app }
+
+final class QuickActionSectionLabel {
+  static String of(BuildContext context, QuickActionSectionKind kind) =>
+      switch (kind) {
+        QuickActionSectionKind.inventory => context.l10n.navInventory,
+        QuickActionSectionKind.operations => context.l10n.moreSectionOperations,
+        QuickActionSectionKind.business => context.l10n.moreSectionBusiness,
+        QuickActionSectionKind.app => context.l10n.settingsApp,
+      };
+}
+
 /// **Everything this app can create, and — last — the page explaining how
 /// it all connects.**
 ///
@@ -143,71 +162,88 @@ enum QuickActionKind {
 /// `AppAddFabScaffold` this list does not know about, so the two cannot
 /// drift.
 final class QuickActionConstant {
-  static const List<QuickAction> actions = <QuickAction>[
-    // Ordered by how often a reseller reaches for it, not alphabetically.
-    // Quick Add is first because hard rule 2 says the product's speed rests
-    // on it.
-    QuickAction(
-      kind: QuickActionKind.quickAddItem,
-      icon: Symbols.bolt_rounded,
-      route: AppRoutes.quickAdd,
+  static const List<QuickActionSection> sections = <QuickActionSection>[
+    QuickActionSection(
+      kind: QuickActionSectionKind.inventory,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.quickAddItem,
+          icon: Symbols.bolt_rounded,
+          route: AppRoutes.quickAdd,
+        ),
+        QuickAction(
+          kind: QuickActionKind.scan,
+          icon: Symbols.barcode_scanner_rounded,
+          route: AppRoutes.scanner,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addItem,
+          icon: Symbols.add_box_rounded,
+          route: AppRoutes.addItem,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addCategory,
+          icon: Symbols.category_rounded,
+          route: AppRoutes.categories,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addLocation,
+          icon: Symbols.shelves,
+          route: AppRoutes.locations,
+        ),
+      ],
     ),
-    QuickAction(
-      kind: QuickActionKind.scan,
-      icon: Symbols.barcode_scanner_rounded,
-      route: AppRoutes.scanner,
+    QuickActionSection(
+      kind: QuickActionSectionKind.operations,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.recordPurchase,
+          icon: Symbols.shopping_bag_rounded,
+          route: AppRoutes.addPurchase,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addExpense,
+          icon: Symbols.receipt_rounded,
+          route: AppRoutes.expenses,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addSource,
+          icon: Symbols.storefront_rounded,
+          route: AppRoutes.sources,
+        ),
+      ],
     ),
-    QuickAction(
-      kind: QuickActionKind.addItem,
-      icon: Symbols.add_box_rounded,
-      route: AppRoutes.addItem,
+    QuickActionSection(
+      kind: QuickActionSectionKind.business,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.inviteTeammate,
+          icon: Symbols.group_add_rounded,
+          route: AppRoutes.team,
+        ),
+      ],
     ),
-    QuickAction(
-      kind: QuickActionKind.recordPurchase,
-      icon: Symbols.shopping_bag_rounded,
-      route: AppRoutes.addPurchase,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addExpense,
-      icon: Symbols.receipt_rounded,
-      route: AppRoutes.expenses,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addSource,
-      icon: Symbols.storefront_rounded,
-      route: AppRoutes.sources,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addCategory,
-      icon: Symbols.category_rounded,
-      route: AppRoutes.categories,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addLocation,
-      icon: Symbols.shelves,
-      route: AppRoutes.locations,
-    ),
-    // Last of the create actions, before About: a seller invites a teammate
-    // once, and everything above it is something they do every week.
-    QuickAction(
-      kind: QuickActionKind.inviteTeammate,
-      icon: Symbols.group_add_rounded,
-      route: AppRoutes.team,
-    ),
-    // Analytics is a tab, so it opens with `go`: pushing a branch root over
-    // Home lands the seller on the wrong tab.
-    QuickAction(
-      kind: QuickActionKind.analytics,
-      icon: Symbols.bar_chart_rounded,
-      route: AppRoutes.analytics,
-      open: QuickActionOpen.goTab,
-    ),
-    QuickAction(
-      kind: QuickActionKind.about,
-      icon: Symbols.info_rounded,
-      route: AppRoutes.about,
+    QuickActionSection(
+      kind: QuickActionSectionKind.app,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.analytics,
+          icon: Symbols.bar_chart_rounded,
+          route: AppRoutes.analytics,
+          open: QuickActionOpen.goTab,
+        ),
+        QuickAction(
+          kind: QuickActionKind.about,
+          icon: Symbols.info_rounded,
+          route: AppRoutes.about,
+        ),
+      ],
     ),
   ];
+
+  static List<QuickAction> get actions => sections
+      .expand((QuickActionSection section) => section.actions)
+      .toList(growable: false);
 }
 
 /// The words for a Quick Access tile.

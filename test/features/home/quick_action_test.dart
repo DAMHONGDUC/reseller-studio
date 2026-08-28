@@ -45,6 +45,35 @@ void main() {
     }
   });
 
+  testWidgets('titled sections share one Quick Action card', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const HomeScreen());
+    await toEnd(tester);
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+    final Finder card = find.ancestor(
+      of: find.text(
+        QuickActionLabel.of(context, QuickActionConstant.actions.first.kind),
+      ),
+      matching: find.byType(AppListCard),
+    );
+
+    expect(card, findsOneWidget);
+    for (final QuickActionSection section in QuickActionConstant.sections) {
+      expect(
+        find.descendant(
+          of: card,
+          matching: find.text(
+            QuickActionSectionLabel.of(context, section.kind),
+          ),
+        ),
+        findsOneWidget,
+        reason: '${section.kind.name} has no title inside the shared card',
+      );
+    }
+  });
+
   testWidgets('every action is a row, and they are the last thing on Home', (
     WidgetTester tester,
   ) async {

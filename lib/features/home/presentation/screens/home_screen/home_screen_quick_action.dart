@@ -33,18 +33,54 @@ class _QuickAction extends StatelessWidget {
     padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
     child: AppListCard(
       children: <Widget>[
-        for (final QuickAction action in QuickActionConstant.actions)
-          AppListRow(
-            title: QuickActionLabel.of(context, action.kind),
-            icon: action.icon,
-            onTap: () => switch (action.open) {
-              QuickActionOpen.push => context.push(action.route),
-              // A branch root: `go` so the seller lands on the tab rather than
-              // on it pushed over Home.
-              QuickActionOpen.goTab => context.go(action.route),
-            },
-          ),
+        for (final QuickActionSection section in QuickActionConstant.sections)
+          _QuickActionSection(section: section),
       ],
     ),
+  );
+}
+
+class _QuickActionSection extends StatelessWidget {
+  const _QuickActionSection({required this.section});
+
+  final QuickActionSection section;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      Semantics(
+        header: true,
+        child: Padding(
+          padding: SdContentPaddingV3.row,
+          child: Text(
+            QuickActionSectionLabel.of(context, section.kind),
+            style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+              color: context.sdTheme3.textPrimary,
+            ),
+          ),
+        ),
+      ),
+      for (int index = 0; index < section.actions.length; index++) ...<Widget>[
+        if (index > 0) const SdDividerV3(),
+        _QuickActionRow(action: section.actions[index]),
+      ],
+    ],
+  );
+}
+
+class _QuickActionRow extends StatelessWidget {
+  const _QuickActionRow({required this.action});
+
+  final QuickAction action;
+
+  @override
+  Widget build(BuildContext context) => AppListRow(
+    title: QuickActionLabel.of(context, action.kind),
+    icon: action.icon,
+    onTap: () => switch (action.open) {
+      QuickActionOpen.push => context.push(action.route),
+      QuickActionOpen.goTab => context.go(action.route),
+    },
   );
 }
