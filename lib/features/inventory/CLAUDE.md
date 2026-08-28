@@ -157,10 +157,12 @@ is live on.
 - **The figures are a size louder than their labels** — owner's rule. They are
   what the row exists to show, and a label at the same weight makes the seller
   hunt for the number among the words introducing it.
-- **A cell is one paragraph, not a label widget beside a value widget.** The
-  label and its figure have to ellipsize as one thing — a `Row` clips
-  whichever child the constraints reach first, which is how a figure vanished
-  while `Cost` sat on width it did not need.
+- **Label at the left edge, figure at the right** — owner's rule. `Cost`,
+  `Asking` and `Profit` are three different lengths, so a figure set directly
+  after its label started at a different place on every line and the three
+  read as a ragged staircase. Pushed apart, the amounts form a column, which
+  is the only way three of them can be compared at a glance. Both halves stay
+  `Flexible` so neither can push the row past the card.
 - **All three render `—` when unknown** (hard rule 5), never `0`: an item added
   through Quick Add has none of them, and a zero would tell the seller it was
   free. The dash is `textTertiary` even in the profit cell — an em dash is not
