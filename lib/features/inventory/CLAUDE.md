@@ -69,10 +69,14 @@ exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
   not the answer: changing it afterwards does not reach back into rows already
   on screen, because a number moving in a field nobody is watching is worse
   than retyping one.
-- **A marketplace the item is already on is ticked and inert** — owner's rule.
-  An empty circle beside a platform the item is live on is simply wrong, and
-  the row stays disabled because a second listing on the same platform is not
-  a thing to offer.
+- **A marketplace the item is already on is ticked, and its price is
+  editable** — owner's rule. An empty circle beside a platform the item is
+  live on is simply wrong; the circle cannot be unticked, because a second
+  listing on the same platform is not a thing to offer, but the price it is
+  live at is the thing sellers most often came to change.
+- **Save covers both halves and counts both.** Adding a platform and moving
+  another's price are one intent when one button was pressed, so they ride in
+  one `saveAll` — and a reprice on its own is reason enough to enable Save.
 - **Publish needs a price on every ticked row.** A row whose field was emptied
   holds publish closed rather than falling back to the seed, which would list
   at a number the seller had just deleted.
@@ -83,6 +87,28 @@ exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
   so `crossList` takes it as a separate argument and leaves the item alone
   when it is null.
 - `test/features/listings/cross_list_test.dart` holds all six.
+
+## Two places price a marketplace, and they answer different questions
+
+Owner's rule, and it is deliberate rather than a duplication left standing.
+
+- **The item form edits the prices of listings that already exist**, inline —
+  cost, asking price and minimum are on that screen already, and the number a
+  buyer actually sees is the one a seller most often came to change. It never
+  creates a listing, and renders nothing when the item is on no marketplace.
+  The edits ride on `ItemFormState.listingPrices`, keyed by listing id, and
+  are written by the form's own Save — so changing a title and a price is one
+  button.
+- **The List screen adds marketplaces**, and prices both the new ones and the
+  live ones. It is where "put this somewhere new" is answered.
+- **Neither writes through the other.** The form's `_saveListingPrices` reads
+  the listings fresh and moves only the price; `crossList` batches new
+  listings and repriced ones together. A shared write path would have to know
+  which screen called it, which is the coupling the split avoids.
+- **`askingPrice` is the item's own number and stays that** — what the seller
+  wants for the thing, shown on its card. A marketplace price never writes
+  back to it, and a reprice on its own does not re-stamp `listedAt`, which
+  would reset the staleness clock.
 
 ## The actions that would be refused are shown, not hidden
 
