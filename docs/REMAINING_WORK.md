@@ -22,11 +22,11 @@ Ordered by what unblocks the most, not by size:
    function used to be something a developer noticed; the invite button is
    something a seller taps.
 2. **Marketplace connection is dropped, not pending** — owner's rule. There is
-   no OAuth, no sync and no `marketplaces/{id}` collection; what §13 and §14
-   asked for is not on this list any more. What the app keeps about a platform
-   is what it charges (`Workspace.marketplaceFeeRates`), and listings are
-   records the seller keeps rather than things pushed anywhere. Reinstating it
-   is a product decision, and hard rule 10 is what it would be built under.
+   no OAuth and no sync; what §13 and §14 asked for is not on this list any
+   more. `marketplaces/{id}` holds the seller-owned name and estimated rate,
+   and listings are records the seller keeps rather than things pushed
+   anywhere. Reinstating integration is a product decision, and hard rule 10
+   is what it would be built under.
 
 **Everything the app carries is now used.** `firebase_messaging` was a
 dependency nothing imported; it is wired through `PushMessaging` and the
@@ -149,9 +149,6 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
   is gitignored and local-only; the cause is a font loader doing real file I/O
   inside a widget test's fake-async zone. Excluding `*_tmp_test.dart` takes the
   full suite from 20 minutes to 8 seconds.
-- **`marketplaces` is still a read-only screen.** It renders and explains why
-  it cannot do more yet; it is not a stub that fails. Team is no longer one —
-  inviting, accepting, changing a role and removing all call their callable.
 - **The team screens call functions that are not deployed.** That is the same
   bet delete-account and delete-workspace already make: the button is drawn,
   the call fails with the one message hard rule 6 allows, and nothing is

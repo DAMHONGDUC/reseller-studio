@@ -22,6 +22,7 @@ are there and the mock backend drives them end to end.
 | 11 | Sourcing — sources ranked by ROI, purchases, purchase detail, buy calculator | built |
 | 12 | Listings — filtered by status, platform rejection messages surfaced, bulk reprice / pause / end from a selection | built; templates are the one §12 feature left |
 | 13 | Cross-listing — one item onto several marketplaces, with the fee estimate per platform | built; publishes drafts, since nothing is integrated |
+| 14 | Marketplaces — add, detail, edit, soft-delete, and four defaults per new business | built; seller-owned records, no integration |
 | 15 | Pricing — profit, margin, ROI, maximum buy price | built, unit-tested |
 | 16 | Returns / refunds — open a return, close it, optional restock | built, no separate screen |
 | 17 | Expenses — add, list, totals by category, delete | built |
@@ -54,7 +55,11 @@ are there and the mock backend drives them end to end.
 - **Workspaces**: several per seller, switched from Home's title through a
   Slack-style sheet. Switching is a write to `lastWorkspaceId`, never local
   state, so a teammate's change cannot contradict it. Creating an additional
-  business is its own pushed route.
+  business is its own pushed route and creates eBay, Etsy, Depop and Poshmark
+  before the workspace pointer becomes visible.
+- **Marketplaces**: a business owns its marketplace records. The list adds and
+  opens detail; detail changes the name and estimated fee or soft-deletes the
+  row, with no published-rate toggle and no OAuth state.
 - **Inventory**: Quick Add takes a title and nothing else. Full add/edit form
   with photos, item detail, list on a marketplace, mark sold (which creates
   the order), reprice, move, archive, restore, soft delete, **bulk reprice /
