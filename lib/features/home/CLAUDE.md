@@ -7,7 +7,7 @@ below is about protecting that answer from the screen filling up around it.
 
 ## The order of the screen is a product decision, not a layout one
 
-Top to bottom: **the three shortcut cards, Needs Attention, Getting started,
+Top to bottom: **the three shortcut cards, Getting started, Needs Attention,
 Performance, Flow overview, Recent Activity, Quick Action.** Owner's rules
 decide it, and they are listed in the order they outrank each other.
 `test/features/home/home_section_order_test.dart` holds the top of it.
@@ -25,13 +25,14 @@ decide it, and they are listed in the order they outrank each other.
    - `HomeShortcutConstant` is the list;
      `test/features/home/home_shortcuts_test.dart` holds the placement and the
      enum-to-card completeness.
-2. **Needs Attention sits directly under the shortcut row, above the
-   numbers.** Owner's rule, and it is the plan's own core principle back where
-   it belongs: a seller opening the app at 8am needs the orders waiting to
+2. **Getting started sits directly under the shortcut row, and wears a tinted
+   edge.** Owner's rule. It is the only card on Home that asks the seller to
+   do something rather than reporting on what they have done, and it is gone
+   for good once the three steps are — so it costs an established seller
+   nothing to have it first. See below.
+3. **Needs Attention follows it, still above the numbers.** The plan's own
+   core principle: a seller opening the app at 8am needs the orders waiting to
    ship, not last night's revenue.
-3. **Getting started rides immediately under Needs Attention.** The two answer
-   the same question — what is waiting on me — for a business that has started
-   and one that has not, so nothing goes between them. See below.
 4. **Performance follows both.** It briefly sat directly under the shortcuts;
    that is no longer the order, and nothing should restore it from the record
    of the intermediate state.
@@ -93,6 +94,11 @@ fresh account:
   rows, ticked as they are done, with the count in the header. It answers "how
   far along am I", which is the question a seller with two items and no sale
   is actually asking, and which a single CTA cannot answer.
+
+**The card carries a tinted border** (`AppListCard.borderColor`, forwarded to
+`SdCardV3`). That widget's rule applies unchanged — colour is never the only
+signal — and the "N of 3 done" in the section header is the label that says
+the same thing.
 
 **Three steps, and they are the lifecycle's spine** — add an item, list it,
 record the sale. `GettingStartedStep` is the list. Anything the app never
