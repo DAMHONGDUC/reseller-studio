@@ -205,11 +205,28 @@ app holding a receipt, so Home lists **every** one of them.
 screen that owns the action; it never opens a form Home would then have to
 know how to save.
 
-**About is the one row here that does not create something, and it goes
-last** — owner's rule. It lives two levels deep under Settings, so this is
-what keeps it findable, and putting it at the end is what stops a seller
-scanning for "add" from stepping over it. Nothing else non-create joins it
-without the same decision.
+**Two rows here do not create anything, and they ride at the end** — owner's
+rule, About last and Flow overview just above it. About lives two levels deep
+under Settings, so Home is what keeps it findable; putting both at the end is
+what stops a seller scanning for "add" from stepping over them. Nothing else
+non-create joins them without the same decision.
+
+**Flow overview opens a sheet, not a screen** — owner's rule. It answers "how
+do I run my selling with this app", which is a question asked while standing
+somewhere else in the app, so pushing a route would cost the seller their
+place to read nine lines. It is the only row here that is not a push, which is
+why `QuickAction.route` is nullable.
+
+- **`WorkflowConstant.steps` is the content, and stays the only copy of the
+  chain.** The sheet and About's diagram draw the same data — a second list
+  written for the sheet is how the app ends up teaching two workflows.
+- **A step carries `isOptional`, and optional means the app never blocks on
+  it** — not "unimportant". Listing, shipping and recording a source are all
+  things a seller can skip entirely and still get paid, and hard rule 2 is why:
+  requirements attach when a record *moves*, never when it is created. Saying
+  so out loud is the point of the badge, because a seller who thinks all nine
+  are mandatory goes back to the spreadsheet.
+- The badge is `SdBadgeV3` in the neutral tone. Optional is not a warning.
 
 The shortcut card at the top of Home is named after the section it lands on
 and scrolls to the end — a card that said something other than where it goes
