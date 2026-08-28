@@ -92,8 +92,23 @@ them.
   a marketplace integration exists — every call carrying a token runs in a
   Cloud Function (hard rule 10). When one does, it writes `order.fees`, which
   already outranks this.
+- **A "Use published rate" toggle per platform decides which it is** —
+  owner's rule. On, the row follows the platform and is not editable; a sheet
+  that let the seller type a number the row would then ignore is a control
+  that lies. Off, the row opens the fee sheet.
+- **Turning it off seeds the correction at the published rate.** "I want my
+  own rate" and "my rate is 13.25%" then say the same thing, so nothing has to
+  render a row that is neither following the platform nor carrying a number.
+- **The toggle is labelled, and the label sits above it** — owner's rules,
+  both. A bare switch in a row's trailing slot reads as "turn this marketplace
+  off", which is not a thing the screen does; and stacked, six platforms read
+  as a column of switches with a heading each rather than six sentences ending
+  in a control.
+- **Going back to the published rate is the toggle, never a button in the
+  sheet.** Two controls for one decision is how they end up disagreeing.
 - `test/features/marketplaces/marketplace_fee_test.dart` holds the resolution,
-  the validity bound and both halves of the fallback.
+  the validity bound, both halves of the fallback, and all four toggle
+  behaviours.
 
 ## One screen edits a business, and two places open it
 
