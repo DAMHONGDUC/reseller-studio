@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/extensions/context_extensions.dart';
-import 'package:reseller_studio/features/home/home_constant.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 import 'package:reseller_studio/features/home/presentation/widgets/flow_overview_sheet.dart';
 import 'package:reseller_studio/features/more/workflow_constant.dart';
@@ -23,9 +22,7 @@ void main() {
 
     await tester.tap(
       find.ancestor(
-        of: find.text(
-          HomeShortcutLabel.of(context, HomeShortcutKind.flowOverview),
-        ),
+        of: find.text(context.l10n.flowOverviewIntro),
         matching: find.byType(SdCardV3),
       ),
     );
@@ -34,7 +31,9 @@ void main() {
     return tester.element(find.byType(FlowOverviewSheet));
   }
 
-  testWidgets('the shortcut card opens it', (WidgetTester tester) async {
+  testWidgets('the dedicated Home section opens it', (
+    WidgetTester tester,
+  ) async {
     await openSheet(tester);
 
     expect(find.byType(FlowOverviewSheet), findsOneWidget);

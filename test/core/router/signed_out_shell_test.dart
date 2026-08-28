@@ -12,6 +12,7 @@ import 'package:reseller_studio/features/auth/providers.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:reseller_studio/reseller_studio_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_design/index.dart';
 
 /// **Four tabs share one signed-out view; More does not** — owner's rule.
 ///
@@ -102,12 +103,28 @@ void main() {
     await goTo(tester, AppRoutes.more);
 
     expect(find.byType(SignedOutView), findsNothing);
+    expect(find.text('Account'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
 
     // Every other destination is a view onto a business nobody has named.
     for (final String hidden in <String>['Sourcing', 'Listings', 'Team']) {
       expect(find.text(hidden), findsNothing, reason: hidden);
     }
+  });
+
+  testWidgets('swiping the shell moves to the adjacent branch', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester);
+    await goTo(tester, AppRoutes.home);
+
+    await tester.drag(
+      find.byKey(SdBottomNavigationV3.swipeSurfaceKey),
+      Offset(-SdBottomNavigationV3.swipeDistance * 2, 0),
+    );
+    await tester.pumpAndSettle();
+
+    expect(router.routeInformationProvider.value.uri.path, AppRoutes.inventory);
   });
 
   testWidgets('no create route is reachable, so no action needs guarding', (

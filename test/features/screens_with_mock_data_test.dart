@@ -1,12 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/analytics/domain/entities/analytics_summary.dart';
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import 'package:reseller_studio/features/analytics/providers.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
@@ -200,6 +203,22 @@ void main() {
       // loses the fact that it is still live and still earning nothing.
       expect(find.text('Stale'), findsWidgets);
       expect(find.text('Listed'), findsWidgets);
+    });
+
+    testWidgets('Item detail exposes a labelled Actions button', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-1'));
+
+      final Finder action = find.widgetWithText(SdButtonV3, 'Actions');
+
+      expect(action, findsOneWidget);
+      expect(find.byIcon(Symbols.more_vert_rounded), findsNothing);
+
+      await tester.tap(action);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ItemActionsSheet), findsOneWidget);
     });
 
     testWidgets('Inventory docks the search field into the bar on scroll', (

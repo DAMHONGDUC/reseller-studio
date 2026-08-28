@@ -65,6 +65,28 @@ final class MoreLabel {
       };
 }
 
+/// One titled group on More.
+class MoreSection {
+  const MoreSection({required this.kind, required this.destinations});
+
+  final MoreSectionKind kind;
+  final List<MoreDestination> destinations;
+}
+
+/// The four questions that split More's destinations into readable groups.
+enum MoreSectionKind { operations, finance, business, account }
+
+/// The localized title for a More section.
+final class MoreSectionLabel {
+  static String of(BuildContext context, MoreSectionKind kind) =>
+      switch (kind) {
+        MoreSectionKind.operations => context.l10n.moreSectionOperations,
+        MoreSectionKind.finance => context.l10n.moreSectionFinance,
+        MoreSectionKind.business => context.l10n.moreSectionBusiness,
+        MoreSectionKind.account => context.l10n.moreSectionAccount,
+      };
+}
+
 /// What the More screen lists, kept off the widget that renders it.
 ///
 /// **This list growing is fine. The bottom bar growing is not** — five tabs is
@@ -75,90 +97,130 @@ final class MoreLabel {
 /// than being hidden. Hiding them would make the app look finished; showing
 /// them greyed says what is coming and stops a tap leading nowhere.
 final class MoreConstant {
-  static const List<MoreDestination> destinations = <MoreDestination>[
-    MoreDestination(
-      kind: MoreDestinationKind.sourcing,
-      icon: Symbols.storefront_rounded,
-      route: AppRoutes.sourcing,
-      isBuilt: true,
+  static const List<MoreSection> sections = <MoreSection>[
+    MoreSection(
+      kind: MoreSectionKind.operations,
+      destinations: <MoreDestination>[
+        MoreDestination(
+          kind: MoreDestinationKind.sourcing,
+          icon: Symbols.storefront_rounded,
+          route: AppRoutes.sourcing,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.listings,
+          icon: Symbols.sell_rounded,
+          route: AppRoutes.listings,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.categories,
+          icon: Symbols.category_rounded,
+          route: AppRoutes.categories,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.locations,
+          icon: Symbols.shelves,
+          route: AppRoutes.locations,
+          isBuilt: true,
+        ),
+      ],
     ),
-    MoreDestination(
-      kind: MoreDestinationKind.listings,
-      icon: Symbols.sell_rounded,
-      route: AppRoutes.listings,
-      isBuilt: true,
+    MoreSection(
+      kind: MoreSectionKind.finance,
+      destinations: <MoreDestination>[
+        MoreDestination(
+          kind: MoreDestinationKind.expenses,
+          icon: Symbols.receipt_rounded,
+          route: AppRoutes.expenses,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.payouts,
+          icon: Symbols.account_balance_rounded,
+          route: AppRoutes.payouts,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.reports,
+          icon: Symbols.summarize_rounded,
+          route: AppRoutes.reports,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.receipts,
+          icon: Symbols.description_rounded,
+          route: AppRoutes.receipts,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.tax,
+          icon: Symbols.account_balance_rounded,
+          route: AppRoutes.tax,
+          isBuilt: true,
+        ),
+      ],
     ),
-    MoreDestination(
-      kind: MoreDestinationKind.expenses,
-      icon: Symbols.receipt_rounded,
-      route: AppRoutes.expenses,
-      isBuilt: true,
+    MoreSection(
+      kind: MoreSectionKind.business,
+      destinations: <MoreDestination>[
+        MoreDestination(
+          kind: MoreDestinationKind.marketplaces,
+          icon: Symbols.hub_rounded,
+          route: AppRoutes.marketplaces,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.team,
+          icon: Symbols.group_rounded,
+          route: AppRoutes.team,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.activity,
+          icon: Symbols.history_rounded,
+          route: AppRoutes.activity,
+          isBuilt: true,
+        ),
+      ],
     ),
-    MoreDestination(
-      kind: MoreDestinationKind.payouts,
-      icon: Symbols.account_balance_rounded,
-      route: AppRoutes.payouts,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.reports,
-      icon: Symbols.summarize_rounded,
-      route: AppRoutes.reports,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.receipts,
-      icon: Symbols.description_rounded,
-      route: AppRoutes.receipts,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.categories,
-      icon: Symbols.category_rounded,
-      route: AppRoutes.categories,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.locations,
-      icon: Symbols.shelves,
-      route: AppRoutes.locations,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.marketplaces,
-      icon: Symbols.hub_rounded,
-      route: AppRoutes.marketplaces,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.team,
-      icon: Symbols.group_rounded,
-      route: AppRoutes.team,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.activity,
-      icon: Symbols.history_rounded,
-      route: AppRoutes.activity,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.tax,
-      icon: Symbols.account_balance_rounded,
-      route: AppRoutes.tax,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.subscription,
-      icon: Symbols.workspace_premium_rounded,
-      route: AppRoutes.subscription,
-      isBuilt: true,
-    ),
-    MoreDestination(
-      kind: MoreDestinationKind.settings,
-      icon: Symbols.settings_rounded,
-      route: AppRoutes.settings,
-      isBuilt: true,
+    MoreSection(
+      kind: MoreSectionKind.account,
+      destinations: <MoreDestination>[
+        MoreDestination(
+          kind: MoreDestinationKind.subscription,
+          icon: Symbols.workspace_premium_rounded,
+          route: AppRoutes.subscription,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.settings,
+          icon: Symbols.settings_rounded,
+          route: AppRoutes.settings,
+          isBuilt: true,
+        ),
+      ],
     ),
   ];
+
+  static List<MoreDestination> get destinations => sections
+      .expand((MoreSection section) => section.destinations)
+      .toList(growable: false);
+
+  static List<MoreSection> sectionsFor({required bool signedIn}) {
+    if (signedIn) return sections;
+
+    final MoreDestination settings = destinations.firstWhere(
+      (MoreDestination destination) =>
+          destination.kind == MoreDestinationKind.settings,
+    );
+
+    return <MoreSection>[
+      MoreSection(
+        kind: MoreSectionKind.account,
+        destinations: <MoreDestination>[settings],
+      ),
+    ];
+  }
 }

@@ -376,6 +376,22 @@
   "@moreManage": {
     "description": "Section header above the More screen list."
   },
+  "moreSectionOperations": "Operations",
+  "@moreSectionOperations": {
+    "description": "More section for sourcing, listings, categories, and locations."
+  },
+  "moreSectionFinance": "Finance",
+  "@moreSectionFinance": {
+    "description": "More section for expenses, payouts, reports, receipts, and tax."
+  },
+  "moreSectionBusiness": "Business",
+  "@moreSectionBusiness": {
+    "description": "More section for marketplaces, team, and activity."
+  },
+  "moreSectionAccount": "Account",
+  "@moreSectionAccount": {
+    "description": "More section for subscription and settings."
+  },
   "moreSourcing": "Sourcing",
   "@moreSourcing": {
     "description": "More destination: where stock comes from and what it returned."

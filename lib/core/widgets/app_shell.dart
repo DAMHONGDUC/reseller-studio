@@ -84,46 +84,40 @@ class _AppShellState extends State<AppShell> {
   }
 
   @override
-  Widget build(BuildContext context) => SdScaffoldV3(
-    extendBody: true,
-    // Marks everything under the tabs as having the glass bar below it. The
-    // only reader is the snackbar, which draws into the root overlay above
-    // the shell and could not otherwise tell the bar is there.
-    body: SdFloatingBarScopeV3(child: widget.shell),
-    bottomNavigationBar: SdGlassNavBarV3(
-      selectedIndex: widget.shell.currentIndex,
-      onSelected: (int index) => widget.shell.goBranch(
-        index,
-        // Re-tapping the active tab pops that branch to its root.
-        initialLocation: index == widget.shell.currentIndex,
+  Widget build(BuildContext context) => SdBottomNavigationV3(
+    body: widget.shell,
+    destinations: <SdNavDestinationV3>[
+      SdNavDestinationV3(
+        icon: Symbols.home_rounded,
+        selectedIcon: Symbols.home_rounded,
+        label: context.l10n.navHome,
       ),
-      destinations: <SdNavDestinationV3>[
-        SdNavDestinationV3(
-          icon: Symbols.home_rounded,
-          selectedIcon: Symbols.home_rounded,
-          label: context.l10n.navHome,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.inventory_2_rounded,
-          selectedIcon: Symbols.inventory_2_rounded,
-          label: context.l10n.navInventory,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.receipt_long_rounded,
-          selectedIcon: Symbols.receipt_long_rounded,
-          label: context.l10n.navOrders,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.bar_chart_rounded,
-          selectedIcon: Symbols.bar_chart_rounded,
-          label: context.l10n.navAnalytics,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.menu_rounded,
-          selectedIcon: Symbols.menu_rounded,
-          label: context.l10n.navMore,
-        ),
-      ],
+      SdNavDestinationV3(
+        icon: Symbols.inventory_2_rounded,
+        selectedIcon: Symbols.inventory_2_rounded,
+        label: context.l10n.navInventory,
+      ),
+      SdNavDestinationV3(
+        icon: Symbols.receipt_long_rounded,
+        selectedIcon: Symbols.receipt_long_rounded,
+        label: context.l10n.navOrders,
+      ),
+      SdNavDestinationV3(
+        icon: Symbols.bar_chart_rounded,
+        selectedIcon: Symbols.bar_chart_rounded,
+        label: context.l10n.navAnalytics,
+      ),
+      SdNavDestinationV3(
+        icon: Symbols.menu_rounded,
+        selectedIcon: Symbols.menu_rounded,
+        label: context.l10n.navMore,
+      ),
+    ],
+    selectedIndex: widget.shell.currentIndex,
+    onSelected: (int index) => widget.shell.goBranch(
+      index,
+      // Re-tapping the active tab pops that branch to its root.
+      initialLocation: index == widget.shell.currentIndex,
     ),
   );
 }

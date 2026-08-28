@@ -79,16 +79,15 @@ class _HomeShortcutCard extends StatelessWidget {
   }
 
   /// `push` for search because it sits outside the shell and comes back here;
-  /// a sheet for the flow overview, so a seller reading how the app fits
-  /// together keeps the screen they were on.
+  /// Scan is pushed above Home and returns to the same dashboard position.
   void _open(BuildContext context) {
     switch (shortcut.kind) {
       case HomeShortcutKind.quickAction:
         onQuickAction();
       case HomeShortcutKind.search:
         context.push(AppRoutes.search);
-      case HomeShortcutKind.flowOverview:
-        FlowOverviewSheet.show(context);
+      case HomeShortcutKind.scan:
+        context.push(AppRoutes.scanner);
     }
   }
 }

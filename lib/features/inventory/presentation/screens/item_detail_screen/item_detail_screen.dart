@@ -48,10 +48,15 @@ class ItemDetailScreen extends ConsumerWidget {
         subtitle: value?.sku,
         actions: <Widget>[
           if (value != null)
-            IconButton(
-              icon: const SdIconV3(Symbols.more_vert_rounded),
-              tooltip: context.l10n.itemActions,
-              onPressed: () => ItemActionsSheet.show(context, value),
+            Padding(
+              padding: EdgeInsets.only(right: SdSpacingConstant.w8),
+              child: SdButtonV3(
+                variant: SdButtonVariantV3.secondary,
+                size: SdButtonSizeV3.small,
+                label: context.l10n.itemActions,
+                icon: Symbols.tune_rounded,
+                onPressed: () => ItemActionsSheet.show(context, value),
+              ),
             ),
         ],
       ),

@@ -17,9 +17,10 @@ final class _NavDestinations {
 
 /// Holds selection so a test follows the same tap path a seller does.
 class _NavBarHost extends StatefulWidget {
-  const _NavBarHost({required this.initialIndex});
+  const _NavBarHost({required this.initialIndex, required this.body});
 
   final int initialIndex;
+  final Widget body;
 
   @override
   State<_NavBarHost> createState() => _NavBarHostState();
@@ -29,22 +30,24 @@ class _NavBarHostState extends State<_NavBarHost> {
   late int _index = widget.initialIndex;
 
   @override
-  Widget build(BuildContext context) => SdScaffoldV3(
-    extendBody: true,
-    body: const SizedBox.expand(),
-    bottomNavigationBar: SdGlassNavBarV3(
-      destinations: _NavDestinations.all,
-      selectedIndex: _index,
-      onSelected: (int index) => setState(() => _index = index),
-    ),
+  Widget build(BuildContext context) => SdBottomNavigationV3(
+    body: widget.body,
+    destinations: _NavDestinations.all,
+    selectedIndex: _index,
+    onSelected: (int index) => setState(() => _index = index),
   );
 }
 
 /// The bar is glyph-only: five equal segments, one icon each, and a fixed-width
 /// tinted thumb sliding under the selected one. Labels remain semantics only.
 void main() {
-  Future<void> pumpBar(WidgetTester tester, int selected) =>
-      pumpScreen(tester, _NavBarHost(initialIndex: selected));
+  Future<void> pumpBar(WidgetTester tester, int selected) => pumpScreen(
+    tester,
+    _NavBarHost(
+      initialIndex: selected,
+      body: const SizedBox.expand(key: Key('tab-body')),
+    ),
+  );
 
   Finder glyph(int index) => find.byIcon(_NavDestinations.all[index].icon);
 
@@ -93,6 +96,83 @@ void main() {
     expect(fills(tester).last, 1);
   });
 
+  testWidgets('swiping the body selects the adjacent tab', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 2);
+
+    await tester.drag(
+      find.byKey(SdBottomNavigationV3.swipeSurfaceKey),
+      Offset(-SdBottomNavigationV3.swipeDistance * 2, 0),
+    );
+    await tester.pumpAndSettle();
+
+    expect(fills(tester)[2], 0);
+    expect(fills(tester)[3], 1);
+  });
+
+  testWidgets('swiping beyond the first tab does nothing', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 0);
+
+    await tester.drag(
+      find.byKey(SdBottomNavigationV3.swipeSurfaceKey),
+      Offset(SdBottomNavigationV3.swipeDistance * 2, 0),
+    );
+    await tester.pumpAndSettle();
+
+    expect(fills(tester).first, 1);
+  });
+
+  testWidgets('a horizontal child keeps its own swipe gesture', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      _NavBarHost(
+        initialIndex: 2,
+        body: ListView(
+          key: const Key('horizontal-list'),
+          scrollDirection: Axis.horizontal,
+          children: <Widget>[SizedBox(width: SdSpacingConstant.w160 * 5)],
+        ),
+      ),
+    );
+
+    await tester.drag(
+      find.byKey(const Key('horizontal-list')),
+      Offset(-SdBottomNavigationV3.swipeDistance * 2, 0),
+    );
+    await tester.pumpAndSettle();
+
+    expect(fills(tester)[2], 1);
+  });
+
+  testWidgets('the switcher fits a small phone and landscape', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 2);
+
+    for (final Size physicalSize in <Size>[
+      const Size(1125, 2436),
+      const Size(2436, 1125),
+    ]) {
+      tester.view.physicalSize = physicalSize;
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(
+        segment(tester, 0).height,
+        greaterThanOrEqualTo(SdSpacingConstant.h44),
+      );
+      expect(
+        segment(tester, 4).right,
+        lessThanOrEqualTo(physicalSize.width / tester.view.devicePixelRatio),
+      );
+    }
+  });
+
   testWidgets('all five segments have the same width', (
     WidgetTester tester,
   ) async {
@@ -115,15 +195,9 @@ void main() {
     final double screenWidth =
         tester.view.physicalSize.width / tester.view.devicePixelRatio;
 
-    expect(
-      first.height,
-      closeTo(SdContentPaddingV3.floatingBarHeight, 0.01),
-    );
+    expect(first.height, closeTo(SdContentPaddingV3.floatingBarHeight, 0.01));
     expect(first.height, greaterThanOrEqualTo(SdSpacingConstant.h48));
-    expect(
-      first.left,
-      closeTo(SdContentPaddingV3.floatingBarHorizontal, 0.01),
-    );
+    expect(first.left, closeTo(SdContentPaddingV3.floatingBarHorizontal, 0.01));
     expect(
       screenWidth - last.right,
       closeTo(SdContentPaddingV3.floatingBarHorizontal, 0.01),

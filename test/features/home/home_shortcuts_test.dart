@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reseller_studio/core/extensions/context_extensions.dart';
 import 'package:reseller_studio/features/home/home_constant.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 import 'package:system_design/index.dart';
@@ -78,6 +79,24 @@ void main() {
         QuickActionLabel.of(context, QuickActionConstant.actions.last.kind),
       ),
       findsWidgets,
+    );
+  });
+
+  testWidgets('Scan replaces Flow overview in the shortcut row', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const HomeScreen());
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+
+    expect(cardFor(context, HomeShortcutKind.scan), findsOneWidget);
+    expect(find.text(context.l10n.homeFlowOverview), findsOneWidget);
+    expect(
+      find.ancestor(
+        of: find.text(context.l10n.flowOverviewIntro),
+        matching: find.byType(SdCardV3),
+      ),
+      findsOneWidget,
     );
   });
 

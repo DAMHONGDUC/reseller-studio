@@ -9,6 +9,7 @@ import '../../../../auth/providers.dart';
 import '../../../more_constant.dart';
 
 part 'more_screen_more_row.dart';
+part 'more_screen_section.dart';
 
 /// More — "where do I manage everything else?".
 ///
@@ -32,13 +33,9 @@ class MoreScreen extends ConsumerWidget {
     // Signed out, every other destination is a view onto a business that has
     // not been named yet — so the list is Settings alone rather than eleven
     // rows that all bounce back here (owner's rule).
-    final List<MoreDestination> destinations = signedIn
-        ? MoreConstant.destinations
-        : MoreConstant.destinations
-              .where(
-                (MoreDestination d) => d.kind == MoreDestinationKind.settings,
-              )
-              .toList();
+    final List<MoreSection> sections = MoreConstant.sectionsFor(
+      signedIn: signedIn,
+    );
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.navMore),
@@ -46,24 +43,8 @@ class MoreScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SdSectionHeaderV3(title: context.l10n.moreManage, first: true),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
-            ),
-            child: SdCardV3(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: <Widget>[
-                  for (final MoreDestination destination in destinations)
-                    _MoreRow(
-                      destination: destination,
-                      isLast: destination == destinations.last,
-                    ),
-                ],
-              ),
-            ),
-          ),
+          for (int index = 0; index < sections.length; index++)
+            _MoreSection(section: sections[index], first: index == 0),
         ],
       ),
     );

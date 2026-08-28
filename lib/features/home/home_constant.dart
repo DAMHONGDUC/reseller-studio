@@ -28,21 +28,19 @@ class HomeShortcut {
 }
 
 /// The three ways out of Home.
-enum HomeShortcutKind { quickAction, search, flowOverview }
+enum HomeShortcutKind { quickAction, search, scan }
 
 /// **The three cards that open Home** — owner's rule.
 ///
 /// Home's own content answers "what needs attention today", and everything
 /// that answers it is *inside* this screen. These three are the ways out: down
-/// to Quick Action, sideways into global search, and open the flow overview.
+/// to Quick Action, sideways into global search, and into the scanner.
 /// They sit first because a seller who opened the app to *go somewhere* should
 /// not have to read a dashboard on the way.
 ///
-/// **Flow overview took Analytics' card, and Analytics moved into Quick
-/// Action** — owner's rule, and the only change this list has had. Analytics
-/// is a tab the seller reaches from the bar anyway; "how does this app work"
-/// is the question they cannot answer from anywhere else, and it is asked most
-/// on the first morning, when Home is the only screen they know.
+/// Flow overview now gets a full section immediately below this row. Scan
+/// takes its card because it is a frequent action a seller starts while
+/// holding an item, and the shortcut row is the fastest way into it.
 ///
 /// **Three, and the list is closed.** A fourth would make this a launcher,
 /// which is exactly what keeping the create actions at the bottom exists to
@@ -56,8 +54,8 @@ final class HomeShortcutConstant {
     ),
     HomeShortcut(kind: HomeShortcutKind.search, icon: Symbols.search_rounded),
     HomeShortcut(
-      kind: HomeShortcutKind.flowOverview,
-      icon: Symbols.account_tree_rounded,
+      kind: HomeShortcutKind.scan,
+      icon: Symbols.barcode_scanner_rounded,
     ),
   ];
 }
@@ -71,7 +69,7 @@ final class HomeShortcutLabel {
       switch (kind) {
         HomeShortcutKind.quickAction => context.l10n.homeQuickAction,
         HomeShortcutKind.search => context.l10n.homeShortcutSearch,
-        HomeShortcutKind.flowOverview => context.l10n.homeFlowOverview,
+        HomeShortcutKind.scan => context.l10n.inventoryScan,
       };
 }
 
@@ -196,9 +194,8 @@ final class QuickActionConstant {
       icon: Symbols.group_add_rounded,
       route: AppRoutes.team,
     ),
-    // Analytics moved down here when Flow overview took its shortcut card
-    // (owner's rule) — it is in one place, never both. A tab, so it opens with
-    // `go`: pushing a branch root over Home lands the seller on the wrong tab.
+    // Analytics is a tab, so it opens with `go`: pushing a branch root over
+    // Home lands the seller on the wrong tab.
     QuickAction(
       kind: QuickActionKind.analytics,
       icon: Symbols.bar_chart_rounded,

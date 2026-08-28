@@ -30,6 +30,7 @@ import '../../widgets/flow_overview_sheet.dart';
 part 'home_screen_activity_row.dart';
 part 'home_screen_all_clear.dart';
 part 'home_screen_attention_row.dart';
+part 'home_screen_flow_overview.dart';
 part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
 part 'home_screen_quick_action.dart';
@@ -120,8 +121,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           _HomeShortcuts(onQuickAction: _toQuickAction),
-          // Not `first` any more: the shortcut row is above it now, and this
-          // heading needs the gap that separates two sections.
+          SdSectionHeaderV3(title: context.l10n.homeFlowOverview),
+          const _HomeFlowOverview(),
           SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
           const _NeedsAttention(),
           SdSectionHeaderV3(title: context.l10n.homePerformance),
