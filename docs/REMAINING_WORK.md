@@ -21,9 +21,12 @@ Ordered by what unblocks the most, not by size:
    **This moved up in cost since the team screens landed.** An undeployed
    function used to be something a developer noticed; the invite button is
    something a seller taps.
-2. **Marketplace OAuth and sync**, which is what is left of §13 and §14 and is
-   blocked on a developer account per platform. Cross-listing itself is built;
-   what it writes is a draft, because nothing can publish to eBay yet.
+2. **Marketplace connection is dropped, not pending** — owner's rule. There is
+   no OAuth, no sync and no `marketplaces/{id}` collection; what §13 and §14
+   asked for is not on this list any more. What the app keeps about a platform
+   is what it charges (`Workspace.marketplaceFeeRates`), and listings are
+   records the seller keeps rather than things pushed anywhere. Reinstating it
+   is a product decision, and hard rule 10 is what it would be built under.
 
 **Everything the app carries is now used.** `firebase_messaging` was a
 dependency nothing imported; it is wired through `PushMessaging` and the
@@ -87,8 +90,8 @@ that needs the Firebase project, which is `RELEASE_ACTIONS.md` blocker 1.
 | 27 | `revenueCatWebhook` | **Written.** Needs `REVENUECAT_WEBHOOK_TOKEN` in Secret Manager and the URL in the RevenueCat dashboard. Until it runs, `planFor` reads every workspace as Free however much the seller paid |
 | — | `deleteAccount` | **Written.** Guideline 5.1.1(v) — deletes the workspaces the seller solely owns, their Storage objects and the Auth user; refuses a sign-in older than five minutes |
 | — | `deleteWorkspace` | **Written.** Owner only, recent sign-in required, and it shares its teardown with `deleteAccount` so neither can forget the Storage objects |
-| 14 | Marketplace OAuth and sync | not written, and blocked on a developer account per marketplace |
-| 13 | Cross-listing push | not written. Every call carrying a token runs server-side (hard rule 10) |
+| 14 | Marketplace OAuth and sync | **dropped** — owner's rule, see "Where to start" |
+| 13 | Cross-listing push | **dropped** with it; a listing is a record the seller keeps |
 
 Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 
@@ -96,7 +99,7 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 
 | Plan § | Feature | What is there today |
 |---|---|---|
-| 13, 14 | Publishing to a real marketplace | cross-listing writes a **draft** listing per platform, which is everything up to the API call. The call itself needs OAuth per marketplace, which needs a developer account per marketplace |
+| 13, 14 | Publishing to a real marketplace | **dropped** — owner's rule. Listing an item writes a record of what it is priced at on each platform; nothing is sent anywhere, and the app no longer claims it will be |
 
 ## 4. Loose ends found in the code
 

@@ -413,10 +413,14 @@ behind it.
    *shape* of a failure ('marketplace token refresh failed'), never its
    contents. `SdCrashReporter.setUserId` takes a Firebase UID and nothing else.
 
-10. **No secret ships in the Flutter binary.** Plan §14 and §32. Marketplace
-    OAuth, and every call that uses a token, happens in a Cloud Function.
-    The app asks the backend; the backend asks eBay. `marketplaces/{id}` in
-    Firestore holds connection *status* only and is `allow write: if false`.
+10. **No secret ships in the Flutter binary.** Plan §14 and §32. Any call that
+    uses a token happens in a Cloud Function — the app asks the backend, the
+    backend asks the platform. Nothing in the app reads or stores one.
+    **Marketplace connection is not a feature of this app** (owner's rule):
+    there is no OAuth, no sync, and no `marketplaces/{id}` collection. What the
+    app keeps about a platform is what it charges — see
+    `lib/features/workspace/CLAUDE.md`. Reinstating a connection is a product
+    decision, and this rule is what it would have to be built under.
 
 11. **Workspace membership is the only ACL, and nobody edits their own
     membership document.** `firestore.rules` decides everything from

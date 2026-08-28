@@ -28,7 +28,6 @@ workspaces/{workspaceId}
   receipts/{receiptId}
   categories/{categoryId}
   locations/{locationId}
-  marketplaces/{marketplaceId}       connection state; tokens are server-only
   activity/{activityId}              append-only audit log
   subscription/{docId}               plan tier, written by webhook only
 ```
@@ -197,14 +196,6 @@ one row.
 `entityType`, `entityId`, `action`, `actorId`, `before`, `after`, `createdAt`.
 Written only by Cloud Functions triggers (see `firestore.rules`) so `actorId`
 cannot be forged. Actions are the list in plan §23.
-
-### `marketplaces/{marketplaceId}`
-
-Connection **status** only: which platform, connected or not, last sync time,
-last error. **The OAuth tokens are not in this document and not in Firestore
-at all** — they live in Secret Manager, reachable only by the functions that
-call the platform. A client can read this to render "eBay · connected", and
-can write nothing.
 
 ## Indexes
 
