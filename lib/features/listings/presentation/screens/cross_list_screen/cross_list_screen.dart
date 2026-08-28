@@ -6,11 +6,8 @@ import 'package:system_design/index.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
-import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
-import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../../core/widgets/money_field.dart';
-import '../../../../../core/widgets/price_entry_sheet.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/presentation/controllers/item_actions_controller.dart';
 import '../../../../inventory/providers.dart';
@@ -22,7 +19,6 @@ import '../../controllers/cross_list_controller.dart';
 
 part 'cross_list_screen_actions.dart';
 part 'cross_list_screen_marketplaces.dart';
-part 'cross_list_screen_review.dart';
 
 /// **The one way an item reaches a marketplace** — one item onto one or
 /// several at once (plan §13).
@@ -159,9 +155,7 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
                       .setPrice(Money.tryParse(value, currency)),
                 ),
                 SizedBox(height: SdSpacingConstant.h24),
-                _Marketplaces(itemId: item.id),
-                SizedBox(height: SdSpacingConstant.h24),
-                _Review(currency: currency),
+                _Marketplaces(itemId: item.id, currency: currency),
               ],
             ),
           ),

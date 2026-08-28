@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/domain/services/item_transition.dart';
@@ -231,19 +233,46 @@ void main() {
       expect(publish.onPressed, isNull);
     });
 
-    testWidgets('picking a marketplace reviews its fee and arms publish', (
+    testWidgets('picking a marketplace opens its own price field, seeded', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
 
+      // Two money fields before: the shared seed at the top, and none on any
+      // row until one is ticked.
+      expect(find.byType(MoneyField), findsOneWidget);
+
       await tester.tap(find.text('Etsy'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Review'), findsOneWidget);
+      expect(find.byType(MoneyField), findsNWidgets(2));
       expect(find.text('Publish to 1 marketplace'), findsOneWidget);
       expect(
         tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
         isNotNull,
+        reason: 'the row was seeded from the shared price, so it can publish',
+      );
+    });
+
+    testWidgets('a marketplace the item is already on is ticked', (
+      WidgetTester tester,
+    ) async {
+      // `itm-4` is on eBay and Depop already. An empty circle beside a
+      // platform the item is live on is simply wrong.
+      await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
+
+      final Finder ebayRow = find.ancestor(
+        of: find.text('eBay'),
+        matching: find.byType(Row),
+      );
+
+      expect(
+        tester
+            .widgetList<SdIconV3>(
+              find.descendant(of: ebayRow.first, matching: find.byType(SdIconV3)),
+            )
+            .any((SdIconV3 icon) => icon.fill == 1),
+        isTrue,
       );
     });
   });
@@ -286,77 +315,74 @@ void main() {
     CrossListState state({
       Set<Marketplace> selected = const <Marketplace>{},
       Money? price,
-      Map<Marketplace, Money> overrides = const <Marketplace, Money>{},
-    }) => CrossListState(
-      selected: selected,
-      price: price,
-      overrides: overrides,
-    );
+      Map<Marketplace, Money> prices = const <Marketplace, Money>{},
+    }) => CrossListState(selected: selected, price: price, prices: prices);
 
-    test('a platform with no price of its own takes the shared one', () {
+    test('a row not ticked yet reads the shared seed', () {
       final CrossListState current = state(
-        selected: <Marketplace>{Marketplace.ebay, Marketplace.depop},
         price: const Money(4500, 'USD'),
-        overrides: const <Marketplace, Money>{
-          Marketplace.depop: Money(4000, 'USD'),
-        },
+        selected: <Marketplace>{Marketplace.depop},
+        prices: const <Marketplace, Money>{Marketplace.depop: Money(4000, 'USD')},
       );
 
       expect(current.priceFor(Marketplace.ebay), const Money(4500, 'USD'));
       expect(current.priceFor(Marketplace.depop), const Money(4000, 'USD'));
-      expect(current.isOverridden(Marketplace.ebay), isFalse);
-      expect(current.isOverridden(Marketplace.depop), isTrue);
     });
 
-    test('an override alone is enough to publish to that platform', () {
-      // The shared box is empty, so eBay has nothing — but Depop was priced
-      // deliberately, and a form that refused it would be asking twice.
+    test('a ticked row with an emptied field holds publish closed', () {
+      // Falling back to the seed here would list at a number the seller had
+      // just deleted.
       expect(
         state(
           selected: <Marketplace>{Marketplace.depop},
-          overrides: const <Marketplace, Money>{
+          price: const Money(4500, 'USD'),
+        ).canPublish,
+        isFalse,
+      );
+      expect(
+        state(
+          selected: <Marketplace>{Marketplace.depop},
+          price: const Money(4500, 'USD'),
+          prices: const <Marketplace, Money>{
             Marketplace.depop: Money(4000, 'USD'),
           },
         ).canPublish,
         isTrue,
       );
-      expect(
-        state(
-          selected: <Marketplace>{Marketplace.depop, Marketplace.ebay},
-          overrides: const <Marketplace, Money>{
-            Marketplace.depop: Money(4000, 'USD'),
-          },
-        ).canPublish,
-        isFalse,
-        reason: 'eBay still has no price of its own and no default',
-      );
     });
 
-    test('unticking a platform drops the price it was given', () {
+    test('ticking seeds the row from the shared price', () {
       final ProviderContainer container = mockContainer();
       final CrossListController controller = container.read(
         crossListControllerProvider.notifier,
       );
 
+      controller.setPrice(const Money(4500, 'USD'));
       controller.toggle(Marketplace.etsy);
-      controller.setPriceFor(Marketplace.etsy, const Money(2500, 'USD'));
 
+      // The common case — one number everywhere — must still be no typing.
       expect(
-        container.read(crossListControllerProvider).isOverridden(
-          Marketplace.etsy,
-        ),
-        isTrue,
+        container.read(crossListControllerProvider).prices[Marketplace.etsy],
+        const Money(4500, 'USD'),
+      );
+    });
+
+    test('unticking drops the price that row was given', () {
+      final ProviderContainer container = mockContainer();
+      final CrossListController controller = container.read(
+        crossListControllerProvider.notifier,
       );
 
+      controller.setPrice(const Money(4500, 'USD'));
+      controller.toggle(Marketplace.etsy);
+      controller.setPriceFor(Marketplace.etsy, const Money(2500, 'USD'));
+      controller.toggle(Marketplace.etsy);
       controller.toggle(Marketplace.etsy);
 
-      // A hidden override that came back on the next tick is a number nobody
-      // chose this time.
+      // Back on the shared seed, not on the 2500 nobody chose this time.
       expect(
-        container.read(crossListControllerProvider).isOverridden(
-          Marketplace.etsy,
-        ),
-        isFalse,
+        container.read(crossListControllerProvider).prices[Marketplace.etsy],
+        const Money(4500, 'USD'),
       );
     });
 
