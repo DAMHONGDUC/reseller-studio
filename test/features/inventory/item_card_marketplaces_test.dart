@@ -52,12 +52,9 @@ void main() {
     expect(find.widgetWithText(SdBadgeV3, 'Poshmark'), findsOneWidget);
     // The item's own asking price stays; a listing's is not on the row any
     // more.
-    expect(
-      find.textContaining(r'Asking $45.00', findRichText: true),
-      findsOneWidget,
-    );
-    expect(find.textContaining(r'$40.00', findRichText: true), findsNothing);
-    expect(find.textContaining(r'$50.00', findRichText: true), findsNothing);
+    expect(find.text(r'$45.00'), findsOneWidget);
+    expect(find.text(r'$40.00'), findsNothing);
+    expect(find.text(r'$50.00'), findsNothing);
   });
 
   testWidgets('an item on no marketplace names none', (

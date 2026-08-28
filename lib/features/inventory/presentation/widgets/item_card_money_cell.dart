@@ -1,15 +1,18 @@
 part of 'item_card.dart';
 
-/// One labelled figure on the money line — `Cost $45.00`.
+/// One labelled figure on the money line — `Cost` at the left, `$45.00` at the
+/// right.
 ///
-/// **The figure is a size louder than its label** — owner's rule. Cost,
-/// asking and profit are what the row exists to show; a label reading at the
-/// same weight makes the seller hunt for the number among the words that
-/// introduce it.
+/// **Label and figure are pushed apart, not set side by side** — owner's rule.
+/// `Cost`, `Asking` and `Profit` are three different lengths, so a label
+/// followed by its figure started each amount at a different place and the
+/// three read as a ragged staircase. Pinned to the card's right edge they
+/// form a column, which is the only way three amounts can be compared at a
+/// glance.
 ///
-/// **Label and value on one line, not stacked.** The stacked version cost the
-/// row a whole line of height to say two words, and three of them side by
-/// side read as a table nobody wanted inside a list row.
+/// **The figure is a size louder than its label** — owner's rule. The amounts
+/// are what the row exists to show, and a label at the same weight makes the
+/// seller hunt for the number among the words introducing it.
 class _MoneyCell extends StatelessWidget {
   const _MoneyCell({
     required this.label,
@@ -22,23 +25,31 @@ class _MoneyCell extends StatelessWidget {
   final Color color;
 
   @override
-  // One paragraph rather than a Row of two Texts: the label and the figure
-  // must ellipsize as one thing, and a Row would clip whichever child the
-  // constraints reached first.
-  Widget build(BuildContext context) => Text.rich(
-    TextSpan(
-      children: <InlineSpan>[
-        TextSpan(text: '$label '),
-        TextSpan(
-          text: value,
+  Widget build(BuildContext context) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: <Widget>[
+      // Both flexible: the label is the shorter of the two and gives way
+      // first, but neither may push the row past the card.
+      Flexible(
+        child: Text(
+          label,
+          style: context.textTheme3.bodySmall!.faint3(context),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+      SizedBox(width: SdSpacingConstant.w12),
+      Flexible(
+        child: Text(
+          value,
           style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
             color: color,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.end,
         ),
-      ],
-    ),
-    style: context.textTheme3.bodySmall!.faint3(context),
-    maxLines: 1,
-    overflow: TextOverflow.ellipsis,
+      ),
+    ],
   );
 }

@@ -41,19 +41,14 @@ void main() {
       ),
     );
 
-    // One paragraph per cell, so the label and its figure ellipsize together.
-    expect(
-      find.textContaining(r'Cost $45.00', findRichText: true),
-      findsOneWidget,
-    );
-    expect(
-      find.textContaining(r'Asking $185.00', findRichText: true),
-      findsOneWidget,
-    );
-    expect(
-      find.textContaining(r'Profit $140.00', findRichText: true),
-      findsOneWidget,
-    );
+    // Label at the card's left edge, figure at its right, so the three
+    // amounts line up in a column whatever their labels measure.
+    expect(find.text('Cost'), findsOneWidget);
+    expect(find.text(r'$45.00'), findsOneWidget);
+    expect(find.text('Asking'), findsOneWidget);
+    expect(find.text(r'$185.00'), findsOneWidget);
+    expect(find.text('Profit'), findsOneWidget);
+    expect(find.text(r'$140.00'), findsOneWidget);
   });
 
   testWidgets('a Quick Add row says the figures are missing, never zero', (
@@ -69,9 +64,7 @@ void main() {
 
     // Hard rule 5: both figures render an em dash rather than a zero, which
     // would tell the seller the item was free.
-    expect(find.textContaining('Cost —', findRichText: true), findsOneWidget);
-    expect(find.textContaining('Asking —', findRichText: true), findsOneWidget);
-    expect(find.textContaining('Profit —', findRichText: true), findsOneWidget);
+    expect(find.text('—'), findsNWidgets(3));
   });
 
   testWidgets('the row carries how long the item has been in its state', (

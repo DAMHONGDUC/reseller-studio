@@ -192,9 +192,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('brass hardware'), findsOneWidget);
-      // A cell is one paragraph, so the dash lives in a span rather than in a
-      // `Text` of its own.
-      expect(find.textContaining('—', findRichText: true), findsWidgets);
+      expect(find.text('—'), findsWidgets);
 
       // The oldest item is tenth and is not built until scrolled to.
       //
