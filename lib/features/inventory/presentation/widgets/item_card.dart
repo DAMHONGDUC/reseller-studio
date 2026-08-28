@@ -167,19 +167,42 @@ class ItemCard extends StatelessWidget {
 /// has to be one a seller already knows, and the overflow dots are what every
 /// list row on the platform uses to mean "more you can do to this". `tune`
 /// reads as filtering when it is not sitting beside the word Actions.
+///
+/// **The glyph sits on the card's content edge, not an `IconButton`'s worth
+/// further in.** A default `IconButton` centres its icon in a 48pt box, which
+/// put these dots 17 points inside where every `AppRowChevron` sits — a
+/// column of end glyphs that does not line up reads as a mistake even to
+/// somebody who cannot say which card is wrong. The tap target is bought back
+/// in height rather than width, so it stays comfortable without moving the
+/// glyph off the edge.
 class _ActionsButton extends StatelessWidget {
   const _ActionsButton({required this.onPressed});
 
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => IconButton(
-    icon: SdIconV3(
-      Icons.more_vert_rounded,
-      size: SdIconV3.smallSize,
-      color: context.sdTheme3.textTertiary,
+  Widget build(BuildContext context) => Tooltip(
+    message: context.l10n.itemActions,
+    child: InkWell(
+      onTap: onPressed,
+      borderRadius: SdRadiusV3.cardAll,
+      // The box is wide enough to hit and the glyph is pinned to its right
+      // edge, so the tap area grows inward while the dots stay on the card's
+      // content edge. `IconButton` cannot do this: Material 3 builds it from
+      // a `ButtonStyle` and ignores `constraints`, so its 48pt target centres
+      // the glyph 16 points short of where it belongs.
+      child: SizedBox(
+        width: SdSpacingConstant.r36,
+        height: SdSpacingConstant.r44,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: SdIconV3(
+            Icons.more_vert_rounded,
+            size: SdIconV3.smallSize,
+            color: context.sdTheme3.textTertiary,
+          ),
+        ),
+      ),
     ),
-    tooltip: context.l10n.itemActions,
-    onPressed: onPressed,
   );
 }

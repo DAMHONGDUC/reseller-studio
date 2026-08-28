@@ -175,4 +175,31 @@ void main() {
       ),
     );
   });
+
+  testWidgets('the arrow reaches the end of the row, whatever the title', (
+    WidgetTester tester,
+  ) async {
+    // A `Flexible` title beside a `Spacer` shares the free space with it, so
+    // the arrow floated a different distance in on every step depending on
+    // how long its title was. Two steps with different title lengths must put
+    // their arrow in the same column.
+    await openSheet(tester);
+
+    final List<double> rights = tester
+        .widgetList<AnimatedRotation>(find.byType(AnimatedRotation))
+        .take(4)
+        .toList()
+        .asMap()
+        .keys
+        .map(
+          (int i) => tester.getRect(find.byType(AnimatedRotation).at(i)).right,
+        )
+        .toList();
+
+    expect(rights.length, greaterThan(1));
+
+    for (final double right in rights) {
+      expect(right, moreOrLessEquals(rights.first, epsilon: 0.5));
+    }
+  });
 }

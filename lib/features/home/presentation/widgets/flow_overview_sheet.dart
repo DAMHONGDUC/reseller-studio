@@ -173,19 +173,27 @@ class _FlowStepHeader extends StatelessWidget {
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w12),
-              Flexible(
-                child: Text(
-                  WorkflowLabel.title(context, step.kind),
-                  style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-                    color: context.sdTheme3.textPrimary,
-                  ),
+              // - one Expanded holding the title AND its badge, so the
+              //   arrow is pushed hard to the end
+              // - a Flexible title beside a Spacer split the free space
+              //   between them, leaving the arrow floating mid-row
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        WorkflowLabel.title(context, step.kind),
+                        style: context.textTheme3.titleSmall!.semiBold3
+                            .copyWith(color: context.sdTheme3.textPrimary),
+                      ),
+                    ),
+                    if (step.isOptional) ...<Widget>[
+                      SizedBox(width: SdSpacingConstant.w8),
+                      SdBadgeV3(label: context.l10n.commonOptional),
+                    ],
+                  ],
                 ),
               ),
-              if (step.isOptional) ...<Widget>[
-                SizedBox(width: SdSpacingConstant.w8),
-                SdBadgeV3(label: context.l10n.commonOptional),
-              ],
-              const Spacer(),
               SizedBox(width: SdSpacingConstant.w8),
               ExcludeSemantics(
                 child: AnimatedRotation(
