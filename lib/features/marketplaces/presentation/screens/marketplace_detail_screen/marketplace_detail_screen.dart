@@ -164,9 +164,9 @@ class _MarketplaceDetailScreenState
             IconButton(
               tooltip: context.l10n.actionDelete,
               onPressed: state.isSaving ? null : () => _confirmDelete(id),
-              icon: SdIconV3(
-                Symbols.delete_rounded,
-                size: SdIconV3.smallSize,
+              icon: Icon(
+                Icons.delete_outline_rounded,
+                size: SdSpacingConstant.r24,
                 color: context.sdTheme3.danger,
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart'
     as record;
@@ -111,7 +110,7 @@ void main() {
       expect(find.widgetWithText(TextField, 'eBay'), findsOneWidget);
       expect(find.widgetWithText(TextField, '13.25'), findsOneWidget);
       expect(find.byTooltip('Delete'), findsOneWidget);
-      expect(find.byIcon(Symbols.delete_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.delete_outline_rounded), findsOneWidget);
       expect(find.byType(Switch), findsNothing);
     });
 
@@ -119,7 +118,7 @@ void main() {
       await pumpScreen(tester, const MarketplaceDetailScreen());
 
       expect(find.byTooltip('Delete'), findsNothing);
-      expect(find.byIcon(Symbols.delete_rounded), findsNothing);
+      expect(find.byIcon(Icons.delete_outline_rounded), findsNothing);
     });
 
     test('the form controller can add a normal marketplace record', () async {
