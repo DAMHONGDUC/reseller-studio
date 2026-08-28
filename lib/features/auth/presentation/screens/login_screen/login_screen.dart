@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_feature_constant.dart';
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/navigation_utils.dart';

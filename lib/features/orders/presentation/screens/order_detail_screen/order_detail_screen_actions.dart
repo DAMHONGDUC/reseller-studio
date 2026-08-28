@@ -40,7 +40,7 @@ class _OrderActions extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.orderReturnDialogTitle,
         message: context.l10n.orderReturnDialogBody,
-        icon: Symbols.assignment_return_rounded,
+        icon: AppIconConstant.assignmentReturn,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.orderRestock,
@@ -84,7 +84,7 @@ class _OrderActions extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
             label: context.l10n.orderShipIt,
-            icon: Symbols.local_shipping_rounded,
+            icon: AppIconConstant.localShipping,
             expand: true,
             busy: isBusy,
             onPressed: () => ShipOrderSheet.show(context, order),
@@ -93,7 +93,7 @@ class _OrderActions extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
             label: context.l10n.orderMarkDelivered,
-            icon: Symbols.check_circle_rounded,
+            icon: AppIconConstant.checkCircle,
             expand: true,
             busy: isBusy,
             onPressed: () => _run(
@@ -108,7 +108,7 @@ class _OrderActions extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
             label: context.l10n.orderItemCameBack,
-            icon: Symbols.assignment_return_rounded,
+            icon: AppIconConstant.assignmentReturn,
             expand: true,
             busy: isBusy,
             onPressed: () => _confirmReturn(context, ref),
@@ -140,7 +140,7 @@ class _OrderActions extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,
             label: context.l10n.refundAction,
-            icon: Symbols.currency_exchange_rounded,
+            icon: AppIconConstant.currencyExchange,
             expand: true,
             busy: isBusy,
             onPressed: () => RefundSheet.show(context, order),

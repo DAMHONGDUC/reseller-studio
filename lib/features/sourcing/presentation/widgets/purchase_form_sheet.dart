@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
@@ -119,7 +119,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           PickerField(
             label: context.l10n.commonDate,
             isRequired: true,
-            icon: Symbols.calendar_month_rounded,
+            icon: AppIconConstant.calendarMonth,
             value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
             onTap: () async {
               final DateTime? picked = await showDatePicker(
@@ -141,7 +141,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
             label: context.l10n.sourcingSourceOptional,
-            icon: Symbols.storefront_rounded,
+            icon: AppIconConstant.storefront,
             value: names[_sourceId],
             placeholder: sources.isEmpty ? 'None yet' : 'Not set',
             onTap: sources.isEmpty

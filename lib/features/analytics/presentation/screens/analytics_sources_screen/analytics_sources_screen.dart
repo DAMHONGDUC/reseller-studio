@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../sourcing/providers.dart';
 import '../../widgets/metric_card.dart';
@@ -43,7 +43,7 @@ class AnalyticsSourcesScreen extends ConsumerWidget {
       appBar: SdAppBarV3(title: context.l10n.analyticsBySource),
       body: rows.isEmpty
           ? SdEmptyStateV3(
-              icon: Symbols.storefront_rounded,
+              icon: AppIconConstant.storefront,
               title: context.l10n.analyticsNoSourcesYet,
               message: context.l10n.analyticsRecordWhereStockComesFromAnd,
             )

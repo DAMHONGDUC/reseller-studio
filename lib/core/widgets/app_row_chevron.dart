@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
+import '../constants/app_icon_constant.dart';
 
 /// The glyph at the end of a row-shaped card that opens something.
 ///
@@ -21,7 +21,7 @@ class AppRowChevron extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SdIconV3(
-    Symbols.chevron_right_rounded,
+    AppIconConstant.chevronRight,
     size: SdIconV3.smallSize,
     color: context.sdTheme3.textTertiary,
   );

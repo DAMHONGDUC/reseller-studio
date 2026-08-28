@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -46,7 +46,7 @@ class SourcingScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.analyticsSpent,
                   value: context.money(spend, compact: true),
-                  icon: Symbols.payments_rounded,
+                  icon: AppIconConstant.payments,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
@@ -54,7 +54,7 @@ class SourcingScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.sourcingBuyingTrips,
                   value: '${purchases.length}',
-                  icon: Symbols.local_mall_rounded,
+                  icon: AppIconConstant.localMall,
                 ),
               ),
             ],
@@ -65,7 +65,7 @@ class SourcingScreen extends ConsumerWidget {
               AppListRow(
                 title: context.l10n.sourcingPurchases,
                 subtitle: context.l10n.sourcingEveryBuyingTripAndWhatIt,
-                icon: Symbols.local_mall_rounded,
+                icon: AppIconConstant.localMall,
                 onTap: () => context.push(AppRoutes.purchases),
               ),
               AppListRow(
@@ -73,13 +73,13 @@ class SourcingScreen extends ConsumerWidget {
                 subtitle: sources.isEmpty
                     ? 'Add the shops worth going back to'
                     : '${sources.length} places, ranked by what they return',
-                icon: Symbols.storefront_rounded,
+                icon: AppIconConstant.storefront,
                 onTap: () => context.push(AppRoutes.sources),
               ),
               AppListRow(
                 title: context.l10n.sourcingShouldIBuyThis,
                 subtitle: context.l10n.sourcingWorkOutProfitRoiAndThe,
-                icon: Symbols.calculate_rounded,
+                icon: AppIconConstant.calculate,
                 onTap: () => context.push(AppRoutes.purchaseEvaluator),
               ),
             ],

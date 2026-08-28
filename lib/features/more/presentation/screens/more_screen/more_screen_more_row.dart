@@ -36,7 +36,7 @@ class _MoreRow extends StatelessWidget {
                   SdBadgeV3(label: context.l10n.moreComingSoon)
                 else
                   SdIconV3(
-                    Symbols.chevron_right_rounded,
+                    AppIconConstant.chevronRight,
                     size: SdIconV3.smallSize,
                     color: context.sdTheme3.textTertiary,
                   ),

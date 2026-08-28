@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:system_design/index.dart';
 
+import '../constants/app_icon_constant.dart';
 import '../constants/log_tag_constant.dart';
 import '../extensions/context_extensions.dart';
 
@@ -103,13 +103,13 @@ class BarcodeCameraViewState extends State<BarcodeCameraView> {
         child: Column(
           children: <Widget>[
             _CameraButton(
-              icon: Symbols.flashlight_on_rounded,
+              icon: AppIconConstant.flashlightOn,
               tooltip: context.l10n.scannerTorch,
               onPressed: _controller.toggleTorch,
             ),
             SizedBox(height: SdSpacingConstant.h8),
             _CameraButton(
-              icon: Symbols.cameraswitch_rounded,
+              icon: AppIconConstant.cameraswitch,
               tooltip: context.l10n.scannerSwitchCamera,
               onPressed: _controller.switchCamera,
             ),

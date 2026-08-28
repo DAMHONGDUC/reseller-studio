@@ -41,8 +41,7 @@ class CrossListState {
   /// edit is a `copyWith` on the real document, not a lookup done twice.
   final Map<Marketplace, Listing> existing;
 
-  bool isExisting(Marketplace marketplace) =>
-      existing.containsKey(marketplace);
+  bool isExisting(Marketplace marketplace) => existing.containsKey(marketplace);
 
   /// What [marketplace] will be listed at — its own number, or the seed for a
   /// row nobody has touched.

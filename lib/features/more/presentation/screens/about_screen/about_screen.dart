@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/config/app_env.dart';
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/legal_links_card.dart';
 import '../../../workflow_constant.dart';
@@ -69,7 +69,7 @@ class _Masthead extends StatelessWidget {
         Row(
           children: <Widget>[
             SdIconTileV3(
-              icon: Symbols.storefront_rounded,
+              icon: AppIconConstant.storefront,
               tint: context.colorScheme3.primary,
             ),
             SizedBox(width: SdSpacingConstant.w12),

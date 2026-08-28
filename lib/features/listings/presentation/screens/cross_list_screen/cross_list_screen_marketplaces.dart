@@ -122,8 +122,8 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
               children: <Widget>[
                 SdIconV3(
                   isTicked
-                      ? Symbols.check_circle_rounded
-                      : Symbols.radio_button_unchecked_rounded,
+                      ? AppIconConstant.checkCircle
+                      : AppIconConstant.radioButtonUnchecked,
                   fill: isTicked ? 1 : 0,
                   color: isTicked
                       ? context.colorScheme3.primary

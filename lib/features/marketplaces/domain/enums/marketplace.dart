@@ -49,5 +49,4 @@ enum Marketplace {
     Marketplace.shopify => 0.029,
     Marketplace.other => 0,
   };
-
 }

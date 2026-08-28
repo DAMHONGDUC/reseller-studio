@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/config/app_env.dart';
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
@@ -89,14 +89,14 @@ class SubscriptionScreen extends ConsumerWidget {
               AppListRow(
                 title: context.l10n.subscriptionRestorePurchases,
                 subtitle: context.l10n.subscriptionIfYouAlreadyPaidOnAnother,
-                icon: Symbols.restore_rounded,
+                icon: AppIconConstant.restore,
                 onTap: isBusy ? null : () => _restore(context, ref),
               ),
               if (status != null && status.source != SubscriptionSource.none)
                 AppListRow(
                   title: context.l10n.subscriptionManageBilling,
                   subtitle: _billingHome(status.source),
-                  icon: Symbols.credit_card_rounded,
+                  icon: AppIconConstant.creditCard,
                   showChevron: false,
                 ),
             ],

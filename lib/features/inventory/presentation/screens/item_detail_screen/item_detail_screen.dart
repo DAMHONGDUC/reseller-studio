@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
@@ -54,7 +54,7 @@ class ItemDetailScreen extends ConsumerWidget {
                 variant: SdButtonVariantV3.secondary,
                 size: SdButtonSizeV3.small,
                 label: context.l10n.itemActions,
-                icon: Symbols.tune_rounded,
+                icon: AppIconConstant.tune,
                 onPressed: () => ItemActionsSheet.show(context, value),
               ),
             ),
@@ -63,14 +63,14 @@ class ItemDetailScreen extends ConsumerWidget {
       body: switch (item) {
         AsyncLoading<Item?>() when !item.hasValue => const SdLoadingV3Page(),
         AsyncError<Item?>() => SdEmptyStateV3(
-          icon: Symbols.error_rounded,
+          icon: AppIconConstant.error,
           title: context.l10n.itemLoadFailed,
           message: context.l10n.commonCouldNotLoad,
         ),
         // Null rather than an error: the row may have been deleted by a
         // teammate while this screen was open, which is not a failure.
         AsyncData<Item?>(value: null) => SdEmptyStateV3(
-          icon: Symbols.search_off_rounded,
+          icon: AppIconConstant.searchOff,
           title: context.l10n.itemNotFound,
           message: context.l10n.commonMayHaveBeenDeleted,
         ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
@@ -36,7 +36,7 @@ class PayoutsScreen extends ConsumerWidget {
       return SdScaffoldV3(
         appBar: SdAppBarV3(title: context.l10n.payoutsTitle),
         body: SdEmptyStateV3(
-          icon: Symbols.account_balance_rounded,
+          icon: AppIconConstant.accountBalance,
           title: context.l10n.payoutsNoSalesYet,
           message: context.l10n.payoutsNoSalesYetNote,
         ),
@@ -55,7 +55,7 @@ class PayoutsScreen extends ConsumerWidget {
             SdStatTileV3(
               label: context.l10n.payoutsNothingOutstanding,
               value: context.l10n.payoutsNothingOutstandingNote,
-              icon: Symbols.check_circle_rounded,
+              icon: AppIconConstant.checkCircle,
               tone: SdStatToneV3.profit,
             ),
             SizedBox(height: SdContentPaddingV3.sectionGap),

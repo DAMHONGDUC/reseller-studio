@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
@@ -69,7 +69,7 @@ class ReportsScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.commonRevenue,
                   value: context.money(summary.revenue, compact: true),
-                  icon: Symbols.trending_up_rounded,
+                  icon: AppIconConstant.trendingUp,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
@@ -81,7 +81,7 @@ class ReportsScreen extends ConsumerWidget {
                   caption: summary.isProfitComplete
                       ? null
                       : 'Some costs missing',
-                  icon: Symbols.savings_rounded,
+                  icon: AppIconConstant.savings,
                 ),
               ),
             ],
@@ -93,7 +93,7 @@ class ReportsScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.commonOrders,
                   value: '${summary.orderCount}',
-                  icon: Symbols.receipt_long_rounded,
+                  icon: AppIconConstant.receiptLong,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
@@ -101,7 +101,7 @@ class ReportsScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.analyticsInventoryValue,
                   value: context.money(summary.inventoryValue, compact: true),
-                  icon: Symbols.inventory_2_rounded,
+                  icon: AppIconConstant.inventory,
                 ),
               ),
             ],
@@ -117,7 +117,7 @@ class ReportsScreen extends ConsumerWidget {
               AppListRow(
                 title: context.l10n.analyticsSales,
                 subtitle: context.l10n.reportsOneRowPerItemSoldWith,
-                icon: Symbols.point_of_sale_rounded,
+                icon: AppIconConstant.pointOfSale,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.sales),
@@ -125,7 +125,7 @@ class ReportsScreen extends ConsumerWidget {
               AppListRow(
                 title: context.l10n.workflowInventory,
                 subtitle: context.l10n.reportsEverythingYouHoldWithCostAnd,
-                icon: Symbols.inventory_2_rounded,
+                icon: AppIconConstant.inventory,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.inventory),
@@ -133,7 +133,7 @@ class ReportsScreen extends ConsumerWidget {
               AppListRow(
                 title: context.l10n.commonExpenses,
                 subtitle: context.l10n.reportsEveryCostByCategoryAndDate,
-                icon: Symbols.receipt_rounded,
+                icon: AppIconConstant.receipt,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.expenses),
@@ -146,7 +146,7 @@ class ReportsScreen extends ConsumerWidget {
                 subtitle: context.l10n.reportsTaxSummaryNote(
                   ref.watch(selectedTaxYearProvider).label,
                 ),
-                icon: Symbols.receipt_long_rounded,
+                icon: AppIconConstant.receiptLong,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.tax),

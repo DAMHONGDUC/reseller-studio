@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../more/workflow_constant.dart';
 
@@ -199,7 +199,7 @@ class _FlowStepHeader extends StatelessWidget {
                   duration: SdMotionV3.fast,
                   curve: SdMotionV3.standard,
                   child: SdIconV3(
-                    Symbols.keyboard_arrow_down_rounded,
+                    AppIconConstant.keyboardArrowDown,
                     size: SdIconV3.smallSize,
                     color: context.sdTheme3.textTertiary,
                   ),
@@ -236,7 +236,7 @@ class _FlowStepDetails extends StatelessWidget {
           variant: SdButtonVariantV3.text,
           size: SdButtonSizeV3.small,
           label: context.l10n.flowOverviewOpen,
-          icon: Symbols.arrow_forward_rounded,
+          icon: AppIconConstant.arrowForward,
           onPressed: () {
             // Close first so the destination does not open under the sheet.
             Navigator.of(context).pop();

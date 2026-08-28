@@ -76,7 +76,7 @@ class _GettingStartedRow extends StatelessWidget {
     title: GettingStartedStepLabel.title(context, step),
     subtitle: GettingStartedStepLabel.detail(context, step),
     icon: isDone
-        ? Symbols.check_circle_rounded
+        ? AppIconConstant.checkCircle
         : GettingStartedStepLabel.icon(step),
     iconTint: isDone ? context.sdTheme3.success : null,
     // A finished step is a record, and a chevron on it is an affordance that

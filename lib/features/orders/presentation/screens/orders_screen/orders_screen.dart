@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -42,12 +42,12 @@ class OrdersScreen extends ConsumerWidget {
         title: context.l10n.navOrders,
         actions: <Widget>[
           IconButton(
-            icon: const SdIconV3(Symbols.local_offer_rounded),
+            icon: const SdIconV3(AppIconConstant.localOffer),
             tooltip: context.l10n.offersTitle,
             onPressed: () => context.push(AppRoutes.offers),
           ),
           IconButton(
-            icon: const SdIconV3(Symbols.local_shipping_rounded),
+            icon: const SdIconV3(AppIconConstant.localShipping),
             tooltip: context.l10n.shippingQueueTitle,
             onPressed: () => context.push(AppRoutes.shippingQueue),
           ),
@@ -63,14 +63,14 @@ class OrdersScreen extends ConsumerWidget {
               AsyncLoading<List<Order>>() when !source.hasValue =>
                 const SdLoadingV3Page(),
               AsyncError<List<Order>>() => SdEmptyStateV3(
-                icon: Symbols.error_rounded,
+                icon: AppIconConstant.error,
                 title: context.l10n.ordersLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
               _ when orders.isEmpty => AppListEmptyState(
                 hasAny: (source.value ?? const <Order>[]).isNotEmpty,
                 noMatchMessage: context.l10n.ordersNoMatch,
-                emptyIcon: Symbols.receipt_long_rounded,
+                emptyIcon: AppIconConstant.receiptLong,
                 emptyTitle: context.l10n.ordersEmptyTitle,
                 emptyMessage: context.l10n.ordersEmptyBody,
                 // Orders have no create action of their own — one appears

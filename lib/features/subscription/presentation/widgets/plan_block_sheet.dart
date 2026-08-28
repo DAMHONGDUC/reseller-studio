@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
@@ -81,7 +81,7 @@ class PlanBlockSheet extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SdIconV3(
-                      Symbols.check_rounded,
+                      AppIconConstant.check,
                       size: SdIconV3.smallSize,
                       color: context.sdTheme3.success,
                     ),

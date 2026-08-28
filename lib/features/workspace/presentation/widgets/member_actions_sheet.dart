@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/widgets/app_sheet_action_row.dart';
@@ -69,7 +69,7 @@ class MemberActionsSheet extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.teamRemoveConfirmTitle,
         message: context.l10n.teamRemoveConfirmBody(_name(context)),
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.teamRemove,
@@ -124,12 +124,12 @@ class MemberActionsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Widget> actions = <Widget>[
       AppSheetActionRow(
-        icon: Symbols.badge_rounded,
+        icon: AppIconConstant.badge,
         label: context.l10n.teamChangeRole,
         onTap: () => _changeRole(context, ref),
       ),
       AppSheetActionRow(
-        icon: Symbols.person_remove_rounded,
+        icon: AppIconConstant.personRemove,
         label: context.l10n.teamRemove,
         isDestructive: true,
         onTap: () {

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
@@ -62,12 +62,12 @@ class OrderDetailScreen extends ConsumerWidget {
       body: switch (order) {
         AsyncLoading<Order?>() when !order.hasValue => const SdLoadingV3Page(),
         AsyncError<Order?>() => SdEmptyStateV3(
-          icon: Symbols.error_rounded,
+          icon: AppIconConstant.error,
           title: context.l10n.orderLoadFailed,
           message: context.l10n.commonCouldNotLoad,
         ),
         AsyncData<Order?>(value: null) => SdEmptyStateV3(
-          icon: Symbols.search_off_rounded,
+          icon: AppIconConstant.searchOff,
           title: context.l10n.orderNotFound,
           message: context.l10n.commonMayHaveBeenDeleted,
         ),

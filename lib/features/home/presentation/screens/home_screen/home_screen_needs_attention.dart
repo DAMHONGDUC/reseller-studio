@@ -49,7 +49,7 @@ class _NeedsAttention extends ConsumerWidget {
     final List<Widget> rows = <Widget>[
       if (pending.isNotEmpty)
         _AttentionRow(
-          icon: Symbols.local_shipping_rounded,
+          icon: AppIconConstant.localShipping,
           label: context.l10n.homeOrdersToShip,
           count: pending.length,
           // An overdue order is a different problem from a pending one: the
@@ -65,7 +65,7 @@ class _NeedsAttention extends ConsumerWidget {
       // the only row here that expires whether or not the seller acts.
       if (offers.isNotEmpty)
         _AttentionRow(
-          icon: Symbols.local_offer_rounded,
+          icon: AppIconConstant.localOffer,
           label: context.l10n.homeOffersWaiting,
           count: offers.length,
           detail: _closingDetail(context, offers, now),
@@ -74,7 +74,7 @@ class _NeedsAttention extends ConsumerWidget {
         ),
       if (unlisted.isNotEmpty)
         _AttentionRow(
-          icon: Symbols.sell_rounded,
+          icon: AppIconConstant.sell,
           label: context.l10n.homeItemsToList,
           count: unlisted.length,
           detail: 'in stock, not listed anywhere',
@@ -83,7 +83,7 @@ class _NeedsAttention extends ConsumerWidget {
         ),
       if (stale.isNotEmpty)
         _AttentionRow(
-          icon: Symbols.hourglass_bottom_rounded,
+          icon: AppIconConstant.hourglassBottom,
           label: context.l10n.homeStaleInventory,
           count: stale.length,
           // The workspace's own threshold, never a literal: a business that

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/workspace/domain/entities/pending_invite.dart';
@@ -176,7 +175,7 @@ class _WorkspaceRow extends StatelessWidget {
       child: Row(
         children: <Widget>[
           SdIconTileV3(
-            icon: Symbols.storefront_rounded,
+            icon: AppIconConstant.storefront,
             tint: accent,
             filled: isCurrent,
           ),
@@ -199,7 +198,7 @@ class _WorkspaceRow extends StatelessWidget {
               ],
             ),
           ),
-          if (isCurrent) SdIconV3(Symbols.check_rounded, color: accent),
+          if (isCurrent) SdIconV3(AppIconConstant.check, color: accent),
           // Its own tap target beside the row's, so choosing a business and
           // correcting one are never the same gesture. Square and sized to
           // the design system's action slot, so it clears 44pt.
@@ -212,7 +211,7 @@ class _WorkspaceRow extends StatelessWidget {
               height: SdAppBarActionV3.slot,
             ),
             icon: SdIconV3(
-              Symbols.edit_rounded,
+              AppIconConstant.edit,
               size: SdIconV3.smallSize,
               color: context.sdTheme3.textSecondary,
             ),
@@ -241,7 +240,7 @@ class _InviteRow extends StatelessWidget {
     child: Row(
       children: <Widget>[
         SdIconTileV3(
-          icon: Symbols.group_add_rounded,
+          icon: AppIconConstant.groupAdd,
           tint: context.colorScheme3.primary,
         ),
         SizedBox(width: SdSpacingConstant.w12),

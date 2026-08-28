@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/config/dev_flags.dart';
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -95,7 +95,7 @@ class SettingsScreen extends ConsumerWidget {
                 AppListRow(
                   title: context.l10n.moreAbout,
                   subtitle: context.l10n.aboutTagline,
-                  icon: Symbols.info_rounded,
+                  icon: AppIconConstant.info,
                   onTap: () => context.push(AppRoutes.about),
                 ),
               ],

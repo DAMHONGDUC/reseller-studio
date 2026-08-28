@@ -21,7 +21,7 @@ class _DemoSeedCard extends ConsumerWidget {
       message:
           'Writes the demo business into this workspace. Rows with the same '
           'ids are replaced, so running it twice is safe.',
-      icon: Symbols.database_rounded,
+      icon: AppIconConstant.database,
       actions: <SdDialogActionV3>[
         SdDialogActionV3(label: 'Seed', onPressed: () => _seed(context, ref)),
         SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
@@ -63,7 +63,7 @@ class _DemoSeedCard extends ConsumerWidget {
           Row(
             children: <Widget>[
               SdIconV3(
-                Symbols.database_rounded,
+                AppIconConstant.database,
                 color: context.sdTheme3.textSecondary,
               ),
               SizedBox(width: SdSpacingConstant.w12),
@@ -92,7 +92,7 @@ class _DemoSeedCard extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,
             label: 'Seed this workspace',
-            icon: Symbols.download_rounded,
+            icon: AppIconConstant.download,
             expand: true,
             busy: running,
             onPressed: hasWorkspace ? () => _confirm(context, ref) : null,

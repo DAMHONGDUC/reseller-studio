@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -114,7 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               context.push(AppRoutes.search);
             },
-            icon: const Icon(Symbols.search_rounded),
+            icon: const Icon(AppIconConstant.search),
             tooltip: context.l10n.homeShortcutSearch,
           ),
           SizedBox(width: SdSpacingConstant.w8),

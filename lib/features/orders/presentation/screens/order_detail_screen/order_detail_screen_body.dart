@@ -81,7 +81,7 @@ class _StatusCard extends StatelessWidget {
                 SdBadgeV3(
                   label: context.l10n.orderOverdue,
                   tone: SdBadgeToneV3.danger,
-                  icon: Symbols.schedule_rounded,
+                  icon: AppIconConstant.schedule,
                 ),
               ],
             ],
@@ -268,9 +268,7 @@ class _TrackingRow extends StatelessWidget {
       value: number,
       trailing: IconButton(
         icon: SdIconV3(
-          url == null
-              ? Symbols.content_copy_rounded
-              : Symbols.open_in_new_rounded,
+          url == null ? AppIconConstant.contentCopy : AppIconConstant.openInNew,
           size: SdIconV3.smallSize,
           color: context.colorScheme3.primary,
         ),

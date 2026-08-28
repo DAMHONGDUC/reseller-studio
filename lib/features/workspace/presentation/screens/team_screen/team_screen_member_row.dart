@@ -17,7 +17,7 @@ class _MemberRow extends StatelessWidget {
     title:
         member.displayName ?? member.email ?? context.l10n.teamMemberFallback,
     subtitle: member.email,
-    icon: Symbols.person_rounded,
+    icon: AppIconConstant.person,
     showChevron: canManage,
     onTap: canManage ? () => MemberActionsSheet.show(context, member) : null,
     trailing: SdBadgeV3(

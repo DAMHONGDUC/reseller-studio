@@ -150,14 +150,14 @@ class _OfferCard extends ConsumerWidget {
                       SdBadgeV3(
                         label: deadline,
                         tone: SdBadgeToneV3.warning,
-                        icon: Symbols.schedule_rounded,
+                        icon: AppIconConstant.schedule,
                       ),
                     if (offer.counterAmount != null)
                       SdBadgeV3(
                         label: context.l10n.offerCountered(
                           context.money(offer.counterAmount),
                         ),
-                        icon: Symbols.reply_rounded,
+                        icon: AppIconConstant.reply,
                       ),
                     if (offer.respondedAt != null)
                       SdBadgeV3(

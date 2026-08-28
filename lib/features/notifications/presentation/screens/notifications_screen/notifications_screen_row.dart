@@ -32,13 +32,13 @@ class _NotificationRow extends ConsumerWidget {
       };
 
   static IconData _icon(NotificationType type) => switch (type) {
-    NotificationType.orderCreated => Symbols.receipt_long_rounded,
-    NotificationType.offerReceived => Symbols.local_offer_rounded,
-    NotificationType.shipmentsDue => Symbols.local_shipping_rounded,
-    NotificationType.staleInventory => Symbols.hourglass_bottom_rounded,
-    NotificationType.lowInventory => Symbols.inventory_2_rounded,
-    NotificationType.memberJoined => Symbols.group_add_rounded,
-    NotificationType.unknown => Symbols.notifications_rounded,
+    NotificationType.orderCreated => AppIconConstant.receiptLong,
+    NotificationType.offerReceived => AppIconConstant.localOffer,
+    NotificationType.shipmentsDue => AppIconConstant.localShipping,
+    NotificationType.staleInventory => AppIconConstant.hourglassBottom,
+    NotificationType.lowInventory => AppIconConstant.inventory,
+    NotificationType.memberJoined => AppIconConstant.groupAdd,
+    NotificationType.unknown => AppIconConstant.notifications,
   };
 
   /// Tapping reads it and goes where it points.

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
@@ -61,7 +61,7 @@ class TeamScreen extends ConsumerWidget {
           SizedBox(height: SdContentPaddingV3.topGap),
           if (members.isEmpty)
             SdEmptyStateV3(
-              icon: Symbols.group_rounded,
+              icon: AppIconConstant.group,
               title: context.l10n.teamAloneTitle,
               message: context.l10n.teamAloneBody,
             )

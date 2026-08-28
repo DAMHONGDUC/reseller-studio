@@ -60,7 +60,7 @@ class _MileageCard extends StatelessWidget {
           AppListRow(
             title: context.l10n.taxDistance,
             subtitle: _unit(jurisdiction),
-            icon: Symbols.directions_car_rounded,
+            icon: AppIconConstant.directionsCar,
             trailingText: summary.mileageDistance <= 0
                 ? null
                 : summary.mileageDistance.toStringAsFixed(0),
@@ -74,7 +74,7 @@ class _MileageCard extends StatelessWidget {
                 summary.mileageDistance > 0 && summary.mileageDeduction == null
                 ? 'No published rate for this year yet'
                 : null,
-            icon: Symbols.calculate_rounded,
+            icon: AppIconConstant.calculate,
             trailingText: context.money(summary.mileageDeduction),
             showChevron: false,
           ),

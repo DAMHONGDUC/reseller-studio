@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
@@ -41,7 +41,7 @@ class ExpensesScreen extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.expensesDeleteThisExpense,
         message: context.l10n.expensesItStopsCountingAgainstYourProfit,
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,
@@ -92,7 +92,7 @@ class ExpensesScreen extends ConsumerWidget {
         AsyncLoading<List<Expense>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when expenses.isEmpty => SdEmptyStateV3(
-          icon: Symbols.receipt_rounded,
+          icon: AppIconConstant.receipt,
           title: context.l10n.expensesNoExpensesYet,
           message: context.l10n.expensesPackagingPostageStorageMileageTheCosts,
           action: SdButtonV3(
@@ -109,7 +109,7 @@ class ExpensesScreen extends ConsumerWidget {
               label: context.l10n.expensesTotalRecorded,
               value: context.money(total),
               caption: '${expenses.length} entries',
-              icon: Symbols.savings_rounded,
+              icon: AppIconConstant.savings,
             ),
             const _DueRecurring(),
             if (totals.isNotEmpty) ...<Widget>[
@@ -164,7 +164,7 @@ class ExpensesScreen extends ConsumerWidget {
                           ),
                           IconButton(
                             icon: SdIconV3(
-                              Symbols.delete_rounded,
+                              AppIconConstant.delete,
                               size: SdIconV3.smallSize,
                               color: context.sdTheme3.textTertiary,
                             ),

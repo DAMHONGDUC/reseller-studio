@@ -50,7 +50,7 @@ class _WorkspaceCard extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,
             label: context.l10n.workspaceEdit,
-            icon: Symbols.edit_rounded,
+            icon: AppIconConstant.edit,
             expand: true,
             onPressed: () =>
                 context.push(AppRoutes.workspaceDetail(workspace.id)),

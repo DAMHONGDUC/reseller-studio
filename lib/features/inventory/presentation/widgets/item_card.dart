@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/widgets/app_photo.dart';
 import '../../../listings/domain/entities/listing.dart';
@@ -101,8 +101,8 @@ class ItemCard extends StatelessWidget {
             if (isSelecting) ...<Widget>[
               SdIconV3(
                 isSelected
-                    ? Symbols.check_circle_rounded
-                    : Symbols.radio_button_unchecked_rounded,
+                    ? AppIconConstant.checkCircle
+                    : AppIconConstant.radioButtonUnchecked,
                 color: isSelected
                     ? context.colorScheme3.primary
                     : context.sdTheme3.textTertiary,
@@ -139,7 +139,7 @@ class ItemCard extends StatelessWidget {
                         SdBadgeV3(
                           label: context.l10n.itemStale,
                           tone: SdBadgeToneV3.warning,
-                          icon: Symbols.hourglass_bottom_rounded,
+                          icon: AppIconConstant.hourglassBottom,
                         ),
                       if (item.quantity > 1)
                         SdBadgeV3(
@@ -208,7 +208,7 @@ class _ActionsButton extends StatelessWidget {
         child: Align(
           alignment: Alignment.centerRight,
           child: SdIconV3(
-            Icons.more_vert_rounded,
+            AppIconConstant.moreVert,
             size: SdIconV3.smallSize,
             color: context.sdTheme3.textTertiary,
           ),

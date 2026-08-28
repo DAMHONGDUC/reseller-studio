@@ -45,13 +45,13 @@ class _AppearanceCard extends ConsumerWidget {
         AppListRow(
           title: context.l10n.settingsTheme,
           subtitle: _label(context, mode),
-          icon: Symbols.contrast_rounded,
+          icon: AppIconConstant.contrast,
           onTap: () => _pickTheme(context, ref),
         ),
         AppListRow(
           title: context.l10n.settingsLanguage,
           subtitle: context.l10n.settingsLanguageEnglish,
-          icon: Symbols.language_rounded,
+          icon: AppIconConstant.language,
           trailing: const _SoonBadge(),
           showChevron: false,
         ),

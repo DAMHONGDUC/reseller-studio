@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../analytics/app_analytics.dart';
+import '../constants/app_icon_constant.dart';
 import '../constants/log_tag_constant.dart';
 import '../constants/nav_tab_constant.dart';
 import '../extensions/context_extensions.dart';
@@ -88,28 +88,28 @@ class _AppShellState extends State<AppShell> {
     body: widget.shell,
     destinations: <SdNavDestinationV3>[
       SdNavDestinationV3(
-        icon: Symbols.home_rounded,
-        selectedIcon: Symbols.home_rounded,
+        icon: AppIconConstant.home,
+        selectedIcon: AppIconConstant.home,
         label: context.l10n.navHome,
       ),
       SdNavDestinationV3(
-        icon: Symbols.inventory_2_rounded,
-        selectedIcon: Symbols.inventory_2_rounded,
+        icon: AppIconConstant.inventory,
+        selectedIcon: AppIconConstant.inventory,
         label: context.l10n.navInventory,
       ),
       SdNavDestinationV3(
-        icon: Symbols.receipt_long_rounded,
-        selectedIcon: Symbols.receipt_long_rounded,
+        icon: AppIconConstant.receiptLong,
+        selectedIcon: AppIconConstant.receiptLong,
         label: context.l10n.navOrders,
       ),
       SdNavDestinationV3(
-        icon: Symbols.bar_chart_rounded,
-        selectedIcon: Symbols.bar_chart_rounded,
+        icon: AppIconConstant.barChart,
+        selectedIcon: AppIconConstant.barChart,
         label: context.l10n.navAnalytics,
       ),
       SdNavDestinationV3(
-        icon: Symbols.menu_rounded,
-        selectedIcon: Symbols.menu_rounded,
+        icon: AppIconConstant.menu,
+        selectedIcon: AppIconConstant.menu,
         label: context.l10n.navMore,
       ),
     ],

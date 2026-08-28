@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
@@ -133,7 +133,7 @@ class LocationsScreen extends ConsumerWidget {
         message: itemCount == 0
             ? context.l10n.locationDeleteUnused
             : context.l10n.locationDeleteInUse(itemCount),
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,
@@ -194,7 +194,7 @@ class LocationsScreen extends ConsumerWidget {
         AsyncLoading<List<StorageLocation>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when locations.isEmpty => SdEmptyStateV3(
-          icon: Symbols.shelves,
+          icon: AppIconConstant.shelves,
           title: context.l10n.locationsEmptyTitle,
           message: context.l10n.locationsEmptyBody,
           action: SdButtonV3(

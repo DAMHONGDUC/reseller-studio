@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
 
 /// A form row whose value is chosen from a sheet rather than typed.
@@ -91,7 +91,7 @@ class PickerField extends StatelessWidget {
                     ),
                   ),
                   SdIconV3(
-                    Symbols.expand_more_rounded,
+                    AppIconConstant.expandMore,
                     size: SdIconV3.smallSize,
                     color: context.sdTheme3.textSecondary,
                   ),

@@ -31,7 +31,7 @@ class _LoginHeader extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: SdIconV3(
-            Symbols.storefront_rounded,
+            AppIconConstant.storefront,
             size: SdSpacingConstant.r36,
             color: accent,
           ),

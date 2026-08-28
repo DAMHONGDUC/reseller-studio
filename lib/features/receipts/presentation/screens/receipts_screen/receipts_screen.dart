@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
@@ -47,7 +47,7 @@ class ReceiptsScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.receiptAttached,
                   value: '${receipts.length}',
-                  icon: Symbols.description_rounded,
+                  icon: AppIconConstant.description,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
@@ -57,7 +57,7 @@ class ReceiptsScreen extends ConsumerWidget {
                   value: '$missing',
                   caption: 'Purchases and expenses with no document',
                   tone: missing > 0 ? SdStatToneV3.loss : SdStatToneV3.neutral,
-                  icon: Symbols.warning_rounded,
+                  icon: AppIconConstant.warning,
                 ),
               ),
             ],
@@ -65,7 +65,7 @@ class ReceiptsScreen extends ConsumerWidget {
           SizedBox(height: SdContentPaddingV3.sectionGap),
           if (receipts.isEmpty)
             SdEmptyStateV3(
-              icon: Symbols.description_rounded,
+              icon: AppIconConstant.description,
               title: context.l10n.receiptsNoReceiptsYet,
               message: context.l10n.receiptsPhotographAReceiptWhenYouRecord,
             )

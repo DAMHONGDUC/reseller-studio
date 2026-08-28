@@ -38,10 +38,10 @@ class _ActivityRow extends ConsumerWidget {
       };
 
   static IconData _icon(ActivityEntityType type) => switch (type) {
-    ActivityEntityType.item => Symbols.inventory_2_rounded,
-    ActivityEntityType.order => Symbols.receipt_long_rounded,
-    ActivityEntityType.listing => Symbols.sell_rounded,
-    ActivityEntityType.unknown => Symbols.history_rounded,
+    ActivityEntityType.item => AppIconConstant.inventory,
+    ActivityEntityType.order => AppIconConstant.receiptLong,
+    ActivityEntityType.listing => AppIconConstant.sell,
+    ActivityEntityType.unknown => AppIconConstant.history,
   };
 
   @override

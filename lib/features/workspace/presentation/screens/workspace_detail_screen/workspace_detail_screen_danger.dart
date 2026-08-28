@@ -23,7 +23,7 @@ class _DangerZone extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.workspaceDeleteConfirmTitle,
         message: context.l10n.workspaceDeleteConfirmBody(workspace.name),
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.workspaceDeleteConfirm,
@@ -67,7 +67,7 @@ class _DangerZone extends ConsumerWidget {
     return SdButtonV3(
       variant: SdButtonVariantV3.destructive,
       label: context.l10n.workspaceDelete,
-      icon: Symbols.delete_forever_rounded,
+      icon: AppIconConstant.deleteForever,
       expand: true,
       onPressed: () => _confirm(context, ref),
     );

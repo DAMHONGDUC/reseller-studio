@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
@@ -158,7 +158,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
           PickerField(
             label: context.l10n.commonCategory,
             isRequired: true,
-            icon: Symbols.category_rounded,
+            icon: AppIconConstant.category,
             value: ExpenseCategoryLabel.of(_category),
             onTap: () async {
               final ExpenseCategory? picked =
@@ -210,7 +210,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
           PickerField(
             label: context.l10n.commonDate,
             isRequired: true,
-            icon: Symbols.calendar_month_rounded,
+            icon: AppIconConstant.calendarMonth,
             value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
             onTap: () async {
               final DateTime? picked = await showDatePicker(

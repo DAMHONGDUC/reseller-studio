@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
@@ -71,7 +71,7 @@ class SourcesScreen extends ConsumerWidget {
         AsyncLoading<List<Source>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when sources.isEmpty => SdEmptyStateV3(
-          icon: Symbols.storefront_rounded,
+          icon: AppIconConstant.storefront,
           title: context.l10n.analyticsNoSourcesYet,
           message: context.l10n.sourcingRecordWhereStockComesFromAnd,
           action: SdButtonV3(
@@ -94,7 +94,7 @@ class SourcesScreen extends ConsumerWidget {
                       ? null
                       : '${row.itemsBought} bought · ${row.itemsSold} sold · '
                             'spent ${context.money(row.spend, compact: true)}',
-                  icon: Symbols.storefront_rounded,
+                  icon: AppIconConstant.storefront,
                   showChevron: false,
                   trailing: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -36,7 +36,7 @@ class PurchaseDetailScreen extends ConsumerWidget {
       return SdScaffoldV3(
         appBar: SdAppBarV3(title: context.l10n.workflowPurchase),
         body: SdEmptyStateV3(
-          icon: Symbols.search_off_rounded,
+          icon: AppIconConstant.searchOff,
           title: context.l10n.sourcingPurchaseNotFound,
           message: context.l10n.commonMayHaveBeenDeleted,
         ),
@@ -68,7 +68,7 @@ class PurchaseDetailScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.sourcingReceiptTotal,
                   value: context.money(purchase.totalCost),
-                  icon: Symbols.receipt_rounded,
+                  icon: AppIconConstant.receipt,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
@@ -77,7 +77,7 @@ class PurchaseDetailScreen extends ConsumerWidget {
                   label: context.l10n.sourcingApportioned,
                   value: context.money(apportioned),
                   caption: '${items.length} items',
-                  icon: Symbols.function_rounded,
+                  icon: AppIconConstant.function,
                 ),
               ),
             ],

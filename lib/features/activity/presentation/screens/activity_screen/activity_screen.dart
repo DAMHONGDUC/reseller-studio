@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../auth/providers.dart';
@@ -34,7 +34,7 @@ class ActivityScreen extends ConsumerWidget {
       appBar: SdAppBarV3(title: context.l10n.activityTitle),
       body: entries.isEmpty
           ? SdEmptyStateV3(
-              icon: Symbols.history_rounded,
+              icon: AppIconConstant.history,
               title: context.l10n.activityEmptyTitle,
               message: context.l10n.activityEmptyMessage,
             )

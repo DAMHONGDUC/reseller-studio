@@ -8,7 +8,7 @@ class _AllClear extends StatelessWidget {
     child: Row(
       children: <Widget>[
         SdIconTileV3(
-          icon: Symbols.check_circle_rounded,
+          icon: AppIconConstant.checkCircle,
           tint: context.sdTheme3.success,
         ),
         SizedBox(width: SdSpacingConstant.w12),

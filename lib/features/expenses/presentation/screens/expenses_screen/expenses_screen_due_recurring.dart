@@ -67,7 +67,7 @@ class _DueRecurring extends ConsumerWidget {
                     ),
                     if (series.latest.vendor != null) series.latest.vendor!,
                   ].join(' · '),
-                  icon: Symbols.autorenew_rounded,
+                  icon: AppIconConstant.autorenew,
                   showChevron: false,
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,

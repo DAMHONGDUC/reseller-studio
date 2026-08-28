@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
@@ -107,7 +107,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
               _ when listings.isEmpty => AppListEmptyState(
                 hasAny: all.isNotEmpty,
                 noMatchMessage: context.l10n.listingsNoMatch,
-                emptyIcon: Symbols.sell_rounded,
+                emptyIcon: AppIconConstant.sell,
                 emptyTitle: context.l10n.listingsEmptyTitle,
                 emptyMessage: context.l10n.listingsListAnItemFromItsDetail,
                 // Listing happens on an item, so the way on is inventory.
@@ -203,7 +203,7 @@ class _ListingRow extends ConsumerWidget {
     return AppListRow(
       title: listing.title,
       subtitle: subtitle,
-      icon: isSelected ? Symbols.check_circle_rounded : Symbols.sell_rounded,
+      icon: isSelected ? AppIconConstant.checkCircle : AppIconConstant.sell,
       iconTint: isSelected ? context.colorScheme3.primary : tint,
       trailingText: context.money(listing.price),
       showChevron: !isSelecting,

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
 import 'domain/enums/getting_started_step.dart';
@@ -51,12 +51,12 @@ final class HomeShortcutConstant {
   static const List<HomeShortcut> shortcuts = <HomeShortcut>[
     HomeShortcut(
       kind: HomeShortcutKind.quickAction,
-      icon: Symbols.bolt_rounded,
+      icon: AppIconConstant.bolt,
     ),
-    HomeShortcut(kind: HomeShortcutKind.search, icon: Symbols.search_rounded),
+    HomeShortcut(kind: HomeShortcutKind.search, icon: AppIconConstant.search),
     HomeShortcut(
       kind: HomeShortcutKind.scan,
-      icon: Symbols.barcode_scanner_rounded,
+      icon: AppIconConstant.barcodeScanner,
     ),
   ];
 }
@@ -169,27 +169,27 @@ final class QuickActionConstant {
       actions: <QuickAction>[
         QuickAction(
           kind: QuickActionKind.quickAddItem,
-          icon: Symbols.bolt_rounded,
+          icon: AppIconConstant.bolt,
           route: AppRoutes.quickAdd,
         ),
         QuickAction(
           kind: QuickActionKind.scan,
-          icon: Symbols.barcode_scanner_rounded,
+          icon: AppIconConstant.barcodeScanner,
           route: AppRoutes.scanner,
         ),
         QuickAction(
           kind: QuickActionKind.addItem,
-          icon: Symbols.add_box_rounded,
+          icon: AppIconConstant.addBox,
           route: AppRoutes.addItem,
         ),
         QuickAction(
           kind: QuickActionKind.addCategory,
-          icon: Symbols.category_rounded,
+          icon: AppIconConstant.category,
           route: AppRoutes.categories,
         ),
         QuickAction(
           kind: QuickActionKind.addLocation,
-          icon: Symbols.shelves,
+          icon: AppIconConstant.shelves,
           route: AppRoutes.locations,
         ),
       ],
@@ -199,17 +199,17 @@ final class QuickActionConstant {
       actions: <QuickAction>[
         QuickAction(
           kind: QuickActionKind.recordPurchase,
-          icon: Symbols.shopping_bag_rounded,
+          icon: AppIconConstant.shoppingBag,
           route: AppRoutes.addPurchase,
         ),
         QuickAction(
           kind: QuickActionKind.addExpense,
-          icon: Symbols.receipt_rounded,
+          icon: AppIconConstant.receipt,
           route: AppRoutes.expenses,
         ),
         QuickAction(
           kind: QuickActionKind.addSource,
-          icon: Symbols.storefront_rounded,
+          icon: AppIconConstant.storefront,
           route: AppRoutes.sources,
         ),
       ],
@@ -219,7 +219,7 @@ final class QuickActionConstant {
       actions: <QuickAction>[
         QuickAction(
           kind: QuickActionKind.inviteTeammate,
-          icon: Symbols.group_add_rounded,
+          icon: AppIconConstant.groupAdd,
           route: AppRoutes.team,
         ),
       ],
@@ -229,13 +229,13 @@ final class QuickActionConstant {
       actions: <QuickAction>[
         QuickAction(
           kind: QuickActionKind.analytics,
-          icon: Symbols.bar_chart_rounded,
+          icon: AppIconConstant.barChart,
           route: AppRoutes.analytics,
           open: QuickActionOpen.goTab,
         ),
         QuickAction(
           kind: QuickActionKind.about,
-          icon: Symbols.info_rounded,
+          icon: AppIconConstant.info,
           route: AppRoutes.about,
         ),
       ],
@@ -285,9 +285,9 @@ final class GettingStartedStepLabel {
       };
 
   static IconData icon(GettingStartedStep step) => switch (step) {
-    GettingStartedStep.addItem => Symbols.bolt_rounded,
-    GettingStartedStep.listItem => Symbols.sell_rounded,
-    GettingStartedStep.recordSale => Symbols.payments_rounded,
+    GettingStartedStep.addItem => AppIconConstant.bolt,
+    GettingStartedStep.listItem => AppIconConstant.sell,
+    GettingStartedStep.recordSale => AppIconConstant.payments,
   };
 
   /// Where the step is performed. Steps two and three share Inventory because

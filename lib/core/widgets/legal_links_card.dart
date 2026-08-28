@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../config/app_env.dart';
+import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
 import '../utils/link_utils.dart';
 import 'app_list_row.dart';
@@ -43,18 +43,18 @@ class LegalLinksCard extends StatelessWidget {
           AppListRow(
             title: context.l10n.legalTermsOfUse,
             subtitle: context.l10n.legalTermsOfUseNote,
-            icon: Symbols.gavel_rounded,
+            icon: AppIconConstant.gavel,
             showChevron: false,
-            trailing: const SdIconV3(Symbols.open_in_new_rounded),
+            trailing: const SdIconV3(AppIconConstant.openInNew),
             onTap: () => _open(context, AppEnv.termsOfServiceUrl),
           ),
         if (AppEnv.privacyPolicyUrl.isNotEmpty)
           AppListRow(
             title: context.l10n.legalPrivacyPolicy,
             subtitle: context.l10n.legalPrivacyPolicyNote,
-            icon: Symbols.shield_rounded,
+            icon: AppIconConstant.shield,
             showChevron: false,
-            trailing: const SdIconV3(Symbols.open_in_new_rounded),
+            trailing: const SdIconV3(AppIconConstant.openInNew),
             onTap: () => _open(context, AppEnv.privacyPolicyUrl),
           ),
       ],

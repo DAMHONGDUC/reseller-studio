@@ -20,7 +20,7 @@ class _BulkActionBar extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.bulkArchiveConfirmTitle(items.length),
         message: context.l10n.bulkArchiveConfirmBody,
-        icon: Symbols.archive_rounded,
+        icon: AppIconConstant.archive,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.itemActionArchive,

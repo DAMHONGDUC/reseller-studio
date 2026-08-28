@@ -25,7 +25,7 @@ class _PerformanceBlock extends ConsumerWidget {
                 ? AppColors.lossRamp(isDark: isDark)
                 : AppColors.profitRamp(isDark: isDark),
             foreground: Colors.white,
-            icon: Symbols.trending_up_rounded,
+            icon: AppIconConstant.trendingUp,
             caption: summary.isProfitComplete
                 ? 'Margin ${context.percent(summary.margin)} · '
                       '${summary.orderCount} orders'
@@ -35,7 +35,7 @@ class _PerformanceBlock extends ConsumerWidget {
                 : SdBadgeV3(
                     label: context.l10n.commonPartial,
                     tone: SdBadgeToneV3.warning,
-                    icon: Symbols.info_rounded,
+                    icon: AppIconConstant.info,
                   ),
             onTap: () => context.go(AppRoutes.analytics),
           ),

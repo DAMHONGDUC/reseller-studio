@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
@@ -119,7 +119,7 @@ class ItemActionsSheet extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.itemDeleteConfirmTitle,
         message: context.l10n.itemDeleteConfirmBody,
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,
@@ -176,7 +176,7 @@ class ItemActionsSheet extends ConsumerWidget {
 
     final List<Widget> actions = <Widget>[
       AppSheetActionRow(
-        icon: Symbols.edit_rounded,
+        icon: AppIconConstant.edit,
         label: context.l10n.actionEdit,
         onTap: () {
           Navigator.of(context).pop();
@@ -189,7 +189,7 @@ class ItemActionsSheet extends ConsumerWidget {
       // seller who had listed on eBay tapped List, got a block message, and
       // the thing they actually wanted was the row underneath.
       AppSheetActionRow(
-        icon: Symbols.sell_rounded,
+        icon: AppIconConstant.sell,
         label: context.l10n.itemActionList,
         onTap: () {
           final ItemTransitionCheck check = ref
@@ -210,7 +210,7 @@ class ItemActionsSheet extends ConsumerWidget {
         },
       ),
       AppSheetActionRow(
-        icon: Symbols.price_change_rounded,
+        icon: AppIconConstant.priceChange,
         label: context.l10n.itemActionReprice,
         onTap: () {
           Navigator.of(context).pop();
@@ -218,12 +218,12 @@ class ItemActionsSheet extends ConsumerWidget {
         },
       ),
       AppSheetActionRow(
-        icon: Symbols.shelves,
+        icon: AppIconConstant.shelves,
         label: context.l10n.itemActionMove,
         onTap: () => _move(context, ref),
       ),
       AppSheetActionRow(
-        icon: Symbols.payments_rounded,
+        icon: AppIconConstant.payments,
         label: context.l10n.itemActionMarkSold,
         onTap: () => _guarded(context, ref, ItemStatus.sold, () {
           Navigator.of(context).pop();
@@ -231,7 +231,7 @@ class ItemActionsSheet extends ConsumerWidget {
         }),
       ),
       AppSheetActionRow(
-        icon: isArchived ? Symbols.unarchive_rounded : Symbols.archive_rounded,
+        icon: isArchived ? AppIconConstant.unarchive : AppIconConstant.archive,
         label: isArchived
             ? context.l10n.itemActionRestore
             : context.l10n.itemActionArchive,
@@ -239,7 +239,7 @@ class ItemActionsSheet extends ConsumerWidget {
             isArchived ? _restore(context, ref) : _archive(context, ref),
       ),
       AppSheetActionRow(
-        icon: Symbols.delete_rounded,
+        icon: AppIconConstant.delete,
         label: context.l10n.actionDelete,
         isDestructive: true,
         onTap: () {

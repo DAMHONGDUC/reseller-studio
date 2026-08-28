@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/utils/date_time_utils.dart';
@@ -139,7 +139,7 @@ class _PurchaseEvaluatorScreenState
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,
             label: context.l10n.sourcingScanAction,
-            icon: Symbols.qr_code_scanner_rounded,
+            icon: AppIconConstant.qrCodeScanner,
             expand: true,
             onPressed: _scan,
           ),
@@ -168,7 +168,7 @@ class _PurchaseEvaluatorScreenState
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
                   label: context.l10n.commonMarketplace,
-                  icon: Symbols.storefront_rounded,
+                  icon: AppIconConstant.storefront,
                   value:
                       '${_marketplace.displayName} · '
                       '${(MarketplaceFeePolicy.rateFor(_marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
@@ -252,9 +252,7 @@ class _Verdict extends StatelessWidget {
           SdBadgeV3(
             label: clears ? 'Worth buying' : 'Too expensive',
             tone: clears ? SdBadgeToneV3.success : SdBadgeToneV3.danger,
-            icon: clears
-                ? Symbols.thumb_up_rounded
-                : Symbols.thumb_down_rounded,
+            icon: clears ? AppIconConstant.thumbUp : AppIconConstant.thumbDown,
           ),
           SizedBox(height: SdSpacingConstant.h12),
           _EvaluationRow(

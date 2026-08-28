@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/barcode_camera_view.dart';
@@ -87,7 +87,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       SdDialogV3(
         title: context.l10n.scannerNoMatchTitle,
         message: context.l10n.scannerNoMatchBody,
-        icon: Symbols.qr_code_scanner_rounded,
+        icon: AppIconConstant.qrCodeScanner,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.scannerAddItem,

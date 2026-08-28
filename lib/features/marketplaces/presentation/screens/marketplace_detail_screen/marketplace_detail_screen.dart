@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
@@ -102,7 +101,7 @@ class _MarketplaceDetailScreenState
       SdDialogV3(
         title: context.l10n.marketplaceDeleteTitle,
         message: context.l10n.marketplaceDeleteBody,
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,

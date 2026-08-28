@@ -64,7 +64,7 @@ class _OrderCard extends StatelessWidget {
                       SdBadgeV3(
                         label: context.l10n.orderLate,
                         tone: SdBadgeToneV3.danger,
-                        icon: Symbols.priority_high_rounded,
+                        icon: AppIconConstant.priorityHigh,
                       ),
                   ],
                 ),

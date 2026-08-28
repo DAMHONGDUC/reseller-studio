@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
@@ -37,7 +37,7 @@ class MarketplacesScreen extends ConsumerWidget {
         AsyncLoading<List<Marketplace>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when marketplaces.isEmpty => SdEmptyStateV3(
-          icon: Symbols.storefront_rounded,
+          icon: AppIconConstant.storefront,
           title: context.l10n.marketplacesEmptyTitle,
           message: context.l10n.marketplacesEmptyBody,
           action: SdButtonV3(
@@ -59,7 +59,7 @@ class MarketplacesScreen extends ConsumerWidget {
                         (marketplace.feeRate * 100).toStringAsFixed(1),
                         context.l10n.marketplacesEstimatedFee,
                       ),
-                      icon: Symbols.storefront_rounded,
+                      icon: AppIconConstant.storefront,
                       onTap: () =>
                           context.push(AppRoutes.marketplace(marketplace.id)),
                     ),

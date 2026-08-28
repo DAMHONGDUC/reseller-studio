@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
 
@@ -64,52 +64,52 @@ final class WorkflowConstant {
     WorkflowStep(
       kind: WorkflowKind.source,
       isOptional: true,
-      icon: Symbols.travel_explore_rounded,
+      icon: AppIconConstant.travelExplore,
       route: AppRoutes.sources,
     ),
     WorkflowStep(
       kind: WorkflowKind.purchase,
       isOptional: true,
-      icon: Symbols.shopping_bag_rounded,
+      icon: AppIconConstant.shoppingBag,
       route: AppRoutes.purchases,
     ),
     WorkflowStep(
       kind: WorkflowKind.inventory,
-      icon: Symbols.inventory_2_rounded,
+      icon: AppIconConstant.inventory,
       route: AppRoutes.inventory,
     ),
     WorkflowStep(
       kind: WorkflowKind.list,
       isOptional: true,
-      icon: Symbols.sell_rounded,
+      icon: AppIconConstant.sell,
       route: AppRoutes.listings,
     ),
     WorkflowStep(
       kind: WorkflowKind.sell,
-      icon: Symbols.point_of_sale_rounded,
+      icon: AppIconConstant.pointOfSale,
       route: AppRoutes.orders,
     ),
     WorkflowStep(
       kind: WorkflowKind.ship,
       isOptional: true,
-      icon: Symbols.local_shipping_rounded,
+      icon: AppIconConstant.localShipping,
       route: AppRoutes.shippingQueue,
     ),
     WorkflowStep(
       kind: WorkflowKind.profit,
-      icon: Symbols.savings_rounded,
+      icon: AppIconConstant.savings,
       route: AppRoutes.analyticsProfit,
     ),
     WorkflowStep(
       kind: WorkflowKind.analyze,
       isOptional: true,
-      icon: Symbols.bar_chart_rounded,
+      icon: AppIconConstant.barChart,
       route: AppRoutes.analytics,
     ),
     WorkflowStep(
       kind: WorkflowKind.sourceBetter,
       isOptional: true,
-      icon: Symbols.restart_alt_rounded,
+      icon: AppIconConstant.restartAlt,
       route: AppRoutes.analyticsSources,
     ),
   ];

@@ -46,7 +46,7 @@ class _ConditionField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => PickerField(
     label: context.l10n.itemCondition,
-    icon: Symbols.grade_rounded,
+    icon: AppIconConstant.grade,
     value: state.condition == null
         ? null
         : ItemConditionLabel.of(context, state.condition!),
@@ -85,7 +85,7 @@ class _CategoryField extends ConsumerWidget {
 
     return PickerField(
       label: context.l10n.commonCategory,
-      icon: Symbols.category_rounded,
+      icon: AppIconConstant.category,
       value: state.categoryId == null ? null : names[state.categoryId],
       placeholder: categories.isEmpty
           ? context.l10n.itemCategoryEmptyHint
@@ -133,7 +133,7 @@ class _LocationField extends ConsumerWidget {
 
     return PickerField(
       label: context.l10n.commonLocation,
-      icon: Symbols.shelves,
+      icon: AppIconConstant.shelves,
       value: state.locationId == null ? null : paths[state.locationId],
       placeholder: locations.isEmpty
           ? context.l10n.itemLocationEmptyHint
@@ -182,7 +182,7 @@ class _SourceField extends ConsumerWidget {
 
     return PickerField(
       label: context.l10n.commonSource,
-      icon: Symbols.storefront_rounded,
+      icon: AppIconConstant.storefront,
       value: state.sourceId == null ? null : names[state.sourceId],
       placeholder: sources.isEmpty ? context.l10n.itemSourceEmptyHint : null,
       onTap: sources.isEmpty
@@ -224,7 +224,7 @@ class _PurchaseDateField extends ConsumerWidget {
 
     return PickerField(
       label: context.l10n.itemPurchaseDate,
-      icon: Symbols.calendar_month_rounded,
+      icon: AppIconConstant.calendarMonth,
       value: state.purchaseDate == null
           ? null
           : DateTimeUtils.mediumDate(

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
@@ -65,7 +65,7 @@ class NotificationsScreen extends ConsumerWidget {
           if (unread > 0)
             IconButton(
               onPressed: () => _markAllRead(context, ref, notifications),
-              icon: const Icon(Symbols.mark_email_read_rounded),
+              icon: const Icon(AppIconConstant.markEmailRead),
               tooltip: context.l10n.notificationsMarkAllRead,
             ),
           SizedBox(width: SdSpacingConstant.w8),
@@ -73,7 +73,7 @@ class NotificationsScreen extends ConsumerWidget {
       ),
       body: notifications.isEmpty
           ? SdEmptyStateV3(
-              icon: Symbols.notifications_rounded,
+              icon: AppIconConstant.notifications,
               title: context.l10n.notificationsEmptyTitle,
               message: context.l10n.notificationsEmptyMessage,
             )

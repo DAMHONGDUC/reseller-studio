@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -119,12 +119,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 ref.read(inventorySearchProvider.notifier).update(value),
             actions: <SdAppBarActionV3>[
               SdAppBarActionV3(
-                icon: Symbols.add_box_rounded,
+                icon: AppIconConstant.addBox,
                 tooltip: context.l10n.inventoryAddItem,
                 onPressed: () => _add(AppRoutes.addItem),
               ),
               SdAppBarActionV3(
-                icon: Symbols.qr_code_scanner_rounded,
+                icon: AppIconConstant.qrCodeScanner,
                 tooltip: context.l10n.inventoryScan,
                 onPressed: () => context.push(AppRoutes.scanner),
               ),
@@ -148,7 +148,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             AsyncError<List<Item>>() => SliverFillRemaining(
               hasScrollBody: false,
               child: SdEmptyStateV3(
-                icon: Symbols.error_rounded,
+                icon: AppIconConstant.error,
                 title: context.l10n.inventoryLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
@@ -158,7 +158,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               child: AppListEmptyState(
                 hasAny: (source.value ?? const <Item>[]).isNotEmpty,
                 noMatchMessage: context.l10n.inventoryNoMatch,
-                emptyIcon: Symbols.inventory_2_rounded,
+                emptyIcon: AppIconConstant.inventory,
                 emptyTitle: context.l10n.inventoryEmptyTitle,
                 emptyMessage: context.l10n.inventoryEmptyBody,
                 // The FAB says the same thing, and it is the wrong place to

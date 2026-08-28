@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
 
 /// The two ways a list can be empty, told apart.
@@ -47,7 +47,7 @@ class AppListEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) => hasAny
       ? SdEmptyStateV3(
-          icon: Symbols.filter_alt_off_rounded,
+          icon: AppIconConstant.filterAltOff,
           title: context.l10n.commonNothingHere,
           message: noMatchMessage,
         )

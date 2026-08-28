@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
@@ -136,7 +136,7 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
       return SdScaffoldV3(
         appBar: SdAppBarV3(title: context.l10n.crossListTitle),
         body: SdEmptyStateV3(
-          icon: Symbols.search_off_rounded,
+          icon: AppIconConstant.searchOff,
           title: context.l10n.itemNotFound,
           message: context.l10n.commonMayHaveBeenDeleted,
         ),

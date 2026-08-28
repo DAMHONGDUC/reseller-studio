@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 import '../extensions/context_extensions.dart';
+import 'app_icon_constant.dart';
 
 /// One thing this app does, as a glyph and two strings.
 ///
@@ -37,17 +37,17 @@ class AppFeature {
 final class AppFeatureConstant {
   static List<AppFeature> of(BuildContext context) => <AppFeature>[
     AppFeature(
-      icon: Symbols.inventory_2_rounded,
+      icon: AppIconConstant.inventory,
       title: context.l10n.onboardingInventoryTitle,
       body: context.l10n.onboardingInventoryBody,
     ),
     AppFeature(
-      icon: Symbols.local_shipping_rounded,
+      icon: AppIconConstant.localShipping,
       title: context.l10n.onboardingSellTitle,
       body: context.l10n.onboardingSellBody,
     ),
     AppFeature(
-      icon: Symbols.trending_up_rounded,
+      icon: AppIconConstant.trendingUp,
       title: context.l10n.onboardingProfitTitle,
       body: context.l10n.onboardingProfitBody,
     ),

@@ -16,7 +16,7 @@ class _MarketplaceBreakdown extends ConsumerWidget {
 
     if (rows.isEmpty) {
       return SdEmptyStateV3(
-        icon: Symbols.bar_chart_rounded,
+        icon: AppIconConstant.barChart,
         title: context.l10n.analyticsNoSalesYet,
         message: context.l10n.analyticsMarketplacePerformanceAppearsOnceYouHave,
       );

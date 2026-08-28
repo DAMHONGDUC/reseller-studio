@@ -16,7 +16,7 @@ class _HomeFlowOverview extends StatelessWidget {
       child: Row(
         children: <Widget>[
           SdIconTileV3(
-            icon: Symbols.account_tree_rounded,
+            icon: AppIconConstant.accountTree,
             tint: context.colorScheme3.primary,
           ),
           SizedBox(width: SdSpacingConstant.w12),
@@ -42,7 +42,7 @@ class _HomeFlowOverview extends StatelessWidget {
           ),
           SizedBox(width: SdSpacingConstant.w8),
           SdIconV3(
-            Symbols.chevron_right_rounded,
+            AppIconConstant.chevronRight,
             size: SdIconV3.smallSize,
             color: context.sdTheme3.textTertiary,
           ),

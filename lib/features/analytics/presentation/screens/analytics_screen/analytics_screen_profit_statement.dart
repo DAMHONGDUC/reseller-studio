@@ -75,7 +75,7 @@ class _ProfitStatement extends StatelessWidget {
               SdBadgeV3(
                 label: context.l10n.commonPartial,
                 tone: SdBadgeToneV3.warning,
-                icon: Symbols.info_rounded,
+                icon: AppIconConstant.info,
               ),
           ],
         ),

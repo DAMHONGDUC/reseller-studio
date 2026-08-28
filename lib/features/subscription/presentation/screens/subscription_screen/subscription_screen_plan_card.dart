@@ -87,7 +87,7 @@ class _PlanCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   SdIconV3(
-                    Symbols.check_rounded,
+                    AppIconConstant.check,
                     size: SdIconV3.smallSize,
                     color: context.sdTheme3.success,
                   ),

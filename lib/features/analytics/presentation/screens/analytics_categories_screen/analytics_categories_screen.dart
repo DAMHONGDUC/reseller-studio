@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../inventory/providers.dart';
 import '../../../domain/entities/analytics_breakdowns.dart';
@@ -33,7 +33,7 @@ class AnalyticsCategoriesScreen extends ConsumerWidget {
       appBar: SdAppBarV3(title: context.l10n.analyticsByCategory),
       body: rows.isEmpty
           ? SdEmptyStateV3(
-              icon: Symbols.category_rounded,
+              icon: AppIconConstant.category,
               title: context.l10n.analyticsNothingIsCategorisedYet,
               message: context.l10n.analyticsPutYourItemsIntoCategoriesAnd,
             )

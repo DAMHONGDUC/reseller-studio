@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/state/form_seed.dart';
@@ -221,7 +221,7 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
                 PickerField(
                   label: context.l10n.workspaceCountry,
                   isRequired: true,
-                  icon: Symbols.public_rounded,
+                  icon: AppIconConstant.public,
                   value: CountryLabel.of(context, state.country),
                   onTap: _pickCountry,
                 ),
@@ -229,14 +229,14 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
                 PickerField(
                   label: context.l10n.workspaceCurrency,
                   isRequired: true,
-                  icon: Symbols.payments_rounded,
+                  icon: AppIconConstant.payments,
                   value: CurrencyLabel.of(context, state.currency),
                   onTap: _pickCurrency,
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
                   label: context.l10n.workspaceBusinessTypeOptional,
-                  icon: Symbols.badge_rounded,
+                  icon: AppIconConstant.badge,
                   value: state.businessType == null
                       ? null
                       : WorkspaceOptionLabel.businessType(
@@ -248,7 +248,7 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
                   label: context.l10n.workspaceStaleAfter,
-                  icon: Symbols.hourglass_bottom_rounded,
+                  icon: AppIconConstant.hourglassBottom,
                   value: context.l10n.workspaceStaleAfterDays(
                     state.staleThresholdDays,
                   ),
@@ -257,7 +257,7 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
                   label: context.l10n.workspaceLowStock,
-                  icon: Symbols.inventory_2_rounded,
+                  icon: AppIconConstant.inventory,
                   value: context.l10n.workspaceLowStockItems(
                     state.lowStockThreshold,
                   ),

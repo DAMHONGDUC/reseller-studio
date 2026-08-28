@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
 import 'app_selectable_row.dart';
 import 'app_sheet_option_list.dart';
@@ -205,7 +205,7 @@ class _PickerRow<T> extends StatelessWidget {
           ),
           // A tick as well as the ground and the weight: colour is never the
           // only signal for a state.
-          if (isSelected) SdIconV3(Symbols.check_rounded, color: accent),
+          if (isSelected) SdIconV3(AppIconConstant.check, color: accent),
         ],
       ),
     );

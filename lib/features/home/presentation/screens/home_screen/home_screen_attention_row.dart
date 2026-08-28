@@ -57,7 +57,7 @@ class _AttentionRow extends StatelessWidget {
           ),
           SizedBox(width: SdSpacingConstant.w4),
           SdIconV3(
-            Symbols.chevron_right_rounded,
+            AppIconConstant.chevronRight,
             size: SdIconV3.smallSize,
             color: context.sdTheme3.textTertiary,
           ),

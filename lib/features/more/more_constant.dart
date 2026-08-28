@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
 
@@ -103,25 +103,25 @@ final class MoreConstant {
       destinations: <MoreDestination>[
         MoreDestination(
           kind: MoreDestinationKind.sourcing,
-          icon: Symbols.storefront_rounded,
+          icon: AppIconConstant.storefront,
           route: AppRoutes.sourcing,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.listings,
-          icon: Symbols.sell_rounded,
+          icon: AppIconConstant.sell,
           route: AppRoutes.listings,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.categories,
-          icon: Symbols.category_rounded,
+          icon: AppIconConstant.category,
           route: AppRoutes.categories,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.locations,
-          icon: Symbols.shelves,
+          icon: AppIconConstant.shelves,
           route: AppRoutes.locations,
           isBuilt: true,
         ),
@@ -132,31 +132,31 @@ final class MoreConstant {
       destinations: <MoreDestination>[
         MoreDestination(
           kind: MoreDestinationKind.expenses,
-          icon: Symbols.receipt_rounded,
+          icon: AppIconConstant.receipt,
           route: AppRoutes.expenses,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.payouts,
-          icon: Symbols.account_balance_rounded,
+          icon: AppIconConstant.accountBalance,
           route: AppRoutes.payouts,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.reports,
-          icon: Symbols.summarize_rounded,
+          icon: AppIconConstant.summarize,
           route: AppRoutes.reports,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.receipts,
-          icon: Symbols.description_rounded,
+          icon: AppIconConstant.description,
           route: AppRoutes.receipts,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.tax,
-          icon: Symbols.account_balance_rounded,
+          icon: AppIconConstant.accountBalance,
           route: AppRoutes.tax,
           isBuilt: true,
         ),
@@ -167,19 +167,19 @@ final class MoreConstant {
       destinations: <MoreDestination>[
         MoreDestination(
           kind: MoreDestinationKind.marketplaces,
-          icon: Symbols.hub_rounded,
+          icon: AppIconConstant.hub,
           route: AppRoutes.marketplaces,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.team,
-          icon: Symbols.group_rounded,
+          icon: AppIconConstant.group,
           route: AppRoutes.team,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.activity,
-          icon: Symbols.history_rounded,
+          icon: AppIconConstant.history,
           route: AppRoutes.activity,
           isBuilt: true,
         ),
@@ -190,13 +190,13 @@ final class MoreConstant {
       destinations: <MoreDestination>[
         MoreDestination(
           kind: MoreDestinationKind.subscription,
-          icon: Symbols.workspace_premium_rounded,
+          icon: AppIconConstant.workspacePremium,
           route: AppRoutes.subscription,
           isBuilt: true,
         ),
         MoreDestination(
           kind: MoreDestinationKind.settings,
-          icon: Symbols.settings_rounded,
+          icon: AppIconConstant.settings,
           route: AppRoutes.settings,
           isBuilt: true,
         ),

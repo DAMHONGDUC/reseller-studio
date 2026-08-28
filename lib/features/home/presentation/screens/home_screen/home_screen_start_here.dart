@@ -21,7 +21,7 @@ class _StartHere extends StatelessWidget {
         Row(
           children: <Widget>[
             SdIconTileV3(
-              icon: Symbols.rocket_launch_rounded,
+              icon: AppIconConstant.rocketLaunch,
               tint: context.colorScheme3.primary,
             ),
             SizedBox(width: SdSpacingConstant.w12),
@@ -48,7 +48,7 @@ class _StartHere extends StatelessWidget {
         SdButtonV3(
           variant: SdButtonVariantV3.primary,
           label: context.l10n.quickAddTitle,
-          icon: Symbols.bolt_rounded,
+          icon: AppIconConstant.bolt,
           expand: true,
           // Pushed, like every other Home hand-off: the screen that owns the
           // record owns the form (see this feature's CLAUDE.md).

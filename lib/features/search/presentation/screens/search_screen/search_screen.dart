@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
@@ -59,10 +59,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   static IconData _iconFor(SearchHitKind kind) => switch (kind) {
-    SearchHitKind.item => Symbols.inventory_2_rounded,
-    SearchHitKind.order => Symbols.receipt_long_rounded,
-    SearchHitKind.listing => Symbols.sell_rounded,
-    SearchHitKind.source => Symbols.storefront_rounded,
+    SearchHitKind.item => AppIconConstant.inventory,
+    SearchHitKind.order => AppIconConstant.receiptLong,
+    SearchHitKind.listing => AppIconConstant.sell,
+    SearchHitKind.source => AppIconConstant.storefront,
   };
 
   @override
@@ -94,12 +94,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: switch (hits) {
               _ when query.trim().length < SearchConstant.minimumQueryLength =>
                 SdEmptyStateV3(
-                  icon: Symbols.search_rounded,
+                  icon: AppIconConstant.search,
                   title: context.l10n.searchSearchEverything,
                   message: context.l10n.searchItemsOrdersListingsAndSourcesType,
                 ),
               _ when hits.isEmpty => SdEmptyStateV3(
-                icon: Symbols.search_off_rounded,
+                icon: AppIconConstant.searchOff,
                 title: context.l10n.searchNothingMatches,
                 message: context.l10n.searchTryAShorterPieceOfThe,
               ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
@@ -40,7 +40,7 @@ class ShippingQueueScreen extends ConsumerWidget {
       ),
       body: orders.isEmpty
           ? SdEmptyStateV3(
-              icon: Symbols.local_shipping_rounded,
+              icon: AppIconConstant.localShipping,
               title: context.l10n.shippingQueueEmptyTitle,
               message: context.l10n.shippingQueueEmptyBody,
             )
@@ -56,7 +56,7 @@ class ShippingQueueScreen extends ConsumerWidget {
                               ? order.marketplace.displayName
                               : order.lines.first.title,
                           subtitle: _deadlineLine(context, order, now),
-                          icon: Symbols.package_2_rounded,
+                          icon: AppIconConstant.package,
                           iconTint: (order.isOverdue(now) ?? false)
                               ? context.sdTheme3.danger
                               : context.colorScheme3.primary,

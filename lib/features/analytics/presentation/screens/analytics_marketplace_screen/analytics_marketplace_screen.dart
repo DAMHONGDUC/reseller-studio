@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../domain/entities/analytics_summary.dart';
 import '../../../providers.dart';
@@ -31,7 +31,7 @@ class AnalyticsMarketplaceScreen extends ConsumerWidget {
       appBar: SdAppBarV3(title: context.l10n.analyticsByMarketplace),
       body: rows.isEmpty
           ? SdEmptyStateV3(
-              icon: Symbols.hub_rounded,
+              icon: AppIconConstant.hub,
               title: context.l10n.analyticsNothingHasSoldYet,
               message: context.l10n.analyticsRecordASaleAndThisRanks,
             )

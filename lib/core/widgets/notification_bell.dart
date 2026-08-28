@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/notifications/providers.dart';
+import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
 import '../router/app_routes.dart';
 import '../router/navigation_utils.dart';
@@ -45,7 +45,7 @@ class NotificationBell extends ConsumerWidget {
       icon: Stack(
         clipBehavior: Clip.none,
         children: <Widget>[
-          const Icon(Symbols.notifications_rounded),
+          const Icon(AppIconConstant.notifications),
           if (unread > 0)
             Positioned(
               top: dotInset,

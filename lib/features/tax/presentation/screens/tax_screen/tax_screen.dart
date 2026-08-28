@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
@@ -59,7 +59,7 @@ class TaxScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.analyticsSales,
                   value: context.money(summary.revenue, compact: true),
-                  icon: Symbols.point_of_sale_rounded,
+                  icon: AppIconConstant.pointOfSale,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
@@ -67,7 +67,7 @@ class TaxScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.commonCostOfGoods,
                   value: context.money(summary.costOfGoods, compact: true),
-                  icon: Symbols.inventory_2_rounded,
+                  icon: AppIconConstant.inventory,
                 ),
               ),
             ],
@@ -79,7 +79,7 @@ class TaxScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.taxDeductions,
                   value: context.money(summary.totalDeductions, compact: true),
-                  icon: Symbols.receipt_rounded,
+                  icon: AppIconConstant.receipt,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
@@ -87,7 +87,7 @@ class TaxScreen extends ConsumerWidget {
                 child: SdStatTileV3(
                   label: context.l10n.taxNetBeforeTax,
                   value: context.money(summary.netBeforeTax, compact: true),
-                  icon: Symbols.savings_rounded,
+                  icon: AppIconConstant.savings,
                 ),
               ),
             ],

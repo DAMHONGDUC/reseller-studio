@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/constants/date_picker_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
@@ -27,8 +27,8 @@ import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../controllers/item_form_controller.dart';
 
-part 'item_form_screen_photo_strip.dart';
 part 'item_form_screen_marketplace_prices.dart';
+part 'item_form_screen_photo_strip.dart';
 part 'item_form_screen_sections.dart';
 
 /// Add Item and Edit Item — one screen, because they are the same fields
