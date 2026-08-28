@@ -2,6 +2,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:system_design/common.dart';
 
 import '../constants/log_tag_constant.dart';
+import 'analytics_parameter_utils.dart';
 
 /// Every analytics event the app sends, as a typed method.
 ///
@@ -14,7 +15,8 @@ import '../constants/log_tag_constant.dart';
 /// item title ever becomes a parameter** (hard rule 9). Analytics is a
 /// third-party dashboard; a title like "Nike Air Max 90" is the seller's
 /// business, and a buyer's name is somebody else's. Counts, ids, enum names
-/// and booleans only.
+/// and boolean flags only. Boolean flags are converted to `1` or `0` before
+/// Firebase receives them because its Flutter SDK rejects Dart `bool` values.
 ///
 /// A no-op until `bootstrap` attaches Firebase, exactly like `CrashReporter`:
 /// the app runs with no backend and every call here is silently dropped
@@ -242,8 +244,13 @@ class _FirebaseAppAnalytics implements AppAnalytics {
   void subscriptionActivated({required String plan}) =>
       _send('subscription_activated', <String, Object>{'plan': plan});
 
-  void _send(String name, Map<String, Object> parameters) =>
-      _report(name, _analytics.logEvent(name: name, parameters: parameters));
+  void _send(String name, Map<String, Object> parameters) => _report(
+    name,
+    _analytics.logEvent(
+      name: name,
+      parameters: AnalyticsParameterUtils.firebaseSafe(parameters),
+    ),
+  );
 
   /// Fire and forget, and never let a failed event break the action that
   /// raised it — but log it, because a caught error nobody logs is a failure
