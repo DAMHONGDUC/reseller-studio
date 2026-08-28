@@ -206,24 +206,23 @@ screen that owns the action; it never opens a form Home would then have to
 know how to save.
 
 **Two rows here do not create anything, and they ride at the end** — owner's
-rule, About last and Flow overview just above it. About lives two levels deep
-under Settings, so Home is what keeps it findable; putting both at the end is
-what stops a seller scanning for "add" from stepping over them. Nothing else
+rule, About last and Analytics just above it. About lives two levels deep under
+Settings, so Home is what keeps it findable; putting both at the end is what
+stops a seller scanning for "add" from stepping over them. Nothing else
 non-create joins them without the same decision.
 
-**Flow overview is the third shortcut card, and Analytics moved down here** —
-owner's rule, and it is the one change to the closed list of three. Analytics
-is a tab a seller reaches from the bar anyway; "how does this app work" is the
-question they cannot answer from anywhere, and it is asked most on the first
-morning, which is when Home is the only screen they know.
+**Flow overview and Analytics swapped places** — owner's rule, and it is the
+one change the closed list of three shortcut cards has had. Flow overview took
+Analytics' card and Analytics came down here. Analytics is a tab a seller
+reaches from the bar anyway; "how does this app work" is the question they
+cannot answer from anywhere, and it is asked most on the first morning, which
+is when Home is the only screen they know. **It is in one place, never two** —
+a launcher that lists the same destination twice is one a seller stops reading.
 
-- **Analytics keeps `go`, not `push`, now that it is a Quick Action row.** It
-  is a branch root, and pushing one over Home leaves the seller on the wrong
-  tab with a back button they should not have. That is why `QuickAction`
-  carries how it opens rather than a route alone.
-- **Flow overview opens a sheet, not a screen** — the question is asked while
-  standing somewhere else, so a route would cost the seller their place. It is
-  the only entry here with no route at all.
+**Analytics opens with `go`, not `push`.** It is a branch root, and pushing one
+over Home leaves the seller on the wrong tab with a back button they should not
+have — which is why `QuickAction` carries how it opens rather than a route
+alone.
 
 - **`WorkflowConstant.steps` is the content, and stays the only copy of the
   chain.** The sheet and About's diagram draw the same data — a second list

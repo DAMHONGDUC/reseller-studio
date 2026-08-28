@@ -15,8 +15,8 @@ and they are listed in the order they outrank each other.
    the ways *out* of Home — down to Quick Action, sideways into global search,
    and open the flow overview — not content, so a seller who opened the app to
    go somewhere does not read a dashboard on the way there.
-   - **Flow overview took Analytics' card, and Analytics moved into Quick
-     Action** — owner's rule, and the only change this closed list has had.
+   - **Flow overview and Analytics swapped places** — owner's rule, and the
+     only change this closed list has had.
      Analytics is a tab the seller reaches from the bar anyway; "how does this
      app work" is the question they cannot answer from anywhere else, and it
      is asked most on the first morning, when Home is the only screen they
@@ -62,21 +62,29 @@ action is missing or the app cannot do it. `quick_access_test.dart` reads every
 screen wearing an `AppAddFabScaffold` off the source and fails on one this list
 does not know about, so the two cannot drift.
 
-## Two rows in Quick Action explain rather than create
+## Two rows in Quick Action do not create anything
 
-Owner's rule, and they ride at the end: **About last, Flow overview just above
-it.** The create actions above them keep the section's shape, and a seller
-scanning for "add" never steps over them.
+Owner's rule, and they ride at the end: **About last, Analytics just above it.**
+The create actions above them keep the section's shape, and a seller scanning
+for "add" never steps over them.
 
 **How a Quick Action row opens is a property of the row**, not something its
-call site works out: `QuickActionOpen` says push, go or sheet. Analytics is
-`go` because a branch root pushed over Home leaves the seller on the wrong tab,
-and Flow overview is `sheet` and carries no route at all.
+call site works out: `QuickActionOpen` says push or go. Analytics is `go`
+because a branch root pushed over Home would leave the seller on the wrong tab
+with a back button they should not have.
 
-**The flow overview sheet is a document, not a menu.** It takes a fixed share
-of the screen (`SdBottomSheetV3.heightFactor`) and spells every step out — what
-it is, whether the app ever asks for it, and what the seller actually does —
-because it is the answer to "how do I use this", and a list of nine nouns is
-not an answer. It draws `WorkflowConstant.steps`, the same data About's diagram
-uses, and badges the steps the app never blocks on; what "optional" means there
-is in `docs/rules/SCREENS.md`.
+**Flow overview is a shortcut card, and it is there instead of in Quick
+Action** — not in both. A launcher that lists the same destination twice is one
+a seller stops reading.
+
+## The flow overview sheet is a document, not a menu
+
+It takes a fixed share of the screen (`SdBottomSheetV3.heightFactor`) and
+spells every step out — what it is, whether the app ever asks for it, and what
+the seller actually does — because it is the answer to "how do I use this", and
+a list of nine nouns is not an answer.
+
+It draws `WorkflowConstant.steps`, the same data About's diagram uses, and
+badges the steps the app never blocks on; what "optional" means there is in
+`docs/rules/SCREENS.md`. Each step opens the screen that performs it, so the
+sheet is a way in rather than a picture.
