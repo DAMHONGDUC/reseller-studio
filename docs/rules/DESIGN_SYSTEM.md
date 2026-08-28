@@ -722,7 +722,9 @@ quietly re-invent one.
   and shared widget code asks for meanings such as `delete` and `add`; that
   one file decides whether each meaning uses Flutter `Icons` or Material
   Symbols, so changing the glyph library never becomes a screen-by-screen
-  migration. `SdIconV3` still owns rendering, size and colour.
+  migration. **No file under `lib/` references `Icons.*` or `Symbols.*`
+  directly except that registry**, and a source test enforces the boundary.
+  `SdIconV3` still owns rendering, size and colour.
 - **Dividers: one thickness, one colour, and between items only**
   (`if (index > 0)`). A rule above the first row lands on the container's edge
   and reads as a border it does not have. Its height equals its thickness — see
