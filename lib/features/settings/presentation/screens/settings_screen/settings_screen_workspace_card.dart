@@ -31,7 +31,7 @@ class _WorkspaceCard extends ConsumerWidget {
         ),
         _SettingRow(
           label: context.l10n.workspaceCurrency,
-          value: WorkspaceOptionLabel.currency(context, workspace.currency),
+          value: CurrencyLabel.of(context, workspace.currency),
         ),
         _SettingRow(
           label: context.l10n.workspaceStaleAfter,

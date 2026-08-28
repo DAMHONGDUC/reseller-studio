@@ -10,6 +10,8 @@ import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
 import '../../../country_label.dart';
 import '../../../country_picker.dart';
+import '../../../currency_label.dart';
+import '../../../currency_picker.dart';
 import '../../../providers.dart';
 import '../../../workspace_constant.dart';
 import '../../../workspace_option_label.dart';
@@ -51,19 +53,9 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
   }
 
   Future<void> _pickCurrency() async {
-    final String? code = await OptionPickerSheet.show<String>(
+    final String? code = await CurrencyPicker.show(
       context,
-      title: context.l10n.workspaceCurrency,
       selected: ref.read(workspaceSetupControllerProvider).currency,
-      options: WorkspaceConstant.currencies
-          .map(
-            (String code) => PickerOption<String>(
-              value: code,
-              label: WorkspaceOptionLabel.currency(context, code),
-              caption: code,
-            ),
-          )
-          .toList(),
     );
 
     if (code == null) return;
@@ -178,7 +170,7 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
                   label: context.l10n.workspaceCurrency,
                   isRequired: true,
                   icon: Symbols.payments_rounded,
-                  value: WorkspaceOptionLabel.currency(context, state.currency),
+                  value: CurrencyLabel.of(context, state.currency),
                   onTap: _pickCurrency,
                 ),
                 SizedBox(height: SdSpacingConstant.h16),

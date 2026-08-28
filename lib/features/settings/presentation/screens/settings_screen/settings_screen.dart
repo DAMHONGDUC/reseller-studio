@@ -14,9 +14,9 @@ import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
 import '../../../../mock_data/providers.dart';
 import '../../../../workspace/country_label.dart';
+import '../../../../workspace/currency_label.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
-import '../../../../workspace/workspace_option_label.dart';
 import '../../controllers/demo_seed_controller.dart';
 import '../../controllers/theme_mode_controller.dart';
 

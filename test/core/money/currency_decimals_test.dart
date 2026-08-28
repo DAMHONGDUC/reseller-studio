@@ -18,6 +18,25 @@ void main() {
       expect(CurrencyDecimals.of('JPY'), 0);
     });
 
+    test('a three-decimal dinar reports three, not the fallback two', () {
+      // These were left out while the picker offered nine currencies. It now
+      // offers every one, so a Kuwaiti business would have had every amount
+      // out by a factor of ten.
+      expect(CurrencyDecimals.of('KWD'), 3);
+      expect(CurrencyDecimals.factorFor('KWD'), 1000);
+
+      for (final String code in <String>[
+        'BHD',
+        'IQD',
+        'JOD',
+        'LYD',
+        'OMR',
+        'TND',
+      ]) {
+        expect(CurrencyDecimals.of(code), 3, reason: code);
+      }
+    });
+
     test('the code is matched case-insensitively', () {
       expect(CurrencyDecimals.of('vnd'), 0);
     });
@@ -62,6 +81,13 @@ void main() {
 
       expect(amount.toInputString(), '19.99');
       expect(Money.tryParse(amount.toInputString(), 'USD'), amount);
+    });
+
+    test('a KWD amount round-trips with three decimal places', () {
+      const Money amount = Money(19990, 'KWD');
+
+      expect(amount.toInputString(), '19.990');
+      expect(Money.tryParse(amount.toInputString(), 'KWD'), amount);
     });
 
     test('a VND amount round-trips with no decimal point', () {

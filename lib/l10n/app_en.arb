@@ -304,38 +304,6 @@
   "@businessTypeHobbySeller": {
     "description": "Business type option."
   },
-  "currencyUsd": "US Dollar ($)",
-  "@currencyUsd": {
-    "description": "Currency option shown at workspace setup."
-  },
-  "currencyEur": "Euro (€)",
-  "@currencyEur": {
-    "description": "Currency option."
-  },
-  "currencyGbp": "British Pound (£)",
-  "@currencyGbp": {
-    "description": "Currency option."
-  },
-  "currencyVnd": "Vietnamese Dong (₫)",
-  "@currencyVnd": {
-    "description": "Currency option. Has no minor unit — see CurrencyDecimals."
-  },
-  "currencyAud": "Australian Dollar",
-  "@currencyAud": {
-    "description": "Currency option."
-  },
-  "currencyCad": "Canadian Dollar",
-  "@currencyCad": {
-    "description": "Currency option."
-  },
-  "currencyJpy": "Japanese Yen (¥)",
-  "@currencyJpy": {
-    "description": "Currency option. Has no minor unit."
-  },
-  "currencySgd": "Singapore Dollar",
-  "@currencySgd": {
-    "description": "Currency option."
-  },
   "countryUs": "United States",
   "@countryUs": {
     "description": "Country name for ISO 3166-1 alpha-2 US."
@@ -4329,6 +4297,10 @@
   "@workspaceCountrySearchHint": {
     "description": "Placeholder in the country picker search box."
   },
+  "workspaceCurrencySearchHint": "Currency name or code",
+  "@workspaceCurrencySearchHint": {
+    "description": "Placeholder in the currency picker search box."
+  },
   "commonOptional": "Optional",
   "@commonOptional": {
     "description": "Badge on a workflow step the app never blocks on."
@@ -4548,5 +4520,633 @@
   "homeStepRecordSaleDetail": "Mark it sold and the order appears in Orders.",
   "@homeStepRecordSaleDetail": {
     "description": "Getting started step 3, supporting line."
+  },
+  "currencyAfn": "Afghan Afghani",
+  "@currencyAfn": {
+    "description": "Currency name for ISO 4217 AFN."
+  },
+  "currencyAll": "Albanian Lek",
+  "@currencyAll": {
+    "description": "Currency name for ISO 4217 ALL."
+  },
+  "currencyDzd": "Algerian Dinar",
+  "@currencyDzd": {
+    "description": "Currency name for ISO 4217 DZD."
+  },
+  "currencyAoa": "Angolan Kwanza",
+  "@currencyAoa": {
+    "description": "Currency name for ISO 4217 AOA."
+  },
+  "currencyArs": "Argentine Peso",
+  "@currencyArs": {
+    "description": "Currency name for ISO 4217 ARS."
+  },
+  "currencyAmd": "Armenian Dram",
+  "@currencyAmd": {
+    "description": "Currency name for ISO 4217 AMD."
+  },
+  "currencyAwg": "Aruban Florin",
+  "@currencyAwg": {
+    "description": "Currency name for ISO 4217 AWG."
+  },
+  "currencyAud": "Australian Dollar",
+  "@currencyAud": {
+    "description": "Currency name for ISO 4217 AUD."
+  },
+  "currencyAzn": "Azerbaijani Manat",
+  "@currencyAzn": {
+    "description": "Currency name for ISO 4217 AZN."
+  },
+  "currencyBsd": "Bahamian Dollar",
+  "@currencyBsd": {
+    "description": "Currency name for ISO 4217 BSD."
+  },
+  "currencyBhd": "Bahraini Dinar",
+  "@currencyBhd": {
+    "description": "Currency name for ISO 4217 BHD."
+  },
+  "currencyBdt": "Bangladeshi Taka",
+  "@currencyBdt": {
+    "description": "Currency name for ISO 4217 BDT."
+  },
+  "currencyBbd": "Barbadian Dollar",
+  "@currencyBbd": {
+    "description": "Currency name for ISO 4217 BBD."
+  },
+  "currencyByn": "Belarusian Ruble",
+  "@currencyByn": {
+    "description": "Currency name for ISO 4217 BYN."
+  },
+  "currencyBzd": "Belize Dollar",
+  "@currencyBzd": {
+    "description": "Currency name for ISO 4217 BZD."
+  },
+  "currencyBmd": "Bermudian Dollar",
+  "@currencyBmd": {
+    "description": "Currency name for ISO 4217 BMD."
+  },
+  "currencyBtn": "Bhutanese Ngultrum",
+  "@currencyBtn": {
+    "description": "Currency name for ISO 4217 BTN."
+  },
+  "currencyBob": "Bolivian Boliviano",
+  "@currencyBob": {
+    "description": "Currency name for ISO 4217 BOB."
+  },
+  "currencyBam": "Bosnia-Herzegovina Convertible Mark",
+  "@currencyBam": {
+    "description": "Currency name for ISO 4217 BAM."
+  },
+  "currencyBwp": "Botswanan Pula",
+  "@currencyBwp": {
+    "description": "Currency name for ISO 4217 BWP."
+  },
+  "currencyBrl": "Brazilian Real",
+  "@currencyBrl": {
+    "description": "Currency name for ISO 4217 BRL."
+  },
+  "currencyGbp": "British Pound",
+  "@currencyGbp": {
+    "description": "Currency name for ISO 4217 GBP."
+  },
+  "currencyBnd": "Brunei Dollar",
+  "@currencyBnd": {
+    "description": "Currency name for ISO 4217 BND."
+  },
+  "currencyBgn": "Bulgarian Lev",
+  "@currencyBgn": {
+    "description": "Currency name for ISO 4217 BGN."
+  },
+  "currencyBif": "Burundian Franc",
+  "@currencyBif": {
+    "description": "Currency name for ISO 4217 BIF."
+  },
+  "currencyXpf": "CFP Franc",
+  "@currencyXpf": {
+    "description": "Currency name for ISO 4217 XPF."
+  },
+  "currencyKhr": "Cambodian Riel",
+  "@currencyKhr": {
+    "description": "Currency name for ISO 4217 KHR."
+  },
+  "currencyCad": "Canadian Dollar",
+  "@currencyCad": {
+    "description": "Currency name for ISO 4217 CAD."
+  },
+  "currencyCve": "Cape Verdean Escudo",
+  "@currencyCve": {
+    "description": "Currency name for ISO 4217 CVE."
+  },
+  "currencyXcg": "Caribbean Guilder",
+  "@currencyXcg": {
+    "description": "Currency name for ISO 4217 XCG."
+  },
+  "currencyKyd": "Cayman Islands Dollar",
+  "@currencyKyd": {
+    "description": "Currency name for ISO 4217 KYD."
+  },
+  "currencyXaf": "Central African CFA Franc",
+  "@currencyXaf": {
+    "description": "Currency name for ISO 4217 XAF."
+  },
+  "currencyClp": "Chilean Peso",
+  "@currencyClp": {
+    "description": "Currency name for ISO 4217 CLP."
+  },
+  "currencyCny": "Chinese Yuan",
+  "@currencyCny": {
+    "description": "Currency name for ISO 4217 CNY."
+  },
+  "currencyCop": "Colombian Peso",
+  "@currencyCop": {
+    "description": "Currency name for ISO 4217 COP."
+  },
+  "currencyKmf": "Comorian Franc",
+  "@currencyKmf": {
+    "description": "Currency name for ISO 4217 KMF."
+  },
+  "currencyCdf": "Congolese Franc",
+  "@currencyCdf": {
+    "description": "Currency name for ISO 4217 CDF."
+  },
+  "currencyCrc": "Costa Rican Colón",
+  "@currencyCrc": {
+    "description": "Currency name for ISO 4217 CRC."
+  },
+  "currencyCup": "Cuban Peso",
+  "@currencyCup": {
+    "description": "Currency name for ISO 4217 CUP."
+  },
+  "currencyCzk": "Czech Koruna",
+  "@currencyCzk": {
+    "description": "Currency name for ISO 4217 CZK."
+  },
+  "currencyDkk": "Danish Krone",
+  "@currencyDkk": {
+    "description": "Currency name for ISO 4217 DKK."
+  },
+  "currencyDjf": "Djiboutian Franc",
+  "@currencyDjf": {
+    "description": "Currency name for ISO 4217 DJF."
+  },
+  "currencyDop": "Dominican Peso",
+  "@currencyDop": {
+    "description": "Currency name for ISO 4217 DOP."
+  },
+  "currencyXcd": "East Caribbean Dollar",
+  "@currencyXcd": {
+    "description": "Currency name for ISO 4217 XCD."
+  },
+  "currencyEgp": "Egyptian Pound",
+  "@currencyEgp": {
+    "description": "Currency name for ISO 4217 EGP."
+  },
+  "currencyErn": "Eritrean Nakfa",
+  "@currencyErn": {
+    "description": "Currency name for ISO 4217 ERN."
+  },
+  "currencyEtb": "Ethiopian Birr",
+  "@currencyEtb": {
+    "description": "Currency name for ISO 4217 ETB."
+  },
+  "currencyEur": "Euro",
+  "@currencyEur": {
+    "description": "Currency name for ISO 4217 EUR."
+  },
+  "currencyFkp": "Falkland Islands Pound",
+  "@currencyFkp": {
+    "description": "Currency name for ISO 4217 FKP."
+  },
+  "currencyFjd": "Fijian Dollar",
+  "@currencyFjd": {
+    "description": "Currency name for ISO 4217 FJD."
+  },
+  "currencyGmd": "Gambian Dalasi",
+  "@currencyGmd": {
+    "description": "Currency name for ISO 4217 GMD."
+  },
+  "currencyGel": "Georgian Lari",
+  "@currencyGel": {
+    "description": "Currency name for ISO 4217 GEL."
+  },
+  "currencyGhs": "Ghanaian Cedi",
+  "@currencyGhs": {
+    "description": "Currency name for ISO 4217 GHS."
+  },
+  "currencyGip": "Gibraltar Pound",
+  "@currencyGip": {
+    "description": "Currency name for ISO 4217 GIP."
+  },
+  "currencyGtq": "Guatemalan Quetzal",
+  "@currencyGtq": {
+    "description": "Currency name for ISO 4217 GTQ."
+  },
+  "currencyGnf": "Guinean Franc",
+  "@currencyGnf": {
+    "description": "Currency name for ISO 4217 GNF."
+  },
+  "currencyGyd": "Guyanaese Dollar",
+  "@currencyGyd": {
+    "description": "Currency name for ISO 4217 GYD."
+  },
+  "currencyHtg": "Haitian Gourde",
+  "@currencyHtg": {
+    "description": "Currency name for ISO 4217 HTG."
+  },
+  "currencyHnl": "Honduran Lempira",
+  "@currencyHnl": {
+    "description": "Currency name for ISO 4217 HNL."
+  },
+  "currencyHkd": "Hong Kong Dollar",
+  "@currencyHkd": {
+    "description": "Currency name for ISO 4217 HKD."
+  },
+  "currencyHuf": "Hungarian Forint",
+  "@currencyHuf": {
+    "description": "Currency name for ISO 4217 HUF."
+  },
+  "currencyIsk": "Icelandic Króna",
+  "@currencyIsk": {
+    "description": "Currency name for ISO 4217 ISK."
+  },
+  "currencyInr": "Indian Rupee",
+  "@currencyInr": {
+    "description": "Currency name for ISO 4217 INR."
+  },
+  "currencyIdr": "Indonesian Rupiah",
+  "@currencyIdr": {
+    "description": "Currency name for ISO 4217 IDR."
+  },
+  "currencyIrr": "Iranian Rial",
+  "@currencyIrr": {
+    "description": "Currency name for ISO 4217 IRR."
+  },
+  "currencyIqd": "Iraqi Dinar",
+  "@currencyIqd": {
+    "description": "Currency name for ISO 4217 IQD."
+  },
+  "currencyIls": "Israeli New Shekel",
+  "@currencyIls": {
+    "description": "Currency name for ISO 4217 ILS."
+  },
+  "currencyJmd": "Jamaican Dollar",
+  "@currencyJmd": {
+    "description": "Currency name for ISO 4217 JMD."
+  },
+  "currencyJpy": "Japanese Yen",
+  "@currencyJpy": {
+    "description": "Currency name for ISO 4217 JPY."
+  },
+  "currencyJod": "Jordanian Dinar",
+  "@currencyJod": {
+    "description": "Currency name for ISO 4217 JOD."
+  },
+  "currencyKzt": "Kazakhstani Tenge",
+  "@currencyKzt": {
+    "description": "Currency name for ISO 4217 KZT."
+  },
+  "currencyKes": "Kenyan Shilling",
+  "@currencyKes": {
+    "description": "Currency name for ISO 4217 KES."
+  },
+  "currencyKwd": "Kuwaiti Dinar",
+  "@currencyKwd": {
+    "description": "Currency name for ISO 4217 KWD."
+  },
+  "currencyKgs": "Kyrgystani Som",
+  "@currencyKgs": {
+    "description": "Currency name for ISO 4217 KGS."
+  },
+  "currencyLak": "Laotian Kip",
+  "@currencyLak": {
+    "description": "Currency name for ISO 4217 LAK."
+  },
+  "currencyLbp": "Lebanese Pound",
+  "@currencyLbp": {
+    "description": "Currency name for ISO 4217 LBP."
+  },
+  "currencyLsl": "Lesotho Loti",
+  "@currencyLsl": {
+    "description": "Currency name for ISO 4217 LSL."
+  },
+  "currencyLrd": "Liberian Dollar",
+  "@currencyLrd": {
+    "description": "Currency name for ISO 4217 LRD."
+  },
+  "currencyLyd": "Libyan Dinar",
+  "@currencyLyd": {
+    "description": "Currency name for ISO 4217 LYD."
+  },
+  "currencyMop": "Macanese Pataca",
+  "@currencyMop": {
+    "description": "Currency name for ISO 4217 MOP."
+  },
+  "currencyMkd": "Macedonian Denar",
+  "@currencyMkd": {
+    "description": "Currency name for ISO 4217 MKD."
+  },
+  "currencyMga": "Malagasy Ariary",
+  "@currencyMga": {
+    "description": "Currency name for ISO 4217 MGA."
+  },
+  "currencyMwk": "Malawian Kwacha",
+  "@currencyMwk": {
+    "description": "Currency name for ISO 4217 MWK."
+  },
+  "currencyMyr": "Malaysian Ringgit",
+  "@currencyMyr": {
+    "description": "Currency name for ISO 4217 MYR."
+  },
+  "currencyMvr": "Maldivian Rufiyaa",
+  "@currencyMvr": {
+    "description": "Currency name for ISO 4217 MVR."
+  },
+  "currencyMru": "Mauritanian Ouguiya",
+  "@currencyMru": {
+    "description": "Currency name for ISO 4217 MRU."
+  },
+  "currencyMur": "Mauritian Rupee",
+  "@currencyMur": {
+    "description": "Currency name for ISO 4217 MUR."
+  },
+  "currencyMxn": "Mexican Peso",
+  "@currencyMxn": {
+    "description": "Currency name for ISO 4217 MXN."
+  },
+  "currencyMdl": "Moldovan Leu",
+  "@currencyMdl": {
+    "description": "Currency name for ISO 4217 MDL."
+  },
+  "currencyMnt": "Mongolian Tugrik",
+  "@currencyMnt": {
+    "description": "Currency name for ISO 4217 MNT."
+  },
+  "currencyMad": "Moroccan Dirham",
+  "@currencyMad": {
+    "description": "Currency name for ISO 4217 MAD."
+  },
+  "currencyMzn": "Mozambican Metical",
+  "@currencyMzn": {
+    "description": "Currency name for ISO 4217 MZN."
+  },
+  "currencyMmk": "Myanmar Kyat",
+  "@currencyMmk": {
+    "description": "Currency name for ISO 4217 MMK."
+  },
+  "currencyNad": "Namibian Dollar",
+  "@currencyNad": {
+    "description": "Currency name for ISO 4217 NAD."
+  },
+  "currencyNpr": "Nepalese Rupee",
+  "@currencyNpr": {
+    "description": "Currency name for ISO 4217 NPR."
+  },
+  "currencyAng": "Netherlands Antillean Guilder",
+  "@currencyAng": {
+    "description": "Currency name for ISO 4217 ANG."
+  },
+  "currencyTwd": "New Taiwan Dollar",
+  "@currencyTwd": {
+    "description": "Currency name for ISO 4217 TWD."
+  },
+  "currencyNzd": "New Zealand Dollar",
+  "@currencyNzd": {
+    "description": "Currency name for ISO 4217 NZD."
+  },
+  "currencyNio": "Nicaraguan Córdoba",
+  "@currencyNio": {
+    "description": "Currency name for ISO 4217 NIO."
+  },
+  "currencyNgn": "Nigerian Naira",
+  "@currencyNgn": {
+    "description": "Currency name for ISO 4217 NGN."
+  },
+  "currencyKpw": "North Korean Won",
+  "@currencyKpw": {
+    "description": "Currency name for ISO 4217 KPW."
+  },
+  "currencyNok": "Norwegian Krone",
+  "@currencyNok": {
+    "description": "Currency name for ISO 4217 NOK."
+  },
+  "currencyOmr": "Omani Rial",
+  "@currencyOmr": {
+    "description": "Currency name for ISO 4217 OMR."
+  },
+  "currencyPkr": "Pakistani Rupee",
+  "@currencyPkr": {
+    "description": "Currency name for ISO 4217 PKR."
+  },
+  "currencyPab": "Panamanian Balboa",
+  "@currencyPab": {
+    "description": "Currency name for ISO 4217 PAB."
+  },
+  "currencyPgk": "Papua New Guinean Kina",
+  "@currencyPgk": {
+    "description": "Currency name for ISO 4217 PGK."
+  },
+  "currencyPyg": "Paraguayan Guarani",
+  "@currencyPyg": {
+    "description": "Currency name for ISO 4217 PYG."
+  },
+  "currencyPen": "Peruvian Sol",
+  "@currencyPen": {
+    "description": "Currency name for ISO 4217 PEN."
+  },
+  "currencyPhp": "Philippine Peso",
+  "@currencyPhp": {
+    "description": "Currency name for ISO 4217 PHP."
+  },
+  "currencyPln": "Polish Zloty",
+  "@currencyPln": {
+    "description": "Currency name for ISO 4217 PLN."
+  },
+  "currencyQar": "Qatari Rial",
+  "@currencyQar": {
+    "description": "Currency name for ISO 4217 QAR."
+  },
+  "currencyRon": "Romanian Leu",
+  "@currencyRon": {
+    "description": "Currency name for ISO 4217 RON."
+  },
+  "currencyRub": "Russian Ruble",
+  "@currencyRub": {
+    "description": "Currency name for ISO 4217 RUB."
+  },
+  "currencyRwf": "Rwandan Franc",
+  "@currencyRwf": {
+    "description": "Currency name for ISO 4217 RWF."
+  },
+  "currencyShp": "Saint Helena Pound",
+  "@currencyShp": {
+    "description": "Currency name for ISO 4217 SHP."
+  },
+  "currencySvc": "Salvadoran Colón",
+  "@currencySvc": {
+    "description": "Currency name for ISO 4217 SVC."
+  },
+  "currencyWst": "Samoan Tala",
+  "@currencyWst": {
+    "description": "Currency name for ISO 4217 WST."
+  },
+  "currencySar": "Saudi Riyal",
+  "@currencySar": {
+    "description": "Currency name for ISO 4217 SAR."
+  },
+  "currencyRsd": "Serbian Dinar",
+  "@currencyRsd": {
+    "description": "Currency name for ISO 4217 RSD."
+  },
+  "currencyScr": "Seychellois Rupee",
+  "@currencyScr": {
+    "description": "Currency name for ISO 4217 SCR."
+  },
+  "currencySle": "Sierra Leonean Leone",
+  "@currencySle": {
+    "description": "Currency name for ISO 4217 SLE."
+  },
+  "currencySgd": "Singapore Dollar",
+  "@currencySgd": {
+    "description": "Currency name for ISO 4217 SGD."
+  },
+  "currencySbd": "Solomon Islands Dollar",
+  "@currencySbd": {
+    "description": "Currency name for ISO 4217 SBD."
+  },
+  "currencySos": "Somali Shilling",
+  "@currencySos": {
+    "description": "Currency name for ISO 4217 SOS."
+  },
+  "currencyZar": "South African Rand",
+  "@currencyZar": {
+    "description": "Currency name for ISO 4217 ZAR."
+  },
+  "currencyKrw": "South Korean Won",
+  "@currencyKrw": {
+    "description": "Currency name for ISO 4217 KRW."
+  },
+  "currencySsp": "South Sudanese Pound",
+  "@currencySsp": {
+    "description": "Currency name for ISO 4217 SSP."
+  },
+  "currencyLkr": "Sri Lankan Rupee",
+  "@currencyLkr": {
+    "description": "Currency name for ISO 4217 LKR."
+  },
+  "currencySdg": "Sudanese Pound",
+  "@currencySdg": {
+    "description": "Currency name for ISO 4217 SDG."
+  },
+  "currencySrd": "Surinamese Dollar",
+  "@currencySrd": {
+    "description": "Currency name for ISO 4217 SRD."
+  },
+  "currencySzl": "Swazi Lilangeni",
+  "@currencySzl": {
+    "description": "Currency name for ISO 4217 SZL."
+  },
+  "currencySek": "Swedish Krona",
+  "@currencySek": {
+    "description": "Currency name for ISO 4217 SEK."
+  },
+  "currencyChf": "Swiss Franc",
+  "@currencyChf": {
+    "description": "Currency name for ISO 4217 CHF."
+  },
+  "currencySyp": "Syrian Pound",
+  "@currencySyp": {
+    "description": "Currency name for ISO 4217 SYP."
+  },
+  "currencyStn": "São Tomé and Príncipe Dobra",
+  "@currencyStn": {
+    "description": "Currency name for ISO 4217 STN."
+  },
+  "currencyTjs": "Tajikistani Somoni",
+  "@currencyTjs": {
+    "description": "Currency name for ISO 4217 TJS."
+  },
+  "currencyTzs": "Tanzanian Shilling",
+  "@currencyTzs": {
+    "description": "Currency name for ISO 4217 TZS."
+  },
+  "currencyThb": "Thai Baht",
+  "@currencyThb": {
+    "description": "Currency name for ISO 4217 THB."
+  },
+  "currencyTop": "Tongan Paanga",
+  "@currencyTop": {
+    "description": "Currency name for ISO 4217 TOP."
+  },
+  "currencyTtd": "Trinidad and Tobago Dollar",
+  "@currencyTtd": {
+    "description": "Currency name for ISO 4217 TTD."
+  },
+  "currencyTnd": "Tunisian Dinar",
+  "@currencyTnd": {
+    "description": "Currency name for ISO 4217 TND."
+  },
+  "currencyTry": "Turkish Lira",
+  "@currencyTry": {
+    "description": "Currency name for ISO 4217 TRY."
+  },
+  "currencyTmt": "Turkmenistani Manat",
+  "@currencyTmt": {
+    "description": "Currency name for ISO 4217 TMT."
+  },
+  "currencyUsd": "US Dollar",
+  "@currencyUsd": {
+    "description": "Currency name for ISO 4217 USD."
+  },
+  "currencyUgx": "Ugandan Shilling",
+  "@currencyUgx": {
+    "description": "Currency name for ISO 4217 UGX."
+  },
+  "currencyUah": "Ukrainian Hryvnia",
+  "@currencyUah": {
+    "description": "Currency name for ISO 4217 UAH."
+  },
+  "currencyAed": "United Arab Emirates Dirham",
+  "@currencyAed": {
+    "description": "Currency name for ISO 4217 AED."
+  },
+  "currencyUyu": "Uruguayan Peso",
+  "@currencyUyu": {
+    "description": "Currency name for ISO 4217 UYU."
+  },
+  "currencyUzs": "Uzbekistani Som",
+  "@currencyUzs": {
+    "description": "Currency name for ISO 4217 UZS."
+  },
+  "currencyVuv": "Vanuatu Vatu",
+  "@currencyVuv": {
+    "description": "Currency name for ISO 4217 VUV."
+  },
+  "currencyVes": "Venezuelan Bolívar",
+  "@currencyVes": {
+    "description": "Currency name for ISO 4217 VES."
+  },
+  "currencyVed": "Venezuelan Digital Bolívar",
+  "@currencyVed": {
+    "description": "Currency name for ISO 4217 VED."
+  },
+  "currencyVnd": "Vietnamese Dong",
+  "@currencyVnd": {
+    "description": "Currency name for ISO 4217 VND."
+  },
+  "currencyXof": "West African CFA Franc",
+  "@currencyXof": {
+    "description": "Currency name for ISO 4217 XOF."
+  },
+  "currencyYer": "Yemeni Rial",
+  "@currencyYer": {
+    "description": "Currency name for ISO 4217 YER."
+  },
+  "currencyZmw": "Zambian Kwacha",
+  "@currencyZmw": {
+    "description": "Currency name for ISO 4217 ZMW."
+  },
+  "currencyZwg": "Zimbabwe Gold",
+  "@currencyZwg": {
+    "description": "Currency name for ISO 4217 ZWG."
   }
 }
