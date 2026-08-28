@@ -48,6 +48,14 @@ with background they did not ask for, and don't narrate the options that were
 not taken. Two labelled rows and a sentence each beat three paragraphs saying
 the same thing.
 
+**`env/` is off limits. Never read, write, move or rename anything in it.**
+Owner's rule. The tool permissions already deny that path, and a denied path
+is a decision rather than an obstacle to route around — `git mv`, `git show`
+and a shell heredoc all reach a file the deny rule covers, and reaching for
+one of them because the file tool refused is the same act with an extra step.
+If a change needs something in there, say exactly what is needed and stop.
+The owner makes it.
+
 ## Where the rest of the rules live
 
 This file holds only what applies to every change. Everything else loads when
