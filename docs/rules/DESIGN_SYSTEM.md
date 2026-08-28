@@ -104,36 +104,26 @@ decides the arguments the look would otherwise keep re-opening:
 
 `test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds all three.
 
-#### The bar is a switcher: the current tab is the only one wearing its word
+#### The bar is glyphs only — no words on any tab
 
-Owner's rule, and it is a rewrite rather than a tweak. The bar used to be five
-equal slots of glyph-over-label with a capsule sliding between them. It is now
-a segmented switcher: **the current destination's segment is wide and shows its
-glyph beside its label; the other four are their glyph alone.**
+Owner's rule, given as the sibling app's own bar: **five equal segments, one
+icon each, and nothing written under them.** It replaces the earlier "always
+rendered — five glyphs with no words is a memory test", and the argument that
+lost is that the bar is five destinations a seller opens every day, not a menu
+they read. The words cost a line of type across the whole width of the chrome
+to say what the seller learned on their second launch.
 
-- **The segments' widths are the animation.** A destination's share of the
-  track is `1 + selectedExpansion` when it is current and `1` when it is not,
-  interpolated by how near it is to where the selection currently *is* — so
-  two segments are half-expanded at the midpoint of a move and the track's
-  total never changes width. That is the whole motion: the outgoing label
-  shrinks away as the incoming one grows in, and no segment jumps.
-- **The capsule is exactly the current segment.** It no longer slides at a
-  fixed width; it is the shape of whatever it is sitting on, which means it
-  narrows in transit and settles wide. **That replaces the sine stretch.** The
-  earlier bulge existed to stop a fixed-width capsule reading as a shape being
-  repositioned — the segment morph says it better, and two systems fighting
-  over the same width is how one of them ends up invisible. The height squash
-  stays: it is what keeps the move feeling like one piece of glass.
-- **The labels have not gone; they are drawn only where there is room for
-  them.** `SdNavDestinationV3.label` is still required, still on every
-  destination, and still the `Semantics` label of every segment — a screen
-  reader hears all five whichever is current. What changed is that four of
-  them are not painted, because a switcher that writes out five words is a
-  row of five buttons rather than one control.
-- **The label is clipped, never resized.** It is revealed by an `Align` whose
-  `widthFactor` follows the same nearness value, inside a `ClipRect`, so the
-  text keeps one size and one weight the whole way and nothing reflows. A
-  label that scaled would be a second thing animating against the segment.
+- **The label has not gone; it stopped being painted.**
+  `SdNavDestinationV3.label` is still required and is still the `Semantics`
+  label of every segment, with the segment marked `container: true` so a
+  screen reader hears one node saying one name. Nothing about the bar is
+  icon-only to somebody who cannot see it.
+- **The segments stay equal, and the capsule keeps sliding at one width.**
+  There is no expanding segment: an icon-only bar has nothing to expand for,
+  and equal thirds are what make the row read as one control.
+- **The glyph still fills in.** `SdIconV3.fill` on the font's `FILL` axis is
+  now the *only* signal besides colour and the capsule, so it matters more
+  rather than less — colour alone must never be the mark.
 
 #### The selected capsule is glass in its own layer, not a tinted pill
 
@@ -161,13 +151,14 @@ Three things follow, and each is the reason the old attempt failed:
   motion enters and leaves in one animation, so `standard` would land it
   abruptly. Tapping mid-flight redirects the capsule from where it *is*, not
   from the tab it was heading to.
-- **It takes the width of the segment it is over, and squashes on the way** —
-  `maxSquash` over a sine envelope that peaks at the midpoint and is zero at
-  both ends. The width half of the old "mercury" bulge is gone: the segment
-  morph above now does that job, and a bulge on top of it was two systems
-  fighting over one number. **Both are real layout, never a `Transform`**: the
-  shader reads the shape's geometry, so a scaled capsule refracts at its
-  unscaled size and the glass visibly detaches from its own edge.
+- **It stretches on the way and settles back** — `maxStretch` and `maxSquash`
+  on the capsule, over a sine envelope that peaks at the midpoint and is zero
+  at both ends, scaled by the length of the jump up to `fullStretchDistance`.
+  This is the "mercury" half of the system bar's motion, and without it the
+  capsule reads as a shape being repositioned rather than one being carried.
+  **The stretch is real layout, never a `Transform`**: the shader reads the
+  shape's geometry, so a scaled capsule refracts at its unscaled size and the
+  glass visibly detaches from its own edge.
 
 The geometry is `SdContentPaddingV3.selectedTabInset` inside the bar on every
 side, and nothing types that number at a call site.
