@@ -7,15 +7,15 @@ below is about protecting that answer from the screen filling up around it.
 
 ## The order of the screen is a product decision, not a layout one
 
-Top to bottom: **the three shortcut cards, Performance, Flow overview, Needs
-Attention, Getting started, Recent Activity, Quick Action.** Owner's rules
+Top to bottom: **the three shortcut cards, Needs Attention, Getting started,
+Performance, Flow overview, Recent Activity, Quick Action.** Owner's rules
 decide it, and they are listed in the order they outrank each other.
 `test/features/home/home_section_order_test.dart` holds the top of it.
 
-1. **Three shortcut cards come first, above even the numbers.** They are the
-   ways *out* of Home — down to Quick Action, sideways into global search, and
-   into Scan — not content, so a seller who opened the app to go somewhere
-   does not read a dashboard on the way there.
+1. **Three shortcut cards come first.** They are the ways *out* of Home — down
+   to Quick Action, sideways into global search, and into Scan — not content,
+   so a seller who opened the app to go somewhere does not read a dashboard on
+   the way there.
    - **Scan replaces Flow overview in the row.** It is a frequent action a
      seller starts while holding an item, so it earns the one-tap entry.
    - **Three, and the list is closed.** A fourth makes the row a launcher, and
@@ -25,20 +25,22 @@ decide it, and they are listed in the order they outrank each other.
    - `HomeShortcutConstant` is the list;
      `test/features/home/home_shortcuts_test.dart` holds the placement and the
      enum-to-card completeness.
-2. **Performance sits directly under the shortcut row.** Owner's rule, and it
-   **reverses the two rules that used to stand here**: Flow overview no longer
-   owns the slot below the shortcuts, and Needs Attention no longer sits above
-   the numbers. The old reason — a seller opening the app at 8am needs the
-   orders waiting to ship, not last night's revenue — is not wrong; it was
-   outranked. Do not restore the old order from that argument alone.
-3. **Flow overview is one full-width card, now below Performance.** The card
-   owns both its title and description — there is no section header above it —
-   so the whole explanation reads and taps as one destination. It opens the
-   existing sheet and appears nowhere else on Home.
-4. **Needs Attention follows Flow overview**, and still renders only the rows
-   that have something in them.
-5. **Getting started rides directly under Needs Attention** — see below. It is
-   the one section that removes itself for good.
+2. **Needs Attention sits directly under the shortcut row, above the
+   numbers.** Owner's rule, and it is the plan's own core principle back where
+   it belongs: a seller opening the app at 8am needs the orders waiting to
+   ship, not last night's revenue.
+3. **Getting started rides immediately under Needs Attention.** The two answer
+   the same question — what is waiting on me — for a business that has started
+   and one that has not, so nothing goes between them. See below.
+4. **Performance follows both.** It briefly sat directly under the shortcuts;
+   that is no longer the order, and nothing should restore it from the record
+   of the intermediate state.
+5. **Flow overview is one full-width card, below the numbers.** The card owns
+   both its title and description — there is no section header above it — so
+   the whole explanation reads and taps as one destination. It opens the
+   existing sheet and appears nowhere else on Home. **It is far enough down
+   that a widget test has to scroll before tapping it** — see
+   `flow_overview_test.dart`.
 6. **Quick Action is one card of rows, split by titled sections, and stays
    last.** Owner's rule. Inventory holds Quick Add, Scan, Add item, Categories
    and Locations; Operations holds Purchases, Expenses and Sources; Business
