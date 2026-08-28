@@ -4,6 +4,19 @@ Rules specific to the item list, the item forms and what a seller can do to an
 item. The root `CLAUDE.md` still applies in full; this file only holds what
 would be wrong to generalise.
 
+## New-business category defaults
+
+Every new business starts with three normal category records: Clothing,
+Shoes, and Accessories. They are editable and soft-deletable like categories
+the seller creates later; defaults remove setup work but never form a closed
+taxonomy.
+
+- **The three categories and the user's workspace pointer share the final
+  creation batch.** A partial default set is indistinguishable from a seller
+  deleting one, so the workspace is not exposed until all defaults exist.
+- **Default ids and names have one owner in Inventory.** Workspace creation
+  consumes that definition and never repeats the strings.
+
 ## Every action on an item is reachable from the row
 
 Owner's rule. `ItemActionsSheet` opens from two places and they offer the same

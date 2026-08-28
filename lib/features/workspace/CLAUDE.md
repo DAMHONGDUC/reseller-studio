@@ -69,18 +69,20 @@ never a reason to hardcode English into a constant.
   not "Bolivia (Plurinational State of)" — because the picker is a list to
   scan, and the long forms bury the word the seller is looking for.
 
-## Workspace creation includes marketplace defaults
+## Workspace creation includes marketplace and category defaults
 
-The marketplace rules live in `lib/features/marketplaces/AGENTS.md`. Workspace
-creation owns their write because the user's workspace pointer must not become
-visible before the new business has all four default marketplace records.
+The marketplace rules live in `lib/features/marketplaces/AGENTS.md`, and the
+category rules live in `lib/features/inventory/CLAUDE.md`. Workspace creation
+owns their write because the user's workspace pointer must not become visible
+before the new business has every default record.
 
 - Creation stays workspace → owner membership → final batch, because Firestore
   rules can validate membership only after both earlier documents are
   committed.
-- The final batch contains the marketplace defaults and the user's workspace
-  list and last-workspace pointer. A failure therefore leaves an unreachable
-  workspace rather than a reachable business with a partial default list.
+- The final batch contains the marketplace defaults, category defaults, and
+  the user's workspace list and last-workspace pointer. A failure therefore
+  leaves an unreachable workspace rather than a reachable business with a
+  partial default list.
 
 ## One screen edits a business, and two places open it
 
