@@ -135,6 +135,11 @@ class Item {
     return cost * quantity;
   }
 
+  /// **A null argument means "leave it alone", never "clear it"** — which is
+  /// why undoing a sale needs [clearSoldAt]. It is the one field the app ever
+  /// has to unset: an item back on the shelf still carrying a sold date reads
+  /// as sold in an export, and there is no other way to say so through a
+  /// copy.
   Item copyWith({
     String? title,
     int? quantity,
@@ -153,6 +158,7 @@ class Item {
     DateTime? listedAt,
     DateTime? soldAt,
     DateTime? deletedAt,
+    bool clearSoldAt = false,
   }) => Item(
     id: id,
     title: title ?? this.title,
@@ -174,7 +180,7 @@ class Item {
     photoUrls: photoUrls ?? this.photoUrls,
     purchaseDate: purchaseDate,
     listedAt: listedAt ?? this.listedAt,
-    soldAt: soldAt ?? this.soldAt,
+    soldAt: clearSoldAt ? null : soldAt ?? this.soldAt,
     deletedAt: deletedAt ?? this.deletedAt,
   );
 }

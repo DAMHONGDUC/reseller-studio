@@ -138,6 +138,10 @@ final class ItemTransition {
       // set once and never moved by a relist.
       listedAt: target == ItemStatus.listed ? item.listedAt ?? now : null,
       soldAt: target == ItemStatus.sold ? now : null,
+      // Coming back onto the shelf undoes the sale, and the date has to go
+      // with it: an item on hand that still carries a sold date is one every
+      // export and every report reads as sold.
+      clearSoldAt: target.isOnHand && item.soldAt != null,
     );
   }
 }

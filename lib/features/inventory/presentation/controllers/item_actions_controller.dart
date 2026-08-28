@@ -202,12 +202,21 @@ class ItemActionsController extends Notifier<bool> {
     (Item item) => item.copyWith(status: ItemStatus.archived),
   );
 
-  /// Back onto the shelf from the archive.
+  /// Back onto the shelf — from the archive, or from a sale that did not
+  /// happen.
+  ///
+  /// **Through `ItemTransition`, not a bare `copyWith`.** Returning an item is
+  /// a state change like any other, and the transition is what knows a sold
+  /// date has to go with it; a copy that only moved the status left a row on
+  /// the shelf that every export still read as sold.
   Future<void> restore(List<Item> items) => _bulk(
     'Restore items',
     items,
     const <String, Object>{},
-    (Item item) => item.copyWith(status: ItemStatus.inStock),
+    // A recorded instant, not a derived one, so it is the wall clock rather
+    // than `clockProvider`.
+    (Item item) =>
+        ItemTransition.apply(item, ItemStatus.inStock, now: DateTime.now()),
   );
 
   /// Soft delete (hard rule 15) — the row stays joinable by the orders and

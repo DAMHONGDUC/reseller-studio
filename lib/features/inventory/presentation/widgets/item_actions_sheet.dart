@@ -157,7 +157,7 @@ class ItemActionsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isArchived = item.status == ItemStatus.archived;
+    final bool isOnHand = item.status.isOnHand;
 
     final List<Widget> actions = <Widget>[
       AppSheetActionRow(
@@ -215,13 +215,23 @@ class ItemActionsSheet extends ConsumerWidget {
           MarkSoldSheet.show(context, item);
         }),
       ),
+      // **Archive, or come back — decided by whether the item is on the shelf,
+      // not by whether it is archived.** A sold item had no way back at all:
+      // the row said Archive, and the only route to stock was archiving it
+      // first and then undoing that.
       AppSheetActionRow(
-        icon: isArchived ? AppIconConstant.unarchive : AppIconConstant.archive,
-        label: isArchived
-            ? context.l10n.itemActionRestore
-            : context.l10n.itemActionArchive,
-        onTap: () =>
-            isArchived ? _restore(context, ref) : _archive(context, ref),
+        icon: isOnHand ? AppIconConstant.archive : AppIconConstant.unarchive,
+        label: isOnHand
+            ? context.l10n.itemActionArchive
+            : context.l10n.itemActionRestore,
+        onTap: () => isOnHand
+            ? _archive(context, ref)
+            : _guarded(
+                context,
+                ref,
+                ItemStatus.inStock,
+                () => _restore(context, ref),
+              ),
       ),
       AppSheetActionRow(
         icon: AppIconConstant.delete,

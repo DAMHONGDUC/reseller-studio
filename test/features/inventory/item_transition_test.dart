@@ -12,6 +12,7 @@ void main() {
     Money? askingPrice,
     int quantity = 1,
     DateTime? listedAt,
+    DateTime? soldAt,
   }) => Item(
     id: 'i1',
     title: 'Nike Air Max 90',
@@ -20,6 +21,7 @@ void main() {
     createdAt: now,
     askingPrice: askingPrice,
     listedAt: listedAt,
+    soldAt: soldAt,
   );
 
   group('creating takes the minimum', () {
@@ -93,6 +95,34 @@ void main() {
         () => ItemTransition.apply(item(), ItemStatus.listed, now: now),
         throwsStateError,
       );
+    });
+
+    test('coming back onto the shelf clears the sold date', () {
+      final Item sold = item(status: ItemStatus.sold, soldAt: now);
+
+      final Item returned = ItemTransition.apply(
+        sold,
+        ItemStatus.inStock,
+        now: now,
+      );
+
+      // An item on hand that still carries a sold date is one every export
+      // and every report reads as sold.
+      expect(returned.status, ItemStatus.inStock);
+      expect(returned.soldAt, isNull);
+      expect(returned.quantityOnHand, 1);
+    });
+
+    test('archiving a sold item keeps the sold date — it really did sell', () {
+      final Item sold = item(status: ItemStatus.sold, soldAt: now);
+
+      final Item archived = ItemTransition.apply(
+        sold,
+        ItemStatus.archived,
+        now: now,
+      );
+
+      expect(archived.soldAt, now);
     });
 
     test('archiving asks for nothing — a correction is never blocked', () {

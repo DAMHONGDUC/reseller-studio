@@ -1118,7 +1118,7 @@
   },
   "itemActionRestore": "Put back in stock",
   "@itemActionRestore": {
-    "description": "Undo an archive."
+    "description": "Brings an item that has left inventory back onto the shelf — an archive undone, or a sale that did not happen."
   },
   "itemMoved": "Moved",
   "@itemMoved": {
