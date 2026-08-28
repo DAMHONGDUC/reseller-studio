@@ -24,6 +24,7 @@ import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
+import '../../../domain/enums/getting_started_step.dart';
 import '../../../domain/enums/workspace_activity.dart';
 import '../../../home_constant.dart';
 import '../../../providers.dart';
@@ -33,6 +34,7 @@ part 'home_screen_activity_row.dart';
 part 'home_screen_all_clear.dart';
 part 'home_screen_attention_row.dart';
 part 'home_screen_flow_overview.dart';
+part 'home_screen_getting_started.dart';
 part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
 part 'home_screen_quick_action.dart';
@@ -124,11 +126,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           _HomeShortcuts(onQuickAction: _toQuickAction),
+          SdSectionHeaderV3(title: context.l10n.homePerformance),
+          const _PerformanceBlock(),
           const _HomeFlowOverview(),
           SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
           const _NeedsAttention(),
-          SdSectionHeaderV3(title: context.l10n.homePerformance),
-          const _PerformanceBlock(),
+          const _GettingStarted(),
           const _RecentActivity(),
           SdSectionHeaderV3(
             title: context.l10n.homeQuickAction,

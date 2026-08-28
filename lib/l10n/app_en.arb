@@ -4508,5 +4508,45 @@
   "homeStartHereBody": "Add your first item — a title is all it needs. Cost, photos and the rest can wait.",
   "@homeStartHereBody": {
     "description": "Home start-here card: what the first step is."
+  },
+  "homeGettingStarted": "Getting started",
+  "@homeGettingStarted": {
+    "description": "Home section header over the three first-run steps."
+  },
+  "homeGettingStartedProgress": "{done} of {total} done",
+  "@homeGettingStartedProgress": {
+    "description": "Subtitle under the Getting started header.",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStepAddItem": "Add your first item",
+  "@homeStepAddItem": {
+    "description": "Getting started step 1."
+  },
+  "homeStepAddItemDetail": "A title is all it needs.",
+  "@homeStepAddItemDetail": {
+    "description": "Getting started step 1, supporting line."
+  },
+  "homeStepListItem": "Price it and list it",
+  "@homeStepListItem": {
+    "description": "Getting started step 2."
+  },
+  "homeStepListItemDetail": "Open the item, then Actions to list it.",
+  "@homeStepListItemDetail": {
+    "description": "Getting started step 2, supporting line."
+  },
+  "homeStepRecordSale": "Record your first sale",
+  "@homeStepRecordSale": {
+    "description": "Getting started step 3."
+  },
+  "homeStepRecordSaleDetail": "Mark it sold and the order appears in Orders.",
+  "@homeStepRecordSaleDetail": {
+    "description": "Getting started step 3, supporting line."
   }
 }

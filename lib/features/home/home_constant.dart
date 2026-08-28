@@ -3,6 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
+import 'domain/enums/getting_started_step.dart';
 
 /// Numbers the Home feature is tuned by, kept off the widgets that read them.
 ///
@@ -262,4 +263,46 @@ final class QuickActionLabel {
         QuickActionKind.analytics => context.l10n.navAnalytics,
         QuickActionKind.about => context.l10n.moreAbout,
       };
+}
+
+/// The words and the glyph for one Getting started step.
+///
+/// Same shape as [HomeShortcutLabel] and [QuickActionLabel], for the same
+/// reason: the enum stays `const` and the strings stay in ARB (hard rule 7).
+final class GettingStartedStepLabel {
+  static String title(BuildContext context, GettingStartedStep step) =>
+      switch (step) {
+        GettingStartedStep.addItem => context.l10n.homeStepAddItem,
+        GettingStartedStep.listItem => context.l10n.homeStepListItem,
+        GettingStartedStep.recordSale => context.l10n.homeStepRecordSale,
+      };
+
+  static String detail(BuildContext context, GettingStartedStep step) =>
+      switch (step) {
+        GettingStartedStep.addItem => context.l10n.homeStepAddItemDetail,
+        GettingStartedStep.listItem => context.l10n.homeStepListItemDetail,
+        GettingStartedStep.recordSale => context.l10n.homeStepRecordSaleDetail,
+      };
+
+  static IconData icon(GettingStartedStep step) => switch (step) {
+    GettingStartedStep.addItem => Symbols.bolt_rounded,
+    GettingStartedStep.listItem => Symbols.sell_rounded,
+    GettingStartedStep.recordSale => Symbols.payments_rounded,
+  };
+
+  /// Where the step is performed. Steps two and three share Inventory because
+  /// both start on an item's Actions sheet — the checklist points at the
+  /// screen that owns the move, it does not learn how to make it.
+  static String route(GettingStartedStep step) => switch (step) {
+    GettingStartedStep.addItem => AppRoutes.quickAdd,
+    GettingStartedStep.listItem => AppRoutes.inventory,
+    GettingStartedStep.recordSale => AppRoutes.inventory,
+  };
+
+  /// Quick Add is pushed over Home; Inventory is a tab, and pushing a branch
+  /// root leaves the seller on the wrong tab with a back button.
+  static QuickActionOpen open(GettingStartedStep step) =>
+      step == GettingStartedStep.addItem
+      ? QuickActionOpen.push
+      : QuickActionOpen.goTab;
 }
