@@ -32,10 +32,11 @@ starts and stops it itself and needs Java. It covers what the file cannot be
 read to prove: that a viewer cannot write, that nobody edits their own
 membership document (hard rule 11), that the first-member bootstrap clause
 admits only the uid the workspace names as `ownerId` and only as `owner`, and
-that the audit log, marketplace and subscription documents refuse every client
-write (hard rules 10 and 12). **It lives under `functions/` because that is the
-repo's only Node toolchain and CI already has the job** — rules are not
-functions, and the directory is the only thing they share.
+that the audit log and subscription documents refuse every client write (hard
+rule 12), while a workspace member may maintain the seller-owned marketplace
+records. **It lives under `functions/` because that is the repo's only Node
+toolchain and CI already has the job** — rules are not functions, and the
+directory is the only thing they share.
 
 Still to do, in order:
 
