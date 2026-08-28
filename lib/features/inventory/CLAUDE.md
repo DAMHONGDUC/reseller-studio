@@ -123,6 +123,51 @@ Owner's rule, and it is deliberate rather than a duplication left standing.
   back to it, and a reprice on its own does not re-stamp `listedAt`, which
   would reset the staleness clock.
 
+## The inventory row is two zones, and every figure has a place
+
+Owner's rule — the row must be **good-looking, sensible and complete**, in
+that order of argument and none of them at the cost of the others. `ItemCard`
+answers it with a split rather than a longer list of lines:
+
+- **Across the top, what the item is**: photo, title, the asking price at the
+  end of that line, then the badges naming its state. **Underneath, at the
+  card's own edges, what it is worth**: cost against expected profit, then the
+  marketplaces it is live on.
+- **The split is what makes the figures fit.** Held inside the top row the
+  money had a 64pt photo on one side and a 36pt actions button on the other,
+  and `Profit $140.00 (76%)` ellipsized on a four-figure item. Given the
+  card's full width it does not.
+- **The asking price sits at the end of the title row**, the same place the
+  order and offer cards put theirs. It is what a seller scans a list for, and
+  at the edge it forms a column the eye runs straight down; buried in a line
+  of three labelled cells it was one figure among three.
+- **Cost at the start of the money line, profit at the end**, so the profit
+  lands under the asking price and the two numbers a seller compares share a
+  column. The margin rides inside the profit cell: a percentage is what makes
+  $140 a good number or a thin one.
+- **A cell is one paragraph, not a label widget beside a value widget.** The
+  label and its figure have to ellipsize as one thing — a `Row` clips
+  whichever child the constraints reach first, which is how the margin
+  disappeared while `Cost` sat on width it did not need.
+- **Nothing here is stored** (hard rule 3): `Item.expectedProfit` and
+  `Item.expectedMargin` are derived, and both are null — rendered `—`, never
+  `0` — the moment a figure behind them is missing (hard rule 5).
+
+## The row says how long, not only what
+
+Owner's rule, part of the same one above. A badge beside the status carries
+the age of the state the item is in — `3w`, `2mo` — from `Item.stateSince`.
+
+- **One timestamp per state**: sold reads `soldAt`, listed reads `listedAt`,
+  everything else `createdAt`. A screen picking its own field is how two
+  places end up disagreeing about what "how long has this sat" means.
+- **The duration alone, beside the badge that names the state.** "Listed 84d"
+  next to a badge already reading *Listed* says the word twice, and the row
+  has no width to spare.
+- **It is not the stale badge.** Stale says a threshold was crossed; the age
+  says by how far, and an item three days over reads differently from one at
+  six months.
+
 ## The row names its marketplaces and prices none of them
 
 Owner's rule, and it replaces the earlier one that put a figure per platform
@@ -137,11 +182,10 @@ plain badges** — no amounts.
   was looking for. A card grows a row instead.
 - **Deduped and walked in `Marketplace.values` order**, so two listings on one
   platform read as one badge and the row cannot reshuffle between builds.
-- **The price line above is unchanged**: cost, asking price and expected
-  profit are the item's own numbers (see the section above), not a
-  marketplace's.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds both
   halves: every name is on the row, and no listing price is.
+  `item_card_figures_test.dart` holds the money and the age;
+  `item_derived_test.dart` holds the two getters they read.
 
 ## The actions that would be refused are shown, not hidden
 
