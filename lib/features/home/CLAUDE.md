@@ -162,6 +162,16 @@ what the seller actually does — because it is the answer to "how do I use
 this", and a list of nine nouns is not an answer. The remaining strip of Home
 keeps the sheet visibly dismissible.
 
+**The Optional badge sits above its step, on its own line** — owner's rule.
+Beside the title it competed for a row that also carries the expand arrow, and
+on the longer titles it was the first thing squeezed; over the step it reads as
+a label on the whole thing, which is what it is.
+
+**The title takes an `Expanded`, never a `Flexible` beside a `Spacer`.** Those
+two share the free space between them, so the arrow floated a different
+distance in on every step depending on how long its title was.
+`flow_overview_test.dart` measures both.
+
 It draws `WorkflowConstant.steps`, the same data About's diagram uses, and
 badges the steps the app never blocks on; what "optional" means there is in
 `docs/rules/SCREENS.md`. **Each step is an independent collapsed row that can
