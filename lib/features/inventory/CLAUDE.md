@@ -221,6 +221,29 @@ plain badges** — no amounts.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
 
+## An item that has left inventory can come back, and the sale goes with it
+
+Owner's rule, after a sold item was given a quantity of 10 and stayed sold.
+
+- **Status never moves through the item form.** `ItemFormController.submit`
+  writes back the status it was seeded with, so editing quantity, price or
+  photos cannot change what state an item is in. Hard rule 2 puts state
+  changes behind verbs, and `ItemTransition` is the one place that decides —
+  a form field that quietly restocked a sold item would be a second one.
+- **The archive row is decided by `status.isOnHand`, not by `archived`.** On
+  the shelf it offers Archive; off it — sold *or* archived — it offers "Put
+  back in stock". A sold item previously had no way back at all: the row said
+  Archive, and the only route to stock was archiving it and undoing that.
+- **`restore` goes through `ItemTransition.apply`**, not a bare `copyWith`.
+  Returning an item is a state change like any other, and the transition is
+  what knows the sold date has to go with it.
+- **Coming back onto the shelf clears `soldAt`**, and it is the only field the
+  app ever unsets — hence `Item.copyWith(clearSoldAt: true)`, since a null
+  argument there means "leave it alone". An item on hand still carrying a sold
+  date is one every CSV export and every days-to-sell figure reads as sold.
+  **Archiving a sold item keeps it**: that one really did sell.
+- `test/features/inventory/item_transition_test.dart` holds both halves.
+
 ## The actions that would be refused are shown, not hidden
 
 A move the item cannot make yet still appears in the sheet, and tapping it
