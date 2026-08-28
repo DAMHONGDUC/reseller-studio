@@ -8,6 +8,7 @@ import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/photo_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/file_uploader.dart';
+import '../../../listings/domain/entities/listing.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
@@ -33,6 +34,7 @@ class ItemFormState {
     this.createdAt,
     this.isSaving = false,
     this.isUploadingPhoto = false,
+    this.listingPrices = const <String, Money>{},
   });
 
   /// Null while creating, set while editing. What decides whether [submit]
@@ -56,6 +58,18 @@ class ItemFormState {
   final bool isSaving;
   final bool isUploadingPhoto;
 
+  /// New prices for the item's live listings, by listing id.
+  ///
+  /// **The marketplace prices are edited in this form, not on another
+  /// screen** — owner's rule. They ride here rather than in the text
+  /// controllers because a listing is a separate document: [submit] has to
+  /// know which ones moved, and a map keyed by id is that answer without
+  /// re-reading the stream to diff it.
+  ///
+  /// Only what the seller changed. An untouched listing is absent, so saving
+  /// an item nobody repriced writes no listing at all.
+  final Map<String, Money> listingPrices;
+
   bool get isEditing => itemId != null;
 
   ItemFormState copyWith({
@@ -71,6 +85,7 @@ class ItemFormState {
     DateTime? createdAt,
     bool? isSaving,
     bool? isUploadingPhoto,
+    Map<String, Money>? listingPrices,
   }) => ItemFormState(
     itemId: itemId ?? this.itemId,
     status: status ?? this.status,
@@ -84,6 +99,7 @@ class ItemFormState {
     createdAt: createdAt ?? this.createdAt,
     isSaving: isSaving ?? this.isSaving,
     isUploadingPhoto: isUploadingPhoto ?? this.isUploadingPhoto,
+    listingPrices: listingPrices ?? this.listingPrices,
   );
 }
 
@@ -196,6 +212,49 @@ class ItemFormController extends Notifier<ItemFormState> {
   /// Every money field is parsed with `Money.tryParse`, which returns **null
   /// for an empty box** — an untyped cost stays unknown and renders `—`
   /// rather than claiming the item was free (hard rule 4).
+  /// Writes the repriced listings alongside the item.
+  ///
+  /// **One `saveAll`, after the item.** The seller pressed Save once, so a
+  /// price landing without the item it belongs to is a state nobody can read
+  /// back — and the item is written first because it is the record the
+  /// listings point at.
+  ///
+  /// Reads the listings fresh rather than holding them from when the form
+  /// opened: a teammate may have changed a title in between, and only the
+  /// price is this form's to move.
+  Future<void> _saveListingPrices(String itemId) async {
+    if (state.listingPrices.isEmpty) return;
+
+    final List<Listing> listings = await ref
+        .read(listingRepositoryProvider)
+        .watchListingsForItem(itemId)
+        .first;
+    final List<Listing> changed = <Listing>[
+      for (final Listing listing in listings)
+        if (state.listingPrices[listing.id] != null &&
+            state.listingPrices[listing.id] != listing.price)
+          listing.copyWith(price: state.listingPrices[listing.id]),
+    ];
+
+    if (changed.isEmpty) return;
+
+    await ref.read(listingRepositoryProvider).saveAll(changed);
+  }
+
+  /// Reprice one of the item's live listings. Null puts it back to whatever
+  /// the listing already says, by dropping the edit.
+  void setListingPrice(String listingId, Money? price) {
+    final Map<String, Money> next = <String, Money>{...state.listingPrices};
+
+    if (price == null) {
+      next.remove(listingId);
+    } else {
+      next[listingId] = price;
+    }
+
+    state = state.copyWith(listingPrices: next);
+  }
+
   Future<String?> submit({
     required String title,
     String quantity = '',
@@ -251,10 +310,12 @@ class ItemFormController extends Notifier<ItemFormState> {
       );
 
       await ref.read(itemRepositoryProvider).save(item);
+      await _saveListingPrices(id);
 
       SdLogger.info(LogTagConstant.item, 'Item form saved', <String, Object>{
         'itemId': id,
         'status': item.status.name,
+        'repriced': state.listingPrices.length,
       });
 
       if (!state.isEditing) {

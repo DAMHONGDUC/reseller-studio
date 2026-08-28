@@ -71,25 +71,36 @@ class ItemActionsController extends Notifier<bool> {
   /// is right when every platform was priced individually and none of them is
   /// the item's number.
   ///
-  /// Marketplaces the item is already on are the caller's to exclude; the
-  /// screen greys them out, and passing one anyway would create a second
-  /// listing on the same platform.
+  /// **[reprice] carries live listings whose price changed** — owner's rule:
+  /// one screen answers "what does this cost on each platform", whether the
+  /// listing exists yet or not. They ride in the same `saveAll` as the new
+  /// ones, because adding a marketplace and correcting another are one
+  /// intent when the seller pressed one button.
+  ///
+  /// Marketplaces the item is already on are the caller's to keep out of
+  /// [prices]; the screen ticks them and offers their price instead, and
+  /// passing one anyway would create a second listing on the same platform.
   Future<void> crossList(
     Item item, {
     required Map<Marketplace, Money> prices,
     Money? askingPrice,
+    List<Listing> reprice = const <Listing>[],
   }) async {
     final ListingRepository listings = ref.read(listingRepositoryProvider);
     final ItemRepository items = ref.read(itemRepositoryProvider);
     final DateTime now = DateTime.now();
 
-    if (prices.isEmpty) return;
+    if (prices.isEmpty && reprice.isEmpty) return;
 
     SdLogger.action(LogTagConstant.listing, 'Cross-list item', <String, Object>{
       'itemId': item.id,
       'prices': <String, int>{
         for (final MapEntry<Marketplace, Money> entry in prices.entries)
           entry.key.name: entry.value.minor,
+      },
+      'repriced': <String, int>{
+        for (final Listing listing in reprice)
+          listing.marketplace.name: listing.price.minor,
       },
     });
 
@@ -99,8 +110,15 @@ class ItemActionsController extends Notifier<bool> {
       final Item priced = askingPrice == null
           ? item
           : item.copyWith(askingPrice: askingPrice);
+      // Nothing new to list means nothing to move the item for: a reprice on
+      // its own must not re-stamp `listedAt` and reset the staleness clock.
+      final bool isNew = prices.isNotEmpty;
 
       await listings.saveAll(<Listing>[
+        // One batch for both halves: a seller who added Depop and cut the
+        // eBay price pressed one button, and half of that landing is a state
+        // nobody can read back.
+        ...reprice,
         for (final MapEntry<Marketplace, Money> entry in prices.entries)
           Listing(
             id: _uuid.v4(),
@@ -119,7 +137,7 @@ class ItemActionsController extends Notifier<bool> {
       ]);
 
       await items.save(
-        item.status.isListable
+        isNew && item.status.isListable
             ? ItemTransition.apply(priced, ItemStatus.listed, now: now)
             : priced,
       );
@@ -127,11 +145,14 @@ class ItemActionsController extends Notifier<bool> {
       SdLogger.info(
         LogTagConstant.listing,
         'Item cross-listed',
-        <String, Object>{'itemId': item.id, 'count': prices.length},
+        <String, Object>{
+          'itemId': item.id,
+          'count': prices.length + reprice.length,
+        },
       );
       AppAnalytics.instance.bulkAction(
         action: 'Cross-list item',
-        count: prices.length,
+        count: prices.length + reprice.length,
       );
     } catch (error, stackTrace) {
       SdLogger.error(

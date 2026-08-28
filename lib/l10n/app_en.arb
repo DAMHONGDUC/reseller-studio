@@ -919,6 +919,19 @@
   "@itemAskingPrice": {
     "description": "What the item is listed at, or intended to be."
   },
+  "itemMarketplacePrices": "Prices on marketplaces",
+  "@itemMarketplacePrices": {
+    "description": "Row in the item form opening the marketplace pricing screen."
+  },
+  "itemMarketplacePricesOn": "{count, plural, =0{Not listed anywhere yet} =1{Listed on 1 marketplace} other{Listed on {count} marketplaces}}",
+  "@itemMarketplacePricesOn": {
+    "description": "Subtitle under that row: how many marketplaces the item is on.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "itemMinimumPrice": "Minimum price",
   "@itemMinimumPrice": {
     "description": "The floor for offers and bulk repricing."
@@ -3072,7 +3085,7 @@
   "@crossListPrice": {
     "description": "The one price every new listing is created at."
   },
-  "crossListPriceHelper": "The price every marketplace starts at. Tap a row below to price one differently.",
+  "crossListPriceHelper": "What a marketplace starts at when you tick it. Each one keeps its own price below.",
   "@crossListPriceHelper": {
     "description": "Explains that the price is shared across the new listings."
   },
@@ -3121,11 +3134,11 @@
   "@crossListFeesEstimated": {
     "description": "Says the fee rates are not accounting."
   },
-  "crossListPublish": "Publish",
+  "crossListPublish": "Save",
   "@crossListPublish": {
     "description": "The commit action before any marketplace is picked."
   },
-  "crossListPublishCount": "{count, plural, =1{Publish to 1 marketplace} other{Publish to {count} marketplaces}}",
+  "crossListPublishCount": "{count, plural, =1{Save 1 marketplace} other{Save {count} marketplaces}}",
   "@crossListPublishCount": {
     "description": "The commit action, naming how many marketplaces it will create listings on.",
     "placeholders": {
@@ -3134,7 +3147,7 @@
       }
     }
   },
-  "crossListDone": "{count, plural, =1{Listed on 1 marketplace} other{Listed on {count} marketplaces}}",
+  "crossListDone": "{count, plural, =1{Saved 1 marketplace} other{Saved {count} marketplaces}}",
   "@crossListDone": {
     "description": "Confirmation after publishing.",
     "placeholders": {

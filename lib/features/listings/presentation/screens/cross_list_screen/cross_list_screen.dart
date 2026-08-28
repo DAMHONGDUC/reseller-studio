@@ -70,6 +70,21 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
     super.dispose();
   }
 
+  /// Hands the item's live listings to the controller, so their prices are
+  /// editable on their own rows.
+  ///
+  /// Deferred like the price below, and for the same reason: this runs inside
+  /// a build, and writing a provider there throws.
+  void _seedExisting(List<Listing> listings) {
+    if (listings.isEmpty) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      if (!mounted) return;
+
+      ref.read(crossListControllerProvider.notifier).seedExisting(listings);
+    });
+  }
+
   void _inheritOnce(Item item) {
     if (_inherited) return;
 
@@ -128,6 +143,10 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
     }
 
     _inheritOnce(item);
+    _seedExisting(
+      ref.watch(listingsForItemProvider(widget.itemId)).value ??
+          const <Listing>[],
+    );
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(

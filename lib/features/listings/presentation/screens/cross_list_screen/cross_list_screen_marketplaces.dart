@@ -1,12 +1,12 @@
 part of 'cross_list_screen.dart';
 
-/// Where to put it, and — on the same row — what each one costs.
+/// Where to put it, and — on the same row — what it costs there.
 ///
-/// **The platforms the item is already on are shown, ticked and disabled**,
-/// never hidden. "Already on eBay" is the answer to the question the seller
-/// came with, a missing row reads as a missing marketplace, and an empty
-/// circle beside a platform the item is live on is simply wrong (owner's
-/// rule).
+/// **The platforms the item is already on are shown, ticked and priced**,
+/// never hidden and no longer inert. "Already on eBay" is the answer to the
+/// question the seller came with, an empty circle beside a platform the item
+/// is live on is simply wrong, and the price it is live at is the thing they
+/// most often came to change (owner's rules).
 ///
 /// **The price field lives under the name it belongs to** — owner's rule, and
 /// it replaced a separate Review section whose rows opened a sheet to edit one
@@ -21,13 +21,6 @@ class _Marketplaces extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Set<Marketplace> already = <Marketplace>{
-      for (final Listing listing
-          in ref.watch(listingsForItemProvider(itemId)).value ??
-              const <Listing>[])
-        listing.marketplace,
-    };
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -45,7 +38,6 @@ class _Marketplaces extends ConsumerWidget {
               for (int i = 0; i < Marketplace.values.length; i++) ...<Widget>[
                 _MarketplaceRow(
                   marketplace: Marketplace.values[i],
-                  isAlreadyListed: already.contains(Marketplace.values[i]),
                   currency: currency,
                 ),
                 if (i != Marketplace.values.length - 1) const SdDividerV3(),
@@ -68,14 +60,9 @@ class _Marketplaces extends ConsumerWidget {
 /// Stateful because the price field is this row's own — a controller created
 /// per build would lose the caret on every keystroke.
 class _MarketplaceRow extends ConsumerStatefulWidget {
-  const _MarketplaceRow({
-    required this.marketplace,
-    required this.isAlreadyListed,
-    required this.currency,
-  });
+  const _MarketplaceRow({required this.marketplace, required this.currency});
 
   final Marketplace marketplace;
-  final bool isAlreadyListed;
   final String currency;
 
   @override
@@ -104,13 +91,25 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
     _price.text = seeded?.toInputString() ?? '';
   }
 
+  /// A live listing's price is in the field from the first build, because the
+  /// row is already ticked and there is nothing to tick.
+  void _fillFromExisting(Money price) {
+    if (_price.text.isNotEmpty) return;
+
+    _price.text = price.toInputString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final CrossListState state = ref.watch(crossListControllerProvider);
+    final Listing? live = state.existing[widget.marketplace];
     final bool isSelected = state.selected.contains(widget.marketplace);
-    // An item already live there is ticked and inert: the circle says what is
-    // true, and tapping cannot make a second listing on the same platform.
-    final bool isTicked = isSelected || widget.isAlreadyListed;
+    // A live platform is ticked and cannot be unticked: the circle says what
+    // is true, and a second listing on the same platform is not a thing to
+    // offer. Its price is still the seller's to change.
+    final bool isTicked = isSelected || live != null;
+
+    if (live != null) _fillFromExisting(live.price);
 
     return Padding(
       padding: SdContentPaddingV3.row,
@@ -118,7 +117,7 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           InkWell(
-            onTap: widget.isAlreadyListed ? null : _toggle,
+            onTap: live != null ? null : _toggle,
             child: Row(
               children: <Widget>[
                 SdIconV3(
@@ -135,18 +134,16 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
                   child: Text(
                     widget.marketplace.displayName,
                     style: context.textTheme3.bodyMedium!.copyWith(
-                      color: widget.isAlreadyListed
-                          ? context.sdTheme3.textSecondary
-                          : context.sdTheme3.textPrimary,
+                      color: context.sdTheme3.textPrimary,
                     ),
                   ),
                 ),
-                if (widget.isAlreadyListed)
+                if (live != null)
                   SdBadgeV3(label: context.l10n.crossListAlreadyListed),
               ],
             ),
           ),
-          if (isSelected) ...<Widget>[
+          if (isTicked) ...<Widget>[
             SizedBox(height: SdSpacingConstant.h8),
             MoneyField(
               label: context.l10n.crossListPrice,

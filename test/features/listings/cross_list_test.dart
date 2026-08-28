@@ -217,20 +217,20 @@ void main() {
       expect(find.text('Already on'), findsNWidgets(2));
     });
 
-    testWidgets('inherits the price and refuses to publish to nothing', (
+    testWidgets('the live listings arrive priced, and change nothing yet', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
 
-      expect(find.text('185.00'), findsOneWidget);
+      // The shared seed plus a field on each of the two live rows.
+      expect(find.byType(MoneyField), findsNWidgets(3));
 
-      // A price alone is not a cross-listing: §28 requires at least one
-      // marketplace, and the button says so by being dead.
-      final SdButtonV3 publish = tester.widget<SdButtonV3>(
-        find.byType(SdButtonV3),
+      // Nothing has been added and no price has moved, so there is nothing to
+      // save and the button says so by being dead.
+      expect(
+        tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
+        isNull,
       );
-
-      expect(publish.onPressed, isNull);
     });
 
     testWidgets('picking a marketplace opens its own price field, seeded', (
@@ -238,20 +238,41 @@ void main() {
     ) async {
       await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
 
-      // Two money fields before: the shared seed at the top, and none on any
-      // row until one is ticked.
-      expect(find.byType(MoneyField), findsOneWidget);
-
       await tester.tap(find.text('Etsy'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(MoneyField), findsNWidgets(2));
-      expect(find.text('Publish to 1 marketplace'), findsOneWidget);
+      expect(find.byType(MoneyField), findsNWidgets(4));
+      expect(find.text('Save 1 marketplace'), findsOneWidget);
       expect(
         tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
         isNotNull,
-        reason: 'the row was seeded from the shared price, so it can publish',
+        reason: 'the row was seeded from the shared price, so it can save',
       );
+    });
+
+    testWidgets('changing a live listing’s price arms save on its own', (
+      WidgetTester tester,
+    ) async {
+      // Owner's rule: an item already on a marketplace comes here to have its
+      // price changed, and that alone is a reason to save.
+      await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
+
+      // The last field on screen belongs to the second live row; typing into
+      // it is a seller changing what that platform charges.
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(MoneyField).last,
+          matching: find.byType(EditableText),
+        ),
+        '150',
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
+        isNotNull,
+      );
+      expect(find.text('Save 1 marketplace'), findsOneWidget);
     });
 
     testWidgets('a marketplace the item is already on is ticked', (

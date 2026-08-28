@@ -16,12 +16,16 @@ class _PinnedPublishAction extends ConsumerWidget {
     final CrossListState state = ref.watch(crossListControllerProvider);
     final bool isBusy = ref.watch(itemActionsControllerProvider);
 
+    // Both halves count: a platform being added and one whose price moved are
+    // each a marketplace this button is about to write.
+    final int count = state.selected.length + state.repriced.length;
+
     return AppPinnedAction(
       // Names the count, so the seller commits to a number rather than to a
-      // verb — "Publish to 3 marketplaces" is checkable at a glance.
-      label: state.selected.isEmpty
+      // verb — "Save 3 marketplaces" is checkable at a glance.
+      label: count == 0
           ? context.l10n.crossListPublish
-          : context.l10n.crossListPublishCount(state.selected.length),
+          : context.l10n.crossListPublishCount(count),
       isBusy: isBusy,
       onPressed: state.canPublish && !isBusy ? onPublish : null,
     );

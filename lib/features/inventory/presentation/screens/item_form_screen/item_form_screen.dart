@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/date_picker_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/money/money.dart';
 import '../../../../../core/state/form_seed.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
@@ -13,6 +14,8 @@ import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
+import '../../../../listings/domain/entities/listing.dart';
+import '../../../../listings/providers.dart';
 import '../../../../sourcing/domain/entities/source.dart';
 import '../../../../sourcing/providers.dart';
 import '../../../../workspace/providers.dart';
@@ -25,6 +28,7 @@ import '../../../providers.dart';
 import '../../controllers/item_form_controller.dart';
 
 part 'item_form_screen_photo_strip.dart';
+part 'item_form_screen_marketplace_prices.dart';
 part 'item_form_screen_sections.dart';
 
 /// Add Item and Edit Item — one screen, because they are the same fields
@@ -217,6 +221,10 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                       helperText: context.l10n.itemMinimumPriceHelp,
                       textInputAction: TextInputAction.next,
                     ),
+                    // Only when editing: a create form has no listings to
+                    // price yet, and no item id to find them by.
+                    if (editingId != null)
+                      _MarketplacePrices(itemId: editingId, currency: currency),
                   ],
                 ),
                 SizedBox(height: SdContentPaddingV3.sectionGap),

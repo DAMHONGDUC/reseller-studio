@@ -4,6 +4,7 @@ import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
 import '../../../inventory/presentation/controllers/item_actions_controller.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
+import '../../domain/entities/listing.dart';
 
 /// What the cross-list screen has collected so far (plan §28's cross-listing
 /// row: an item, at least one marketplace, and a price that may be inherited).
@@ -12,8 +13,10 @@ class CrossListState {
     this.selected = const <Marketplace>{},
     this.price,
     this.prices = const <Marketplace, Money>{},
+    this.existing = const <Marketplace, Listing>{},
   });
 
+  /// Marketplaces ticked to be listed on for the first time.
   final Set<Marketplace> selected;
 
   /// **The seed, not the answer.** It inherits from the item (§28) and is what
@@ -23,35 +26,55 @@ class CrossListState {
   /// retyping one.
   final Money? price;
 
-  /// What each ticked marketplace will actually be listed at.
+  /// The number currently in every visible price field, new rows and live
+  /// ones alike.
   ///
-  /// **One entry per selection** — owner's rule: the platforms reward
-  /// different numbers and take different cuts, so every row owns its price
-  /// rather than sharing one. A null value is a field the seller emptied,
-  /// which is "not known" and never zero (hard rule 4).
+  /// A null value is a field the seller emptied, which is "not known" and
+  /// never zero (hard rule 4).
   final Map<Marketplace, Money> prices;
 
-  /// What [marketplace] will be listed at — its own price, or the seed for a
-  /// row that has not been ticked yet.
+  /// The listings this item already has, by marketplace.
+  ///
+  /// **They are editable here** — owner's rule: this is the one screen for
+  /// what an item costs on each platform, whether the listing exists yet or
+  /// not. Held as the whole `Listing` rather than its price so publishing an
+  /// edit is a `copyWith` on the real document, not a lookup done twice.
+  final Map<Marketplace, Listing> existing;
+
+  bool isExisting(Marketplace marketplace) =>
+      existing.containsKey(marketplace);
+
+  /// What [marketplace] will be listed at — its own number, or the seed for a
+  /// row nobody has touched.
   Money? priceFor(Marketplace marketplace) => prices[marketplace] ?? price;
 
-  /// Every ticked marketplace needs a price. A row whose field was emptied
-  /// holds publish closed rather than quietly falling back to the seed, which
-  /// would list at a number the seller had just deleted.
+  /// Live listings whose price the seller has changed.
+  Map<Marketplace, Money> get repriced => <Marketplace, Money>{
+    for (final MapEntry<Marketplace, Listing> entry in existing.entries)
+      if (prices[entry.key] != null && prices[entry.key] != entry.value.price)
+        entry.key: prices[entry.key]!,
+  };
+
+  /// **Publish covers both halves**: new marketplaces and repriced ones. Every
+  /// ticked row needs a price — one whose field was emptied holds publish
+  /// closed rather than falling back to the seed, which would list at a number
+  /// the seller had just deleted.
   bool get canPublish =>
-      selected.isNotEmpty &&
-      selected.every((Marketplace market) => prices[market] != null);
+      selected.every((Marketplace market) => prices[market] != null) &&
+      (selected.isNotEmpty || repriced.isNotEmpty);
 
   CrossListState copyWith({
     Set<Marketplace>? selected,
     Money? price,
     Map<Marketplace, Money>? prices,
+    Map<Marketplace, Listing>? existing,
   }) => CrossListState(
     selected: selected ?? this.selected,
     // Explicitly nullable: clearing the field has to be able to put the
     // price back to unknown, which `price ?? this.price` could not.
     price: price,
     prices: prices ?? this.prices,
+    existing: existing ?? this.existing,
   );
 }
 
@@ -77,6 +100,31 @@ class CrossListController extends Notifier<CrossListState> {
     state = state.copyWith(price: price);
   }
 
+  /// Load the listings the item already has, so their prices are editable
+  /// here rather than on a second screen.
+  ///
+  /// **It fills a field the seller has not touched and never overwrites one
+  /// they have** — the stream re-emits on every write, and a teammate saving
+  /// something else must not retype this seller's price for them.
+  void seedExisting(List<Listing> listings) {
+    final Map<Marketplace, Listing> existing = <Marketplace, Listing>{
+      for (final Listing listing in listings) listing.marketplace: listing,
+    };
+    final Map<Marketplace, Money> prices = <Marketplace, Money>{
+      ...state.prices,
+    };
+
+    for (final MapEntry<Marketplace, Listing> entry in existing.entries) {
+      prices.putIfAbsent(entry.key, () => entry.value.price);
+    }
+
+    state = state.copyWith(
+      price: state.price,
+      prices: prices,
+      existing: existing,
+    );
+  }
+
   /// Tick or untick a marketplace.
   ///
   /// **Ticking seeds that row's price from the shared one**, so the common
@@ -99,7 +147,7 @@ class CrossListController extends Notifier<CrossListState> {
       if (seed != null) prices[marketplace] = seed;
     }
 
-    state = CrossListState(
+    state = state.copyWith(
       selected: selected,
       price: state.price,
       prices: prices,
@@ -122,23 +170,32 @@ class CrossListController extends Notifier<CrossListState> {
     state = state.copyWith(price: state.price, prices: next);
   }
 
-  /// Returns how many marketplaces were published to, so the screen can say
-  /// so without recounting a set it no longer owns.
+  /// Writes both halves, and returns how many marketplaces were touched — so
+  /// the screen can say so without recounting sets it no longer owns.
   Future<int> publish(Item item) async {
     final CrossListState current = state;
 
     if (!current.canPublish) return 0;
 
-    final Map<Marketplace, Money> prices = <Marketplace, Money>{
+    final Map<Marketplace, Money> created = <Marketplace, Money>{
       for (final Marketplace market in current.selected)
         market: current.prices[market]!,
     };
+    final Map<Marketplace, Money> repriced = current.repriced;
 
     await ref
         .read(itemActionsControllerProvider.notifier)
-        .crossList(item, prices: prices, askingPrice: current.price);
+        .crossList(
+          item,
+          prices: created,
+          askingPrice: current.price,
+          reprice: <Listing>[
+            for (final MapEntry<Marketplace, Money> entry in repriced.entries)
+              current.existing[entry.key]!.copyWith(price: entry.value),
+          ],
+        );
 
-    return prices.length;
+    return created.length + repriced.length;
   }
 }
 
