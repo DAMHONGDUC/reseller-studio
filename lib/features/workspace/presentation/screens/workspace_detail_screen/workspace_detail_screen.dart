@@ -5,6 +5,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/state/form_seed.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
@@ -40,10 +41,9 @@ class WorkspaceDetailScreen extends ConsumerStatefulWidget {
       _WorkspaceDetailScreenState();
 }
 
-class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen> {
+class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
+    with FormSeed<WorkspaceDetailScreen> {
   final TextEditingController _name = TextEditingController();
-
-  bool _seeded = false;
 
   @override
   void dispose() {
@@ -51,12 +51,12 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen> {
     super.dispose();
   }
 
-  /// Once. The provider outlives one visit to the form, so a second business
-  /// opened after a first would otherwise inherit its country.
+  /// Copies the loaded business into the fields.
+  ///
+  /// Called through `seedOnce`, which owns both the once-only guard — the
+  /// provider outlives one visit, so a second business opened after a first
+  /// would otherwise inherit its country — and the deferral off the build.
   void _seed(Workspace workspace) {
-    if (_seeded) return;
-
-    _seeded = true;
     _name.text = workspace.name;
     ref.read(workspaceDetailControllerProvider.notifier).seed(workspace);
   }
@@ -186,7 +186,7 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen> {
       );
     }
 
-    _seed(workspace);
+    seedOnce(() => _seed(workspace));
 
     final WorkspaceDetailState state = ref.watch(
       workspaceDetailControllerProvider,

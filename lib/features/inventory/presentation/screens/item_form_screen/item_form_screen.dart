@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/date_picker_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/state/form_seed.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
@@ -47,7 +48,8 @@ class ItemFormScreen extends ConsumerStatefulWidget {
   ConsumerState<ItemFormScreen> createState() => _ItemFormScreenState();
 }
 
-class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
+class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
+    with FormSeed<ItemFormScreen> {
   final TextEditingController _title = TextEditingController();
   final TextEditingController _quantity = TextEditingController(text: '1');
   final TextEditingController _sku = TextEditingController();
@@ -57,11 +59,6 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
   final TextEditingController _minimum = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _notes = TextEditingController();
-
-  /// Guards the one-time seed. The item arrives asynchronously and rebuilds
-  /// afterwards; re-seeding on each of those would throw away every keystroke
-  /// the seller had made in between.
-  bool _seeded = false;
 
   @override
   void initState() {
@@ -90,10 +87,9 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
     super.dispose();
   }
 
+  /// Copies the loaded item into the fields. Called through `seedOnce`, which
+  /// owns both the once-only guard and the deferral off the build.
   void _seed(Item item) {
-    if (_seeded) return;
-
-    _seeded = true;
     _title.text = item.title;
     _quantity.text = '${item.quantity}';
     _sku.text = item.sku ?? '';
@@ -155,7 +151,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
     if (editingId != null) {
       final Item? existing = ref.watch(itemProvider(editingId)).value;
 
-      if (existing != null) _seed(existing);
+      if (existing != null) seedOnce(() => _seed(existing));
     }
 
     return SdScaffoldV3(
