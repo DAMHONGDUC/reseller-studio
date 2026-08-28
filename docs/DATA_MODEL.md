@@ -29,6 +29,7 @@ workspaces/{workspaceId}
   categories/{categoryId}
   locations/{locationId}
   marketplaces/{marketplaceId}
+  carriers/{carrierId}
   activity/{activityId}              append-only audit log
   subscription/{docId}               plan tier, written by webhook only
 ```
@@ -154,6 +155,15 @@ Every new workspace starts with eBay, Etsy, Depop, Poshmark, and Vinted as
 ordinary records. Their ids, names and initial rates come from one code-owned
 default list; after creation they behave exactly like a marketplace the seller
 added.
+
+### `carriers/{carrierId}`
+
+`name`, `deletedAt`, plus the fields every document carries. These are
+business-owned shipping choices: Settings may add, rename, and soft-delete
+them, while shipment forms offer the active records.
+
+Every new workspace starts with the carriers defined by
+`CarrierConstant.defaults`. They are ordinary editable records after seeding.
 
 ### `orders/{orderId}`
 
