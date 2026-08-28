@@ -5,6 +5,8 @@ import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/domain/services/item_transition.dart';
 import 'package:reseller_studio/features/inventory/presentation/controllers/item_actions_controller.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
@@ -15,7 +17,13 @@ import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
-/// Cross-listing (plan §13) — one item onto several marketplaces at once.
+/// Listing (plan §13) — one item onto one or several marketplaces at once.
+///
+/// **There is one List row, not a `List` sheet beside a `Cross-list` row.**
+/// The two read as the same verb, and the narrower one was gated on
+/// `check(item, listed)` — which refuses an item already on a marketplace,
+/// the exact item the other one existed for. So the first thing it did after
+/// a seller's first listing was refuse and point at nothing.
 void main() {
   Item item({
     required String id,
@@ -228,6 +236,40 @@ void main() {
       expect(
         tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
         isNotNull,
+      );
+    });
+  });
+
+  group('one List row, not two verbs meaning the same thing', () {
+    testWidgets('the actions sheet offers List and no Cross-list', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const InventoryScreen());
+      await tester.tap(
+        find
+            .descendant(
+              of: find.byType(ItemCard),
+              matching: find.byTooltip('Actions'),
+            )
+            .first,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('List on marketplaces'), findsOneWidget);
+      expect(find.text('Cross-list'), findsNothing);
+    });
+
+    test('the row is gated by crossListCheck, so it survives the first sale '
+        'listing', () {
+      // The deleted `List` sheet used `check(item, listed)`, which refuses an
+      // item already on a marketplace — the exact item this flow exists for.
+      final Item listed = item(id: 'i-listed', status: ItemStatus.listed);
+
+      expect(ItemTransition.crossListCheck(listed).isAllowed, isTrue);
+      expect(
+        ItemTransition.check(listed, ItemStatus.listed).isAllowed,
+        isFalse,
+        reason: 'the old gate would have refused it, which was the bug',
       );
     });
   });

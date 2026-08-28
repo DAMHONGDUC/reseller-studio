@@ -1047,7 +1047,7 @@
   "@itemAddSourceFirst": {
     "description": "Says where to go when the source picker is empty."
   },
-  "itemActionList": "List on a marketplace",
+  "itemActionList": "List on marketplaces",
   "@itemActionList": {
     "description": "Opens the sheet that puts an item on a marketplace."
   },
@@ -1094,31 +1094,6 @@
   "itemDeleteConfirmBody": "It disappears from your inventory. Orders and purchases that reference it keep working.",
   "@itemDeleteConfirmBody": {
     "description": "Explains that deleting is soft — hard rule 15 keeps the row joinable."
-  },
-  "listItemTitle": "List this item",
-  "@listItemTitle": {
-    "description": "Sheet title."
-  },
-  "listItemPrice": "Listing price",
-  "@listItemPrice": {
-    "description": "What the item goes up at."
-  },
-  "listItemSubmit": "List it",
-  "@listItemSubmit": {
-    "description": "Confirm button on the listing sheet."
-  },
-  "listItemPriceRequired": "Enter a listing price first",
-  "@listItemPriceRequired": {
-    "description": "Plan §29: listing needs a price, and this is where it is asked for."
-  },
-  "listItemDone": "Listed on {marketplace}",
-  "@listItemDone": {
-    "description": "Confirmation after a listing is created.",
-    "placeholders": {
-      "marketplace": {
-        "type": "String"
-      }
-    }
   },
   "marketplaceManualCaption": "Manual — no sync yet",
   "@marketplaceManualCaption": {
@@ -3089,11 +3064,7 @@
   "@notificationSomethingHappened": {
     "description": "Fallback row for a notification type this build does not know."
   },
-  "itemActionCrossList": "Cross-list",
-  "@itemActionCrossList": {
-    "description": "Item action that opens the cross-listing flow."
-  },
-  "crossListTitle": "Cross-list",
+  "crossListTitle": "List on marketplaces",
   "@crossListTitle": {
     "description": "Title of the cross-listing screen."
   },

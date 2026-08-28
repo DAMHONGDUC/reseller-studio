@@ -21,11 +21,20 @@ part 'cross_list_screen_actions.dart';
 part 'cross_list_screen_marketplaces.dart';
 part 'cross_list_screen_review.dart';
 
-/// Cross-listing (plan §13) — one item onto several marketplaces at once.
+/// **The one way an item reaches a marketplace** — one item onto one or
+/// several at once (plan §13).
 ///
 /// ```text
-/// Item → Cross-list → Select marketplaces → Review → Publish
+/// Item → List → Select marketplaces → Review → Publish
 /// ```
+///
+/// **It replaced a second, narrower flow** — owner's rule. A `List` sheet used
+/// to put an item on exactly one marketplace, beside a `Cross-list` row for
+/// the rest. To a seller who had not learned the difference they were the same
+/// verb twice, and the narrower one refused to run once the item was already
+/// listed — so the first thing it did after the first listing was show an
+/// error and point at nothing. Picking one marketplace here does everything
+/// that sheet did.
 ///
 /// **Review is not a second screen.** The plan draws it as a step, and a
 /// separate page would be a tap between choosing and committing that adds

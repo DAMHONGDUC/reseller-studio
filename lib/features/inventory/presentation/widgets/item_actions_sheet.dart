@@ -17,7 +17,6 @@ import '../../domain/services/item_transition.dart';
 import '../../item_block_presenter.dart';
 import '../../providers.dart';
 import '../controllers/item_actions_controller.dart';
-import 'list_item_sheet.dart';
 import 'mark_sold_sheet.dart';
 import 'reprice_sheet.dart';
 
@@ -184,17 +183,14 @@ class ItemActionsSheet extends ConsumerWidget {
           context.push(AppRoutes.editItem(item.id));
         },
       ),
+      // **One List row, not List and Cross-list** — owner's rule. The two
+      // read as the same verb to anybody who has not learned the difference,
+      // and the narrower one stopped working after the first listing: a
+      // seller who had listed on eBay tapped List, got a block message, and
+      // the thing they actually wanted was the row underneath.
       AppSheetActionRow(
         icon: Symbols.sell_rounded,
         label: context.l10n.itemActionList,
-        onTap: () => _guarded(context, ref, ItemStatus.listed, () {
-          Navigator.of(context).pop();
-          ListItemSheet.show(context, item);
-        }),
-      ),
-      AppSheetActionRow(
-        icon: Symbols.share_rounded,
-        label: context.l10n.itemActionCrossList,
         onTap: () {
           final ItemTransitionCheck check = ref
               .read(itemActionsControllerProvider.notifier)
