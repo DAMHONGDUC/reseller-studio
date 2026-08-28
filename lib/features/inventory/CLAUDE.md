@@ -29,6 +29,30 @@ list: the detail screen's Actions button, and **the `more_vert` button on
   pass it.
 - `test/features/inventory/item_card_actions_test.dart` holds all four.
 
+## One List row, and it opens the cross-list screen
+
+Owner's rule. The actions sheet used to carry **two** verbs for putting an
+item on a marketplace — a `List` sheet for exactly one, and `Cross-list` for
+several. They are now one row, `itemActionList`, opening `CrossListScreen`.
+
+- **They read as the same verb.** Nothing on either row said which to use, and
+  a seller meeting the sheet for the first time has no way to tell.
+- **The narrower one stopped working after the first listing.** `List` was
+  gated on `ItemTransition.check(item, listed)`, which refuses an item that is
+  already listed — the exact item cross-listing exists for. So the first thing
+  it did once a seller had listed anything was refuse and point at nothing,
+  while the row they wanted sat underneath.
+- **The row is gated on `crossListCheck`**, which refuses only a sold or
+  archived item and an empty shelf — and asks for no price, because the screen
+  it opens is where the price is entered (hard rule 2).
+- **Nothing was lost.** Picking one marketplace on that screen writes the same
+  listing and makes the same status move the sheet did.
+  `ListItemSheet` and `ItemActionsController.listItem` are deleted rather than
+  left as a second way to write a listing.
+- `test/features/listings/cross_list_test.dart` holds both halves: the sheet
+  offers List and no Cross-list, and the old gate would still refuse the item
+  the new one allows.
+
 ## The actions that would be refused are shown, not hidden
 
 A move the item cannot make yet still appears in the sheet, and tapping it
