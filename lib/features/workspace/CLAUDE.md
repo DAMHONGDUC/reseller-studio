@@ -69,46 +69,18 @@ never a reason to hardcode English into a constant.
   not "Bolivia (Plurinational State of)" — because the picker is a list to
   scan, and the long forms bury the word the seller is looking for.
 
-## A platform's fee is the business's number, not the enum's
+## Workspace creation includes marketplace defaults
 
-Owner's rule. `Marketplace.estimatedFeeRate` is the platform's published
-headline; a seller on a shop tier, in another country, or with a category
-discount pays something else, and every after-fees figure was quietly wrong for
-them.
+The marketplace rules live in `lib/features/marketplaces/AGENTS.md`. Workspace
+creation owns their write because the user's workspace pointer must not become
+visible before the new business has all four default marketplace records.
 
-- **`Workspace.marketplaceFeeRates` holds only the corrections**, keyed by
-  `Marketplace.name`. A platform absent from the map uses its published rate,
-  so a rate the platform later changes is not frozen at whatever the app
-  shipped with.
-- **`MarketplaceFeePolicy` is the only thing that reads that map.** It is pure
-  Dart and takes the rates as an argument, because `PayoutReconciliation` needs
-  it too and `domain/` imports no Flutter. Never write
-  `marketplace.estimatedFeeRate` at a call site again — that is the bug this
-  replaced.
-- **A real fee still wins.** The correction is a planning estimate;
-  `order.fees` is a fact, and `PayoutReconciliation.expected` falls back to the
-  rate only when the order reports none.
-- **Auto-syncing the fee from the platform is not coming.** Connecting to a
-  marketplace is dropped (hard rule 10), so nothing will ever fetch a rate —
-  the seller's own number and the fee an order reports are the only two
-  sources, and the reported one already wins.
-- **A "Use published rate" toggle per platform decides which it is** —
-  owner's rule. On, the row follows the platform and is not editable; a sheet
-  that let the seller type a number the row would then ignore is a control
-  that lies. Off, the row opens the fee sheet.
-- **Turning it off seeds the correction at the published rate.** "I want my
-  own rate" and "my rate is 13.25%" then say the same thing, so nothing has to
-  render a row that is neither following the platform nor carrying a number.
-- **The toggle is labelled, and the label sits above it** — owner's rules,
-  both. A bare switch in a row's trailing slot reads as "turn this marketplace
-  off", which is not a thing the screen does; and stacked, six platforms read
-  as a column of switches with a heading each rather than six sentences ending
-  in a control.
-- **Going back to the published rate is the toggle, never a button in the
-  sheet.** Two controls for one decision is how they end up disagreeing.
-- `test/features/marketplaces/marketplace_fee_test.dart` holds the resolution,
-  the validity bound, both halves of the fallback, and all four toggle
-  behaviours.
+- Creation stays workspace → owner membership → final batch, because Firestore
+  rules can validate membership only after both earlier documents are
+  committed.
+- The final batch contains the marketplace defaults and the user's workspace
+  list and last-workspace pointer. A failure therefore leaves an unreachable
+  workspace rather than a reachable business with a partial default list.
 
 ## One screen edits a business, and two places open it
 
