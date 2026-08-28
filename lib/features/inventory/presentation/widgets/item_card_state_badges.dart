@@ -31,8 +31,6 @@ class _StateBadges extends StatelessWidget {
             tone: SdBadgeToneV3.warning,
             icon: AppIconConstant.hourglassBottom,
           ),
-        if (item.quantity > 1)
-          SdBadgeV3(label: context.l10n.itemQuantityTimes(item.quantity)),
         // How long it has been in that state, right after the badge that
         // names it — the two are one sentence.
         SdBadgeV3(

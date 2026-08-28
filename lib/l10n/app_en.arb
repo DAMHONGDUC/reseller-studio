@@ -2529,6 +2529,10 @@
       }
     }
   },
+  "itemQuantityShort": "Qty",
+  "@itemQuantityShort": {
+    "description": "Label of the inventory row's quantity cell — how many are still on hand. Short because it shares a band with three amounts."
+  },
   "itemQuantityTimes": "×{quantity}",
   "@itemQuantityTimes": {
     "description": "How many of an item. The × is a multiplication sign, not the letter x.",

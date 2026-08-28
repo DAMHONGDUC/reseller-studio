@@ -18,6 +18,19 @@ void main() {
     soldAt: sold,
   );
 
+  group('quantityOnHand', () {
+    test('is the recorded quantity while the item is on the shelf', () {
+      expect(itemWith().quantityOnHand, 1);
+    });
+
+    test('is zero once the item is sold or archived', () {
+      // The field records how many were taken in; what is left after the last
+      // one went out the door is not that number.
+      expect(itemWith(status: ItemStatus.sold).quantityOnHand, 0);
+      expect(itemWith(status: ItemStatus.archived).quantityOnHand, 0);
+    });
+  });
+
   group('stateSince', () {
     test('reads the timestamp of the state the item is in', () {
       expect(itemWith(status: ItemStatus.sold).stateSince, sold);

@@ -100,6 +100,15 @@ class Item {
     return asking - cost;
   }
 
+  /// How many are still on the shelf.
+  ///
+  /// **Zero once the item is sold or archived, whatever [quantity] says.**
+  /// The field records how many were taken in; a row asking "what is left"
+  /// must not answer with that number after the last one went out the door.
+  /// This is a known zero, not a missing figure — hard rule 5 is about the
+  /// difference.
+  int get quantityOnHand => status.isOnHand ? quantity : 0;
+
   /// When the item entered the state it is in now — what "how long has this
   /// sat?" is measured from.
   ///

@@ -27,7 +27,38 @@ void main() {
     askingPrice: asking,
   );
 
-  testWidgets('the money block states cost, asking price and profit', (
+  testWidgets('the band leads with how many are left', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(cost: const Money(4500, 'USD')),
+        now: testNow,
+      ),
+    );
+
+    expect(find.text('Qty'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
+  });
+
+  testWidgets('a sold item has none left, and says so as a zero', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(status: ItemStatus.sold),
+        now: testNow,
+      ),
+    );
+
+    // A known zero, not a missing figure: the em dashes beside it are the
+    // amounts nobody entered.
+    expect(find.text('0'), findsOneWidget);
+  });
+
+  testWidgets('the band states cost, asking price and profit', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
