@@ -31,12 +31,13 @@ and they are listed in the order they outrank each other.
 3. **Needs Attention sits above the numbers**, inverting the plan's own order
    (§6). A seller opening the app at 8am needs the orders waiting to ship, not
    last night's revenue.
-4. **Quick Action is rows and stays last.** Eight of
-   anything is a list, and a grid of tiles above the figures made the screen
-   open on a launcher instead of on the answer. At the bottom it is where a
-   seller who came to *add* something scrolls to, and it costs the seller who
-   came to *read* nothing. `test/features/home/quick_access_test.dart` holds
-   both halves.
+4. **Quick Action is one card of rows, split by titled sections, and stays
+   last.** Owner's rule. Inventory holds Quick Add, Scan, Add item, Categories
+   and Locations; Operations holds Purchases, Expenses and Sources; Business
+   holds Team; App holds Analytics and About. The titles make the long list
+   scannable like Settings, while one outer card keeps it reading as one Quick
+   Action block rather than four unrelated dashboard sections. At the bottom
+   it costs the seller who came to read nothing.
 
 **The shortcut card and those two sections being last are one mechanism.** The
 card scrolls to the end of the list rather than to a key, because a lazy
@@ -61,6 +62,10 @@ learned to look here stops finding what they need and cannot tell whether the
 action is missing or the app cannot do it. `quick_access_test.dart` reads every
 screen wearing an `AppAddFabScaffold` off the source and fails on one this list
 does not know about, so the two cannot drift.
+
+`QuickActionConstant.sections` owns both grouping and order;
+`QuickActionConstant.actions` is only its flattened audit view. A second flat
+list beside the sections would let the UI and completeness test disagree.
 
 ## Two rows in Quick Action do not create anything
 
