@@ -53,6 +53,32 @@ several. They are now one row, `itemActionList`, opening `CrossListScreen`.
   offers List and no Cross-list, and the old gate would still refuse the item
   the new one allows.
 
+## Every marketplace may carry its own price
+
+Owner's rule. `Listing.price` was always per-listing; what was missing was a
+way to set it. The cross-list screen now collects **a shared price plus the
+exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
+
+- **A map of overrides, not one entry per selected platform.** The common case
+  is one price everywhere, and a map filled in eagerly would make "the seller
+  chose this" indistinguishable from "the default was copied here".
+  `CrossListState.priceFor` resolves the two; nothing downstream has to know
+  which a number came from.
+- **The price is set on the review row**, not in a second field beside the
+  shared one. That row already shows the fee and what is left, so the place to
+  change the number is the line that shows what changing it does — and six
+  boxes for one intent is hard rule 2 backwards.
+- **Publish needs a price for every selected platform**, from its own override
+  or from the shared default. An override alone is enough; a platform with
+  neither keeps publish off.
+- **Unticking a platform drops its override.** A hidden price that reappeared
+  on the next tick is a number nobody chose that time.
+- **The item's `askingPrice` takes the shared price, never a platform's.**
+  What the item is worth is not whichever marketplace happened to be cheapest,
+  so `crossList` takes it as a separate argument and leaves the item alone
+  when it is null.
+- `test/features/listings/cross_list_test.dart` holds all six.
+
 ## The actions that would be refused are shown, not hidden
 
 A move the item cannot make yet still appears in the sheet, and tapping it
