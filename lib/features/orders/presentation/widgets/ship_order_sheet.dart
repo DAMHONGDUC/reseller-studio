@@ -8,9 +8,10 @@ import '../../../../core/money/money.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../core/widgets/picker_field.dart';
+import '../../../carriers/domain/entities/carrier.dart';
+import '../../../carriers/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/order.dart';
-import '../../orders_constant.dart';
 import '../controllers/order_actions_controller.dart';
 
 /// Ship an order (plan §8's `Pick → Pack → Label → Tracking → Shipped`).
@@ -93,6 +94,7 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
   @override
   Widget build(BuildContext context) {
     final bool isBusy = ref.watch(orderActionsControllerProvider);
+    final List<Carrier> carriers = ref.watch(activeCarriersProvider);
 
     return SdBottomSheetV3(
       title: context.l10n.shipTitle,
@@ -107,10 +109,12 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
                 context,
                 title: context.l10n.orderCarrier,
                 selected: _carrier,
-                options: OrdersConstant.carriers
+                options: carriers
                     .map(
-                      (String carrier) =>
-                          PickerOption<String>(value: carrier, label: carrier),
+                      (Carrier carrier) => PickerOption<String>(
+                        value: carrier.name,
+                        label: carrier.name,
+                      ),
                     )
                     .toList(),
               );

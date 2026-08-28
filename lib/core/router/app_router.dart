@@ -13,6 +13,8 @@ import '../../features/analytics/presentation/screens/analytics_screen/analytics
 import '../../features/analytics/presentation/screens/analytics_sources_screen/analytics_sources_screen.dart';
 import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
 import '../../features/auth/providers.dart';
+import '../../features/carriers/presentation/screens/carrier_detail_screen/carrier_detail_screen.dart';
+import '../../features/carriers/presentation/screens/carriers_screen/carriers_screen.dart';
 import '../../features/expenses/presentation/screens/expenses_screen/expenses_screen.dart';
 import '../../features/home/presentation/screens/home_screen/home_screen.dart';
 import '../../features/inventory/presentation/screens/categories_screen/categories_screen.dart';
@@ -483,6 +485,28 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                             MarketplaceDetailScreen(
                               marketplaceId:
                                   state.pathParameters['marketplaceId'],
+                            ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'carriers',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const CarriersScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'new',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const CarrierDetailScreen(),
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: ':carrierId',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            CarrierDetailScreen(
+                              carrierId: state.pathParameters['carrierId'],
                             ),
                       ),
                     ],

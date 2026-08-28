@@ -9,6 +9,7 @@ import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_collections.dart';
+import '../../../carriers/domain/entities/carrier.dart';
 import '../../../inventory/domain/entities/item_category.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../marketplaces/domain/entities/marketplace.dart';
@@ -98,6 +99,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
     String? businessType,
     required List<Marketplace> marketplaces,
     required List<ItemCategory> categories,
+    required List<Carrier> carriers,
   }) => FailureMapper.guard('create workspace', () async {
     final String id = _uuid.v4();
     final DateTime now = DateTime.now();
@@ -167,6 +169,18 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
       );
     }
 
+    for (final Carrier carrier in carriers) {
+      finalBatch.set(
+        collections.carriers.doc(carrier.id),
+        FirestoreMapper.pruned(<String, Object?>{
+          'name': carrier.name,
+          'createdAt': FirestoreMapper.serverTimestamp,
+          'updatedAt': FirestoreMapper.serverTimestamp,
+          'createdBy': ownerId,
+        }),
+      );
+    }
+
     finalBatch.set(_users.doc(ownerId), <String, Object?>{
       'workspaceIds': FieldValue.arrayUnion(<String>[id]),
       'lastWorkspaceId': id,
@@ -183,6 +197,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
         'country': country,
         'marketplaceCount': marketplaces.length,
         'categoryCount': categories.length,
+        'carrierCount': carriers.length,
       },
     );
 

@@ -15,6 +15,8 @@ import '../../core/firestore/workspace_context.dart';
 import '../../core/storage/file_uploader.dart';
 import '../../core/storage/firebase_file_uploader.dart';
 import '../../core/storage/local_file_uploader.dart';
+import '../carriers/data/repositories/firestore_carrier_repository.dart';
+import '../carriers/domain/repositories/carrier_repository.dart';
 import '../expenses/data/repositories/firestore_expense_repository.dart';
 import '../expenses/domain/repositories/expense_repository.dart';
 import '../inventory/data/repositories/firestore_catalog_repositories.dart';
@@ -259,6 +261,19 @@ final Provider<MarketplaceRepository> marketplaceRepositoryProvider =
       }
 
       return FirestoreMarketplaceRepository(context);
+    });
+
+final Provider<CarrierRepository> carrierRepositoryProvider =
+    Provider<CarrierRepository>((Ref ref) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return InMemoryCarrierRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) LiveRepositoryGuard.noWorkspace('CarrierRepository');
+
+      return FirestoreCarrierRepository(context);
     });
 
 final Provider<ListingRepository> listingRepositoryProvider =

@@ -184,6 +184,14 @@ describe('what only a Cloud Function may write', () => {
     );
   });
 
+  it('lets a member maintain business-owned carrier records', async () => {
+    await assertSucceeds(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/carriers/usps`).set({
+        name: 'USPS',
+      }),
+    );
+  });
+
   it('refuses a client granting itself a plan', async () => {
     await assertFails(
       as(OWNER).doc(`workspaces/${WORKSPACE}/subscription/current`).set({ plan: 'business' }),

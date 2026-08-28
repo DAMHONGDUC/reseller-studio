@@ -6,8 +6,8 @@
 /// is lost. Anything absent from this map falls back to copying the number,
 /// which works everywhere.
 ///
-/// Keyed by the strings in `OrdersConstant.carriers` — the carrier field is
-/// free text, so an unrecognised value is normal rather than a bug.
+/// Keyed by carrier names. Carrier records are seller-owned, so an
+/// unrecognised value is normal rather than a bug.
 final class OrdersTrackingConstant {
   /// `{n}` is replaced by the tracking number, URL-encoded.
   static const Map<String, String> urlTemplates = <String, String>{

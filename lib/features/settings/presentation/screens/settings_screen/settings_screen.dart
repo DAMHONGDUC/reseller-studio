@@ -85,6 +85,22 @@ class SettingsScreen extends ConsumerWidget {
                   )
                 : _WorkspaceCard(workspace: workspace),
           ),
+          SdSectionHeaderV3(title: context.l10n.settingsShipping),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: AppListCard(
+              children: <Widget>[
+                AppListRow(
+                  title: context.l10n.carriersTitle,
+                  subtitle: context.l10n.carriersSettingsSubtitle,
+                  icon: AppIconConstant.localShipping,
+                  onTap: () => context.push(AppRoutes.carriers),
+                ),
+              ],
+            ),
+          ),
           SdSectionHeaderV3(title: context.l10n.settingsApp),
           Padding(
             padding: EdgeInsets.symmetric(

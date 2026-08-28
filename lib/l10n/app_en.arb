@@ -5205,5 +5205,49 @@
   "currencyZwg": "Zimbabwe Gold",
   "@currencyZwg": {
     "description": "Currency name for ISO 4217 ZWG."
+  },
+  "settingsShipping": "Shipping",
+  "@settingsShipping": {
+    "description": "Settings section for shipping configuration."
+  },
+  "carriersTitle": "Carriers",
+  "@carriersTitle": {
+    "description": "Title for the business carrier list."
+  },
+  "carriersSettingsSubtitle": "Manage the carriers offered when shipping an order",
+  "@carriersSettingsSubtitle": {
+    "description": "Settings row subtitle for carrier management."
+  },
+  "carrierAdd": "Add carrier",
+  "@carrierAdd": {
+    "description": "Action and screen title for adding a carrier."
+  },
+  "carrierEditTitle": "Edit carrier",
+  "@carrierEditTitle": {
+    "description": "Title for editing an existing carrier."
+  },
+  "carrierNameLabel": "Carrier name",
+  "@carrierNameLabel": {
+    "description": "Label for the editable carrier name."
+  },
+  "carrierNameHint": "For example, Evri",
+  "@carrierNameHint": {
+    "description": "Example shown in an empty carrier name field."
+  },
+  "carriersEmptyTitle": "No carriers yet",
+  "@carriersEmptyTitle": {
+    "description": "Title when a business has no active carriers."
+  },
+  "carriersEmptyBody": "Add the shipping companies your business uses.",
+  "@carriersEmptyBody": {
+    "description": "Message when a business has no active carriers."
+  },
+  "carrierDeleteTitle": "Delete carrier?",
+  "@carrierDeleteTitle": {
+    "description": "Confirmation title before soft-deleting a carrier."
+  },
+  "carrierDeleteBody": "It will be removed from future shipments. Existing orders keep their carrier.",
+  "@carrierDeleteBody": {
+    "description": "Confirmation message before soft-deleting a carrier."
   }
 }

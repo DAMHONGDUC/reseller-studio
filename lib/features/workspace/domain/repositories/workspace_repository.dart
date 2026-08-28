@@ -1,3 +1,4 @@
+import '../../../carriers/domain/entities/carrier.dart';
 import '../../../inventory/domain/entities/item_category.dart';
 import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../entities/user_profile.dart';
@@ -41,6 +42,7 @@ abstract interface class WorkspaceRepository {
     String? businessType,
     required List<Marketplace> marketplaces,
     required List<ItemCategory> categories,
+    required List<Carrier> carriers,
   });
 
   Future<void> updateWorkspace(Workspace workspace);

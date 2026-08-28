@@ -180,6 +180,7 @@ service cloud.firestore {
       match /locations/{locationId}        { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /categories/{categoryId}       { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /marketplaces/{marketplaceId}  { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
+      match /carriers/{carrierId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /receipts/{receiptId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
 
       // --- Audit log ------------------------------------------------------

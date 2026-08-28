@@ -1,4 +1,6 @@
 import '../../../core/money/money.dart';
+import '../../carriers/carrier_constant.dart';
+import '../../carriers/domain/entities/carrier.dart';
 import '../../expenses/domain/entities/expense.dart';
 import '../../inventory/domain/entities/item.dart';
 import '../../inventory/domain/entities/item_category.dart';
@@ -53,6 +55,7 @@ class MockDataset {
     required this.locations,
     required this.offers,
     required this.marketplaces,
+    required this.carriers,
   });
 
   /// Build the world.
@@ -84,6 +87,10 @@ class MockDataset {
           feeRate: seed.feeRate,
           createdAt: now,
         ),
+    ];
+    final List<Carrier> carriers = <Carrier>[
+      for (final CarrierSeed seed in CarrierConstant.defaults)
+        Carrier(id: seed.id, name: seed.name, createdAt: now),
     ];
 
     final List<Member> members = <Member>[
@@ -706,6 +713,7 @@ class MockDataset {
     return MockDataset._(
       workspace: workspace,
       marketplaces: marketplaces,
+      carriers: carriers,
       members: members,
       sources: sources,
       purchases: purchases,
@@ -731,4 +739,5 @@ class MockDataset {
   final List<StorageLocation> locations;
   final List<Offer> offers;
   final List<Marketplace> marketplaces;
+  final List<Carrier> carriers;
 }

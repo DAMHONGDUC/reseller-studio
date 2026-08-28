@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reseller_studio/features/orders/orders_constant.dart';
+import 'package:reseller_studio/features/carriers/carrier_constant.dart';
 import 'package:reseller_studio/features/orders/orders_tracking_constant.dart';
 
 /// A row that opens the wrong page is worse than one that does not open: the
@@ -32,11 +32,9 @@ void main() {
     expect(OrdersTrackingConstant.url(carrier: null, number: '123'), isNull);
   });
 
-  test('every template names a carrier the picker offers', () {
-    // A template keyed on a carrier nobody can select is dead code, and one
-    // spelled differently from the picker never fires.
-    for (final String carrier in OrdersTrackingConstant.urlTemplates.keys) {
-      expect(OrdersConstant.carriers, contains(carrier));
+  test('every default carrier has a tracking template', () {
+    for (final CarrierSeed carrier in CarrierConstant.defaults) {
+      expect(OrdersTrackingConstant.urlTemplates, contains(carrier.name));
     }
   });
 

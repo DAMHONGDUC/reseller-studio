@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../../carriers/domain/entities/carrier.dart';
+import '../../carriers/domain/repositories/carrier_repository.dart';
 import '../../expenses/domain/entities/expense.dart';
 import '../../expenses/domain/repositories/expense_repository.dart';
 import '../../inventory/domain/entities/item.dart';
@@ -49,6 +51,7 @@ class MockStore {
       locations = List<StorageLocation>.of(dataset.locations),
       offers = List<Offer>.of(dataset.offers),
       marketplaces = List<Marketplace>.of(dataset.marketplaces),
+      carriers = List<Carrier>.of(dataset.carriers),
       workspace = dataset.workspace;
 
   /// Seeded from the current clock, so the demo data is always recent.
@@ -67,6 +70,7 @@ class MockStore {
   final List<StorageLocation> locations;
   final List<Offer> offers;
   final List<Marketplace> marketplaces;
+  final List<Carrier> carriers;
 
   /// The demo business itself, mutable because Settings can now change it.
   ///
@@ -252,6 +256,47 @@ class InMemoryMarketplaceRepository implements MarketplaceRepository {
 
     // Soft, like the real one (hard rule 15).
     _store.marketplaces[index] = _store.marketplaces[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
+class InMemoryCarrierRepository implements CarrierRepository {
+  const InMemoryCarrierRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<Carrier>> watchCarriers() =>
+      _store.watch(() => List<Carrier>.of(_store.carriers));
+
+  @override
+  Future<void> save(Carrier carrier) async => _store.upsert(
+    _store.carriers,
+    carrier,
+    (Carrier other) => other.id == carrier.id,
+  );
+
+  @override
+  Future<void> saveAll(List<Carrier> carriers) async {
+    for (final Carrier carrier in carriers) {
+      _store.upsert(
+        _store.carriers,
+        carrier,
+        (Carrier other) => other.id == carrier.id,
+      );
+    }
+  }
+
+  @override
+  Future<void> delete(String carrierId) async {
+    final int index = _store.carriers.indexWhere(
+      (Carrier carrier) => carrier.id == carrierId,
+    );
+    if (index == -1) return;
+
+    _store.carriers[index] = _store.carriers[index].copyWith(
       deletedAt: DateTime.now(),
     );
     _store.notifyChanged();
@@ -640,6 +685,7 @@ class InMemoryWorkspaceRepository implements WorkspaceRepository {
     String? businessType,
     required List<Marketplace> marketplaces,
     required List<ItemCategory> categories,
+    required List<Carrier> carriers,
   }) async => _store.workspace.id;
 
   /// **Does nothing, and the demo never offers it.** The mock world holds one

@@ -126,6 +126,9 @@ final class AppRoutes {
   static const String addMarketplace = '/more/marketplaces/new';
   static const String marketplaceDetailPath =
       '/more/marketplaces/:marketplaceId';
+  static const String carriers = '/more/carriers';
+  static const String addCarrier = '/more/carriers/new';
+  static const String carrierDetailPath = '/more/carriers/:carrierId';
   static const String team = '/more/team';
   static const String settings = '/more/settings';
 
@@ -149,6 +152,8 @@ final class AppRoutes {
   /// place that knows the segment layout is this file.
   static String marketplace(String marketplaceId) =>
       '/more/marketplaces/$marketplaceId';
+
+  static String carrier(String carrierId) => '/more/carriers/$carrierId';
 
   static String item(String itemId) => '/inventory/item/$itemId';
   static String editItem(String itemId) => '/inventory/item/$itemId/edit';
