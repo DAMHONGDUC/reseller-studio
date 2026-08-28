@@ -9,7 +9,6 @@ import 'package:reseller_studio/features/carriers/presentation/screens/carriers_
 import 'package:reseller_studio/features/carriers/providers.dart';
 import 'package:reseller_studio/features/mock_data/providers.dart'
     as mock_providers;
-import 'package:reseller_studio/features/settings/presentation/screens/settings_screen/settings_screen.dart';
 
 import '../../support/pump_app.dart';
 
@@ -41,20 +40,6 @@ void main() {
     expect(find.text('Edit carrier'), findsOneWidget);
     expect(find.widgetWithText(TextField, 'USPS'), findsOneWidget);
     expect(find.byTooltip('Delete'), findsOneWidget);
-  });
-
-  testWidgets('Settings exposes carrier management', (
-    WidgetTester tester,
-  ) async {
-    await pumpScreen(tester, const SettingsScreen());
-    await tester.scrollUntilVisible(find.text('Carriers'), 300);
-    await tester.pumpAndSettle();
-
-    expect(find.text('Carriers'), findsOneWidget);
-    expect(
-      find.text('Manage the carriers offered when shipping an order'),
-      findsOneWidget,
-    );
   });
 
   test('carrier controller adds, edits, and soft-deletes records', () async {

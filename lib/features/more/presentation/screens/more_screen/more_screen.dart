@@ -15,7 +15,7 @@ part 'more_screen_section.dart';
 ///
 /// Everything the plan deliberately kept off the bottom bar: Sourcing,
 /// Listings, Expenses, Reports, Receipts, Categories, Locations,
-/// Marketplaces, Team, Settings (plan §10).
+/// Marketplaces, Carriers, Team, Settings (plan §10).
 ///
 /// **This screen growing is fine. The bottom bar growing is not** — five tabs
 /// is a product decision (hard rule 13), and this list is where the pressure

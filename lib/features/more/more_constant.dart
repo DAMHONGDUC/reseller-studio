@@ -37,6 +37,7 @@ enum MoreDestinationKind {
   categories,
   locations,
   marketplaces,
+  carriers,
   team,
   activity,
   tax,
@@ -57,6 +58,7 @@ final class MoreLabel {
         MoreDestinationKind.categories => context.l10n.moreCategories,
         MoreDestinationKind.locations => context.l10n.moreLocations,
         MoreDestinationKind.marketplaces => context.l10n.moreMarketplaces,
+        MoreDestinationKind.carriers => context.l10n.carriersTitle,
         MoreDestinationKind.team => context.l10n.moreTeam,
         MoreDestinationKind.activity => context.l10n.moreActivity,
         MoreDestinationKind.tax => context.l10n.moreTax,
@@ -169,6 +171,12 @@ final class MoreConstant {
           kind: MoreDestinationKind.marketplaces,
           icon: AppIconConstant.hub,
           route: AppRoutes.marketplaces,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.carriers,
+          icon: AppIconConstant.localShipping,
+          route: AppRoutes.carriers,
           isBuilt: true,
         ),
         MoreDestination(

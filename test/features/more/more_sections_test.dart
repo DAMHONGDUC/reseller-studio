@@ -33,6 +33,7 @@ void main() {
       ],
       MoreSectionKind.business: <MoreDestinationKind>[
         MoreDestinationKind.marketplaces,
+        MoreDestinationKind.carriers,
         MoreDestinationKind.team,
         MoreDestinationKind.activity,
       ],
