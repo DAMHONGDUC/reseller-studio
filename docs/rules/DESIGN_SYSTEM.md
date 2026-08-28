@@ -128,7 +128,16 @@ Three things follow, and each is the reason the old attempt failed:
 - **It slides; it does not fade in and out.** One capsule moving is what says
   the tabs are one row. `SdMotionV3.normal` on `SdMotionV3.emphasized` — the
   motion enters and leaves in one animation, so `standard` would land it
-  abruptly.
+  abruptly. Tapping mid-flight redirects the capsule from where it *is*, not
+  from the tab it was heading to.
+- **It stretches on the way and settles back** — `maxStretch` and `maxSquash`
+  on the capsule, over a sine envelope that peaks at the midpoint and is zero
+  at both ends, scaled by the length of the jump up to `fullStretchDistance`.
+  This is the "mercury" half of the system bar's motion, and without it the
+  capsule reads as a shape being repositioned rather than one being carried.
+  **The stretch is real layout, never a `Transform`**: the shader reads the
+  shape's geometry, so a scaled capsule refracts at its unscaled size and the
+  glass visibly detaches from its own edge.
 
 The geometry is `SdContentPaddingV3.selectedTabInset` inside the bar on every
 side, and nothing types that number at a call site.
