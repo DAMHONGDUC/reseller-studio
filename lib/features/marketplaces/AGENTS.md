@@ -18,6 +18,9 @@ workflow that creates a workspace.
   existing marketplace and still opens the confirmation dialog. Keeping the
   destructive action in the chrome leaves the form body for editable fields
   and the pinned bottom action for Save alone.
+- **The delete action uses Flutter's `Icons.delete_outline_rounded` at the
+  normal app-bar icon size.** Owner's rule. The smaller Symbols glyph was too
+  light and too hard to recognise in the chrome.
 - **There is no "Use published rate" toggle.** The marketplace record always
   carries the business's current estimated fee rate, and the seller edits it
   directly on the detail screen. A published rate and an override are two
