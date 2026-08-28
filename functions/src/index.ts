@@ -75,4 +75,5 @@ export { dailyDigest } from './notifications/dailyDigest';
 // ask an SDK a question.
 export { revenueCatWebhook } from './subscription/revenueCatWebhook';
 
-// Still to write: marketplace OAuth and sync.
+// Marketplace OAuth and sync are dropped, not pending — see CLAUDE.md
+// hard rule 10 and docs/REMAINING_WORK.md.

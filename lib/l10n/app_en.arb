@@ -689,22 +689,6 @@
   "@marketplacesTitle": {
     "description": "Marketplaces screen title."
   },
-  "marketplacesSyncOffTitle": "Syncing is not switched on yet",
-  "@marketplacesSyncOffTitle": {
-    "description": "Explains why nothing is connected."
-  },
-  "marketplacesSyncOffBody": "Connections run on the server so your marketplace passwords and tokens never touch this app. Until that is live, list and sell manually — everything else in Reseller Studio works the same either way.",
-  "@marketplacesSyncOffBody": {
-    "description": "Why marketplace OAuth is server-side. Hard rule 10: no secret ships in the Flutter binary."
-  },
-  "marketplacesConnected": "Connected",
-  "@marketplacesConnected": {
-    "description": "Connection status badge."
-  },
-  "marketplacesComingSoon": "Coming soon",
-  "@marketplacesComingSoon": {
-    "description": "Connection status badge for a platform with no integration yet."
-  },
   "marketplacesEstimatedFee": "Estimated fee",
   "@marketplacesEstimatedFee": {
     "description": "Caption on a marketplace row. A published rate for planning, never used as accounting."

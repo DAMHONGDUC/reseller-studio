@@ -12,18 +12,16 @@ import '../../../domain/services/marketplace_fee_policy.dart';
 import '../../controllers/marketplace_fee_controller.dart';
 import '../../widgets/fee_entry_sheet.dart';
 
-/// Marketplaces — connection status, and nothing else (plan §14).
+/// Marketplaces — what each platform charges this business.
 ///
-/// **No token ever reaches this screen, or this app.** OAuth and every call
-/// that uses a token happen in a Cloud Function; `marketplaces/{id}` in
-/// Firestore holds connection *status* only and is `allow write: if false`
-/// (hard rule 10). The app asks the backend; the backend asks eBay.
+/// **Connecting to a marketplace is not a feature of this app** (owner's rule,
+/// hard rule 10). There is no OAuth, no sync and no connection state, so this
+/// screen no longer explains why nothing is connected — there is nothing to
+/// connect. A listing is a record the seller keeps of what an item is priced
+/// at on each platform.
 ///
-/// Nothing is connected today because no function is deployed, and the screen
-/// says so plainly rather than showing a Connect button that fails. The fee
-/// rate shown is the platform's published estimate, used by the buy
-/// calculator — never by an order, which carries the fee the platform
-/// actually charged.
+/// What is left is the number every after-fees figure leans on: the published
+/// rate, or this business's own. See `MarketplaceFeePolicy`.
 class MarketplacesScreen extends ConsumerWidget {
   const MarketplacesScreen({super.key});
 
@@ -34,25 +32,6 @@ class MarketplacesScreen extends ConsumerWidget {
       padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
-        SdCardV3(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                context.l10n.marketplacesSyncOffTitle,
-                style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
-                  color: context.sdTheme3.textPrimary,
-                ),
-              ),
-              SizedBox(height: SdSpacingConstant.h6),
-              Text(
-                context.l10n.marketplacesSyncOffBody,
-                style: context.textTheme3.bodySmall!.faint3(context),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: SdContentPaddingV3.sectionGap),
         SdSectionHeaderV3(
           title: context.l10n.marketplacesFeesTitle,
           subtitle: context.l10n.marketplacesFeesBody,

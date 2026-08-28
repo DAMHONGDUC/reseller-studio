@@ -24,14 +24,13 @@ rules_version = '2';
 //     expenses/{expenseId}
 //     locations/{locationId}
 //     categories/{categoryId}
-//     marketplaces/{marketplaceId}
 //     activity/{activityId}  ← audit log, append-only, never edited
 //
 // Roles (plan §24): owner > admin > member > viewer.
 //
 // **Anything a client must not be able to forge is written by a Cloud
 // Function with the Admin SDK, which bypasses these rules entirely.** That is
-// the enforcement for marketplace tokens, payouts and subscription state —
+// the enforcement for payouts and subscription state —
 // not a rule here, because a rule can only check what the client sent.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -181,17 +180,6 @@ service cloud.firestore {
       match /locations/{locationId}        { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /categories/{categoryId}       { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /receipts/{receiptId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-
-      // --- Marketplace connections ---------------------------------------
-
-      // Readable so the app can show connection status, but **never writable
-      // by a client**: the document holds OAuth tokens, and the plan is
-      // explicit that secrets stay server-side (§14, §32). Connect and
-      // disconnect are callables.
-      match /marketplaces/{marketplaceId} {
-        allow read: if canRead(workspaceId);
-        allow write: if false;
-      }
 
       // --- Audit log ------------------------------------------------------
 
