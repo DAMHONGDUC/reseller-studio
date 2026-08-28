@@ -521,6 +521,47 @@ that drifts, and it drifts invisibly: each file looks right on its own.
   `context.colorScheme3` / `context.sdTheme3` or names an `AppColors` constant;
   a *package widget* reads the extension and never names a colour at all.
 
+## Forms and input
+
+Owner's rules. Every one of them is something a seller read wrong, so each is
+fixed in a single owner rather than at the call sites that got it wrong.
+
+- **Anywhere a keyboard can open, a tap outside the field closes it.** Wired
+  once in `SdKeyboardDismissV3`, which `SdScaffoldV3` and `SdBottomSheetV3`
+  both wrap their content in — no screen writes its own `GestureDetector`, and
+  no form leaves the platform's own gesture as the only way out. The hit test
+  is translucent, so it is reached only when nothing nearer claims the tap, and
+  a scroll drag defeats a tap, so scrolling is untouched.
+  - **A sheet needs it as much as a screen does.** A sheet is a route of its
+    own and is not inside the scaffold underneath it, so it inherits nothing
+    from that wrapper — and a sheet is where most of this app's typing happens.
+  - A field that owns its own trough and is not in either container
+    (`SdSearchFieldV3` docked in an app bar) is the exception the wrapper
+    cannot reach; the screen holding it dismisses on scroll instead.
+
+- **A placeholder is fainter than any real text, and it has its own colour
+  slot.** `SdThemeV3.textPlaceholder`, read through `.placeholder3(context)`.
+  It sits a step below `textTertiary` on purpose: tertiary is the faintest
+  colour still meant to be *read* — a caption, a timestamp, a disabled label —
+  and a hint drawn in it was being taken for a value the field already held.
+  Anything standing in for a value the seller has not given yet takes this: a
+  text field's hint, a search field's hint, `PickerField`'s "not set". Helper
+  and error text keep their own colours — those are text to read, not text
+  standing in for something absent.
+
+- **A required field is marked with an asterisk, and the widget draws it.**
+  `isRequired: true` on `SdTextFieldV3`, `MoneyField` or `PickerField` appends
+  it after the label in `SdThemeV3.danger`. No call site concatenates a
+  `*` into a string, or the marker ends up inside an ARB value where a
+  translator has to know to keep it and a screen reader reads it as a word.
+  - **The marker follows what the form actually blocks on**, which is hard
+    rule 2's state-based validation: a field is starred on the screen where
+    submitting without it fails, and unstarred on every screen where it does
+    not. A price is not required to create an item and is required to list one,
+    so the same value is starred in one sheet and bare in another.
+  - It never replaces the error: a starred field that is left empty still
+    reports it under the field on submit.
+
 ## Snackbars, dialogs and sheets
 
 All three are built in `v3/` and in use across the app. **Never reach into
@@ -555,6 +596,18 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
 - Sheets: always `showSdBottomSheetV3` — it must use the root navigator so
   sheets cover the floating glass tab bar; raw `showModalBottomSheet` slides
   under it.
+- **A sheet's options are separated by a rule, not by air.** Owner's rule, and
+  it covers every list of choices in a sheet — an actions sheet, a picker, the
+  workspace switcher. `AppSheetOptionList` (`core/widgets/`) lays the rows out
+  and puts `SdDividerV3` between them, so no sheet spaces its own and they
+  cannot drift apart. A column of same-weight rows with only a gap between
+  them reads as one block of text a seller has to parse before they can count
+  the choices.
+  - Between items only, per the divider rule below: nothing above the first row
+    or below the last.
+  - The rule keeps a small gap either side, because a picker's chosen row draws
+    a rounded ground and a hairline flush against that corner reads as two
+    shapes fighting.
 - Use `SdPressableScaleV3` for tactile button feedback.
 
 ## The rest of the primitives
@@ -596,9 +649,8 @@ quietly re-invent one.
 - **Charts hide their marks from screen readers and expose a summary instead.**
   A chart without that label is silence to VoiceOver, and this app's analytics
   is mostly charts.
-- **Tapping outside a focused field drops focus**, wired once in `SdScaffoldV3`
-  with a translucent hit test so it never eats a tap meant for a button or a
-  row.
+- **Tapping outside a focused field drops focus** — see Forms and input
+  above, which owns that rule and says where it is wired.
 - Every `Text` carries an explicit `style:` — root `CLAUDE.md`, Syntax. Not
   repeated here.
 
