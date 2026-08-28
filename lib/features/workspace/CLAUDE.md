@@ -17,12 +17,41 @@ about who is allowed to sign up.
   how one of them ends up missing the country somebody is standing in.
 - **Ordered by the name a seller reads, not by code.** The codes are what is
   stored; the alphabet the picker scrolls through has to be the one on screen.
-- **The currency list stays short, and that is not an inconsistency.** They are
-  different questions: a country is a fact about the seller, whereas a currency
-  is a default that every money format in the app has to have been got right
-  for. Adding one is work; adding a country is not.
 - **A list that long is only usable with a search box**, which is why
   `OptionPickerSheet` takes a `searchHint`. See `docs/rules/DESIGN_SYSTEM.md`.
+
+## The currency picker offers every currency too
+
+Owner's rule, and it **replaces the rule that used to stand here** — that the
+currency list could stay short because a country is a fact about the seller
+while a currency is a default the money layer has to have been got right for.
+The second half of that was true, so it was done rather than argued with: the
+money layer is now right for every ISO 4217 currency, and the list opened
+after that, not before. Offering 249 countries and eight currencies left most
+of those sellers keeping their books in somebody else's money.
+
+- **`CurrencyConstant.codes` is the whole active ISO 4217 set and the only
+  list**, ordered by the name a seller reads. Same shape as `CountryConstant`,
+  same reasons, and there is no second shorter copy.
+- **`CurrencyLabel` is its own file**, away from `WorkspaceOptionLabel`, for
+  the reason `CountryLabel` is: hundreds of arms would bury the four
+  business-type ones that file exists for.
+- **`CurrencyPicker` is the one presenter**, searchable, with the code as each
+  row's caption so somebody who thinks in codes can type GBP.
+- **`CurrencyDecimals` had to be completed first, and is the real cost of this
+  rule.** It carries the full zero-decimal set *and* the three-decimal one —
+  the Gulf and North African dinars plus the Omani rial — which it previously
+  skipped on the explicit grounds that none of them was selectable. The moment
+  the picker offered KWD, that reasoning became a factor-of-ten error in every
+  amount a Kuwaiti business entered.
+  **Anything added to the currency list is checked against that file.**
+- **`IDR` is a deliberate deviation from ISO**, which gives the rupiah an
+  exponent of 2. The sen has not circulated in decades, the app already
+  treated it as zero-decimal, and changing it now would multiply every stored
+  rupiah amount by a hundred.
+- `test/features/workspace/currency_list_test.dart` holds the list — every
+  code distinct, every code with words, ordered by name — and
+  `test/core/money/currency_decimals_test.dart` holds the arithmetic.
 
 ## Country names go through the ARB files like every other string
 
