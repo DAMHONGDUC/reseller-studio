@@ -174,7 +174,13 @@ because they are about the shell, not the bar:
   A filter has an obvious fix already on screen. A first empty list is where a
   new seller stops, so it names the next step and opens it — including on the
   lists with no create action of their own, where the step is upstream
-  (Orders and Listings send the seller to Inventory).
+  (Listings sends the seller to Inventory).
+- **A list that has a create action offers that action, never a detour.**
+  Orders was the exception until it got one: it now opens the record-sale
+  screen from both its button and its empty state, and the two say the same
+  words. An empty state pointing somewhere other than the screen's own create
+  button teaches a route the seller then has to unlearn
+  (`lib/features/orders/CLAUDE.md`).
 
 ## A form seeds through `FormSeed`, never straight from `build`
 
