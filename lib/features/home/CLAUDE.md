@@ -87,5 +87,9 @@ keeps the sheet visibly dismissible.
 
 It draws `WorkflowConstant.steps`, the same data About's diagram uses, and
 badges the steps the app never blocks on; what "optional" means there is in
-`docs/rules/SCREENS.md`. Each step opens the screen that performs it, so the
-sheet is a way in rather than a picture.
+`docs/rules/SCREENS.md`. **Each step is an independent collapsed row that can
+expand and collapse.** Owner's rule. The title, position and optional badge
+stay visible for scanning; expanding reveals the explanation, instructions
+and route action, and several steps may stay open while the seller compares
+them. Each step opens the screen that performs it, so the sheet is a way in
+rather than a picture.
