@@ -175,10 +175,12 @@ describe('what only a Cloud Function may write', () => {
     );
   });
 
-  it('refuses a client writing marketplace connection state', async () => {
-    // Hard rule 10 — the document holds OAuth tokens.
-    await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/marketplaces/ebay`).set({ connected: true }),
+  it('lets a member maintain seller-owned marketplace records', async () => {
+    await assertSucceeds(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/marketplaces/ebay`).set({
+        name: 'eBay',
+        feeRate: 0.1325,
+      }),
     );
   });
 

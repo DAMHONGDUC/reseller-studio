@@ -638,6 +638,7 @@ class InMemoryWorkspaceRepository implements WorkspaceRepository {
     String? ownerName,
     String? ownerEmail,
     String? businessType,
+    required List<Marketplace> marketplaces,
   }) async => _store.workspace.id;
 
   /// **Does nothing, and the demo never offers it.** The mock world holds one

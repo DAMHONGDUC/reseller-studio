@@ -1,6 +1,10 @@
 /// One of the marketplaces a new business starts with.
 class MarketplaceSeed {
-  const MarketplaceSeed({required this.id, required this.name, required this.feeRate});
+  const MarketplaceSeed({
+    required this.id,
+    required this.name,
+    required this.feeRate,
+  });
 
   /// A stable, readable id — so a seeded row is recognisable in Firestore and
   /// two businesses name eBay the same way, which is what lets a future

@@ -47,33 +47,31 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
       });
 
   @override
-  Future<void> saveAll(List<Marketplace> marketplaces) => FailureMapper.guard(
-    'seed marketplaces',
-    () async {
-      if (marketplaces.isEmpty) return;
+  Future<void> saveAll(List<Marketplace> marketplaces) =>
+      FailureMapper.guard('seed marketplaces', () async {
+        if (marketplaces.isEmpty) return;
 
-      // One batch: an account left with two of its four starting marketplaces
-      // has no way to tell that from a seller who deleted two.
-      final WriteBatch batch =
-          _context.collections.marketplaces.firestore.batch();
+        // One batch: an account left with two of its four starting marketplaces
+        // has no way to tell that from a seller who deleted two.
+        final WriteBatch batch = _context.collections.marketplaces.firestore
+            .batch();
 
-      for (final Marketplace marketplace in marketplaces) {
-        batch.set(
-          _context.collections.marketplaces.doc(marketplace.id),
-          MarketplaceDto.toMap(marketplace, createdBy: _context.uid),
-          SetOptions(merge: true),
+        for (final Marketplace marketplace in marketplaces) {
+          batch.set(
+            _context.collections.marketplaces.doc(marketplace.id),
+            MarketplaceDto.toMap(marketplace, createdBy: _context.uid),
+            SetOptions(merge: true),
+          );
+        }
+
+        await batch.commit();
+
+        SdLogger.info(
+          LogTagConstant.marketplace,
+          'Marketplaces seeded',
+          <String, Object>{'count': marketplaces.length},
         );
-      }
-
-      await batch.commit();
-
-      SdLogger.info(
-        LogTagConstant.marketplace,
-        'Marketplaces seeded',
-        <String, Object>{'count': marketplaces.length},
-      );
-    },
-  );
+      });
 
   @override
   Future<void> delete(String marketplaceId) =>
@@ -81,7 +79,10 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
         // Soft (hard rule 15): listings and orders name this by id, and a
         // hard delete would take it out of figures already reported.
         await _context.collections.marketplaces.doc(marketplaceId).set(
-          <String, Object?>{'deletedAt': Timestamp.now()},
+          <String, Object?>{
+            'deletedAt': Timestamp.now(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
           SetOptions(merge: true),
         );
 

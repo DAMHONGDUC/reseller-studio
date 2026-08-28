@@ -1,8 +1,28 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../workspace/providers.dart';
 import '../mock_data/providers.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/marketplace.dart';
+import 'marketplace_constant.dart';
+
+/// The normal marketplace records created for every new business.
+///
+/// Exposed here because another feature may import this feature's providers,
+/// while the default definition itself remains owned by Marketplaces.
+final Provider<List<Marketplace>> defaultMarketplacesProvider =
+    Provider<List<Marketplace>>((Ref ref) {
+      final DateTime createdAt = DateTime.now();
+
+      return <Marketplace>[
+        for (final MarketplaceSeed seed in MarketplaceConstant.defaults)
+          Marketplace(
+            id: seed.id,
+            name: seed.name,
+            feeRate: seed.feeRate,
+            createdAt: createdAt,
+          ),
+      ];
+    });
 
 /// Every marketplace this business has, deleted ones included.
 ///

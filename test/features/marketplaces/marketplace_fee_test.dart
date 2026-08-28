@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart'
+    as record;
 import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
+import 'package:reseller_studio/features/marketplaces/domain/repositories/marketplace_repository.dart';
 import 'package:reseller_studio/features/marketplaces/domain/services/marketplace_fee_policy.dart';
+import 'package:reseller_studio/features/marketplaces/presentation/controllers/marketplace_form_controller.dart';
+import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplace_detail_screen/marketplace_detail_screen.dart';
 import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
-import 'package:reseller_studio/features/marketplaces/presentation/widgets/fee_entry_sheet.dart';
+import 'package:reseller_studio/features/marketplaces/providers.dart';
+import 'package:reseller_studio/features/mock_data/providers.dart'
+    as mock_providers;
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
 import 'package:reseller_studio/features/orders/domain/services/payout_reconciliation.dart';
-import 'package:reseller_studio/features/workspace/providers.dart';
 
 import '../../support/pump_app.dart';
 
-/// A platform's published rate is a starting point, not the answer —
-/// owner's rule.
-///
-/// A seller on a shop tier, in another country, or with a category discount
-/// pays something else, and every after-fees figure in the app was quietly
-/// wrong for them until they could say so.
 void main() {
   Order order({Money? fees}) => Order(
     id: 'o-1',
@@ -30,42 +30,8 @@ void main() {
     fees: fees,
   );
 
-  group('resolving a rate', () {
-    test('a platform nobody corrected uses its published number', () {
-      expect(
-        MarketplaceFeePolicy.rateFor(Marketplace.ebay),
-        Marketplace.ebay.estimatedFeeRate,
-      );
-      expect(MarketplaceFeePolicy.isOverridden(Marketplace.ebay), isFalse);
-    });
-
-    test('a correction wins, and only for the platform it names', () {
-      const Map<String, double> overrides = <String, double>{'ebay': 0.08};
-
-      expect(MarketplaceFeePolicy.rateFor(Marketplace.ebay, overrides: overrides), 0.08);
-      expect(
-        MarketplaceFeePolicy.rateFor(Marketplace.etsy, overrides: overrides),
-        Marketplace.etsy.estimatedFeeRate,
-      );
-      expect(
-        MarketplaceFeePolicy.isOverridden(Marketplace.ebay, overrides: overrides),
-        isTrue,
-      );
-    });
-
-    test('a rate outside 0–100% is a typo, not a fee', () {
-      expect(MarketplaceFeePolicy.isValid(0), isTrue);
-      expect(MarketplaceFeePolicy.isValid(0.13), isTrue);
-      expect(MarketplaceFeePolicy.isValid(1), isTrue);
-      expect(MarketplaceFeePolicy.isValid(-0.01), isFalse);
-      expect(MarketplaceFeePolicy.isValid(1.5), isFalse);
-    });
-  });
-
-  group('what the corrected rate reaches', () {
-    test('an expected payout uses this business’s rate', () {
-      // 100.00 less an 8% fee the seller told us about, rather than eBay's
-      // published 13.25%.
+  group('legacy order estimates', () {
+    test('a correction wins when an order reports no fee', () {
       expect(
         PayoutReconciliation.expected(
           order(),
@@ -75,9 +41,7 @@ void main() {
       );
     });
 
-    test('a fee the platform actually reported still wins', () {
-      // The correction is a planning estimate. A real fee on the order is a
-      // fact, and a fact is never overwritten by an estimate.
+    test('a reported fee still wins over an estimate', () {
       expect(
         PayoutReconciliation.expected(
           order(fees: const Money(500, 'USD')),
@@ -86,76 +50,111 @@ void main() {
         const Money(9500, 'USD'),
       );
     });
+
+    test('a rate outside 0–100% is invalid', () {
+      expect(MarketplaceFeePolicy.isValid(0), isTrue);
+      expect(MarketplaceFeePolicy.isValid(1), isTrue);
+      expect(MarketplaceFeePolicy.isValid(-0.01), isFalse);
+      expect(MarketplaceFeePolicy.isValid(1.5), isFalse);
+    });
   });
 
-  group('the published-rate toggle', () {
-    testWidgets('every toggle names what it toggles', (
-      WidgetTester tester,
-    ) async {
-      // A bare switch in a row's trailing slot reads as "turn this
-      // marketplace off", which is not a thing this screen does.
-      await pumpScreen(tester, const MarketplacesScreen());
+  group('seller-owned marketplaces', () {
+    test('a new business receives the four defaults with rates', () {
+      final ProviderContainer container = mockContainer();
+      final List<record.Marketplace> defaults = container.read(
+        defaultMarketplacesProvider,
+      );
 
+      expect(defaults.map((record.Marketplace row) => row.name), <String>[
+        'eBay',
+        'Etsy',
+        'Depop',
+        'Poshmark',
+      ]);
       expect(
-        find.text('Use published rate'),
-        findsNWidgets(find.byType(Switch).evaluate().length),
+        defaults.every((record.Marketplace row) => row.feeRate > 0),
+        isTrue,
       );
     });
 
-    testWidgets('a platform nobody corrected shows the toggle on', (
+    testWidgets('the list has add and detail rows but no publish toggle', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const MarketplacesScreen());
 
-      final List<Switch> switches = tester
-          .widgetList<Switch>(find.byType(Switch))
-          .toList();
-
-      expect(switches, isNotEmpty);
-      expect(switches.every((Switch toggle) => toggle.value), isTrue);
+      expect(find.text('Add marketplace'), findsOneWidget);
+      expect(find.text('eBay'), findsOneWidget);
+      expect(find.text('Poshmark'), findsOneWidget);
+      expect(find.byType(Switch), findsNothing);
     });
 
-    testWidgets('while it is on the row cannot be edited', (
+    testWidgets('detail edits name and estimated rate together', (
       WidgetTester tester,
     ) async {
-      // A sheet that let the seller type a number the row would then ignore
-      // is a control that lies.
-      await pumpScreen(tester, const MarketplacesScreen());
+      await pumpScreen(
+        tester,
+        const MarketplaceDetailScreen(marketplaceId: 'ebay'),
+      );
 
-      await tester.tap(find.text('eBay'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(FeeEntrySheet), findsNothing);
+      expect(find.text('Edit marketplace'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'eBay'), findsOneWidget);
+      expect(find.widgetWithText(TextField, '13.25'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+      expect(find.byType(Switch), findsNothing);
     });
 
-    testWidgets('turning it off seeds the correction at the published rate', (
-      WidgetTester tester,
-    ) async {
-      await pumpScreen(tester, const MarketplacesScreen());
+    test('the form controller can add a normal marketplace record', () async {
+      final ProviderContainer container = mockContainer();
+      final MarketplaceFormController controller = container.read(
+        marketplaceFormControllerProvider.notifier,
+      );
+      final MarketplaceRepository repository = container.read(
+        mock_providers.marketplaceRepositoryProvider,
+      );
 
-      await tester.tap(find.byType(Switch).first);
-      await tester.pumpAndSettle();
+      controller.startCreate();
+      controller.updateFeeRate(0.12);
+      final String? id = await controller.submit(name: 'Vinted');
+      final List<record.Marketplace> rows = await repository
+          .watchMarketplaces()
+          .first;
 
-      // "I want my own rate" and "my rate is 13.25%" now say the same thing,
-      // so nothing renders a row that is neither.
-      final Map<String, double> rates = ProviderScope.containerOf(
-        tester.element(find.byType(MarketplacesScreen)),
-      ).read(marketplaceFeeRatesProvider);
-
-      expect(rates['ebay'], Marketplace.ebay.estimatedFeeRate);
+      expect(id, isNotNull);
+      expect(
+        rows.where((record.Marketplace row) => row.name == 'Vinted'),
+        hasLength(1),
+      );
     });
 
-    testWidgets('with it off the row opens the fee sheet', (
-      WidgetTester tester,
-    ) async {
-      await pumpScreen(tester, const MarketplacesScreen());
+    test('the form controller edits and soft-deletes a marketplace', () async {
+      final ProviderContainer container = mockContainer();
+      final MarketplaceFormController controller = container.read(
+        marketplaceFormControllerProvider.notifier,
+      );
+      final MarketplaceRepository repository = container.read(
+        mock_providers.marketplaceRepositoryProvider,
+      );
+      final record.Marketplace ebay =
+          (await repository.watchMarketplaces().first).firstWhere(
+            (record.Marketplace row) => row.id == 'ebay',
+          );
 
-      await tester.tap(find.byType(Switch).first);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('eBay'));
-      await tester.pumpAndSettle();
+      controller.seed(ebay);
+      controller.updateFeeRate(0.15);
+      await controller.submit(name: 'eBay UK', marketplaceId: ebay.id);
+      record.Marketplace changed = (await repository.watchMarketplaces().first)
+          .firstWhere((record.Marketplace row) => row.id == ebay.id);
 
-      expect(find.byType(FeeEntrySheet), findsOneWidget);
+      expect(changed.name, 'eBay UK');
+      expect(changed.feeRate, 0.15);
+
+      await controller.delete(ebay.id);
+      changed = (await repository.watchMarketplaces().first).firstWhere(
+        (record.Marketplace row) => row.id == ebay.id,
+      );
+
+      expect(changed.isDeleted, isTrue);
     });
   });
 }

@@ -24,6 +24,7 @@ import '../../features/inventory/presentation/screens/quick_add_screen/quick_add
 import '../../features/inventory/presentation/screens/scanner_screen/scanner_screen.dart';
 import '../../features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
 import '../../features/listings/presentation/screens/listings_screen/listings_screen.dart';
+import '../../features/marketplaces/presentation/screens/marketplace_detail_screen/marketplace_detail_screen.dart';
 import '../../features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import '../../features/more/presentation/screens/about_screen/about_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
@@ -459,6 +460,25 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'marketplaces',
                     builder: (BuildContext context, GoRouterState state) =>
                         const MarketplacesScreen(),
+                    routes: <RouteBase>[
+                      // Before the `:marketplaceId` route, or 'new' matches it
+                      // and the form opens looking for a record called "new".
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'new',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const MarketplaceDetailScreen(),
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: ':marketplaceId',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            MarketplaceDetailScreen(
+                              marketplaceId:
+                                  state.pathParameters['marketplaceId'],
+                            ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

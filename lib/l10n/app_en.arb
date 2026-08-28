@@ -689,54 +689,57 @@
   "@marketplacesTitle": {
     "description": "Marketplaces screen title."
   },
+  "marketplaceAdd": "Add marketplace",
+  "@marketplaceAdd": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceEditTitle": "Edit marketplace",
+  "@marketplaceEditTitle": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceNameLabel": "Name",
+  "@marketplaceNameLabel": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceNameHint": "eBay, Vinted, Sunday market",
+  "@marketplaceNameHint": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceFeeLabel": "Fee",
+  "@marketplaceFeeLabel": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceFeeHelper": "What this platform takes, as a percentage of the sale. A fee an order reports still wins.",
+  "@marketplaceFeeHelper": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceFeeInvalid": "Enter a percentage between 0 and 100.",
+  "@marketplaceFeeInvalid": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceNameRequired": "Give it a name.",
+  "@marketplaceNameRequired": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplacesEmptyTitle": "No marketplaces yet",
+  "@marketplacesEmptyTitle": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplacesEmptyBody": "Add the places you sell, so a listing can say where it is and what that costs.",
+  "@marketplacesEmptyBody": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceDeleteTitle": "Delete this marketplace?",
+  "@marketplaceDeleteTitle": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceDeleteBody": "Listings and orders that name it keep it — it just stops being offered when you list something new.",
+  "@marketplaceDeleteBody": {
+    "description": "Marketplace add/edit screen."
+  },
   "marketplacesEstimatedFee": "Estimated fee",
   "@marketplacesEstimatedFee": {
-    "description": "Caption on a marketplace row. A published rate for planning, never used as accounting."
-  },
-  "marketplacesYourFee": "Your fee",
-  "@marketplacesYourFee": {
-    "description": "Caption on a marketplace whose rate the seller corrected."
-  },
-  "marketplacesEditFee": "Fee on {marketplace}",
-  "@marketplacesEditFee": {
-    "description": "Title of the sheet correcting one platform’s rate.",
-    "placeholders": {
-      "marketplace": {
-        "type": "String"
-      }
-    }
-  },
-  "marketplacesFeeLabel": "Fee",
-  "@marketplacesFeeLabel": {
-    "description": "Label of the fee percentage field."
-  },
-  "marketplacesFeeHelper": "What this platform actually takes, as a percentage of the sale.",
-  "@marketplacesFeeHelper": {
-    "description": "Helper under the fee field."
-  },
-  "marketplacesFeeInvalid": "Enter a percentage between 0 and 100.",
-  "@marketplacesFeeInvalid": {
-    "description": "Shown when the typed fee is not a usable percentage."
-  },
-  "marketplacesUsePublished": "Use the published rate",
-  "@marketplacesUsePublished": {
-    "description": "Clears the seller’s own rate for a platform."
-  },
-  "marketplacesUsePublishedShort": "Use published rate",
-  "@marketplacesUsePublishedShort": {
-    "description": "Label of the per-marketplace toggle that follows the platform’s own rate."
-  },
-  "marketplacesTapToEditFee": "Tap to set your own",
-  "@marketplacesTapToEditFee": {
-    "description": "Caption on a row whose rate the seller may edit."
-  },
-  "marketplacesFeesTitle": "What each platform charges",
-  "@marketplacesFeesTitle": {
-    "description": "Heading over the editable fee list."
-  },
-  "marketplacesFeesBody": "These drive the buy calculator and the after-fees figures. Correct one if your rate differs — a real fee still overrides it when an order reports one.",
-  "@marketplacesFeesBody": {
-    "description": "Explains what the fee list is for."
+    "description": "Caption on a marketplace row. A planning estimate, never used as accounting."
   },
   "moreComingSoon": "Soon",
   "@moreComingSoon": {

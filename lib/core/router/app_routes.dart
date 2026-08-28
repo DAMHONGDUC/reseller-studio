@@ -115,6 +115,9 @@ final class AppRoutes {
   static const String tax = '/more/tax';
   static const String categories = '/more/categories';
   static const String marketplaces = '/more/marketplaces';
+  static const String addMarketplace = '/more/marketplaces/new';
+  static const String marketplaceDetailPath =
+      '/more/marketplaces/:marketplaceId';
   static const String team = '/more/team';
   static const String settings = '/more/settings';
 
@@ -136,6 +139,9 @@ final class AppRoutes {
   ///
   /// `AppRoutes.item('abc')` rather than `'/inventory/item/abc'`, so the one
   /// place that knows the segment layout is this file.
+  static String marketplace(String marketplaceId) =>
+      '/more/marketplaces/$marketplaceId';
+
   static String item(String itemId) => '/inventory/item/$itemId';
   static String editItem(String itemId) => '/inventory/item/$itemId/edit';
   static String crossList(String itemId) =>

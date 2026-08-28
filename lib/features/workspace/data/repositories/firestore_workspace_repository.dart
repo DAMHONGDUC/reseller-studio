@@ -10,6 +10,7 @@ import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_collections.dart';
 import '../../../listings/domain/enums/listing_status.dart';
+import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/workspace.dart';
@@ -18,14 +19,11 @@ import '../dtos/workspace_dto.dart';
 
 /// Workspaces, memberships and user profiles, in Firestore.
 ///
-/// **Creation is three sequential writes, not one batch, and that is forced
-/// by the security rules.** The membership rule has to read the workspace
-/// document to check that the caller is its `ownerId`, and a rules `get()`
-/// only sees committed data — so a batch containing both would be rejected on
-/// the membership write. The order is therefore workspace → membership →
-/// profile pointer, and a failure partway leaves a workspace the user is not
-/// a member of: invisible to them, and re-running onboarding creates a clean
-/// one. That is the recoverable failure of the three.
+/// **Creation is two prerequisite writes and one final batch, forced by the
+/// security rules.** A rules `get()` sees only committed data, so the order is
+/// workspace → membership → batch(default marketplaces + profile pointer).
+/// A failure before the last step leaves the workspace unreachable rather
+/// than exposing a business with only part of its default marketplace list.
 class FirestoreWorkspaceRepository implements WorkspaceRepository {
   const FirestoreWorkspaceRepository(this._firestore, this._functions);
 
@@ -97,6 +95,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
     String? ownerName,
     String? ownerEmail,
     String? businessType,
+    required List<Marketplace> marketplaces,
   }) => FailureMapper.guard('create workspace', () async {
     final String id = _uuid.v4();
     final DateTime now = DateTime.now();
@@ -135,11 +134,31 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
           ),
         );
 
-    await _users.doc(ownerId).set(<String, Object?>{
+    final WriteBatch finalBatch = _firestore.batch();
+    final WorkspaceCollections collections = WorkspaceCollections(
+      _firestore,
+      id,
+    );
+
+    for (final Marketplace marketplace in marketplaces) {
+      finalBatch.set(
+        collections.marketplaces.doc(marketplace.id),
+        FirestoreMapper.pruned(<String, Object?>{
+          'name': marketplace.name,
+          'feeRate': marketplace.feeRate,
+          'createdAt': FirestoreMapper.serverTimestamp,
+          'updatedAt': FirestoreMapper.serverTimestamp,
+          'createdBy': ownerId,
+        }),
+      );
+    }
+
+    finalBatch.set(_users.doc(ownerId), <String, Object?>{
       'workspaceIds': FieldValue.arrayUnion(<String>[id]),
       'lastWorkspaceId': id,
       'updatedAt': FirestoreMapper.serverTimestamp,
     }, SetOptions(merge: true));
+    await finalBatch.commit();
 
     SdLogger.action(
       LogTagConstant.workspace,
@@ -148,6 +167,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
         'workspaceId': id,
         'currency': currency,
         'country': country,
+        'marketplaceCount': marketplaces.length,
       },
     );
 
