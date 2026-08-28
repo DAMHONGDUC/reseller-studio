@@ -125,27 +125,21 @@ to say what the seller learned on their second launch.
   now the *only* signal besides colour and the capsule, so it matters more
   rather than less — colour alone must never be the mark.
 
-#### The selected capsule is glass in its own layer, not a tinted pill
+#### The selected capsule is a tinted thumb inside the glass bar
 
-The rule this replaces said an indicator was Material's idiom and read as a
-foreign control. That was true of what was tried — **a flat filled shape**.
-The iOS 26 system tab bar does put something behind the current tab, and the
-difference is what it is made of: a second piece of Liquid Glass, brighter
-than the bar, refracting the same page underneath and travelling between tabs.
-The rule was against the material, not against the mark.
+Owner's rule, taken from the reference switcher. The bar is the one Liquid
+Glass surface; the selected segment is a **tinted `DecoratedBox`** sliding
+inside it. A second Liquid Glass layer made the active segment too subtle over
+light content, so it stopped reading as a switcher.
 
-Three things follow, and each is the reason the old attempt failed:
+Two things follow:
 
-- **The capsule gets its own `LiquidGlassLayer`
-  (`LiquidGlass.withOwnLayer`), never `LiquidGlass.grouped` in the bar's blend
-  group.** Shapes in one blend group are combined with a smooth union, and a
-  capsule wholly inside the bar's stadium unions into it and disappears. Its
-  own layer paints after the bar and reads the bar's own output as its
-  backdrop, which is exactly the stacked-lens look the system bar has.
-- **It is sheerer and brighter than the bar, and it carries no blur.** The
-  bar has already blurred the page; blurring a blurred backdrop a second time
-  smears rather than frosts. The capsule's job is refraction and rim light —
-  `SdGlassNavBarV3.selectedCapsuleSettings`.
+- **The thumb uses the primary colour at `selectedThumbOpacity`.** It is clear
+  enough to mark the selected icon without becoming a solid Material button.
+  The filled glyph is the second signal, so colour is never the only one.
+- **It slides; it does not fade in and out.** One thumb moving is what says the
+  tabs are one control. `SdMotionV3.normal` on `SdMotionV3.emphasized` moves
+  it from the current segment to the next, and a re-tap does nothing.
 - **It slides; it does not fade in and out.** One capsule moving is what says
   the tabs are one row. `SdMotionV3.normal` on `SdMotionV3.emphasized` — the
   motion enters and leaves in one animation, so `standard` would land it
