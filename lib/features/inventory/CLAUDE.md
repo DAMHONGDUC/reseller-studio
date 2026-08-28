@@ -59,20 +59,25 @@ Owner's rule. `Listing.price` was always per-listing; what was missing was a
 way to set it. The cross-list screen now collects **a shared price plus the
 exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
 
-- **A map of overrides, not one entry per selected platform.** The common case
-  is one price everywhere, and a map filled in eagerly would make "the seller
-  chose this" indistinguishable from "the default was copied here".
-  `CrossListState.priceFor` resolves the two; nothing downstream has to know
-  which a number came from.
-- **The price is set on the review row**, not in a second field beside the
-  shared one. That row already shows the fee and what is left, so the place to
-  change the number is the line that shows what changing it does — and six
-  boxes for one intent is hard rule 2 backwards.
-- **Publish needs a price for every selected platform**, from its own override
-  or from the shared default. An override alone is enough; a platform with
-  neither keeps publish off.
-- **Unticking a platform drops its override.** A hidden price that reappeared
-  on the next tick is a number nobody chose that time.
+- **The price field sits under the marketplace it belongs to** — owner's rule.
+  Choosing a platform and pricing it is one decision, and it replaced a
+  separate Review section whose rows opened a sheet to edit one number: the
+  seller ticked something and had to scroll to find out what that had done.
+  The fee and what is left ride under the field as its helper.
+- **Ticking seeds that row from the shared price**, so the common case — one
+  number everywhere — is still no typing at all. The shared field is the seed,
+  not the answer: changing it afterwards does not reach back into rows already
+  on screen, because a number moving in a field nobody is watching is worse
+  than retyping one.
+- **A marketplace the item is already on is ticked and inert** — owner's rule.
+  An empty circle beside a platform the item is live on is simply wrong, and
+  the row stays disabled because a second listing on the same platform is not
+  a thing to offer.
+- **Publish needs a price on every ticked row.** A row whose field was emptied
+  holds publish closed rather than falling back to the seed, which would list
+  at a number the seller had just deleted.
+- **Unticking a platform drops its price.** A hidden number that came back on
+  the next tick is one nobody chose that time.
 - **The item's `askingPrice` takes the shared price, never a platform's.**
   What the item is worth is not whichever marketplace happened to be cheapest,
   so `crossList` takes it as a separate argument and leaves the item alone
