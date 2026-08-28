@@ -55,14 +55,21 @@ The spacing rulebook (`SdContentPaddingV2`) **was** ported in full. Two
 neighbouring v2 patterns were not, and this is the standing answer:
 
 - **`SdCollapsingFilterScaffoldV2` + `SdPinnedFilterBarV2`.** v2 lifts the
-  whole filter row *into the app bar* as the list scrolls. v3 does not, and
-  that is the recorded owner's rule: a filter strip is never part of the app
-  bar, it is its own widget in the body with the body's background.
-  **What changed since:** the strip now *pins* below the chrome rather than
-  scrolling away, because chips a seller cannot reach 300 rows down are chips
-  they scroll back up for. Pinned below is not the same as lifted inside —
-  v2's component is still not what v3 wants, and v3 pins with a plain
-  `SliverPersistentHeader` it owns.
+  whole filter row *into the app bar* as the list scrolls. The recorded
+  owner's rule used to be that v3 never does this.
+  **What changed since, twice:** the strip first started to *pin* below the
+  chrome rather than scroll away, because chips a seller cannot reach 300 rows
+  down are chips they scroll back up for. Then Orders was asked for the
+  docking shape outright — the chips travel into the title's row and sit
+  beside the actions — so v3 now lifts a strip into the bar on one screen.
+  **The v2 components are still not what v3 uses**, and the reason is
+  unchanged by either step: v2's chrome is frosted glass the body scrolls
+  behind, so its scaffold owns the whole screen to make that work. v3's bar is
+  opaque and takes real layout space, so the same effect is one
+  `SliverPersistentHeader` and two rectangles — `SdFilterHeaderV3` over
+  `SdDockingHeaderV3`, which `SdSearchHeaderV3` shares. Importing v2 here
+  would drag a premise v3 does not hold, and `WIDGET_RULES.md` forbids it
+  anyway.
 - **`SdContentPaddingV3.belowPinnedFilterBar`.** Follows from the above: it is
   `appBarInset` plus the strip's height, the first term is zero under an
   opaque bar, and nothing pins a strip over a list anyway.
