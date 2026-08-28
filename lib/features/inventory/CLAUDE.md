@@ -35,12 +35,22 @@ list: the detail screen's Actions button, and **the `more_vert` button on
   to be one a seller already knows; `tune` reads as filtering when it is not
   sitting next to the word Actions. The detail screen keeps `tune` because it
   has room for the label.
+- **A round 44pt target, centred on the glyph** — owner's rule. It was a 36×44
+  box with the dots pinned to its right edge: a squeezed target, and a ripple
+  that came up as a rounded rectangle nowhere near what it was acknowledging.
+  The glyph still lands on the card's content edge, where every
+  `AppRowChevron` sits — the target is centred on it and the button is nudged
+  outward by what centring cost, overhanging the card's padding rather than
+  pushing the dots inward. `IconButton` cannot do either: Material 3 builds it
+  from a `ButtonStyle` and ignores `constraints`.
+  `test/features/inventory/item_card_actions_test.dart` pins the size and the
+  shape.
 - **It disappears while a bulk selection is open.** Every tap ticks a row
   then, and a sheet for one item would lose the forty the seller had just
   picked — the same reason a tap selects instead of navigating in that mode.
 - **`onActions` is nullable**, so a list that only navigates simply does not
   pass it.
-- `test/features/inventory/item_card_actions_test.dart` holds all four.
+- `test/features/inventory/item_card_actions_test.dart` holds all of it.
 
 ## One List row, and it opens the cross-list screen
 
@@ -127,31 +137,38 @@ Owner's rule, and it is deliberate rather than a duplication left standing.
 
 Owner's rule — the row must be **good-looking, sensible and complete**, in
 that order of argument and none of them at the cost of the others. `ItemCard`
-answers it with a split rather than a longer list of lines:
+answers it with a split: beside the photo, what the item *is* — its title and
+the badges naming its state. Below, running to the card's own left edge, what
+it is *worth* — cost, asking price, expected profit, and the marketplaces it
+is live on.
 
-- **Across the top, what the item is**: photo, title, the asking price at the
-  end of that line, then the badges naming its state. **Underneath, at the
-  card's own edges, what it is worth**: cost against expected profit, then the
-  marketplaces it is live on.
-- **The split is what makes the figures fit.** Held inside the top row the
-  money had a 64pt photo on one side and a 36pt actions button on the other,
-  and `Profit $140.00 (76%)` ellipsized on a four-figure item. Given the
-  card's full width it does not.
-- **The asking price sits at the end of the title row**, the same place the
-  order and offer cards put theirs. It is what a seller scans a list for, and
-  at the edge it forms a column the eye runs straight down; buried in a line
-  of three labelled cells it was one figure among three.
-- **Cost at the start of the money line, profit at the end**, so the profit
-  lands under the asking price and the two numbers a seller compares share a
-  column. The margin rides inside the profit cell: a percentage is what makes
-  $140 a good number or a thin one.
+- **The money and the marketplaces start at the card's left edge**, not after
+  the photo — owner's rule. It gives them the card's full width, and it
+  separates the two questions the row answers instead of running them into one
+  column.
+- **Three figures, stacked, in that order** — owner's rule: what went out,
+  what is being asked, what is left. Side by side they each got a share of the
+  width and truncated in turn; stacked, each has the whole card.
+- **The asking price is a labelled line in that block, not a figure beside the
+  title** — owner's rule, and it settles where the number lives after two
+  moves. Beside the title it took width from the one thing that identifies the
+  item; as a bare number under the title it read as a second title. Labelled
+  among the other two, it is one of a set a seller compares.
+- **The figures are a size louder than their labels** — owner's rule. They are
+  what the row exists to show, and a label at the same weight makes the seller
+  hunt for the number among the words introducing it.
 - **A cell is one paragraph, not a label widget beside a value widget.** The
   label and its figure have to ellipsize as one thing — a `Row` clips
-  whichever child the constraints reach first, which is how the margin
-  disappeared while `Cost` sat on width it did not need.
-- **Nothing here is stored** (hard rule 3): `Item.expectedProfit` and
-  `Item.expectedMargin` are derived, and both are null — rendered `—`, never
-  `0` — the moment a figure behind them is missing (hard rule 5).
+  whichever child the constraints reach first, which is how a figure vanished
+  while `Cost` sat on width it did not need.
+- **All three render `—` when unknown** (hard rule 5), never `0`: an item added
+  through Quick Add has none of them, and a zero would tell the seller it was
+  free. The dash is `textTertiary` even in the profit cell — an em dash is not
+  a figure, so it is not tinted as good news or bad.
+- **The profit is derived, never stored** (hard rule 3), and it is deliberately
+  rough: `Item.expectedProfit` ignores fees and shipping, because which
+  marketplace takes them is not known until the item sells. `ProfitBreakdown`
+  is the real number, on a completed order.
 
 ## The row says how long, not only what
 
