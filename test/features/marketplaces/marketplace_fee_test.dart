@@ -1,10 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:reseller_studio/features/marketplaces/domain/services/marketplace_fee_policy.dart';
+import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
+import 'package:reseller_studio/features/marketplaces/presentation/widgets/fee_entry_sheet.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
 import 'package:reseller_studio/features/orders/domain/services/payout_reconciliation.dart';
+import 'package:reseller_studio/features/workspace/providers.dart';
 
 import '../../support/pump_app.dart';
 
@@ -80,6 +85,77 @@ void main() {
         ),
         const Money(9500, 'USD'),
       );
+    });
+  });
+
+  group('the published-rate toggle', () {
+    testWidgets('every toggle names what it toggles', (
+      WidgetTester tester,
+    ) async {
+      // A bare switch in a row's trailing slot reads as "turn this
+      // marketplace off", which is not a thing this screen does.
+      await pumpScreen(tester, const MarketplacesScreen());
+
+      expect(
+        find.text('Use published rate'),
+        findsNWidgets(find.byType(Switch).evaluate().length),
+      );
+    });
+
+    testWidgets('a platform nobody corrected shows the toggle on', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const MarketplacesScreen());
+
+      final List<Switch> switches = tester
+          .widgetList<Switch>(find.byType(Switch))
+          .toList();
+
+      expect(switches, isNotEmpty);
+      expect(switches.every((Switch toggle) => toggle.value), isTrue);
+    });
+
+    testWidgets('while it is on the row cannot be edited', (
+      WidgetTester tester,
+    ) async {
+      // A sheet that let the seller type a number the row would then ignore
+      // is a control that lies.
+      await pumpScreen(tester, const MarketplacesScreen());
+
+      await tester.tap(find.text('eBay'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FeeEntrySheet), findsNothing);
+    });
+
+    testWidgets('turning it off seeds the correction at the published rate', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const MarketplacesScreen());
+
+      await tester.tap(find.byType(Switch).first);
+      await tester.pumpAndSettle();
+
+      // "I want my own rate" and "my rate is 13.25%" now say the same thing,
+      // so nothing renders a row that is neither.
+      final Map<String, double> rates = ProviderScope.containerOf(
+        tester.element(find.byType(MarketplacesScreen)),
+      ).read(marketplaceFeeRatesProvider);
+
+      expect(rates['ebay'], Marketplace.ebay.estimatedFeeRate);
+    });
+
+    testWidgets('with it off the row opens the fee sheet', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const MarketplacesScreen());
+
+      await tester.tap(find.byType(Switch).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('eBay'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FeeEntrySheet), findsOneWidget);
     });
   });
 }

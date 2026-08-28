@@ -14,9 +14,10 @@ import '../controllers/marketplace_fee_controller.dart';
 /// sells for, so `PriceEntrySheet` is the wrong shape: it would ask for an
 /// amount in the workspace currency and mean nothing on the next sale.
 ///
-/// **It offers the published rate back.** A seller who corrected eBay and then
-/// changed tier needs a way to stop maintaining a number by hand, and deleting
-/// the field to mean that is not something anybody guesses.
+/// **Going back to the published rate is the row's toggle, not a button
+/// here** — owner's rule. Two controls for one decision is how they end up
+/// disagreeing, and this sheet only opens while the toggle already says the
+/// seller owns the number.
 class FeeEntrySheet extends ConsumerStatefulWidget {
   const FeeEntrySheet({required this.marketplace, required this.rate, super.key});
 
@@ -116,13 +117,6 @@ class _FeeEntrySheetState extends ConsumerState<FeeEntrySheet> {
             expand: true,
             busy: isBusy,
             onPressed: isBusy ? null : _save,
-          ),
-          SizedBox(height: SdSpacingConstant.h8),
-          SdButtonV3(
-            variant: SdButtonVariantV3.text,
-            label: context.l10n.marketplacesUsePublished,
-            expand: true,
-            onPressed: isBusy ? null : () => _write(null),
           ),
         ],
       ),

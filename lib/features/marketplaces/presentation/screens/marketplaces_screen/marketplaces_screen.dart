@@ -3,11 +3,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/enums/marketplace.dart';
 import '../../../domain/services/marketplace_fee_policy.dart';
+import '../../controllers/marketplace_fee_controller.dart';
 import '../../widgets/fee_entry_sheet.dart';
 
 /// Marketplaces — connection status, and nothing else (plan §14).
@@ -79,6 +81,12 @@ class MarketplacesScreen extends ConsumerWidget {
 /// else, and every after-fees figure in the app was quietly wrong for them.
 /// The row says whose number it is, so a corrected rate cannot be mistaken for
 /// the platform's own.
+/// One platform: what it charges this business, and whose number that is.
+///
+/// **The toggle says what it toggles, on its own line** — owner's rule. A bare
+/// switch in a row's trailing slot reads as "turn this marketplace off", which
+/// is not a thing this screen does; the words are what stop that reading, and
+/// they do not fit beside a title, a rate and a chevron.
 class _FeeRow extends ConsumerWidget {
   const _FeeRow({required this.marketplace});
 
@@ -87,26 +95,107 @@ class _FeeRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Map<String, double> rates = ref.watch(marketplaceFeeRatesProvider);
-    final double rate = MarketplaceFeePolicy.rateFor(
-      marketplace,
-      overrides: rates,
-    );
     final bool isOwn = MarketplaceFeePolicy.isOverridden(
       marketplace,
       overrides: rates,
     );
+    final double rate = MarketplaceFeePolicy.rateFor(
+      marketplace,
+      overrides: rates,
+    );
+    final bool isBusy = ref.watch(marketplaceFeeControllerProvider);
 
-    return AppListRow(
-      title: marketplace.displayName,
-      subtitle: context.l10n.marketplacesEstimatedFeeLine(
-        (rate * 100).toStringAsFixed(1),
-        isOwn
-            ? context.l10n.marketplacesYourFee
-            : context.l10n.marketplacesEstimatedFee,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        AppListRow(
+          title: marketplace.displayName,
+          subtitle: context.l10n.marketplacesEstimatedFeeLine(
+            (rate * 100).toStringAsFixed(1),
+            isOwn
+                ? context.l10n.marketplacesTapToEditFee
+                : context.l10n.marketplacesEstimatedFee,
+          ),
+          icon: Symbols.hub_rounded,
+          // Only editable while the toggle is off. On, the row is following
+          // the platform, and a sheet that let the seller type a number the
+          // row would then ignore is a control that lies.
+          showChevron: isOwn,
+          onTap: isOwn && !isBusy
+              ? () => FeeEntrySheet.show(
+                  context,
+                  marketplace: marketplace,
+                  rate: rate,
+                )
+              : null,
+        ),
+        _PublishedRateToggle(marketplace: marketplace, isOwn: isOwn),
+      ],
+    );
+  }
+}
+
+/// **"Use published rate", named in full and per platform** — owner's rule.
+///
+/// On, the row follows `Marketplace.estimatedFeeRate` and cannot be edited.
+/// Off, the seller owns the number.
+///
+/// **Turning it off seeds the correction at the published rate** rather than
+/// leaving it unset. "I want my own rate" and "my rate is 13.25%" then say the
+/// same thing, so nothing has to render a row that is neither following the
+/// platform nor carrying a number.
+class _PublishedRateToggle extends ConsumerWidget {
+  const _PublishedRateToggle({required this.marketplace, required this.isOwn});
+
+  final Marketplace marketplace;
+  final bool isOwn;
+
+  Future<void> _set(BuildContext context, WidgetRef ref, bool usePublished) =>
+      ref
+          .read(marketplaceFeeControllerProvider.notifier)
+          .setRate(
+            marketplace,
+            usePublished ? null : marketplace.estimatedFeeRate,
+          )
+          .onError((Object error, StackTrace _) {
+            // Already logged by the controller.
+            if (!context.mounted) return;
+
+            SdSnackBarUtilsV3.error(
+              context,
+              FailurePresenter.message(context, error),
+            );
+          });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool isBusy = ref.watch(marketplaceFeeControllerProvider);
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: SdContentPaddingV3.row.left,
+        right: SdContentPaddingV3.row.right,
+        bottom: SdContentPaddingV3.row.bottom,
       ),
-      icon: Symbols.hub_rounded,
-      onTap: () =>
-          FeeEntrySheet.show(context, marketplace: marketplace, rate: rate),
+      // **Stacked, not side by side** — owner's rule. The label sits over the
+      // control it names, so at six platforms the eye reads a column of
+      // switches with a heading each rather than six sentences ending in a
+      // control.
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            context.l10n.marketplacesUsePublishedShort,
+            style: context.textTheme3.bodySmall!.muted3(context),
+          ),
+          Switch(
+            value: !isOwn,
+            onChanged: isBusy
+                ? null
+                : (bool usePublished) => _set(context, ref, usePublished),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -738,6 +738,14 @@
   "@marketplacesUsePublished": {
     "description": "Clears the seller’s own rate for a platform."
   },
+  "marketplacesUsePublishedShort": "Use published rate",
+  "@marketplacesUsePublishedShort": {
+    "description": "Label of the per-marketplace toggle that follows the platform’s own rate."
+  },
+  "marketplacesTapToEditFee": "Tap to set your own",
+  "@marketplacesTapToEditFee": {
+    "description": "Caption on a row whose rate the seller may edit."
+  },
   "marketplacesFeesTitle": "What each platform charges",
   "@marketplacesFeesTitle": {
     "description": "Heading over the editable fee list."
