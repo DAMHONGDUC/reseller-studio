@@ -41,7 +41,7 @@ class _NavBarHostState extends State<_NavBarHost> {
 }
 
 /// The bar is glyph-only: five equal segments, one icon each, and a fixed-width
-/// glass capsule sliding under the selected one. Labels remain semantics only.
+/// tinted thumb sliding under the selected one. Labels remain semantics only.
 void main() {
   Future<void> pumpBar(WidgetTester tester, int selected) =>
       pumpScreen(tester, _NavBarHost(initialIndex: selected));
@@ -175,26 +175,22 @@ void main() {
     expect(midFlight.height, moreOrLessEquals(before.height));
   });
 
-  testWidgets('nothing flat is painted behind the current glyph', (
+  testWidgets('one visible tinted thumb marks the current segment', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 0);
 
-    final Iterable<BoxDecoration> painted = tester
-        .widgetList<DecoratedBox>(
-          find.descendant(
-            of: find.byType(SdGlassNavBarV3),
-            matching: find.byType(DecoratedBox),
-          ),
-        )
-        .map((DecoratedBox box) => box.decoration as BoxDecoration);
+    final DecoratedBox thumb = tester.widget<DecoratedBox>(
+      find.byKey(SdGlassNavBarV3.selectedCapsuleKey),
+    );
+    final BoxDecoration decoration = thumb.decoration as BoxDecoration;
+    final BuildContext context = tester.element(find.byType(SdGlassNavBarV3));
 
     expect(
-      painted.where(
-        (BoxDecoration decoration) =>
-            decoration.color != null && decoration.color!.a > 0,
+      decoration.color,
+      context.colorScheme3.primary.withValues(
+        alpha: SdGlassNavBarV3.selectedThumbOpacity,
       ),
-      isEmpty,
     );
   });
 
@@ -206,10 +202,6 @@ void main() {
     final BuildContext context = tester.element(find.byType(SdGlassNavBarV3));
 
     expect(SdGlassNavBarV3.barSettings(context).chromaticAberration, 0);
-    expect(
-      SdGlassNavBarV3.selectedCapsuleSettings(context).chromaticAberration,
-      0,
-    );
   });
 
   testWidgets('the bar sits in the depth band of a sheet', (
