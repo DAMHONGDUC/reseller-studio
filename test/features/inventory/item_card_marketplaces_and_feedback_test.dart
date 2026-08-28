@@ -1,0 +1,82 @@
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
+
+import '../../support/pump_app.dart';
+
+void main() {
+  testWidgets('Inventory card lists every marketplace without listing prices', (
+    WidgetTester tester,
+  ) async {
+    final Item item = Item(
+      id: 'item',
+      title: 'Cross-listed item',
+      quantity: 1,
+      status: ItemStatus.listed,
+      createdAt: testNow,
+      askingPrice: const Money(10000, 'USD'),
+      listedAt: testNow,
+    );
+    final List<Listing> listings = <Listing>[
+      Listing(
+        id: 'ebay',
+        itemId: item.id,
+        marketplace: Marketplace.ebay,
+        title: item.title,
+        price: const Money(4512, 'USD'),
+        status: ListingStatus.active,
+        createdAt: testNow,
+      ),
+      Listing(
+        id: 'etsy',
+        itemId: item.id,
+        marketplace: Marketplace.etsy,
+        title: item.title,
+        price: const Money(4099, 'USD'),
+        status: ListingStatus.active,
+        createdAt: testNow,
+      ),
+    ];
+
+    await pumpScreen(
+      tester,
+      ItemCard(item: item, now: testNow, listings: listings),
+    );
+
+    expect(find.text('eBay'), findsOneWidget);
+    expect(find.text('Etsy'), findsOneWidget);
+    expect(find.textContaining('45.12'), findsNothing);
+    expect(find.textContaining('40.99'), findsNothing);
+  });
+
+  test('successful item actions do not present a toast', () {
+    const List<String> paths = <String>[
+      'lib/features/inventory/presentation/widgets/item_actions_sheet.dart',
+      'lib/features/inventory/presentation/widgets/reprice_sheet.dart',
+      'lib/features/inventory/presentation/screens/inventory_screen/inventory_screen_bulk_bar.dart',
+    ];
+
+    final List<String> sources = paths
+        .map((String path) => File(path).readAsStringSync())
+        .toList();
+
+    for (int index = 0; index < paths.length; index++) {
+      final String source = sources[index];
+      final String path = paths[index];
+      expect(
+        source,
+        isNot(contains('SdSnackBarUtilsV3.success')),
+        reason: path,
+      );
+    }
+
+    expect(sources.join(), contains('SdSnackBarUtilsV3.error'));
+  });
+}

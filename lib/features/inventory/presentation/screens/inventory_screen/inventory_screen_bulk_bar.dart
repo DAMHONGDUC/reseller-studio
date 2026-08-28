@@ -34,10 +34,6 @@ class _BulkActionBar extends ConsumerWidget {
                 if (!context.mounted) return;
 
                 ref.read(inventorySelectionProvider.notifier).clear();
-                SdSnackBarUtilsV3.success(
-                  context,
-                  context.l10n.bulkArchiveDone(items.length),
-                );
               } catch (error) {
                 // Already logged by the controller.
                 if (!context.mounted) return;
@@ -90,10 +86,6 @@ class _BulkActionBar extends ConsumerWidget {
       if (!context.mounted) return;
 
       ref.read(inventorySelectionProvider.notifier).clear();
-      SdSnackBarUtilsV3.success(
-        context,
-        context.l10n.bulkMoveDone(items.length),
-      );
     } catch (error) {
       // Already logged by the controller.
       if (!context.mounted) return;

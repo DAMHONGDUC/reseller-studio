@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
@@ -32,20 +31,9 @@ final class RepriceSheet {
       submitLabel: context.l10n.repriceSubmit,
       initialPrice: sharedPrice(items),
       helperText: count == 1 ? null : context.l10n.repriceBulkHelp,
-      onSubmit: (Money price) async {
-        await ref
-            .read(itemActionsControllerProvider.notifier)
-            .reprice(items, price);
-
-        if (!context.mounted) return;
-
-        SdSnackBarUtilsV3.success(
-          context,
-          count == 1
-              ? context.l10n.repriceDone
-              : context.l10n.repriceDoneBulk(count),
-        );
-      },
+      onSubmit: (Money price) => ref
+          .read(itemActionsControllerProvider.notifier)
+          .reprice(items, price),
     );
   }
 

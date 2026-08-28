@@ -89,28 +89,22 @@ class ItemActionsSheet extends ConsumerWidget {
 
     await _run(
       context,
-      ref,
       () => ref.read(itemActionsControllerProvider.notifier).move(<Item>[
         item,
       ], picked),
-      context.l10n.itemMoved,
     );
   }
 
   Future<void> _archive(BuildContext context, WidgetRef ref) => _run(
     context,
-    ref,
     () =>
         ref.read(itemActionsControllerProvider.notifier).archive(<Item>[item]),
-    context.l10n.itemArchived,
   );
 
   Future<void> _restore(BuildContext context, WidgetRef ref) => _run(
     context,
-    ref,
     () =>
         ref.read(itemActionsControllerProvider.notifier).restore(<Item>[item]),
-    context.l10n.itemRestored,
   );
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
@@ -126,11 +120,9 @@ class ItemActionsSheet extends ConsumerWidget {
             isDestructive: true,
             onPressed: () => _run(
               context,
-              ref,
               () => ref
                   .read(itemActionsControllerProvider.notifier)
                   .delete(item.id),
-              context.l10n.commonDeleted,
             ),
           ),
           SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
@@ -139,15 +131,10 @@ class ItemActionsSheet extends ConsumerWidget {
     );
   }
 
-  /// The one place an action's result becomes a message.
-  ///
-  /// Closes the sheet first so the confirmation is not covered by the very
-  /// sheet that raised it.
+  /// Runs an action, closes its sheet, and presents failures only.
   Future<void> _run(
     BuildContext context,
-    WidgetRef ref,
     Future<void> Function() action,
-    String done,
   ) async {
     final NavigatorState navigator = Navigator.of(context);
 
@@ -157,8 +144,6 @@ class ItemActionsSheet extends ConsumerWidget {
       if (!context.mounted) return;
 
       if (navigator.canPop()) navigator.pop();
-
-      SdSnackBarUtilsV3.success(context, done);
     } catch (error) {
       // Already logged by the controller.
       if (!context.mounted) return;
