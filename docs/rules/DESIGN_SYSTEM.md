@@ -153,6 +153,11 @@ Two things follow:
 The geometry is `SdContentPaddingV3.selectedTabInset` inside the bar on every
 side, and nothing types that number at a call site.
 
+**The switcher stays compact.** Owner's rule. Its visible pill uses the
+smaller `floatingBarHeight` and a larger `floatingBarHorizontal`, while every
+equal segment remains a full touch target. Compactness comes from the chrome's
+footprint, never from shrinking the icon or its tappable region.
+
 **The glass is tuned sheer and refractive, not frosted** — owner's rule, and
 it is the one that decides how the bar is read at a glance. A high-alpha fill
 with a heavy blur is a frosted panel: it says "surface", and the page under it
