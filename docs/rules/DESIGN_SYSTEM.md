@@ -163,11 +163,11 @@ Two things follow:
 The geometry is `SdContentPaddingV3.selectedTabInset` inside the bar on every
 side, and nothing types that number at a call site.
 
-**The switcher stays compact and has no horizontal outer padding.** Owner's
-rule. Its visible pill uses the smaller `floatingBarHeight` and
-`floatingBarHorizontal` resolves to no inset, while every equal segment
-remains a full touch target. Compactness comes from the chrome's height, never
-from shrinking the icon or its tappable region.
+**The switcher stays compact and keeps its horizontal outer inset.** Owner's
+rule, reversing the edge-to-edge variant: `floatingBarHorizontal` detaches the
+visible pill from the screen edges while every equal segment remains a full
+touch target. Compactness comes from the chrome's height, never from shrinking
+the icon or its tappable region.
 
 **The glass is tuned sheer and refractive, not frosted** — owner's rule, and
 it is the one that decides how the bar is read at a glance. A high-alpha fill
@@ -408,7 +408,7 @@ below for why they are not repeated here.
 | `bottom(context, {floatingNav})` | where the last item ends. `floatingNav: true` on the five tab screens only |
 | `detailBottom(context)` | the plain rule for everything else: the device's safe area **floored** at `minDetailBottom`, and **deliberately not `bottomGap` on top of it** — a device reporting a deep inset already gives more room than the floor asks for, and stacking a gap on it makes a detail screen look like it ends early |
 | `floatingBarHeight` / `floatingBarRadius` | the glass bar's height, and its radius **derived** as half of it |
-| `floatingBarHorizontal` | the outer horizontal inset, currently none |
+| `floatingBarHorizontal` | the outer horizontal inset that detaches the floating bar from the screen edges |
 | `navBarOffset(context)` | the device's bottom inset **clamped** between `minNavBarOffset` and `maxNavBarOffset` |
 | `floatingBarInset(context)` | offset + height — the bar's whole footprint, what content and overlays must clear |
 | `statusBarInset(context)` | the status bar, for the one thing that draws chrome from the top of the window itself |
