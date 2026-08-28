@@ -351,6 +351,37 @@ change there is not local to this project. Commit the gitlink deliberately.
 
 why: see DECISIONS.md § Reseller Studio pays for v2's dependencies
 
+## A card that is a row is info at the start and an affordance at the end
+
+Owner's rule. **Every row-shaped card lays out `space-between`: the information
+at the start, and at the end one glyph telling the seller something happens
+when they tap it** — a chevron for a row that opens something, `more_vert` for
+one that opens a sheet of verbs.
+
+- **A tappable row without an end glyph is the bug this rule exists for.** The
+  whole card is a tap target and nothing on it says so, so the seller learns
+  the screen by poking at it. `AppListRow` has always drawn the chevron by
+  default; the violations were rows that passed `showChevron: false` while
+  still passing an `onTap`.
+- **The converse still holds, and it is the older rule**: an inert row draws
+  no chevron. "An affordance that leads nowhere is worse than none" —
+  `AppListRow.showChevron`. So `showChevron: false` is correct **only** on a
+  row with no `onTap`, or one whose `trailing` widget is itself the
+  interaction (a switch, a delete button).
+- **A card built by hand rather than from `AppListRow` obeys it too.** The
+  order card, the offer card and the receipt row are `SdCardV3`s with their
+  own layout; each wraps its content in a `Row` with the glyph as the last
+  child, rather than growing a private idea of what a tappable card looks
+  like.
+- **The end glyph is `textTertiary` at `SdIconV3.smallSize`.** It is a hint,
+  not content — a chevron with the weight of the title competes with it.
+- **Cards that are not rows are out of scope.** Home's three shortcut cards
+  are columns — a glyph over a label, three across — and a chevron on each
+  would be three arrows pointing at nothing. So are the stat tiles and the
+  hero card, which are figures rather than rows.
+- `test/core/widgets/row_affordance_test.dart` reads the source and fails on a
+  tappable `AppListRow` that hides its chevron and offers no trailing widget.
+
 ## Spacing — one class owns it, and nothing else does
 
 Ported from BaroEase's `SdContentPaddingV2`, which v3 was copied from. Read
