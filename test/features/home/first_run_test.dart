@@ -1,20 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-// `Override` is not in the main entrypoint's `show` list; `misc.dart` is
-// where hooks_riverpod exports it.
-import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
-import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
-import 'package:reseller_studio/features/inventory/providers.dart';
-import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
-import 'package:reseller_studio/features/listings/providers.dart';
-import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
-import 'package:reseller_studio/features/offers/providers.dart';
-import 'package:reseller_studio/features/orders/domain/entities/order.dart';
-import 'package:reseller_studio/features/orders/providers.dart';
 
 import '../../support/pump_app.dart';
+import 'empty_business.dart';
 
 /// What Home says to an account that has just been created.
 ///
@@ -31,22 +20,6 @@ void main() {
       await tester.pumpAndSettle();
     }
   }
-
-  /// A workspace with nothing in it — every source empty, not merely filtered.
-  List<Override> emptyBusiness() => <Override>[
-    itemsProvider.overrideWith(
-      (Ref ref) => Stream<List<Item>>.value(const <Item>[]),
-    ),
-    ordersProvider.overrideWith(
-      (Ref ref) => Stream<List<Order>>.value(const <Order>[]),
-    ),
-    offersProvider.overrideWith(
-      (Ref ref) => Stream<List<Offer>>.value(const <Offer>[]),
-    ),
-    listingsProvider.overrideWith(
-      (Ref ref) => Stream<List<Listing>>.value(const <Listing>[]),
-    ),
-  ];
 
   testWidgets('a business with nothing in it is told where to start', (
     WidgetTester tester,

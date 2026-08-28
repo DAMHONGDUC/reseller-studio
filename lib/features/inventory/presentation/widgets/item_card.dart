@@ -23,12 +23,20 @@ part 'item_card_thumbnail.dart';
 /// present: an item can be listed *and* stale, and collapsing that into one
 /// marker would lose the fact that it is still live and still earning
 /// nothing.
+///
+/// **The actions sheet opens from the row, not only from the detail screen**
+/// — owner's rule. Listing, repricing and marking sold are what a seller does
+/// while looking at the list; making each one cost a push into detail and a
+/// pop back out is how a forty-row afternoon turns into eighty extra taps.
+/// It is the same sheet the detail screen opens, so a verb added there cannot
+/// go missing here.
 class ItemCard extends StatelessWidget {
   const ItemCard({
     required this.item,
     required this.now,
     this.onTap,
     this.onLongPress,
+    this.onActions,
     this.isSelected = false,
     this.isSelecting = false,
     super.key,
@@ -46,6 +54,13 @@ class ItemCard extends StatelessWidget {
   /// button in the app bar: the row a seller wants is the one under their
   /// thumb, and reaching for a toggle first loses it.
   final VoidCallback? onLongPress;
+
+  /// Opens the item's actions sheet. Null on a list that only navigates.
+  ///
+  /// **Hidden while a selection is open**: every tap ticks a row then, and a
+  /// button that opened a sheet for one item mid-bulk-edit would lose the
+  /// forty rows the seller had just picked.
+  final VoidCallback? onActions;
 
   final bool isSelected;
 
@@ -127,6 +142,8 @@ class ItemCard extends StatelessWidget {
                 ],
               ),
             ),
+            if (onActions != null && !isSelecting)
+              _ActionsButton(onPressed: onActions!),
           ],
         ),
       ),
@@ -141,4 +158,28 @@ class ItemCard extends StatelessWidget {
     ItemStatus.sold => SdBadgeToneV3.neutral,
     ItemStatus.archived => SdBadgeToneV3.neutral,
   };
+}
+
+/// The row's way into `ItemActionsSheet`.
+///
+/// **`more_vert`, not the detail screen's `tune`** — owner's rule. A glyph is
+/// all the width allows next to a title, two badges and a price line, so it
+/// has to be one a seller already knows, and the overflow dots are what every
+/// list row on the platform uses to mean "more you can do to this". `tune`
+/// reads as filtering when it is not sitting beside the word Actions.
+class _ActionsButton extends StatelessWidget {
+  const _ActionsButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+    icon: SdIconV3(
+      Icons.more_vert_rounded,
+      size: SdIconV3.smallSize,
+      color: context.sdTheme3.textTertiary,
+    ),
+    tooltip: context.l10n.itemActions,
+    onPressed: onPressed,
+  );
 }

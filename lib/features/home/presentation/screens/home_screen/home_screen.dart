@@ -126,9 +126,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           _HomeShortcuts(onQuickAction: _toQuickAction),
+          const _GettingStarted(),
           SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
           const _NeedsAttention(),
-          const _GettingStarted(),
           SdSectionHeaderV3(title: context.l10n.homePerformance),
           const _PerformanceBlock(),
           const _HomeFlowOverview(),

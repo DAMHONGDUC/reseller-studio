@@ -46,6 +46,9 @@ class _ItemList extends ConsumerWidget {
                 : () => context.push(AppRoutes.item(item.id)),
             onLongPress: () =>
                 ref.read(inventorySelectionProvider.notifier).toggle(item.id),
+            // The same sheet the detail screen opens — one list of verbs, so
+            // an action added there cannot go missing here.
+            onActions: () => ItemActionsSheet.show(context, item),
           );
         },
       ),

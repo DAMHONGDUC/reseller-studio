@@ -7,6 +7,11 @@ part of 'home_screen.dart';
 /// whole short path and says how far along it is, which is the question a
 /// seller who has added two items but sold nothing is actually asking.
 ///
+/// **It sits directly under the shortcut row and wears a tinted edge** —
+/// owner's rule. It is the only card on Home that asks the seller to do
+/// something rather than reporting on what they have done, and above the
+/// dashboard without an edge it read as another row of chrome.
+///
 /// **It removes itself.** Once all three are done the section is gone for
 /// good, header included — no dismiss control to build, and nothing for an
 /// established seller to keep scrolling past. That is also why it never
@@ -38,6 +43,11 @@ class _GettingStarted extends ConsumerWidget {
             horizontal: SdContentPaddingV3.horizontal,
           ),
           child: AppListCard(
+            // The one card on Home asking for something. It sits under three
+            // shortcut cards and above the dashboard, so without an edge it
+            // reads as more chrome; the "N of 3 done" header is the label that
+            // keeps colour from being the only signal.
+            borderColor: context.colorScheme3.primary,
             children: <Widget>[
               for (int i = 0; i < steps.length; i++) ...<Widget>[
                 if (i > 0) const SdDividerV3(),

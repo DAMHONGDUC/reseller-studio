@@ -123,13 +123,19 @@ class AppListRow extends StatelessWidget {
 /// The divider is drawn here rather than by each row, so the last row does not
 /// have to know it is last.
 class AppListCard extends StatelessWidget {
-  const AppListCard({required this.children, super.key});
+  const AppListCard({required this.children, this.borderColor, super.key});
 
   final List<Widget> children;
+
+  /// Tints the edge, forwarded to `SdCardV3`. Its rule applies unchanged:
+  /// colour is never the only signal, so a tinted card always carries a label
+  /// saying the same thing.
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) => SdCardV3(
     padding: EdgeInsets.zero,
+    borderColor: borderColor,
     child: Column(
       children: <Widget>[
         for (int i = 0; i < children.length; i++) ...<Widget>[
