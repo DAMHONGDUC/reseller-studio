@@ -718,6 +718,11 @@ quietly re-invent one.
 - **Icons: `SdIconV3`, and it always resolves to a concrete size.** A bare
   `Icon` inherits the ambient `IconTheme`, so the same glyph comes out at
   different sizes depending on what happens to wrap it.
+- **Semantic glyph choices live in `AppIconConstant`.** Owner's rule. Feature
+  and shared widget code asks for meanings such as `delete` and `add`; that
+  one file decides whether each meaning uses Flutter `Icons` or Material
+  Symbols, so changing the glyph library never becomes a screen-by-screen
+  migration. `SdIconV3` still owns rendering, size and colour.
 - **Dividers: one thickness, one colour, and between items only**
   (`if (index > 0)`). A rule above the first row lands on the container's edge
   and reads as a border it does not have. Its height equals its thickness — see
