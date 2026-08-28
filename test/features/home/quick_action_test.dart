@@ -103,9 +103,14 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
-    // Owner's rule: the one row here that does not create something goes at
-    // the end, so a seller scanning for "add" never steps over it.
+    // Owner's rule: the two rows here that do not create something go at the
+    // end — About last, Flow overview just above it — so a seller scanning for
+    // "add" never steps over them.
     expect(QuickActionConstant.actions.last.kind, QuickActionKind.about);
+    expect(
+      QuickActionConstant.actions[QuickActionConstant.actions.length - 2].kind,
+      QuickActionKind.flowOverview,
+    );
 
     final double aboutTop = tester
         .getRect(find.text(context.l10n.moreAbout))
@@ -140,6 +145,14 @@ void main() {
 
   test('no tile points at a route that does not exist', () {
     for (final QuickAction action in QuickActionConstant.actions) {
+      // Flow overview opens a sheet rather than a route (owner's rule), and
+      // it is the only row allowed to.
+      if (action.route == null) {
+        expect(action.kind, QuickActionKind.flowOverview);
+
+        continue;
+      }
+
       expect(action.route, startsWith('/'));
       // A parameterised path cannot be pushed without its argument, so a
       // Quick Access tile must never be given one.
@@ -177,6 +190,7 @@ void main() {
 
     final Set<String> routes = QuickActionConstant.actions
         .map((QuickAction action) => action.route)
+        .nonNulls
         .toSet();
 
     // Each create screen's own route has to be one Quick Access opens, or the

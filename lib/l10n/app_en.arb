@@ -4312,5 +4312,21 @@
   "workspaceCountrySearchHint": "Country name or code",
   "@workspaceCountrySearchHint": {
     "description": "Placeholder in the country picker search box."
+  },
+  "commonOptional": "Optional",
+  "@commonOptional": {
+    "description": "Badge on a workflow step the app never blocks on."
+  },
+  "homeFlowOverview": "Flow overview",
+  "@homeFlowOverview": {
+    "description": "Quick Action row opening the flow overview sheet."
+  },
+  "flowOverviewTitle": "How selling works here",
+  "@flowOverviewTitle": {
+    "description": "Title of the flow overview sheet."
+  },
+  "flowOverviewIntro": "Work down the list. The steps marked optional can be skipped — the app never asks for them.",
+  "@flowOverviewIntro": {
+    "description": "One line above the steps in the flow overview sheet."
   }
 }

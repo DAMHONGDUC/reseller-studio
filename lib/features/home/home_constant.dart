@@ -76,15 +76,15 @@ final class HomeShortcutLabel {
 /// which is also what keeps the list below `const`. The same shape
 /// `MoreDestination` has, for the same reason.
 class QuickAction {
-  const QuickAction({
-    required this.kind,
-    required this.icon,
-    required this.route,
-  });
+  const QuickAction({required this.kind, required this.icon, this.route});
 
   final QuickActionKind kind;
   final IconData icon;
-  final String route;
+
+  /// **Null means the row is not a push.** Only Flow overview is: it opens a
+  /// sheet, because the question it answers is asked while standing somewhere
+  /// else in the app and a route would cost the seller their place.
+  final String? route;
 }
 
 /// Every create action in the app.
@@ -98,6 +98,7 @@ enum QuickActionKind {
   addCategory,
   addLocation,
   inviteTeammate,
+  flowOverview,
   about,
 }
 
@@ -110,11 +111,11 @@ enum QuickActionKind {
 /// on the screen and wrong for one who opened the app to add something: it is
 /// three taps to record an expense from Home.
 ///
-/// **About is the one row that does not create something, and it goes last** —
-/// owner's rule. It lives two levels deep under Settings, so this is what
-/// keeps it findable; putting it at the end is what stops a seller scanning
-/// for "add" from stepping over it. Nothing else non-create joins it without
-/// the same decision.
+/// **Two rows do not create something, and they ride at the end** — owner's
+/// rule: About last, Flow overview just above it. About lives two levels deep
+/// under Settings, so this is what keeps it findable; putting both at the end
+/// is what stops a seller scanning for "add" from stepping over them. Nothing
+/// else non-create joins them without the same decision.
 ///
 /// **Adding a create action anywhere means adding it here.**
 /// `test/features/home/quick_access_test.dart` fails when a screen grows an
@@ -172,6 +173,13 @@ final class QuickActionConstant {
       icon: Symbols.group_add_rounded,
       route: AppRoutes.team,
     ),
+    // The two that explain rather than create. Flow overview answers "how do
+    // I run my week with this", which is the question that comes before any
+    // of the rows above it — and it is the only row here that opens a sheet.
+    QuickAction(
+      kind: QuickActionKind.flowOverview,
+      icon: Symbols.account_tree_rounded,
+    ),
     QuickAction(
       kind: QuickActionKind.about,
       icon: Symbols.info_rounded,
@@ -193,6 +201,7 @@ final class QuickActionLabel {
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
         QuickActionKind.inviteTeammate => context.l10n.teamInvite,
+        QuickActionKind.flowOverview => context.l10n.homeFlowOverview,
         QuickActionKind.about => context.l10n.moreAbout,
       };
 }

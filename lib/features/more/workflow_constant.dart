@@ -13,6 +13,7 @@ class WorkflowStep {
     required this.kind,
     required this.icon,
     required this.route,
+    this.isOptional = false,
   });
 
   final WorkflowKind kind;
@@ -23,6 +24,14 @@ class WorkflowStep {
   /// that explains a workflow without leading into it is the kind of screen
   /// `CLAUDE.md` says will be redesigned.
   final String route;
+
+  /// **Optional means the app never blocks on this step**, not that it does
+  /// not matter. Requirements attach when a record *moves* rather than when it
+  /// is created (hard rule 2), so a seller can skip listing, shipping and
+  /// recording a source entirely and still get paid. Home's flow overview
+  /// badges these, because a seller who thinks all nine are mandatory goes
+  /// back to the spreadsheet.
+  final bool isOptional;
 }
 
 enum WorkflowKind {
@@ -54,11 +63,13 @@ final class WorkflowConstant {
   static const List<WorkflowStep> steps = <WorkflowStep>[
     WorkflowStep(
       kind: WorkflowKind.source,
+      isOptional: true,
       icon: Symbols.travel_explore_rounded,
       route: AppRoutes.sources,
     ),
     WorkflowStep(
       kind: WorkflowKind.purchase,
+      isOptional: true,
       icon: Symbols.shopping_bag_rounded,
       route: AppRoutes.purchases,
     ),
@@ -69,6 +80,7 @@ final class WorkflowConstant {
     ),
     WorkflowStep(
       kind: WorkflowKind.list,
+      isOptional: true,
       icon: Symbols.sell_rounded,
       route: AppRoutes.listings,
     ),
@@ -79,6 +91,7 @@ final class WorkflowConstant {
     ),
     WorkflowStep(
       kind: WorkflowKind.ship,
+      isOptional: true,
       icon: Symbols.local_shipping_rounded,
       route: AppRoutes.shippingQueue,
     ),
@@ -89,11 +102,13 @@ final class WorkflowConstant {
     ),
     WorkflowStep(
       kind: WorkflowKind.analyze,
+      isOptional: true,
       icon: Symbols.bar_chart_rounded,
       route: AppRoutes.analytics,
     ),
     WorkflowStep(
       kind: WorkflowKind.sourceBetter,
+      isOptional: true,
       icon: Symbols.restart_alt_rounded,
       route: AppRoutes.analyticsSources,
     ),
