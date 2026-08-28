@@ -14,11 +14,27 @@ import '../../support/pump_app.dart';
 /// screen, every step expands to its full instructions, and the ones the app
 /// never blocks on are badged.
 void main() {
+  /// The card sits below the numbers now, so Home has to be scrolled before
+  /// it is built — `find` matches built widgets only.
+  Future<void> toCard(WidgetTester tester, BuildContext context) async {
+    final Finder intro = find.text(context.l10n.flowOverviewIntro);
+
+    for (int i = 0; i < 8 && intro.evaluate().isEmpty; i++) {
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -400));
+      await tester.pumpAndSettle();
+    }
+  }
+
   Future<BuildContext> openSheet(WidgetTester tester) async {
     await pumpScreen(tester, const HomeScreen());
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
+    await toCard(tester, context);
+    // Scrolled into view is not the same as tappable: a card half off the
+    // bottom edge has its centre outside the viewport.
+    await tester.ensureVisible(find.text(context.l10n.flowOverviewIntro));
+    await tester.pumpAndSettle();
     await tester.tap(
       find.ancestor(
         of: find.text(context.l10n.flowOverviewIntro),
@@ -44,6 +60,9 @@ void main() {
     await pumpScreen(tester, const HomeScreen());
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
+
+    await toCard(tester, context);
+
     final Finder card = find.ancestor(
       of: find.text(context.l10n.flowOverviewIntro),
       matching: find.byType(SdCardV3),
