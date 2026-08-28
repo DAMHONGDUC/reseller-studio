@@ -28,9 +28,11 @@ workflow that creates a workspace.
 - **Every new business starts with eBay, Etsy, Depop, and Poshmark.** Each is
   created as a normal marketplace record with its default estimated fee rate,
   so the seller can list immediately and can later edit or delete any of them.
-- **The four defaults are written atomically with workspace creation.** A
-  partial default list is indistinguishable from a seller-edited list, so the
-  workspace and all four marketplace records must either be created together
-  or not at all.
+- **The four defaults and the user's workspace pointer share one final batch.**
+  Firestore rules require the workspace and owner membership to exist in two
+  earlier writes, so creation is workspace → membership → one batch containing
+  all four marketplaces and the profile pointer. A partial default list is
+  indistinguishable from a seller-edited list; withholding the pointer until
+  that batch succeeds keeps an incomplete business out of the app.
 - **Default names, ids, and rates have one owner in code.** Workspace creation
   consumes that definition; no controller or screen repeats the values.
