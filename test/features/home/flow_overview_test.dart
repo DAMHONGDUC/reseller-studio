@@ -39,6 +39,34 @@ void main() {
     expect(find.byType(FlowOverviewSheet), findsOneWidget);
   });
 
+  testWidgets('the Home card owns its title and description', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const HomeScreen());
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+    final Finder card = find.ancestor(
+      of: find.text(context.l10n.flowOverviewIntro),
+      matching: find.byType(SdCardV3),
+    );
+
+    expect(card, findsOneWidget);
+    expect(
+      find.descendant(
+        of: card,
+        matching: find.text(context.l10n.homeFlowOverview),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.ancestor(
+        of: find.text(context.l10n.homeFlowOverview),
+        matching: find.byType(SdSectionHeaderV3),
+      ),
+      findsNothing,
+    );
+  });
+
   testWidgets(
     'every step is spelled out, and only the skippable ones are badged',
     (WidgetTester tester) async {
@@ -88,6 +116,7 @@ void main() {
     final double screenHeight =
         tester.view.physicalSize.height / tester.view.devicePixelRatio;
 
+    expect(FlowOverviewSheet.heightFactor, 0.9);
     expect(
       tester.getRect(find.byType(FlowOverviewSheet)).height,
       moreOrLessEquals(

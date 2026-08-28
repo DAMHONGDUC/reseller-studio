@@ -6,10 +6,13 @@ class _HomeFlowOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
+    padding: EdgeInsets.only(
+      left: SdContentPaddingV3.horizontal,
+      top: SdContentPaddingV3.sectionGap,
+      right: SdContentPaddingV3.horizontal,
+    ),
     child: SdCardV3(
       onTap: () => FlowOverviewSheet.show(context),
-      semanticLabel: context.l10n.homeFlowOverview,
       child: Row(
         children: <Widget>[
           SdIconTileV3(
@@ -18,13 +21,23 @@ class _HomeFlowOverview extends StatelessWidget {
           ),
           SizedBox(width: SdSpacingConstant.w12),
           Expanded(
-            child: Text(
-              context.l10n.flowOverviewIntro,
-              style: context.textTheme3.bodyMedium!.copyWith(
-                color: context.sdTheme3.textPrimary,
-              ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  context.l10n.homeFlowOverview,
+                  style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+                    color: context.sdTheme3.textPrimary,
+                  ),
+                ),
+                SizedBox(height: SdSpacingConstant.h4),
+                Text(
+                  context.l10n.flowOverviewIntro,
+                  style: context.textTheme3.bodySmall!.muted3(context),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
           SizedBox(width: SdSpacingConstant.w8),

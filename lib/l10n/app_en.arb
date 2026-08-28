@@ -4335,7 +4335,7 @@
   },
   "homeFlowOverview": "Flow overview",
   "@homeFlowOverview": {
-    "description": "Quick Action row opening the flow overview sheet."
+    "description": "Title in the Home card that opens the flow overview sheet."
   },
   "flowOverviewTitle": "How selling works here",
   "@flowOverviewTitle": {
@@ -4343,7 +4343,7 @@
   },
   "flowOverviewIntro": "Nine steps, and they loop. Work down the list — the ones marked optional can be skipped entirely, because this app only ever asks for something when a record moves.",
   "@flowOverviewIntro": {
-    "description": "One line above the steps in the flow overview sheet."
+    "description": "Description in the Home flow card and introduction above the sheet steps."
   },
   "workspaceDetailTitle": "Business details",
   "@workspaceDetailTitle": {

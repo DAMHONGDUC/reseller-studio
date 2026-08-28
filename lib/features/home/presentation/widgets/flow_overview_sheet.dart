@@ -31,7 +31,7 @@ class FlowOverviewSheet extends StatelessWidget {
 
   /// Most of the screen, and deliberately not all of it: the strip of page
   /// left showing is what says the sheet can be dismissed.
-  static const double heightFactor = 0.85;
+  static const double heightFactor = 0.9;
 
   @override
   Widget build(BuildContext context) => SdBottomSheetV3(
