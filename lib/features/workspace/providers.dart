@@ -354,3 +354,17 @@ final Provider<bool> canEditWorkspaceProvider = Provider<bool>((Ref ref) {
 final Provider<bool> canDeleteWorkspaceProvider = Provider<bool>((Ref ref) {
   return ref.watch(currentMemberRoleProvider)?.canOwn ?? false;
 });
+
+/// The platform commissions this business has corrected, keyed by
+/// `Marketplace.name`.
+///
+/// **Empty is the normal state** — only corrections are stored, and
+/// `MarketplaceFeePolicy` falls back to the published rate. Read this rather
+/// than the workspace, so a widget rebuilds when the rates change and not when
+/// somebody renames the business.
+final Provider<Map<String, double>> marketplaceFeeRatesProvider =
+    Provider<Map<String, double>>(
+      (Ref ref) =>
+          ref.watch(currentWorkspaceProvider)?.marketplaceFeeRates ??
+          const <String, double>{},
+    );

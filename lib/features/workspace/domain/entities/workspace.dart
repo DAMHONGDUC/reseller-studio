@@ -20,6 +20,7 @@ class Workspace {
     this.logoUrl,
     this.staleThresholdDays = StaleInventoryPolicy.defaultThresholdDays,
     this.lowStockThreshold = LowStockPolicy.defaultThreshold,
+    this.marketplaceFeeRates = const <String, double>{},
   });
 
   final String id;
@@ -43,6 +44,14 @@ class Workspace {
   final String? timezone;
   final String? businessType;
   final String? logoUrl;
+
+  /// The platform commissions this business has corrected, keyed by
+  /// `Marketplace.name`.
+  ///
+  /// **Only the corrections** — a platform absent here uses its published
+  /// rate. See `MarketplaceFeePolicy`, which is the only thing that should
+  /// read this map.
+  final Map<String, double> marketplaceFeeRates;
 
   /// How long a listing sits before this workspace calls it stale. Per
   /// workspace because the right answer differs wildly: fast fashion goes
@@ -74,6 +83,7 @@ class Workspace {
     String? logoUrl,
     int? staleThresholdDays,
     int? lowStockThreshold,
+    Map<String, double>? marketplaceFeeRates,
   }) => Workspace(
     id: id,
     name: name ?? this.name,
@@ -86,6 +96,7 @@ class Workspace {
     logoUrl: logoUrl ?? this.logoUrl,
     staleThresholdDays: staleThresholdDays ?? this.staleThresholdDays,
     lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
+    marketplaceFeeRates: marketplaceFeeRates ?? this.marketplaceFeeRates,
   );
 }
 

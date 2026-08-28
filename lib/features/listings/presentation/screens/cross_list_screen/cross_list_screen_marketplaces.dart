@@ -154,6 +154,7 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
                 context,
                 widget.marketplace,
                 state.prices[widget.marketplace],
+                ref.watch(marketplaceFeeRatesProvider),
               ),
               onChanged: (String value) => ref
                   .read(crossListControllerProvider.notifier)
@@ -177,7 +178,12 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
 /// decision being made is "is this price worth this platform's cut", and a
 /// seller who cannot see the cut is choosing blind.
 final class _AfterFees {
-  static String of(BuildContext context, Marketplace marketplace, Money? price) {
+  static String of(
+    BuildContext context,
+    Marketplace marketplace,
+    Money? price,
+    Map<String, double> feeRates,
+  ) {
     if (price == null) {
       // `—`, never a zero: nobody has typed a price, so nothing is known
       // about the fee either (hard rule 5).
@@ -187,7 +193,9 @@ final class _AfterFees {
       );
     }
 
-    final Money fee = price.applyRate(marketplace.estimatedFeeRate);
+    final Money fee = price.applyRate(
+      MarketplaceFeePolicy.rateFor(marketplace, overrides: feeRates),
+    );
 
     return context.l10n.crossListAfterFees(
       context.money(fee),

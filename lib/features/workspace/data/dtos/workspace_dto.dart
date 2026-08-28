@@ -27,6 +27,16 @@ final class WorkspaceDto {
       lowStockThreshold:
           FirestoreMapper.intOrNull(data['lowStockThreshold']) ??
           LowStockPolicy.defaultThreshold,
+      // Only the corrections the seller made; a platform absent here uses its
+      // published rate. Anything unparseable is dropped rather than defaulted
+      // to zero, which would claim the platform works for free.
+      marketplaceFeeRates: <String, double>{
+        for (final MapEntry<String, Object?> entry
+            in (data['marketplaceFeeRates'] as Map<String, Object?>? ??
+                    const <String, Object?>{})
+                .entries)
+          if (entry.value is num) entry.key: (entry.value! as num).toDouble(),
+      },
     );
   }
 
@@ -45,6 +55,7 @@ final class WorkspaceDto {
         'logoUrl': workspace.logoUrl,
         'staleThresholdDays': workspace.staleThresholdDays,
         'lowStockThreshold': workspace.lowStockThreshold,
+        'marketplaceFeeRates': workspace.marketplaceFeeRates,
         'updatedAt': FirestoreMapper.serverTimestamp,
       });
 }

@@ -13,6 +13,7 @@ import '../../../../../core/widgets/picker_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';
 import '../../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';
@@ -110,7 +111,12 @@ class _PurchaseEvaluatorScreenState
     // The fee is estimated from the platform's published rate. It is a
     // planning number and is never written to an order — the real fee arrives
     // from the marketplace when the sale settles.
-    final Money fees = sale?.applyRate(_marketplace.estimatedFeeRate) ?? zero;
+    final Map<String, double> feeRates = ref.read(marketplaceFeeRatesProvider);
+    final Money fees =
+        sale?.applyRate(
+          MarketplaceFeePolicy.rateFor(_marketplace, overrides: feeRates),
+        ) ??
+        zero;
 
     final PurchaseEvaluation? evaluation = sale == null
         ? null
@@ -165,7 +171,7 @@ class _PurchaseEvaluatorScreenState
                   icon: Symbols.storefront_rounded,
                   value:
                       '${_marketplace.displayName} · '
-                      '${(_marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% fee',
+                      '${(MarketplaceFeePolicy.rateFor(_marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
                   onTap: () async {
                     final Marketplace?
                     picked = await OptionPickerSheet.show<Marketplace>(
@@ -180,7 +186,7 @@ class _PurchaseEvaluatorScreenState
                               value: marketplace,
                               label: marketplace.displayName,
                               caption:
-                                  '${(marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% estimated fee',
+                                  '${(MarketplaceFeePolicy.rateFor(marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
                             ),
                           )
                           .toList(),

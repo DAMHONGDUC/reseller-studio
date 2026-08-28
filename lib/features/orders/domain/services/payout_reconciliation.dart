@@ -1,5 +1,6 @@
 import '../../../../core/money/money.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../marketplaces/domain/services/marketplace_fee_policy.dart';
 import '../entities/order.dart';
 
 /// What one marketplace still owes, and what it has already paid.
@@ -51,7 +52,10 @@ class MarketplacePayout {
 /// and a service that fetched its own data could not be tested at either.
 final class PayoutReconciliation {
   /// One entry per marketplace that has an order worth money, busiest first.
-  static List<MarketplacePayout> byMarketplace(List<Order> orders) {
+  static List<MarketplacePayout> byMarketplace(
+    List<Order> orders, {
+    Map<String, double> feeRates = const <String, double>{},
+  }) {
     final Map<Marketplace, List<Order>> grouped = <Marketplace, List<Order>>{};
 
     for (final Order order in orders) {
@@ -63,7 +67,7 @@ final class PayoutReconciliation {
     final List<MarketplacePayout> rows = grouped.entries
         .map(
           (MapEntry<Marketplace, List<Order>> entry) =>
-              _payout(entry.key, entry.value),
+              _payout(entry.key, entry.value, feeRates),
         )
         .toList();
 
@@ -79,11 +83,16 @@ final class PayoutReconciliation {
   /// postage the seller bought. **A missing fee falls back to
   /// `Marketplace.estimatedFeeRate`** rather than to zero: zero would claim
   /// the platform worked for free, which overstates every figure built on it.
-  static Money expected(Order order) {
+  static Money expected(
+    Order order, {
+    Map<String, double> feeRates = const <String, double>{},
+  }) {
     final Money zero = Money.zero(order.salePrice.currency);
     final Money fees =
         order.fees ??
-        order.salePrice.applyRate(order.marketplace.estimatedFeeRate);
+        order.salePrice.applyRate(
+          MarketplaceFeePolicy.rateFor(order.marketplace, overrides: feeRates),
+        );
 
     return order.salePrice -
         (order.refund ?? zero) -
@@ -97,6 +106,7 @@ final class PayoutReconciliation {
   static MarketplacePayout _payout(
     Marketplace marketplace,
     List<Order> orders,
+    Map<String, double> feeRates,
   ) {
     final List<Order> settled =
         orders.where((Order order) => order.payout != null).toList()
@@ -111,7 +121,9 @@ final class PayoutReconciliation {
       settled: settled,
       awaiting: awaiting,
       settledTotal: settled.map((Order order) => order.payout).totalOfKnown(),
-      awaitingTotal: awaiting.map(expected).totalOrNull(),
+      awaitingTotal: awaiting
+          .map((Order order) => expected(order, feeRates: feeRates))
+          .totalOrNull(),
       awaitingIsEstimated: awaiting.any(isEstimated),
     );
   }

@@ -709,6 +709,43 @@
   "@marketplacesEstimatedFee": {
     "description": "Caption on a marketplace row. A published rate for planning, never used as accounting."
   },
+  "marketplacesYourFee": "Your fee",
+  "@marketplacesYourFee": {
+    "description": "Caption on a marketplace whose rate the seller corrected."
+  },
+  "marketplacesEditFee": "Fee on {marketplace}",
+  "@marketplacesEditFee": {
+    "description": "Title of the sheet correcting one platform’s rate.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplacesFeeLabel": "Fee",
+  "@marketplacesFeeLabel": {
+    "description": "Label of the fee percentage field."
+  },
+  "marketplacesFeeHelper": "What this platform actually takes, as a percentage of the sale.",
+  "@marketplacesFeeHelper": {
+    "description": "Helper under the fee field."
+  },
+  "marketplacesFeeInvalid": "Enter a percentage between 0 and 100.",
+  "@marketplacesFeeInvalid": {
+    "description": "Shown when the typed fee is not a usable percentage."
+  },
+  "marketplacesUsePublished": "Use the published rate",
+  "@marketplacesUsePublished": {
+    "description": "Clears the seller’s own rate for a platform."
+  },
+  "marketplacesFeesTitle": "What each platform charges",
+  "@marketplacesFeesTitle": {
+    "description": "Heading over the editable fee list."
+  },
+  "marketplacesFeesBody": "These drive the buy calculator and the after-fees figures. Correct one if your rate differs — a real fee still overrides it when an order reports one.",
+  "@marketplacesFeesBody": {
+    "description": "Explains what the fee list is for."
+  },
   "moreComingSoon": "Soon",
   "@moreComingSoon": {
     "description": "Badge on a More row whose screen is not built yet. Shown rather than hidden: hiding it would make the app look finished."

@@ -5,7 +5,10 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../workspace/providers.dart';
 import '../../../domain/enums/marketplace.dart';
+import '../../../domain/services/marketplace_fee_policy.dart';
+import '../../widgets/fee_entry_sheet.dart';
 
 /// Marketplaces — connection status, and nothing else (plan §14).
 ///
@@ -48,35 +51,62 @@ class MarketplacesScreen extends ConsumerWidget {
           ),
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
+        SdSectionHeaderV3(
+          title: context.l10n.marketplacesFeesTitle,
+          subtitle: context.l10n.marketplacesFeesBody,
+          first: true,
+        ),
         AppListCard(
           children: Marketplace.values
               .where(
                 // "Other" is where a car-boot sale goes. It is not a platform
-                // and there is nothing to connect it to.
+                // and there is nothing to connect it to — nor a fee to name.
                 (Marketplace marketplace) => marketplace != Marketplace.other,
               )
-              .map(
-                (Marketplace marketplace) => AppListRow(
-                  title: marketplace.displayName,
-                  subtitle: context.l10n.marketplacesEstimatedFeeLine(
-                    (marketplace.estimatedFeeRate * 100).toStringAsFixed(1),
-                    context.l10n.marketplacesEstimatedFee,
-                  ),
-                  icon: Symbols.hub_rounded,
-                  showChevron: false,
-                  trailing: SdBadgeV3(
-                    label: marketplace.hasIntegration
-                        ? context.l10n.marketplacesConnected
-                        : context.l10n.marketplacesComingSoon,
-                    tone: marketplace.hasIntegration
-                        ? SdBadgeToneV3.success
-                        : SdBadgeToneV3.neutral,
-                  ),
-                ),
-              )
+              .map((Marketplace marketplace) => _FeeRow(marketplace: marketplace))
               .toList(),
         ),
       ],
     ),
   );
+}
+
+
+/// One platform: what it charges this business, and the way to correct it.
+///
+/// **The published rate is a starting point** — owner's rule. A seller on a
+/// shop tier, in another country, or with a category discount pays something
+/// else, and every after-fees figure in the app was quietly wrong for them.
+/// The row says whose number it is, so a corrected rate cannot be mistaken for
+/// the platform's own.
+class _FeeRow extends ConsumerWidget {
+  const _FeeRow({required this.marketplace});
+
+  final Marketplace marketplace;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final Map<String, double> rates = ref.watch(marketplaceFeeRatesProvider);
+    final double rate = MarketplaceFeePolicy.rateFor(
+      marketplace,
+      overrides: rates,
+    );
+    final bool isOwn = MarketplaceFeePolicy.isOverridden(
+      marketplace,
+      overrides: rates,
+    );
+
+    return AppListRow(
+      title: marketplace.displayName,
+      subtitle: context.l10n.marketplacesEstimatedFeeLine(
+        (rate * 100).toStringAsFixed(1),
+        isOwn
+            ? context.l10n.marketplacesYourFee
+            : context.l10n.marketplacesEstimatedFee,
+      ),
+      icon: Symbols.hub_rounded,
+      onTap: () =>
+          FeeEntrySheet.show(context, marketplace: marketplace, rate: rate),
+    );
+  }
 }

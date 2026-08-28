@@ -125,6 +125,7 @@ final Provider<List<MarketplacePayout>> marketplacePayoutsProvider =
     Provider<List<MarketplacePayout>>((Ref ref) {
       return PayoutReconciliation.byMarketplace(
         ref.watch(ordersProvider).value ?? const <Order>[],
+        feeRates: ref.watch(marketplaceFeeRatesProvider),
       );
     });
 
