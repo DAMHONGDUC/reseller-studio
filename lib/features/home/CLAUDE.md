@@ -24,10 +24,10 @@ and they are listed in the order they outrank each other.
    - `HomeShortcutConstant` is the list;
      `test/features/home/home_shortcuts_test.dart` holds the placement and the
      enum-to-card completeness.
-2. **Flow overview is its own full-width section immediately below the
-   shortcuts.** It needs enough context to explain the workflow, which a
-   third-width card cannot carry. It opens the existing sheet and appears
-   nowhere else on Home.
+2. **Flow overview is one full-width card immediately below the shortcuts.**
+   Owner's rule. The card owns both its title and description — there is no
+   section header above it — so the whole explanation reads and taps as one
+   destination. It opens the existing sheet and appears nowhere else on Home.
 3. **Needs Attention sits above the numbers**, inverting the plan's own order
    (§6). A seller opening the app at 8am needs the orders waiting to ship, not
    last night's revenue.
@@ -79,10 +79,11 @@ reading.
 
 ## The flow overview sheet is a document, not a menu
 
-It takes a fixed share of the screen (`SdBottomSheetV3.heightFactor`) and
-spells every step out — what it is, whether the app ever asks for it, and what
-the seller actually does — because it is the answer to "how do I use this", and
-a list of nine nouns is not an answer.
+It takes the near-full-screen share named by `FlowOverviewSheet.heightFactor`
+and spells every step out — what it is, whether the app ever asks for it, and
+what the seller actually does — because it is the answer to "how do I use
+this", and a list of nine nouns is not an answer. The remaining strip of Home
+keeps the sheet visibly dismissible.
 
 It draws `WorkflowConstant.steps`, the same data About's diagram uses, and
 badges the steps the app never blocks on; what "optional" means there is in
