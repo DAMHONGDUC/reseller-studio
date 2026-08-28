@@ -9,6 +9,8 @@ import '../../inventory/domain/repositories/catalog_repository.dart';
 import '../../inventory/domain/repositories/item_repository.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/repositories/listing_repository.dart';
+import '../../marketplaces/domain/entities/marketplace.dart';
+import '../../marketplaces/domain/repositories/marketplace_repository.dart';
 import '../../offers/domain/entities/offer.dart';
 import '../../offers/domain/repositories/offer_repository.dart';
 import '../../orders/domain/entities/order.dart';
@@ -46,6 +48,7 @@ class MockStore {
       categories = List<ItemCategory>.of(dataset.categories),
       locations = List<StorageLocation>.of(dataset.locations),
       offers = List<Offer>.of(dataset.offers),
+      marketplaces = List<Marketplace>.of(dataset.marketplaces),
       workspace = dataset.workspace;
 
   /// Seeded from the current clock, so the demo data is always recent.
@@ -63,6 +66,7 @@ class MockStore {
   final List<ItemCategory> categories;
   final List<StorageLocation> locations;
   final List<Offer> offers;
+  final List<Marketplace> marketplaces;
 
   /// The demo business itself, mutable because Settings can now change it.
   ///
@@ -209,6 +213,49 @@ class InMemoryOrderRepository implements OrderRepository {
     order,
     (Order other) => other.id == order.id,
   );
+}
+
+class InMemoryMarketplaceRepository implements MarketplaceRepository {
+  const InMemoryMarketplaceRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<Marketplace>> watchMarketplaces() =>
+      _store.watch(() => List<Marketplace>.of(_store.marketplaces));
+
+  @override
+  Future<void> save(Marketplace marketplace) async => _store.upsert(
+    _store.marketplaces,
+    marketplace,
+    (Marketplace other) => other.id == marketplace.id,
+  );
+
+  @override
+  Future<void> saveAll(List<Marketplace> marketplaces) async {
+    for (final Marketplace marketplace in marketplaces) {
+      _store.upsert(
+        _store.marketplaces,
+        marketplace,
+        (Marketplace other) => other.id == marketplace.id,
+      );
+    }
+  }
+
+  @override
+  Future<void> delete(String marketplaceId) async {
+    final int index = _store.marketplaces.indexWhere(
+      (Marketplace other) => other.id == marketplaceId,
+    );
+
+    if (index == -1) return;
+
+    // Soft, like the real one (hard rule 15).
+    _store.marketplaces[index] = _store.marketplaces[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
 }
 
 class InMemoryListingRepository implements ListingRepository {

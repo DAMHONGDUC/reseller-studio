@@ -6,7 +6,9 @@ import '../../inventory/domain/entities/storage_location.dart';
 import '../../inventory/domain/enums/item_status.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/enums/listing_status.dart';
-import '../../marketplaces/domain/enums/marketplace.dart';
+import '../../marketplaces/domain/entities/marketplace.dart';
+import '../../marketplaces/domain/enums/marketplace.dart' as legacy;
+import '../../marketplaces/marketplace_constant.dart';
 import '../../offers/domain/entities/offer.dart';
 import '../../orders/domain/entities/order.dart';
 import '../../orders/domain/enums/order_status.dart';
@@ -50,6 +52,7 @@ class MockDataset {
     required this.categories,
     required this.locations,
     required this.offers,
+    required this.marketplaces,
   });
 
   /// Build the world.
@@ -70,6 +73,18 @@ class MockDataset {
       currency: currency,
       createdAt: daysAgo(420),
     );
+
+    // The four a real new business starts with, so the demo and a fresh
+    // account describe the same world.
+    final List<Marketplace> marketplaces = <Marketplace>[
+      for (final MarketplaceSeed seed in MarketplaceConstant.defaults)
+        Marketplace(
+          id: seed.id,
+          name: seed.name,
+          feeRate: seed.feeRate,
+          createdAt: now,
+        ),
+    ];
 
     final List<Member> members = <Member>[
       Member(
@@ -333,7 +348,7 @@ class MockDataset {
       Listing(
         id: 'lst-1',
         itemId: 'itm-4',
-        marketplace: Marketplace.ebay,
+        marketplace: legacy.Marketplace.ebay,
         title: 'Vintage Levi\'s 501 Redline Selvedge Denim 34x32 USA Made',
         price: money(18500),
         status: ListingStatus.active,
@@ -347,7 +362,7 @@ class MockDataset {
       Listing(
         id: 'lst-2',
         itemId: 'itm-4',
-        marketplace: Marketplace.depop,
+        marketplace: legacy.Marketplace.depop,
         title: 'vintage levis 501 redline selvedge 34x32',
         price: money(17500),
         status: ListingStatus.active,
@@ -358,7 +373,7 @@ class MockDataset {
       Listing(
         id: 'lst-3',
         itemId: 'itm-5',
-        marketplace: Marketplace.etsy,
+        marketplace: legacy.Marketplace.etsy,
         title: 'Fire-King Jadeite Mugs Set of 4 Restaurant Ware',
         price: money(7200),
         status: ListingStatus.active,
@@ -370,7 +385,7 @@ class MockDataset {
       Listing(
         id: 'lst-4',
         itemId: 'itm-6',
-        marketplace: Marketplace.poshmark,
+        marketplace: legacy.Marketplace.poshmark,
         title: 'Carhartt Detroit Jacket Women\'s M Brown Duck',
         price: money(8900),
         status: ListingStatus.active,
@@ -383,7 +398,7 @@ class MockDataset {
       Listing(
         id: 'lst-5',
         itemId: 'itm-7',
-        marketplace: Marketplace.mercari,
+        marketplace: legacy.Marketplace.mercari,
         title: 'Sony WH-1000XM3 Wireless Headphones',
         price: money(11000),
         status: ListingStatus.error,
@@ -393,7 +408,7 @@ class MockDataset {
       Listing(
         id: 'lst-6',
         itemId: 'itm-8',
-        marketplace: Marketplace.ebay,
+        marketplace: legacy.Marketplace.ebay,
         title: 'Le Creuset 5.5qt Round Dutch Oven Flame Orange',
         price: money(14500),
         status: ListingStatus.draft,
@@ -405,7 +420,7 @@ class MockDataset {
       Order(
         id: 'ord-1',
         status: OrderStatus.delivered,
-        marketplace: Marketplace.ebay,
+        marketplace: legacy.Marketplace.ebay,
         salePrice: money(6800),
         fees: money(901),
         shippingCost: money(1240),
@@ -430,7 +445,7 @@ class MockDataset {
       Order(
         id: 'ord-2',
         status: OrderStatus.delivered,
-        marketplace: Marketplace.etsy,
+        marketplace: legacy.Marketplace.etsy,
         salePrice: money(9500),
         fees: money(903),
         shippingCost: money(1580),
@@ -454,7 +469,7 @@ class MockDataset {
       Order(
         id: 'ord-3',
         status: OrderStatus.delivered,
-        marketplace: Marketplace.mercari,
+        marketplace: legacy.Marketplace.mercari,
         salePrice: money(3500),
         fees: money(350),
         shippingCost: money(890),
@@ -478,7 +493,7 @@ class MockDataset {
       Order(
         id: 'ord-4',
         status: OrderStatus.toShip,
-        marketplace: Marketplace.poshmark,
+        marketplace: legacy.Marketplace.poshmark,
         salePrice: money(8900),
         fees: money(1780),
         orderedAt: daysAgo(2),
@@ -498,7 +513,7 @@ class MockDataset {
       Order(
         id: 'ord-5',
         status: OrderStatus.toShip,
-        marketplace: Marketplace.ebay,
+        marketplace: legacy.Marketplace.ebay,
         salePrice: money(11000),
         fees: money(1458),
         orderedAt: daysAgo(5),
@@ -518,7 +533,7 @@ class MockDataset {
       Order(
         id: 'ord-6',
         status: OrderStatus.returnRequested,
-        marketplace: Marketplace.ebay,
+        marketplace: legacy.Marketplace.ebay,
         salePrice: money(4200),
         fees: money(557),
         shippingCost: money(720),
@@ -657,7 +672,7 @@ class MockDataset {
         id: 'off-1',
         itemId: items.first.id,
         itemTitle: items.first.title,
-        marketplace: Marketplace.ebay,
+        marketplace: legacy.Marketplace.ebay,
         amount: money(2200),
         status: OfferStatus.pending,
         createdAt: daysAgo(1),
@@ -669,7 +684,7 @@ class MockDataset {
         id: 'off-2',
         itemId: items.last.id,
         itemTitle: items.last.title,
-        marketplace: Marketplace.depop,
+        marketplace: legacy.Marketplace.depop,
         amount: money(900),
         status: OfferStatus.pending,
         createdAt: daysAgo(3),
@@ -680,7 +695,7 @@ class MockDataset {
         id: 'off-3',
         itemId: items.first.id,
         itemTitle: items.first.title,
-        marketplace: Marketplace.ebay,
+        marketplace: legacy.Marketplace.ebay,
         amount: money(1500),
         status: OfferStatus.declined,
         createdAt: daysAgo(12),
@@ -690,6 +705,7 @@ class MockDataset {
 
     return MockDataset._(
       workspace: workspace,
+      marketplaces: marketplaces,
       members: members,
       sources: sources,
       purchases: purchases,
@@ -714,4 +730,5 @@ class MockDataset {
   final List<ItemCategory> categories;
   final List<StorageLocation> locations;
   final List<Offer> offers;
+  final List<Marketplace> marketplaces;
 }

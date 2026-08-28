@@ -23,6 +23,8 @@ import '../inventory/domain/repositories/catalog_repository.dart';
 import '../inventory/domain/repositories/item_repository.dart';
 import '../listings/data/repositories/firestore_listing_repository.dart';
 import '../listings/domain/repositories/listing_repository.dart';
+import '../marketplaces/data/repositories/firestore_marketplace_repository.dart';
+import '../marketplaces/domain/repositories/marketplace_repository.dart';
 import '../offers/data/repositories/firestore_offer_repository.dart';
 import '../offers/domain/repositories/offer_repository.dart';
 import '../orders/data/repositories/firestore_order_repository.dart';
@@ -242,6 +244,21 @@ final Provider<OfferRepository> offerRepositoryProvider =
       if (context == null) LiveRepositoryGuard.noWorkspace('OfferRepository');
 
       return FirestoreOfferRepository(context);
+    });
+
+final Provider<MarketplaceRepository> marketplaceRepositoryProvider =
+    Provider<MarketplaceRepository>((Ref ref) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return InMemoryMarketplaceRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('MarketplaceRepository');
+      }
+
+      return FirestoreMarketplaceRepository(context);
     });
 
 final Provider<ListingRepository> listingRepositoryProvider =
