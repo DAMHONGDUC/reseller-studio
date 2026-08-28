@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
+
+import 'app_row_chevron.dart';
 
 /// The row every list of records in this app is made of.
 ///
@@ -106,11 +107,7 @@ class AppListRow extends StatelessWidget {
                 ),
               )
             else if (showChevron && onTap != null)
-              SdIconV3(
-                Symbols.chevron_right_rounded,
-                size: SdIconV3.smallSize,
-                color: context.sdTheme3.textTertiary,
-              ),
+              const AppRowChevron(),
           ],
         ),
       ),

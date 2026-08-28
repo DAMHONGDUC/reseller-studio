@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../providers.dart';
 
 part 'receipts_screen_preview.dart';
@@ -125,6 +126,8 @@ class _ReceiptRow extends StatelessWidget {
             color: context.sdTheme3.textPrimary,
           ),
         ),
+        SizedBox(width: SdSpacingConstant.w8),
+        const AppRowChevron(),
       ],
     ),
   );

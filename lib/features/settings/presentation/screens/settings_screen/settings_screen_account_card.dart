@@ -111,7 +111,6 @@ class _AccountCard extends ConsumerWidget {
           title: context.l10n.settingsSignOut,
           icon: Symbols.logout_rounded,
           iconTint: context.sdTheme3.textSecondary,
-          showChevron: false,
           onTap: () => _confirmSignOut(context, ref),
         ),
         AppListRow(
@@ -119,7 +118,6 @@ class _AccountCard extends ConsumerWidget {
           subtitle: context.l10n.settingsDeleteAccountPermanent,
           icon: Symbols.delete_forever_rounded,
           iconTint: context.sdTheme3.danger,
-          showChevron: false,
           onTap: () => _confirmDelete(context, ref),
         ),
       ],

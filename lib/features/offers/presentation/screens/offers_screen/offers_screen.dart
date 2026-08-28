@@ -12,6 +12,7 @@ import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';

@@ -92,120 +92,130 @@ class _OfferCard extends ConsumerWidget {
           canAct && (offer.expiresAt?.difference(now).inHours ?? 99) < 24
           ? context.sdTheme3.warning
           : null,
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  offer.itemTitle,
-                  style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
-                    color: context.sdTheme3.textPrimary,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              SizedBox(width: SdSpacingConstant.w8),
-              Text(
-                context.money(offer.amount),
-                style: context.textTheme3.titleMedium!.bold3.tabular3.copyWith(
-                  color: context.sdTheme3.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: SdSpacingConstant.h6),
-          Text(
-            <String>[
-              offer.marketplace.displayName,
-              if (item?.askingPrice != null)
-                context.l10n.offerAsking(context.money(item!.askingPrice)),
-              if (discount != null)
-                context.l10n.offerBelowAsking(context.percent(discount)),
-              if (offer.buyerName != null) offer.buyerName!,
-            ].join(' · '),
-            style: context.textTheme3.bodySmall!.faint3(context),
-          ),
-          if (offer.message != null) ...<Widget>[
-            SizedBox(height: SdSpacingConstant.h6),
-            Text(
-              context.l10n.offerMessageQuote(offer.message!),
-              style: context.textTheme3.bodySmall!.muted3(context),
-            ),
-          ],
-          SizedBox(height: SdSpacingConstant.h8),
-          Wrap(
-            spacing: SdSpacingConstant.w6,
-            runSpacing: SdSpacingConstant.h4,
-            children: <Widget>[
-              if (deadline != null)
-                SdBadgeV3(
-                  label: deadline,
-                  tone: SdBadgeToneV3.warning,
-                  icon: Symbols.schedule_rounded,
-                ),
-              if (offer.counterAmount != null)
-                SdBadgeV3(
-                  label: context.l10n.offerCountered(
-                    context.money(offer.counterAmount),
-                  ),
-                  icon: Symbols.reply_rounded,
-                ),
-              if (offer.respondedAt != null)
-                SdBadgeV3(
-                  label: DateTimeUtils.shortDate(
-                    offer.respondedAt!,
-                    locale: context.localeTag,
-                  ),
-                ),
-            ],
-          ),
-          if (canAct) ...<Widget>[
-            SizedBox(height: SdSpacingConstant.h12),
-            Row(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Expanded(
-                  child: SdButtonV3(
-                    variant: SdButtonVariantV3.primary,
-                    label: context.l10n.offerAccept,
-                    size: SdButtonSizeV3.small,
-                    expand: true,
-                    busy: isBusy,
-                    onPressed: () => _confirmAccept(context, ref),
-                  ),
-                ),
-                SizedBox(width: SdSpacingConstant.w8),
-                Expanded(
-                  child: SdButtonV3(
-                    variant: SdButtonVariantV3.secondary,
-                    label: context.l10n.offerCounter,
-                    size: SdButtonSizeV3.small,
-                    expand: true,
-                    onPressed: () => _CounterSheet.show(context, offer),
-                  ),
-                ),
-                SizedBox(width: SdSpacingConstant.w8),
-                Expanded(
-                  child: SdButtonV3(
-                    variant: SdButtonVariantV3.outlined,
-                    label: context.l10n.offerDecline,
-                    size: SdButtonSizeV3.small,
-                    expand: true,
-                    onPressed: () => _run(
-                      context,
-                      () => ref
-                          .read(offerActionsControllerProvider.notifier)
-                          .decline(offer),
-                      context.l10n.offerDeclined,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        offer.itemTitle,
+                        style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
+                          color: context.sdTheme3.textPrimary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
+                    SizedBox(width: SdSpacingConstant.w8),
+                    Text(
+                      context.money(offer.amount),
+                      style: context.textTheme3.titleMedium!.bold3.tabular3
+                          .copyWith(color: context.sdTheme3.textPrimary),
+                    ),
+                  ],
                 ),
+                SizedBox(height: SdSpacingConstant.h6),
+                Text(
+                  <String>[
+                    offer.marketplace.displayName,
+                    if (item?.askingPrice != null)
+                      context.l10n.offerAsking(
+                        context.money(item!.askingPrice),
+                      ),
+                    if (discount != null)
+                      context.l10n.offerBelowAsking(context.percent(discount)),
+                    if (offer.buyerName != null) offer.buyerName!,
+                  ].join(' · '),
+                  style: context.textTheme3.bodySmall!.faint3(context),
+                ),
+                if (offer.message != null) ...<Widget>[
+                  SizedBox(height: SdSpacingConstant.h6),
+                  Text(
+                    context.l10n.offerMessageQuote(offer.message!),
+                    style: context.textTheme3.bodySmall!.muted3(context),
+                  ),
+                ],
+                SizedBox(height: SdSpacingConstant.h8),
+                Wrap(
+                  spacing: SdSpacingConstant.w6,
+                  runSpacing: SdSpacingConstant.h4,
+                  children: <Widget>[
+                    if (deadline != null)
+                      SdBadgeV3(
+                        label: deadline,
+                        tone: SdBadgeToneV3.warning,
+                        icon: Symbols.schedule_rounded,
+                      ),
+                    if (offer.counterAmount != null)
+                      SdBadgeV3(
+                        label: context.l10n.offerCountered(
+                          context.money(offer.counterAmount),
+                        ),
+                        icon: Symbols.reply_rounded,
+                      ),
+                    if (offer.respondedAt != null)
+                      SdBadgeV3(
+                        label: DateTimeUtils.shortDate(
+                          offer.respondedAt!,
+                          locale: context.localeTag,
+                        ),
+                      ),
+                  ],
+                ),
+                if (canAct) ...<Widget>[
+                  SizedBox(height: SdSpacingConstant.h12),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: SdButtonV3(
+                          variant: SdButtonVariantV3.primary,
+                          label: context.l10n.offerAccept,
+                          size: SdButtonSizeV3.small,
+                          expand: true,
+                          busy: isBusy,
+                          onPressed: () => _confirmAccept(context, ref),
+                        ),
+                      ),
+                      SizedBox(width: SdSpacingConstant.w8),
+                      Expanded(
+                        child: SdButtonV3(
+                          variant: SdButtonVariantV3.secondary,
+                          label: context.l10n.offerCounter,
+                          size: SdButtonSizeV3.small,
+                          expand: true,
+                          onPressed: () => _CounterSheet.show(context, offer),
+                        ),
+                      ),
+                      SizedBox(width: SdSpacingConstant.w8),
+                      Expanded(
+                        child: SdButtonV3(
+                          variant: SdButtonVariantV3.outlined,
+                          label: context.l10n.offerDecline,
+                          size: SdButtonSizeV3.small,
+                          expand: true,
+                          onPressed: () => _run(
+                            context,
+                            () => ref
+                                .read(offerActionsControllerProvider.notifier)
+                                .decline(offer),
+                            context.l10n.offerDeclined,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
-          ],
+          ),
+          SizedBox(width: SdSpacingConstant.w8),
+          const AppRowChevron(),
         ],
       ),
     );

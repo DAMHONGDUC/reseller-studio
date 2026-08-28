@@ -90,7 +90,6 @@ class SubscriptionScreen extends ConsumerWidget {
                 title: context.l10n.subscriptionRestorePurchases,
                 subtitle: context.l10n.subscriptionIfYouAlreadyPaidOnAnother,
                 icon: Symbols.restore_rounded,
-                showChevron: false,
                 onTap: isBusy ? null : () => _restore(context, ref),
               ),
               if (status != null && status.source != SubscriptionSource.none)
