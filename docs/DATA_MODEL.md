@@ -28,6 +28,7 @@ workspaces/{workspaceId}
   receipts/{receiptId}
   categories/{categoryId}
   locations/{locationId}
+  marketplaces/{marketplaceId}
   activity/{activityId}              append-only audit log
   subscription/{docId}               plan tier, written by webhook only
 ```
@@ -101,16 +102,6 @@ makes adding a team member a migration later.
 its own. Changing it does **not** convert existing records — it cannot, since
 nobody knows what rate applied on a purchase made last March.
 
-`marketplaceFeeRates` is a map of `Marketplace.name` → fraction of the sale,
-and it holds **only the platforms this business corrected**. A platform absent
-from it uses `Marketplace.estimatedFeeRate`, the published headline. Storing
-every default instead would freeze a rate the platform later changed, and make
-"the seller told us" indistinguishable from "nobody has said".
-
-**It is a planning estimate and never accounting.** A fee an order actually
-reported is a fact and always wins — see `PayoutReconciliation.expected`, which
-falls back to this only when `fees` is null.
-
 ### `members/{uid}`
 
 `role` (`owner` | `admin` | `member` | `viewer`), `displayName`, `email`,
@@ -143,6 +134,19 @@ an item would have to wait for that job to see it leave the Stale tab.
 One per item **per marketplace** — cross-listing (plan §13) means one item has
 several. `externalListingId` and `externalUrl` are how the sync layer matches
 a remote listing back to ours, and both are null until a publish succeeds.
+
+### `marketplaces/{marketplaceId}`
+
+`name`, `feeRate`, `deletedAt`, plus the fields every document carries. These
+are seller-owned records rather than a closed platform list: a business can
+add, rename, change the estimated rate, and soft-delete any marketplace.
+
+`feeRate` is a fraction of the sale and is **a planning estimate, never
+accounting**. A fee an order actually reports is a fact and always wins.
+
+Every new workspace starts with eBay, Etsy, Depop, and Poshmark as ordinary
+records. Their ids, names and initial rates come from one code-owned default
+list; after creation they behave exactly like a marketplace the seller added.
 
 ### `orders/{orderId}`
 
