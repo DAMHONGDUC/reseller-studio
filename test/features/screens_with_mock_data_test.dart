@@ -178,11 +178,23 @@ void main() {
       // The list sorts newest-created first, so this is the top row.
       expect(find.textContaining('Nike windbreaker'), findsOneWidget);
 
-      // A Quick Add leftover: title only, no cost, no price. Both money cells
+      // A Quick Add leftover: title only, no cost, no price. Every money cell
       // must render an em dash rather than a zero — hard rule 5, proven on a
       // real row rather than asserted in a comment.
+      //
+      // Scrolled to rather than expected on the first screenful: the row
+      // carries three figures now, so fewer of them fit at once.
+      await tester.scrollUntilVisible(
+        find.textContaining('brass hardware'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+
       expect(find.textContaining('brass hardware'), findsOneWidget);
-      expect(find.text('—'), findsWidgets);
+      // A cell is one paragraph, so the dash lives in a span rather than in a
+      // `Text` of its own.
+      expect(find.textContaining('—', findRichText: true), findsWidgets);
 
       // The oldest item is tenth and is not built until scrolled to.
       //

@@ -27,7 +27,7 @@ void main() {
     askingPrice: asking,
   );
 
-  testWidgets('the asking price leads, and cost and profit carry the margin', (
+  testWidgets('the money block states cost, asking price and profit', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -41,14 +41,17 @@ void main() {
       ),
     );
 
-    expect(find.text(r'$185.00'), findsOneWidget);
     // One paragraph per cell, so the label and its figure ellipsize together.
     expect(
       find.textContaining(r'Cost $45.00', findRichText: true),
       findsOneWidget,
     );
     expect(
-      find.textContaining(r'Profit $140.00 (76%)', findRichText: true),
+      find.textContaining(r'Asking $185.00', findRichText: true),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining(r'Profit $140.00', findRichText: true),
       findsOneWidget,
     );
   });
@@ -64,11 +67,11 @@ void main() {
       ),
     );
 
-    // Hard rule 5: the asking price and the cost both render an em dash, and
-    // there is no profit to claim.
-    expect(find.text('—'), findsOneWidget);
+    // Hard rule 5: both figures render an em dash rather than a zero, which
+    // would tell the seller the item was free.
     expect(find.textContaining('Cost —', findRichText: true), findsOneWidget);
-    expect(find.textContaining('Profit', findRichText: true), findsNothing);
+    expect(find.textContaining('Asking —', findRichText: true), findsOneWidget);
+    expect(find.textContaining('Profit —', findRichText: true), findsOneWidget);
   });
 
   testWidgets('the row carries how long the item has been in its state', (

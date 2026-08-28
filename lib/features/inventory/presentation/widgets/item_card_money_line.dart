@@ -1,14 +1,15 @@
 part of 'item_card.dart';
 
-/// What it cost, and what selling it at the asking price would leave.
+/// What it cost, what it is being asked for, and what the difference is.
 ///
-/// **Cost at the start, profit at the end**, so the profit lands under the
-/// asking price above it and the two figures a seller compares sit in one
-/// column at the card's edge.
+/// **Three lines, stacked** — owner's rule. Figures sharing a line each got
+/// half the width and truncated in turn; each on its own line has the whole
+/// card to spell itself out, and the three read down as a small statement:
+/// what went out, what is being asked, what is left.
 ///
-/// Both render `—` when unknown, which is most of the point: an item added
-/// through Quick Add has neither, and the row must say so rather than imply
-/// the item was free.
+/// Every one renders `—` when unknown, which is most of the point: an item
+/// added through Quick Add has none of them, and the row must say so rather
+/// than imply the item was free.
 class _MoneyLine extends StatelessWidget {
   const _MoneyLine({required this.item});
 
@@ -17,45 +18,33 @@ class _MoneyLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Money? profit = item.expectedProfit;
-    final double? margin = item.expectedMargin;
 
-    return Row(
-      // Spread rather than packed: the profit belongs under the asking price
-      // at the card's edge, where the two numbers read as one column.
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        // Two thirds of the line to the profit, one to the cost: a Row
-        // splits equal flex equally, which truncated the longer cell while
-        // the shorter one sat on width it did not need.
-        Flexible(
-          child: _MoneyCell(
-            label: context.l10n.itemCost,
-            value: context.money(item.purchasePrice),
-            color: context.sdTheme3.textSecondary,
-          ),
+        _MoneyCell(
+          label: context.l10n.itemCost,
+          value: context.money(item.purchasePrice),
+          color: context.sdTheme3.textSecondary,
         ),
-        if (profit != null) ...<Widget>[
-          SizedBox(width: SdSpacingConstant.w12),
-          Flexible(
-            flex: 2,
-            child: _MoneyCell(
-              label: context.l10n.itemProfit,
-              // The margin rides inside the same cell: a percentage is what
-              // makes $140 a good number or a thin one, and reading it three
-              // cards later is not the same information.
-              value: margin == null
-                  ? context.money(profit)
-                  : context.l10n.itemProfitWithMargin(
-                      context.money(profit),
-                      context.percent(margin),
-                    ),
-              color: profit.isNegative
-                  ? context.sdTheme3.loss
-                  : context.sdTheme3.profit,
-              textAlign: TextAlign.end,
-            ),
-          ),
-        ],
+        SizedBox(height: SdSpacingConstant.h4),
+        _MoneyCell(
+          label: context.l10n.itemAsking,
+          value: context.money(item.askingPrice),
+          color: context.sdTheme3.textPrimary,
+        ),
+        SizedBox(height: SdSpacingConstant.h4),
+        _MoneyCell(
+          label: context.l10n.itemProfit,
+          value: context.money(profit),
+          // Hard rule 5: an em dash is not a figure, so it must not be tinted
+          // as though it were good news or bad.
+          color: profit == null
+              ? context.sdTheme3.textTertiary
+              : profit.isNegative
+              ? context.sdTheme3.loss
+              : context.sdTheme3.profit,
+        ),
       ],
     );
   }

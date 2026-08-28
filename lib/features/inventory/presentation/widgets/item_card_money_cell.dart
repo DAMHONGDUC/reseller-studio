@@ -2,6 +2,11 @@ part of 'item_card.dart';
 
 /// One labelled figure on the money line — `Cost $45.00`.
 ///
+/// **The figure is a size louder than its label** — owner's rule. Cost,
+/// asking and profit are what the row exists to show; a label reading at the
+/// same weight makes the seller hunt for the number among the words that
+/// introduce it.
+///
 /// **Label and value on one line, not stacked.** The stacked version cost the
 /// row a whole line of height to say two words, and three of them side by
 /// side read as a table nobody wanted inside a list row.
@@ -10,13 +15,11 @@ class _MoneyCell extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
-    this.textAlign = TextAlign.start,
   });
 
   final String label;
   final String value;
   final Color color;
-  final TextAlign textAlign;
 
   @override
   // One paragraph rather than a Row of two Texts: the label and the figure
@@ -28,7 +31,7 @@ class _MoneyCell extends StatelessWidget {
         TextSpan(text: '$label '),
         TextSpan(
           text: value,
-          style: context.textTheme3.bodySmall!.semiBold3.tabular3.copyWith(
+          style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
             color: color,
           ),
         ),
@@ -37,6 +40,5 @@ class _MoneyCell extends StatelessWidget {
     style: context.textTheme3.bodySmall!.faint3(context),
     maxLines: 1,
     overflow: TextOverflow.ellipsis,
-    textAlign: textAlign,
   );
 }

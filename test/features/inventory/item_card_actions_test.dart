@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
@@ -48,6 +49,39 @@ void main() {
     // through, the sheet would be sitting on top of a screen the seller never
     // asked for.
     expect(find.byType(InventoryScreen), findsOneWidget);
+  });
+
+  testWidgets('the target is a round 44pt one, not a squeezed box', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const InventoryScreen());
+
+    final Size size = tester.getSize(
+      find
+          .descendant(
+            of: actionsButton().first,
+            matching: find.byType(SizedBox),
+          )
+          .first,
+    );
+
+    // 44 square, and circular: an icon-only control that ripples as a rounded
+    // rectangle acknowledges a tap somewhere other than where it landed.
+    expect(size.width, size.height);
+    expect(size.width, greaterThanOrEqualTo(44));
+    expect(
+      tester
+          .widget<InkResponse>(
+            find
+                .descendant(
+                  of: actionsButton().first,
+                  matching: find.byType(InkResponse),
+                )
+                .first,
+          )
+          .customBorder,
+      isA<CircleBorder>(),
+    );
   });
 
   testWidgets('it disappears while a bulk selection is open', (

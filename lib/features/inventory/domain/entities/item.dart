@@ -100,23 +100,6 @@ class Item {
     return asking - cost;
   }
 
-  /// [expectedProfit] as a fraction of [askingPrice] — how much of each
-  /// dollar asked the seller would keep. Null whenever the profit is, and
-  /// when the item is being given away.
-  ///
-  /// **Margin, not ROI.** Both are useful and the plan wants both, but a row
-  /// has space for one number: margin stays inside 0–100% and reads at a
-  /// glance, while a 311% ROI on a $45 buy takes a second look to place.
-  /// `ProfitBreakdown` carries both for the screens that have room.
-  double? get expectedMargin {
-    final Money? profit = expectedProfit;
-    final Money? asking = askingPrice;
-
-    if (profit == null || asking == null) return null;
-
-    return profit.ratioOf(asking);
-  }
-
   /// When the item entered the state it is in now — what "how long has this
   /// sat?" is measured from.
   ///
