@@ -211,11 +211,19 @@ under Settings, so Home is what keeps it findable; putting both at the end is
 what stops a seller scanning for "add" from stepping over them. Nothing else
 non-create joins them without the same decision.
 
-**Flow overview opens a sheet, not a screen** — owner's rule. It answers "how
-do I run my selling with this app", which is a question asked while standing
-somewhere else in the app, so pushing a route would cost the seller their
-place to read nine lines. It is the only row here that is not a push, which is
-why `QuickAction.route` is nullable.
+**Flow overview is the third shortcut card, and Analytics moved down here** —
+owner's rule, and it is the one change to the closed list of three. Analytics
+is a tab a seller reaches from the bar anyway; "how does this app work" is the
+question they cannot answer from anywhere, and it is asked most on the first
+morning, which is when Home is the only screen they know.
+
+- **Analytics keeps `go`, not `push`, now that it is a Quick Action row.** It
+  is a branch root, and pushing one over Home leaves the seller on the wrong
+  tab with a back button they should not have. That is why `QuickAction`
+  carries how it opens rather than a route alone.
+- **Flow overview opens a sheet, not a screen** — the question is asked while
+  standing somewhere else, so a route would cost the seller their place. It is
+  the only entry here with no route at all.
 
 - **`WorkflowConstant.steps` is the content, and stays the only copy of the
   chain.** The sheet and About's diagram draw the same data — a second list

@@ -13,8 +13,14 @@ and they are listed in the order they outrank each other.
 
 1. **Three shortcut cards come first, above even Needs Attention.** They are
    the ways *out* of Home — down to Quick Action, sideways into global search,
-   across to Analytics — not content, so a seller who opened the app to go
-   somewhere does not read a dashboard on the way there.
+   and open the flow overview — not content, so a seller who opened the app to
+   go somewhere does not read a dashboard on the way there.
+   - **Flow overview took Analytics' card, and Analytics moved into Quick
+     Action** — owner's rule, and the only change this closed list has had.
+     Analytics is a tab the seller reaches from the bar anyway; "how does this
+     app work" is the question they cannot answer from anywhere else, and it
+     is asked most on the first morning, when Home is the only screen they
+     know.
    - **Three, and the list is closed.** A fourth makes the row a launcher, and
      a launcher above the figures is exactly what keeping the create actions at
      the bottom exists to prevent. The row works because it is short enough to
@@ -62,12 +68,15 @@ Owner's rule, and they ride at the end: **About last, Flow overview just above
 it.** The create actions above them keep the section's shape, and a seller
 scanning for "add" never steps over them.
 
-**Flow overview opens a sheet, not a screen.** It answers "how do I run my
-selling with this app", which is asked while standing somewhere else — pushing
-a route would cost the seller their place to read nine lines. It is why
-`QuickAction.route` is nullable, and it is the only row allowed to leave it
-null; `quick_action_test.dart` says so.
+**How a Quick Action row opens is a property of the row**, not something its
+call site works out: `QuickActionOpen` says push, go or sheet. Analytics is
+`go` because a branch root pushed over Home leaves the seller on the wrong tab,
+and Flow overview is `sheet` and carries no route at all.
 
-The sheet draws `WorkflowConstant.steps`, the same data About's diagram uses,
-and badges the steps the app never blocks on. What "optional" means there is
-in `docs/rules/SCREENS.md`.
+**The flow overview sheet is a document, not a menu.** It takes a fixed share
+of the screen (`SdBottomSheetV3.heightFactor`) and spells every step out — what
+it is, whether the app ever asks for it, and what the seller actually does —
+because it is the answer to "how do I use this", and a list of nine nouns is
+not an answer. It draws `WorkflowConstant.steps`, the same data About's diagram
+uses, and badges the steps the app never blocks on; what "optional" means there
+is in `docs/rules/SCREENS.md`.

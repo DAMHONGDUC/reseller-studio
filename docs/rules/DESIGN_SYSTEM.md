@@ -614,6 +614,15 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
 - Sheets: always `showSdBottomSheetV3` — it must use the root navigator so
   sheets cover the floating glass tab bar; raw `showModalBottomSheet` slides
   under it.
+- **A sheet sizes to its content, unless it is a document.** `SdBottomSheetV3`
+  is `mainAxisSize.min` by default, which is right for a menu: a sheet taller
+  than its rows is a sheet with dead space under the seller's thumb. A sheet
+  that is *read* rather than chosen from — the flow overview — passes
+  `heightFactor` and takes that share of the screen instead, so its scrollbar
+  starts at a predictable place and the page behind stays visible enough to
+  say the sheet is dismissable.
+  - **It is a fraction, never a number of points.** A height typed in points
+    is a height that is wrong on the next device.
 - **A sheet's options are separated by a rule, not by air.** Owner's rule, and
   it covers every list of choices in a sheet — an actions sheet, a picker, the
   workspace switcher. `AppSheetOptionList` (`core/widgets/`) lays the rows out
