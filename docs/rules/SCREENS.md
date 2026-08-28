@@ -24,21 +24,26 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   labelled `SdFabV3`, same button, same place, every screen. That is an
   always-apply rule and it lives in the root `CLAUDE.md`; the design-system
   half is in `DESIGN_SYSTEM.md`.
-- **A form screen pins its commit action to the bottom** — owner's rule,
-  stated about workspace setup. Only the fields scroll; the button holds the
-  bottom edge, so a seller never scrolls to find out how to finish. **This is
-  not the `SdFabV3` rule above and does not compete with it**: that one is for
-  a list screen creating a new row, this one is for a screen whose single
-  action commits the screen itself.
+- **Every add or edit screen pins its save action to the bottom** — owner's
+  rule, first stated about workspace setup and then restated for all of them,
+  because two screens had let the button scroll away with the last field. Only
+  the fields scroll; the button holds the bottom edge, so a seller never
+  scrolls to find out how to finish, and the way to finish is in the same place
+  on every screen. **This is not the `SdFabV3` rule above and does not compete
+  with it**: that one is for a list screen creating a new row, this one is for a
+  screen whose single action commits the screen itself.
+  - **`AppPinnedAction` (`core/widgets/`) is the one implementation.** Three
+    screens had written their own before it was extracted, which is three
+    chances for the gap above the button to be a different number.
   - The action sits **below** the scroll view, never floating over it, so
     content can never pass behind it. That is why it wears no surface and no
     blur — `SdContentPaddingV3.pinnedActionsGap` above it is the whole
     separation, and `SdContentPaddingV3.bottom(context)` below it clears the
     home indicator.
-  - It goes in its own widget in a `part` file, watching the controller
-    itself, so a keystroke rebuilds the button and not the fields above it.
-  - `WorkspaceSetupScreen` is the worked example; v2 recorded the same idea in
-    `SdActionViewV2`'s pinned mode.
+  - The screen passes the button's own state down; the widget holding it stays
+    small enough that a keystroke rebuilds it and not the fields above.
+  - A sheet is already this shape — its action is its last row and the sheet
+    is only as tall as its content — so it needs nothing extra.
 
 ## The device status bar — one source, and the two platforms disagree
 

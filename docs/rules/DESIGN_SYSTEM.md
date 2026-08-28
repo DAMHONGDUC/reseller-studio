@@ -569,6 +569,24 @@ All three are built in `v3/` and in use across the app. **Never reach into
 stopgap — a stopgap is how the app ends up with two snackbar looks.
 `WIDGET_RULES.md` governs how to build a new one.
 
+- **A message comes from the top, and it never takes a tap.** Owner's rule,
+  and both halves are one decision: a card at the bottom sits under the
+  thumb that just pressed the button, and a card anywhere that swallows
+  touches makes the seller wait out an animation before they can carry on.
+  `SdSnackBarPlacementV3.top` is the default, and the host wraps the card in
+  an `IgnorePointer` — so tap-to-dismiss is gone on purpose, and the timer is
+  the only thing that takes a message away.
+- **An add that worked says nothing.** Owner's rule. A sheet closing and the
+  new row appearing behind it is the confirmation; a card on top of it is the
+  app telling the seller what they can already see, and it costs the top of
+  the screen for two seconds every time they add a row. So no
+  `SdSnackBarUtilsV3.success` on a create or add flow.
+  - **Failure always speaks**, on every flow, because nothing on screen says
+    it (hard rule 6 decides the words).
+  - **A result the seller cannot see still speaks.** A bulk action on forty
+    rows, an invite sent to somebody else, a copy to the clipboard, a delete
+    of the record whose screen is now gone — those are successes with no
+    visible evidence, and they keep their message.
 - Snackbars: always `SdSnackBarUtilsV3.success/error/info` — never raw
   `ScaffoldMessenger.showSnackBar`. It draws the app's own card and shows one
   message at a time. Pass a finished localized string; the kind picks the icon
