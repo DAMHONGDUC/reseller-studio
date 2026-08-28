@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/state/form_seed.dart';
@@ -164,8 +165,8 @@ class _MarketplaceDetailScreenState
             IconButton(
               tooltip: context.l10n.actionDelete,
               onPressed: state.isSaving ? null : () => _confirmDelete(id),
-              icon: Icon(
-                Icons.delete_outline_rounded,
+              icon: SdIconV3(
+                AppIconConstant.delete,
                 size: SdSpacingConstant.r24,
                 color: context.sdTheme3.danger,
               ),

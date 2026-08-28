@@ -8,6 +8,7 @@ import '../../features/workspace/domain/entities/pending_invite.dart';
 import '../../features/workspace/domain/entities/workspace.dart';
 import '../../features/workspace/presentation/controllers/team_controller.dart';
 import '../../features/workspace/providers.dart';
+import '../constants/app_icon_constant.dart';
 import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../router/app_routes.dart';
@@ -287,7 +288,7 @@ class _CreateWorkspaceRow extends StatelessWidget {
     onTap: onTap,
     child: Row(
       children: <Widget>[
-        SdIconV3(Symbols.add_rounded, color: context.colorScheme3.primary),
+        SdIconV3(AppIconConstant.add, color: context.colorScheme3.primary),
         SizedBox(width: SdSpacingConstant.w12),
         Text(
           context.l10n.workspaceCreateNew,
