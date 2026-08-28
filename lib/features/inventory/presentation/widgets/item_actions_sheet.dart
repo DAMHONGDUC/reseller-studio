@@ -9,6 +9,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/app_sheet_action_row.dart';
 import '../../../../core/widgets/app_sheet_option_list.dart';
+import '../../../../core/widgets/mark_sold_sheet.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/entities/storage_location.dart';
@@ -17,7 +18,6 @@ import '../../domain/services/item_transition.dart';
 import '../../item_block_presenter.dart';
 import '../../providers.dart';
 import '../controllers/item_actions_controller.dart';
-import 'mark_sold_sheet.dart';
 import 'reprice_sheet.dart';
 
 /// Everything a seller can do to one item, in one sheet (plan §7).

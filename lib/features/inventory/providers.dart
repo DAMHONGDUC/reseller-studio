@@ -13,6 +13,7 @@ import 'domain/entities/item.dart';
 import 'domain/entities/item_category.dart';
 import 'domain/entities/storage_location.dart';
 import 'domain/enums/item_status.dart';
+import 'domain/services/item_search.dart';
 import 'item_category_constant.dart';
 
 /// The normal category records created for every new business.
@@ -262,17 +263,29 @@ final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
   final DateTime now = ref.watch(clockProvider).now();
 
-  return items.where((Item item) {
-    if (!filter.matches(item, now: now)) return false;
+  return items
+      .where(
+        (Item item) =>
+            filter.matches(item, now: now) && ItemSearch.matches(item, query),
+      )
+      .toList();
+});
 
-    if (query.isEmpty) return true;
+/// What a seller could sell right now — everything still on the shelf.
+///
+/// **`sold` and `archived` are out, and so is an empty shelf**: recording a
+/// sale against either is a sale that cannot happen, and offering it is how a
+/// seller ends up with two orders for one item. `isOnHand` is the same test
+/// inventory value is counted with, so the two cannot drift apart.
+///
+/// Source order is kept, whatever the repository hands back: re-sorting here
+/// would make the picker list items in an order Inventory does not.
+final Provider<List<Item>> sellableItemsProvider = Provider<List<Item>>((
+  Ref ref,
+) {
+  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
 
-    // Title, SKU and barcode — the three things a seller has to hand when
-    // looking for a specific item (plan §21). Notes are deliberately not
-    // searched: they are long, and matching them makes the results look
-    // random to someone who typed a SKU.
-    return item.title.toLowerCase().contains(query) ||
-        (item.sku?.toLowerCase().contains(query) ?? false) ||
-        (item.barcode?.toLowerCase().contains(query) ?? false);
-  }).toList();
+  return items
+      .where((Item item) => item.status.isOnHand && item.quantity > 0)
+      .toList();
 });

@@ -10,16 +10,18 @@ import '../../../listings/domain/enums/listing_status.dart';
 import '../../../listings/domain/repositories/listing_repository.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../mock_data/providers.dart';
-import '../../../orders/domain/entities/order.dart';
-import '../../../orders/domain/enums/order_status.dart';
-import '../../../orders/domain/repositories/order_repository.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../domain/repositories/item_repository.dart';
 import '../../domain/services/item_transition.dart';
 
-/// Everything a seller does *to* an item once it exists: list it, sell it,
-/// reprice it, move it, archive it — one at a time or forty at once.
+/// Everything a seller does *to* an item once it exists: list it, reprice it,
+/// move it, archive it — one at a time or forty at once.
+///
+/// **Selling is not here.** It writes an order, so it belongs to the feature
+/// that owns orders — `RecordSaleController`, reached through
+/// `orders/providers.dart`. What stays is [check], which the Actions sheet
+/// asks before it opens the sheet.
 ///
 /// **The bulk paths are not a loop over the single one.** Hard rule 16 makes
 /// bulk first class: `saveAll` batches the write, so forty repriced rows are
@@ -164,88 +166,6 @@ class ItemActionsController extends Notifier<bool> {
           'itemId': item.id,
           'marketplaces': prices.keys.map((Marketplace m) => m.name).toList(),
         },
-      );
-
-      rethrow;
-    } finally {
-      state = false;
-    }
-  }
-
-  /// Record a sale (plan §28's manual order).
-  ///
-  /// **Creates the order as well as moving the item**, because profit is
-  /// derived from orders and an item marked sold with no order would vanish
-  /// from every figure the product is judged on.
-  Future<String> markSold(
-    Item item, {
-    required Money salePrice,
-    required Marketplace marketplace,
-    required DateTime soldAt,
-    String? buyerName,
-  }) async {
-    final OrderRepository orders = ref.read(orderRepositoryProvider);
-    final ItemRepository items = ref.read(itemRepositoryProvider);
-    final String orderId = _uuid.v4();
-
-    SdLogger.action(LogTagConstant.item, 'Mark item sold', <String, Object>{
-      'itemId': item.id,
-      'marketplace': marketplace.name,
-      'salePriceMinor': salePrice.minor,
-    });
-
-    state = true;
-
-    try {
-      await orders.save(
-        Order(
-          id: orderId,
-          status: OrderStatus.toShip,
-          marketplace: marketplace,
-          lines: <OrderLine>[
-            OrderLine(
-              itemId: item.id,
-              title: item.title,
-              quantity: 1,
-              unitPrice: salePrice,
-              // Null when nobody entered a cost — the order's profit is then
-              // `—` rather than the whole sale price (hard rule 5).
-              unitCost: item.purchasePrice,
-            ),
-          ],
-          salePrice: salePrice,
-          orderedAt: soldAt,
-          buyerName: buyerName,
-        ),
-      );
-
-      await items.save(
-        ItemTransition.apply(
-          item.copyWith(askingPrice: item.askingPrice ?? salePrice),
-          ItemStatus.sold,
-          now: soldAt,
-        ),
-      );
-
-      SdLogger.info(LogTagConstant.item, 'Item sold', <String, Object>{
-        'itemId': item.id,
-        'orderId': orderId,
-      });
-      AppAnalytics.instance.itemSold(
-        marketplace: marketplace.name,
-        // The share of sales with no cost is the health metric for the whole
-        // "insight" half of the product — it is what makes profit unknowable.
-        hadCost: item.purchasePrice != null,
-      );
-
-      return orderId;
-    } catch (error, stackTrace) {
-      SdLogger.error(
-        LogTagConstant.item,
-        'Failed to mark item sold',
-        error: error,
-        stackTrace: stackTrace,
-        data: <String, Object>{'itemId': item.id},
       );
 
       rethrow;

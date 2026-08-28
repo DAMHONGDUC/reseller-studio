@@ -35,6 +35,7 @@ import '../../features/onboarding/providers.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import '../../features/orders/presentation/screens/payouts_screen/payouts_screen.dart';
+import '../../features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
 import '../../features/receipts/presentation/screens/receipts_screen/receipts_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen/reports_screen.dart';
@@ -298,6 +299,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'offers',
                     builder: (BuildContext context, GoRouterState state) =>
                         const OffersScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'record-sale',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const RecordSaleScreen(),
                   ),
                   // Last among the order sub-routes on purpose: a literal
                   // segment declared after `:orderId` would be swallowed by

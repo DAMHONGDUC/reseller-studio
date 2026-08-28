@@ -3,11 +3,15 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../inventory/domain/entities/item.dart';
+import '../inventory/domain/services/item_search.dart';
+import '../inventory/providers.dart';
 import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
 import 'domain/enums/order_status.dart';
 import 'domain/services/payout_reconciliation.dart';
+import 'presentation/controllers/record_sale_controller.dart';
 
 /// The tabs across the top of Orders (plan §8).
 enum OrderFilter {
@@ -140,4 +144,43 @@ final Provider<int> ordersAwaitingPayoutProvider = Provider<int>((Ref ref) {
         0,
         (int running, MarketplacePayout row) => running + row.awaiting.length,
       );
+});
+
+/// The one way an order is written — see `lib/features/orders/CLAUDE.md`.
+///
+/// Declared here rather than beside the controller because Inventory's Mark
+/// as sold sheet and Offers both reach it, and a feature is imported through
+/// its `providers.dart`, never through its `presentation/`.
+final NotifierProvider<RecordSaleController, bool>
+recordSaleControllerProvider = NotifierProvider<RecordSaleController, bool>(
+  RecordSaleController.new,
+);
+
+/// What the seller has typed into the record-sale picker.
+///
+/// A controller rather than screen state, per `docs/rules/SCREENS.md`: the
+/// query survives a rebuild, and filtering is nobody's job but this.
+class RecordSaleQueryController extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void update(String query) => state = query;
+
+  void clear() => state = '';
+}
+
+final NotifierProvider<RecordSaleQueryController, String>
+recordSaleQueryProvider = NotifierProvider<RecordSaleQueryController, String>(
+  RecordSaleQueryController.new,
+);
+
+/// The rows the record-sale picker shows: what is on the shelf, narrowed by
+/// the search box.
+final Provider<List<Item>> recordSaleItemsProvider = Provider<List<Item>>((
+  Ref ref,
+) {
+  final List<Item> items = ref.watch(sellableItemsProvider);
+  final String query = ref.watch(recordSaleQueryProvider);
+
+  return items.where((Item item) => ItemSearch.matches(item, query)).toList();
 });

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
-import '../../../../core/constants/date_picker_constant.dart';
-import '../../../../core/error/failure_presenter.dart';
-import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/money/money.dart';
-import '../../../../core/utils/date_time_utils.dart';
-import '../../../../core/widgets/money_field.dart';
-import '../../../../core/widgets/option_picker_sheet.dart';
-import '../../../../core/widgets/picker_field.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
-import '../../../workspace/providers.dart';
-import '../../domain/entities/item.dart';
-import '../controllers/item_actions_controller.dart';
+import '../../features/inventory/domain/entities/item.dart';
+import '../../features/marketplaces/domain/enums/marketplace.dart';
+import '../../features/orders/providers.dart';
+import '../../features/workspace/providers.dart';
+import '../constants/date_picker_constant.dart';
+import '../error/failure_presenter.dart';
+import '../extensions/context_extensions.dart';
+import '../money/money.dart';
+import '../utils/date_time_utils.dart';
+import 'money_field.dart';
+import 'option_picker_sheet.dart';
+import 'picker_field.dart';
 
 /// Record that an item sold.
 ///
@@ -21,13 +21,23 @@ import '../controllers/item_actions_controller.dart';
 /// from orders (hard rule 3), so an item flipped to `sold` with no order
 /// behind it would disappear from every figure the product is judged on —
 /// revenue, margin, ROI, sell-through, all of it.
+///
+/// **In `core/widgets/` because two features open it** — Inventory's Actions
+/// sheet, and the Orders tab's record-sale screen once it has an item. Those
+/// are the two ways an order is created, and they are one sheet on purpose
+/// (`lib/features/orders/CLAUDE.md`).
 class MarkSoldSheet extends ConsumerStatefulWidget {
   const MarkSoldSheet({required this.item, super.key});
 
   final Item item;
 
-  static Future<void> show(BuildContext context, Item item) =>
-      showSdBottomSheetV3<void>(
+  /// True when a sale was recorded, null when the seller dismissed the sheet.
+  ///
+  /// The record-sale screen pops itself on a true so the seller lands back on
+  /// Orders with the new order under them; Inventory's Actions sheet has
+  /// nothing to close and ignores it.
+  static Future<bool?> show(BuildContext context, Item item) =>
+      showSdBottomSheetV3<bool>(
         context: context,
         builder: (BuildContext context) => MarkSoldSheet(item: item),
       );
@@ -66,8 +76,8 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
     try {
       await ref
-          .read(itemActionsControllerProvider.notifier)
-          .markSold(
+          .read(recordSaleControllerProvider.notifier)
+          .record(
             widget.item,
             salePrice: price,
             marketplace: _marketplace,
@@ -77,7 +87,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
       if (!mounted) return;
 
-      navigator.pop();
+      navigator.pop(true);
       SdSnackBarUtilsV3.success(context, context.l10n.markSoldDone);
     } catch (error) {
       // Already logged by the controller.
@@ -92,7 +102,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isBusy = ref.watch(itemActionsControllerProvider);
+    final bool isBusy = ref.watch(recordSaleControllerProvider);
     final String currency = ref.watch(workspaceCurrencyProvider);
     final DateTime now = DateTime.now();
 

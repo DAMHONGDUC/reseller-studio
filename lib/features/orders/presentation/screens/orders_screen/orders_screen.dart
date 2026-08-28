@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
@@ -29,6 +30,10 @@ part 'orders_screen_order_list.dart';
 /// **To Ship is the tab that matters**; everything else is history. An
 /// overdue order is called out in red on its row, because the shipping
 /// deadline is the one thing here with an external penalty attached.
+///
+/// **The create button records a sale** — the second of the two ways an order
+/// exists (`lib/features/orders/CLAUDE.md`). Until it was here, the one screen
+/// about selling was the one screen a seller could not record a sale on.
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
 
@@ -37,7 +42,11 @@ class OrdersScreen extends ConsumerWidget {
     final List<Order> orders = ref.watch(visibleOrdersProvider);
     final AsyncValue<List<Order>> source = ref.watch(ordersProvider);
 
-    return SdScaffoldV3(
+    return AppAddFabScaffold(
+      // Orders is a tab screen, so the button clears the glass bar.
+      floatingNav: true,
+      addLabel: context.l10n.recordSaleTitle,
+      onAdd: () => context.push(AppRoutes.recordSale),
       appBar: SdAppBarV3(
         title: context.l10n.navOrders,
         actions: <Widget>[
@@ -73,12 +82,13 @@ class OrdersScreen extends ConsumerWidget {
                 emptyIcon: AppIconConstant.receiptLong,
                 emptyTitle: context.l10n.ordersEmptyTitle,
                 emptyMessage: context.l10n.ordersEmptyBody,
-                // Orders have no create action of their own — one appears
-                // when an item is marked sold — so the way on is upstream.
+                // The same action the button is, in the same words. An empty
+                // state that pointed somewhere else would teach a route the
+                // seller then has to unlearn.
                 emptyAction: SdButtonV3(
                   variant: SdButtonVariantV3.primary,
-                  label: context.l10n.commonGoToInventory,
-                  onPressed: () => context.go(AppRoutes.inventory),
+                  label: context.l10n.recordSaleTitle,
+                  onPressed: () => context.push(AppRoutes.recordSale),
                 ),
               ),
               _ => _OrderList(orders: orders),

@@ -114,6 +114,7 @@ enum QuickActionKind {
   quickAddItem,
   addItem,
   scan,
+  recordSale,
   recordPurchase,
   addExpense,
   addSource,
@@ -198,6 +199,11 @@ final class QuickActionConstant {
       kind: QuickActionSectionKind.operations,
       actions: <QuickAction>[
         QuickAction(
+          kind: QuickActionKind.recordSale,
+          icon: AppIconConstant.payments,
+          route: AppRoutes.recordSale,
+        ),
+        QuickAction(
           kind: QuickActionKind.recordPurchase,
           icon: AppIconConstant.shoppingBag,
           route: AppRoutes.addPurchase,
@@ -254,6 +260,7 @@ final class QuickActionLabel {
         QuickActionKind.quickAddItem => context.l10n.quickAddTitle,
         QuickActionKind.addItem => context.l10n.inventoryAddItem,
         QuickActionKind.scan => context.l10n.inventoryScan,
+        QuickActionKind.recordSale => context.l10n.recordSaleTitle,
         QuickActionKind.recordPurchase => context.l10n.homeQuickRecordPurchase,
         QuickActionKind.addExpense => context.l10n.homeQuickAddExpense,
         QuickActionKind.addSource => context.l10n.homeQuickAddSource,
@@ -290,13 +297,13 @@ final class GettingStartedStepLabel {
     GettingStartedStep.recordSale => AppIconConstant.payments,
   };
 
-  /// Where the step is performed. Steps two and three share Inventory because
-  /// both start on an item's Actions sheet — the checklist points at the
-  /// screen that owns the move, it does not learn how to make it.
+  /// Where the step is performed. Listing still points at Inventory because it
+  /// starts on an item's Actions sheet; recording a sale has a screen of its
+  /// own, so the checklist opens the action rather than the shelf it is on.
   static String route(GettingStartedStep step) => switch (step) {
     GettingStartedStep.addItem => AppRoutes.quickAdd,
     GettingStartedStep.listItem => AppRoutes.inventory,
-    GettingStartedStep.recordSale => AppRoutes.inventory,
+    GettingStartedStep.recordSale => AppRoutes.recordSale,
   };
 
   /// Quick Add is pushed over Home; Inventory is a tab, and pushing a branch

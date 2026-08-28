@@ -230,6 +230,7 @@ void main() {
       'sources_screen': '/more/sourcing/sources',
       'purchases_screen': '/more/sourcing/purchases/new',
       'inventory_screen': '/inventory/quick-add',
+      'orders_screen': '/orders/record-sale',
       'team_screen': '/more/team',
     };
 

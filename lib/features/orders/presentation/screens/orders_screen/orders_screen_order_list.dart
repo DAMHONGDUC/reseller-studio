@@ -10,7 +10,9 @@ class _OrderList extends ConsumerWidget {
     final DateTime now = ref.watch(clockProvider).now();
 
     return ListView.separated(
-      padding: SdContentPaddingV3.screen(context, floatingNav: true),
+      // Clears the create button as well as the glass bar; without it the
+      // last order sits under the button and cannot be tapped.
+      padding: AppAddFabScaffold.listPadding(context, floatingNav: true),
       itemCount: orders.length,
       separatorBuilder: (BuildContext context, int index) =>
           SizedBox(height: SdContentPaddingV3.listItemGap),

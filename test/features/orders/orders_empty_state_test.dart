@@ -15,6 +15,9 @@ import '../../support/pump_app.dart';
 /// filter"** — naming a filter they never set, and pointing at a fix that does
 /// not exist. Inventory had always told the two apart; this is what stops the
 /// screens drifting back apart again.
+///
+/// The way out of the first empty is now Orders' own create action rather than
+/// a detour through Inventory — `lib/features/orders/CLAUDE.md`.
 void main() {
   List<Override> orders(List<Order> rows) => <Override>[
     ordersProvider.overrideWith((Ref ref) => Stream<List<Order>>.value(rows)),
@@ -33,7 +36,7 @@ void main() {
     expect(find.text('No orders match this filter.'), findsNothing);
   });
 
-  testWidgets('the way on is offered, because orders start in inventory', (
+  testWidgets('the way on is the screen own create action, in its own words', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -42,7 +45,10 @@ void main() {
       overrides: orders(const <Order>[]),
     );
 
-    expect(find.text('Go to inventory'), findsOneWidget);
+    // Twice: the button in the corner and the empty state's own action say
+    // the same thing, so a seller is never taught a second route to it.
+    expect(find.text('Record a sale'), findsNWidgets(2));
+    expect(find.text('Go to inventory'), findsNothing);
   });
 
   testWidgets('an empty tab on a real business still blames the filter', (

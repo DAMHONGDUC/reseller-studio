@@ -1176,6 +1176,26 @@
   "@markSoldDone": {
     "description": "Confirmation. Says where the order went, because marking sold creates one."
   },
+  "recordSaleTitle": "Record a sale",
+  "@recordSaleTitle": {
+    "description": "The Orders tab's create button, its screen title, and the Quick Action row. The second of the two ways an order is created."
+  },
+  "recordSaleSearchHint": "Search title, SKU or barcode",
+  "@recordSaleSearchHint": {
+    "description": "Search field on the record-sale screen."
+  },
+  "recordSaleNoMatch": "No items match that search.",
+  "@recordSaleNoMatch": {
+    "description": "Record-sale screen, when the search hides everything on the shelf."
+  },
+  "recordSaleNothingToSellTitle": "Nothing on the shelf",
+  "@recordSaleNothingToSellTitle": {
+    "description": "Record-sale screen, when the business has no item that could be sold."
+  },
+  "recordSaleNothingToSellBody": "An order names what sold, so add an item to inventory first.",
+  "@recordSaleNothingToSellBody": {
+    "description": "Record-sale empty state: says why inventory comes first."
+  },
   "repriceTitle": "Reprice",
   "@repriceTitle": {
     "description": "Sheet title for a single item."
@@ -4478,9 +4498,9 @@
   "@ordersEmptyTitle": {
     "description": "Orders screen, shown when the workspace has no orders at all."
   },
-  "ordersEmptyBody": "An order lands here when you mark an item sold.",
+  "ordersEmptyBody": "Record a sale here, or mark an item sold in inventory.",
   "@ordersEmptyBody": {
-    "description": "Orders screen empty state: says where orders come from."
+    "description": "Orders screen empty state: names both ways an order is created."
   },
   "offersEmptyTitle": "No offers yet",
   "@offersEmptyTitle": {

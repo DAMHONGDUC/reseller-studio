@@ -75,6 +75,14 @@ final class AppRoutes {
 
   static const String orders = '/orders';
   static const String orderDetail = '/orders/:orderId';
+
+  /// Recording a sale from the Orders side — the second of the two ways an
+  /// order is created (`lib/features/orders/CLAUDE.md`). It picks the item
+  /// first and then opens the same sheet Inventory's Mark as sold does.
+  ///
+  /// A route rather than a sheet raised from the tab, because Quick Action on
+  /// Home has to be able to start every create action the app has.
+  static const String recordSale = '/orders/record-sale';
   static const String shippingQueue = '/orders/shipping-queue';
   static const String offers = '/orders/offers';
   // No `/orders/returns`: returns are opened and closed from order detail

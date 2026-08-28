@@ -5,9 +5,9 @@ import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
 import '../../../inventory/domain/repositories/item_repository.dart';
-import '../../../inventory/presentation/controllers/item_actions_controller.dart';
 import '../../../mock_data/providers.dart';
 import '../../../orders/domain/enums/order_status.dart';
+import '../../../orders/providers.dart';
 import '../../domain/entities/offer.dart';
 import '../../domain/repositories/offer_repository.dart';
 
@@ -59,8 +59,8 @@ class OfferActionsController extends Notifier<bool> {
       }
 
       await ref
-          .read(itemActionsControllerProvider.notifier)
-          .markSold(
+          .read(recordSaleControllerProvider.notifier)
+          .record(
             item,
             salePrice: offer.amount,
             marketplace: offer.marketplace,
