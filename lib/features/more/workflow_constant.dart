@@ -130,6 +130,62 @@ final class WorkflowLabel {
         WorkflowKind.sourceBetter => context.l10n.workflowSourceBetter,
       };
 
+  /// What the seller actually does at this step, in the order they do it.
+  ///
+  /// **Three lines each, and they name the screen.** Home's flow overview is
+  /// the answer to "how do I use this app", and a one-line summary per step is
+  /// a table of contents rather than an answer. Kept beside [detail] because
+  /// they are the same fact at two lengths — the diagram shows one, the sheet
+  /// shows both.
+  static List<String> how(BuildContext context, WorkflowKind kind) =>
+      switch (kind) {
+        WorkflowKind.source => <String>[
+          context.l10n.workflowSourceHow1,
+          context.l10n.workflowSourceHow2,
+          context.l10n.workflowSourceHow3,
+        ],
+        WorkflowKind.purchase => <String>[
+          context.l10n.workflowPurchaseHow1,
+          context.l10n.workflowPurchaseHow2,
+          context.l10n.workflowPurchaseHow3,
+        ],
+        WorkflowKind.inventory => <String>[
+          context.l10n.workflowInventoryHow1,
+          context.l10n.workflowInventoryHow2,
+          context.l10n.workflowInventoryHow3,
+        ],
+        WorkflowKind.list => <String>[
+          context.l10n.workflowListHow1,
+          context.l10n.workflowListHow2,
+          context.l10n.workflowListHow3,
+        ],
+        WorkflowKind.sell => <String>[
+          context.l10n.workflowSellHow1,
+          context.l10n.workflowSellHow2,
+          context.l10n.workflowSellHow3,
+        ],
+        WorkflowKind.ship => <String>[
+          context.l10n.workflowShipHow1,
+          context.l10n.workflowShipHow2,
+          context.l10n.workflowShipHow3,
+        ],
+        WorkflowKind.profit => <String>[
+          context.l10n.workflowProfitHow1,
+          context.l10n.workflowProfitHow2,
+          context.l10n.workflowProfitHow3,
+        ],
+        WorkflowKind.analyze => <String>[
+          context.l10n.workflowAnalyzeHow1,
+          context.l10n.workflowAnalyzeHow2,
+          context.l10n.workflowAnalyzeHow3,
+        ],
+        WorkflowKind.sourceBetter => <String>[
+          context.l10n.workflowSourceBetterHow1,
+          context.l10n.workflowSourceBetterHow2,
+          context.l10n.workflowSourceBetterHow3,
+        ],
+      };
+
   static String detail(BuildContext context, WorkflowKind kind) =>
       switch (kind) {
         WorkflowKind.source => context.l10n.workflowSourceDetail,

@@ -4325,7 +4325,7 @@
   "@flowOverviewTitle": {
     "description": "Title of the flow overview sheet."
   },
-  "flowOverviewIntro": "Work down the list. The steps marked optional can be skipped — the app never asks for them.",
+  "flowOverviewIntro": "Nine steps, and they loop. Work down the list — the ones marked optional can be skipped entirely, because this app only ever asks for something when a record moves.",
   "@flowOverviewIntro": {
     "description": "One line above the steps in the flow overview sheet."
   },
@@ -4336,5 +4336,121 @@
   "workspaceEdit": "Edit business",
   "@workspaceEdit": {
     "description": "Opens the business details screen. Also the tooltip on the switcher row."
+  },
+  "workflowSourceHow1": "Add each shop, auction or wholesaler you buy from under More → Sourcing → Sources.",
+  "@workflowSourceHow1": {
+    "description": "Flow overview: what a seller does at the Source step (1 of 3)."
+  },
+  "workflowSourceHow2": "Standing in a shop, open the purchase evaluator: type what it costs and what you think it sells for, and it tells you the margin after fees and postage.",
+  "@workflowSourceHow2": {
+    "description": "Flow overview: what a seller does at the Source step (2 of 3)."
+  },
+  "workflowSourceHow3": "A source is worth recording even for one item — it is what makes the ROI figures later say anything.",
+  "@workflowSourceHow3": {
+    "description": "Flow overview: what a seller does at the Source step (3 of 3)."
+  },
+  "workflowPurchaseHow1": "Record a buying trip as one purchase: the date, the source and the total you paid.",
+  "@workflowPurchaseHow1": {
+    "description": "Flow overview: what a seller does at the Purchase step (1 of 3)."
+  },
+  "workflowPurchaseHow2": "Photograph the receipt onto it, so the paperwork for the tax year is already gathered.",
+  "@workflowPurchaseHow2": {
+    "description": "Flow overview: what a seller does at the Purchase step (2 of 3)."
+  },
+  "workflowPurchaseHow3": "Split the total across the items when you unpack — cost recorded now is profit you can prove later.",
+  "@workflowPurchaseHow3": {
+    "description": "Flow overview: what a seller does at the Purchase step (3 of 3)."
+  },
+  "workflowInventoryHow1": "Quick Add takes a title and nothing else. Everything else — price, photos, category, source — attaches whenever you get to it.",
+  "@workflowInventoryHow1": {
+    "description": "Flow overview: what a seller does at the Inventory step (1 of 3)."
+  },
+  "workflowInventoryHow2": "Add the cost as soon as you know it: every profit figure in the app is derived from it, and an item with no cost shows a dash rather than a wrong number.",
+  "@workflowInventoryHow2": {
+    "description": "Flow overview: what a seller does at the Inventory step (2 of 3)."
+  },
+  "workflowInventoryHow3": "Give things a location and a photo once you have shelves — that is what makes an order findable in a stockroom.",
+  "@workflowInventoryHow3": {
+    "description": "Flow overview: what a seller does at the Inventory step (3 of 3)."
+  },
+  "workflowListHow1": "Open an item and list it: a price and a marketplace are the two things this step needs, and nothing earlier asked for them.",
+  "@workflowListHow1": {
+    "description": "Flow overview: what a seller does at the List step (1 of 3)."
+  },
+  "workflowListHow2": "Cross-list the same item to several marketplaces from its action sheet, with one price.",
+  "@workflowListHow2": {
+    "description": "Flow overview: what a seller does at the List step (2 of 3)."
+  },
+  "workflowListHow3": "Watch the stale marker. It is set per business, and it is the app telling you what to reprice or pull.",
+  "@workflowListHow3": {
+    "description": "Flow overview: what a seller does at the List step (3 of 3)."
+  },
+  "workflowSellHow1": "Mark the item sold and the order is created for you, with the marketplace, the fees and the payout.",
+  "@workflowSellHow1": {
+    "description": "Flow overview: what a seller does at the Sell step (1 of 3)."
+  },
+  "workflowSellHow2": "Record the fees the marketplace actually took, not the ones you expected — they are what the profit is measured against.",
+  "@workflowSellHow2": {
+    "description": "Flow overview: what a seller does at the Sell step (2 of 3)."
+  },
+  "workflowSellHow3": "A counter-offer, a discount or a refund all go on the order, so the final number stays the true one.",
+  "@workflowSellHow3": {
+    "description": "Flow overview: what a seller does at the Sell step (3 of 3)."
+  },
+  "workflowShipHow1": "The shipping queue is sorted by what breaches its deadline first, so the top of the list is the work.",
+  "@workflowShipHow1": {
+    "description": "Flow overview: what a seller does at the Ship step (1 of 3)."
+  },
+  "workflowShipHow2": "Add the carrier and the tracking number as you post, and the buyer-facing side is done.",
+  "@workflowShipHow2": {
+    "description": "Flow overview: what a seller does at the Ship step (2 of 3)."
+  },
+  "workflowShipHow3": "Skip it entirely for a local handover — the app never blocks a sale on shipping information.",
+  "@workflowShipHow3": {
+    "description": "Flow overview: what a seller does at the Ship step (3 of 3)."
+  },
+  "workflowProfitHow1": "Profit is derived, never stored: cost, sale price, fees, postage and overheads, every time you look.",
+  "@workflowProfitHow1": {
+    "description": "Flow overview: what a seller does at the Profit step (1 of 3)."
+  },
+  "workflowProfitHow2": "Record expenses under More → Expenses — postage supplies, mileage, subscriptions — or the profit figure flatters you.",
+  "@workflowProfitHow2": {
+    "description": "Flow overview: what a seller does at the Profit step (2 of 3)."
+  },
+  "workflowProfitHow3": "A dash means something is missing rather than zero. Fill the gap and the number appears.",
+  "@workflowProfitHow3": {
+    "description": "Flow overview: what a seller does at the Profit step (3 of 3)."
+  },
+  "workflowAnalyzeHow1": "Analytics answers which categories, which marketplaces and which sources are worth your time.",
+  "@workflowAnalyzeHow1": {
+    "description": "Flow overview: what a seller does at the Analyze step (1 of 3)."
+  },
+  "workflowAnalyzeHow2": "Compare a period against the one before it rather than reading one month alone.",
+  "@workflowAnalyzeHow2": {
+    "description": "Flow overview: what a seller does at the Analyze step (2 of 3)."
+  },
+  "workflowAnalyzeHow3": "Sell-through and days-to-sell are the two figures that change what you buy next.",
+  "@workflowAnalyzeHow3": {
+    "description": "Flow overview: what a seller does at the Analyze step (3 of 3)."
+  },
+  "workflowSourceBetterHow1": "Take the source and category figures back out with you — that is the whole loop.",
+  "@workflowSourceBetterHow1": {
+    "description": "Flow overview: what a seller does at the SourceBetter step (1 of 3)."
+  },
+  "workflowSourceBetterHow2": "Stop buying what sits. The stale list and the days-to-sell figure both name it.",
+  "@workflowSourceBetterHow2": {
+    "description": "Flow overview: what a seller does at the SourceBetter step (2 of 3)."
+  },
+  "workflowSourceBetterHow3": "Set your ROI target in the purchase evaluator so the decision is made before you pay.",
+  "@workflowSourceBetterHow3": {
+    "description": "Flow overview: what a seller does at the SourceBetter step (3 of 3)."
+  },
+  "flowOverviewOpen": "Open it",
+  "@flowOverviewOpen": {
+    "description": "Button on a flow overview step that opens the screen performing it."
+  },
+  "flowOverviewLoop": "Then round again. What sold, at what margin and where it came from is what decides the next trip — which is why cost and source stay attached to every item.",
+  "@flowOverviewLoop": {
+    "description": "Closing line of the flow overview sheet, under the last step."
   }
 }

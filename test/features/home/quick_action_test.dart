@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/extensions/context_extensions.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/widgets/app_list_row.dart';
 import 'package:reseller_studio/features/home/home_constant.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
@@ -110,12 +111,12 @@ void main() {
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
     // Owner's rule: the two rows here that do not create something go at the
-    // end — About last, Flow overview just above it — so a seller scanning for
+    // end — About last, Analytics just above it — so a seller scanning for
     // "add" never steps over them.
     expect(QuickActionConstant.actions.last.kind, QuickActionKind.about);
     expect(
       QuickActionConstant.actions[QuickActionConstant.actions.length - 2].kind,
-      QuickActionKind.flowOverview,
+      QuickActionKind.analytics,
     );
 
     final double aboutTop = tester
@@ -151,14 +152,6 @@ void main() {
 
   test('no tile points at a route that does not exist', () {
     for (final QuickAction action in QuickActionConstant.actions) {
-      // Flow overview opens a sheet rather than a route (owner's rule), and
-      // it is the only row allowed to.
-      if (action.route == null) {
-        expect(action.kind, QuickActionKind.flowOverview);
-
-        continue;
-      }
-
       expect(action.route, startsWith('/'));
       // A parameterised path cannot be pushed without its argument, so a
       // Quick Access tile must never be given one.
@@ -197,7 +190,6 @@ void main() {
 
     final Set<String> routes = QuickActionConstant.actions
         .map((QuickAction action) => action.route)
-        .nonNulls
         .toSet();
 
     // Each create screen's own route has to be one Quick Access opens, or the
@@ -229,6 +221,30 @@ void main() {
         routes,
         contains(expected),
         reason: '$path creates something Quick Access cannot start',
+      );
+    }
+  });
+
+  test('a branch root is opened with go, never pushed', () {
+    // Owner's rule via `docs/rules/SCREENS.md`: pushing a tab root over Home
+    // leaves the seller on the wrong tab with a back button they should not
+    // have. Read off the shell's own branch roots so a new tab cannot be added
+    // to this list as a push by accident.
+    const Set<String> branchRoots = <String>{
+      AppRoutes.home,
+      AppRoutes.inventory,
+      AppRoutes.orders,
+      AppRoutes.analytics,
+      AppRoutes.more,
+    };
+
+    for (final QuickAction action in QuickActionConstant.actions) {
+      expect(
+        action.open,
+        branchRoots.contains(action.route)
+            ? QuickActionOpen.goTab
+            : QuickActionOpen.push,
+        reason: '${action.kind.name} opens the wrong way',
       );
     }
   });

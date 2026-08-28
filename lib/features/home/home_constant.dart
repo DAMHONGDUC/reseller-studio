@@ -28,15 +28,21 @@ class HomeShortcut {
 }
 
 /// The three ways out of Home.
-enum HomeShortcutKind { quickAction, search, analytics }
+enum HomeShortcutKind { quickAction, search, flowOverview }
 
 /// **The three cards that open Home** — owner's rule.
 ///
 /// Home's own content answers "what needs attention today", and everything
 /// that answers it is *inside* this screen. These three are the ways out: down
-/// to Quick Action, sideways into global search, across to Analytics. They sit
-/// first because a seller who opened the app to *go somewhere* should not have
-/// to read a dashboard on the way.
+/// to Quick Action, sideways into global search, and open the flow overview.
+/// They sit first because a seller who opened the app to *go somewhere* should
+/// not have to read a dashboard on the way.
+///
+/// **Flow overview took Analytics' card, and Analytics moved into Quick
+/// Action** — owner's rule, and the only change this list has had. Analytics
+/// is a tab the seller reaches from the bar anyway; "how does this app work"
+/// is the question they cannot answer from anywhere else, and it is asked most
+/// on the first morning, when Home is the only screen they know.
 ///
 /// **Three, and the list is closed.** A fourth would make this a launcher,
 /// which is exactly what keeping the create actions at the bottom exists to
@@ -50,8 +56,8 @@ final class HomeShortcutConstant {
     ),
     HomeShortcut(kind: HomeShortcutKind.search, icon: Symbols.search_rounded),
     HomeShortcut(
-      kind: HomeShortcutKind.analytics,
-      icon: Symbols.bar_chart_rounded,
+      kind: HomeShortcutKind.flowOverview,
+      icon: Symbols.account_tree_rounded,
     ),
   ];
 }
@@ -65,7 +71,7 @@ final class HomeShortcutLabel {
       switch (kind) {
         HomeShortcutKind.quickAction => context.l10n.homeQuickAction,
         HomeShortcutKind.search => context.l10n.homeShortcutSearch,
-        HomeShortcutKind.analytics => context.l10n.navAnalytics,
+        HomeShortcutKind.flowOverview => context.l10n.homeFlowOverview,
       };
 }
 
@@ -76,15 +82,32 @@ final class HomeShortcutLabel {
 /// which is also what keeps the list below `const`. The same shape
 /// `MoreDestination` has, for the same reason.
 class QuickAction {
-  const QuickAction({required this.kind, required this.icon, this.route});
+  const QuickAction({
+    required this.kind,
+    required this.icon,
+    required this.route,
+    this.open = QuickActionOpen.push,
+  });
 
   final QuickActionKind kind;
   final IconData icon;
 
-  /// **Null means the row is not a push.** Only Flow overview is: it opens a
-  /// sheet, because the question it answers is asked while standing somewhere
-  /// else in the app and a route would cost the seller their place.
-  final String? route;
+  final String route;
+
+  /// **How the row opens, as a property of the row.** An enum rather than a
+  /// bool: a third behaviour picked by flags at the call site is how the
+  /// fourth one ends up implemented twice.
+  final QuickActionOpen open;
+}
+
+/// What tapping a Quick Action row does.
+enum QuickActionOpen {
+  /// The common case: a screen above Home that comes back here.
+  push,
+
+  /// A shell branch root. Pushing one over Home leaves the seller on the wrong
+  /// tab with a back button they should not have.
+  goTab,
 }
 
 /// Every create action in the app.
@@ -98,7 +121,7 @@ enum QuickActionKind {
   addCategory,
   addLocation,
   inviteTeammate,
-  flowOverview,
+  analytics,
   about,
 }
 
@@ -112,7 +135,7 @@ enum QuickActionKind {
 /// three taps to record an expense from Home.
 ///
 /// **Two rows do not create something, and they ride at the end** — owner's
-/// rule: About last, Flow overview just above it. About lives two levels deep
+/// rule: About last, Analytics just above it. About lives two levels deep
 /// under Settings, so this is what keeps it findable; putting both at the end
 /// is what stops a seller scanning for "add" from stepping over them. Nothing
 /// else non-create joins them without the same decision.
@@ -173,12 +196,14 @@ final class QuickActionConstant {
       icon: Symbols.group_add_rounded,
       route: AppRoutes.team,
     ),
-    // The two that explain rather than create. Flow overview answers "how do
-    // I run my week with this", which is the question that comes before any
-    // of the rows above it — and it is the only row here that opens a sheet.
+    // Analytics moved down here when Flow overview took its shortcut card
+    // (owner's rule) — it is in one place, never both. A tab, so it opens with
+    // `go`: pushing a branch root over Home lands the seller on the wrong tab.
     QuickAction(
-      kind: QuickActionKind.flowOverview,
-      icon: Symbols.account_tree_rounded,
+      kind: QuickActionKind.analytics,
+      icon: Symbols.bar_chart_rounded,
+      route: AppRoutes.analytics,
+      open: QuickActionOpen.goTab,
     ),
     QuickAction(
       kind: QuickActionKind.about,
@@ -201,7 +226,7 @@ final class QuickActionLabel {
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
         QuickActionKind.inviteTeammate => context.l10n.teamInvite,
-        QuickActionKind.flowOverview => context.l10n.homeFlowOverview,
+        QuickActionKind.analytics => context.l10n.navAnalytics,
         QuickActionKind.about => context.l10n.moreAbout,
       };
 }

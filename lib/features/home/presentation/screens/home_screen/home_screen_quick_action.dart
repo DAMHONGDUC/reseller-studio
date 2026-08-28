@@ -12,13 +12,14 @@ part of 'home_screen.dart';
 /// them, so every row pushes the screen that owns the action rather than
 /// opening a form Home would then have to know how to save.
 ///
-/// **About rides last, and Flow overview just above it** — owner's rule. They
-/// are the two rows here that do not create something; About sits two levels
-/// deep under Settings, so this is what keeps it findable, and the actions
-/// above them keep the section's shape.
+/// **About rides last, and Analytics just above it** — owner's rule. They are
+/// the two rows here that do not create something; About sits two levels deep
+/// under Settings, so this is what keeps it findable, and the actions above
+/// them keep the section's shape.
 ///
-/// **Flow overview is the one row that is not a push** — it opens a sheet, so
-/// a seller reading how the app fits together does not lose where they were.
+/// **How a row opens is a property of the row** (`QuickActionOpen`), not
+/// something worked out here: Analytics is a branch root, so it opens with
+/// `go` rather than being pushed over Home.
 ///
 /// **Rows, and near the bottom** — owner's rule. Home answers "what needs
 /// attention today" first; a launcher above the figures made the screen open
@@ -36,9 +37,12 @@ class _QuickAction extends StatelessWidget {
           AppListRow(
             title: QuickActionLabel.of(context, action.kind),
             icon: action.icon,
-            onTap: () => action.route == null
-                ? FlowOverviewSheet.show(context)
-                : context.push(action.route!),
+            onTap: () => switch (action.open) {
+              QuickActionOpen.push => context.push(action.route),
+              // A branch root: `go` so the seller lands on the tab rather than
+              // on it pushed over Home.
+              QuickActionOpen.goTab => context.go(action.route),
+            },
           ),
       ],
     ),

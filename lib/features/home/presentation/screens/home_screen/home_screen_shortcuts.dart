@@ -79,16 +79,16 @@ class _HomeShortcutCard extends StatelessWidget {
   }
 
   /// `push` for search because it sits outside the shell and comes back here;
-  /// `go` for Analytics because it is a tab, and pushing a branch root over
-  /// Home would leave the seller on the wrong tab with a back button.
+  /// a sheet for the flow overview, so a seller reading how the app fits
+  /// together keeps the screen they were on.
   void _open(BuildContext context) {
     switch (shortcut.kind) {
       case HomeShortcutKind.quickAction:
         onQuickAction();
       case HomeShortcutKind.search:
         context.push(AppRoutes.search);
-      case HomeShortcutKind.analytics:
-        context.go(AppRoutes.analytics);
+      case HomeShortcutKind.flowOverview:
+        FlowOverviewSheet.show(context);
     }
   }
 }
