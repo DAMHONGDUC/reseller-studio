@@ -97,6 +97,70 @@ void main() {
       );
     });
 
+    test('selling one of several leaves the rest where they were', () {
+      final Item listed = item(
+        status: ItemStatus.listed,
+        askingPrice: const Money(4500, 'USD'),
+        quantity: 3,
+        listedAt: now,
+      );
+
+      final Item afterSale = ItemTransition.sell(listed, now: now);
+
+      // Two still on the shelf, so the row is not sold and its staleness
+      // clock is untouched.
+      expect(afterSale.quantity, 2);
+      expect(afterSale.status, ItemStatus.listed);
+      expect(afterSale.soldAt, isNull);
+      expect(afterSale.listedAt, now);
+    });
+
+    test('the sale that empties the shelf is the one that sells the row', () {
+      final Item listed = item(
+        status: ItemStatus.listed,
+        askingPrice: const Money(4500, 'USD'),
+        listedAt: now,
+      );
+
+      final Item afterSale = ItemTransition.sell(listed, now: now);
+
+      expect(afterSale.quantity, 0);
+      expect(afterSale.status, ItemStatus.sold);
+      expect(afterSale.soldAt, now);
+      expect(afterSale.quantityOnHand, 0);
+    });
+
+    test('an empty shelf cannot be sold from', () {
+      final Item soldOut = item(
+        status: ItemStatus.sold,
+        askingPrice: const Money(4500, 'USD'),
+        quantity: 0,
+      );
+
+      expect(() => ItemTransition.sell(soldOut, now: now), throwsStateError);
+    });
+
+    test('putting stock behind a sold row puts it back on the shelf', () {
+      final Item restocked = ItemTransition.restocked(
+        item(status: ItemStatus.sold, soldAt: now, quantity: 4),
+        now: now,
+      );
+
+      expect(restocked.status, ItemStatus.inStock);
+      expect(restocked.soldAt, isNull);
+      expect(restocked.quantityOnHand, 4);
+    });
+
+    test('a count does not undo an archive', () {
+      // Archiving is a deliberate withdrawal; only a verb brings it back.
+      final Item archived = ItemTransition.restocked(
+        item(status: ItemStatus.archived, quantity: 4),
+        now: now,
+      );
+
+      expect(archived.status, ItemStatus.archived);
+    });
+
     test('coming back onto the shelf clears the sold date', () {
       final Item sold = item(status: ItemStatus.sold, soldAt: now);
 

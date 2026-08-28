@@ -6,7 +6,6 @@ import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
-import '../../../inventory/domain/enums/item_status.dart';
 import '../../../inventory/domain/repositories/item_repository.dart';
 import '../../../inventory/domain/services/item_transition.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
@@ -80,10 +79,11 @@ class RecordSaleController extends Notifier<bool> {
         ),
       );
 
+      // One unit, not the whole row: `sell` moves the status only when the
+      // sale empties the shelf, so selling one of ten leaves nine listed.
       await items.save(
-        ItemTransition.apply(
+        ItemTransition.sell(
           item.copyWith(askingPrice: item.askingPrice ?? salePrice),
-          ItemStatus.sold,
           now: soldAt,
         ),
       );

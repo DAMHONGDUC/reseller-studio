@@ -13,6 +13,7 @@ import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
+import '../../domain/services/item_transition.dart';
 
 /// The choices on the Add/Edit Item form that are not typed.
 ///
@@ -32,6 +33,8 @@ class ItemFormState {
     this.purchaseDate,
     this.photoUrls = const <String>[],
     this.createdAt,
+    this.listedAt,
+    this.soldAt,
     this.isSaving = false,
     this.isUploadingPhoto = false,
     this.listingPrices = const <String, Money>{},
@@ -54,6 +57,13 @@ class ItemFormState {
   /// `createdAt` is what Inventory sorts by, and refreshing it on every save
   /// would shuffle the list every time somebody fixed a typo.
   final DateTime? createdAt;
+
+  /// Carried for the same reason, and it is not cosmetic: [submit] builds a
+  /// whole `Item`, so a timestamp the form does not hold is one that saving a
+  /// typo fix erases. Losing `listedAt` resets the staleness clock and drops
+  /// the row out of days-to-sell; losing `soldAt` unfiles a sale.
+  final DateTime? listedAt;
+  final DateTime? soldAt;
 
   final bool isSaving;
   final bool isUploadingPhoto;
@@ -83,6 +93,8 @@ class ItemFormState {
     DateTime? purchaseDate,
     List<String>? photoUrls,
     DateTime? createdAt,
+    DateTime? listedAt,
+    DateTime? soldAt,
     bool? isSaving,
     bool? isUploadingPhoto,
     Map<String, Money>? listingPrices,
@@ -97,6 +109,8 @@ class ItemFormState {
     purchaseDate: purchaseDate ?? this.purchaseDate,
     photoUrls: photoUrls ?? this.photoUrls,
     createdAt: createdAt ?? this.createdAt,
+    listedAt: listedAt ?? this.listedAt,
+    soldAt: soldAt ?? this.soldAt,
     isSaving: isSaving ?? this.isSaving,
     isUploadingPhoto: isUploadingPhoto ?? this.isUploadingPhoto,
     listingPrices: listingPrices ?? this.listingPrices,
@@ -133,6 +147,8 @@ class ItemFormController extends Notifier<ItemFormState> {
     purchaseDate: item.purchaseDate,
     photoUrls: item.photoUrls,
     createdAt: item.createdAt,
+    listedAt: item.listedAt,
+    soldAt: item.soldAt,
   );
 
   void selectCondition(ItemCondition value) =>
@@ -307,14 +323,20 @@ class ItemFormController extends Notifier<ItemFormState> {
         notes: _orNull(notes),
         photoUrls: state.photoUrls,
         purchaseDate: state.purchaseDate,
+        listedAt: state.listedAt,
+        soldAt: state.soldAt,
       );
 
-      await ref.read(itemRepositoryProvider).save(item);
+      // Putting stock behind a sold row is the seller saying they have the
+      // thing again — the domain decides what that means, not the form.
+      final Item saved = ItemTransition.restocked(item, now: now);
+
+      await ref.read(itemRepositoryProvider).save(saved);
       await _saveListingPrices(id);
 
       SdLogger.info(LogTagConstant.item, 'Item form saved', <String, Object>{
         'itemId': id,
-        'status': item.status.name,
+        'status': saved.status.name,
         'repriced': state.listingPrices.length,
       });
 

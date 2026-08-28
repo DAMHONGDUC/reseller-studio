@@ -118,6 +118,47 @@ final class ItemTransition {
         : ItemTransitionCheck.blocked(blocks);
   }
 
+  /// One unit out the door.
+  ///
+  /// **Quantity is what decides whether the record is sold** — owner's rule.
+  /// Selling one of ten used to mark the whole row sold and leave the count
+  /// at ten, so the shelf claimed nine items that Inventory said were gone.
+  /// A sale now takes one off the count, and only the sale that empties it
+  /// moves the status.
+  ///
+  /// Throws for the same reason [apply] does: nothing on the shelf to sell,
+  /// no sale price, or an item that has already left inventory.
+  static Item sell(Item item, {required DateTime now}) {
+    final ItemTransitionCheck result = check(item, ItemStatus.sold);
+    final int left = item.quantity - 1;
+
+    if (!result.isAllowed) {
+      throw StateError(
+        'Cannot sell item ${item.id}: '
+        '${result.blocks.map((ItemTransitionBlock b) => b.name).join(', ')}',
+      );
+    }
+
+    // Still stock behind it: the record stays exactly where it was — listed
+    // stays listed, and its staleness clock is not touched.
+    if (left > 0) return item.copyWith(quantity: left);
+
+    return apply(item, ItemStatus.sold, now: now).copyWith(quantity: 0);
+  }
+
+  /// [item] after its count was edited — back on the shelf if the seller put
+  /// stock behind a sold record.
+  ///
+  /// **The other half of the rule above** — owner's rule. A sold row given a
+  /// quantity again is a seller saying they have the thing, and leaving it
+  /// sold made the card claim nothing was left of ten. Nothing else moves:
+  /// archiving is a deliberate withdrawal, and a count does not undo it.
+  static Item restocked(Item item, {required DateTime now}) {
+    if (item.status != ItemStatus.sold || item.quantity <= 0) return item;
+
+    return apply(item, ItemStatus.inStock, now: now);
+  }
+
   /// [item] moved to [target], with the timestamps that move implies.
   ///
   /// **Throws if the move is blocked.** Callers check first; this is the
