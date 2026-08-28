@@ -71,7 +71,8 @@ void main() {
       expect(
         lowest,
         lessThanOrEqualTo(tester.getRect(fab).top),
-        reason: '$name draws content to $lowest; the button starts at '
+        reason:
+            '$name draws content to $lowest; the button starts at '
             '${tester.getRect(fab).top}',
       );
     });

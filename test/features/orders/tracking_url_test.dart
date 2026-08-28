@@ -23,10 +23,7 @@ void main() {
   });
 
   test('an unknown carrier, Other, or no number opens nothing', () {
-    expect(
-      OrdersTrackingConstant.url(carrier: 'Other', number: '123'),
-      isNull,
-    );
+    expect(OrdersTrackingConstant.url(carrier: 'Other', number: '123'), isNull);
     expect(
       OrdersTrackingConstant.url(carrier: 'Some Local Courier', number: '123'),
       isNull,
@@ -44,8 +41,7 @@ void main() {
   });
 
   test('every template has a slot for the number', () {
-    for (final String template
-        in OrdersTrackingConstant.urlTemplates.values) {
+    for (final String template in OrdersTrackingConstant.urlTemplates.values) {
       expect(template, contains('{n}'));
     }
   });

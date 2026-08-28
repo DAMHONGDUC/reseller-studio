@@ -31,9 +31,10 @@ void main() {
   Future<Order> anyDelivered(ProviderContainer container) async {
     await warmUp(container);
 
-    return container.read(ordersProvider).value!.firstWhere(
-      (Order order) => order.status == OrderStatus.delivered,
-    );
+    return container
+        .read(ordersProvider)
+        .value!
+        .firstWhere((Order order) => order.status == OrderStatus.delivered);
   }
 
   test('a partial refund leaves the order counting as revenue', () async {
@@ -63,9 +64,6 @@ void main() {
     // The sale price is what the buyer paid and stays history; the refund is
     // what came back out of it.
     expect(after.salePrice, order.salePrice);
-    expect(
-      after.profit().revenue.minor,
-      order.salePrice.minor - 1000,
-    );
+    expect(after.profit().revenue.minor, order.salePrice.minor - 1000);
   });
 }

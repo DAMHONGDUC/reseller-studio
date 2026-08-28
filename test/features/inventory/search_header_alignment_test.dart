@@ -31,7 +31,8 @@ void main() {
     expect(
       field.center.dy,
       moreOrLessEquals(action.center.dy, epsilon: 0.5),
-      reason: 'field ${field.top}–${field.bottom}, '
+      reason:
+          'field ${field.top}–${field.bottom}, '
           'action ${action.top}–${action.bottom}',
     );
   });

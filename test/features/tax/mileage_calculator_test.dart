@@ -111,7 +111,10 @@ void main() {
       expect(
         MileageCalculator.forJourneys(
           journeys: <MileageJourney>[
-            MileageJourney(date: DateTime(2026, DateTime.june), distance: 12000),
+            MileageJourney(
+              date: DateTime(2026, DateTime.june),
+              distance: 12000,
+            ),
           ],
           jurisdiction: TaxJurisdiction.uk,
           currency: 'GBP',
@@ -220,11 +223,7 @@ void main() {
         isNull,
       );
       expect(
-        MileageCalculator.deduction(
-          distance: 500,
-          rate: null,
-          currency: 'USD',
-        ),
+        MileageCalculator.deduction(distance: 500, rate: null, currency: 'USD'),
         isNull,
       );
     });

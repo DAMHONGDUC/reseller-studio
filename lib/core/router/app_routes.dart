@@ -41,6 +41,12 @@ final class AppRoutes {
   /// of it. This one is an ordinary pushed route that pops when it is done.
   static const String workspaceCreate = '/workspace/new';
 
+  /// Editing one business. **It names a record**, so a signed-out visitor is
+  /// bounced to Home like every other detail route (hard rule 1), and it is
+  /// deliberately not under Settings: the switcher opens it too, on a business
+  /// the seller is not currently standing in.
+  static const String workspaceDetailPath = '/workspace/:workspaceId';
+
   // --- Shell branch 1: Home ---
 
   static const String home = '/home';
@@ -135,6 +141,8 @@ final class AppRoutes {
   static String crossList(String itemId) =>
       '/inventory/item/$itemId/cross-list';
   static String order(String orderId) => '/orders/$orderId';
+  static String workspaceDetail(String workspaceId) =>
+      '/workspace/$workspaceId';
   static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';

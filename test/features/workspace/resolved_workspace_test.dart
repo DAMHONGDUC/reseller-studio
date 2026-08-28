@@ -25,10 +25,7 @@ void main() {
     // Removed from 'b' by an owner while signed in elsewhere. Falling through
     // to the first they still belong to keeps the app readable; honouring the
     // stale pointer would open a workspace every rule denies them.
-    expect(
-      profileWith(last: 'b', ids: <String>['a']).resolvedWorkspaceId,
-      'a',
-    );
+    expect(profileWith(last: 'b', ids: <String>['a']).resolvedWorkspaceId, 'a');
   });
 
   test('no pointer yet opens the first business', () {

@@ -37,9 +37,7 @@ void main() {
 
       await warmUp(container);
 
-      final AnalyticsSummary summary = container.read(
-        analyticsSummaryProvider,
-      );
+      final AnalyticsSummary summary = container.read(analyticsSummaryProvider);
 
       expect(summary.revenue, const Money(43900, 'USD'));
       expect(summary.netProfit, const Money(1152, 'USD'));
@@ -58,20 +56,23 @@ void main() {
       expect(container.read(analyticsSummaryProvider).isProfitComplete, isTrue);
     });
 
-    test('inventory value counts on-hand items at cost, ignoring unknowns', () async {
-      final ProviderContainer container = mockContainer();
+    test(
+      'inventory value counts on-hand items at cost, ignoring unknowns',
+      () async {
+        final ProviderContainer container = mockContainer();
 
-      await warmUp(container);
+        await warmUp(container);
 
-      // On hand with a known cost: 1500+2800+2200+4100+1500+(900×2) = 13900.
-      // itm-9 and itm-10 are Quick Add leftovers with no cost and are
-      // excluded rather than counted as free — hard rule 5.
-      expect(
-        container.read(analyticsSummaryProvider).inventoryValue,
-        const Money(13900, 'USD'),
-      );
-      expect(container.read(analyticsSummaryProvider).itemsOnHand, 8);
-    });
+        // On hand with a known cost: 1500+2800+2200+4100+1500+(900×2) = 13900.
+        // itm-9 and itm-10 are Quick Add leftovers with no cost and are
+        // excluded rather than counted as free — hard rule 5.
+        expect(
+          container.read(analyticsSummaryProvider).inventoryValue,
+          const Money(13900, 'USD'),
+        );
+        expect(container.read(analyticsSummaryProvider).itemsOnHand, 8);
+      },
+    );
 
     test('marketplace rows are ordered by revenue', () async {
       final ProviderContainer container = mockContainer();

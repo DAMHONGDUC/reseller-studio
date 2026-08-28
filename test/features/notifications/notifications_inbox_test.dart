@@ -56,12 +56,12 @@ void main() {
       tester,
       const NotificationsScreen(),
       overrides: inbox(<AppNotification>[
+        notification(id: 'n-1', type: NotificationType.shipmentsDue, count: 3),
         notification(
-          id: 'n-1',
-          type: NotificationType.shipmentsDue,
-          count: 3,
+          id: 'n-2',
+          type: NotificationType.staleInventory,
+          count: 1,
         ),
-        notification(id: 'n-2', type: NotificationType.staleInventory, count: 1),
       ]),
     );
 

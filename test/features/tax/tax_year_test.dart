@@ -102,9 +102,7 @@ void main() {
       // The last instant before the boundary is still in — a sale timestamped
       // there is exactly what an inclusive end date drops.
       expect(
-        uk.contains(
-          uk.endExclusive.subtract(const Duration(milliseconds: 1)),
-        ),
+        uk.contains(uk.endExclusive.subtract(const Duration(milliseconds: 1))),
         isTrue,
       );
     });

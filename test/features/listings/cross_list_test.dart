@@ -55,9 +55,7 @@ void main() {
         ItemStatus.archived,
       ]) {
         expect(
-          ItemTransition.crossListCheck(
-            item(id: 'i-3', status: status),
-          ).blocks,
+          ItemTransition.crossListCheck(item(id: 'i-3', status: status)).blocks,
           contains(ItemTransitionBlock.wrongStatus),
         );
       }
@@ -71,7 +69,10 @@ void main() {
     ) async {
       container.listen<AsyncValue<List<Listing>>>(
         listingsForItemProvider(itemId),
-        (AsyncValue<List<Listing>>? previous, AsyncValue<List<Listing>> next) {},
+        (
+          AsyncValue<List<Listing>>? previous,
+          AsyncValue<List<Listing>> next,
+        ) {},
         fireImmediately: true,
       );
 
@@ -97,10 +98,10 @@ void main() {
       final List<Listing> listings = await listingsFor(container, 'x-1');
 
       expect(listings, hasLength(2));
-      expect(
-        listings.map((Listing l) => l.marketplace).toSet(),
-        <Marketplace>{Marketplace.ebay, Marketplace.depop},
-      );
+      expect(listings.map((Listing l) => l.marketplace).toSet(), <Marketplace>{
+        Marketplace.ebay,
+        Marketplace.depop,
+      });
       // Draft, not active: nothing is integrated, so nothing may claim to be
       // live on eBay.
       expect(
@@ -136,36 +137,39 @@ void main() {
       expect(saved.listedAt, isNotNull);
     });
 
-    test('leaves an already-listed item where it is, including listedAt', () async {
-      final ProviderContainer container = mockContainer();
-      final DateTime firstListed = testNow.subtract(const Duration(days: 40));
-      final Item coat = item(
-        id: 'x-3',
-        status: ItemStatus.listed,
-        asking: const Money(5000, 'USD'),
-        listedAt: firstListed,
-      );
+    test(
+      'leaves an already-listed item where it is, including listedAt',
+      () async {
+        final ProviderContainer container = mockContainer();
+        final DateTime firstListed = testNow.subtract(const Duration(days: 40));
+        final Item coat = item(
+          id: 'x-3',
+          status: ItemStatus.listed,
+          asking: const Money(5000, 'USD'),
+          listedAt: firstListed,
+        );
 
-      await container.read(itemRepositoryProvider).save(coat);
-      await container
-          .read(itemActionsControllerProvider.notifier)
-          .crossList(
-            coat,
-            marketplaces: <Marketplace>{Marketplace.poshmark},
-            price: const Money(4000, 'USD'),
-          );
+        await container.read(itemRepositoryProvider).save(coat);
+        await container
+            .read(itemActionsControllerProvider.notifier)
+            .crossList(
+              coat,
+              marketplaces: <Marketplace>{Marketplace.poshmark},
+              price: const Money(4000, 'USD'),
+            );
 
-      final Item? saved = await container
-          .read(itemRepositoryProvider)
-          .watchItem('x-3')
-          .first;
+        final Item? saved = await container
+            .read(itemRepositoryProvider)
+            .watchItem('x-3')
+            .first;
 
-      // Staleness is measured from the first time it went live anywhere, so
-      // adding a marketplace must not reset the clock.
-      expect(saved!.listedAt, firstListed);
-      expect(saved.status, ItemStatus.listed);
-      expect(saved.askingPrice, const Money(4000, 'USD'));
-    });
+        // Staleness is measured from the first time it went live anywhere, so
+        // adding a marketplace must not reset the clock.
+        expect(saved!.listedAt, firstListed);
+        expect(saved.status, ItemStatus.listed);
+        expect(saved.askingPrice, const Money(4000, 'USD'));
+      },
+    );
 
     test('an empty selection writes nothing', () async {
       final ProviderContainer container = mockContainer();

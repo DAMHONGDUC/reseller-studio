@@ -47,6 +47,7 @@ import '../../features/sourcing/presentation/screens/sourcing_screen/sourcing_sc
 import '../../features/subscription/presentation/screens/subscription_screen/subscription_screen.dart';
 import '../../features/tax/presentation/screens/tax_screen/tax_screen.dart';
 import '../../features/workspace/presentation/screens/team_screen/team_screen.dart';
+import '../../features/workspace/presentation/screens/workspace_detail_screen/workspace_detail_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
 import '../../features/workspace/providers.dart';
 import '../constants/log_tag_constant.dart';
@@ -164,6 +165,15 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.workspaceSetup,
         builder: (BuildContext context, GoRouterState state) =>
             const WorkspaceSetupScreen(),
+      ),
+      // After `workspaceCreate` on purpose: go_router matches in declaration
+      // order, and `/workspace/new` would otherwise be read as an id.
+      GoRoute(
+        path: AppRoutes.workspaceDetailPath,
+        builder: (BuildContext context, GoRouterState state) =>
+            WorkspaceDetailScreen(
+              workspaceId: state.pathParameters['workspaceId']!,
+            ),
       ),
       // Outside the shell: search covers the whole app rather than one tab,
       // and it is reached from every one of them.

@@ -46,18 +46,21 @@ void main() {
     expect(expense.amount.minor, 0);
   });
 
-  test('every other category still refuses to save without an amount', () async {
-    final ProviderContainer container = mockContainer();
+  test(
+    'every other category still refuses to save without an amount',
+    () async {
+      final ProviderContainer container = mockContainer();
 
-    await container
-        .read(expenseControllerProvider.notifier)
-        .save(
-          id: 'exp-packaging',
-          category: ExpenseCategory.packaging,
-          amount: '',
-          date: testNow,
-        );
+      await container
+          .read(expenseControllerProvider.notifier)
+          .save(
+            id: 'exp-packaging',
+            category: ExpenseCategory.packaging,
+            amount: '',
+            date: testNow,
+          );
 
-    expect(await saved(container, 'exp-packaging'), isNull);
-  });
+      expect(await saved(container, 'exp-packaging'), isNull);
+    },
+  );
 }

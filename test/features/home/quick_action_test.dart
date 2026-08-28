@@ -57,7 +57,10 @@ void main() {
     final double sectionTop = tester
         .getRect(
           find.text(
-            QuickActionLabel.of(context, QuickActionConstant.actions.first.kind),
+            QuickActionLabel.of(
+              context,
+              QuickActionConstant.actions.first.kind,
+            ),
           ),
         )
         .top;
@@ -85,7 +88,10 @@ void main() {
       find.descendant(
         of: find.ancestor(
           of: find.text(
-            QuickActionLabel.of(context, QuickActionConstant.actions.first.kind),
+            QuickActionLabel.of(
+              context,
+              QuickActionConstant.actions.first.kind,
+            ),
           ),
           matching: find.byType(AppListCard),
         ),
@@ -174,8 +180,9 @@ void main() {
   test('every screen with an add button is reachable from Quick Access', () {
     final List<String> screens = <String>[];
 
-    for (final FileSystemEntity entity
-        in Directory('lib/features').listSync(recursive: true)) {
+    for (final FileSystemEntity entity in Directory(
+      'lib/features',
+    ).listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
 
       final String source = entity.readAsStringSync();
@@ -214,7 +221,8 @@ void main() {
       expect(
         expected,
         isNotNull,
-        reason: '$path has an add button that this audit does not know about '
+        reason:
+            '$path has an add button that this audit does not know about '
             '— add it to Quick Access and to this map',
       );
       expect(

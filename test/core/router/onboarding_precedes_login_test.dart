@@ -76,13 +76,12 @@ void main() {
           builder: (BuildContext context, Widget? _) => MaterialApp.router(
             theme: AppTheme.light,
             routerConfig: router,
-            localizationsDelegates:
-                const <LocalizationsDelegate<Object>>[
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
+            localizationsDelegates: const <LocalizationsDelegate<Object>>[
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
           ),
         ),
       ),

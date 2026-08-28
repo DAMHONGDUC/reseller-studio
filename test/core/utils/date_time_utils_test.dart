@@ -19,10 +19,7 @@ void main() {
 
     test('a deadline already past comes back negative', () {
       expect(
-        DateTimeUtils.daysBetween(
-          DateTime(2026, 8, 12),
-          DateTime(2026, 8, 9),
-        ),
+        DateTimeUtils.daysBetween(DateTime(2026, 8, 12), DateTime(2026, 8, 9)),
         -3,
       );
     });

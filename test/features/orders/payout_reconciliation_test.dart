@@ -109,24 +109,22 @@ void main() {
     });
 
     test('the oldest unsettled order comes first', () {
-      final List<MarketplacePayout> rows = PayoutReconciliation.byMarketplace(
-        <Order>[
-          order('ord-new', orderedAt: DateTime(2026, 8, 10)),
-          order('ord-old', orderedAt: DateTime(2026, 6, 1)),
-        ],
-      );
+      final List<MarketplacePayout> rows =
+          PayoutReconciliation.byMarketplace(<Order>[
+            order('ord-new', orderedAt: DateTime(2026, 8, 10)),
+            order('ord-old', orderedAt: DateTime(2026, 6, 1)),
+          ]);
 
       expect(rows.single.awaiting.first.id, 'ord-old');
     });
 
     test('each marketplace is its own row, busiest first', () {
-      final List<MarketplacePayout> rows = PayoutReconciliation.byMarketplace(
-        <Order>[
-          order('ord-1', marketplace: Marketplace.etsy),
-          order('ord-2', marketplace: Marketplace.ebay),
-          order('ord-3', marketplace: Marketplace.ebay),
-        ],
-      );
+      final List<MarketplacePayout> rows =
+          PayoutReconciliation.byMarketplace(<Order>[
+            order('ord-1', marketplace: Marketplace.etsy),
+            order('ord-2', marketplace: Marketplace.ebay),
+            order('ord-3', marketplace: Marketplace.ebay),
+          ]);
 
       expect(rows.first.marketplace, Marketplace.ebay);
       expect(rows.first.awaiting, hasLength(2));

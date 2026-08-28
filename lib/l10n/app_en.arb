@@ -4328,5 +4328,13 @@
   "flowOverviewIntro": "Work down the list. The steps marked optional can be skipped — the app never asks for them.",
   "@flowOverviewIntro": {
     "description": "One line above the steps in the flow overview sheet."
+  },
+  "workspaceDetailTitle": "Business details",
+  "@workspaceDetailTitle": {
+    "description": "Title of the screen that edits one business."
+  },
+  "workspaceEdit": "Edit business",
+  "@workspaceEdit": {
+    "description": "Opens the business details screen. Also the tooltip on the switcher row."
   }
 }

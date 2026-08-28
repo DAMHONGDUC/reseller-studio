@@ -59,8 +59,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final double screenHeight = tester.view.physicalSize.height /
-        tester.view.devicePixelRatio;
+    final double screenHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
     final double barTop =
         screenHeight - SdContentPaddingV3.floatingBarInset(screenContext);
 
@@ -92,8 +92,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final double screenHeight = tester.view.physicalSize.height /
-        tester.view.devicePixelRatio;
+    final double screenHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
 
     // No scope, so nothing is floating over this route and the message keeps
     // the position it had before the scope existed.

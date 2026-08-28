@@ -75,7 +75,8 @@ void main() {
     await pumpScreen(tester, const OrdersScreen());
 
     final double orders =
-        chipRect(tester).top - tester.getRect(find.byType(SdAppBarV3).first).bottom;
+        chipRect(tester).top -
+        tester.getRect(find.byType(SdAppBarV3).first).bottom;
 
     await pumpScreen(tester, const InventoryScreen());
 
@@ -83,7 +84,8 @@ void main() {
     // `appBar`, because `SdSearchHeaderV3` is a sliver that has to live in the
     // scroll view to dock as the list moves.
     expect(
-      chipRect(tester).top - tester.getRect(find.byType(SdSearchFieldV3)).bottom,
+      chipRect(tester).top -
+          tester.getRect(find.byType(SdSearchFieldV3)).bottom,
       moreOrLessEquals(orders, epsilon: 0.5),
     );
   });

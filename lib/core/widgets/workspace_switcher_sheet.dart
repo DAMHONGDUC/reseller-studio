@@ -120,6 +120,10 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
                 workspace: workspace,
                 isCurrent: workspace.id == currentId,
                 onTap: () => _switch(context, ref, workspace.id),
+                onEdit: () {
+                  Navigator.of(context).pop();
+                  context.push(AppRoutes.workspaceDetail(workspace.id));
+                },
               );
             },
           ),
@@ -141,11 +145,17 @@ class _WorkspaceRow extends StatelessWidget {
     required this.workspace,
     required this.isCurrent,
     required this.onTap,
+    required this.onEdit,
   });
 
   final Workspace workspace;
   final bool isCurrent;
   final VoidCallback onTap;
+
+  /// Opens the business details screen — owner's rule, on every row and not
+  /// only the current one. `firestore.rules` still decides who may write, so
+  /// this is an affordance rather than a permission.
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +199,23 @@ class _WorkspaceRow extends StatelessWidget {
             ),
           ),
           if (isCurrent) SdIconV3(Symbols.check_rounded, color: accent),
+          // Its own tap target beside the row's, so choosing a business and
+          // correcting one are never the same gesture. Square and sized to
+          // the design system's action slot, so it clears 44pt.
+          IconButton(
+            onPressed: onEdit,
+            tooltip: context.l10n.workspaceEdit,
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints.tightFor(
+              width: SdAppBarActionV3.slot,
+              height: SdAppBarActionV3.slot,
+            ),
+            icon: SdIconV3(
+              Symbols.edit_rounded,
+              size: SdIconV3.smallSize,
+              color: context.sdTheme3.textSecondary,
+            ),
+          ),
         ],
       ),
     );

@@ -89,9 +89,7 @@ void main() {
     expect(fills(tester)[2], 1);
   });
 
-  testWidgets('the fill moves with the selection', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('the fill moves with the selection', (WidgetTester tester) async {
     await pumpBar(tester, 0);
 
     expect(fills(tester).first, 1);

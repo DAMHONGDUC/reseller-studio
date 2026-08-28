@@ -61,23 +61,26 @@ void main() {
     expect(due.single.latest.amount.minor, 6000);
   });
 
-  test('deleting the occurrence you posted by mistake owes the month again', () {
-    final List<RecurringExpense> due = RecurringExpenseSchedule.due(
-      expenses: <Expense>[
-        expense('exp-1', DateTime(2026, 6, 3)),
-        expense(
-          'exp-2',
-          DateTime(2026, 7, 3),
-          seriesId: 'exp-1',
-          deletedAt: DateTime(2026, 7, 4),
-        ),
-      ],
-      now: DateTime(2026, 7, 10),
-    );
+  test(
+    'deleting the occurrence you posted by mistake owes the month again',
+    () {
+      final List<RecurringExpense> due = RecurringExpenseSchedule.due(
+        expenses: <Expense>[
+          expense('exp-1', DateTime(2026, 6, 3)),
+          expense(
+            'exp-2',
+            DateTime(2026, 7, 3),
+            seriesId: 'exp-1',
+            deletedAt: DateTime(2026, 7, 4),
+          ),
+        ],
+        now: DateTime(2026, 7, 10),
+      );
 
-    expect(due.single.latest.id, 'exp-1');
-    expect(due.single.due, DateTime(2026, 7, 3));
-  });
+      expect(due.single.latest.id, 'exp-1');
+      expect(due.single.due, DateTime(2026, 7, 3));
+    },
+  );
 
   test('a one-off cost is never a series', () {
     expect(

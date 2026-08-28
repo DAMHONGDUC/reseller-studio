@@ -99,10 +99,7 @@ void main() {
   test('an invitation never grants ownership', () {
     // `inviteMember` refuses `owner` server-side; offering it in the picker
     // would be a control whose only outcome is an error.
-    expect(
-      InviteMemberSheet.invitableRoles,
-      isNot(contains(MemberRole.owner)),
-    );
+    expect(InviteMemberSheet.invitableRoles, isNot(contains(MemberRole.owner)));
   });
 
   testWidgets('a role describes itself from what it may actually do', (

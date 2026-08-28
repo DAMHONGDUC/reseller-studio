@@ -162,10 +162,7 @@ void main() {
 
     test('a listing older than the threshold is stale', () {
       expect(
-        StaleInventoryPolicy.isStale(
-          DateTime(2026, 5, 1),
-          now: now,
-        ),
+        StaleInventoryPolicy.isStale(DateTime(2026, 5, 1), now: now),
         isTrue,
       );
     });

@@ -36,9 +36,10 @@ void main() {
     final ProviderContainer container = await withListings();
     final List<Listing> all = listingsIn(container);
 
-    container
-        .read(listingSelectionProvider.notifier)
-        .selectAll(<String>[all.first.id, all[1].id]);
+    container.read(listingSelectionProvider.notifier).selectAll(<String>[
+      all.first.id,
+      all[1].id,
+    ]);
 
     expect(container.read(selectedListingsProvider), hasLength(2));
 
@@ -47,45 +48,50 @@ void main() {
     expect(container.read(selectedListingsProvider), isEmpty);
   });
 
-  test('a bulk reprice writes the same price to every selected listing', () async {
-    final ProviderContainer container = await withListings();
-    final List<Listing> picked = listingsIn(container).take(3).toList();
-    const Money price = Money(950, 'USD');
+  test(
+    'a bulk reprice writes the same price to every selected listing',
+    () async {
+      final ProviderContainer container = await withListings();
+      final List<Listing> picked = listingsIn(container).take(3).toList();
+      const Money price = Money(950, 'USD');
 
-    await container
-        .read(listingActionsControllerProvider.notifier)
-        .reprice(picked, price);
-    await Future<void>.delayed(Duration.zero);
+      await container
+          .read(listingActionsControllerProvider.notifier)
+          .reprice(picked, price);
+      await Future<void>.delayed(Duration.zero);
 
-    final Set<String> ids = picked.map((Listing l) => l.id).toSet();
+      final Set<String> ids = picked.map((Listing l) => l.id).toSet();
 
-    for (final Listing listing in listingsIn(container)) {
-      if (!ids.contains(listing.id)) continue;
+      for (final Listing listing in listingsIn(container)) {
+        if (!ids.contains(listing.id)) continue;
 
-      expect(listing.price, price);
-    }
-  });
+        expect(listing.price, price);
+      }
+    },
+  );
 
   test('ending stamps the date, pausing leaves it alone', () async {
     final ProviderContainer container = await withListings();
     final Listing first = listingsIn(container).first;
 
-    await container
-        .read(listingActionsControllerProvider.notifier)
-        .setStatus(<Listing>[first], ListingStatus.paused);
+    await container.read(listingActionsControllerProvider.notifier).setStatus(
+      <Listing>[first],
+      ListingStatus.paused,
+    );
     await Future<void>.delayed(Duration.zero);
 
-    Listing reread() => listingsIn(container).firstWhere(
-      (Listing listing) => listing.id == first.id,
-    );
+    Listing reread() => listingsIn(
+      container,
+    ).firstWhere((Listing listing) => listing.id == first.id);
 
     expect(reread().status, ListingStatus.paused);
     // A paused listing has not ended.
     expect(reread().endedAt, first.endedAt);
 
-    await container
-        .read(listingActionsControllerProvider.notifier)
-        .setStatus(<Listing>[first], ListingStatus.ended);
+    await container.read(listingActionsControllerProvider.notifier).setStatus(
+      <Listing>[first],
+      ListingStatus.ended,
+    );
     await Future<void>.delayed(Duration.zero);
 
     expect(reread().status, ListingStatus.ended);
@@ -99,9 +105,10 @@ void main() {
     // A listing sells because an order exists. Letting a bulk control say
     // otherwise would create a sale with no order, and every profit figure in
     // the app is derived from orders.
-    await container
-        .read(listingActionsControllerProvider.notifier)
-        .setStatus(<Listing>[first], ListingStatus.sold);
+    await container.read(listingActionsControllerProvider.notifier).setStatus(
+      <Listing>[first],
+      ListingStatus.sold,
+    );
     await Future<void>.delayed(Duration.zero);
 
     expect(

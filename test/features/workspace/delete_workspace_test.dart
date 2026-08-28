@@ -29,7 +29,10 @@ void main() {
 
   test('only an owner is offered the delete', () {
     expect(withRole(MemberRole.owner).read(canDeleteWorkspaceProvider), isTrue);
-    expect(withRole(MemberRole.admin).read(canDeleteWorkspaceProvider), isFalse);
+    expect(
+      withRole(MemberRole.admin).read(canDeleteWorkspaceProvider),
+      isFalse,
+    );
     expect(
       withRole(MemberRole.member).read(canDeleteWorkspaceProvider),
       isFalse,

@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
 import 'package:reseller_studio/features/workspace/domain/entities/workspace.dart';
-import 'package:reseller_studio/features/workspace/presentation/controllers/workspace_edit_controller.dart';
+import 'package:reseller_studio/features/workspace/presentation/controllers/workspace_detail_controller.dart';
 import 'package:reseller_studio/features/workspace/providers.dart';
 
 import '../../support/pump_app.dart';
@@ -11,6 +11,10 @@ import '../../support/pump_app.dart';
 /// The country is the field this exists for: it decides the tax jurisdiction,
 /// the tax year boundary and the mileage rate, and it used to be permanent
 /// because nothing called `updateWorkspace`.
+///
+/// **The form drafts and writes once** (owner's rule), so every case here
+/// seeds the controller, edits the draft, then submits — a change that is
+/// never submitted must not reach the record.
 void main() {
   /// A container subscribed the way a mounted screen is.
   ///
@@ -33,11 +37,21 @@ void main() {
     return container;
   }
 
+  /// Seeds the form from the live record, applies [change], saves.
   Future<Workspace?> after(
     ProviderContainer container,
-    Future<void> Function(WorkspaceEditController edit) change,
-  ) async {
-    await change(container.read(workspaceEditControllerProvider.notifier));
+    void Function(WorkspaceDetailController form) change, {
+    bool submit = true,
+  }) async {
+    final WorkspaceDetailController form = container.read(
+      workspaceDetailControllerProvider.notifier,
+    );
+
+    form.seed(container.read(currentWorkspaceProvider)!);
+    change(form);
+
+    if (submit) await form.submit();
+
     await Future<void>.delayed(Duration.zero);
 
     return container.read(currentWorkspaceProvider);
@@ -48,9 +62,26 @@ void main() {
 
     expect(container.read(currentWorkspaceProvider)!.country, 'US');
     expect(
-      (await after(container, (WorkspaceEditController e) => e.setCountry('GB')))!
-          .country,
+      (await after(
+        container,
+        (WorkspaceDetailController f) => f.selectCountry('GB'),
+      ))!.country,
       'GB',
+    );
+  });
+
+  test('nothing is written until the form is saved', () async {
+    final ProviderContainer container = await subscribed();
+
+    // The whole point of a pinned save: a picker tapped and then backed out
+    // of must leave the record alone.
+    expect(
+      (await after(
+        container,
+        (WorkspaceDetailController f) => f.selectCountry('GB'),
+        submit: false,
+      ))!.country,
+      'US',
     );
   });
 
@@ -60,14 +91,16 @@ void main() {
     expect(
       (await after(
         container,
-        (WorkspaceEditController e) => e.rename('  Attic Finds Ltd  '),
+        (WorkspaceDetailController f) => f.updateName('  Attic Finds Ltd  '),
       ))!.name,
       'Attic Finds Ltd',
     );
 
     expect(
-      (await after(container, (WorkspaceEditController e) => e.rename('   ')))!
-          .name,
+      (await after(
+        container,
+        (WorkspaceDetailController f) => f.updateName('   '),
+      ))!.name,
       'Attic Finds Ltd',
     );
   });
@@ -76,14 +109,14 @@ void main() {
     final ProviderContainer container = await subscribed();
     final String before = container.read(currentWorkspaceProvider)!.currency;
 
-    final Workspace? after_ = await after(
+    final Workspace? saved = await after(
       container,
-      (WorkspaceEditController e) => e.setCurrency('GBP'),
+      (WorkspaceDetailController f) => f.selectCurrency('GBP'),
     );
 
     // Nobody knows what rate applied to a purchase made last March, so this
     // only moves what new amounts default to.
-    expect(after_!.currency, 'GBP');
+    expect(saved!.currency, 'GBP');
     expect(before, isNot('GBP'));
   });
 
@@ -97,7 +130,7 @@ void main() {
 
     await after(
       container,
-      (WorkspaceEditController e) => e.setStaleThresholdDays(14),
+      (WorkspaceDetailController f) => f.selectStaleThresholdDays(14),
     );
 
     expect(container.read(staleThresholdProvider), const Duration(days: 14));
