@@ -7,7 +7,9 @@ shipment carrier picker.
 
 - **A carrier is a record the business owns, not a fixed picker list.**
   Owner's rule. Sellers must be able to add, rename, and remove local couriers;
-  Settings owns that management workflow and shipment forms consume it.
+  More exposes that management workflow as a direct destination and shipment
+  forms consume it. Do not bury Carrier management inside Settings: shipping
+  configuration is part of operating the business, not an app preference.
 - **Carrier removal is soft-delete.** Orders retain the carrier name they were
   shipped with, and a deleted carrier disappears only from future choices.
 - **Every new business starts with USPS, UPS, FedEx, DHL, and Royal Mail.**
