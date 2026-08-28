@@ -176,6 +176,27 @@ because they are about the shell, not the bar:
   lists with no create action of their own, where the step is upstream
   (Orders and Listings send the seller to Inventory).
 
+## A form seeds through `FormSeed`, never straight from `build`
+
+A form that edits an existing record learns it has one in a `build` — the
+record arrives on a stream, so there is nowhere earlier. **Copying it into the
+form's controller from there throws**: `Tried to modify a provider while the
+widget tree was building`. It is not a debug-only assertion in practice — the
+form stayed empty, and the seller saw an edit screen that never filled in.
+
+- **Use the `FormSeed` mixin (`core/state/`) and call `seedOnce`.** It defers
+  the copy to the end of the frame, which is the fix Riverpod's own error
+  message names, and it owns the once-only flag.
+- **Once, not once per build.** The record rebuilds the screen whenever a
+  teammate edits it, and re-seeding then throws away every keystroke the
+  seller made in between. Never re-derive the guard per screen — two screens
+  had written it themselves and both had the bug beside it.
+- **One frame of empty fields is the cost, and it is invisible**: the screen
+  was already showing empty fields while the record loaded.
+- Held by `test/features/inventory/item_form_seed_test.dart` and
+  `test/features/workspace/workspace_detail_seed_test.dart`, both of which
+  fail on the direct call.
+
 ## Search
 
 - **Search is a mode of the header, not a widget parked above the list.**
