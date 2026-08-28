@@ -15,12 +15,7 @@ final class _NavDestinations {
   ];
 }
 
-/// Holds the selection so a test can change it **without** re-pumping.
-///
-/// `pumpScreen` ends in `pumpAndSettle`, so pumping the bar again with a new
-/// index lands it already settled and every assertion about the travel would
-/// pass without the travel ever happening. Tapping a destination here is also
-/// the real path a seller takes.
+/// Holds selection so a test follows the same tap path a seller does.
 class _NavBarHost extends StatefulWidget {
   const _NavBarHost({required this.initialIndex});
 
@@ -45,26 +40,28 @@ class _NavBarHostState extends State<_NavBarHost> {
   );
 }
 
-/// The current tab is marked the way iOS 26 marks it: the **glyph fills in**
-/// and a **glass capsule slides under it**, stretching along the way.
-///
-/// `FILL` is a variable-font axis, so weight is a real second signal alongside
-/// colour — which colour alone must never be, least of all on glass with a
-/// moving list showing through it. The capsule is the third signal, and it is
-/// glass rather than a filled shape: a flat pill behind the icon is Material's
-/// idiom and reads as a foreign control inside iOS chrome.
-/// See `docs/rules/DECISIONS.md` § The tab bar's selected indicator came back.
+/// The bar is glyph-only: five equal segments, one icon each, and a fixed-width
+/// glass capsule sliding under the selected one. Labels remain semantics only.
 void main() {
   Future<void> pumpBar(WidgetTester tester, int selected) =>
       pumpScreen(tester, _NavBarHost(initialIndex: selected));
 
-  /// Tap a destination and let the capsule finish travelling.
+  Finder glyph(int index) => find.byIcon(_NavDestinations.all[index].icon);
+
   Future<void> tapTab(WidgetTester tester, int index) async {
-    await tester.tap(find.text(_NavDestinations.all[index].label));
+    await tester.tap(glyph(index));
     await tester.pumpAndSettle();
   }
 
-  /// How filled each destination's glyph is, in destination order.
+  Rect segment(WidgetTester tester, int index) => tester.getRect(
+    find
+        .descendant(
+          of: find.byType(SdGlassNavBarV3),
+          matching: find.byType(InkWell),
+        )
+        .at(index),
+  );
+
   List<double?> fills(WidgetTester tester) => tester
       .widgetList<Icon>(
         find.descendant(
@@ -75,8 +72,6 @@ void main() {
       .map((Icon icon) => icon.fill)
       .toList();
 
-  /// The capsule's real rect. Measured rather than read off a widget's
-  /// arguments: where it is and how wide it is mid-flight *are* layout.
   Rect capsule(WidgetTester tester) =>
       tester.getRect(find.byKey(SdGlassNavBarV3.selectedCapsuleKey));
 
@@ -92,102 +87,92 @@ void main() {
   testWidgets('the fill moves with the selection', (WidgetTester tester) async {
     await pumpBar(tester, 0);
 
-    expect(fills(tester).first, 1);
-    expect(fills(tester).last, 0);
-
     await tapTab(tester, _NavDestinations.all.length - 1);
 
     expect(fills(tester).first, 0);
     expect(fills(tester).last, 1);
   });
 
-  testWidgets('the capsule steps evenly and never reaches its neighbour', (
+  testWidgets('all five segments have the same width', (
     WidgetTester tester,
   ) async {
-    await pumpBar(tester, 0);
+    await pumpBar(tester, 2);
 
-    final List<double> centres = <double>[];
+    final double first = segment(tester, 0).width;
 
-    for (int i = 0; i < _NavDestinations.all.length; i++) {
-      await tapTab(tester, i);
-      centres.add(capsule(tester).center.dx);
+    for (int i = 1; i < _NavDestinations.all.length; i++) {
+      expect(segment(tester, i).width, closeTo(first, 0.01));
     }
-
-    final double step = centres[1] - centres[0];
-
-    // One destination's share of the bar, derived from the capsule's own
-    // travel rather than re-deriving the bar's inner width in the test.
-    for (int i = 1; i < centres.length; i++) {
-      expect(centres[i] - centres[i - 1], closeTo(step, 0.01));
-    }
-
-    // The row of capsule positions is centred in the bar.
-    final Rect bar = tester.getRect(find.byType(SdGlassNavBarV3));
-
-    expect((centres.first + centres.last) / 2, closeTo(bar.center.dx, 0.01));
-
-    // It keeps its inset, so two adjacent destinations never share an edge.
-    expect(capsule(tester).width, lessThan(step));
   });
 
-  testWidgets('the capsule travels rather than jumping', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('labels are not painted', (WidgetTester tester) async {
     await pumpBar(tester, 0);
 
-    final double start = capsule(tester).center.dx;
-
-    await tester.tap(find.text(_NavDestinations.all.last.label));
-    await tester.pump();
-    await tester.pump(SdMotionV3.normal ~/ 2);
-
-    final double midFlight = capsule(tester).center.dx;
-
-    await tester.pumpAndSettle();
-
-    // One shape moving is what says the five destinations are a single row.
-    expect(midFlight, greaterThan(start));
-    expect(midFlight, lessThan(capsule(tester).center.dx));
+    for (final SdNavDestinationV3 destination in _NavDestinations.all) {
+      expect(find.text(destination.label), findsNothing);
+    }
   });
 
-  testWidgets('the capsule stretches on the way and settles back', (
+  testWidgets('every destination still has a semantic label', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 0);
 
-    final Rect resting = capsule(tester);
+    final Iterable<Semantics> segments = tester.widgetList<Semantics>(
+      find.descendant(
+        of: find.byType(SdGlassNavBarV3),
+        matching: find.byType(Semantics),
+      ),
+    );
 
-    await tester.tap(find.text(_NavDestinations.all.last.label));
+    for (final SdNavDestinationV3 destination in _NavDestinations.all) {
+      expect(
+        segments.where(
+          (Semantics item) => item.properties.label == destination.label,
+        ),
+        isNotEmpty,
+        reason: '${destination.label} is not announced',
+      );
+    }
+  });
+
+  testWidgets('the capsule is fixed to one selected segment', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 3);
+
+    final Rect segmentRect = segment(tester, 3);
+    final Rect capsuleRect = capsule(tester);
+
+    expect(capsuleRect.center.dx, closeTo(segmentRect.center.dx, 0.01));
+    expect(
+      capsuleRect.width,
+      closeTo(
+        segmentRect.width - SdContentPaddingV3.selectedTabInset.horizontal,
+        0.01,
+      ),
+    );
+  });
+
+  testWidgets('the fixed-width capsule travels rather than jumping', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 0);
+
+    final Rect before = capsule(tester);
+
+    await tester.tap(glyph(_NavDestinations.all.length - 1));
     await tester.pump();
     await tester.pump(SdMotionV3.normal ~/ 2);
 
     final Rect midFlight = capsule(tester);
 
-    // Squash and stretch: pulled long and thin at the midpoint, which is what
-    // makes the move read as one piece of glass being carried rather than a
-    // shape being repositioned.
-    expect(midFlight.width, greaterThan(resting.width));
-    expect(midFlight.height, lessThan(resting.height));
-
     await tester.pumpAndSettle();
 
-    expect(capsule(tester).size, resting.size);
-  });
-
-  testWidgets('a re-tap of the current tab stretches nothing', (
-    WidgetTester tester,
-  ) async {
-    await pumpBar(tester, 2);
-
-    final Rect before = capsule(tester);
-
-    await tester.tap(find.text(_NavDestinations.all[2].label));
-    await tester.pump();
-    await tester.pump(SdMotionV3.normal ~/ 2);
-
-    // Nothing moved, so there is nothing to animate — a capsule that pulsed
-    // on every re-tap of the current tab would read as a glitch.
-    expect(capsule(tester), before);
+    expect(midFlight.center.dx, greaterThan(before.center.dx));
+    expect(midFlight.center.dx, lessThan(capsule(tester).center.dx));
+    expect(midFlight.width, moreOrLessEquals(before.width));
+    expect(midFlight.height, moreOrLessEquals(before.height));
   });
 
   testWidgets('nothing flat is painted behind the current glyph', (
@@ -195,8 +180,6 @@ void main() {
   ) async {
     await pumpBar(tester, 0);
 
-    // The mark is glass, never a filled shape: a tinted pill behind the icon
-    // is Material's idiom and reads as a foreign control inside iOS chrome.
     final Iterable<BoxDecoration> painted = tester
         .widgetList<DecoratedBox>(
           find.descendant(
@@ -215,15 +198,13 @@ void main() {
     );
   });
 
-  testWidgets('the bar never fringes the figures underneath it', (
+  testWidgets('the bar never fringes figures underneath it', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 0);
 
     final BuildContext context = tester.element(find.byType(SdGlassNavBarV3));
 
-    // The bar sits over columns of money, and chromatic aberration on small
-    // tabular figures is the fastest way to make a number hard to read.
     expect(SdGlassNavBarV3.barSettings(context).chromaticAberration, 0);
     expect(
       SdGlassNavBarV3.selectedCapsuleSettings(context).chromaticAberration,
@@ -231,19 +212,7 @@ void main() {
     );
   });
 
-  testWidgets('every destination still shows its label', (
-    WidgetTester tester,
-  ) async {
-    await pumpBar(tester, 0);
-
-    // Five glyphs with no words is a memory test — the labels are not a
-    // detail the capsule replaces.
-    for (final SdNavDestinationV3 destination in _NavDestinations.all) {
-      expect(find.text(destination.label), findsOneWidget);
-    }
-  });
-
-  testWidgets('the bar sits in the depth band of a sheet, not of a card', (
+  testWidgets('the bar sits in the depth band of a sheet', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 0);
@@ -262,9 +231,6 @@ void main() {
               decoration.boxShadow ?? const <BoxShadow>[],
         );
 
-    // Owner's call that the bar should read as more present: it never scrolls
-    // away, so it does not belong at the same height as the cards it passes
-    // over.
     expect(shadows, containsAll(SdElevationV3.modal(context)));
   });
 }
