@@ -724,7 +724,10 @@ quietly re-invent one.
   Symbols, so changing the glyph library never becomes a screen-by-screen
   migration. **No file under `lib/` references `Icons.*` or `Symbols.*`
   directly except that registry**, and a source test enforces the boundary.
-  `SdIconV3` still owns rendering, size and colour.
+  `SdIconV3` still owns rendering, size and colour. **Every registry entry has
+  one short doc comment stating its UI meaning and one blank line before the
+  next entry.** The name alone is not enough when one glyph serves several
+  workflows, and the separation keeps future icon-source swaps reviewable.
 - **Dividers: one thickness, one colour, and between items only**
   (`if (index > 0)`). A rule above the first row lands on the container's edge
   and reads as a border it does not have. Its height equals its thickness — see
