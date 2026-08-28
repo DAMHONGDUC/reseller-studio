@@ -11,9 +11,8 @@ import '../../support/pump_app.dart';
 /// The sheet that answers "how do I use this app".
 ///
 /// **It is a document, not a menu** — owner's rule: a fixed share of the
-/// screen, every step spelled out, and the ones the app never blocks on
-/// badged. A step that appears without its instructions is the table of
-/// contents this replaced.
+/// screen, every step expands to its full instructions, and the ones the app
+/// never blocks on are badged.
 void main() {
   Future<BuildContext> openSheet(WidgetTester tester) async {
     await pumpScreen(tester, const HomeScreen());
@@ -68,7 +67,7 @@ void main() {
   });
 
   testWidgets(
-    'every step is spelled out, and only the skippable ones are badged',
+    'every step expands independently and only skippable ones are badged',
     (WidgetTester tester) async {
       final BuildContext context = await openSheet(tester);
       final Finder scrollable = find.descendant(
@@ -89,6 +88,22 @@ void main() {
         for (final String line in WorkflowLabel.how(context, step.kind)) {
           expect(
             find.descendant(of: row, matching: find.text(line)),
+            findsNothing,
+            reason: '${step.kind.name} starts expanded',
+          );
+        }
+
+        await tester.tap(
+          find.descendant(
+            of: row,
+            matching: find.text(WorkflowLabel.title(context, step.kind)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        for (final String line in WorkflowLabel.how(context, step.kind)) {
+          expect(
+            find.descendant(of: row, matching: find.text(line)),
             findsOneWidget,
             reason: '${step.kind.name} lost an instruction',
           );
@@ -104,6 +119,22 @@ void main() {
           step.isOptional ? findsOneWidget : findsNothing,
           reason: '${step.kind.name} is badged wrong',
         );
+
+        await tester.tap(
+          find.descendant(
+            of: row,
+            matching: find.text(WorkflowLabel.title(context, step.kind)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        for (final String line in WorkflowLabel.how(context, step.kind)) {
+          expect(
+            find.descendant(of: row, matching: find.text(line)),
+            findsNothing,
+            reason: '${step.kind.name} did not collapse',
+          );
+        }
       }
     },
   );

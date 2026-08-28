@@ -21,7 +21,7 @@ import '../../../more/workflow_constant.dart';
 /// It draws `WorkflowConstant.steps`, the same data About's diagram uses: a
 /// second list written for this sheet is how the app ends up teaching two
 /// workflows.
-class FlowOverviewSheet extends StatelessWidget {
+class FlowOverviewSheet extends StatefulWidget {
   const FlowOverviewSheet({super.key});
 
   static Future<void> show(BuildContext context) => showSdBottomSheetV3<void>(
@@ -34,9 +34,20 @@ class FlowOverviewSheet extends StatelessWidget {
   static const double heightFactor = 0.9;
 
   @override
+  State<FlowOverviewSheet> createState() => _FlowOverviewSheetState();
+}
+
+class _FlowOverviewSheetState extends State<FlowOverviewSheet> {
+  final Set<WorkflowKind> _expandedSteps = <WorkflowKind>{};
+
+  void _toggle(WorkflowKind kind) => setState(() {
+    if (!_expandedSteps.add(kind)) _expandedSteps.remove(kind);
+  });
+
+  @override
   Widget build(BuildContext context) => SdBottomSheetV3(
     title: context.l10n.flowOverviewTitle,
-    heightFactor: heightFactor,
+    heightFactor: FlowOverviewSheet.heightFactor,
     child: ListView(
       padding: EdgeInsets.zero,
       children: <Widget>[
@@ -54,6 +65,8 @@ class FlowOverviewSheet extends StatelessWidget {
             key: ValueKey<WorkflowKind>(WorkflowConstant.steps[i].kind),
             step: WorkflowConstant.steps[i],
             position: i + 1,
+            isExpanded: _expandedSteps.contains(WorkflowConstant.steps[i].kind),
+            onToggle: () => _toggle(WorkflowConstant.steps[i].kind),
           ),
         ],
         SizedBox(height: SdSpacingConstant.h16),
@@ -74,59 +87,137 @@ class FlowOverviewSheet extends StatelessWidget {
 /// read top to bottom in one go, so an ordinal says "third of nine" faster
 /// than a rail does, and it survives the block wrapping to ten lines.
 class _FlowStep extends StatelessWidget {
-  const _FlowStep({required this.step, required this.position, super.key});
+  const _FlowStep({
+    required this.step,
+    required this.position,
+    required this.isExpanded,
+    required this.onToggle,
+    super.key,
+  });
 
   final WorkflowStep step;
 
   /// 1-based, because it is read rather than indexed.
   final int position;
+  final bool isExpanded;
+  final VoidCallback onToggle;
 
   /// The numbered disc's own size — what it is, not configuration about it.
   static double get discSize => SdSpacingConstant.r28;
 
   @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      _FlowStepHeader(
+        step: step,
+        position: position,
+        isExpanded: isExpanded,
+        onTap: onToggle,
+      ),
+      AnimatedSize(
+        duration: SdMotionV3.normal,
+        curve: SdMotionV3.emphasized,
+        alignment: Alignment.topCenter,
+        child: isExpanded
+            ? _FlowStepDetails(step: step)
+            : const SizedBox.shrink(),
+      ),
+    ],
+  );
+}
+
+class _FlowStepHeader extends StatelessWidget {
+  const _FlowStepHeader({
+    required this.step,
+    required this.position,
+    required this.isExpanded,
+    required this.onTap,
+  });
+
+  final WorkflowStep step;
+  final int position;
+  final bool isExpanded;
+  final VoidCallback onTap;
+
+  @override
   Widget build(BuildContext context) {
     final Color accent = context.colorScheme3.primary;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Container(
-              width: discSize,
-              height: discSize,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: SdIconTileV3.backgroundOpacity),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  '$position',
-                  style: context.textTheme3.labelSmall!.semiBold3.copyWith(
-                    color: accent,
+    return Semantics(
+      button: true,
+      container: true,
+      expanded: isExpanded,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: SdSpacingConstant.h8),
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: _FlowStep.discSize,
+                height: _FlowStep.discSize,
+                decoration: BoxDecoration(
+                  color: accent.withValues(
+                    alpha: SdIconTileV3.backgroundOpacity,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '$position',
+                    style: context.textTheme3.labelSmall!.semiBold3.copyWith(
+                      color: accent,
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(width: SdSpacingConstant.w12),
-            Flexible(
-              child: Text(
-                WorkflowLabel.title(context, step.kind),
-                style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-                  color: context.sdTheme3.textPrimary,
+              SizedBox(width: SdSpacingConstant.w12),
+              Flexible(
+                child: Text(
+                  WorkflowLabel.title(context, step.kind),
+                  style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+                    color: context.sdTheme3.textPrimary,
+                  ),
                 ),
               ),
-            ),
-            if (step.isOptional) ...<Widget>[
+              if (step.isOptional) ...<Widget>[
+                SizedBox(width: SdSpacingConstant.w8),
+                SdBadgeV3(label: context.l10n.commonOptional),
+              ],
+              const Spacer(),
               SizedBox(width: SdSpacingConstant.w8),
-              // Neutral: optional is not a warning, and the word is what
-              // carries it — colour is never the only signal.
-              SdBadgeV3(label: context.l10n.commonOptional),
+              ExcludeSemantics(
+                child: AnimatedRotation(
+                  turns: isExpanded ? 0.5 : 0,
+                  duration: SdMotionV3.fast,
+                  curve: SdMotionV3.standard,
+                  child: SdIconV3(
+                    Symbols.keyboard_arrow_down_rounded,
+                    size: SdIconV3.smallSize,
+                    color: context.sdTheme3.textTertiary,
+                  ),
+                ),
+              ),
             ],
-          ],
+          ),
         ),
-        SizedBox(height: SdSpacingConstant.h8),
+      ),
+    );
+  }
+}
+
+class _FlowStepDetails extends StatelessWidget {
+  const _FlowStepDetails({required this.step});
+
+  final WorkflowStep step;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(top: SdSpacingConstant.h8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
         Text(
           WorkflowLabel.detail(context, step.kind),
           style: context.textTheme3.bodySmall!.muted3(context),
@@ -141,15 +232,14 @@ class _FlowStep extends StatelessWidget {
           label: context.l10n.flowOverviewOpen,
           icon: Symbols.arrow_forward_rounded,
           onPressed: () {
-            // Closes first, so the seller lands on the step rather than
-            // reading the sheet again over it.
+            // Close first so the destination does not open under the sheet.
             Navigator.of(context).pop();
             context.push(step.route);
           },
         ),
       ],
-    );
-  }
+    ),
+  );
 }
 
 /// One instruction under a step.
