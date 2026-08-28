@@ -275,3 +275,29 @@ nothing needs migrating.
 says "every month" and nothing offers weekly, because a cadence nobody asked
 for is a picker on a create flow (hard rule 2). A second cadence becomes a
 field on the series, never an `if` at the call site.
+
+## The tab bar's selected indicator came back, as glass
+
+The earlier rule was "nothing behind the current glyph — an indicator pill is
+Material's idiom and reads as a foreign control inside iOS chrome". It is
+reversed, and the reversal is recorded here because the old reasoning still
+reads as correct on its own terms.
+
+What was tried and removed was a **flat filled shape**: a solid or tinted
+rounded rect painted behind the icon. That really is Material's `NavigationBar`
+indicator, and next to real iOS chrome it reads as one.
+
+But the iOS 26 system tab bar does mark its current tab, and the mark is a
+second piece of Liquid Glass — brighter than the bar, refracting the same page
+through it, sliding between tabs. The old rule was rejecting the *material*
+and generalised too far, to the mark itself. Owner's call is that the bar
+follows the system bar 100%, so the mark returns in the system's material.
+
+The glyph still fills on the `FILL` axis. Colour alone was never allowed to be
+the signal and still is not; the capsule is a third signal, not a replacement
+for the second.
+
+The mechanism is in `docs/rules/DESIGN_SYSTEM.md` — notably why the capsule
+gets its own `LiquidGlassLayer` rather than joining the bar's blend group,
+which is the one thing that looks like a free simplification and silently
+deletes the capsule.

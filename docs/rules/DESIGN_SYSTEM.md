@@ -93,15 +93,57 @@ decides the arguments the look would otherwise keep re-opening:
 - It wears `SdElevationV3.modal`, not `.raised`. It floats over every screen
   and never scrolls away, so it belongs in the same depth band as a sheet
   rather than at the height of the cards passing under it.
-- **The current tab is marked by the glyph filling in, and by nothing behind
-  it.** `SdIconV3.fill` drives the font's `FILL` axis, so one glyph morphs
-  rather than two swapping — weight is a real second signal alongside colour,
-  which colour alone must never be. **An indicator pill was tried and
-  removed**: a shape behind the icon is Material's idiom and reads as a
-  foreign control sitting inside iOS chrome. Do not put it back.
-- The corner stays a `LiquidRoundedSuperellipse`, not a circular radius.
+- **The current tab is marked by the glyph filling in *and* by a glass
+  capsule behind it, and the capsule slides.** Owner's rule, and it **reverses
+  the earlier "nothing behind the glyph"** — see below for what changed and
+  why. `SdIconV3.fill` drives the font's `FILL` axis, so one glyph morphs
+  rather than two swapping; weight stays a real second signal alongside
+  colour, which colour alone must never be.
+- The corner stays a `LiquidRoundedSuperellipse`, not a circular radius —
+  the capsule's too, at the same family of corner as the bar it sits in.
 
 `test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds all three.
+
+#### The selected capsule is glass in its own layer, not a tinted pill
+
+The rule this replaces said an indicator was Material's idiom and read as a
+foreign control. That was true of what was tried — **a flat filled shape**.
+The iOS 26 system tab bar does put something behind the current tab, and the
+difference is what it is made of: a second piece of Liquid Glass, brighter
+than the bar, refracting the same page underneath and travelling between tabs.
+The rule was against the material, not against the mark.
+
+Three things follow, and each is the reason the old attempt failed:
+
+- **The capsule gets its own `LiquidGlassLayer`
+  (`LiquidGlass.withOwnLayer`), never `LiquidGlass.grouped` in the bar's blend
+  group.** Shapes in one blend group are combined with a smooth union, and a
+  capsule wholly inside the bar's stadium unions into it and disappears. Its
+  own layer paints after the bar and reads the bar's own output as its
+  backdrop, which is exactly the stacked-lens look the system bar has.
+- **It is sheerer and brighter than the bar, and it carries no blur.** The
+  bar has already blurred the page; blurring a blurred backdrop a second time
+  smears rather than frosts. The capsule's job is refraction and rim light —
+  `SdGlassNavBarV3.selectedCapsuleSettings`.
+- **It slides; it does not fade in and out.** One capsule moving is what says
+  the tabs are one row. `SdMotionV3.normal` on `SdMotionV3.emphasized` — the
+  motion enters and leaves in one animation, so `standard` would land it
+  abruptly.
+
+The geometry is `SdContentPaddingV3.selectedTabInset` inside the bar on every
+side, and nothing types that number at a call site.
+
+**The glass is tuned sheer and refractive, not frosted** — owner's rule, and
+it is the one that decides how the bar is read at a glance. A high-alpha fill
+with a heavy blur is a frosted panel: it says "surface", and the page under it
+stops existing. The tuning is the other way — a low `glassColor` alpha, a
+thick pane at a real `refractiveIndex`, and enough `lightIntensity` for the
+specular rim to draw the shape's edge. What keeps the labels legible is the
+blur plus that rim, never opacity.
+
+**`chromaticAberration` stays 0 on this bar.** It sits over columns of money,
+and colour fringing on small tabular figures is the fastest way to make a
+number hard to read. Every other glass knob is tunable; this one is a rule.
 
 `navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
 call, so both apps' floating bars sit identically. `maxNavBarOffset` lands
