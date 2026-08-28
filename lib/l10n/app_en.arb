@@ -3072,9 +3072,26 @@
   "@crossListPrice": {
     "description": "The one price every new listing is created at."
   },
-  "crossListPriceHelper": "Used on every marketplace you pick. Change one later if you need to.",
+  "crossListPriceHelper": "The price every marketplace starts at. Tap a row below to price one differently.",
   "@crossListPriceHelper": {
     "description": "Explains that the price is shared across the new listings."
+  },
+  "crossListPriceOwn": "Own price",
+  "@crossListPriceOwn": {
+    "description": "Badge on a review row priced differently from the shared price."
+  },
+  "crossListSetPriceFor": "Price on {marketplace}",
+  "@crossListSetPriceFor": {
+    "description": "Title of the sheet setting one marketplace’s own price.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "crossListUseShared": "Use the shared price",
+  "@crossListUseShared": {
+    "description": "Clears a marketplace’s own price, putting it back on the shared one."
   },
   "crossListPickMarketplaces": "Marketplaces",
   "@crossListPickMarketplaces": {

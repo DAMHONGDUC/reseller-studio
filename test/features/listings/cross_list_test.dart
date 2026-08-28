@@ -9,6 +9,7 @@ import 'package:reseller_studio/features/inventory/presentation/screens/inventor
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/listings/presentation/controllers/cross_list_controller.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
 import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
@@ -39,6 +40,25 @@ void main() {
     askingPrice: asking,
     listedAt: listedAt,
   );
+
+    Future<List<Listing>> listingsFor(
+    ProviderContainer container,
+    String itemId,
+  ) async {
+    container.listen<AsyncValue<List<Listing>>>(
+      listingsForItemProvider(itemId),
+      (
+        AsyncValue<List<Listing>>? previous,
+        AsyncValue<List<Listing>> next,
+      ) {},
+      fireImmediately: true,
+    );
+
+    await Future<void>.delayed(Duration.zero);
+
+    return container.read(listingsForItemProvider(itemId)).value ??
+        const <Listing>[];
+  }
 
   group('what may be cross-listed', () {
     test('an item already listed may be — that is the whole point', () {
@@ -71,25 +91,6 @@ void main() {
   });
 
   group('publishing', () {
-    Future<List<Listing>> listingsFor(
-      ProviderContainer container,
-      String itemId,
-    ) async {
-      container.listen<AsyncValue<List<Listing>>>(
-        listingsForItemProvider(itemId),
-        (
-          AsyncValue<List<Listing>>? previous,
-          AsyncValue<List<Listing>> next,
-        ) {},
-        fireImmediately: true,
-      );
-
-      await Future<void>.delayed(Duration.zero);
-
-      return container.read(listingsForItemProvider(itemId)).value ??
-          const <Listing>[];
-    }
-
     test('writes one draft listing per marketplace, at one price', () async {
       final ProviderContainer container = mockContainer();
       final Item coat = item(id: 'x-1');
@@ -99,8 +100,11 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            marketplaces: <Marketplace>{Marketplace.ebay, Marketplace.depop},
-            price: const Money(4500, 'USD'),
+            prices: const <Marketplace, Money>{
+              Marketplace.ebay: Money(4500, 'USD'),
+              Marketplace.depop: Money(4500, 'USD'),
+            },
+            askingPrice: const Money(4500, 'USD'),
           );
 
       final List<Listing> listings = await listingsFor(container, 'x-1');
@@ -131,8 +135,10 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            marketplaces: <Marketplace>{Marketplace.etsy},
-            price: const Money(3000, 'USD'),
+            prices: const <Marketplace, Money>{
+              Marketplace.etsy: Money(3000, 'USD'),
+            },
+            askingPrice: const Money(3000, 'USD'),
           );
 
       final Item? saved = await container
@@ -162,8 +168,10 @@ void main() {
             .read(itemActionsControllerProvider.notifier)
             .crossList(
               coat,
-              marketplaces: <Marketplace>{Marketplace.poshmark},
-              price: const Money(4000, 'USD'),
+              prices: const <Marketplace, Money>{
+                Marketplace.poshmark: Money(4000, 'USD'),
+              },
+              askingPrice: const Money(4000, 'USD'),
             );
 
         final Item? saved = await container
@@ -188,8 +196,8 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            marketplaces: const <Marketplace>{},
-            price: const Money(1000, 'USD'),
+            prices: const <Marketplace, Money>{},
+            askingPrice: const Money(1000, 'USD'),
           );
 
       expect(await listingsFor(container, 'x-4'), isEmpty);
@@ -271,6 +279,137 @@ void main() {
         isFalse,
         reason: 'the old gate would have refused it, which was the bug',
       );
+    });
+  });
+
+  group('a price per marketplace', () {
+    CrossListState state({
+      Set<Marketplace> selected = const <Marketplace>{},
+      Money? price,
+      Map<Marketplace, Money> overrides = const <Marketplace, Money>{},
+    }) => CrossListState(
+      selected: selected,
+      price: price,
+      overrides: overrides,
+    );
+
+    test('a platform with no price of its own takes the shared one', () {
+      final CrossListState current = state(
+        selected: <Marketplace>{Marketplace.ebay, Marketplace.depop},
+        price: const Money(4500, 'USD'),
+        overrides: const <Marketplace, Money>{
+          Marketplace.depop: Money(4000, 'USD'),
+        },
+      );
+
+      expect(current.priceFor(Marketplace.ebay), const Money(4500, 'USD'));
+      expect(current.priceFor(Marketplace.depop), const Money(4000, 'USD'));
+      expect(current.isOverridden(Marketplace.ebay), isFalse);
+      expect(current.isOverridden(Marketplace.depop), isTrue);
+    });
+
+    test('an override alone is enough to publish to that platform', () {
+      // The shared box is empty, so eBay has nothing — but Depop was priced
+      // deliberately, and a form that refused it would be asking twice.
+      expect(
+        state(
+          selected: <Marketplace>{Marketplace.depop},
+          overrides: const <Marketplace, Money>{
+            Marketplace.depop: Money(4000, 'USD'),
+          },
+        ).canPublish,
+        isTrue,
+      );
+      expect(
+        state(
+          selected: <Marketplace>{Marketplace.depop, Marketplace.ebay},
+          overrides: const <Marketplace, Money>{
+            Marketplace.depop: Money(4000, 'USD'),
+          },
+        ).canPublish,
+        isFalse,
+        reason: 'eBay still has no price of its own and no default',
+      );
+    });
+
+    test('unticking a platform drops the price it was given', () {
+      final ProviderContainer container = mockContainer();
+      final CrossListController controller = container.read(
+        crossListControllerProvider.notifier,
+      );
+
+      controller.toggle(Marketplace.etsy);
+      controller.setPriceFor(Marketplace.etsy, const Money(2500, 'USD'));
+
+      expect(
+        container.read(crossListControllerProvider).isOverridden(
+          Marketplace.etsy,
+        ),
+        isTrue,
+      );
+
+      controller.toggle(Marketplace.etsy);
+
+      // A hidden override that came back on the next tick is a number nobody
+      // chose this time.
+      expect(
+        container.read(crossListControllerProvider).isOverridden(
+          Marketplace.etsy,
+        ),
+        isFalse,
+      );
+    });
+
+    test('each listing is written at its own price', () async {
+      final ProviderContainer container = mockContainer();
+      final Item coat = item(id: 'x-5');
+
+      await container.read(itemRepositoryProvider).save(coat);
+      await container
+          .read(itemActionsControllerProvider.notifier)
+          .crossList(
+            coat,
+            prices: const <Marketplace, Money>{
+              Marketplace.ebay: Money(4500, 'USD'),
+              Marketplace.depop: Money(4000, 'USD'),
+            },
+            askingPrice: const Money(4500, 'USD'),
+          );
+
+      final Map<Marketplace, Money> written = <Marketplace, Money>{
+        for (final Listing listing in await listingsFor(container, 'x-5'))
+          listing.marketplace: listing.price,
+      };
+
+      expect(written, <Marketplace, Money>{
+        Marketplace.ebay: const Money(4500, 'USD'),
+        Marketplace.depop: const Money(4000, 'USD'),
+      });
+    });
+
+    test('the item keeps the shared price, not one platform’s', () async {
+      final ProviderContainer container = mockContainer();
+      final Item coat = item(id: 'x-6');
+
+      await container.read(itemRepositoryProvider).save(coat);
+      await container
+          .read(itemActionsControllerProvider.notifier)
+          .crossList(
+            coat,
+            prices: const <Marketplace, Money>{
+              Marketplace.ebay: Money(4500, 'USD'),
+              Marketplace.depop: Money(4000, 'USD'),
+            },
+            askingPrice: const Money(4500, 'USD'),
+          );
+
+      final Item? saved = await container
+          .read(itemRepositoryProvider)
+          .watchItem('x-6')
+          .first;
+
+      // What the item is worth is not whichever platform was cheapest.
+      expect(saved!.askingPrice, const Money(4500, 'USD'));
     });
   });
 }

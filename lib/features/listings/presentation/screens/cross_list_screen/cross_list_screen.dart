@@ -6,8 +6,11 @@ import 'package:system_design/index.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../../core/widgets/money_field.dart';
+import '../../../../../core/widgets/price_entry_sheet.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/presentation/controllers/item_actions_controller.dart';
 import '../../../../inventory/providers.dart';
@@ -158,7 +161,7 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
                 SizedBox(height: SdSpacingConstant.h24),
                 _Marketplaces(itemId: item.id),
                 SizedBox(height: SdSpacingConstant.h24),
-                const _Review(),
+                _Review(currency: currency),
               ],
             ),
           ),
