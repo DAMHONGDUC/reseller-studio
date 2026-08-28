@@ -4468,5 +4468,45 @@
   "flowOverviewLoop": "Then round again. What sold, at what margin and where it came from is what decides the next trip — which is why cost and source stay attached to every item.",
   "@flowOverviewLoop": {
     "description": "Closing line of the flow overview sheet, under the last step."
+  },
+  "ordersEmptyTitle": "No orders yet",
+  "@ordersEmptyTitle": {
+    "description": "Orders screen, shown when the workspace has no orders at all."
+  },
+  "ordersEmptyBody": "An order lands here when you mark an item sold.",
+  "@ordersEmptyBody": {
+    "description": "Orders screen empty state: says where orders come from."
+  },
+  "offersEmptyTitle": "No offers yet",
+  "@offersEmptyTitle": {
+    "description": "Offers screen, shown when the workspace has no offers at all."
+  },
+  "offersEmptyBody": "Offers buyers send on your listings show up here.",
+  "@offersEmptyBody": {
+    "description": "Offers screen empty state: says where offers come from."
+  },
+  "listingsEmptyTitle": "No listings yet",
+  "@listingsEmptyTitle": {
+    "description": "Listings screen, shown when the workspace has no listings at all."
+  },
+  "listingsNoMatch": "No listings under this tab.",
+  "@listingsNoMatch": {
+    "description": "Listings screen, shown when a tab is empty but others are not."
+  },
+  "commonGoToInventory": "Go to inventory",
+  "@commonGoToInventory": {
+    "description": "Empty-state button on a list fed by inventory."
+  },
+  "commonViewListings": "View listings",
+  "@commonViewListings": {
+    "description": "Empty-state button on a list fed by listings."
+  },
+  "homeStartHereTitle": "Start here",
+  "@homeStartHereTitle": {
+    "description": "Home, shown in place of \"All clear\" when the workspace has never held anything."
+  },
+  "homeStartHereBody": "Add your first item — a title is all it needs. Cost, photos and the rest can wait.",
+  "@homeStartHereBody": {
+    "description": "Home start-here card: what the first step is."
   }
 }

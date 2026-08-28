@@ -12,6 +12,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
+import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -24,7 +25,6 @@ import '../../widgets/item_card.dart';
 import '../../widgets/reprice_sheet.dart';
 
 part 'inventory_screen_bulk_bar.dart';
-part 'inventory_screen_empty_inventory.dart';
 part 'inventory_screen_filter_strip.dart';
 part 'inventory_screen_item_list.dart';
 
@@ -152,8 +152,20 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             ),
             _ when items.isEmpty => SliverFillRemaining(
               hasScrollBody: false,
-              child: _EmptyInventory(
-                hasAnyItems: (source.value ?? const <Item>[]).isNotEmpty,
+              child: AppListEmptyState(
+                hasAny: (source.value ?? const <Item>[]).isNotEmpty,
+                noMatchMessage: context.l10n.inventoryNoMatch,
+                emptyIcon: Symbols.inventory_2_rounded,
+                emptyTitle: context.l10n.inventoryEmptyTitle,
+                emptyMessage: context.l10n.inventoryEmptyBody,
+                // The FAB says the same thing, and it is the wrong place to
+                // find it: on the first empty screen a seller ever sees, the
+                // eye is in the middle, not the corner.
+                emptyAction: SdButtonV3(
+                  variant: SdButtonVariantV3.primary,
+                  label: context.l10n.quickAddTitle,
+                  onPressed: () => _add(AppRoutes.quickAdd),
+                ),
               ),
             ),
             _ => _ItemList(items: items),

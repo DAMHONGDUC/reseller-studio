@@ -8,6 +8,10 @@ part of 'home_screen.dart';
 /// A block renders **only when it has something in it**. A permanent list of
 /// zeroes trains the eye to skip the whole section, which defeats the one
 /// thing this screen exists to do.
+///
+/// **With no rows, what the section says depends on whether the business has
+/// started.** "All clear" is a report on work, and a new account has none —
+/// see `WorkspaceActivity`.
 class _NeedsAttention extends ConsumerWidget {
   const _NeedsAttention();
 
@@ -95,7 +99,13 @@ class _NeedsAttention extends ConsumerWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
       child: rows.isEmpty
-          ? const _AllClear()
+          ? switch (ref.watch(workspaceActivityProvider)) {
+              // Neither answer while the records are still arriving: a
+              // returning seller must not be shown "start here" for a frame.
+              WorkspaceActivity.unknown => const SizedBox.shrink(),
+              WorkspaceActivity.untouched => const _StartHere(),
+              WorkspaceActivity.active => const _AllClear(),
+            }
           : SdCardV3(
               padding: EdgeInsets.zero,
               child: Column(

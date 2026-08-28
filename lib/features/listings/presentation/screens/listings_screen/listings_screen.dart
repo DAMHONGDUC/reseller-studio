@@ -10,6 +10,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
+import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/price_entry_sheet.dart';
 import '../../../domain/entities/listing.dart';
@@ -103,10 +104,18 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
             child: switch (source) {
               AsyncLoading<List<Listing>>() when !source.hasValue =>
                 const SdLoadingV3Page(),
-              _ when listings.isEmpty => SdEmptyStateV3(
-                icon: Symbols.sell_rounded,
-                title: context.l10n.commonNothingHere,
-                message: context.l10n.listingsListAnItemFromItsDetail,
+              _ when listings.isEmpty => AppListEmptyState(
+                hasAny: all.isNotEmpty,
+                noMatchMessage: context.l10n.listingsNoMatch,
+                emptyIcon: Symbols.sell_rounded,
+                emptyTitle: context.l10n.listingsEmptyTitle,
+                emptyMessage: context.l10n.listingsListAnItemFromItsDetail,
+                // Listing happens on an item, so the way on is inventory.
+                emptyAction: SdButtonV3(
+                  variant: SdButtonVariantV3.primary,
+                  label: context.l10n.commonGoToInventory,
+                  onPressed: () => context.go(AppRoutes.inventory),
+                ),
               ),
               _ => ListView(
                 padding: SdContentPaddingV3.screen(context),

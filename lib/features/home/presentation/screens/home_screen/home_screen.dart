@@ -24,7 +24,9 @@ import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
+import '../../../domain/enums/workspace_activity.dart';
 import '../../../home_constant.dart';
+import '../../../providers.dart';
 import '../../widgets/flow_overview_sheet.dart';
 
 part 'home_screen_activity_row.dart';
@@ -36,6 +38,7 @@ part 'home_screen_performance_block.dart';
 part 'home_screen_quick_action.dart';
 part 'home_screen_recent_activity.dart';
 part 'home_screen_shortcuts.dart';
+part 'home_screen_start_here.dart';
 
 /// Home — "what do I need to do today?".
 ///
@@ -126,7 +129,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const _NeedsAttention(),
           SdSectionHeaderV3(title: context.l10n.homePerformance),
           const _PerformanceBlock(),
-          SdSectionHeaderV3(title: context.l10n.homeRecentActivity),
           const _RecentActivity(),
           SdSectionHeaderV3(
             title: context.l10n.homeQuickAction,

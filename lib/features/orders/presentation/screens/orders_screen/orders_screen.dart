@@ -9,6 +9,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
+import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
@@ -65,10 +66,19 @@ class OrdersScreen extends ConsumerWidget {
                 title: context.l10n.ordersLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
-              _ when orders.isEmpty => SdEmptyStateV3(
-                icon: Symbols.receipt_long_rounded,
-                title: context.l10n.commonNothingHere,
-                message: context.l10n.ordersNoMatch,
+              _ when orders.isEmpty => AppListEmptyState(
+                hasAny: (source.value ?? const <Order>[]).isNotEmpty,
+                noMatchMessage: context.l10n.ordersNoMatch,
+                emptyIcon: Symbols.receipt_long_rounded,
+                emptyTitle: context.l10n.ordersEmptyTitle,
+                emptyMessage: context.l10n.ordersEmptyBody,
+                // Orders have no create action of their own — one appears
+                // when an item is marked sold — so the way on is upstream.
+                emptyAction: SdButtonV3(
+                  variant: SdButtonVariantV3.primary,
+                  label: context.l10n.commonGoToInventory,
+                  onPressed: () => context.go(AppRoutes.inventory),
+                ),
               ),
               _ => _OrderList(orders: orders),
             },

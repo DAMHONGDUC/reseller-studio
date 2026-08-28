@@ -11,6 +11,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
+import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';
@@ -70,10 +71,19 @@ class OffersScreen extends ConsumerWidget {
                 title: context.l10n.offersLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
-              _ when offers.isEmpty => SdEmptyStateV3(
-                icon: Symbols.local_offer_rounded,
-                title: context.l10n.commonNothingHere,
-                message: context.l10n.offersNoMatch,
+              _ when offers.isEmpty => AppListEmptyState(
+                hasAny: (source.value ?? const <Offer>[]).isNotEmpty,
+                noMatchMessage: context.l10n.offersNoMatch,
+                emptyIcon: Symbols.local_offer_rounded,
+                emptyTitle: context.l10n.offersEmptyTitle,
+                emptyMessage: context.l10n.offersEmptyBody,
+                // An offer arrives on a listing, so listings is the step a
+                // seller with none has not taken yet.
+                emptyAction: SdButtonV3(
+                  variant: SdButtonVariantV3.primary,
+                  label: context.l10n.commonViewListings,
+                  onPressed: () => context.push(AppRoutes.listings),
+                ),
               ),
               _ => ListView.separated(
                 padding: SdContentPaddingV3.screen(context),
