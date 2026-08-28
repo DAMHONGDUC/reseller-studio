@@ -221,6 +221,37 @@ plain badges** — no amounts.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
 
+## Quantity is what decides whether a record is sold
+
+Owner's rule: **count 0 means sold, count above 0 means in stock.** Taken as
+"status = f(quantity)" that would delete the lifecycle — `listed`, `draft`,
+`reserved` and `archived` all have to survive, and `sold` is a claim that
+money changed hands, which only an order can back. So the rule is wired as
+quantity *driving* the transition, with the status still stored:
+
+- **A sale takes one unit, not the row.** `ItemTransition.sell` decrements the
+  count and moves the status to `sold` **only when the shelf empties**.
+  Selling one of ten used to mark the whole record sold and leave the count at
+  ten, so Inventory said gone while nine were still on the shelf.
+- **A row with stock behind it keeps its status and its clocks.** Nine left
+  after a sale is still `listed`, and `listedAt` is untouched — a sale is not
+  a relist, and staleness is measured from the first time it went live.
+- **`restocked` is the other half**, run by the item form on save: a `sold`
+  row given a count above zero goes back to `inStock` and loses its `soldAt`.
+  **An archived one does not move** — archiving is a deliberate withdrawal,
+  and a number in a box does not undo it.
+- **Both live in `ItemTransition`**, so the sheet, the bulk bar, the Orders
+  tab's Record sale and the offer-accept path all get the same behaviour
+  without any of them knowing the rule.
+- **The form carries `listedAt` and `soldAt` because `submit` builds a whole
+  `Item`.** Any timestamp the form does not hold is one that saving a typo fix
+  erased — it reset the staleness clock and dropped the row out of
+  days-to-sell. `test/features/inventory/item_form_quantity_test.dart` pins
+  that, and the restock beside it.
+- `test/features/inventory/item_transition_test.dart` holds the rest: one of
+  three, the last of one, an empty shelf refusing a sale, and the archive that
+  a count cannot undo.
+
 ## An item that has left inventory can come back, and the sale goes with it
 
 Owner's rule, after a sold item was given a quantity of 10 and stayed sold.
