@@ -15,12 +15,13 @@ class _NotificationRow extends ConsumerWidget {
   static String _title(BuildContext context, AppNotification notification) =>
       switch (notification.type) {
         NotificationType.orderCreated => context.l10n.notificationOrderCreated,
-        NotificationType.offerReceived => context.l10n.notificationOfferReceived,
+        NotificationType.offerReceived =>
+          context.l10n.notificationOfferReceived,
         NotificationType.shipmentsDue => context.l10n.notificationShipmentsDue(
           notification.count ?? 0,
         ),
-        NotificationType.staleInventory => context.l10n
-            .notificationStaleInventory(notification.count ?? 0),
+        NotificationType.staleInventory =>
+          context.l10n.notificationStaleInventory(notification.count ?? 0),
         NotificationType.lowInventory => context.l10n.notificationLowInventory(
           notification.count ?? 0,
         ),

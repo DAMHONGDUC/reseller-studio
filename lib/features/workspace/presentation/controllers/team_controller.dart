@@ -25,7 +25,10 @@ class TeamController extends Notifier<bool> {
   bool build() => false;
 
   Future<void> invite({required String email, required MemberRole role}) =>
-      _run('invite a teammate', (TeamRepository repository, String workspaceId) async {
+      _run('invite a teammate', (
+        TeamRepository repository,
+        String workspaceId,
+      ) async {
         await repository.invite(
           workspaceId: workspaceId,
           email: email,
@@ -47,16 +50,15 @@ class TeamController extends Notifier<bool> {
     );
   }, <String, Object>{'role': role.name});
 
-  Future<void> remove(String memberUid) =>
-      _run('remove a teammate', (
-        TeamRepository repository,
-        String workspaceId,
-      ) async {
-        await repository.removeMember(
-          workspaceId: workspaceId,
-          memberUid: memberUid,
-        );
-      }, const <String, Object>{});
+  Future<void> remove(String memberUid) => _run('remove a teammate', (
+    TeamRepository repository,
+    String workspaceId,
+  ) async {
+    await repository.removeMember(
+      workspaceId: workspaceId,
+      memberUid: memberUid,
+    );
+  }, const <String, Object>{});
 
   /// Accepting is the one method that is not about the current workspace: the
   /// invitation names its own, and the seller is not a member of it yet.

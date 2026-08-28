@@ -26,9 +26,7 @@ final class OrdersTrackingConstant {
   /// what a seller picks precisely when the app does not know the courier.
   static String? url({required String? carrier, required String? number}) {
     final String trimmed = number?.trim() ?? '';
-    final String? template = carrier == null
-        ? null
-        : urlTemplates[carrier];
+    final String? template = carrier == null ? null : urlTemplates[carrier];
 
     if (template == null || trimmed.isEmpty) return null;
 

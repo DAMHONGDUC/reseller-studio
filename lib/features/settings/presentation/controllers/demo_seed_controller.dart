@@ -34,9 +34,7 @@ class DemoSeedController extends Notifier<bool> {
     try {
       // The workspace's own currency, not the seed's default: a GBP business
       // filled with dollar amounts is a demo that argues against itself.
-      return await seeder.seed(
-        MockDataset.seed(now: now, currency: currency),
-      );
+      return await seeder.seed(MockDataset.seed(now: now, currency: currency));
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.workspace,

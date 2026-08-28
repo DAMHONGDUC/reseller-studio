@@ -33,46 +33,51 @@ class WorkspaceEditController extends Notifier<bool> {
   /// **Does not convert a single stored amount, and must never try** — nobody
   /// knows what rate applied to a purchase made last March. It changes what
   /// new money fields default to.
-  Future<void> setCurrency(String code) =>
-      _apply('set currency', <String, Object>{'currency': code}, (
-        Workspace current,
-      ) {
-        return current.copyWith(currency: code);
-      });
+  Future<void> setCurrency(String code) => _apply(
+    'set currency',
+    <String, Object>{'currency': code},
+    (Workspace current) {
+      return current.copyWith(currency: code);
+    },
+  );
 
   /// The tax jurisdiction follows from this, so it is the one field here that
   /// changes what a number *means* rather than how it is shown.
-  Future<void> setCountry(String code) =>
-      _apply('set country', <String, Object>{'country': code}, (
-        Workspace current,
-      ) {
-        return current.copyWith(country: code);
-      });
+  Future<void> setCountry(String code) => _apply(
+    'set country',
+    <String, Object>{'country': code},
+    (Workspace current) {
+      return current.copyWith(country: code);
+    },
+  );
 
-  Future<void> setBusinessType(String key) =>
-      _apply('set business type', <String, Object>{'businessType': key}, (
-        Workspace current,
-      ) {
-        return current.copyWith(businessType: key);
-      });
+  Future<void> setBusinessType(String key) => _apply(
+    'set business type',
+    <String, Object>{'businessType': key},
+    (Workspace current) {
+      return current.copyWith(businessType: key);
+    },
+  );
 
-  Future<void> setStaleThresholdDays(int days) =>
-      _apply('set stale threshold', <String, Object>{'days': days}, (
-        Workspace current,
-      ) {
-        return current.copyWith(staleThresholdDays: days);
-      });
+  Future<void> setStaleThresholdDays(int days) => _apply(
+    'set stale threshold',
+    <String, Object>{'days': days},
+    (Workspace current) {
+      return current.copyWith(staleThresholdDays: days);
+    },
+  );
 
   /// How few items on hand before the daily digest says so.
   ///
   /// **Read by a Cloud Function, not by a screen** — the reminder is sent from
   /// the backend, so this setting is the only thing the app contributes to it.
-  Future<void> setLowStockThreshold(int items) =>
-      _apply('set low stock threshold', <String, Object>{'items': items}, (
-        Workspace current,
-      ) {
-        return current.copyWith(lowStockThreshold: items);
-      });
+  Future<void> setLowStockThreshold(int items) => _apply(
+    'set low stock threshold',
+    <String, Object>{'items': items},
+    (Workspace current) {
+      return current.copyWith(lowStockThreshold: items);
+    },
+  );
 
   /// End the business: its records, its files and the invitations to it.
   ///
@@ -129,15 +134,16 @@ class WorkspaceEditController extends Notifier<bool> {
     if (current == null) return;
 
     state = true;
-    SdLogger.action(LogTagConstant.workspace, 'Workspace $what', <String, Object>{
-      'workspaceId': current.id,
-      ...data,
-    });
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Workspace $what',
+      <String, Object>{'workspaceId': current.id, ...data},
+    );
 
     try {
-      await ref.read(workspaceRepositoryProvider).updateWorkspace(
-        change(current),
-      );
+      await ref
+          .read(workspaceRepositoryProvider)
+          .updateWorkspace(change(current));
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.workspace,

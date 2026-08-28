@@ -39,7 +39,7 @@ class CategoriesScreen extends ConsumerWidget {
       context,
       () =>
           ref.read(catalogControllerProvider.notifier).saveCategory(name: name),
-      context.l10n.categoryAdded,
+      null,
     );
   }
 
@@ -103,15 +103,17 @@ class CategoriesScreen extends ConsumerWidget {
   }
 
   /// The one place a write's outcome becomes a message.
+  /// A [done] of null is an add: the new row appearing in the list behind is
+  /// the confirmation, so nothing is said (owner's rule).
   Future<void> _write(
     BuildContext context,
     Future<void> Function() action,
-    String done,
+    String? done,
   ) async {
     try {
       await action();
 
-      if (!context.mounted) return;
+      if (!context.mounted || done == null) return;
 
       SdSnackBarUtilsV3.success(context, done);
     } catch (error) {

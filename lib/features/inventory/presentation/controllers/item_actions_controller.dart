@@ -180,10 +180,11 @@ class ItemActionsController extends Notifier<bool> {
             : priced,
       );
 
-      SdLogger.info(LogTagConstant.listing, 'Item cross-listed', <String, Object>{
-        'itemId': item.id,
-        'count': marketplaces.length,
-      });
+      SdLogger.info(
+        LogTagConstant.listing,
+        'Item cross-listed',
+        <String, Object>{'itemId': item.id, 'count': marketplaces.length},
+      );
       AppAnalytics.instance.bulkAction(
         action: 'Cross-list item',
         count: marketplaces.length,

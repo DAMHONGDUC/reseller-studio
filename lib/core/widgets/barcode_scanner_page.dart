@@ -14,7 +14,11 @@ import 'barcode_camera_view.dart';
 /// destination and does have a path. Both draw the same
 /// [BarcodeCameraView] — what differs is who answers the code.
 class BarcodeScannerPage extends StatelessWidget {
-  const BarcodeScannerPage({required this.title, required this.hint, super.key});
+  const BarcodeScannerPage({
+    required this.title,
+    required this.hint,
+    super.key,
+  });
 
   final String title;
   final String hint;

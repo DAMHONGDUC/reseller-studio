@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../extensions/context_extensions.dart';
 import 'app_selectable_row.dart';
+import 'app_sheet_option_list.dart';
 
 /// One row in an [OptionPickerSheet].
 ///
@@ -23,6 +25,12 @@ class PickerOption<T> {
   final String? caption;
 
   final IconData? icon;
+
+  /// Whether a search query matches this row. The caption counts, so typing a
+  /// country's code finds it as well as its name.
+  bool matches(String query) =>
+      label.toLowerCase().contains(query) ||
+      (caption?.toLowerCase().contains(query) ?? false);
 }
 
 /// The app's one "choose one of these" sheet.
@@ -36,17 +44,24 @@ class PickerOption<T> {
 /// without picking. **Null means "left it alone", never "cleared it"** — a
 /// caller that treats a dismissal as a change would wipe a field every time
 /// somebody tapped outside.
-class OptionPickerSheet<T> extends StatelessWidget {
+///
+/// **[searchHint] turns on the search box**, and a list long enough to need
+/// scrolling should pass one: the country picker holds every country, and a
+/// list that long with no way to filter it is a list nobody reaches the end
+/// of. A short list is faster to read than to type at, so it goes without.
+class OptionPickerSheet<T> extends StatefulWidget {
   const OptionPickerSheet({
     required this.title,
     required this.options,
     this.selected,
+    this.searchHint,
     super.key,
   });
 
   final String title;
   final List<PickerOption<T>> options;
   final T? selected;
+  final String? searchHint;
 
   /// Present the sheet and wait for a choice.
   static Future<T?> show<T>(
@@ -54,42 +69,84 @@ class OptionPickerSheet<T> extends StatelessWidget {
     required String title,
     required List<PickerOption<T>> options,
     T? selected,
+    String? searchHint,
   }) => showSdBottomSheetV3<T>(
     context: context,
     builder: (BuildContext context) => OptionPickerSheet<T>(
       title: title,
       options: options,
       selected: selected,
+      searchHint: searchHint,
     ),
   );
+
+  /// How tall the list may grow before it scrolls inside the sheet.
+  static double get listMaxHeight => SdSpacingConstant.h200 * 2;
 
   @override
-  Widget build(BuildContext context) => SdBottomSheetV3(
-    title: title,
-    child: ConstrainedBox(
-      // Capped so a long list — every currency, say — scrolls inside the
-      // sheet instead of growing it past the top of the screen.
-      constraints: BoxConstraints(maxHeight: SdSpacingConstant.h200 * 2),
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: options.length,
-        // A gap rather than a hairline: each row carries its own rounded
-        // ground when chosen, and a divider cutting through that reads as two
-        // competing shapes.
-        separatorBuilder: (BuildContext context, int index) =>
-            SizedBox(height: SdSpacingConstant.h4),
-        itemBuilder: (BuildContext context, int index) {
-          final PickerOption<T> option = options[index];
+  State<OptionPickerSheet<T>> createState() => _OptionPickerSheetState<T>();
+}
 
-          return _PickerRow<T>(
-            option: option,
-            isSelected: option.value == selected,
-            onTap: () => Navigator.of(context).pop(option.value),
-          );
-        },
+class _OptionPickerSheetState<T> extends State<OptionPickerSheet<T>> {
+  final TextEditingController _query = TextEditingController();
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String query = _query.text.trim().toLowerCase();
+
+    final List<PickerOption<T>> visible = query.isEmpty
+        ? widget.options
+        : widget.options
+              .where((PickerOption<T> option) => option.matches(query))
+              .toList();
+
+    return SdBottomSheetV3(
+      title: widget.title,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          if (widget.searchHint != null) ...<Widget>[
+            SdSearchFieldV3(
+              controller: _query,
+              hint: widget.searchHint!,
+              clearTooltip: context.l10n.commonClear,
+              onChanged: (_) => setState(() {}),
+            ),
+            SizedBox(height: SdSpacingConstant.h12),
+          ],
+          if (visible.isEmpty)
+            Padding(
+              padding: SdContentPaddingV3.row,
+              child: Text(
+                context.l10n.commonNoResults,
+                style: context.textTheme3.bodyMedium!.muted3(context),
+              ),
+            )
+          else
+            AppSheetOptionList(
+              maxHeight: OptionPickerSheet.listMaxHeight,
+              itemCount: visible.length,
+              itemBuilder: (BuildContext context, int index) {
+                final PickerOption<T> option = visible[index];
+
+                return _PickerRow<T>(
+                  option: option,
+                  isSelected: option.value == widget.selected,
+                  onTap: () => Navigator.of(context).pop(option.value),
+                );
+              },
+            ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _PickerRow<T> extends StatelessWidget {

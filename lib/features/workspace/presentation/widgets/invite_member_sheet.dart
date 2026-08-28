@@ -80,7 +80,10 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -95,6 +98,7 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
         children: <Widget>[
           SdTextFieldV3(
             label: context.l10n.teamInviteEmail,
+            isRequired: true,
             controller: _email,
             hint: context.l10n.teamInviteEmailHint,
             errorText: _error,

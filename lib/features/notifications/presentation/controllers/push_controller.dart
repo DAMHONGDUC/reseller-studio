@@ -137,10 +137,14 @@ class PushController extends Notifier<void> {
       return;
     }
 
-    SdLogger.action(LogTagConstant.notification, 'Push opened', <String, Object>{
-      'route': route,
-      'type': message.data['type']?.toString() ?? '',
-    });
+    SdLogger.action(
+      LogTagConstant.notification,
+      'Push opened',
+      <String, Object>{
+        'route': route,
+        'type': message.data['type']?.toString() ?? '',
+      },
+    );
 
     ref.read(routerProvider).go(route);
   }

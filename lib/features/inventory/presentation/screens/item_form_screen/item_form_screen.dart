@@ -8,6 +8,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
@@ -131,8 +132,9 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
 
       if (id == null || !mounted) return;
 
+      // No success message: the screen closes onto the row that just changed,
+      // which is the confirmation (owner's rule).
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, context.l10n.commonSaved);
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -162,112 +164,118 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
             ? context.l10n.itemFormEditTitle
             : context.l10n.inventoryAddItem,
       ),
-      body: ListView(
-        padding: SdContentPaddingV3.screen(context),
+      body: Column(
         children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          const _PhotoStrip(),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          _FormSection(
-            title: context.l10n.itemFormBasics,
-            children: <Widget>[
-              SdTextFieldV3(
-                label: context.l10n.commonTitle,
-                controller: _title,
-                hint: context.l10n.quickAddNameHint,
-                helperText: context.l10n.itemFormOnlyRequired,
-                textInputAction: TextInputAction.next,
+          Expanded(
+            child: ListView(
+              // No bottom inset: the pinned action owns the bottom edge.
+              padding: EdgeInsets.symmetric(
+                horizontal: SdContentPaddingV3.horizontal,
               ),
-              SdTextFieldV3(
-                label: context.l10n.commonQuantity,
-                controller: _quantity,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-              ),
-              _ConditionField(state: state),
-              _CategoryField(state: state),
-            ],
+              children: <Widget>[
+                SizedBox(height: SdContentPaddingV3.topGap),
+                const _PhotoStrip(),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _FormSection(
+                  title: context.l10n.itemFormBasics,
+                  children: <Widget>[
+                    SdTextFieldV3(
+                      label: context.l10n.commonTitle,
+                      controller: _title,
+                      hint: context.l10n.quickAddNameHint,
+                      isRequired: true,
+                      helperText: context.l10n.itemFormOnlyRequired,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SdTextFieldV3(
+                      label: context.l10n.commonQuantity,
+                      controller: _quantity,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    _ConditionField(state: state),
+                    _CategoryField(state: state),
+                  ],
+                ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _FormSection(
+                  title: context.l10n.itemPricing,
+                  children: <Widget>[
+                    MoneyField(
+                      label: context.l10n.itemCost,
+                      controller: _cost,
+                      currency: currency,
+                      helperText: context.l10n.itemCostHelp,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    MoneyField(
+                      label: context.l10n.itemAskingPrice,
+                      controller: _asking,
+                      currency: currency,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    MoneyField(
+                      label: context.l10n.itemMinimumPrice,
+                      controller: _minimum,
+                      currency: currency,
+                      helperText: context.l10n.itemMinimumPriceHelp,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ],
+                ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _FormSection(
+                  title: context.l10n.itemFormWhereFrom,
+                  children: <Widget>[
+                    _SourceField(state: state),
+                    _PurchaseDateField(state: state),
+                  ],
+                ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _FormSection(
+                  title: context.l10n.itemFormWhereIs,
+                  children: <Widget>[_LocationField(state: state)],
+                ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _FormSection(
+                  title: context.l10n.itemFormIdentifiers,
+                  children: <Widget>[
+                    SdTextFieldV3(
+                      label: context.l10n.commonSku,
+                      controller: _sku,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SdTextFieldV3(
+                      label: context.l10n.commonBarcode,
+                      controller: _barcode,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ],
+                ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _FormSection(
+                  title: context.l10n.commonNotes,
+                  children: <Widget>[
+                    SdTextFieldV3(
+                      label: context.l10n.commonDescription,
+                      controller: _description,
+                      maxLines: 3,
+                    ),
+                    SdTextFieldV3(
+                      label: context.l10n.itemFormPrivateNotes,
+                      controller: _notes,
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          _FormSection(
-            title: context.l10n.itemPricing,
-            children: <Widget>[
-              MoneyField(
-                label: context.l10n.itemCost,
-                controller: _cost,
-                currency: currency,
-                helperText: context.l10n.itemCostHelp,
-                textInputAction: TextInputAction.next,
-              ),
-              MoneyField(
-                label: context.l10n.itemAskingPrice,
-                controller: _asking,
-                currency: currency,
-                textInputAction: TextInputAction.next,
-              ),
-              MoneyField(
-                label: context.l10n.itemMinimumPrice,
-                controller: _minimum,
-                currency: currency,
-                helperText: context.l10n.itemMinimumPriceHelp,
-                textInputAction: TextInputAction.next,
-              ),
-            ],
-          ),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          _FormSection(
-            title: context.l10n.itemFormWhereFrom,
-            children: <Widget>[
-              _SourceField(state: state),
-              _PurchaseDateField(state: state),
-            ],
-          ),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          _FormSection(
-            title: context.l10n.itemFormWhereIs,
-            children: <Widget>[_LocationField(state: state)],
-          ),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          _FormSection(
-            title: context.l10n.itemFormIdentifiers,
-            children: <Widget>[
-              SdTextFieldV3(
-                label: context.l10n.commonSku,
-                controller: _sku,
-                textInputAction: TextInputAction.next,
-              ),
-              SdTextFieldV3(
-                label: context.l10n.commonBarcode,
-                controller: _barcode,
-                textInputAction: TextInputAction.next,
-              ),
-            ],
-          ),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          _FormSection(
-            title: context.l10n.commonNotes,
-            children: <Widget>[
-              SdTextFieldV3(
-                label: context.l10n.commonDescription,
-                controller: _description,
-                maxLines: 3,
-              ),
-              SdTextFieldV3(
-                label: context.l10n.itemFormPrivateNotes,
-                controller: _notes,
-                maxLines: 3,
-              ),
-            ],
-          ),
-          SizedBox(height: SdSpacingConstant.h32),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
+          AppPinnedAction(
             label: context.l10n.actionSave,
-            expand: true,
-            busy: state.isSaving,
+            isBusy: state.isSaving,
             onPressed: state.isSaving ? null : _submit,
           ),
-          SizedBox(height: SdContentPaddingV3.bottomGap),
         ],
       ),
     );

@@ -37,7 +37,6 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
 }
 
 class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
-
   late final TextEditingController _price = TextEditingController(
     text: widget.item.askingPrice?.toInputString() ?? '',
   );
@@ -104,6 +103,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
         children: <Widget>[
           MoneyField(
             label: context.l10n.markSoldPrice,
+            isRequired: true,
             controller: _price,
             currency: currency,
             textInputAction: TextInputAction.next,
@@ -142,7 +142,9 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
               final DateTime? picked = await showDatePicker(
                 context: context,
                 initialDate: _soldAt,
-                firstDate: DateTime(now.year - DatePickerConstant.recentEntryYearsBack),
+                firstDate: DateTime(
+                  now.year - DatePickerConstant.recentEntryYearsBack,
+                ),
                 lastDate: now,
               );
 

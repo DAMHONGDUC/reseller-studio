@@ -73,7 +73,9 @@ class _WorkflowRow extends StatelessWidget {
                     width: nodeSize,
                     height: nodeSize,
                     decoration: BoxDecoration(
-                      color: accent.withValues(alpha: SdIconTileV3.backgroundOpacity),
+                      color: accent.withValues(
+                        alpha: SdIconTileV3.backgroundOpacity,
+                      ),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -130,5 +132,4 @@ class _WorkflowRow extends StatelessWidget {
       ),
     );
   }
-
 }

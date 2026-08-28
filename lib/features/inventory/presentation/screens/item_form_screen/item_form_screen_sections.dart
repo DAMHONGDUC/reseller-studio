@@ -218,7 +218,6 @@ class _PurchaseDateField extends ConsumerWidget {
 
   final ItemFormState state;
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final DateTime now = DateTime.now();

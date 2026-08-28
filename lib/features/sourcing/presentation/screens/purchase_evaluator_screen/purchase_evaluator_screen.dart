@@ -157,8 +157,7 @@ class _PurchaseEvaluatorScreenState
                       ? context.l10n.sourcingSalePriceFilled
                       : null,
                   textInputAction: TextInputAction.next,
-                  onChanged: (_) =>
-                      setState(() => _saleFromHistory = false),
+                  onChanged: (_) => setState(() => _saleFromHistory = false),
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(

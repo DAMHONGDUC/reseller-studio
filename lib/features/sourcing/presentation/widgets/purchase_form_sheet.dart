@@ -35,7 +35,6 @@ class PurchaseFormSheet extends ConsumerStatefulWidget {
 }
 
 class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
-
   final TextEditingController _total = TextEditingController();
   final TextEditingController _notes = TextEditingController();
 
@@ -93,7 +92,6 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
       if (!mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Purchase recorded');
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -120,13 +118,16 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
         children: <Widget>[
           PickerField(
             label: context.l10n.commonDate,
+            isRequired: true,
             icon: Symbols.calendar_month_rounded,
             value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
             onTap: () async {
               final DateTime? picked = await showDatePicker(
                 context: context,
                 initialDate: _date,
-                firstDate: DateTime(now.year - DatePickerConstant.taxRecordYearsBack),
+                firstDate: DateTime(
+                  now.year - DatePickerConstant.taxRecordYearsBack,
+                ),
                 // A purchase cannot be from next month, and one filed there
                 // breaks every period report it lands in.
                 lastDate: now,

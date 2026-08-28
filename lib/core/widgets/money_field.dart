@@ -19,6 +19,7 @@ class MoneyField extends StatelessWidget {
     required this.label,
     required this.controller,
     required this.currency,
+    this.isRequired = false,
     this.errorText,
     this.helperText,
     this.textInputAction,
@@ -33,6 +34,9 @@ class MoneyField extends StatelessWidget {
   /// Shown as the field's prefix, so the seller can see which currency they
   /// are typing in without reading the workspace settings.
   final String currency;
+
+  /// Passed straight through to the field's label marker.
+  final bool isRequired;
 
   /// Tints the border and replaces [helperText] below the field. A form that
   /// can only report a problem in a snackbar makes the seller guess which box
@@ -55,6 +59,7 @@ class MoneyField extends StatelessWidget {
     label: label,
     controller: controller,
     hint: _hint,
+    isRequired: isRequired,
     errorText: errorText,
     helperText: helperText,
     keyboardType: const TextInputType.numberWithOptions(decimal: true),

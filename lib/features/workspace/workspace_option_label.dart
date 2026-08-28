@@ -2,7 +2,10 @@ import 'package:flutter/widgets.dart';
 
 import '../../core/extensions/context_extensions.dart';
 
-/// The words for a stored currency, country or business-type code.
+/// The words for a stored currency or business-type code.
+///
+/// A country's name is not here — `CountryLabel` owns that one, because
+/// there are 249 of them and they would bury these two.
 ///
 /// `WorkspaceConstant` holds the codes and this holds the labels, because a
 /// label is a user-facing string (hard rule 7) and a code is a record. A
@@ -21,19 +24,6 @@ final class WorkspaceOptionLabel {
     'CAD' => context.l10n.currencyCad,
     'JPY' => context.l10n.currencyJpy,
     'SGD' => context.l10n.currencySgd,
-    _ => code,
-  };
-
-  static String country(BuildContext context, String code) => switch (code) {
-    'US' => context.l10n.countryUs,
-    'GB' => context.l10n.countryGb,
-    'VN' => context.l10n.countryVn,
-    'AU' => context.l10n.countryAu,
-    'CA' => context.l10n.countryCa,
-    'DE' => context.l10n.countryDe,
-    'FR' => context.l10n.countryFr,
-    'JP' => context.l10n.countryJp,
-    'SG' => context.l10n.countrySg,
     _ => code,
   };
 

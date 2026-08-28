@@ -96,6 +96,7 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
         children: <Widget>[
           PickerField(
             label: context.l10n.commonMarketplace,
+            isRequired: true,
             value: _marketplace.displayName,
             onTap: () async {
               final Marketplace? picked =
@@ -125,6 +126,7 @@ class _ListItemSheetState extends ConsumerState<ListItemSheet> {
           SizedBox(height: SdSpacingConstant.h16),
           MoneyField(
             label: context.l10n.listItemPrice,
+            isRequired: true,
             controller: _price,
             currency: currency,
             textInputAction: TextInputAction.done,

@@ -109,8 +109,7 @@ final class ItemTransition {
 
     if (item.quantity <= 0) blocks.add(ItemTransitionBlock.noQuantity);
 
-    if (item.status == ItemStatus.sold ||
-        item.status == ItemStatus.archived) {
+    if (item.status == ItemStatus.sold || item.status == ItemStatus.archived) {
       blocks.add(ItemTransitionBlock.wrongStatus);
     }
 

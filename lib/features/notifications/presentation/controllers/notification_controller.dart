@@ -20,8 +20,12 @@ class NotificationController extends Notifier<bool> {
   Future<void> markRead(AppNotification notification) async {
     if (!notification.isUnread) return;
 
-    await _write('mark read', <String, Object>{'notificationId': notification.id},
-        (NotificationRepository repository) => repository.markRead(notification.id));
+    await _write(
+      'mark read',
+      <String, Object>{'notificationId': notification.id},
+      (NotificationRepository repository) =>
+          repository.markRead(notification.id),
+    );
   }
 
   Future<void> markAllRead(List<AppNotification> notifications) async {
@@ -32,8 +36,11 @@ class NotificationController extends Notifier<bool> {
 
     if (unread.isEmpty) return;
 
-    await _write('mark all read', <String, Object>{'count': unread.length},
-        (NotificationRepository repository) => repository.markAllRead(unread));
+    await _write(
+      'mark all read',
+      <String, Object>{'count': unread.length},
+      (NotificationRepository repository) => repository.markAllRead(unread),
+    );
   }
 
   Future<void> _write(

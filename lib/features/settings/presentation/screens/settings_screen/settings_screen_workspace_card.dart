@@ -49,18 +49,9 @@ class _WorkspaceCard extends ConsumerWidget {
   }
 
   Future<void> _pickCountry(BuildContext context, WidgetRef ref) async {
-    final String? code = await OptionPickerSheet.show<String>(
+    final String? code = await CountryPicker.show(
       context,
-      title: context.l10n.workspaceCountry,
       selected: workspace.country,
-      options: WorkspaceConstant.countries
-          .map(
-            (String code) => PickerOption<String>(
-              value: code,
-              label: WorkspaceOptionLabel.country(context, code),
-            ),
-          )
-          .toList(),
     );
 
     if (code == null || !context.mounted) return;
@@ -140,7 +131,10 @@ class _WorkspaceCard extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -162,7 +156,10 @@ class _WorkspaceCard extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -183,7 +180,7 @@ class _WorkspaceCard extends ConsumerWidget {
         ),
         AppListRow(
           title: context.l10n.workspaceCountry,
-          subtitle: WorkspaceOptionLabel.country(context, workspace.country),
+          subtitle: CountryLabel.of(context, workspace.country),
           icon: Symbols.public_rounded,
           onTap: () => _pickCountry(context, ref),
         ),
@@ -246,7 +243,7 @@ class _WorkspaceReadOnlyCard extends StatelessWidget {
         ),
         _SettingRow(
           label: context.l10n.workspaceCountry,
-          value: WorkspaceOptionLabel.country(context, workspace.country),
+          value: CountryLabel.of(context, workspace.country),
         ),
         _SettingRow(
           label: context.l10n.workspaceCurrency,

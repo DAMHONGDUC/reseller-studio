@@ -338,39 +338,39 @@
   },
   "countryUs": "United States",
   "@countryUs": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 US."
   },
   "countryGb": "United Kingdom",
   "@countryGb": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 GB."
   },
   "countryVn": "Vietnam",
   "@countryVn": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 VN."
   },
   "countryAu": "Australia",
   "@countryAu": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 AU."
   },
   "countryCa": "Canada",
   "@countryCa": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 CA."
   },
   "countryDe": "Germany",
   "@countryDe": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 DE."
   },
   "countryFr": "France",
   "@countryFr": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 FR."
   },
   "countryJp": "Japan",
   "@countryJp": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 JP."
   },
   "countrySg": "Singapore",
   "@countrySg": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 SG."
   },
   "moreManage": "Manage",
   "@moreManage": {
@@ -3344,5 +3344,973 @@
         "type": "int"
       }
     }
+  },
+  "countryAf": "Afghanistan",
+  "@countryAf": {
+    "description": "Country name for ISO 3166-1 alpha-2 AF."
+  },
+  "countryAl": "Albania",
+  "@countryAl": {
+    "description": "Country name for ISO 3166-1 alpha-2 AL."
+  },
+  "countryDz": "Algeria",
+  "@countryDz": {
+    "description": "Country name for ISO 3166-1 alpha-2 DZ."
+  },
+  "countryAd": "Andorra",
+  "@countryAd": {
+    "description": "Country name for ISO 3166-1 alpha-2 AD."
+  },
+  "countryAo": "Angola",
+  "@countryAo": {
+    "description": "Country name for ISO 3166-1 alpha-2 AO."
+  },
+  "countryAi": "Anguilla",
+  "@countryAi": {
+    "description": "Country name for ISO 3166-1 alpha-2 AI."
+  },
+  "countryAq": "Antarctica",
+  "@countryAq": {
+    "description": "Country name for ISO 3166-1 alpha-2 AQ."
+  },
+  "countryAg": "Antigua & Barbuda",
+  "@countryAg": {
+    "description": "Country name for ISO 3166-1 alpha-2 AG."
+  },
+  "countryAr": "Argentina",
+  "@countryAr": {
+    "description": "Country name for ISO 3166-1 alpha-2 AR."
+  },
+  "countryAm": "Armenia",
+  "@countryAm": {
+    "description": "Country name for ISO 3166-1 alpha-2 AM."
+  },
+  "countryAw": "Aruba",
+  "@countryAw": {
+    "description": "Country name for ISO 3166-1 alpha-2 AW."
+  },
+  "countryAt": "Austria",
+  "@countryAt": {
+    "description": "Country name for ISO 3166-1 alpha-2 AT."
+  },
+  "countryAz": "Azerbaijan",
+  "@countryAz": {
+    "description": "Country name for ISO 3166-1 alpha-2 AZ."
+  },
+  "countryBs": "Bahamas",
+  "@countryBs": {
+    "description": "Country name for ISO 3166-1 alpha-2 BS."
+  },
+  "countryBh": "Bahrain",
+  "@countryBh": {
+    "description": "Country name for ISO 3166-1 alpha-2 BH."
+  },
+  "countryBd": "Bangladesh",
+  "@countryBd": {
+    "description": "Country name for ISO 3166-1 alpha-2 BD."
+  },
+  "countryBb": "Barbados",
+  "@countryBb": {
+    "description": "Country name for ISO 3166-1 alpha-2 BB."
+  },
+  "countryBy": "Belarus",
+  "@countryBy": {
+    "description": "Country name for ISO 3166-1 alpha-2 BY."
+  },
+  "countryBe": "Belgium",
+  "@countryBe": {
+    "description": "Country name for ISO 3166-1 alpha-2 BE."
+  },
+  "countryBz": "Belize",
+  "@countryBz": {
+    "description": "Country name for ISO 3166-1 alpha-2 BZ."
+  },
+  "countryBj": "Benin",
+  "@countryBj": {
+    "description": "Country name for ISO 3166-1 alpha-2 BJ."
+  },
+  "countryBm": "Bermuda",
+  "@countryBm": {
+    "description": "Country name for ISO 3166-1 alpha-2 BM."
+  },
+  "countryBt": "Bhutan",
+  "@countryBt": {
+    "description": "Country name for ISO 3166-1 alpha-2 BT."
+  },
+  "countryBo": "Bolivia",
+  "@countryBo": {
+    "description": "Country name for ISO 3166-1 alpha-2 BO."
+  },
+  "countryBa": "Bosnia & Herzegovina",
+  "@countryBa": {
+    "description": "Country name for ISO 3166-1 alpha-2 BA."
+  },
+  "countryBw": "Botswana",
+  "@countryBw": {
+    "description": "Country name for ISO 3166-1 alpha-2 BW."
+  },
+  "countryBv": "Bouvet Island",
+  "@countryBv": {
+    "description": "Country name for ISO 3166-1 alpha-2 BV."
+  },
+  "countryBr": "Brazil",
+  "@countryBr": {
+    "description": "Country name for ISO 3166-1 alpha-2 BR."
+  },
+  "countryIo": "British Indian Ocean Territory",
+  "@countryIo": {
+    "description": "Country name for ISO 3166-1 alpha-2 IO."
+  },
+  "countryBn": "Brunei",
+  "@countryBn": {
+    "description": "Country name for ISO 3166-1 alpha-2 BN."
+  },
+  "countryBg": "Bulgaria",
+  "@countryBg": {
+    "description": "Country name for ISO 3166-1 alpha-2 BG."
+  },
+  "countryBf": "Burkina Faso",
+  "@countryBf": {
+    "description": "Country name for ISO 3166-1 alpha-2 BF."
+  },
+  "countryBi": "Burundi",
+  "@countryBi": {
+    "description": "Country name for ISO 3166-1 alpha-2 BI."
+  },
+  "countryKh": "Cambodia",
+  "@countryKh": {
+    "description": "Country name for ISO 3166-1 alpha-2 KH."
+  },
+  "countryCm": "Cameroon",
+  "@countryCm": {
+    "description": "Country name for ISO 3166-1 alpha-2 CM."
+  },
+  "countryCv": "Cape Verde",
+  "@countryCv": {
+    "description": "Country name for ISO 3166-1 alpha-2 CV."
+  },
+  "countryBq": "Caribbean NL",
+  "@countryBq": {
+    "description": "Country name for ISO 3166-1 alpha-2 BQ."
+  },
+  "countryKy": "Cayman Islands",
+  "@countryKy": {
+    "description": "Country name for ISO 3166-1 alpha-2 KY."
+  },
+  "countryCf": "Central African Rep.",
+  "@countryCf": {
+    "description": "Country name for ISO 3166-1 alpha-2 CF."
+  },
+  "countryTd": "Chad",
+  "@countryTd": {
+    "description": "Country name for ISO 3166-1 alpha-2 TD."
+  },
+  "countryCl": "Chile",
+  "@countryCl": {
+    "description": "Country name for ISO 3166-1 alpha-2 CL."
+  },
+  "countryCn": "China",
+  "@countryCn": {
+    "description": "Country name for ISO 3166-1 alpha-2 CN."
+  },
+  "countryCx": "Christmas Island",
+  "@countryCx": {
+    "description": "Country name for ISO 3166-1 alpha-2 CX."
+  },
+  "countryCc": "Cocos (Keeling) Islands",
+  "@countryCc": {
+    "description": "Country name for ISO 3166-1 alpha-2 CC."
+  },
+  "countryCo": "Colombia",
+  "@countryCo": {
+    "description": "Country name for ISO 3166-1 alpha-2 CO."
+  },
+  "countryKm": "Comoros",
+  "@countryKm": {
+    "description": "Country name for ISO 3166-1 alpha-2 KM."
+  },
+  "countryCd": "Congo (Dem. Rep.)",
+  "@countryCd": {
+    "description": "Country name for ISO 3166-1 alpha-2 CD."
+  },
+  "countryCg": "Congo (Rep.)",
+  "@countryCg": {
+    "description": "Country name for ISO 3166-1 alpha-2 CG."
+  },
+  "countryCk": "Cook Islands",
+  "@countryCk": {
+    "description": "Country name for ISO 3166-1 alpha-2 CK."
+  },
+  "countryCr": "Costa Rica",
+  "@countryCr": {
+    "description": "Country name for ISO 3166-1 alpha-2 CR."
+  },
+  "countryHr": "Croatia",
+  "@countryHr": {
+    "description": "Country name for ISO 3166-1 alpha-2 HR."
+  },
+  "countryCu": "Cuba",
+  "@countryCu": {
+    "description": "Country name for ISO 3166-1 alpha-2 CU."
+  },
+  "countryCw": "Curaçao",
+  "@countryCw": {
+    "description": "Country name for ISO 3166-1 alpha-2 CW."
+  },
+  "countryCy": "Cyprus",
+  "@countryCy": {
+    "description": "Country name for ISO 3166-1 alpha-2 CY."
+  },
+  "countryCz": "Czech Republic",
+  "@countryCz": {
+    "description": "Country name for ISO 3166-1 alpha-2 CZ."
+  },
+  "countryCi": "Côte d’Ivoire",
+  "@countryCi": {
+    "description": "Country name for ISO 3166-1 alpha-2 CI."
+  },
+  "countryDk": "Denmark",
+  "@countryDk": {
+    "description": "Country name for ISO 3166-1 alpha-2 DK."
+  },
+  "countryDj": "Djibouti",
+  "@countryDj": {
+    "description": "Country name for ISO 3166-1 alpha-2 DJ."
+  },
+  "countryDm": "Dominica",
+  "@countryDm": {
+    "description": "Country name for ISO 3166-1 alpha-2 DM."
+  },
+  "countryDo": "Dominican Republic",
+  "@countryDo": {
+    "description": "Country name for ISO 3166-1 alpha-2 DO."
+  },
+  "countryTl": "East Timor",
+  "@countryTl": {
+    "description": "Country name for ISO 3166-1 alpha-2 TL."
+  },
+  "countryEc": "Ecuador",
+  "@countryEc": {
+    "description": "Country name for ISO 3166-1 alpha-2 EC."
+  },
+  "countryEg": "Egypt",
+  "@countryEg": {
+    "description": "Country name for ISO 3166-1 alpha-2 EG."
+  },
+  "countrySv": "El Salvador",
+  "@countrySv": {
+    "description": "Country name for ISO 3166-1 alpha-2 SV."
+  },
+  "countryGq": "Equatorial Guinea",
+  "@countryGq": {
+    "description": "Country name for ISO 3166-1 alpha-2 GQ."
+  },
+  "countryEr": "Eritrea",
+  "@countryEr": {
+    "description": "Country name for ISO 3166-1 alpha-2 ER."
+  },
+  "countryEe": "Estonia",
+  "@countryEe": {
+    "description": "Country name for ISO 3166-1 alpha-2 EE."
+  },
+  "countrySz": "Eswatini (Swaziland)",
+  "@countrySz": {
+    "description": "Country name for ISO 3166-1 alpha-2 SZ."
+  },
+  "countryEt": "Ethiopia",
+  "@countryEt": {
+    "description": "Country name for ISO 3166-1 alpha-2 ET."
+  },
+  "countryFk": "Falkland Islands",
+  "@countryFk": {
+    "description": "Country name for ISO 3166-1 alpha-2 FK."
+  },
+  "countryFo": "Faroe Islands",
+  "@countryFo": {
+    "description": "Country name for ISO 3166-1 alpha-2 FO."
+  },
+  "countryFj": "Fiji",
+  "@countryFj": {
+    "description": "Country name for ISO 3166-1 alpha-2 FJ."
+  },
+  "countryFi": "Finland",
+  "@countryFi": {
+    "description": "Country name for ISO 3166-1 alpha-2 FI."
+  },
+  "countryGf": "French Guiana",
+  "@countryGf": {
+    "description": "Country name for ISO 3166-1 alpha-2 GF."
+  },
+  "countryPf": "French Polynesia",
+  "@countryPf": {
+    "description": "Country name for ISO 3166-1 alpha-2 PF."
+  },
+  "countryTf": "French S. Terr.",
+  "@countryTf": {
+    "description": "Country name for ISO 3166-1 alpha-2 TF."
+  },
+  "countryGa": "Gabon",
+  "@countryGa": {
+    "description": "Country name for ISO 3166-1 alpha-2 GA."
+  },
+  "countryGm": "Gambia",
+  "@countryGm": {
+    "description": "Country name for ISO 3166-1 alpha-2 GM."
+  },
+  "countryGe": "Georgia",
+  "@countryGe": {
+    "description": "Country name for ISO 3166-1 alpha-2 GE."
+  },
+  "countryGh": "Ghana",
+  "@countryGh": {
+    "description": "Country name for ISO 3166-1 alpha-2 GH."
+  },
+  "countryGi": "Gibraltar",
+  "@countryGi": {
+    "description": "Country name for ISO 3166-1 alpha-2 GI."
+  },
+  "countryGr": "Greece",
+  "@countryGr": {
+    "description": "Country name for ISO 3166-1 alpha-2 GR."
+  },
+  "countryGl": "Greenland",
+  "@countryGl": {
+    "description": "Country name for ISO 3166-1 alpha-2 GL."
+  },
+  "countryGd": "Grenada",
+  "@countryGd": {
+    "description": "Country name for ISO 3166-1 alpha-2 GD."
+  },
+  "countryGp": "Guadeloupe",
+  "@countryGp": {
+    "description": "Country name for ISO 3166-1 alpha-2 GP."
+  },
+  "countryGu": "Guam",
+  "@countryGu": {
+    "description": "Country name for ISO 3166-1 alpha-2 GU."
+  },
+  "countryGt": "Guatemala",
+  "@countryGt": {
+    "description": "Country name for ISO 3166-1 alpha-2 GT."
+  },
+  "countryGg": "Guernsey",
+  "@countryGg": {
+    "description": "Country name for ISO 3166-1 alpha-2 GG."
+  },
+  "countryGn": "Guinea",
+  "@countryGn": {
+    "description": "Country name for ISO 3166-1 alpha-2 GN."
+  },
+  "countryGw": "Guinea-Bissau",
+  "@countryGw": {
+    "description": "Country name for ISO 3166-1 alpha-2 GW."
+  },
+  "countryGy": "Guyana",
+  "@countryGy": {
+    "description": "Country name for ISO 3166-1 alpha-2 GY."
+  },
+  "countryHt": "Haiti",
+  "@countryHt": {
+    "description": "Country name for ISO 3166-1 alpha-2 HT."
+  },
+  "countryHm": "Heard Island & McDonald Islands",
+  "@countryHm": {
+    "description": "Country name for ISO 3166-1 alpha-2 HM."
+  },
+  "countryHn": "Honduras",
+  "@countryHn": {
+    "description": "Country name for ISO 3166-1 alpha-2 HN."
+  },
+  "countryHk": "Hong Kong",
+  "@countryHk": {
+    "description": "Country name for ISO 3166-1 alpha-2 HK."
+  },
+  "countryHu": "Hungary",
+  "@countryHu": {
+    "description": "Country name for ISO 3166-1 alpha-2 HU."
+  },
+  "countryIs": "Iceland",
+  "@countryIs": {
+    "description": "Country name for ISO 3166-1 alpha-2 IS."
+  },
+  "countryIn": "India",
+  "@countryIn": {
+    "description": "Country name for ISO 3166-1 alpha-2 IN."
+  },
+  "countryId": "Indonesia",
+  "@countryId": {
+    "description": "Country name for ISO 3166-1 alpha-2 ID."
+  },
+  "countryIr": "Iran",
+  "@countryIr": {
+    "description": "Country name for ISO 3166-1 alpha-2 IR."
+  },
+  "countryIq": "Iraq",
+  "@countryIq": {
+    "description": "Country name for ISO 3166-1 alpha-2 IQ."
+  },
+  "countryIe": "Ireland",
+  "@countryIe": {
+    "description": "Country name for ISO 3166-1 alpha-2 IE."
+  },
+  "countryIm": "Isle of Man",
+  "@countryIm": {
+    "description": "Country name for ISO 3166-1 alpha-2 IM."
+  },
+  "countryIl": "Israel",
+  "@countryIl": {
+    "description": "Country name for ISO 3166-1 alpha-2 IL."
+  },
+  "countryIt": "Italy",
+  "@countryIt": {
+    "description": "Country name for ISO 3166-1 alpha-2 IT."
+  },
+  "countryJm": "Jamaica",
+  "@countryJm": {
+    "description": "Country name for ISO 3166-1 alpha-2 JM."
+  },
+  "countryJe": "Jersey",
+  "@countryJe": {
+    "description": "Country name for ISO 3166-1 alpha-2 JE."
+  },
+  "countryJo": "Jordan",
+  "@countryJo": {
+    "description": "Country name for ISO 3166-1 alpha-2 JO."
+  },
+  "countryKz": "Kazakhstan",
+  "@countryKz": {
+    "description": "Country name for ISO 3166-1 alpha-2 KZ."
+  },
+  "countryKe": "Kenya",
+  "@countryKe": {
+    "description": "Country name for ISO 3166-1 alpha-2 KE."
+  },
+  "countryKi": "Kiribati",
+  "@countryKi": {
+    "description": "Country name for ISO 3166-1 alpha-2 KI."
+  },
+  "countryKp": "Korea (North)",
+  "@countryKp": {
+    "description": "Country name for ISO 3166-1 alpha-2 KP."
+  },
+  "countryKr": "Korea (South)",
+  "@countryKr": {
+    "description": "Country name for ISO 3166-1 alpha-2 KR."
+  },
+  "countryKw": "Kuwait",
+  "@countryKw": {
+    "description": "Country name for ISO 3166-1 alpha-2 KW."
+  },
+  "countryKg": "Kyrgyzstan",
+  "@countryKg": {
+    "description": "Country name for ISO 3166-1 alpha-2 KG."
+  },
+  "countryLa": "Laos",
+  "@countryLa": {
+    "description": "Country name for ISO 3166-1 alpha-2 LA."
+  },
+  "countryLv": "Latvia",
+  "@countryLv": {
+    "description": "Country name for ISO 3166-1 alpha-2 LV."
+  },
+  "countryLb": "Lebanon",
+  "@countryLb": {
+    "description": "Country name for ISO 3166-1 alpha-2 LB."
+  },
+  "countryLs": "Lesotho",
+  "@countryLs": {
+    "description": "Country name for ISO 3166-1 alpha-2 LS."
+  },
+  "countryLr": "Liberia",
+  "@countryLr": {
+    "description": "Country name for ISO 3166-1 alpha-2 LR."
+  },
+  "countryLy": "Libya",
+  "@countryLy": {
+    "description": "Country name for ISO 3166-1 alpha-2 LY."
+  },
+  "countryLi": "Liechtenstein",
+  "@countryLi": {
+    "description": "Country name for ISO 3166-1 alpha-2 LI."
+  },
+  "countryLt": "Lithuania",
+  "@countryLt": {
+    "description": "Country name for ISO 3166-1 alpha-2 LT."
+  },
+  "countryLu": "Luxembourg",
+  "@countryLu": {
+    "description": "Country name for ISO 3166-1 alpha-2 LU."
+  },
+  "countryMo": "Macau",
+  "@countryMo": {
+    "description": "Country name for ISO 3166-1 alpha-2 MO."
+  },
+  "countryMg": "Madagascar",
+  "@countryMg": {
+    "description": "Country name for ISO 3166-1 alpha-2 MG."
+  },
+  "countryMw": "Malawi",
+  "@countryMw": {
+    "description": "Country name for ISO 3166-1 alpha-2 MW."
+  },
+  "countryMy": "Malaysia",
+  "@countryMy": {
+    "description": "Country name for ISO 3166-1 alpha-2 MY."
+  },
+  "countryMv": "Maldives",
+  "@countryMv": {
+    "description": "Country name for ISO 3166-1 alpha-2 MV."
+  },
+  "countryMl": "Mali",
+  "@countryMl": {
+    "description": "Country name for ISO 3166-1 alpha-2 ML."
+  },
+  "countryMt": "Malta",
+  "@countryMt": {
+    "description": "Country name for ISO 3166-1 alpha-2 MT."
+  },
+  "countryMh": "Marshall Islands",
+  "@countryMh": {
+    "description": "Country name for ISO 3166-1 alpha-2 MH."
+  },
+  "countryMq": "Martinique",
+  "@countryMq": {
+    "description": "Country name for ISO 3166-1 alpha-2 MQ."
+  },
+  "countryMr": "Mauritania",
+  "@countryMr": {
+    "description": "Country name for ISO 3166-1 alpha-2 MR."
+  },
+  "countryMu": "Mauritius",
+  "@countryMu": {
+    "description": "Country name for ISO 3166-1 alpha-2 MU."
+  },
+  "countryYt": "Mayotte",
+  "@countryYt": {
+    "description": "Country name for ISO 3166-1 alpha-2 YT."
+  },
+  "countryMx": "Mexico",
+  "@countryMx": {
+    "description": "Country name for ISO 3166-1 alpha-2 MX."
+  },
+  "countryFm": "Micronesia",
+  "@countryFm": {
+    "description": "Country name for ISO 3166-1 alpha-2 FM."
+  },
+  "countryMd": "Moldova",
+  "@countryMd": {
+    "description": "Country name for ISO 3166-1 alpha-2 MD."
+  },
+  "countryMc": "Monaco",
+  "@countryMc": {
+    "description": "Country name for ISO 3166-1 alpha-2 MC."
+  },
+  "countryMn": "Mongolia",
+  "@countryMn": {
+    "description": "Country name for ISO 3166-1 alpha-2 MN."
+  },
+  "countryMe": "Montenegro",
+  "@countryMe": {
+    "description": "Country name for ISO 3166-1 alpha-2 ME."
+  },
+  "countryMs": "Montserrat",
+  "@countryMs": {
+    "description": "Country name for ISO 3166-1 alpha-2 MS."
+  },
+  "countryMa": "Morocco",
+  "@countryMa": {
+    "description": "Country name for ISO 3166-1 alpha-2 MA."
+  },
+  "countryMz": "Mozambique",
+  "@countryMz": {
+    "description": "Country name for ISO 3166-1 alpha-2 MZ."
+  },
+  "countryMm": "Myanmar (Burma)",
+  "@countryMm": {
+    "description": "Country name for ISO 3166-1 alpha-2 MM."
+  },
+  "countryNa": "Namibia",
+  "@countryNa": {
+    "description": "Country name for ISO 3166-1 alpha-2 NA."
+  },
+  "countryNr": "Nauru",
+  "@countryNr": {
+    "description": "Country name for ISO 3166-1 alpha-2 NR."
+  },
+  "countryNp": "Nepal",
+  "@countryNp": {
+    "description": "Country name for ISO 3166-1 alpha-2 NP."
+  },
+  "countryNl": "Netherlands",
+  "@countryNl": {
+    "description": "Country name for ISO 3166-1 alpha-2 NL."
+  },
+  "countryNc": "New Caledonia",
+  "@countryNc": {
+    "description": "Country name for ISO 3166-1 alpha-2 NC."
+  },
+  "countryNz": "New Zealand",
+  "@countryNz": {
+    "description": "Country name for ISO 3166-1 alpha-2 NZ."
+  },
+  "countryNi": "Nicaragua",
+  "@countryNi": {
+    "description": "Country name for ISO 3166-1 alpha-2 NI."
+  },
+  "countryNe": "Niger",
+  "@countryNe": {
+    "description": "Country name for ISO 3166-1 alpha-2 NE."
+  },
+  "countryNg": "Nigeria",
+  "@countryNg": {
+    "description": "Country name for ISO 3166-1 alpha-2 NG."
+  },
+  "countryNu": "Niue",
+  "@countryNu": {
+    "description": "Country name for ISO 3166-1 alpha-2 NU."
+  },
+  "countryNf": "Norfolk Island",
+  "@countryNf": {
+    "description": "Country name for ISO 3166-1 alpha-2 NF."
+  },
+  "countryMk": "North Macedonia",
+  "@countryMk": {
+    "description": "Country name for ISO 3166-1 alpha-2 MK."
+  },
+  "countryMp": "Northern Mariana Islands",
+  "@countryMp": {
+    "description": "Country name for ISO 3166-1 alpha-2 MP."
+  },
+  "countryNo": "Norway",
+  "@countryNo": {
+    "description": "Country name for ISO 3166-1 alpha-2 NO."
+  },
+  "countryOm": "Oman",
+  "@countryOm": {
+    "description": "Country name for ISO 3166-1 alpha-2 OM."
+  },
+  "countryPk": "Pakistan",
+  "@countryPk": {
+    "description": "Country name for ISO 3166-1 alpha-2 PK."
+  },
+  "countryPw": "Palau",
+  "@countryPw": {
+    "description": "Country name for ISO 3166-1 alpha-2 PW."
+  },
+  "countryPs": "Palestine",
+  "@countryPs": {
+    "description": "Country name for ISO 3166-1 alpha-2 PS."
+  },
+  "countryPa": "Panama",
+  "@countryPa": {
+    "description": "Country name for ISO 3166-1 alpha-2 PA."
+  },
+  "countryPg": "Papua New Guinea",
+  "@countryPg": {
+    "description": "Country name for ISO 3166-1 alpha-2 PG."
+  },
+  "countryPy": "Paraguay",
+  "@countryPy": {
+    "description": "Country name for ISO 3166-1 alpha-2 PY."
+  },
+  "countryPe": "Peru",
+  "@countryPe": {
+    "description": "Country name for ISO 3166-1 alpha-2 PE."
+  },
+  "countryPh": "Philippines",
+  "@countryPh": {
+    "description": "Country name for ISO 3166-1 alpha-2 PH."
+  },
+  "countryPn": "Pitcairn",
+  "@countryPn": {
+    "description": "Country name for ISO 3166-1 alpha-2 PN."
+  },
+  "countryPl": "Poland",
+  "@countryPl": {
+    "description": "Country name for ISO 3166-1 alpha-2 PL."
+  },
+  "countryPt": "Portugal",
+  "@countryPt": {
+    "description": "Country name for ISO 3166-1 alpha-2 PT."
+  },
+  "countryPr": "Puerto Rico",
+  "@countryPr": {
+    "description": "Country name for ISO 3166-1 alpha-2 PR."
+  },
+  "countryQa": "Qatar",
+  "@countryQa": {
+    "description": "Country name for ISO 3166-1 alpha-2 QA."
+  },
+  "countryRo": "Romania",
+  "@countryRo": {
+    "description": "Country name for ISO 3166-1 alpha-2 RO."
+  },
+  "countryRu": "Russia",
+  "@countryRu": {
+    "description": "Country name for ISO 3166-1 alpha-2 RU."
+  },
+  "countryRw": "Rwanda",
+  "@countryRw": {
+    "description": "Country name for ISO 3166-1 alpha-2 RW."
+  },
+  "countryRe": "Réunion",
+  "@countryRe": {
+    "description": "Country name for ISO 3166-1 alpha-2 RE."
+  },
+  "countryAs": "Samoa (American)",
+  "@countryAs": {
+    "description": "Country name for ISO 3166-1 alpha-2 AS."
+  },
+  "countryWs": "Samoa (western)",
+  "@countryWs": {
+    "description": "Country name for ISO 3166-1 alpha-2 WS."
+  },
+  "countrySm": "San Marino",
+  "@countrySm": {
+    "description": "Country name for ISO 3166-1 alpha-2 SM."
+  },
+  "countrySt": "Sao Tome & Principe",
+  "@countrySt": {
+    "description": "Country name for ISO 3166-1 alpha-2 ST."
+  },
+  "countrySa": "Saudi Arabia",
+  "@countrySa": {
+    "description": "Country name for ISO 3166-1 alpha-2 SA."
+  },
+  "countrySn": "Senegal",
+  "@countrySn": {
+    "description": "Country name for ISO 3166-1 alpha-2 SN."
+  },
+  "countryRs": "Serbia",
+  "@countryRs": {
+    "description": "Country name for ISO 3166-1 alpha-2 RS."
+  },
+  "countrySc": "Seychelles",
+  "@countrySc": {
+    "description": "Country name for ISO 3166-1 alpha-2 SC."
+  },
+  "countrySl": "Sierra Leone",
+  "@countrySl": {
+    "description": "Country name for ISO 3166-1 alpha-2 SL."
+  },
+  "countrySk": "Slovakia",
+  "@countrySk": {
+    "description": "Country name for ISO 3166-1 alpha-2 SK."
+  },
+  "countrySi": "Slovenia",
+  "@countrySi": {
+    "description": "Country name for ISO 3166-1 alpha-2 SI."
+  },
+  "countrySb": "Solomon Islands",
+  "@countrySb": {
+    "description": "Country name for ISO 3166-1 alpha-2 SB."
+  },
+  "countrySo": "Somalia",
+  "@countrySo": {
+    "description": "Country name for ISO 3166-1 alpha-2 SO."
+  },
+  "countryZa": "South Africa",
+  "@countryZa": {
+    "description": "Country name for ISO 3166-1 alpha-2 ZA."
+  },
+  "countryGs": "South Georgia & the South Sandwich Islands",
+  "@countryGs": {
+    "description": "Country name for ISO 3166-1 alpha-2 GS."
+  },
+  "countrySs": "South Sudan",
+  "@countrySs": {
+    "description": "Country name for ISO 3166-1 alpha-2 SS."
+  },
+  "countryEs": "Spain",
+  "@countryEs": {
+    "description": "Country name for ISO 3166-1 alpha-2 ES."
+  },
+  "countryLk": "Sri Lanka",
+  "@countryLk": {
+    "description": "Country name for ISO 3166-1 alpha-2 LK."
+  },
+  "countryBl": "St Barthelemy",
+  "@countryBl": {
+    "description": "Country name for ISO 3166-1 alpha-2 BL."
+  },
+  "countrySh": "St Helena",
+  "@countrySh": {
+    "description": "Country name for ISO 3166-1 alpha-2 SH."
+  },
+  "countryKn": "St Kitts & Nevis",
+  "@countryKn": {
+    "description": "Country name for ISO 3166-1 alpha-2 KN."
+  },
+  "countryLc": "St Lucia",
+  "@countryLc": {
+    "description": "Country name for ISO 3166-1 alpha-2 LC."
+  },
+  "countrySx": "St Maarten (Dutch)",
+  "@countrySx": {
+    "description": "Country name for ISO 3166-1 alpha-2 SX."
+  },
+  "countryMf": "St Martin (French)",
+  "@countryMf": {
+    "description": "Country name for ISO 3166-1 alpha-2 MF."
+  },
+  "countryPm": "St Pierre & Miquelon",
+  "@countryPm": {
+    "description": "Country name for ISO 3166-1 alpha-2 PM."
+  },
+  "countryVc": "St Vincent",
+  "@countryVc": {
+    "description": "Country name for ISO 3166-1 alpha-2 VC."
+  },
+  "countrySd": "Sudan",
+  "@countrySd": {
+    "description": "Country name for ISO 3166-1 alpha-2 SD."
+  },
+  "countrySr": "Suriname",
+  "@countrySr": {
+    "description": "Country name for ISO 3166-1 alpha-2 SR."
+  },
+  "countrySj": "Svalbard & Jan Mayen",
+  "@countrySj": {
+    "description": "Country name for ISO 3166-1 alpha-2 SJ."
+  },
+  "countrySe": "Sweden",
+  "@countrySe": {
+    "description": "Country name for ISO 3166-1 alpha-2 SE."
+  },
+  "countryCh": "Switzerland",
+  "@countryCh": {
+    "description": "Country name for ISO 3166-1 alpha-2 CH."
+  },
+  "countrySy": "Syria",
+  "@countrySy": {
+    "description": "Country name for ISO 3166-1 alpha-2 SY."
+  },
+  "countryTw": "Taiwan",
+  "@countryTw": {
+    "description": "Country name for ISO 3166-1 alpha-2 TW."
+  },
+  "countryTj": "Tajikistan",
+  "@countryTj": {
+    "description": "Country name for ISO 3166-1 alpha-2 TJ."
+  },
+  "countryTz": "Tanzania",
+  "@countryTz": {
+    "description": "Country name for ISO 3166-1 alpha-2 TZ."
+  },
+  "countryTh": "Thailand",
+  "@countryTh": {
+    "description": "Country name for ISO 3166-1 alpha-2 TH."
+  },
+  "countryTg": "Togo",
+  "@countryTg": {
+    "description": "Country name for ISO 3166-1 alpha-2 TG."
+  },
+  "countryTk": "Tokelau",
+  "@countryTk": {
+    "description": "Country name for ISO 3166-1 alpha-2 TK."
+  },
+  "countryTo": "Tonga",
+  "@countryTo": {
+    "description": "Country name for ISO 3166-1 alpha-2 TO."
+  },
+  "countryTt": "Trinidad & Tobago",
+  "@countryTt": {
+    "description": "Country name for ISO 3166-1 alpha-2 TT."
+  },
+  "countryTn": "Tunisia",
+  "@countryTn": {
+    "description": "Country name for ISO 3166-1 alpha-2 TN."
+  },
+  "countryTr": "Turkey",
+  "@countryTr": {
+    "description": "Country name for ISO 3166-1 alpha-2 TR."
+  },
+  "countryTm": "Turkmenistan",
+  "@countryTm": {
+    "description": "Country name for ISO 3166-1 alpha-2 TM."
+  },
+  "countryTc": "Turks & Caicos Is",
+  "@countryTc": {
+    "description": "Country name for ISO 3166-1 alpha-2 TC."
+  },
+  "countryTv": "Tuvalu",
+  "@countryTv": {
+    "description": "Country name for ISO 3166-1 alpha-2 TV."
+  },
+  "countryUm": "US minor outlying islands",
+  "@countryUm": {
+    "description": "Country name for ISO 3166-1 alpha-2 UM."
+  },
+  "countryUg": "Uganda",
+  "@countryUg": {
+    "description": "Country name for ISO 3166-1 alpha-2 UG."
+  },
+  "countryUa": "Ukraine",
+  "@countryUa": {
+    "description": "Country name for ISO 3166-1 alpha-2 UA."
+  },
+  "countryAe": "United Arab Emirates",
+  "@countryAe": {
+    "description": "Country name for ISO 3166-1 alpha-2 AE."
+  },
+  "countryUy": "Uruguay",
+  "@countryUy": {
+    "description": "Country name for ISO 3166-1 alpha-2 UY."
+  },
+  "countryUz": "Uzbekistan",
+  "@countryUz": {
+    "description": "Country name for ISO 3166-1 alpha-2 UZ."
+  },
+  "countryVu": "Vanuatu",
+  "@countryVu": {
+    "description": "Country name for ISO 3166-1 alpha-2 VU."
+  },
+  "countryVa": "Vatican City",
+  "@countryVa": {
+    "description": "Country name for ISO 3166-1 alpha-2 VA."
+  },
+  "countryVe": "Venezuela",
+  "@countryVe": {
+    "description": "Country name for ISO 3166-1 alpha-2 VE."
+  },
+  "countryVg": "Virgin Islands (UK)",
+  "@countryVg": {
+    "description": "Country name for ISO 3166-1 alpha-2 VG."
+  },
+  "countryVi": "Virgin Islands (US)",
+  "@countryVi": {
+    "description": "Country name for ISO 3166-1 alpha-2 VI."
+  },
+  "countryWf": "Wallis & Futuna",
+  "@countryWf": {
+    "description": "Country name for ISO 3166-1 alpha-2 WF."
+  },
+  "countryEh": "Western Sahara",
+  "@countryEh": {
+    "description": "Country name for ISO 3166-1 alpha-2 EH."
+  },
+  "countryYe": "Yemen",
+  "@countryYe": {
+    "description": "Country name for ISO 3166-1 alpha-2 YE."
+  },
+  "countryZm": "Zambia",
+  "@countryZm": {
+    "description": "Country name for ISO 3166-1 alpha-2 ZM."
+  },
+  "countryZw": "Zimbabwe",
+  "@countryZw": {
+    "description": "Country name for ISO 3166-1 alpha-2 ZW."
+  },
+  "countryAx": "Åland Islands",
+  "@countryAx": {
+    "description": "Country name for ISO 3166-1 alpha-2 AX."
+  },
+  "commonNoResults": "No matches",
+  "@commonNoResults": {
+    "description": "Shown in a picker sheet when the search matches nothing."
+  },
+  "workspaceCountrySearchHint": "Country name or code",
+  "@workspaceCountrySearchHint": {
+    "description": "Placeholder in the country picker search box."
   }
 }

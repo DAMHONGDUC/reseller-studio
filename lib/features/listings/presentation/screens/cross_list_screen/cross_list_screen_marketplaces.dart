@@ -66,8 +66,9 @@ class _MarketplaceRow extends ConsumerWidget {
     return InkWell(
       onTap: isAlreadyListed
           ? null
-          : () =>
-                ref.read(crossListControllerProvider.notifier).toggle(marketplace),
+          : () => ref
+                .read(crossListControllerProvider.notifier)
+                .toggle(marketplace),
       child: Padding(
         padding: SdContentPaddingV3.row,
         child: Row(

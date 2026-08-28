@@ -55,9 +55,15 @@ final class AppColors {
   static const Color textSecondary = Color(0xFF5B6472);
   static const Color textTertiary = Color(0xFF8D96A4);
 
+  /// A step fainter than tertiary, and only ever used for text standing in
+  /// for a value that is not there — a field's hint, a picker's "not set". A
+  /// hint drawn at tertiary was being read as a value the field already held.
+  static const Color textPlaceholder = Color(0xFFB4BCC8);
+
   static const Color textPrimaryDark = Color(0xFFF2F4F8);
   static const Color textSecondaryDark = Color(0xFFA3ACBB);
   static const Color textTertiaryDark = Color(0xFF6E7887);
+  static const Color textPlaceholderDark = Color(0xFF525B68);
 
   // --- Money ---
   //

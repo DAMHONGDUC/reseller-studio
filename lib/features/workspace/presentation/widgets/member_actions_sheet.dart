@@ -5,6 +5,8 @@ import 'package:system_design/index.dart';
 
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/widgets/app_sheet_action_row.dart';
+import '../../../../core/widgets/app_sheet_option_list.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../domain/entities/workspace.dart';
@@ -108,7 +110,10 @@ class MemberActionsSheet extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -116,63 +121,29 @@ class MemberActionsSheet extends ConsumerWidget {
       member.displayName ?? member.email ?? context.l10n.teamMemberFallback;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => SdBottomSheetV3(
-    title: _name(context),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _MemberActionRow(
-          icon: Symbols.badge_rounded,
-          label: context.l10n.teamChangeRole,
-          onTap: () => _changeRole(context, ref),
-        ),
-        _MemberActionRow(
-          icon: Symbols.person_remove_rounded,
-          label: context.l10n.teamRemove,
-          isDestructive: true,
-          onTap: () {
-            Navigator.of(context).pop();
-            _confirmRemove(context, ref);
-          },
-        ),
-      ],
-    ),
-  );
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<Widget> actions = <Widget>[
+      AppSheetActionRow(
+        icon: Symbols.badge_rounded,
+        label: context.l10n.teamChangeRole,
+        onTap: () => _changeRole(context, ref),
+      ),
+      AppSheetActionRow(
+        icon: Symbols.person_remove_rounded,
+        label: context.l10n.teamRemove,
+        isDestructive: true,
+        onTap: () {
+          Navigator.of(context).pop();
+          _confirmRemove(context, ref);
+        },
+      ),
+    ];
 
-class _MemberActionRow extends StatelessWidget {
-  const _MemberActionRow({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.isDestructive = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isDestructive;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color tint = isDestructive
-        ? context.sdTheme3.danger
-        : context.sdTheme3.textPrimary;
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: SdContentPaddingV3.row,
-        child: Row(
-          children: <Widget>[
-            SdIconV3(icon, color: tint),
-            SizedBox(width: SdSpacingConstant.w12),
-            Text(
-              label,
-              style: context.textTheme3.bodyMedium!.copyWith(color: tint),
-            ),
-          ],
-        ),
+    return SdBottomSheetV3(
+      title: _name(context),
+      child: AppSheetOptionList(
+        itemCount: actions.length,
+        itemBuilder: (BuildContext context, int index) => actions[index],
       ),
     );
   }

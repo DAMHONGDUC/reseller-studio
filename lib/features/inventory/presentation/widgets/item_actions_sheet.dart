@@ -7,6 +7,8 @@ import 'package:system_design/index.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/app_sheet_action_row.dart';
+import '../../../../core/widgets/app_sheet_option_list.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/entities/storage_location.dart';
@@ -173,128 +175,89 @@ class ItemActionsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isArchived = item.status == ItemStatus.archived;
 
+    final List<Widget> actions = <Widget>[
+      AppSheetActionRow(
+        icon: Symbols.edit_rounded,
+        label: context.l10n.actionEdit,
+        onTap: () {
+          Navigator.of(context).pop();
+          context.push(AppRoutes.editItem(item.id));
+        },
+      ),
+      AppSheetActionRow(
+        icon: Symbols.sell_rounded,
+        label: context.l10n.itemActionList,
+        onTap: () => _guarded(context, ref, ItemStatus.listed, () {
+          Navigator.of(context).pop();
+          ListItemSheet.show(context, item);
+        }),
+      ),
+      AppSheetActionRow(
+        icon: Symbols.share_rounded,
+        label: context.l10n.itemActionCrossList,
+        onTap: () {
+          final ItemTransitionCheck check = ref
+              .read(itemActionsControllerProvider.notifier)
+              .crossListCheck(item);
+
+          if (!check.isAllowed) {
+            SdSnackBarUtilsV3.error(
+              context,
+              ItemBlockPresenter.messages(context, check.blocks),
+            );
+
+            return;
+          }
+
+          Navigator.of(context).pop();
+          context.push(AppRoutes.crossList(item.id));
+        },
+      ),
+      AppSheetActionRow(
+        icon: Symbols.price_change_rounded,
+        label: context.l10n.itemActionReprice,
+        onTap: () {
+          Navigator.of(context).pop();
+          RepriceSheet.show(context, ref, <Item>[item]);
+        },
+      ),
+      AppSheetActionRow(
+        icon: Symbols.shelves,
+        label: context.l10n.itemActionMove,
+        onTap: () => _move(context, ref),
+      ),
+      AppSheetActionRow(
+        icon: Symbols.payments_rounded,
+        label: context.l10n.itemActionMarkSold,
+        onTap: () => _guarded(context, ref, ItemStatus.sold, () {
+          Navigator.of(context).pop();
+          MarkSoldSheet.show(context, item);
+        }),
+      ),
+      AppSheetActionRow(
+        icon: isArchived ? Symbols.unarchive_rounded : Symbols.archive_rounded,
+        label: isArchived
+            ? context.l10n.itemActionRestore
+            : context.l10n.itemActionArchive,
+        onTap: () =>
+            isArchived ? _restore(context, ref) : _archive(context, ref),
+      ),
+      AppSheetActionRow(
+        icon: Symbols.delete_rounded,
+        label: context.l10n.actionDelete,
+        isDestructive: true,
+        onTap: () {
+          Navigator.of(context).pop();
+          _confirmDelete(context, ref);
+        },
+      ),
+    ];
+
     return SdBottomSheetV3(
       title: item.title,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _ActionRow(
-            icon: Symbols.edit_rounded,
-            label: context.l10n.actionEdit,
-            onTap: () {
-              Navigator.of(context).pop();
-              context.push(AppRoutes.editItem(item.id));
-            },
-          ),
-          _ActionRow(
-            icon: Symbols.sell_rounded,
-            label: context.l10n.itemActionList,
-            onTap: () => _guarded(context, ref, ItemStatus.listed, () {
-              Navigator.of(context).pop();
-              ListItemSheet.show(context, item);
-            }),
-          ),
-          _ActionRow(
-            icon: Symbols.share_rounded,
-            label: context.l10n.itemActionCrossList,
-            onTap: () {
-              final ItemTransitionCheck check = ref
-                  .read(itemActionsControllerProvider.notifier)
-                  .crossListCheck(item);
-
-              if (!check.isAllowed) {
-                SdSnackBarUtilsV3.error(
-                  context,
-                  ItemBlockPresenter.messages(context, check.blocks),
-                );
-
-                return;
-              }
-
-              Navigator.of(context).pop();
-              context.push(AppRoutes.crossList(item.id));
-            },
-          ),
-          _ActionRow(
-            icon: Symbols.price_change_rounded,
-            label: context.l10n.itemActionReprice,
-            onTap: () {
-              Navigator.of(context).pop();
-              RepriceSheet.show(context, ref, <Item>[item]);
-            },
-          ),
-          _ActionRow(
-            icon: Symbols.shelves,
-            label: context.l10n.itemActionMove,
-            onTap: () => _move(context, ref),
-          ),
-          _ActionRow(
-            icon: Symbols.payments_rounded,
-            label: context.l10n.itemActionMarkSold,
-            onTap: () => _guarded(context, ref, ItemStatus.sold, () {
-              Navigator.of(context).pop();
-              MarkSoldSheet.show(context, item);
-            }),
-          ),
-          _ActionRow(
-            icon: isArchived
-                ? Symbols.unarchive_rounded
-                : Symbols.archive_rounded,
-            label: isArchived
-                ? context.l10n.itemActionRestore
-                : context.l10n.itemActionArchive,
-            onTap: () =>
-                isArchived ? _restore(context, ref) : _archive(context, ref),
-          ),
-          _ActionRow(
-            icon: Symbols.delete_rounded,
-            label: context.l10n.actionDelete,
-            isDestructive: true,
-            onTap: () {
-              Navigator.of(context).pop();
-              _confirmDelete(context, ref);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  const _ActionRow({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.isDestructive = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isDestructive;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color tint = isDestructive
-        ? context.sdTheme3.danger
-        : context.sdTheme3.textPrimary;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: SdRadiusV3.cardAll,
-      child: Padding(
-        padding: SdContentPaddingV3.row,
-        child: Row(
-          children: <Widget>[
-            SdIconV3(icon, color: tint),
-            SizedBox(width: SdSpacingConstant.w12),
-            Text(
-              label,
-              style: context.textTheme3.bodyMedium!.copyWith(color: tint),
-            ),
-          ],
-        ),
+      child: AppSheetOptionList(
+        itemCount: actions.length,
+        itemBuilder: (BuildContext context, int index) => actions[index],
       ),
     );
   }

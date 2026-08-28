@@ -8,10 +8,7 @@ import '../../../marketplaces/domain/enums/marketplace.dart';
 /// What the cross-list screen has collected so far (plan §28's cross-listing
 /// row: an item, at least one marketplace, and a price that may be inherited).
 class CrossListState {
-  const CrossListState({
-    this.selected = const <Marketplace>{},
-    this.price,
-  });
+  const CrossListState({this.selected = const <Marketplace>{}, this.price});
 
   final Set<Marketplace> selected;
 

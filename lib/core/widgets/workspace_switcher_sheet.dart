@@ -12,6 +12,8 @@ import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../router/app_routes.dart';
 import 'app_selectable_row.dart';
+import 'app_sheet_option_list.dart';
+import 'option_picker_sheet.dart';
 
 /// Slack's workspace switcher, in the shape a five-tab app can hold it.
 ///
@@ -108,23 +110,18 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
               onAccept: () => _accept(context, ref, invite),
             ),
           if (invites.isNotEmpty) const SdDividerV3(),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: SdSpacingConstant.h200 * 2),
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: workspaces.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  SizedBox(height: SdSpacingConstant.h4),
-              itemBuilder: (BuildContext context, int index) {
-                final Workspace workspace = workspaces[index];
+          AppSheetOptionList(
+            maxHeight: OptionPickerSheet.listMaxHeight,
+            itemCount: workspaces.length,
+            itemBuilder: (BuildContext context, int index) {
+              final Workspace workspace = workspaces[index];
 
-                return _WorkspaceRow(
-                  workspace: workspace,
-                  isCurrent: workspace.id == currentId,
-                  onTap: () => _switch(context, ref, workspace.id),
-                );
-              },
-            ),
+              return _WorkspaceRow(
+                workspace: workspace,
+                isCurrent: workspace.id == currentId,
+                onTap: () => _switch(context, ref, workspace.id),
+              );
+            },
           ),
           const SdDividerV3(),
           _CreateWorkspaceRow(

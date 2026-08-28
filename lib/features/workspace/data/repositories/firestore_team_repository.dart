@@ -70,9 +70,11 @@ class FirestoreTeamRepository implements TeamRepository {
   @override
   Future<String> acceptInvite(String inviteId) =>
       FailureMapper.guard('accept an invitation', () async {
-        SdLogger.action(LogTagConstant.team, 'Accept invitation', <String, Object>{
-          'inviteId': inviteId,
-        });
+        SdLogger.action(
+          LogTagConstant.team,
+          'Accept invitation',
+          <String, Object>{'inviteId': inviteId},
+        );
 
         final HttpsCallableResult<Object?> result = await _functions
             .httpsCallable(CallableConstant.acceptInvite)
@@ -80,9 +82,11 @@ class FirestoreTeamRepository implements TeamRepository {
 
         final String workspaceId = _stringField(result.data, 'workspaceId');
 
-        SdLogger.action(LogTagConstant.team, 'Invitation accepted', <String, Object>{
-          'workspaceId': workspaceId,
-        });
+        SdLogger.action(
+          LogTagConstant.team,
+          'Invitation accepted',
+          <String, Object>{'workspaceId': workspaceId},
+        );
 
         return workspaceId;
       });
@@ -138,19 +142,16 @@ class FirestoreTeamRepository implements TeamRepository {
     return '';
   }
 
-  CollectionReference<Map<String, Object?>> get _invites =>
-      _firestore
-          .collection('invites')
-          .withConverter<Map<String, Object?>>(
-            fromFirestore:
-                (
-                  DocumentSnapshot<Map<String, dynamic>> snapshot,
-                  SnapshotOptions? _,
-                ) => snapshot.data() ?? <String, Object?>{},
-            toFirestore: (Map<String, Object?> data, SetOptions? _) =>
-                data.map(
-                  (String key, Object? value) =>
-                      MapEntry<String, dynamic>(key, value),
-                ),
-          );
+  CollectionReference<Map<String, Object?>> get _invites => _firestore
+      .collection('invites')
+      .withConverter<Map<String, Object?>>(
+        fromFirestore:
+            (
+              DocumentSnapshot<Map<String, dynamic>> snapshot,
+              SnapshotOptions? _,
+            ) => snapshot.data() ?? <String, Object?>{},
+        toFirestore: (Map<String, Object?> data, SetOptions? _) => data.map(
+          (String key, Object? value) => MapEntry<String, dynamic>(key, value),
+        ),
+      );
 }

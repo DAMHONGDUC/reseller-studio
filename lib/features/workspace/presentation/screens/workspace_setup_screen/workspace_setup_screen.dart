@@ -5,14 +5,15 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
+import '../../../country_label.dart';
+import '../../../country_picker.dart';
 import '../../../providers.dart';
 import '../../../workspace_constant.dart';
 import '../../../workspace_option_label.dart';
 import '../../controllers/workspace_setup_controller.dart';
-
-part 'workspace_setup_screen_actions.dart';
 
 /// Workspace setup — the step between signing in and Home (plan §26).
 ///
@@ -22,7 +23,7 @@ part 'workspace_setup_screen_actions.dart';
 /// nothing else.
 ///
 /// **The create action is pinned to the bottom** (owner's rule) — only the
-/// form scrolls. See [_PinnedCreateAction].
+/// form scrolls. See `AppPinnedAction`.
 class WorkspaceSetupScreen extends ConsumerStatefulWidget {
   const WorkspaceSetupScreen({this.isAdditional = false, super.key});
 
@@ -71,18 +72,9 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
   }
 
   Future<void> _pickCountry() async {
-    final String? code = await OptionPickerSheet.show<String>(
+    final String? code = await CountryPicker.show(
       context,
-      title: context.l10n.workspaceCountry,
       selected: ref.read(workspaceSetupControllerProvider).country,
-      options: WorkspaceConstant.countries
-          .map(
-            (String code) => PickerOption<String>(
-              value: code,
-              label: WorkspaceOptionLabel.country(context, code),
-            ),
-          )
-          .toList(),
     );
 
     if (code == null) return;
@@ -175,6 +167,7 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
                   label: context.l10n.workspaceNameLabel,
                   controller: _name,
                   hint: context.l10n.workspaceNameHint,
+                  isRequired: true,
                   textInputAction: TextInputAction.done,
                   onChanged: ref
                       .read(workspaceSetupControllerProvider.notifier)
@@ -183,6 +176,7 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
                   label: context.l10n.workspaceCurrency,
+                  isRequired: true,
                   icon: Symbols.payments_rounded,
                   value: WorkspaceOptionLabel.currency(context, state.currency),
                   onTap: _pickCurrency,
@@ -190,8 +184,9 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
                   label: context.l10n.workspaceCountry,
+                  isRequired: true,
                   icon: Symbols.public_rounded,
-                  value: WorkspaceOptionLabel.country(context, state.country),
+                  value: CountryLabel.of(context, state.country),
                   onTap: _pickCountry,
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
@@ -209,7 +204,11 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
               ],
             ),
           ),
-          _PinnedCreateAction(onSubmit: _submit),
+          AppPinnedAction(
+            label: context.l10n.workspaceCreate,
+            isBusy: state.isSaving,
+            onPressed: state.canSubmit ? _submit : null,
+          ),
         ],
       ),
     );

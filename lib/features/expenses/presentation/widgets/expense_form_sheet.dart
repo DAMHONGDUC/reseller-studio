@@ -36,7 +36,6 @@ class ExpenseFormSheet extends ConsumerStatefulWidget {
 }
 
 class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
-
   final TextEditingController _amount = TextEditingController();
   final TextEditingController _distance = TextEditingController();
   final TextEditingController _vendor = TextEditingController();
@@ -135,7 +134,6 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
       if (!mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Expense recorded');
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -159,6 +157,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
         children: <Widget>[
           PickerField(
             label: context.l10n.commonCategory,
+            isRequired: true,
             icon: Symbols.category_rounded,
             value: ExpenseCategoryLabel.of(_category),
             onTap: () async {
@@ -188,6 +187,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
             label: context.l10n.commonAmount,
             controller: _amount,
             currency: ref.watch(workspaceCurrencyProvider),
+            isRequired: !_isMileage,
             textInputAction: TextInputAction.next,
             errorText: _amountError,
             helperText: _isMileage
@@ -209,13 +209,16 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
             label: context.l10n.commonDate,
+            isRequired: true,
             icon: Symbols.calendar_month_rounded,
             value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
             onTap: () async {
               final DateTime? picked = await showDatePicker(
                 context: context,
                 initialDate: _date,
-                firstDate: DateTime(now.year - DatePickerConstant.recentEntryYearsBack),
+                firstDate: DateTime(
+                  now.year - DatePickerConstant.recentEntryYearsBack,
+                ),
                 lastDate: now,
               );
 
@@ -270,7 +273,6 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
   }
 }
 
-
 /// How far the seller drove, with what it is worth underneath.
 ///
 /// **The estimate is the point.** A distance on its own is a number nobody can
@@ -313,6 +315,9 @@ class _MileageField extends ConsumerWidget {
       label: context.l10n.expensesDistanceDriven,
       controller: controller,
       hint: '0',
+      // Only ever built for a mileage trip, which is the one category where
+      // the distance is required and the money is not.
+      isRequired: true,
       errorText: errorText,
       helperText: _helper(context, driven, deduction),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),

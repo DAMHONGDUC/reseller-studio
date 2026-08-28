@@ -139,11 +139,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
 
   /// The platform's own rejection message is surfaced deliberately: it is the
   /// seller's action item, not the kind of internal error hard rule 6 forbids.
-  static String _subtitle(
-    BuildContext context,
-    Listing listing,
-    DateTime now,
-  ) {
+  static String _subtitle(BuildContext context, Listing listing, DateTime now) {
     if (listing.lastError != null) {
       return '${listing.marketplace.displayName} · ${listing.lastError}';
     }

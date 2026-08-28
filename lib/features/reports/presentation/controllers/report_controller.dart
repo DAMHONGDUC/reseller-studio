@@ -253,7 +253,11 @@ class ReportController extends Notifier<bool> {
       rows: <List<String>>[
         <String>['Tax year', summary.year.label, ''],
         <String>['Revenue', _major(summary.revenue), summary.currency],
-        <String>['Cost of goods', _major(summary.costOfGoods), summary.currency],
+        <String>[
+          'Cost of goods',
+          _major(summary.costOfGoods),
+          summary.currency,
+        ],
         for (final TaxLineTotal line in summary.lines)
           <String>[line.line, _major(line.amount), summary.currency],
         <String>['Mileage distance', _distance(summary.mileageDistance), ''],

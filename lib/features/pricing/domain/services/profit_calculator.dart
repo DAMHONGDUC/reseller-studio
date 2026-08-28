@@ -210,9 +210,7 @@ final class StaleInventoryPolicy {
   /// and a `const` default cannot call `.inDays`.
   static const int defaultThresholdDays = 60;
 
-  static const Duration defaultThreshold = Duration(
-    days: defaultThresholdDays,
-  );
+  static const Duration defaultThreshold = Duration(days: defaultThresholdDays);
 
   /// True when [listedAt] is further back than [threshold].
   ///

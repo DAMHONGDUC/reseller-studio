@@ -35,13 +35,11 @@ class SourcesScreen extends ConsumerWidget {
     if (name == null || !context.mounted) return;
 
     try {
+      // No success message on an add: the new row appears in the list behind
+      // the sheet, which is the confirmation (owner's rule).
       await ref
           .read(sourcingControllerProvider.notifier)
           .saveSource(name: name);
-
-      if (!context.mounted) return;
-
-      SdSnackBarUtilsV3.success(context, 'Source added');
     } catch (error) {
       // Already logged by the controller.
       if (!context.mounted) return;

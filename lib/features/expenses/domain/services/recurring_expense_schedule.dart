@@ -41,14 +41,13 @@ final class RecurringExpenseSchedule {
     required List<Expense> expenses,
     required DateTime now,
   }) {
-    final List<RecurringExpense> owed = all(expenses: expenses)
-        .where((RecurringExpense series) => !series.due.isAfter(now))
-        .toList();
+    final List<RecurringExpense> owed = all(
+      expenses: expenses,
+    ).where((RecurringExpense series) => !series.due.isAfter(now)).toList();
 
-    return owed
-      ..sort(
-        (RecurringExpense a, RecurringExpense b) => a.due.compareTo(b.due),
-      );
+    return owed..sort(
+      (RecurringExpense a, RecurringExpense b) => a.due.compareTo(b.due),
+    );
   }
 
   /// Every recurring series, due or not, one entry per series.

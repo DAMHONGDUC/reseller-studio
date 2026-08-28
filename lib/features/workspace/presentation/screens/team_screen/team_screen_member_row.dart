@@ -14,7 +14,8 @@ class _MemberRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppListRow(
-    title: member.displayName ?? member.email ?? context.l10n.teamMemberFallback,
+    title:
+        member.displayName ?? member.email ?? context.l10n.teamMemberFallback,
     subtitle: member.email,
     icon: Symbols.person_rounded,
     showChevron: canManage,

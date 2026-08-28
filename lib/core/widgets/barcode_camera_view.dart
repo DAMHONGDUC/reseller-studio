@@ -17,7 +17,11 @@ import '../extensions/context_extensions.dart';
 /// of detections a second and the caller acts on all of them. [resume] is how
 /// a caller that showed "no match" offers another go.
 class BarcodeCameraView extends StatefulWidget {
-  const BarcodeCameraView({required this.hint, required this.onCode, super.key});
+  const BarcodeCameraView({
+    required this.hint,
+    required this.onCode,
+    super.key,
+  });
 
   /// One line over the camera saying what to point it at. A user-facing
   /// string, so the caller owns it (hard rule 7).

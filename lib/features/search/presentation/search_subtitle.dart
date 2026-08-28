@@ -26,10 +26,11 @@ final class SearchSubtitle {
     return parts.isEmpty ? null : parts.join(' · ');
   }
 
-  static String? _status(BuildContext context, Enum? status) => switch (status) {
-    final ItemStatus value => ItemStatusLabel.of(context, value),
-    final OrderStatus value => OrderStatusLabel.of(context, value),
-    final ListingStatus value => ListingStatusLabel.of(context, value),
-    _ => null,
-  };
+  static String? _status(BuildContext context, Enum? status) =>
+      switch (status) {
+        final ItemStatus value => ItemStatusLabel.of(context, value),
+        final OrderStatus value => OrderStatusLabel.of(context, value),
+        final ListingStatus value => ListingStatusLabel.of(context, value),
+        _ => null,
+      };
 }

@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../controllers/quick_add_controller.dart';
 
 /// The fastest way to get something into inventory.
@@ -32,7 +33,8 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   }
 
   /// Saves, then leaves. The controller has already logged both outcomes, so
-  /// this only decides what the seller sees.
+  /// this only decides what the seller sees — which on success is nothing but
+  /// the new row in the list behind (owner's rule).
   Future<void> _submit() async {
     final NavigatorState navigator = Navigator.of(context);
 
@@ -44,7 +46,6 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       if (id == null || !mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, context.l10n.quickAddSaved);
     } catch (_) {
       // Already logged by the controller; the seller gets the one message
       // hard rule 6 allows.
@@ -60,32 +61,39 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.quickAddTitle),
-      body: ListView(
-        padding: SdContentPaddingV3.screen(context),
+      body: Column(
         children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          SdTextFieldV3(
-            controller: _title,
-            label: context.l10n.quickAddNameLabel,
-            hint: context.l10n.quickAddNameHint,
-            // The field's own helper, not a Text under it: one control owns
-            // the message so it cannot drift out of the field's layout.
-            helperText: context.l10n.quickAddHelp,
-            textInputAction: TextInputAction.done,
-            onChanged: ref
-                .read(quickAddControllerProvider.notifier)
-                .updateTitle,
-            onSubmitted: (_) {
-              if (state.canSubmit) _submit();
-            },
+          Expanded(
+            child: ListView(
+              // No bottom inset: the pinned action owns the bottom edge.
+              padding: EdgeInsets.symmetric(
+                horizontal: SdContentPaddingV3.horizontal,
+              ),
+              children: <Widget>[
+                SizedBox(height: SdContentPaddingV3.topGap),
+                SdTextFieldV3(
+                  controller: _title,
+                  label: context.l10n.quickAddNameLabel,
+                  hint: context.l10n.quickAddNameHint,
+                  isRequired: true,
+                  // The field's own helper, not a Text under it: one control owns
+                  // the message so it cannot drift out of the field's layout.
+                  helperText: context.l10n.quickAddHelp,
+                  textInputAction: TextInputAction.done,
+                  onChanged: ref
+                      .read(quickAddControllerProvider.notifier)
+                      .updateTitle,
+                  onSubmitted: (_) {
+                    if (state.canSubmit) _submit();
+                  },
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: SdSpacingConstant.h24),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
+          AppPinnedAction(
             label: context.l10n.actionSave,
+            isBusy: state.isSaving,
             onPressed: state.canSubmit ? _submit : null,
-            busy: state.isSaving,
-            expand: true,
           ),
         ],
       ),

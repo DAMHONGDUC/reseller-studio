@@ -109,11 +109,8 @@ class PushMessaging {
 
   /// A token is rotated by the platform, not only issued once. Missing this
   /// stream is how a device quietly stops receiving pushes months later.
-  Stream<String> tokenRefreshes() =>
-      FirebaseMessaging.instance.onTokenRefresh.handleError((
-        Object error,
-        StackTrace stackTrace,
-      ) {
+  Stream<String> tokenRefreshes() => FirebaseMessaging.instance.onTokenRefresh
+      .handleError((Object error, StackTrace stackTrace) {
         SdLogger.error(
           LogTagConstant.notification,
           'Push token refresh failed',

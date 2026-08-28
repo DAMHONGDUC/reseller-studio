@@ -73,6 +73,7 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
         children: <Widget>[
           MoneyField(
             label: context.l10n.offerCounterAmount,
+            isRequired: true,
             controller: _amount,
             currency: ref.watch(workspaceCurrencyProvider),
             textInputAction: TextInputAction.done,

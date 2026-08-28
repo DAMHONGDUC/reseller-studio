@@ -11,8 +11,9 @@ import '../extensions/context_extensions.dart';
 /// though: there is nothing to type, so it takes a tap and shows what is
 /// currently set.
 ///
-/// [value] of null renders [placeholder] in the muted colour, which is how a
-/// seller tells "not chosen" from "chosen and happens to be short".
+/// [value] of null renders [placeholder] in `SdThemeV3.textPlaceholder`,
+/// fainter than any text meant to be read, which is how a seller tells "not
+/// chosen" from "chosen and happens to be short".
 class PickerField extends StatelessWidget {
   const PickerField({
     required this.label,
@@ -20,6 +21,7 @@ class PickerField extends StatelessWidget {
     required this.onTap,
     this.placeholder,
     this.icon,
+    this.isRequired = false,
     super.key,
   });
 
@@ -30,6 +32,12 @@ class PickerField extends StatelessWidget {
   /// cannot be a localized string — it is evaluated with no `BuildContext`.
   final String? placeholder;
   final IconData? icon;
+
+  /// Draws the asterisk after [label] — the same marker `SdTextFieldV3` uses,
+  /// through the same widget, so a form's typed rows and its picked rows
+  /// cannot mark required differently.
+  final bool isRequired;
+
   final VoidCallback onTap;
 
   @override
@@ -47,7 +55,7 @@ class PickerField extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(label, style: context.textTheme3.labelMedium!.muted3(context)),
+            SdFieldLabelV3(label: label, isRequired: isRequired),
             SizedBox(height: SdSpacingConstant.h6),
             Container(
               height: SdSpacingConstant.h48,
@@ -77,7 +85,9 @@ class PickerField extends StatelessWidget {
                           ? context.textTheme3.bodyMedium!.copyWith(
                               color: context.sdTheme3.textPrimary,
                             )
-                          : context.textTheme3.bodyMedium!.faint3(context),
+                          : context.textTheme3.bodyMedium!.placeholder3(
+                              context,
+                            ),
                     ),
                   ),
                   SdIconV3(

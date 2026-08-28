@@ -86,8 +86,9 @@ final Provider<int> unreadNotificationCountProvider = Provider<int>((Ref ref) {
 });
 
 final NotifierProvider<NotificationController, bool>
-notificationControllerProvider =
-    NotifierProvider<NotificationController, bool>(NotificationController.new);
+notificationControllerProvider = NotifierProvider<NotificationController, bool>(
+  NotificationController.new,
+);
 
 /// Device registration and push taps.
 ///

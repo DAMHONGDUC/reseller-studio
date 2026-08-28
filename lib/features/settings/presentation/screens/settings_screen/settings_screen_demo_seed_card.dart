@@ -42,7 +42,10 @@ class _DemoSeedCard extends ConsumerWidget {
       // Already logged by the controller.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 

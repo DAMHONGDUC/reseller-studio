@@ -100,4 +100,3 @@ final Provider<String?> currentUidProvider = Provider<String?>((Ref ref) {
   // here: nobody is signed in until the stream says so.
   return ref.watch(authUserProvider).value?.uid;
 });
-

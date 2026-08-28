@@ -120,6 +120,7 @@ class _RefundSheetState extends ConsumerState<RefundSheet> {
           SizedBox(height: SdSpacingConstant.h16),
           MoneyField(
             label: context.l10n.refundAmount,
+            isRequired: true,
             controller: _amount,
             currency: currency,
             helperText: _helper(context),

@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/presentation/controllers/item_actions_controller.dart';
@@ -95,7 +96,10 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
       // Already logged by the controller.
       if (!mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 
@@ -136,6 +140,7 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
                   label: context.l10n.crossListPrice,
                   controller: _price,
                   currency: currency,
+                  isRequired: true,
                   helperText: context.l10n.crossListPriceHelper,
                   onChanged: (String value) => ref
                       .read(crossListControllerProvider.notifier)
