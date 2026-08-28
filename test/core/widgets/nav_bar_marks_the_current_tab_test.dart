@@ -105,6 +105,31 @@ void main() {
     }
   });
 
+  testWidgets('the pill is compact without shrinking its touch targets', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 2);
+
+    final Rect first = segment(tester, 0);
+    final Rect last = segment(tester, _NavDestinations.all.length - 1);
+    final double screenWidth =
+        tester.view.physicalSize.width / tester.view.devicePixelRatio;
+
+    expect(
+      first.height,
+      closeTo(SdContentPaddingV3.floatingBarHeight, 0.01),
+    );
+    expect(first.height, greaterThanOrEqualTo(SdSpacingConstant.h48));
+    expect(
+      first.left,
+      closeTo(SdContentPaddingV3.floatingBarHorizontal, 0.01),
+    );
+    expect(
+      screenWidth - last.right,
+      closeTo(SdContentPaddingV3.floatingBarHorizontal, 0.01),
+    );
+  });
+
   testWidgets('labels are not painted', (WidgetTester tester) async {
     await pumpBar(tester, 0);
 
