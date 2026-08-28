@@ -207,37 +207,18 @@ Owner's rules, all of them read from one place so no screen types them:
   things **the header itself draws** is not the screen's `topGap`, even at the
   same value. Read the emphasis: it once carried a `stripGap` for the filter
   strip, which the header does *not* draw, and that gap was then placed twice.
-- **A filter strip is never part of the app bar until it docks into one, and
-  it never scrolls away.** Owner's rules. The first half read "never part of
-  the app bar" full stop until Orders was asked for the docking shape; it now
-  describes every screen except the one that asked, and the half that never
-  moved is that the chips stay reachable 300 rows down.
-  - **Orders docks.** Scroll and the title fades while the chips travel up
-    into the title's row, ending beside the actions — which do not move.
-    Scrolled chrome costs one row instead of two. `SdFilterHeaderV3` is the
-    widget, and `SdAppBarV3` leaves that screen: a bar in the scaffold slot
-    and a strip in the body are two widgets, and the strip can only reach the
-    title's row if one widget owns both.
-  - **Inventory pins instead, and cannot dock.** Its title row is where the
-    search field lands, and two controls docking into one row is a collision.
-    Its strip is a `SliverPersistentHeader(pinned: true)` whose extent is
-    `topGap * 2 + AppFilterStrip.height`; that band carries both gaps, so the
-    screen places neither. `SdSearchHeaderV3` still holds only the title, the
-    field and the actions — there is no `bottom` slot on it, deliberately.
-  - **Offers, Listings and Tax do neither, and that is not a backlog.** Their
-    strip sits in a `Column` above an `Expanded` list, so it was never in the
-    scrollable and never moves. A screen earns `SdFilterHeaderV3` when its
-    list is long enough that a seller scrolls away from the chips.
-  - **The gap above a docked strip belongs to the header that draws it.**
-    `SdFilterHeaderMetricsV3.stripGap` is that header's own geometry, which is
-    exactly why `SdSearchHeaderV3` may not carry one — it does not draw the
-    strip below it. Same value, different owner, and the owner is the rule.
-  - **The docking chrome is drawn in one place.** `SdFilterHeaderV3` and
-    `SdSearchHeaderV3` are two rect calculations over one `SdDockingHeaderV3`,
-    which draws the title, the actions, the hairline and the travelling child.
-    Two headers drawing their own bar row is two bars that drift.
-  - **This is still not v2's `SdCollapsingFilterScaffoldV2`** — see
-    `DECISIONS.md`.
+- **A filter strip is never part of the app bar, and it stays put while the
+  list scrolls.** Owner's rules, and they are not in tension: the strip is its
+  own widget below the chrome with the body's background, and it is *pinned*
+  there rather than lifted into the bar. `SdSearchHeaderV3` still holds only
+  the title, the search field and the actions — there is no `bottom` slot on
+  it, deliberately.
+  - Orders gets this for free: its strip sits in a `Column` above an
+    `Expanded` list, so it was never inside the scrollable.
+  - Inventory's list *is* the scrollable — the search header has to live in it
+    to dock — so its strip is a `SliverPersistentHeader(pinned: true)` whose
+    extent is `topGap * 2 + AppFilterStrip.height`. That band carries both
+    gaps, so the screen places neither.
   - **This reverses the earlier "a filter row is content, and content
     scrolls".** Chips a seller cannot reach 300 rows down are chips they
     scroll back up for, which is the cost the docking header exists to avoid.
@@ -475,10 +456,9 @@ disagree with reality** — do not port them back "for later":
   `statusBarInset` is not a replacement: it exists only for
   `SdSearchHeaderV3`, whose `maxExtent` has no context to read from.
 - **`belowPinnedFilterBar` — not ported.** It is `appBarInset` plus the
-  strip's height, and with an opaque bar the first term is zero. A v3 strip
-  never floats over the list either: pinned it is a sliver of its own, docked
-  it is inside `SdFilterHeaderV3`, and both take real layout space — so no
-  screen owes a strip any clearance.
+  strip's height, and with an opaque bar the first term is zero. Nothing here
+  pins a filter strip over a scrolling list either: a filter strip is its own
+  widget in the body and takes real layout space, so nothing has to clear it.
 
 The same call covers `SdCollapsingFilterScaffoldV2` and `SdPinnedFilterBarV2`,
 neither of which v3 has. **v3's chrome is its own design, not an unfinished

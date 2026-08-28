@@ -142,11 +142,8 @@ because they are about the shell, not the bar:
   chip row inside the list drives the collapse. The threshold is a static on
   the widget it belongs to; an element that must scroll fully out before it
   fires has to start at offset 0, so nothing may be padded in above it.
-  `SdSearchHeaderV3`, `SdFilterHeaderV3` and `AppAddFabScaffold` are the
-  implementations — read them before writing a fourth. The first two read the
-  sliver's own `shrinkOffset` instead, which is the same rule with the
-  geometry handed to them: a persistent header is told how far it has been
-  scrolled, so listening for it as well would be two answers to one question.
+  `SdSearchHeaderV3` and `AppAddFabScaffold` are the two implementations —
+  read them before writing a third.
 - **Pull-to-refresh is one wrapper.** There is no v3 refresh indicator yet;
   when one is added it goes in the package, not in a screen. Its `edgeOffset`
   is 0 under this app's opaque bar — the scaffold already subtracted the bar —
