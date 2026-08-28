@@ -98,6 +98,9 @@ because they are about the shell, not the bar:
 
 - **The selection indicator slides, it does not fade.** Same duration as every
   other piece of chrome, from `SdMotionV3`. No flash, no strobe.
+- **The complete frame is `SdBottomNavigationV3`.** Owner's rule. It owns the
+  glass bar and adjacent-tab swipe; `AppShell` owns only GoRouter branch
+  selection, analytics and localized destination data.
 - **Tabs are branches of an `IndexedStack`, so no route is pushed and a
   navigator observer sees nothing.** Screen-view analytics for the five tabs
   therefore cannot come from the router, or tab analytics are silently empty
@@ -211,13 +214,11 @@ Settings, so Home is what keeps it findable; putting both at the end is what
 stops a seller scanning for "add" from stepping over them. Nothing else
 non-create joins them without the same decision.
 
-**Flow overview and Analytics swapped places** — owner's rule, and it is the
-one change the closed list of three shortcut cards has had. Flow overview took
-Analytics' card and Analytics came down here. Analytics is a tab a seller
-reaches from the bar anyway; "how does this app work" is the question they
-cannot answer from anywhere, and it is asked most on the first morning, which
-is when Home is the only screen they know. **It is in one place, never two** —
-a launcher that lists the same destination twice is one a seller stops reading.
+**Scan is a Home shortcut; Flow overview is its own section directly below
+the shortcut row.** Owner's rule. Scan is an action a seller reaches for while
+holding an item, so it belongs in the one-glance row. Flow overview needs more
+context than a small launcher card can carry, so its dedicated section opens
+the existing sheet and appears in one place only.
 
 **Analytics opens with `go`, not `push`.** It is a branch root, and pushing one
 over Home leaves the seller on the wrong tab with a back button they should not
@@ -238,6 +239,20 @@ alone.
 The shortcut card at the top of Home is named after the section it lands on
 and scrolls to the end — a card that said something other than where it goes
 is a card that lies.
+
+## Dense destination screens expose their hierarchy
+
+**More is grouped into titled sections, never one undifferentiated list.**
+Owner's rule. Operations contains Sourcing, Listings, Categories and
+Locations; Finance contains Expenses, Payouts, Reports, Receipts and Tax;
+Business contains Marketplaces, Team and Activity; Account contains
+Subscription and Settings. Signed-out More renders only the Account section
+with Settings.
+
+**An item detail exposes its action sheet with a labelled app-bar button, not
+an ellipsis glyph.** Owner's rule. The sheet holds several important state
+transitions, so a subtle three-dot icon makes the main way to act on an item
+look decorative; the localized Actions label is the affordance.
 
 **Rows, and always last on the screen** — owner's rule. Home answers "what
 needs attention today" first, so a launcher sitting above the figures makes

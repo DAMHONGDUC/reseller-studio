@@ -33,6 +33,16 @@ needs both lines.
 
 ### The tab bar is liquid glass and that makes its geometry layout
 
+`SdBottomNavigationV3` is the complete tab frame: it owns the extended
+scaffold, `SdFloatingBarScopeV3`, swipe handling and `SdGlassNavBarV3`.
+`AppShell` supplies app routes and localized labels only; rebuilding the frame
+there would leave swipe and glass clearance as app-specific behaviour.
+
+Horizontal swipes move one adjacent tab. A horizontal scrollable inside a tab
+wins Flutter's gesture arena, so filter strips and carousels keep their own
+gesture; a swipe at either end does nothing. Taps and swipes call the same
+`onSelected` callback, which keeps routing and analytics on one path.
+
 `SdGlassNavBarV3` floats over the content in the iOS 26 idiom — a detached
 superellipse pill the body scrolls behind and refracts through. Three things
 follow, and missing any one of them looks like a bug:
@@ -153,10 +163,11 @@ Two things follow:
 The geometry is `SdContentPaddingV3.selectedTabInset` inside the bar on every
 side, and nothing types that number at a call site.
 
-**The switcher stays compact.** Owner's rule. Its visible pill uses the
-smaller `floatingBarHeight` and a larger `floatingBarHorizontal`, while every
-equal segment remains a full touch target. Compactness comes from the chrome's
-footprint, never from shrinking the icon or its tappable region.
+**The switcher stays compact and has no horizontal outer padding.** Owner's
+rule. Its visible pill uses the smaller `floatingBarHeight` and
+`floatingBarHorizontal` resolves to no inset, while every equal segment
+remains a full touch target. Compactness comes from the chrome's height, never
+from shrinking the icon or its tappable region.
 
 **The glass is tuned sheer and refractive, not frosted** — owner's rule, and
 it is the one that decides how the bar is read at a glance. A high-alpha fill
