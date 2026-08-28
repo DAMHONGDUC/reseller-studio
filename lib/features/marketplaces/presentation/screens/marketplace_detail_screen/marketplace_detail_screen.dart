@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/state/form_seed.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../domain/entities/marketplace.dart';
+import '../../../domain/services/marketplace_rate_input_utils.dart';
 import '../../../providers.dart';
 import '../../controllers/marketplace_form_controller.dart';
 
@@ -58,12 +59,13 @@ class _MarketplaceDetailScreenState
 
   void _updateRate(String value) {
     final String trimmed = value.trim();
-    final double? percent = double.tryParse(trimmed);
 
     ref
         .read(marketplaceFormControllerProvider.notifier)
         .updateFeeRate(
-          trimmed.isEmpty ? null : (percent == null ? -1 : percent / 100),
+          trimmed.isEmpty
+              ? null
+              : MarketplaceRateInputUtils.parse(trimmed) ?? -1,
         );
   }
 

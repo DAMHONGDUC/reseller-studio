@@ -58,7 +58,12 @@ class MarketplaceFormController extends Notifier<MarketplaceFormState> {
 
     final double? feeRate = state.feeRate;
 
-    if (trimmed.isEmpty || state.isSaving || feeRate == null) return null;
+    if (trimmed.isEmpty ||
+        state.isSaving ||
+        feeRate == null ||
+        !MarketplaceConstant.isValidFeeRate(feeRate)) {
+      return null;
+    }
 
     state = state.copyWith(isSaving: true);
     SdLogger.action(

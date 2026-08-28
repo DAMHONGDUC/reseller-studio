@@ -114,6 +114,35 @@ void main() {
       expect(find.byType(Switch), findsNothing);
     });
 
+    testWidgets('saving an existing marketplace accepts a decimal comma', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(
+        tester,
+        const MarketplaceDetailScreen(marketplaceId: 'ebay'),
+      );
+      final ProviderContainer container = ProviderScope.containerOf(
+        tester.element(find.byType(MarketplaceDetailScreen)),
+      );
+
+      await tester.enterText(find.widgetWithText(TextField, 'eBay'), 'eBay UK');
+      await tester.enterText(find.widgetWithText(TextField, '13.25'), '13,5');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final MarketplaceRepository repository = container.read(
+        mock_providers.marketplaceRepositoryProvider,
+      );
+      final record.Marketplace changed =
+          (await repository.watchMarketplaces().first).firstWhere(
+            (record.Marketplace row) => row.id == 'ebay',
+          );
+
+      expect(changed.name, 'eBay UK');
+      expect(changed.feeRate, 0.135);
+      expect(find.text('Enter a percentage between 0 and 100.'), findsNothing);
+    });
+
     testWidgets('add mode has no delete action', (WidgetTester tester) async {
       await pumpScreen(tester, const MarketplaceDetailScreen());
 
@@ -142,6 +171,27 @@ void main() {
         rows.where((record.Marketplace row) => row.name == 'Mercari'),
         hasLength(1),
       );
+    });
+
+    test('the form controller refuses an invalid fee rate', () async {
+      final ProviderContainer container = mockContainer();
+      final MarketplaceFormController controller = container.read(
+        marketplaceFormControllerProvider.notifier,
+      );
+      final MarketplaceRepository repository = container.read(
+        mock_providers.marketplaceRepositoryProvider,
+      );
+      final int countBefore =
+          (await repository.watchMarketplaces().first).length;
+
+      controller.startCreate();
+      controller.updateFeeRate(-1);
+      final String? id = await controller.submit(name: 'Invalid market');
+      final int countAfter =
+          (await repository.watchMarketplaces().first).length;
+
+      expect(id, isNull);
+      expect(countAfter, countBefore);
     });
 
     test('the form controller edits and soft-deletes a marketplace', () async {
