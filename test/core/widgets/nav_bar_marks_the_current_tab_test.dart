@@ -4,13 +4,15 @@ import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
-/// The current tab is marked the way iOS marks it: the **glyph fills in**,
-/// and nothing appears behind it.
+/// The current tab is marked the way iOS 26 marks it: the **glyph fills in**
+/// and a **glass capsule slides under it**.
 ///
-/// A shape behind the icon is Material's idiom and reads as a foreign control
-/// sitting inside iOS chrome. `FILL` is a variable-font axis, so weight is a
-/// real second signal alongside colour — which colour alone must never be,
-/// least of all on glass with a moving list showing through it.
+/// `FILL` is a variable-font axis, so weight is a real second signal alongside
+/// colour — which colour alone must never be, least of all on glass with a
+/// moving list showing through it. The capsule is the third signal, and it is
+/// glass rather than a filled shape: a flat pill behind the icon is Material's
+/// idiom and reads as a foreign control inside iOS chrome.
+/// See `docs/rules/DECISIONS.md` § The tab bar's selected indicator came back.
 void main() {
   const List<SdNavDestinationV3> destinations = <SdNavDestinationV3>[
     SdNavDestinationV3(icon: Icons.home, label: 'Home'),
@@ -67,13 +69,58 @@ void main() {
     expect(fills(tester).last, 1);
   });
 
-  testWidgets('nothing is drawn behind the current glyph', (
+  /// Where the capsule is aligned across the bar, and how wide a slot it
+  /// covers.
+  (Alignment, double) capsule(WidgetTester tester) {
+    final AnimatedAlign align = tester.widget<AnimatedAlign>(
+      find.descendant(
+        of: find.byType(SdGlassNavBarV3),
+        matching: find.byType(AnimatedAlign),
+      ),
+    );
+    final FractionallySizedBox box = tester.widget<FractionallySizedBox>(
+      find.descendant(
+        of: find.byType(AnimatedAlign),
+        matching: find.byType(FractionallySizedBox),
+      ),
+    );
+
+    return (align.alignment as Alignment, box.widthFactor!);
+  }
+
+  testWidgets('one capsule covers exactly one destination slot', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 0);
 
-    // The Material indicator pill was tried and removed: iOS does not put a
-    // shape behind a tab bar glyph, and one here read as a foreign control.
+    final (Alignment alignment, double widthFactor) = capsule(tester);
+
+    expect(widthFactor, 1 / destinations.length);
+    expect(alignment.x, -1);
+  });
+
+  testWidgets('the capsule slides to the selected destination', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, destinations.length - 1);
+
+    // It travels rather than fading in and out — one shape moving is what
+    // says the five destinations are a single row.
+    expect(capsule(tester).$1.x, 1);
+
+    await pumpBar(tester, 2);
+    await tester.pumpAndSettle();
+
+    expect(capsule(tester).$1.x, 0);
+  });
+
+  testWidgets('nothing flat is painted behind the current glyph', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 0);
+
+    // The mark is glass, never a filled shape: a tinted pill behind the icon
+    // is Material's idiom and reads as a foreign control inside iOS chrome.
     final Iterable<BoxDecoration> painted = tester
         .widgetList<DecoratedBox>(
           find.descendant(
@@ -89,6 +136,22 @@ void main() {
             decoration.color != null && decoration.color!.a > 0,
       ),
       isEmpty,
+    );
+  });
+
+  testWidgets('the bar never fringes the figures underneath it', (
+    WidgetTester tester,
+  ) async {
+    await pumpBar(tester, 0);
+
+    final BuildContext context = tester.element(find.byType(SdGlassNavBarV3));
+
+    // The bar sits over columns of money, and chromatic aberration on small
+    // tabular figures is the fastest way to make a number hard to read.
+    expect(SdGlassNavBarV3.barSettings(context).chromaticAberration, 0);
+    expect(
+      SdGlassNavBarV3.selectedCapsuleSettings(context).chromaticAberration,
+      0,
     );
   });
 
