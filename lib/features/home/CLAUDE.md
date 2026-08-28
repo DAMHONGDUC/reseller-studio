@@ -55,3 +55,19 @@ learned to look here stops finding what they need and cannot tell whether the
 action is missing or the app cannot do it. `quick_access_test.dart` reads every
 screen wearing an `AppAddFabScaffold` off the source and fails on one this list
 does not know about, so the two cannot drift.
+
+## Two rows in Quick Action explain rather than create
+
+Owner's rule, and they ride at the end: **About last, Flow overview just above
+it.** The create actions above them keep the section's shape, and a seller
+scanning for "add" never steps over them.
+
+**Flow overview opens a sheet, not a screen.** It answers "how do I run my
+selling with this app", which is asked while standing somewhere else — pushing
+a route would cost the seller their place to read nine lines. It is why
+`QuickAction.route` is nullable, and it is the only row allowed to leave it
+null; `quick_action_test.dart` says so.
+
+The sheet draws `WorkflowConstant.steps`, the same data About's diagram uses,
+and badges the steps the app never blocks on. What "optional" means there is
+in `docs/rules/SCREENS.md`.
