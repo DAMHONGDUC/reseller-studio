@@ -29,6 +29,13 @@ part 'orders_screen_order_list.dart';
 /// **To Ship is the tab that matters**; everything else is history. An
 /// overdue order is called out in red on its row, because the shipping
 /// deadline is the one thing here with an external penalty attached.
+///
+/// **The chips dock into the title's row as the list scrolls** — owner's
+/// rule, and the reason this screen wears `SdFilterHeaderV3` instead of
+/// `SdAppBarV3`. The title fades, the strip travels up beside the two actions
+/// that never move, and scrolled chrome costs one row instead of two. A bar in
+/// the scaffold slot with a strip in the body could not do it: they are two
+/// widgets, and only one widget owning both can move the strip into the bar.
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
 
@@ -38,36 +45,50 @@ class OrdersScreen extends ConsumerWidget {
     final AsyncValue<List<Order>> source = ref.watch(ordersProvider);
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: context.l10n.navOrders,
-        actions: <Widget>[
-          IconButton(
-            icon: const SdIconV3(AppIconConstant.localOffer),
-            tooltip: context.l10n.offersTitle,
-            onPressed: () => context.push(AppRoutes.offers),
+      // No `appBar`: the header is a sliver and has to live in the scroll
+      // view to dock as the list moves.
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SdFilterHeaderV3(
+            title: context.l10n.navOrders,
+            filters: const _OrderFilterStrip(),
+            actions: <SdAppBarActionV3>[
+              SdAppBarActionV3(
+                icon: AppIconConstant.localOffer,
+                tooltip: context.l10n.offersTitle,
+                onPressed: () => context.push(AppRoutes.offers),
+              ),
+              SdAppBarActionV3(
+                icon: AppIconConstant.localShipping,
+                tooltip: context.l10n.shippingQueueTitle,
+                onPressed: () => context.push(AppRoutes.shippingQueue),
+              ),
+            ],
           ),
-          IconButton(
-            icon: const SdIconV3(AppIconConstant.localShipping),
-            tooltip: context.l10n.shippingQueueTitle,
-            onPressed: () => context.push(AppRoutes.shippingQueue),
+          // The boundary below the header belongs to the body, so the screen
+          // places it — the header carries only the gap above its own chips.
+          SliverToBoxAdapter(
+            child: SizedBox(height: SdContentPaddingV3.topGap),
           ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          const _OrderFilterStrip(),
-          SizedBox(height: SdContentPaddingV3.topGap),
-          Expanded(
-            child: switch (source) {
-              AsyncLoading<List<Order>>() when !source.hasValue =>
-                const SdLoadingV3Page(),
-              AsyncError<List<Order>>() => SdEmptyStateV3(
+          switch (source) {
+            // A screen that has not loaded is not empty — saying "No orders"
+            // to a seller with forty is worse than a spinner.
+            AsyncLoading<List<Order>>() when !source.hasValue =>
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: SdLoadingV3Page(),
+              ),
+            AsyncError<List<Order>>() => SliverFillRemaining(
+              hasScrollBody: false,
+              child: SdEmptyStateV3(
                 icon: AppIconConstant.error,
                 title: context.l10n.ordersLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
-              _ when orders.isEmpty => AppListEmptyState(
+            ),
+            _ when orders.isEmpty => SliverFillRemaining(
+              hasScrollBody: false,
+              child: AppListEmptyState(
                 hasAny: (source.value ?? const <Order>[]).isNotEmpty,
                 noMatchMessage: context.l10n.ordersNoMatch,
                 emptyIcon: AppIconConstant.receiptLong,
@@ -81,9 +102,9 @@ class OrdersScreen extends ConsumerWidget {
                   onPressed: () => context.go(AppRoutes.inventory),
                 ),
               ),
-              _ => _OrderList(orders: orders),
-            },
-          ),
+            ),
+            _ => _OrderList(orders: orders),
+          },
         ],
       ),
     );
