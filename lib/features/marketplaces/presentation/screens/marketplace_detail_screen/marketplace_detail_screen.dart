@@ -159,6 +159,18 @@ class _MarketplaceDetailScreenState
         title: id == null
             ? context.l10n.marketplaceAdd
             : context.l10n.marketplaceEditTitle,
+        actions: <Widget>[
+          if (id != null)
+            IconButton(
+              tooltip: context.l10n.actionDelete,
+              onPressed: state.isSaving ? null : () => _confirmDelete(id),
+              icon: SdIconV3(
+                Symbols.delete_rounded,
+                size: SdIconV3.smallSize,
+                color: context.sdTheme3.danger,
+              ),
+            ),
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -197,15 +209,6 @@ class _MarketplaceDetailScreenState
                   onChanged: _updateRate,
                   onSubmitted: (_) => _submit(),
                 ),
-                if (id != null) ...<Widget>[
-                  SizedBox(height: SdSpacingConstant.h24),
-                  SdButtonV3(
-                    variant: SdButtonVariantV3.destructive,
-                    label: context.l10n.actionDelete,
-                    expand: true,
-                    onPressed: state.isSaving ? null : () => _confirmDelete(id),
-                  ),
-                ],
               ],
             ),
           ),
