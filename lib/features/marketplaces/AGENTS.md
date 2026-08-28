@@ -14,6 +14,10 @@ workflow that creates a workspace.
   opens that screen; the list itself does not carry inline fee controls. One
   editing surface keeps the name and estimated rate in one transaction and
   gives deletion enough context to explain its effect.
+- **Delete is an app-bar icon on marketplace detail.** It appears only for an
+  existing marketplace and still opens the confirmation dialog. Keeping the
+  destructive action in the chrome leaves the form body for editable fields
+  and the pinned bottom action for Save alone.
 - **There is no "Use published rate" toggle.** The marketplace record always
   carries the business's current estimated fee rate, and the seller edits it
   directly on the detail screen. A published rate and an override are two
