@@ -7,20 +7,16 @@ below is about protecting that answer from the screen filling up around it.
 
 ## The order of the screen is a product decision, not a layout one
 
-Top to bottom: **the three shortcut cards, Needs Attention, Performance,
-Recent Activity, Quick Action, Quick Access.** Three owner's rules decide it,
+Top to bottom: **the three shortcut cards, Flow overview, Needs Attention,
+Performance, Recent Activity, Quick Action.** Three owner's rules decide it,
 and they are listed in the order they outrank each other.
 
 1. **Three shortcut cards come first, above even Needs Attention.** They are
    the ways *out* of Home — down to Quick Action, sideways into global search,
-   and open the flow overview — not content, so a seller who opened the app to
+   and into Scan — not content, so a seller who opened the app to
    go somewhere does not read a dashboard on the way there.
-   - **Flow overview and Analytics swapped places** — owner's rule, and the
-     only change this closed list has had.
-     Analytics is a tab the seller reaches from the bar anyway; "how does this
-     app work" is the question they cannot answer from anywhere else, and it
-     is asked most on the first morning, when Home is the only screen they
-     know.
+   - **Scan replaces Flow overview in the row.** It is a frequent action a
+     seller starts while holding an item, so it earns the one-tap entry.
    - **Three, and the list is closed.** A fourth makes the row a launcher, and
      a launcher above the figures is exactly what keeping the create actions at
      the bottom exists to prevent. The row works because it is short enough to
@@ -28,10 +24,14 @@ and they are listed in the order they outrank each other.
    - `HomeShortcutConstant` is the list;
      `test/features/home/home_shortcuts_test.dart` holds the placement and the
      enum-to-card completeness.
-2. **Needs Attention sits above the numbers**, inverting the plan's own order
+2. **Flow overview is its own full-width section immediately below the
+   shortcuts.** It needs enough context to explain the workflow, which a
+   third-width card cannot carry. It opens the existing sheet and appears
+   nowhere else on Home.
+3. **Needs Attention sits above the numbers**, inverting the plan's own order
    (§6). A seller opening the app at 8am needs the orders waiting to ship, not
    last night's revenue.
-3. **Quick Action is rows, and the two bottom sections are last.** Eight of
+4. **Quick Action is rows and stays last.** Eight of
    anything is a list, and a grid of tiles above the figures made the screen
    open on a launcher instead of on the answer. At the bottom it is where a
    seller who came to *add* something scrolls to, and it costs the seller who
@@ -73,9 +73,9 @@ call site works out: `QuickActionOpen` says push or go. Analytics is `go`
 because a branch root pushed over Home would leave the seller on the wrong tab
 with a back button they should not have.
 
-**Flow overview is a shortcut card, and it is there instead of in Quick
-Action** — not in both. A launcher that lists the same destination twice is one
-a seller stops reading.
+**Flow overview is its own Home section, not a Quick Action row** — never in
+both. A launcher that lists the same destination twice is one a seller stops
+reading.
 
 ## The flow overview sheet is a document, not a menu
 

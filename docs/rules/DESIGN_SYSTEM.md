@@ -408,7 +408,7 @@ below for why they are not repeated here.
 | `bottom(context, {floatingNav})` | where the last item ends. `floatingNav: true` on the five tab screens only |
 | `detailBottom(context)` | the plain rule for everything else: the device's safe area **floored** at `minDetailBottom`, and **deliberately not `bottomGap` on top of it** — a device reporting a deep inset already gives more room than the floor asks for, and stacking a gap on it makes a detail screen look like it ends early |
 | `floatingBarHeight` / `floatingBarRadius` | the glass bar's height, and its radius **derived** as half of it |
-| `floatingBarHorizontal` | side margin shared by every floating bar |
+| `floatingBarHorizontal` | the outer horizontal inset, currently none |
 | `navBarOffset(context)` | the device's bottom inset **clamped** between `minNavBarOffset` and `maxNavBarOffset` |
 | `floatingBarInset(context)` | offset + height — the bar's whole footprint, what content and overlays must clear |
 | `statusBarInset(context)` | the status bar, for the one thing that draws chrome from the top of the window itself |
