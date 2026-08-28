@@ -46,6 +46,31 @@ no `currentContext` does nothing — see `_HomeScreenState._toQuickAction` and
 `ScrollUtils.toEnd`. Moving Quick Action off the bottom breaks that card, and
 the Quick Access test is what says so.
 
+## Home never reports on a business that has not started
+
+**Needs Attention with no rows has two answers, not one.** "All clear" is a
+report on work, and a brand-new account has none — saying it there told a
+seller the app had already looked at their business and found nothing worth
+mentioning. `workspaceActivityProvider` picks:
+
+- **`untouched`** — no items and no orders have ever existed → `_StartHere`,
+  which names the first step and opens Quick Add. It disappears on the first
+  record, so there is nothing to dismiss and nothing to remember.
+- **`active`** → `_AllClear`, unchanged.
+- **`unknown`** — a stream has not delivered → neither. Reading a loading
+  stream as an empty business would flash "start here" at a seller with four
+  hundred items, the same mistake as showing the login form while auth
+  resolves (hard rule 1).
+
+**The two are never both on screen.** One card answers the section, or they
+stand next to each other claiming different things.
+`test/features/home/first_run_test.dart` pins it.
+
+**A section owns its own header.** Home rendered the "Recent Activity" heading
+and the section under it decided whether to build anything, which on a new
+account left a title over a gap. Whatever answers "does this section exist"
+renders the heading too — see `_RecentActivity`.
+
 ## Where Home sends the seller
 
 - **Search is `push`; Analytics is `go`.** Search lives outside the shell and

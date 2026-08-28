@@ -163,6 +163,18 @@ because they are about the shell, not the bar:
   matches that search" are different situations and get different copy, chosen
   off the trimmed query — otherwise a search with no hits reads as data loss.
   Both strings go through ARB keys (hard rule 7).
+- **A filtered list picks between the two with `AppListEmptyState`, and its
+  `hasAny` reads the unfiltered source.** Four screens had written the choice
+  by hand and three of them got it wrong the same way: Orders, Offers and
+  Listings told a seller who had never added anything that nothing matched a
+  filter they never set. The widget is what makes the filter half impossible
+  to write twice, and its `hasAny` is deliberately awkward to pass from a
+  filtered list, because a count taken after filtering is the bug.
+- **The "not started yet" half carries an action; the filter half does not.**
+  A filter has an obvious fix already on screen. A first empty list is where a
+  new seller stops, so it names the next step and opens it — including on the
+  lists with no create action of their own, where the step is upstream
+  (Orders and Listings send the seller to Inventory).
 
 ## Search
 
