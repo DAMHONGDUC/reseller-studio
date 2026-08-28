@@ -14,6 +14,8 @@ import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../listings/domain/entities/listing.dart';
+import '../../../../listings/providers.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';

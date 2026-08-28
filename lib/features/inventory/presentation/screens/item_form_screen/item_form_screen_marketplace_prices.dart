@@ -29,11 +29,17 @@ class _MarketplacePrices extends ConsumerWidget {
 
     if (listings.isEmpty) return const SizedBox.shrink();
 
+    // The section spaces its own children, and this whole block is one of
+    // them — so the gap between these fields has to come from here, or they
+    // sit flush against each other while every other field on the form has
+    // air around it.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        for (final Listing listing in listings)
-          _MarketplacePriceField(listing: listing, currency: currency),
+        for (int i = 0; i < listings.length; i++) ...<Widget>[
+          if (i > 0) SizedBox(height: SdSpacingConstant.h16),
+          _MarketplacePriceField(listing: listings[i], currency: currency),
+        ],
       ],
     );
   }

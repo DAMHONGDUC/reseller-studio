@@ -915,6 +915,18 @@
   "@itemAsking": {
     "description": "Short form of asking price, for a dense row."
   },
+  "itemMarketplacePriceEntry": "{marketplace} {price}",
+  "@itemMarketplacePriceEntry": {
+    "description": "One marketplace and its price on an inventory card.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "itemAskingPrice": "Asking price",
   "@itemAskingPrice": {
     "description": "What the item is listed at, or intended to be."

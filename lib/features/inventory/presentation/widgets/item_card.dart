@@ -4,11 +4,13 @@ import 'package:system_design/index.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/widgets/app_photo.dart';
+import '../../../listings/domain/entities/listing.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../item_label.dart';
 
+part 'item_card_marketplace_prices.dart';
 part 'item_card_price_cell.dart';
 part 'item_card_price_line.dart';
 part 'item_card_thumbnail.dart';
@@ -34,6 +36,7 @@ class ItemCard extends StatelessWidget {
   const ItemCard({
     required this.item,
     required this.now,
+    this.listings = const <Listing>[],
     this.onTap,
     this.onLongPress,
     this.onActions,
@@ -43,6 +46,13 @@ class ItemCard extends StatelessWidget {
   });
 
   final Item item;
+
+  /// This item's live listings, for the per-marketplace prices.
+  ///
+  /// **Passed in, not watched per card.** The list groups one `listingsProvider`
+  /// read by item id; a family watch on every row would be one subscription
+  /// per card and a rebuild storm on any listing write.
+  final List<Listing> listings;
 
   /// Passed in rather than read from the clock, so every row in one build
   /// agrees about what "stale" means and a widget test can pin it.
@@ -139,6 +149,7 @@ class ItemCard extends StatelessWidget {
                   ),
                   SizedBox(height: SdSpacingConstant.h8),
                   _PriceLine(item: item),
+                  _MarketplacePrices(listings: listings),
                 ],
               ),
             ),
