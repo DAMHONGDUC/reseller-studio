@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:system_design/index.dart';
 
 import '../../core/extensions/context_extensions.dart';
 import 'domain/entities/storage_location.dart';
@@ -18,6 +19,15 @@ final class ItemStatusLabel {
     ItemStatus.reserved => context.l10n.itemStatusReserved,
     ItemStatus.sold => context.l10n.itemStatusSold,
     ItemStatus.archived => context.l10n.itemStatusArchived,
+  };
+
+  static SdBadgeToneV3 tone(ItemStatus status) => switch (status) {
+    ItemStatus.draft => SdBadgeToneV3.neutral,
+    ItemStatus.inStock => SdBadgeToneV3.info,
+    ItemStatus.listed => SdBadgeToneV3.success,
+    ItemStatus.reserved => SdBadgeToneV3.warning,
+    ItemStatus.sold => SdBadgeToneV3.neutral,
+    ItemStatus.archived => SdBadgeToneV3.neutral,
   };
 }
 

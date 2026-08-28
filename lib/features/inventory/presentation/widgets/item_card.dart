@@ -133,7 +133,7 @@ class ItemCard extends StatelessWidget {
                     children: <Widget>[
                       SdBadgeV3(
                         label: ItemStatusLabel.of(context, item.status),
-                        tone: _statusTone(item.status),
+                        tone: ItemStatusLabel.tone(item.status),
                       ),
                       if (isStale)
                         SdBadgeV3(
@@ -160,15 +160,6 @@ class ItemCard extends StatelessWidget {
       ),
     );
   }
-
-  static SdBadgeToneV3 _statusTone(ItemStatus status) => switch (status) {
-    ItemStatus.draft => SdBadgeToneV3.neutral,
-    ItemStatus.inStock => SdBadgeToneV3.info,
-    ItemStatus.listed => SdBadgeToneV3.success,
-    ItemStatus.reserved => SdBadgeToneV3.warning,
-    ItemStatus.sold => SdBadgeToneV3.neutral,
-    ItemStatus.archived => SdBadgeToneV3.neutral,
-  };
 }
 
 /// The row's way into `ItemActionsSheet`.
