@@ -123,6 +123,26 @@ Owner's rule, and it is deliberate rather than a duplication left standing.
   back to it, and a reprice on its own does not re-stamp `listedAt`, which
   would reset the staleness clock.
 
+## The row names its marketplaces and prices none of them
+
+Owner's rule, and it replaces the earlier one that put a figure per platform
+on the card. `ItemCard` shows **every marketplace the item is live on, as
+plain badges** — no amounts.
+
+- **A price per platform is not what a list is scanned for.** Where the item
+  is takes one glance; what it costs on each takes a comparison, and a
+  comparison belongs on the detail screen where the numbers can be laid out.
+- **Every marketplace shows, wrapped rather than cut to one line.** The old
+  line ellipsized, which hid exactly the platform a seller with five listings
+  was looking for. A card grows a row instead.
+- **Deduped and walked in `Marketplace.values` order**, so two listings on one
+  platform read as one badge and the row cannot reshuffle between builds.
+- **The price line above is unchanged**: cost, asking price and expected
+  profit are the item's own numbers (see the section above), not a
+  marketplace's.
+- `test/features/inventory/item_card_marketplaces_test.dart` holds both
+  halves: every name is on the row, and no listing price is.
+
 ## The actions that would be refused are shown, not hidden
 
 A move the item cannot make yet still appears in the sheet, and tapping it
