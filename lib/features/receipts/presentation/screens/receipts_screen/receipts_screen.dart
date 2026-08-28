@@ -9,6 +9,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../../core/widgets/app_stat_tile_row.dart';
 import '../../../providers.dart';
 
 part 'receipts_screen_preview.dart';
@@ -41,26 +42,19 @@ class ReceiptsScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.receiptAttached,
-                  value: '${receipts.length}',
-                  icon: AppIconConstant.description,
-                ),
-              ),
-              SizedBox(width: SdSpacingConstant.w8),
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.receiptsMissing,
-                  value: '$missing',
-                  caption: 'Purchases and expenses with no document',
-                  tone: missing > 0 ? SdStatToneV3.loss : SdStatToneV3.neutral,
-                  icon: AppIconConstant.warning,
-                ),
-              ),
-            ],
+          AppStatTileRow(
+            left: SdStatTileV3(
+              label: context.l10n.receiptAttached,
+              value: '${receipts.length}',
+              icon: AppIconConstant.description,
+            ),
+            right: SdStatTileV3(
+              label: context.l10n.receiptsMissing,
+              value: '$missing',
+              caption: 'Purchases and expenses with no document',
+              tone: missing > 0 ? SdStatToneV3.loss : SdStatToneV3.neutral,
+              icon: AppIconConstant.warning,
+            ),
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           if (receipts.isEmpty)

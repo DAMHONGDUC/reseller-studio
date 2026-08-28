@@ -9,6 +9,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_stat_tile_row.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
 import '../../../../tax/providers.dart';
@@ -63,48 +64,32 @@ class ReportsScreen extends ConsumerWidget {
             ),
             first: true,
           ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.commonRevenue,
-                  value: context.money(summary.revenue, compact: true),
-                  icon: AppIconConstant.trendingUp,
-                ),
-              ),
-              SizedBox(width: SdSpacingConstant.w8),
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.commonNetProfit,
-                  value: context.money(summary.netProfit, compact: true),
-                  tone: _profitTone(summary.netProfit),
-                  caption: summary.isProfitComplete
-                      ? null
-                      : 'Some costs missing',
-                  icon: AppIconConstant.savings,
-                ),
-              ),
-            ],
+          AppStatTileRow(
+            left: SdStatTileV3(
+              label: context.l10n.commonRevenue,
+              value: context.money(summary.revenue, compact: true),
+              icon: AppIconConstant.trendingUp,
+            ),
+            right: SdStatTileV3(
+              label: context.l10n.commonNetProfit,
+              value: context.money(summary.netProfit, compact: true),
+              tone: _profitTone(summary.netProfit),
+              caption: summary.isProfitComplete ? null : 'Some costs missing',
+              icon: AppIconConstant.savings,
+            ),
           ),
           SizedBox(height: SdSpacingConstant.h8),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.commonOrders,
-                  value: '${summary.orderCount}',
-                  icon: AppIconConstant.receiptLong,
-                ),
-              ),
-              SizedBox(width: SdSpacingConstant.w8),
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.analyticsInventoryValue,
-                  value: context.money(summary.inventoryValue, compact: true),
-                  icon: AppIconConstant.inventory,
-                ),
-              ),
-            ],
+          AppStatTileRow(
+            left: SdStatTileV3(
+              label: context.l10n.commonOrders,
+              value: '${summary.orderCount}',
+              icon: AppIconConstant.receiptLong,
+            ),
+            right: SdStatTileV3(
+              label: context.l10n.analyticsInventoryValue,
+              value: context.money(summary.inventoryValue, compact: true),
+              icon: AppIconConstant.inventory,
+            ),
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           SdSectionHeaderV3(
