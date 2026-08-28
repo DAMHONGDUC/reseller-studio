@@ -1,0 +1,84 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
+import 'package:system_design/index.dart';
+
+import '../../support/pump_app.dart';
+
+/// What the row says about money and about time.
+///
+/// The figures are the reason the card is worth its height: an inventory list
+/// a seller cannot judge from is a list they open forty times.
+void main() {
+  Item itemWith({
+    Money? cost,
+    Money? asking,
+    ItemStatus status = ItemStatus.listed,
+  }) => Item(
+    id: 'itm-1',
+    title: 'Vintage jacket',
+    quantity: 1,
+    status: status,
+    createdAt: testNow.subtract(const Duration(days: 40)),
+    listedAt: testNow.subtract(const Duration(days: 21)),
+    purchasePrice: cost,
+    askingPrice: asking,
+  );
+
+  testWidgets('the asking price leads, and cost and profit carry the margin', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(
+          cost: const Money(4500, 'USD'),
+          asking: const Money(18500, 'USD'),
+        ),
+        now: testNow,
+      ),
+    );
+
+    expect(find.text(r'$185.00'), findsOneWidget);
+    // One paragraph per cell, so the label and its figure ellipsize together.
+    expect(
+      find.textContaining(r'Cost $45.00', findRichText: true),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining(r'Profit $140.00 (76%)', findRichText: true),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a Quick Add row says the figures are missing, never zero', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(status: ItemStatus.draft),
+        now: testNow,
+      ),
+    );
+
+    // Hard rule 5: the asking price and the cost both render an em dash, and
+    // there is no profit to claim.
+    expect(find.text('—'), findsOneWidget);
+    expect(find.textContaining('Cost —', findRichText: true), findsOneWidget);
+    expect(find.textContaining('Profit', findRichText: true), findsNothing);
+  });
+
+  testWidgets('the row carries how long the item has been in its state', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, ItemCard(item: itemWith(), now: testNow));
+
+    // Listed 21 days ago, so the badge reads in weeks — beside the badge that
+    // says which state those weeks were spent in.
+    expect(find.widgetWithText(SdBadgeV3, '3w'), findsOneWidget);
+    expect(find.widgetWithText(SdBadgeV3, 'Listed'), findsOneWidget);
+  });
+}

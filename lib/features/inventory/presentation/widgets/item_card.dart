@@ -3,6 +3,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/money/money.dart';
 import '../../../../core/widgets/app_photo.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
@@ -11,21 +12,24 @@ import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../item_label.dart';
 
+part 'item_card_headline.dart';
 part 'item_card_marketplaces.dart';
-part 'item_card_price_cell.dart';
-part 'item_card_price_line.dart';
+part 'item_card_money_cell.dart';
+part 'item_card_money_line.dart';
+part 'item_card_state_badges.dart';
 part 'item_card_thumbnail.dart';
 
 /// One row of Inventory.
 ///
-/// Shows the four things a seller scans a list for: **what it is, what state
-/// it is in, what it costs, what it is priced at.** Everything else is on the
-/// detail screen.
+/// **Two zones.** Across the top, what the item *is*: its photo, its title,
+/// the asking price at the end of that line, and the badges naming its state.
+/// Underneath, at the card's own edges, what it is *worth*: cost against
+/// expected profit, then the marketplaces it is live on. Everything else is
+/// on the detail screen.
 ///
-/// The status badge and the stale badge are separate, and both can be
-/// present: an item can be listed *and* stale, and collapsing that into one
-/// marker would lose the fact that it is still live and still earning
-/// nothing.
+/// The split is what makes the figures fit. Held inside the top row they had
+/// a 64pt photo on one side and a 36pt button on the other, so the profit
+/// ellipsized on a $1,299 item; given the full width they do not.
 ///
 /// **The actions sheet opens from the row, not only from the detail screen**
 /// — owner's rule. Listing, repricing and marking sold are what a seller does
@@ -81,86 +85,63 @@ class ItemCard extends StatelessWidget {
   final bool isSelecting;
 
   @override
-  Widget build(BuildContext context) {
-    final bool isStale =
-        item.status == ItemStatus.listed &&
-        StaleInventoryPolicy.isStale(item.listedAt, now: now);
-
-    // The long-press wraps the card rather than living on it: `SdCardV3` takes
-    // a tap and nothing else, and giving the design system a second gesture
-    // for one screen's benefit is the wrong direction of dependency.
-    return GestureDetector(
-      onLongPress: onLongPress,
-      child: SdCardV3(
-        onTap: onTap,
-        // Outlined as well as ticked: colour is never the only signal, and
-        // the tick is never the only one either.
-        borderColor: isSelected ? context.colorScheme3.primary : null,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            if (isSelecting) ...<Widget>[
-              SdIconV3(
-                isSelected
-                    ? AppIconConstant.checkCircle
-                    : AppIconConstant.radioButtonUnchecked,
-                color: isSelected
-                    ? context.colorScheme3.primary
-                    : context.sdTheme3.textTertiary,
-                semanticLabel: isSelected
-                    ? context.l10n.inventorySelected
-                    : context.l10n.inventoryNotSelected,
-              ),
+  // The long-press wraps the card rather than living on it: `SdCardV3` takes
+  // a tap and nothing else, and giving the design system a second gesture for
+  // one screen's benefit is the wrong direction of dependency.
+  Widget build(BuildContext context) => GestureDetector(
+    onLongPress: onLongPress,
+    child: SdCardV3(
+      onTap: onTap,
+      // Outlined as well as ticked: colour is never the only signal, and
+      // the tick is never the only one either.
+      borderColor: isSelected ? context.colorScheme3.primary : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Two zones, and the split is what buys the width back: what the
+          // item IS across the top, what it is WORTH underneath, where the
+          // figures start at the card's own edge instead of after a 64pt
+          // photo and end before a 36pt button.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              if (isSelecting) ...<Widget>[
+                SdIconV3(
+                  isSelected
+                      ? AppIconConstant.checkCircle
+                      : AppIconConstant.radioButtonUnchecked,
+                  color: isSelected
+                      ? context.colorScheme3.primary
+                      : context.sdTheme3.textTertiary,
+                  semanticLabel: isSelected
+                      ? context.l10n.inventorySelected
+                      : context.l10n.inventoryNotSelected,
+                ),
+                SizedBox(width: SdSpacingConstant.w12),
+              ],
+              _Thumbnail(item: item),
               SizedBox(width: SdSpacingConstant.w12),
-            ],
-            _Thumbnail(item: item),
-            SizedBox(width: SdSpacingConstant.w12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    item.title,
-                    style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
-                      color: context.sdTheme3.textPrimary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: SdSpacingConstant.h6),
-                  Wrap(
-                    spacing: SdSpacingConstant.w6,
-                    runSpacing: SdSpacingConstant.h4,
-                    children: <Widget>[
-                      SdBadgeV3(
-                        label: ItemStatusLabel.of(context, item.status),
-                        tone: ItemStatusLabel.tone(item.status),
-                      ),
-                      if (isStale)
-                        SdBadgeV3(
-                          label: context.l10n.itemStale,
-                          tone: SdBadgeToneV3.warning,
-                          icon: AppIconConstant.hourglassBottom,
-                        ),
-                      if (item.quantity > 1)
-                        SdBadgeV3(
-                          label: context.l10n.itemQuantityTimes(item.quantity),
-                        ),
-                    ],
-                  ),
-                  SizedBox(height: SdSpacingConstant.h8),
-                  _PriceLine(item: item),
-                  _Marketplaces(listings: listings),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _Headline(item: item),
+                    SizedBox(height: SdSpacingConstant.h6),
+                    _StateBadges(item: item, now: now),
+                  ],
+                ),
               ),
-            ),
-            if (onActions != null && !isSelecting)
-              _ActionsButton(onPressed: onActions!),
-          ],
-        ),
+              if (onActions != null && !isSelecting)
+                _ActionsButton(onPressed: onActions!),
+            ],
+          ),
+          SizedBox(height: SdSpacingConstant.h10),
+          _MoneyLine(item: item),
+          _Marketplaces(listings: listings),
+        ],
       ),
-    );
-  }
+    ),
+  );
 }
 
 /// The row's way into `ItemActionsSheet`.

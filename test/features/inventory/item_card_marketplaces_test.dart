@@ -57,11 +57,16 @@ void main() {
     expect(find.text(r'$50.00'), findsNothing);
   });
 
-  testWidgets('an item on no marketplace adds nothing to its row', (
+  testWidgets('an item on no marketplace names none', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, ItemCard(item: item, now: testNow));
 
-    expect(find.byType(SdBadgeV3), findsNWidgets(1));
+    for (final Marketplace marketplace in Marketplace.values) {
+      expect(
+        find.widgetWithText(SdBadgeV3, marketplace.displayName),
+        findsNothing,
+      );
+    }
   });
 }

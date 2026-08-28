@@ -947,6 +947,18 @@
   "@itemAsking": {
     "description": "Short form of asking price, for a dense row."
   },
+  "itemProfitWithMargin": "{profit} ({margin})",
+  "@itemProfitWithMargin": {
+    "description": "Expected profit with its margin beside it, on an inventory row.",
+    "placeholders": {
+      "profit": {
+        "type": "String"
+      },
+      "margin": {
+        "type": "String"
+      }
+    }
+  },
   "itemAskingPrice": "Asking price",
   "@itemAskingPrice": {
     "description": "What the item is listed at, or intended to be."

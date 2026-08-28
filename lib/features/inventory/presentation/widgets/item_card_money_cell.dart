@@ -19,15 +19,11 @@ class _MoneyCell extends StatelessWidget {
   final TextAlign textAlign;
 
   @override
-  Widget build(BuildContext context) => RichText(
-    maxLines: 1,
-    overflow: TextOverflow.ellipsis,
-    textAlign: textAlign,
-    // One paragraph rather than a Row of two Texts: the label and the figure
-    // must ellipsize as one thing, and a Row would clip whichever child the
-    // constraints reached first.
-    text: TextSpan(
-      style: context.textTheme3.bodySmall!.faint3(context),
+  // One paragraph rather than a Row of two Texts: the label and the figure
+  // must ellipsize as one thing, and a Row would clip whichever child the
+  // constraints reached first.
+  Widget build(BuildContext context) => Text.rich(
+    TextSpan(
       children: <InlineSpan>[
         TextSpan(text: '$label '),
         TextSpan(
@@ -38,5 +34,9 @@ class _MoneyCell extends StatelessWidget {
         ),
       ],
     ),
+    style: context.textTheme3.bodySmall!.faint3(context),
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    textAlign: textAlign,
   );
 }

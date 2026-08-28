@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:system_design/index.dart';
 
 import '../../core/extensions/context_extensions.dart';
+import '../../core/utils/date_time_utils.dart';
+import 'domain/entities/item.dart';
 import 'domain/entities/storage_location.dart';
 import 'domain/enums/item_status.dart';
 
@@ -52,4 +54,14 @@ final class LocationKindLabel {
     LocationKind.shelf => context.l10n.locationShelf,
     LocationKind.bin => context.l10n.locationBin,
   };
+}
+
+/// How long the item has been in the state it is in — `3d`, `5w`, `2mo`.
+///
+/// **The duration alone, next to the status badge that names the state.**
+/// "Listed 84d" beside a badge already reading *Listed* says the word twice,
+/// and the row has no width to spare for it.
+final class ItemAgeLabel {
+  static String of(Item item, {required DateTime now}) =>
+      DateTimeUtils.compactAge(now.difference(item.stateSince));
 }
