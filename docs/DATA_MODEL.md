@@ -129,6 +129,12 @@ Statuses: `draft`, `inStock`, `listed`, `reserved`, `sold`, `archived`.
 mean a nightly job flipping thousands of documents, and a seller who reprices
 an item would have to wait for that job to see it leave the Stale tab.
 
+### `categories/{categoryId}`
+
+`name`, `parentId`, `description`, `deletedAt`, plus the fields every document
+carries. Every new workspace starts with Clothing, Shoes, and Accessories as
+normal editable records; they are defaults rather than a closed taxonomy.
+
 ### `listings/{listingId}`
 
 One per item **per marketplace** — cross-listing (plan §13) means one item has
@@ -144,9 +150,10 @@ add, rename, change the estimated rate, and soft-delete any marketplace.
 `feeRate` is a fraction of the sale and is **a planning estimate, never
 accounting**. A fee an order actually reports is a fact and always wins.
 
-Every new workspace starts with eBay, Etsy, Depop, and Poshmark as ordinary
-records. Their ids, names and initial rates come from one code-owned default
-list; after creation they behave exactly like a marketplace the seller added.
+Every new workspace starts with eBay, Etsy, Depop, Poshmark, and Vinted as
+ordinary records. Their ids, names and initial rates come from one code-owned
+default list; after creation they behave exactly like a marketplace the seller
+added.
 
 ### `orders/{orderId}`
 
