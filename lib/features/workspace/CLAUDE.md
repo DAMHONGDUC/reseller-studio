@@ -69,6 +69,32 @@ never a reason to hardcode English into a constant.
   not "Bolivia (Plurinational State of)" — because the picker is a list to
   scan, and the long forms bury the word the seller is looking for.
 
+## A platform's fee is the business's number, not the enum's
+
+Owner's rule. `Marketplace.estimatedFeeRate` is the platform's published
+headline; a seller on a shop tier, in another country, or with a category
+discount pays something else, and every after-fees figure was quietly wrong for
+them.
+
+- **`Workspace.marketplaceFeeRates` holds only the corrections**, keyed by
+  `Marketplace.name`. A platform absent from the map uses its published rate,
+  so a rate the platform later changes is not frozen at whatever the app
+  shipped with.
+- **`MarketplaceFeePolicy` is the only thing that reads that map.** It is pure
+  Dart and takes the rates as an argument, because `PayoutReconciliation` needs
+  it too and `domain/` imports no Flutter. Never write
+  `marketplace.estimatedFeeRate` at a call site again — that is the bug this
+  replaced.
+- **A real fee still wins.** The correction is a planning estimate;
+  `order.fees` is a fact, and `PayoutReconciliation.expected` falls back to the
+  rate only when the order reports none.
+- **Auto-syncing the fee from the platform is not built**, and cannot be until
+  a marketplace integration exists — every call carrying a token runs in a
+  Cloud Function (hard rule 10). When one does, it writes `order.fees`, which
+  already outranks this.
+- `test/features/marketplaces/marketplace_fee_test.dart` holds the resolution,
+  the validity bound and both halves of the fallback.
+
 ## One screen edits a business, and two places open it
 
 Owner's rule. `WorkspaceDetailScreen` is where a business's name, country,

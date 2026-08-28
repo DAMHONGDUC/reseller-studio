@@ -102,6 +102,16 @@ makes adding a team member a migration later.
 its own. Changing it does **not** convert existing records — it cannot, since
 nobody knows what rate applied on a purchase made last March.
 
+`marketplaceFeeRates` is a map of `Marketplace.name` → fraction of the sale,
+and it holds **only the platforms this business corrected**. A platform absent
+from it uses `Marketplace.estimatedFeeRate`, the published headline. Storing
+every default instead would freeze a rate the platform later changed, and make
+"the seller told us" indistinguishable from "nobody has said".
+
+**It is a planning estimate and never accounting.** A fee an order actually
+reported is a fact and always wins — see `PayoutReconciliation.expected`, which
+falls back to this only when `fees` is null.
+
 ### `members/{uid}`
 
 `role` (`owner` | `admin` | `member` | `viewer`), `displayName`, `email`,
