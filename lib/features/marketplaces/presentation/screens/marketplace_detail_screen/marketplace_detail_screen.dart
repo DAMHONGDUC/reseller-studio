@@ -204,7 +204,7 @@ class _MarketplaceDetailScreenState
                     decimal: true,
                   ),
                   helperText: context.l10n.marketplaceFeeHelper,
-                  errorText: state.feeRate == null || state.canSubmit
+                  errorText: state.feeRate == null || state.isFeeRateValid
                       ? null
                       : context.l10n.marketplaceFeeInvalid,
                   textInputAction: TextInputAction.done,

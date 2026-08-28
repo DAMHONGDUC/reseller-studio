@@ -17,10 +17,10 @@ class MarketplaceFormState {
 
   final bool isSaving;
 
-  bool get canSubmit =>
-      !isSaving &&
-      feeRate != null &&
-      MarketplaceConstant.isValidFeeRate(feeRate!);
+  bool get isFeeRateValid =>
+      feeRate != null && MarketplaceConstant.isValidFeeRate(feeRate!);
+
+  bool get canSubmit => !isSaving && isFeeRateValid;
 
   MarketplaceFormState copyWith({double? feeRate, bool? isSaving}) =>
       MarketplaceFormState(

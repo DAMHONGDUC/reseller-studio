@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart'
     as record;
@@ -143,6 +146,32 @@ void main() {
       expect(find.text('Enter a percentage between 0 and 100.'), findsNothing);
     });
 
+    testWidgets('a valid rate shows no validation error while saving', (
+      WidgetTester tester,
+    ) async {
+      final _DelayedMarketplaceRepository repository =
+          _DelayedMarketplaceRepository();
+      await pumpScreen(
+        tester,
+        const MarketplaceDetailScreen(marketplaceId: 'ebay'),
+        overrides: <Override>[
+          mock_providers.marketplaceRepositoryProvider.overrideWithValue(
+            repository,
+          ),
+        ],
+      );
+
+      await tester.tap(find.text('Save'));
+      await tester.pump();
+
+      expect(find.text('Enter a percentage between 0 and 100.'), findsNothing);
+
+      repository.completeSave();
+      await tester.pumpAndSettle();
+
+      expect(repository.saved?.id, 'ebay');
+    });
+
     testWidgets('add mode has no delete action', (WidgetTester tester) async {
       await pumpScreen(tester, const MarketplaceDetailScreen());
 
@@ -224,4 +253,39 @@ void main() {
       expect(changed.isDeleted, isTrue);
     });
   });
+}
+
+class _DelayedMarketplaceRepository implements MarketplaceRepository {
+  final Completer<void> _saveGate = Completer<void>();
+  final record.Marketplace _marketplace = record.Marketplace(
+    id: 'ebay',
+    name: 'eBay',
+    feeRate: 0.1325,
+    createdAt: testNow,
+  );
+
+  record.Marketplace? saved;
+
+  void completeSave() => _saveGate.complete();
+
+  @override
+  Future<void> delete(String marketplaceId) async {}
+
+  @override
+  Future<void> save(record.Marketplace marketplace) async {
+    await _saveGate.future;
+    saved = marketplace;
+  }
+
+  @override
+  Future<void> saveAll(List<record.Marketplace> marketplaces) async {
+    await _saveGate.future;
+    saved = marketplaces.isEmpty ? null : marketplaces.first;
+  }
+
+  @override
+  Stream<List<record.Marketplace>> watchMarketplaces() =>
+      Stream<List<record.Marketplace>>.value(<record.Marketplace>[
+        saved ?? _marketplace,
+      ]);
 }
