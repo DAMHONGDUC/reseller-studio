@@ -32,4 +32,18 @@ void main() {
 
     expect(offenders, isEmpty);
   });
+
+  test('every registry icon is documented and separated', () {
+    const String registryPath = 'lib/core/constants/app_icon_constant.dart';
+    final String source = File(registryPath).readAsStringSync();
+    final RegExp declaration = RegExp(r'  static const IconData ');
+    final RegExp documentedEntry = RegExp(
+      r'  /// [^\n]+\n  static const IconData [\s\S]*?;\n(?=\n|})',
+    );
+
+    expect(
+      documentedEntry.allMatches(source).length,
+      declaration.allMatches(source).length,
+    );
+  });
 }
