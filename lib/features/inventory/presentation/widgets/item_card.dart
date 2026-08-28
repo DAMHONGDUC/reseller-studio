@@ -96,8 +96,8 @@ class ItemCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // The figures run to the card's own left edge — owner's rule — so
-          // the Row above holds only what sits beside the photo.
+          // The money band runs to the card's own left edge — owner's rule —
+          // so the Row above holds only what sits beside the photo.
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -131,6 +131,7 @@ class ItemCard extends StatelessWidget {
                     ),
                     SizedBox(height: SdSpacingConstant.h6),
                     _StateBadges(item: item, now: now),
+                    _Marketplaces(listings: listings),
                   ],
                 ),
               ),
@@ -138,9 +139,10 @@ class ItemCard extends StatelessWidget {
                 _ActionsButton(onPressed: onActions!),
             ],
           ),
-          SizedBox(height: SdSpacingConstant.h10),
+          // The rule makes the band deliberate rather than a block that
+          // happens to start further left than everything above it.
+          SdDividerV3(gap: SdSpacingConstant.h12),
           _MoneyLine(item: item),
-          _Marketplaces(listings: listings),
         ],
       ),
     ),
