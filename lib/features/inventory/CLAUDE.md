@@ -142,9 +142,9 @@ answers it with a split, ruled off by a hairline:
 - **Above: what the item is.** Photo, title, the badges naming its state and
   its age, and the marketplaces it is live on — all in one column beside the
   photo, sharing one left edge.
-- **Below: what it is worth.** A band across the card's full width holding
-  three equal cells — cost, asking price, expected profit — each a label with
-  its amount under it.
+- **Below: what it is worth.** A band across the card's full width — how many
+  are left, then cost, asking price and expected profit, each a label with its
+  figure under it.
 
 The shape is the answer to two failed ones, and both failures are worth
 keeping written down:
@@ -155,9 +155,19 @@ keeping written down:
 - **Three figures side by side inside the top row** had a 64pt photo on one
   side and a 36pt button on the other, so a four-figure amount ellipsized.
 
-Across the foot each cell has a third of the card, the labels share one
-baseline and the amounts share the next — which is what lets three amounts be
-compared at a glance.
+Across the foot the labels share one baseline and the figures share the next,
+which is what lets the amounts be compared at a glance.
+
+- **The quantity leads, and its cell is narrower** — owner's rule that the row
+  carry what is left. A count is two characters where an amount is nine, so
+  equal quarters would spend width where it is not needed and ellipsize a
+  four-figure price. It replaces the old `×3` badge: a figure with a permanent
+  cell is one a seller can find without reading the chips.
+- **`Item.quantityOnHand` is zero once the item is sold or archived**,
+  whatever `quantity` says. The field records how many were taken in; a row
+  answering "what is left" must not answer with that number after the last one
+  went out. That zero is known rather than missing, which is why it is not an
+  em dash.
 
 - **The amount is a size louder than its label.** The figures are what the row
   exists to show, and a label at the same weight makes the seller hunt for the
@@ -165,9 +175,9 @@ compared at a glance.
 - **`SdDividerV3` between the zones**, not a gap alone: it makes the band
   deliberate rather than a block that happens to start further left than
   everything above it.
-- **All three render `—` when unknown** (hard rule 5), never `0`: an item added
-  through Quick Add has none of them, and a zero would tell the seller it was
-  free. The dash is `textTertiary` even in the profit cell — an em dash is not
+- **The three amounts render `—` when unknown** (hard rule 5), never `0`: an
+  item added through Quick Add has none of them, and a zero would tell the
+  seller it was free. The dash is `textTertiary` even in the profit cell — an em dash is not
   a figure, so it is not tinted as good news or bad.
 - **The profit is derived, never stored** (hard rule 3), and it is deliberately
   rough: `Item.expectedProfit` ignores fees and shipping, because which
