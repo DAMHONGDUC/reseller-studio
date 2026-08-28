@@ -185,7 +185,7 @@ void main() {
     }
   });
 
-  testWidgets('the pill is compact without shrinking its touch targets', (
+  testWidgets('the pill is compact, inset, and keeps full touch targets', (
     WidgetTester tester,
   ) async {
     await pumpBar(tester, 2);
