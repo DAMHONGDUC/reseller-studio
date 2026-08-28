@@ -472,6 +472,12 @@ behind it.
 17. **`system_design/v2` is never modified, and v3 never imports it.** Plan
     principles 17–19. See `docs/rules/DESIGN_SYSTEM.md`.
 
+18. **Every implementation change includes a scoped automated test that checks
+    the intended behavior.** Owner's rule. An analyzer pass proves only that
+    code is well formed; it does not prove that Save updates a marketplace or
+    that a regression cannot return. Add or update the test in the same change
+    and run that scope before committing.
+
 ## Code style
 
 How Dart in this repo is written. UI primitives live in
