@@ -109,6 +109,15 @@ class _FlowStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
+      // **Above the step, not beside the title** — owner's rule. Inline it
+      // was competing with the title for a row that also carries the arrow,
+      // and on the longer titles it was the first thing to be squeezed. On
+      // its own line it reads as a label over the whole step, which is what
+      // it is.
+      if (step.isOptional) ...<Widget>[
+        SdBadgeV3(label: context.l10n.commonOptional),
+        SizedBox(height: SdSpacingConstant.h4),
+      ],
       _FlowStepHeader(
         step: step,
         position: position,
@@ -173,25 +182,14 @@ class _FlowStepHeader extends StatelessWidget {
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w12),
-              // - one Expanded holding the title AND its badge, so the
-              //   arrow is pushed hard to the end
-              // - a Flexible title beside a Spacer split the free space
-              //   between them, leaving the arrow floating mid-row
+              // Expanded, not Flexible beside a Spacer: those two share the
+              // free space, which left the arrow floating mid-row.
               Expanded(
-                child: Row(
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        WorkflowLabel.title(context, step.kind),
-                        style: context.textTheme3.titleSmall!.semiBold3
-                            .copyWith(color: context.sdTheme3.textPrimary),
-                      ),
-                    ),
-                    if (step.isOptional) ...<Widget>[
-                      SizedBox(width: SdSpacingConstant.w8),
-                      SdBadgeV3(label: context.l10n.commonOptional),
-                    ],
-                  ],
+                child: Text(
+                  WorkflowLabel.title(context, step.kind),
+                  style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+                    color: context.sdTheme3.textPrimary,
+                  ),
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),

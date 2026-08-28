@@ -202,4 +202,33 @@ void main() {
       expect(right, moreOrLessEquals(rights.first, epsilon: 0.5));
     }
   });
+
+  testWidgets('the Optional badge sits above its step, not beside the title', (
+    WidgetTester tester,
+  ) async {
+    // Inline it competed with the title for a row that also carries the
+    // arrow, and on the longer titles it was the first thing squeezed.
+    final BuildContext context = await openSheet(tester);
+    final WorkflowStep optional = WorkflowConstant.steps.firstWhere(
+      (WorkflowStep step) => step.isOptional,
+    );
+    final Rect badge = tester.getRect(
+      find.text(context.l10n.commonOptional).first,
+    );
+    final Rect title = tester.getRect(
+      find.text(WorkflowLabel.title(context, optional.kind)),
+    );
+
+    // Beside the title it sat to its right, past the numbered disc's indent.
+    expect(
+      badge.left,
+      lessThan(title.left),
+      reason: 'the badge is still indented into the title column',
+    );
+    expect(
+      badge.bottom,
+      lessThanOrEqualTo(title.top),
+      reason: 'the badge is still sharing a row with the title',
+    );
+  });
 }
