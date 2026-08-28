@@ -5,12 +5,13 @@ import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/widgets/app_photo.dart';
 import '../../../listings/domain/entities/listing.dart';
+import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../item_label.dart';
 
-part 'item_card_marketplace_prices.dart';
+part 'item_card_marketplaces.dart';
 part 'item_card_price_cell.dart';
 part 'item_card_price_line.dart';
 part 'item_card_thumbnail.dart';
@@ -47,7 +48,7 @@ class ItemCard extends StatelessWidget {
 
   final Item item;
 
-  /// This item's live listings, for the per-marketplace prices.
+  /// This item's live listings, for the marketplace badges.
   ///
   /// **Passed in, not watched per card.** The list groups one `listingsProvider`
   /// read by item id; a family watch on every row would be one subscription
@@ -149,7 +150,7 @@ class ItemCard extends StatelessWidget {
                   ),
                   SizedBox(height: SdSpacingConstant.h8),
                   _PriceLine(item: item),
-                  _MarketplacePrices(listings: listings),
+                  _Marketplaces(listings: listings),
                 ],
               ),
             ),
