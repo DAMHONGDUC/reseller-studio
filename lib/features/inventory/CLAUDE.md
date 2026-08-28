@@ -137,32 +137,34 @@ Owner's rule, and it is deliberate rather than a duplication left standing.
 
 Owner's rule — the row must be **good-looking, sensible and complete**, in
 that order of argument and none of them at the cost of the others. `ItemCard`
-answers it with a split: beside the photo, what the item *is* — its title and
-the badges naming its state. Below, running to the card's own left edge, what
-it is *worth* — cost, asking price, expected profit, and the marketplaces it
-is live on.
+answers it with a split, ruled off by a hairline:
 
-- **The money and the marketplaces start at the card's left edge**, not after
-  the photo — owner's rule. It gives them the card's full width, and it
-  separates the two questions the row answers instead of running them into one
-  column.
-- **Three figures, stacked, in that order** — owner's rule: what went out,
-  what is being asked, what is left. Side by side they each got a share of the
-  width and truncated in turn; stacked, each has the whole card.
-- **The asking price is a labelled line in that block, not a figure beside the
-  title** — owner's rule, and it settles where the number lives after two
-  moves. Beside the title it took width from the one thing that identifies the
-  item; as a bare number under the title it read as a second title. Labelled
-  among the other two, it is one of a set a seller compares.
-- **The figures are a size louder than their labels** — owner's rule. They are
-  what the row exists to show, and a label at the same weight makes the seller
-  hunt for the number among the words introducing it.
-- **Label at the left edge, figure at the right** — owner's rule. `Cost`,
-  `Asking` and `Profit` are three different lengths, so a figure set directly
-  after its label started at a different place on every line and the three
-  read as a ragged staircase. Pushed apart, the amounts form a column, which
-  is the only way three of them can be compared at a glance. Both halves stay
-  `Flexible` so neither can push the row past the card.
+- **Above: what the item is.** Photo, title, the badges naming its state and
+  its age, and the marketplaces it is live on — all in one column beside the
+  photo, sharing one left edge.
+- **Below: what it is worth.** A band across the card's full width holding
+  three equal cells — cost, asking price, expected profit — each a label with
+  its amount under it.
+
+The shape is the answer to two failed ones, and both failures are worth
+keeping written down:
+
+- **Three figures stacked as lines** made the card tall, and with the label at
+  one edge and the amount at the other every label was marooned a card's width
+  from the number it names.
+- **Three figures side by side inside the top row** had a 64pt photo on one
+  side and a 36pt button on the other, so a four-figure amount ellipsized.
+
+Across the foot each cell has a third of the card, the labels share one
+baseline and the amounts share the next — which is what lets three amounts be
+compared at a glance.
+
+- **The amount is a size louder than its label.** The figures are what the row
+  exists to show, and a label at the same weight makes the seller hunt for the
+  number among the words introducing it.
+- **`SdDividerV3` between the zones**, not a gap alone: it makes the band
+  deliberate rather than a block that happens to start further left than
+  everything above it.
 - **All three render `—` when unknown** (hard rule 5), never `0`: an item added
   through Quick Add has none of them, and a zero would tell the seller it was
   free. The dash is `textTertiary` even in the profit cell — an em dash is not
@@ -199,6 +201,9 @@ plain badges** — no amounts.
 - **Every marketplace shows, wrapped rather than cut to one line.** The old
   line ellipsized, which hid exactly the platform a seller with five listings
   was looking for. A card grows a row instead.
+- **They sit with the state badges, above the money band.** Where an item is
+  live is a fact about the item, not a figure — grouping it with the badges
+  keeps the band to the three amounts it exists to line up.
 - **Deduped and walked in `Marketplace.values` order**, so two listings on one
   platform read as one badge and the row cannot reshuffle between builds.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds both
