@@ -75,6 +75,7 @@ in the left.
 | anything that looks like missing infrastructure — Firebase, signing, icons | `docs/rules/SETUP.md` |
 | asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
 | asking what is already built, or what is left and why | `docs/DONE_WORK.md`, `docs/REMAINING_WORK.md` |
+| subscription plans, paywalls, usage limits or premium gates | `docs/rules/SUBSCRIPTION.md` |
 | anything in `lib/features/mock_data/` | `lib/features/mock_data/AGENTS.md` (loads on its own) |
 | anything in `lib/features/workspace/` | `lib/features/workspace/AGENTS.md` (loads on its own) |
 
