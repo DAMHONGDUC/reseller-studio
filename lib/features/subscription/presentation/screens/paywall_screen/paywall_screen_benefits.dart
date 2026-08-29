@@ -19,25 +19,32 @@ class _PaywallBenefits extends StatelessWidget {
         ),
       ),
       SizedBox(height: SdSpacingConstant.h12),
-      LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double columnWidth =
-              (constraints.maxWidth - SdSpacingConstant.w12) / 2;
+      // A well, not a raised card: this is the thing being bought, read and
+      // never tapped, so the option cards below it own the sheet's one raised
+      // depth.
+      SdCardV3(
+        layer: SdCardLayerV3.sunken,
+        padding: EdgeInsets.all(SdSpacingConstant.w12),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double columnWidth =
+                (constraints.maxWidth - SdSpacingConstant.w12) / 2;
 
-          return Wrap(
-            spacing: SdSpacingConstant.w12,
-            runSpacing: SdSpacingConstant.h8,
-            children: <Widget>[
-              for (final String line in SubscriptionLabels.allowances(
-                SellerPlan.premium,
-              ))
-                SizedBox(
-                  width: columnWidth,
-                  child: _PaywallBenefitLine(label: line),
-                ),
-            ],
-          );
-        },
+            return Wrap(
+              spacing: SdSpacingConstant.w12,
+              runSpacing: SdSpacingConstant.h8,
+              children: <Widget>[
+                for (final String line in SubscriptionLabels.allowances(
+                  SellerPlan.premium,
+                ))
+                  SizedBox(
+                    width: columnWidth,
+                    child: _PaywallBenefitLine(label: line),
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     ],
   );

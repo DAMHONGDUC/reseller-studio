@@ -86,6 +86,15 @@ void main() {
     expect(cardBehind(tester, 'Yearly').borderColor, isNull);
   });
 
+  testWidgets('what Premium includes is framed as a well', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const PaywallScreen());
+
+    expect(cardBehind(tester, 'Unlimited items').layer, SdCardLayerV3.sunken);
+    expect(cardBehind(tester, 'Yearly').layer, SdCardLayerV3.elevated);
+  });
+
   testWidgets('the sheet keeps nine tenths of the screen, footer at its foot', (
     WidgetTester tester,
   ) async {
