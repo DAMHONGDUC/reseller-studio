@@ -23,6 +23,10 @@ Read this file before changing anything in `lib/features/inventory/`.
   whole Price cell is one circular tap target that opens the marketplace price
   list, rather than making the seller hit the arrow alone. The complete label
   and arrow stack is centred inside that circle.
+- **The Inventory card's horizontal padding is equal at both edges.** Owner's
+  rule. The complete circular target of the trailing actions button stays
+  inside the right padding; aligning only its glyph while letting the target
+  overhang makes the card's actual interactive layout asymmetric.
 
 ## Item action feedback
 
