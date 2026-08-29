@@ -634,6 +634,11 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   `SdSnackBarPlacementV3.top` is the default, and the host wraps the card in
   an `IgnorePointer` — so tap-to-dismiss is gone on purpose, and the timer is
   the only thing that takes a message away.
+- **A top message starts below the app bar, never over it.** Owner's rule.
+  Back and app-bar actions are primary navigation controls; a transient
+  message may not obscure them even though it ignores taps. The shared host
+  clears the status bar plus `kToolbarHeight`, so every call site gets the
+  same safe position without screen-specific offsets.
 - **An add that worked says nothing.** Owner's rule. A sheet closing and the
   new row appearing behind it is the confirmation; a card on top of it is the
   app telling the seller what they can already see, and it costs the top of
@@ -654,8 +659,8 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   one sends its messages to the screen *underneath*, where the very sheet that
   raised them covers them up. Widget tests do not catch it: `find.text`
   matches a widget the user cannot see. Placement is a second prop —
-  `SdSnackBarPlacementV3.bottom` is the default and what every screen wants,
-  `top` is for a route that owns the bottom of the screen. Assert on
+  `SdSnackBarPlacementV3.top` is the default and what every screen wants;
+  `bottom` is for a route that owns the top of the screen. Assert on
   `SdSnackBarCardV3`, the only public handle on what a static presenter drew.
   - **Drawing into the root overlay means it cannot see the glass nav bar**,
     and for a while it landed inside the band the bar occupies on all five
