@@ -16,6 +16,18 @@ any action that can be blocked by an entitlement.
 - **A downgrade never deletes existing records.** The gate blocks the next
   create once usage is at or above the Free ceiling; inventory, order history,
   and businesses already stored remain readable.
+- **RevenueCat client configuration is build-time environment data.** Owner's
+  rule. `AppEnv` is the only reader of `REVENUECAT_IOS_KEY`,
+  `REVENUECAT_ANDROID_KEY`, `REVENUECAT_ENTITLEMENT`, and
+  `REVENUECAT_OFFERING`; billing code reads those fields and never repeats a
+  RevenueCat dashboard identifier. The values are public client configuration,
+  not credentials, but one owner still prevents a renamed offering or
+  entitlement from silently disagreeing with the app.
+- **Home shows Free sellers one compact Premium banner directly above the
+  shortcut row.** Owner's rule. The whole banner opens the subscription screen,
+  and it disappears for Premium sellers so a paid customer is never advertised
+  the product they already own. It stays a banner rather than a fourth shortcut
+  because Home's shortcut list is closed.
 
 ## Enforcement
 
