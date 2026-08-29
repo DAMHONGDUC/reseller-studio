@@ -29,8 +29,8 @@ whole discipline was worth nothing. A path that holds a value blocked here is
 blocked wherever else it lives.
 
 **A script may read one; you may not print one.** `packages/system_design/tool/prepare-env.sh` copies
-these files and `_url-scheme.sh` derives from one, which is fine and is why
-`prepare-env.sh` says it copies bytes and never reads them. The line is the
+these files, which is fine and is why it says it copies bytes and never reads
+them. The line is the
 transcript: a command whose output contains a value from one of these files has
 already done the harm, whether it was `cat`, a `git diff`, a `PlistBuddy Print`
 or a Python script echoing what it just wrote. Redirect to the file, never to

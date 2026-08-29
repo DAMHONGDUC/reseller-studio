@@ -9,8 +9,8 @@ A `String.fromEnvironment('FIREBASE_…')` in a feature is a magic string nobody
 can audit and a typo that silently returns `''`.
 
 ```sh
-melos run run            # env/dev.json
-melos run run -- prod    # env/prod.json
+fvm flutter run --dart-define-from-file=env/dev.json
+fvm flutter run --dart-define-from-file=env/prod.json
 ```
 
 **There is a second half to a build's configuration, and nothing ties it to
