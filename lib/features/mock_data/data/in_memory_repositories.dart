@@ -155,12 +155,22 @@ class InMemoryItemRepository implements ItemRepository {
   );
 
   @override
-  Future<void> save(Item item) async =>
-      _store.upsert(_store.items, item, (Item other) => other.id == item.id);
+  Future<void> save(Item item) async => _store.upsert(
+    _store.items,
+    // Firestore stamps this server-side; mock mode has no server, so the
+    // repository does it — otherwise "last updated" would be blank in the
+    // only mode the app can be developed against.
+    _stamped(item),
+    (Item other) => other.id == item.id,
+  );
+
+  /// [item] with the moment it was written on it.
+  static Item _stamped(Item item) => item.copyWith(updatedAt: DateTime.now());
 
   @override
   Future<void> saveAll(List<Item> items) async {
-    for (final Item item in items) {
+    for (final Item row in items) {
+      final Item item = _stamped(row);
       final int index = _store.items.indexWhere((Item o) => o.id == item.id);
 
       if (index == -1) {

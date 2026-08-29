@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
-import 'package:reseller_studio/features/inventory/domain/services/item_transition.dart';
 import 'package:reseller_studio/features/inventory/presentation/controllers/item_form_controller.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
 
@@ -61,33 +60,30 @@ void main() {
     expect(draft.status, ItemStatus.draft, reason: 'the fixture starts draft');
 
     form.seed(draft);
-
-    expect(form.checkStatus(ItemStatus.inStock, quantity: '1').isAllowed, true);
-
     form.selectStatus(ItemStatus.inStock);
     await form.submit(title: draft.title, quantity: '1');
 
     expect((await saved(container, 'itm-10')).status, ItemStatus.inStock);
   });
 
-  test('an empty shelf cannot be moved anywhere', () async {
+  test('a picked status is never refused, whatever the record says', () async {
     final ProviderContainer container = mockContainer();
 
     await warmUp(container);
 
+    // Nothing on the shelf and no price: every requirement the verbs check is
+    // missing, and the form takes it anyway — owner's rule, because this is
+    // the screen where a seller corrects what the app got wrong.
     final Item sold = await saved(container, 'itm-1');
     final ItemFormController form = container.read(
       itemFormControllerProvider.notifier,
     );
 
     form.seed(sold);
+    form.selectStatus(ItemStatus.archived);
+    await form.submit(title: sold.title, quantity: '0');
 
-    // Nothing to move: the same requirement the actions sheet enforces, and
-    // the reason Restock exists — it puts stock behind the row first.
-    expect(
-      form.checkStatus(ItemStatus.archived, quantity: '0').blocks,
-      contains(ItemTransitionBlock.noQuantity),
-    );
+    expect((await saved(container, 'itm-1')).status, ItemStatus.archived);
   });
 
   test('sold can be set by hand, and takes the count with it', () async {
@@ -101,14 +97,6 @@ void main() {
     );
 
     form.seed(onShelf);
-
-    expect(
-      form
-          .checkStatus(ItemStatus.sold, quantity: '2', askingPrice: '42.00')
-          .isAllowed,
-      isTrue,
-    );
-
     form.selectStatus(ItemStatus.sold);
     await form.submit(title: onShelf.title, quantity: '2', askingPrice: '42');
 

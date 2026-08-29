@@ -19,6 +19,7 @@ class Item {
     required this.quantity,
     required this.status,
     required this.createdAt,
+    this.updatedAt,
     this.purchasePrice,
     this.askingPrice,
     this.minimumPrice,
@@ -43,6 +44,16 @@ class Item {
   final int quantity;
   final ItemStatus status;
   final DateTime createdAt;
+
+  /// When the record last changed, or null for one nothing has touched since
+  /// it was written.
+  ///
+  /// **Stamped by whoever saves, not derived** — Firestore writes it as a
+  /// server timestamp, so two devices editing the same item cannot disagree
+  /// about which edit was later. It is read-only everywhere in the app: no
+  /// form offers it, because a date the seller can type is not a record of
+  /// anything.
+  final DateTime? updatedAt;
 
   /// What the seller paid. **Null means nobody entered it**, not zero — every
   /// profit figure derived from this item is then `—` rather than wrong. See
@@ -161,6 +172,7 @@ class Item {
     DateTime? listedAt,
     DateTime? soldAt,
     DateTime? deletedAt,
+    DateTime? updatedAt,
     bool clearSoldAt = false,
   }) => Item(
     id: id,
@@ -168,6 +180,7 @@ class Item {
     quantity: quantity ?? this.quantity,
     status: status ?? this.status,
     createdAt: createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
     purchasePrice: purchasePrice ?? this.purchasePrice,
     askingPrice: askingPrice ?? this.askingPrice,
     minimumPrice: minimumPrice ?? this.minimumPrice,

@@ -119,6 +119,50 @@ final class AppColors {
     Color(0xFFFF7A70),
   ];
 
+  // --- Tags ---
+
+  /// Hues for a set of values that has to be told apart at a glance — the
+  /// item statuses, the condition grades.
+  ///
+  /// **Why not the semantic tokens.** `success`, `warning`, `danger` and
+  /// `info` say what a state *means*; a condition grade set needs seven
+  /// colours that only have to differ, and reusing the meaning colours for
+  /// them would make "Fair" read as a warning.
+  ///
+  /// Ordered light-to-serious on purpose: a set that runs from best to worst
+  /// (the condition grades do) reads correctly by index alone.
+  static const List<Color> tagSeries = <Color>[
+    Color(0xFF0F7A57),
+    Color(0xFF2160C4),
+    Color(0xFF8E3BC0),
+    Color(0xFF3D50DF),
+    Color(0xFF0E7490),
+    Color(0xFFA96A00),
+    Color(0xFFB8342A),
+    Color(0xFF5B6472),
+  ];
+
+  static const List<Color> tagSeriesDark = <Color>[
+    Color(0xFF43C79A),
+    Color(0xFF6DA4FF),
+    Color(0xFFC48BEA),
+    Color(0xFF8792FF),
+    Color(0xFF4FC3D9),
+    Color(0xFFE8A33D),
+    Color(0xFFFF7A70),
+    Color(0xFFA3ACBB),
+  ];
+
+  /// The tag palette for the palette in use, so a caller picks by index and
+  /// never by brightness.
+  static Color tag(BuildContext context, int index) {
+    final List<Color> palette = Theme.of(context).brightness == Brightness.dark
+        ? tagSeriesDark
+        : tagSeries;
+
+    return palette[index % palette.length];
+  }
+
   // --- Scrim and shadow ---
 
   static const Color barrier = Color(0x99000000);

@@ -4,6 +4,7 @@ import 'package:system_design/index.dart';
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/widgets/app_photo.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
@@ -14,14 +15,16 @@ part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
 part 'item_card_money_line.dart';
 part 'item_card_state_badges.dart';
+part 'item_card_updated.dart';
 part 'item_card_thumbnail.dart';
 
 /// One row of Inventory.
 ///
 /// **Two zones.** Beside the photo, what the item *is*: its title and the
-/// badges naming its state. Below, running to the card's own left edge, what
-/// it is *worth*: what it cost, what it is being asked for, and the
-/// marketplaces it is live on. Everything else is on the detail screen.
+/// badges naming its state, its age and its grade. Below, running to the
+/// card's own left edge, what it is *worth*: what it cost, what it is being
+/// asked for, and the marketplaces it is live on — then when the record last
+/// changed. Everything else is on the detail screen.
 ///
 /// The figures start at the edge rather than after the photo — owner's rule.
 /// It gives them the card's full width, and it separates the two questions
@@ -141,6 +144,7 @@ class ItemCard extends StatelessWidget {
           // happens to start further left than everything above it.
           SdDividerV3(gap: SdSpacingConstant.h12),
           _MoneyLine(item: item),
+          _UpdatedLine(item: item),
         ],
       ),
     ),

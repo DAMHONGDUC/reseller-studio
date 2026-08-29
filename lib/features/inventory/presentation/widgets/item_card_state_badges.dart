@@ -25,13 +25,21 @@ class _StateBadges extends StatelessWidget {
       children: <Widget>[
         SdBadgeV3(
           label: ItemStatusLabel.of(context, item.status),
-          tone: ItemStatusLabel.tone(item.status),
+          color: item.status.color(context),
         ),
         if (isStale)
           SdBadgeV3(
             label: context.l10n.itemStale,
             tone: SdBadgeToneV3.warning,
             icon: AppIconConstant.hourglassBottom,
+          ),
+        // The grade a buyer reads first on every marketplace, and the thing
+        // that explains a price a seller would otherwise have to open the
+        // item to justify.
+        if (item.condition != null)
+          SdBadgeV3(
+            label: ItemConditionLabel.of(context, item.condition!),
+            color: item.condition!.color(context),
           ),
         // How long it has been in that state, right after the badge that
         // names it — the two are one sentence.

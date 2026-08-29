@@ -36,6 +36,9 @@ final class ItemDto {
       quantity: FirestoreMapper.intOrNull(data['quantity']) ?? 1,
       status: _status(data['status']),
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
+      // Written as a server timestamp on every save, so it is null only for a
+      // document that has not come back from the server yet.
+      updatedAt: FirestoreMapper.dateOrNull(data['updatedAt']),
       purchasePrice: FirestoreMapper.moneyOrNull(
         data['purchasePriceMinor'],
         currency,

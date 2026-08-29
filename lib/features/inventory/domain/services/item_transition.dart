@@ -198,17 +198,33 @@ final class ItemTransition {
       );
     }
 
-    return item.copyWith(
-      status: target,
-      // Sold means sold out, whichever way it was reached: the count goes to
-      // zero so the card, the restock box and Analytics all agree with the
-      // status rather than each other.
-      quantity: target == ItemStatus.sold ? 0 : null,
-      soldAt: target == ItemStatus.sold ? now : null,
-      // Coming back onto the shelf undoes the sale, and the date has to go
-      // with it: an item on hand that still carries a sold date is one every
-      // export and every report reads as sold.
-      clearSoldAt: target.isOnHand && item.soldAt != null,
-    );
+    return setStatus(item, target, now: now);
   }
+
+  /// [item] moved to [target] with no gate at all — the seller's own choice.
+  ///
+  /// **The status a seller picks on the form is never refused** — owner's
+  /// rule. That screen is where they correct what the app got wrong, and a
+  /// correction that argues back is the thing they came to fix. The verbs are
+  /// unchanged: [apply] still checks, so Mark as sold and the bulk paths ask
+  /// for what they need.
+  ///
+  /// The side effects come along either way, because they are what keeps the
+  /// record consistent rather than what keeps it legal.
+  static Item setStatus(
+    Item item,
+    ItemStatus target, {
+    required DateTime now,
+  }) => item.copyWith(
+    status: target,
+    // Sold means sold out, whichever way it was reached: the count goes to
+    // zero so the card, the restock box and Analytics all agree with the
+    // status rather than each other.
+    quantity: target == ItemStatus.sold ? 0 : null,
+    soldAt: target == ItemStatus.sold ? now : null,
+    // Coming back onto the shelf undoes the sale, and the date has to go with
+    // it: an item on hand that still carries a sold date is one every export
+    // and every report reads as sold.
+    clearSoldAt: target.isOnHand && item.soldAt != null,
+  );
 }

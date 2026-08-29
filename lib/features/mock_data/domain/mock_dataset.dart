@@ -343,6 +343,7 @@ class MockDataset {
         quantity: 2,
         status: ItemStatus.inStock,
         createdAt: daysAgo(3),
+        updatedAt: daysAgo(1),
         purchasePrice: money(900),
         askingPrice: money(4200),
         sku: 'AF-0024',

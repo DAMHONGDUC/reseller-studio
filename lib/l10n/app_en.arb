@@ -116,6 +116,23 @@
   "@itemBlockWrongStatus": {
     "description": "Why a transition is refused because the item's current status is not a valid starting point."
   },
+  "itemUpdatedAt": "Updated {date}",
+  "@itemUpdatedAt": {
+    "description": "Last line of an inventory row: when the record last changed.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "itemAdded": "Added",
+  "@itemAdded": {
+    "description": "Detail row label: when the item was created. Read-only — no form offers it."
+  },
+  "itemLastUpdated": "Last updated",
+  "@itemLastUpdated": {
+    "description": "Detail row label: when the record last changed. Read-only."
+  },
   "itemStatus": "Status",
   "@itemStatus": {
     "description": "Field label on the item form for the item's state."

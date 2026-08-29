@@ -163,43 +163,10 @@ class ItemFormController extends Notifier<ItemFormState> {
     soldAt: item.soldAt,
   );
 
-  /// Whether the seller may set [target] from the form, given what is typed
-  /// in the boxes right now.
-  ///
-  /// **Checked against the pending values, not the saved record.** A price
-  /// typed a second ago is a price: refusing a move over a field the seller
-  /// has already filled in is the form arguing with itself.
-  ///
-  /// **The same `ItemTransition.check` every other path uses** — owner's rule
-  /// that the picker may set any status, `sold` included. What it may not do
-  /// is skip a requirement: a sale still needs a price, and an empty shelf
-  /// still cannot move.
-  ItemTransitionCheck checkStatus(
-    ItemStatus target, {
-    String quantity = '',
-    String askingPrice = '',
-  }) => ItemTransition.check(_candidate(quantity, askingPrice), target);
-
   /// Take the pick. The move itself happens in [submit], where the record is
   /// written — a status changed on a form the seller then abandons is one
   /// nothing should have saved.
   void selectStatus(ItemStatus value) => state = state.copyWith(status: value);
-
-  /// The item as the boxes currently describe it, for a check that has to run
-  /// before anything is saved.
-  Item _candidate(String quantity, String askingPrice) => Item(
-    id: state.itemId ?? '',
-    title: '',
-    quantity: int.tryParse(quantity.trim()) ?? 1,
-    status: state.savedStatus,
-    createdAt: state.createdAt ?? DateTime.now(),
-    askingPrice: Money.tryParse(
-      askingPrice,
-      ref.read(workspaceCurrencyProvider),
-    ),
-    listedAt: state.listedAt,
-    soldAt: state.soldAt,
-  );
 
   void selectCondition(ItemCondition value) =>
       state = state.copyWith(condition: value);
@@ -379,12 +346,13 @@ class ItemFormController extends Notifier<ItemFormState> {
         soldAt: state.soldAt,
       );
 
-      // A picked status is a state change like any other: it goes through the
-      // transition, which is what stamps `listedAt` and refuses a move the
-      // seller could not have made.
+      // **A picked status is never refused** — owner's rule: the form is where
+      // a seller corrects what the app got wrong. It still goes through the
+      // transition, which is what carries the side effects — a sold row loses
+      // its count, a returning one loses its sold date.
       final Item moved = state.status == state.savedStatus
           ? item
-          : ItemTransition.apply(item, state.status, now: now);
+          : ItemTransition.setStatus(item, state.status, now: now);
 
       // Putting stock behind a sold row is the seller saying they have the
       // thing again — the domain decides what that means, not the form.

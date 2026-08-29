@@ -31,11 +31,12 @@ class _ItemBody extends StatelessWidget {
               children: <Widget>[
                 SdBadgeV3(
                   label: ItemStatusLabel.of(context, item.status),
-                  tone: ItemStatusLabel.tone(item.status),
+                  color: item.status.color(context),
                 ),
                 if (item.condition != null)
                   SdBadgeV3(
                     label: ItemConditionLabel.of(context, item.condition!),
+                    color: item.condition!.color(context),
                   ),
                 if (item.quantity > 1)
                   SdBadgeV3(

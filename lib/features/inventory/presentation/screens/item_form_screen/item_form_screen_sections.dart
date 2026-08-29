@@ -37,185 +37,108 @@ class _FormSection extends StatelessWidget {
   );
 }
 
-/// The item's state, editable — four radios, each wearing its own colour.
+/// The item's state, editable — four tags, each wearing its own colour.
 ///
-/// **Radios rather than a picker sheet** — owner's rule. There are four
-/// states and they are the answer to one question, so hiding them behind a
-/// row that opens a sheet costs two taps to see what the choices even are.
-/// Laid out, the seller reads the whole vocabulary at once.
+/// **Tags rather than a picker sheet** — owner's rule. There are four states
+/// and they are the answer to one question, so hiding them behind a row that
+/// opens a sheet costs two taps to see what the choices even are. Laid out,
+/// the seller reads the whole vocabulary at once.
 ///
-/// **Each option carries the colour of its badge** (`ItemStatusLabel.color`),
-/// so the chosen radio and the tag on the card are visibly the same thing.
-/// Colour is never the only signal: the label is spelled out and the radio is
-/// filled.
+/// **Switching is free** — owner's rule, and it is the newest one here. No
+/// requirement is checked and no move is refused: the picker is where a
+/// seller corrects what the app got wrong, and a correction that argues back
+/// is the thing they came to fix. What the *verbs* do is unchanged —
+/// `ItemTransition.check` still gates Mark as sold and the bulk paths, which
+/// is where a missing price actually matters.
 ///
-/// **Sold is offered too** — owner's rule. It records that the stock is gone
-/// and empties the count with it, and it writes no order: revenue and profit
-/// are still read from orders (hard rule 3), so a sale that should show up in
-/// the figures is recorded through Mark as sold instead.
-///
-/// A refused move says which requirement is missing rather than going quiet,
-/// the same way the actions sheet does.
+/// Setting `sold` still empties the count, because sold means sold out
+/// however it was reached, and it writes **no order**: revenue and profit are
+/// read from orders (hard rule 3), so a sale that has to show up in the
+/// figures is recorded through Mark as sold.
 class _StatusField extends ConsumerWidget {
-  const _StatusField({
-    required this.state,
-    required this.quantity,
-    required this.askingPrice,
-  });
+  const _StatusField({required this.state});
 
   final ItemFormState state;
 
-  /// The boxes as they are right now, so a price typed a second ago counts.
-  final TextEditingController quantity;
-  final TextEditingController askingPrice;
-
-  void _pick(BuildContext context, WidgetRef ref, ItemStatus status) {
-    final ItemFormController form = ref.read(
-      itemFormControllerProvider.notifier,
-    );
-    final ItemTransitionCheck check = form.checkStatus(
-      status,
-      quantity: quantity.text,
-      askingPrice: askingPrice.text,
-    );
-
-    if (!check.isAllowed) {
-      SdSnackBarUtilsV3.error(
-        context,
-        ItemBlockPresenter.messages(context, check.blocks),
-      );
-
-      return;
-    }
-
-    form.selectStatus(status);
-  }
-
-  // Full width and left-aligned: `_FormSection` centres what it is given, so
-  // a group that sizes to its chips would sit indented while every typed row
-  // beside it starts at the card's edge.
   @override
-  Widget build(BuildContext context, WidgetRef ref) => SizedBox(
+  Widget build(BuildContext context, WidgetRef ref) => _TagGroupField(
+    label: context.l10n.itemStatus,
+    children: <Widget>[
+      for (final ItemStatus status in ItemStatus.values)
+        SdTagV3(
+          label: ItemStatusLabel.of(context, status),
+          color: status.color(context),
+          selected: state.status == status,
+          onSelected: () => ref
+              .read(itemFormControllerProvider.notifier)
+              .selectStatus(status),
+        ),
+    ],
+  );
+}
+
+/// The label and the wrap that every tag group on this form shares.
+///
+/// Extracted on its second use, which is the trigger the rules name: status
+/// and condition ask the same shape of question and must not answer it two
+/// ways.
+///
+/// **Full width and left-aligned**: `_FormSection` centres what it is given,
+/// so a group that sized to its tags would sit indented while every typed row
+/// beside it starts at the card's edge.
+class _TagGroupField extends StatelessWidget {
+  const _TagGroupField({required this.label, required this.children});
+
+  final String label;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
     width: double.infinity,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // The same label widget the typed and picked rows use, so one form
         // cannot label its fields three ways.
-        SdFieldLabelV3(label: context.l10n.itemStatus),
+        SdFieldLabelV3(label: label),
         SizedBox(height: SdSpacingConstant.h6),
         Wrap(
           spacing: SdSpacingConstant.w8,
           runSpacing: SdSpacingConstant.h8,
-          children: <Widget>[
-            for (final ItemStatus status in ItemStatus.values)
-              _StatusOption(
-                status: status,
-                isSelected: state.status == status,
-                onTap: () => _pick(context, ref, status),
-              ),
-          ],
+          children: children,
         ),
       ],
     ),
   );
 }
 
-/// One radio in that group.
-class _StatusOption extends StatelessWidget {
-  const _StatusOption({
-    required this.status,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final ItemStatus status;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  /// How much of the status colour the chosen option keeps behind it. The
-  /// same strength `SdBadgeV3` fills with, so the radio and the tag on the
-  /// card read as one colour rather than two versions of it.
-  static const double selectedFillOpacity = SdBadgeV3.fillOpacity;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color tint = ItemStatusLabel.color(context, status);
-    final Color foreground = isSelected ? tint : context.sdTheme3.textSecondary;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: SdRadiusV3.chipAll,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: SdSpacingConstant.w12,
-          vertical: SdSpacingConstant.h8,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? tint.withValues(alpha: selectedFillOpacity)
-              : Colors.transparent,
-          borderRadius: SdRadiusV3.chipAll,
-          border: Border.all(
-            color: isSelected ? tint : context.sdTheme3.border,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SdIconV3(
-              isSelected
-                  ? AppIconConstant.radioButtonChecked
-                  : AppIconConstant.radioButtonUnchecked,
-              size: SdIconV3.smallSize,
-              color: foreground,
-            ),
-            SizedBox(width: SdSpacingConstant.w6),
-            Text(
-              ItemStatusLabel.of(context, status),
-              style: context.textTheme3.bodySmall!.semiBold3.copyWith(
-                color: foreground,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// The condition grades resellers actually use in listings./// The condition grades resellers actually use in listings.
+/// The condition grades resellers actually use in listings.
+///
+/// **Tags, like the status above** — owner's rule. Seven grades behind a sheet
+/// is a list nobody opens, and the grade is what a buyer reads first on every
+/// marketplace.
+///
+/// **Each grade has its own colour**, ordered best to worst, so the set reads
+/// as a scale rather than seven equal options.
 class _ConditionField extends ConsumerWidget {
   const _ConditionField({required this.state});
 
   final ItemFormState state;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => PickerField(
+  Widget build(BuildContext context, WidgetRef ref) => _TagGroupField(
     label: context.l10n.itemCondition,
-    icon: AppIconConstant.grade,
-    value: state.condition == null
-        ? null
-        : ItemConditionLabel.of(context, state.condition!),
-    onTap: () async {
-      final ItemCondition? picked = await OptionPickerSheet.show<ItemCondition>(
-        context,
-        title: context.l10n.itemCondition,
-        selected: state.condition,
-        options: ItemCondition.values
-            .map(
-              (ItemCondition condition) => PickerOption<ItemCondition>(
-                value: condition,
-                label: ItemConditionLabel.of(context, condition),
-              ),
-            )
-            .toList(),
-      );
-
-      if (picked == null) return;
-
-      ref.read(itemFormControllerProvider.notifier).selectCondition(picked);
-    },
+    children: <Widget>[
+      for (final ItemCondition condition in ItemCondition.values)
+        SdTagV3(
+          label: ItemConditionLabel.of(context, condition),
+          color: condition.color(context),
+          selected: state.condition == condition,
+          onSelected: () => ref
+              .read(itemFormControllerProvider.notifier)
+              .selectCondition(condition),
+        ),
+    ],
   );
 }
 

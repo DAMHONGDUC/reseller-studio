@@ -23,8 +23,6 @@ import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_category.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../domain/enums/item_status.dart';
-import '../../../domain/services/item_transition.dart';
-import '../../../item_block_presenter.dart';
 import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../controllers/item_form_controller.dart';
@@ -208,11 +206,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.next,
                     ),
-                    _StatusField(
-                      state: state,
-                      quantity: _quantity,
-                      askingPrice: _asking,
-                    ),
+                    _StatusField(state: state),
                     _ConditionField(state: state),
                     _CategoryField(state: state),
                   ],
