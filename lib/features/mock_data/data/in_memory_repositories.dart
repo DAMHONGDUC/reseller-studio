@@ -617,28 +617,16 @@ class InMemorySubscriptionRepository implements SubscriptionRepository {
   /// reason the real ones are — see `PlanOffering`.
   static const List<PlanOffering> catalogue = <PlanOffering>[
     PlanOffering(
-      productId: 'mock_pro_monthly',
-      plan: SellerPlan.pro,
+      productId: 'mock_premium_monthly',
+      plan: SellerPlan.premium,
       period: BillingPeriod.monthly,
       formattedPrice: r'$9.99',
     ),
     PlanOffering(
-      productId: 'mock_pro_yearly',
-      plan: SellerPlan.pro,
+      productId: 'mock_premium_yearly',
+      plan: SellerPlan.premium,
       period: BillingPeriod.yearly,
       formattedPrice: r'$89.99',
-    ),
-    PlanOffering(
-      productId: 'mock_business_monthly',
-      plan: SellerPlan.business,
-      period: BillingPeriod.monthly,
-      formattedPrice: r'$24.99',
-    ),
-    PlanOffering(
-      productId: 'mock_business_yearly',
-      plan: SellerPlan.business,
-      period: BillingPeriod.yearly,
-      formattedPrice: r'$229.99',
     ),
   ];
 

@@ -16,14 +16,12 @@ import '../domain/services/plan_gate.dart';
 final class SubscriptionLabels {
   static String name(SellerPlan plan) => switch (plan) {
     SellerPlan.free => 'Free',
-    SellerPlan.pro => 'Pro',
-    SellerPlan.business => 'Business',
+    SellerPlan.premium => 'Premium',
   };
 
   static String tagline(SellerPlan plan) => switch (plan) {
     SellerPlan.free => 'Enough to run a small shelf',
-    SellerPlan.pro => 'For a seller doing this properly',
-    SellerPlan.business => 'For a team, and more than one shop',
+    SellerPlan.premium => 'Unlimited selling, without usage ceilings',
   };
 
   static String feature(PlanFeature feature) => switch (feature) {
@@ -49,16 +47,8 @@ final class SubscriptionLabels {
 
     return <String>[
       _countLine(limits.items, 'item', 'Unlimited items'),
-      _countLine(
-        limits.activeListings,
-        'active listing',
-        'Unlimited active listings',
-      ),
-      _countLine(
-        limits.marketplaces,
-        'marketplace connection',
-        'Unlimited marketplace connections',
-      ),
+      _countLine(limits.orders, 'order', 'Unlimited orders'),
+      _countLine(limits.workspaces, 'business', 'Unlimited businesses'),
       for (final PlanFeature capability in PlanFeature.values)
         if (PlanGate.has(plan, capability)) feature(capability),
     ];
@@ -76,13 +66,10 @@ final class SubscriptionLabels {
       PlanBlock.none => '',
       PlanBlock.itemLimit =>
         '$planName holds ${limits.items} items. Upgrade to add more.',
-      PlanBlock.listingLimit =>
-        '$planName allows ${limits.activeListings} active listings at once.',
-      PlanBlock.marketplaceLimit =>
-        '$planName connects to ${limits.marketplaces} marketplace'
-            '${limits.marketplaces == 1 ? '' : 's'}.',
-      PlanBlock.memberLimit =>
-        '$planName includes ${limits.members} seats. Upgrade for more.',
+      PlanBlock.orderLimit =>
+        '$planName holds ${limits.orders} orders. Upgrade to record more.',
+      PlanBlock.workspaceLimit =>
+        '$planName includes ${limits.workspaces} business. Upgrade to create more.',
       PlanBlock.featureLocked => 'This is part of a higher plan.',
     };
   }

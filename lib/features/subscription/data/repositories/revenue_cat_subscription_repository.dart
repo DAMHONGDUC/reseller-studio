@@ -185,9 +185,8 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
         .firstOrNull;
   }
 
-  /// **Reads the highest active entitlement, not the first.** A seller who
-  /// upgraded mid-period holds both for a while, and picking either at random
-  /// is how Business briefly renders as Pro.
+  /// **Reads the highest active entitlement, not the first.** RevenueCat can
+  /// return stale and current entitlements together during a product change.
   static SubscriptionStatus _statusFrom(CustomerInfo info) {
     final Map<String, EntitlementInfo> active = info.entitlements.active;
 
@@ -245,8 +244,8 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
 
   /// Which plan a package sells, read off the product identifier.
   ///
-  /// The identifier is expected to contain the plan's name — `pro_monthly`,
-  /// `business_yearly`. That is a convention with the dashboard, so it is
+  /// The identifier is expected to contain the plan's name —
+  /// `premium_monthly` or `premium_yearly`. That is a dashboard convention, so it is
   /// checked rather than assumed: an unrecognised product is dropped, never
   /// sold as the wrong tier.
   static SellerPlan? _planFor(Package package) {

@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../features/subscription/domain/services/plan_gate.dart';
+import '../../features/subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../features/subscription/providers.dart';
 import '../../features/workspace/domain/entities/pending_invite.dart';
 import '../../features/workspace/domain/entities/workspace.dart';
 import '../../features/workspace/presentation/controllers/team_controller.dart';
@@ -89,6 +92,26 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
     }
   }
 
+  Future<void> _create(BuildContext context, WidgetRef ref) async {
+    final PlanBlock block = ref.read(addWorkspaceBlockProvider);
+
+    Navigator.of(context).pop();
+
+    if (block == PlanBlock.none) {
+      await context.push(AppRoutes.workspaceCreate);
+
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    await PlanBlockSheet.show(
+      context,
+      block: block,
+      plan: ref.read(currentPlanProvider),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Workspace> workspaces = ref.watch(workspacesProvider);
@@ -128,12 +151,7 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
             },
           ),
           const SdDividerV3(),
-          _CreateWorkspaceRow(
-            onTap: () {
-              Navigator.of(context).pop();
-              context.push(AppRoutes.workspaceCreate);
-            },
-          ),
+          _CreateWorkspaceRow(onTap: () => _create(context, ref)),
         ],
       ),
     );

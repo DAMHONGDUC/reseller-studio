@@ -8,6 +8,9 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../country_label.dart';
 import '../../../country_picker.dart';
 import '../../../currency_label.dart';
@@ -99,6 +102,18 @@ class _WorkspaceSetupScreenState extends ConsumerState<WorkspaceSetupScreen> {
   /// Creates the workspace. For the first one this stops here — the router
   /// watches `workspaceStatusProvider` and moves the seller to Home itself.
   Future<void> _submit() async {
+    final PlanBlock block = ref.read(addWorkspaceBlockProvider);
+
+    if (widget.isAdditional && block != PlanBlock.none) {
+      await PlanBlockSheet.show(
+        context,
+        block: block,
+        plan: ref.read(currentPlanProvider),
+      );
+
+      return;
+    }
+
     try {
       final String? id = await ref
           .read(workspaceSetupControllerProvider.notifier)

@@ -12,6 +12,9 @@ import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
@@ -37,6 +40,24 @@ part 'orders_screen_order_list.dart';
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
 
+  Future<void> _recordSale(BuildContext context, WidgetRef ref) async {
+    final PlanBlock block = ref.read(addOrderBlockProvider);
+
+    if (block == PlanBlock.none) {
+      await context.push(AppRoutes.recordSale);
+
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    await PlanBlockSheet.show(
+      context,
+      block: block,
+      plan: ref.read(currentPlanProvider),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Order> orders = ref.watch(visibleOrdersProvider);
@@ -46,7 +67,7 @@ class OrdersScreen extends ConsumerWidget {
       // Orders is a tab screen, so the button clears the glass bar.
       floatingNav: true,
       addLabel: context.l10n.recordSaleTitle,
-      onAdd: () => context.push(AppRoutes.recordSale),
+      onAdd: () => _recordSale(context, ref),
       appBar: SdAppBarV3(
         title: context.l10n.navOrders,
         actions: <Widget>[
@@ -88,7 +109,7 @@ class OrdersScreen extends ConsumerWidget {
                 emptyAction: SdButtonV3(
                   variant: SdButtonVariantV3.primary,
                   label: context.l10n.recordSaleTitle,
-                  onPressed: () => context.push(AppRoutes.recordSale),
+                  onPressed: () => _recordSale(context, ref),
                 ),
               ),
               _ => _OrderList(orders: orders),

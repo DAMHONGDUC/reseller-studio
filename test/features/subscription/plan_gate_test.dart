@@ -4,127 +4,83 @@ import 'package:reseller_studio/features/subscription/domain/enums/plan_feature.
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
 
-/// The gate decides what a plan may do, and the only interesting part of a
-/// limit is its boundary — so that is what is asserted, not the middle.
-///
-/// The expected numbers are read from `PlanLimits`, never typed here: a test
-/// that hardcodes 50 passes for the wrong reason the day the price changes.
+/// Every boundary reads its expected ceiling from `PlanLimits`, so the test
+/// cannot keep passing against a stale number copied into prose.
 void main() {
-  group('item limit', () {
-    final int freeItems = PlanLimits.of(SellerPlan.free).items!;
+  final PlanLimits free = PlanLimits.of(SellerPlan.free);
 
-    test('the last item under the limit is allowed', () {
-      expect(
-        PlanGate.canAddItem(SellerPlan.free, currentItems: freeItems - 1),
-        PlanBlock.none,
-      );
-    });
-
-    test('holding exactly the limit blocks the next one', () {
-      expect(
-        PlanGate.canAddItem(SellerPlan.free, currentItems: freeItems),
-        PlanBlock.itemLimit,
-      );
-    });
-
-    test('a paid plan with no ceiling never blocks', () {
-      expect(PlanLimits.of(SellerPlan.pro).items, isNull);
-      expect(
-        PlanGate.canAddItem(SellerPlan.pro, currentItems: 100000),
-        PlanBlock.none,
-      );
-    });
-
-    test('an empty workspace on the smallest plan is allowed', () {
-      expect(
-        PlanGate.canAddItem(SellerPlan.free, currentItems: 0),
-        PlanBlock.none,
-      );
-    });
+  test('Free allows the last item and blocks the next one', () {
+    expect(
+      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items! - 1),
+      PlanBlock.none,
+    );
+    expect(
+      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items!),
+      PlanBlock.itemLimit,
+    );
   });
 
-  group('team', () {
-    test('a one-person plan is blocked on the feature, not the seat count', () {
-      // The honest message is "this plan has no team", and a seat-count block
-      // would send the seller looking for a seat to free up.
-      expect(
-        PlanGate.canInviteMember(SellerPlan.free, currentMembers: 0),
-        PlanBlock.featureLocked,
-      );
-      expect(
-        PlanGate.canInviteMember(SellerPlan.pro, currentMembers: 0),
-        PlanBlock.featureLocked,
-      );
-    });
-
-    test('Business fills its seats and then blocks', () {
-      final int seats = PlanLimits.of(SellerPlan.business).members!;
-
-      expect(
-        PlanGate.canInviteMember(
-          SellerPlan.business,
-          currentMembers: seats - 1,
-        ),
-        PlanBlock.none,
-      );
-      expect(
-        PlanGate.canInviteMember(SellerPlan.business, currentMembers: seats),
-        PlanBlock.memberLimit,
-      );
-    });
+  test('Free allows the last order and blocks the next one', () {
+    expect(
+      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders! - 1),
+      PlanBlock.none,
+    );
+    expect(
+      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders!),
+      PlanBlock.orderLimit,
+    );
   });
 
-  group('features', () {
-    test('a plan includes everything the cheaper ones do', () {
-      for (final PlanFeature feature in PlanFeature.values) {
-        if (PlanGate.has(SellerPlan.pro, feature)) {
-          expect(
-            PlanGate.has(SellerPlan.business, feature),
-            isTrue,
-            reason: '${feature.name} is in Pro but not in Business',
-          );
-        }
-      }
-    });
-
-    test('Free includes none of the gated ones', () {
-      for (final PlanFeature feature in PlanFeature.values) {
-        expect(
-          PlanGate.has(SellerPlan.free, feature),
-          isFalse,
-          reason: '${feature.name} would be free',
-        );
-      }
-    });
+  test('Free allows its first business and blocks another one', () {
+    expect(
+      PlanGate.canAddWorkspace(
+        SellerPlan.free,
+        currentWorkspaces: free.workspaces! - 1,
+      ),
+      PlanBlock.none,
+    );
+    expect(
+      PlanGate.canAddWorkspace(
+        SellerPlan.free,
+        currentWorkspaces: free.workspaces!,
+      ),
+      PlanBlock.workspaceLimit,
+    );
   });
 
-  group('where a block sends the seller', () {
-    test('nothing to upgrade to when nothing is blocked', () {
-      expect(
-        PlanGate.upgradeFor(PlanBlock.none, from: SellerPlan.free),
-        isNull,
-      );
-    });
+  test('Premium removes every usage ceiling', () {
+    final PlanLimits premium = PlanLimits.of(SellerPlan.premium);
 
-    test('a stock limit points at Pro, a team block at Business', () {
-      expect(
-        PlanGate.upgradeFor(PlanBlock.itemLimit, from: SellerPlan.free),
-        SellerPlan.pro,
-      );
-      expect(
-        PlanGate.upgradeFor(PlanBlock.featureLocked, from: SellerPlan.pro),
-        SellerPlan.business,
-      );
-    });
+    expect(premium.items, isNull);
+    expect(premium.orders, isNull);
+    expect(premium.workspaces, isNull);
+    expect(
+      PlanGate.canAddItem(SellerPlan.premium, currentItems: 100000),
+      PlanBlock.none,
+    );
+    expect(
+      PlanGate.canAddOrder(SellerPlan.premium, currentOrders: 100000),
+      PlanBlock.none,
+    );
+    expect(
+      PlanGate.canAddWorkspace(SellerPlan.premium, currentWorkspaces: 100000),
+      PlanBlock.none,
+    );
+  });
 
-    test('the top plan never points past itself', () {
+  test('every paid feature belongs to Premium', () {
+    for (final PlanFeature feature in PlanFeature.values) {
+      expect(PlanGate.has(SellerPlan.free, feature), isFalse);
+      expect(PlanGate.has(SellerPlan.premium, feature), isTrue);
+    }
+  });
+
+  test('every block points to Premium', () {
+    for (final PlanBlock block in PlanBlock.values) {
       expect(
-        PlanGate.upgradeFor(
-          PlanBlock.marketplaceLimit,
-          from: SellerPlan.business,
-        ),
-        SellerPlan.business,
+        PlanGate.upgradeFor(block, from: SellerPlan.free),
+        block == PlanBlock.none ? isNull : SellerPlan.premium,
       );
-    });
+    }
   });
 }

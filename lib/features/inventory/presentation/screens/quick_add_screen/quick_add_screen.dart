@@ -4,6 +4,9 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../controllers/quick_add_controller.dart';
 
 /// The fastest way to get something into inventory.
@@ -37,6 +40,17 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   /// the new row in the list behind (owner's rule).
   Future<void> _submit() async {
     final NavigatorState navigator = Navigator.of(context);
+    final PlanBlock block = ref.read(addItemBlockProvider);
+
+    if (block != PlanBlock.none) {
+      await PlanBlockSheet.show(
+        context,
+        block: block,
+        plan: ref.read(currentPlanProvider),
+      );
+
+      return;
+    }
 
     try {
       final String? id = await ref

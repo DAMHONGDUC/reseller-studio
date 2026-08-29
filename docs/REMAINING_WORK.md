@@ -125,14 +125,13 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
 - **`lib/features/mock_data/` ships in the binary.** Gated behind `DevFlags`
   and tree-shaken from release, but it is still a whole fake backend inside
   the repo's binary. Worth an explicit decision before submission.
-- **The plan limits are a first proposal, not a priced decision.**
-  `PlanLimits.byPlan` holds every ceiling. **Two things are deliberately
-  duplicated in `functions/`**, both for the same reason — the backend needs
-  them where a modified client cannot reach: `seatsByPlan` in
-  `lib/firestore.ts` (rules cannot count a collection) and
-  `planByEntitlement` in `subscription/entitlement.ts`, which mirrors
-  `SubscriptionProductConstant`. Changing either means changing its pair;
-  there is no third place.
+- **Premium billing still needs live App Store configuration.**
+  `PlanLimits.byPlan` holds the approved Free ceilings and the UI gates them;
+  `planByEntitlement` in `subscription/entitlement.ts` mirrors
+  `SubscriptionProductConstant`. The RevenueCat entitlement, monthly and
+  yearly products, webhook secret, and App Store review products still have
+  to be created and deployed. Inventory and Order counts also need trusted
+  server-side enforcement before the client gates become a security boundary.
 - **`selleros://` deep links are declared on both platforms but untested end
   to end.** There is now something that produces one — a push carries a
   `route` and `PushController` follows it — but it still needs a device and a

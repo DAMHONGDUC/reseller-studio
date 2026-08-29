@@ -17,12 +17,13 @@ enum PlanFeature {
   ///
   /// The whole plan-to-feature table, in one switch. Gates ask
   /// `plan.isAtLeast(feature.requiredPlan)`, never a list of plans, so a
-  /// fourth tier slots in here and nowhere else.
+  /// a future tier slots in here and nowhere else.
   SellerPlan get requiredPlan => switch (this) {
-    PlanFeature.advancedAnalytics || PlanFeature.reports => SellerPlan.pro,
-    PlanFeature.automation => SellerPlan.pro,
+    PlanFeature.advancedAnalytics ||
+    PlanFeature.reports ||
+    PlanFeature.automation ||
     PlanFeature.team ||
     PlanFeature.multipleWorkspaces ||
-    PlanFeature.advancedPermissions => SellerPlan.business,
+    PlanFeature.advancedPermissions => SellerPlan.premium,
   };
 }

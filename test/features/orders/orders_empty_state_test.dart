@@ -6,6 +6,9 @@ import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
+import 'package:reseller_studio/features/subscription/providers.dart';
+import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
@@ -62,5 +65,24 @@ void main() {
 
     expect(find.text('No orders match this filter.'), findsOneWidget);
     expect(find.text('No orders yet'), findsNothing);
+  });
+
+  testWidgets('the order ceiling opens the Premium gate before the form', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      const OrdersScreen(),
+      overrides: <Override>[
+        ...orders(const <Order>[]),
+        addOrderBlockProvider.overrideWith((Ref ref) => PlanBlock.orderLimit),
+      ],
+    );
+
+    await tester.tap(find.widgetWithText(SdButtonV3, 'Record a sale'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Upgrade to continue'), findsOneWidget);
+    expect(find.textContaining('orders. Upgrade'), findsOneWidget);
   });
 }

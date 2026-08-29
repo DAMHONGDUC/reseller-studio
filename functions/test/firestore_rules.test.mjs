@@ -194,7 +194,7 @@ describe('what only a Cloud Function may write', () => {
 
   it('refuses a client granting itself a plan', async () => {
     await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/subscription/current`).set({ plan: 'business' }),
+      as(OWNER).doc(`workspaces/${WORKSPACE}/subscription/current`).set({ plan: 'premium' }),
     );
   });
 });

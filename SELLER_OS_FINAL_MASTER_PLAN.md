@@ -887,31 +887,31 @@ verification — the identity provider owns all of that.
 
 ## 27. Monetization
 
-Potential plans:
+Plans:
 
 ```text
-Free → Pro → Business
+Free → Premium
 ```
 
 Free:
-- Limited inventory
-- Limited listings
-- Limited marketplace connections
+- Inventory limited by `PlanLimits.items`
+- Orders limited by `PlanLimits.orders`
+- Businesses limited by `PlanLimits.workspaces`
 - Basic analytics
 
-Pro:
+Premium:
 - Unlimited inventory
-- Multiple marketplaces
+- Unlimited orders
+- Unlimited businesses
 - Advanced analytics
 - Automation
 - Reports
-
-Business:
 - Team
-- Multiple workspaces
 - Advanced permissions
 - Advanced reports
-- Higher limits
+
+Premium has one entitlement and two auto-renewing billing periods: monthly and
+yearly. Both products unlock exactly the same capabilities.
 
 Subscription architecture may use App Store/Google Play + RevenueCat or equivalent + Cloud Functions + Firestore.
 

@@ -33,19 +33,16 @@ export const paths = {
 };
 
 /**
- * Seats per plan, mirroring `PlanLimits.byPlan` in the app.
+ * Team seats per plan.
  *
- * **This is a deliberate duplicate and the only one.** The limit has to be
- * enforced somewhere a modified client cannot reach, and rules cannot count a
- * collection — so the number exists in Dart for the paywall copy and here for
- * the check. Changing one means changing the other; there is no third place.
+ * The callable enforces this where a modified client cannot reach. It is
+ * separate from the Inventory, Order, and business ceilings in `PlanLimits`.
  *
  * `null` means unlimited.
  */
 export const seatsByPlan: Record<string, number | null> = {
   free: 1,
-  pro: 1,
-  business: 10,
+  premium: 10,
 };
 
 /**
@@ -53,7 +50,7 @@ export const seatsByPlan: Record<string, number | null> = {
  *
  * **A missing subscription document reads as `free`**, which matches the app:
  * with no billing configured every seller reads as Free. Failing the other way
- * would hand out Business seats to anyone whose webhook had not landed yet.
+ * would hand out Premium seats to anyone whose webhook had not landed yet.
  */
 export async function planFor(workspaceId: string): Promise<string> {
   const snap = await db().doc(paths.subscription(workspaceId)).get();

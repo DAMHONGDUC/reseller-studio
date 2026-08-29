@@ -23,7 +23,7 @@ part 'subscription_screen_offerings.dart';
 part 'subscription_screen_plan_card.dart';
 
 /// Subscription — what the seller is on, and what the other plans give
-/// (plan §25's Subscription block, over §27's tiers).
+/// (plan §25's Subscription block, over §27's Free/Premium model).
 ///
 /// **One screen, not a paywall and a settings page.** A seller who opens this
 /// from More is asking the same question a blocked action asks on their

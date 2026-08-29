@@ -9,12 +9,11 @@ import { seatsByPlan } from '../lib/firestore';
  * modified client cannot reach. Changing one means changing the other.
  */
 export const planByEntitlement: Record<string, string> = {
-  pro: 'pro',
-  business: 'business',
+  premium: 'premium',
 };
 
 /** Cheapest first, so "the highest entitlement the seller holds" is a max. */
-const planRank = ['free', 'pro', 'business'];
+const planRank = ['free', 'premium'];
 
 /**
  * Which plan a RevenueCat event leaves the seller on.

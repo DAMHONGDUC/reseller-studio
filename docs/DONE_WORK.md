@@ -36,7 +36,7 @@ are there and the mock backend drives them end to end.
 | 24 | Team — invite by email, accept from the workspace switcher, change a role, remove a member | built; every action is a callable, so it is silent until they are deployed |
 | 25 | Settings — account, workspace, theme, mock-data switch (debug only) | built |
 | 26 | Authentication — Apple and Google, sign out, delete account, signed-out shell | built, unconfigured |
-| 27 | Monetization — Free / Pro / Business, limits, paywall, Subscription screen | built, unconfigured |
+| 27 | Monetization — Free / Premium, Inventory/Order/business gates, monthly/yearly paywall | built, unconfigured |
 | 27 | Entitlement mirrored server-side — the RevenueCat webhook, and the uid it needs | written, not deployed |
 
 ## What the flows actually cover

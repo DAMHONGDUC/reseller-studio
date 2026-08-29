@@ -12,9 +12,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
-import '../listings/domain/entities/listing.dart';
-import '../listings/providers.dart';
 import '../mock_data/providers.dart';
+import '../orders/domain/entities/order.dart';
+import '../orders/providers.dart';
+import '../workspace/domain/entities/workspace.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/plan_limits.dart';
 import 'domain/entities/subscription_status.dart';
 import 'domain/enums/plan_feature.dart';
@@ -30,7 +32,7 @@ final StreamProvider<SubscriptionStatus> subscriptionStatusProvider =
 ///
 /// **Falls back to Free while the entitlement is still loading**, and that
 /// direction is deliberate: showing a paying seller the free tier for a
-/// moment is a cosmetic bug, whereas defaulting to Business would hand the
+/// moment is a cosmetic bug, whereas defaulting to Premium would hand the
 /// whole app away on every cold start.
 final Provider<SellerPlan> currentPlanProvider = Provider<SellerPlan>((
   Ref ref,
@@ -73,11 +75,16 @@ final Provider<int> countedItemsProvider = Provider<int>((Ref ref) {
       .length;
 });
 
-final Provider<int> countedListingsProvider = Provider<int>((Ref ref) {
-  final List<Listing> listings =
-      ref.watch(listingsProvider).value ?? const <Listing>[];
+final Provider<int> countedOrdersProvider = Provider<int>((Ref ref) {
+  final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
 
-  return listings.where((Listing listing) => listing.status.isLive).length;
+  return orders.length;
+});
+
+final Provider<int> countedWorkspacesProvider = Provider<int>((Ref ref) {
+  final List<Workspace> workspaces = ref.watch(workspacesProvider);
+
+  return workspaces.length;
 });
 
 /// Whether one more item may be created, and why not when it may not.
@@ -92,11 +99,20 @@ final Provider<PlanBlock> addItemBlockProvider = Provider<PlanBlock>((Ref ref) {
   );
 });
 
-final Provider<PlanBlock> listItemBlockProvider = Provider<PlanBlock>((
+final Provider<PlanBlock> addOrderBlockProvider = Provider<PlanBlock>((
   Ref ref,
 ) {
-  return PlanGate.canListItem(
+  return PlanGate.canAddOrder(
     ref.watch(currentPlanProvider),
-    currentActiveListings: ref.watch(countedListingsProvider),
+    currentOrders: ref.watch(countedOrdersProvider),
+  );
+});
+
+final Provider<PlanBlock> addWorkspaceBlockProvider = Provider<PlanBlock>((
+  Ref ref,
+) {
+  return PlanGate.canAddWorkspace(
+    ref.watch(currentPlanProvider),
+    currentWorkspaces: ref.watch(countedWorkspacesProvider),
   );
 });

@@ -10,47 +10,25 @@ import '../enums/seller_plan.dart';
 class PlanLimits {
   const PlanLimits({
     required this.items,
-    required this.activeListings,
-    required this.marketplaces,
-    required this.members,
+    required this.orders,
+    required this.workspaces,
   });
 
   /// Items on hand. Nothing is deleted when a seller downgrades — see
   /// `PlanGate`, which blocks the next *create* and never the existing rows.
   final int? items;
 
-  final int? activeListings;
-  final int? marketplaces;
-
-  /// Seats, the seller included. Free and Pro are one person.
-  final int? members;
+  final int? orders;
+  final int? workspaces;
 
   /// The table itself. One place, so a limit cannot be quoted differently by
   /// the paywall and by the gate that enforces it.
   ///
-  /// **These numbers are a first proposal, not a priced decision.** They are
-  /// here rather than in a document because a number in prose goes stale
-  /// silently; changing them is a one-line edit and needs no code change
-  /// anywhere else.
+  /// The owner-approved ceilings. They live here rather than in prose because
+  /// a copied number goes stale silently; paywall copy and gates read this map.
   static const Map<SellerPlan, PlanLimits> byPlan = <SellerPlan, PlanLimits>{
-    SellerPlan.free: PlanLimits(
-      items: 50,
-      activeListings: 25,
-      marketplaces: 1,
-      members: 1,
-    ),
-    SellerPlan.pro: PlanLimits(
-      items: null,
-      activeListings: null,
-      marketplaces: 5,
-      members: 1,
-    ),
-    SellerPlan.business: PlanLimits(
-      items: null,
-      activeListings: null,
-      marketplaces: null,
-      members: 10,
-    ),
+    SellerPlan.free: PlanLimits(items: 50, orders: 30, workspaces: 1),
+    SellerPlan.premium: PlanLimits(items: null, orders: null, workspaces: null),
   };
 
   /// Never null: every plan has a row, and a missing one is a programming

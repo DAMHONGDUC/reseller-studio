@@ -18,6 +18,9 @@ import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/providers.dart';
 import '../../../../sourcing/domain/entities/source.dart';
 import '../../../../sourcing/providers.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_category.dart';
@@ -108,6 +111,17 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
 
   Future<void> _submit() async {
     final NavigatorState navigator = Navigator.of(context);
+    final PlanBlock block = ref.read(addItemBlockProvider);
+
+    if (widget.itemId == null && block != PlanBlock.none) {
+      await PlanBlockSheet.show(
+        context,
+        block: block,
+        plan: ref.read(currentPlanProvider),
+      );
+
+      return;
+    }
 
     final int? quantity = int.tryParse(_quantity.text.trim());
 

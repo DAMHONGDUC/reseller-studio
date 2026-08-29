@@ -12,14 +12,13 @@ import '../../support/pump_app.dart';
 /// The demo business starts on Free, which is what a developer sees and what
 /// the limits are written against.
 void main() {
-  testWidgets('every tier is offered, with the demo prices', (
+  testWidgets('Premium is offered monthly and yearly', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const SubscriptionScreen());
 
     expect(find.text('Free'), findsWidgets);
-    expect(find.text('Pro'), findsWidgets);
-    expect(find.text('Business'), findsWidgets);
+    expect(find.text('Premium'), findsOneWidget);
 
     // The mock catalogue prices, rendered as the store would hand them over —
     // a formatted string, never a Money this app formats itself.
@@ -39,7 +38,7 @@ void main() {
     expect(find.text('Your plan'), findsOneWidget);
 
     // Free is what they already have, so it offers nothing to buy.
-    expect(find.textContaining('per month'), findsNWidgets(2));
+    expect(find.textContaining('per month'), findsOneWidget);
   });
 
   testWidgets('the free allowances come from PlanLimits, not from copy', (
@@ -50,7 +49,8 @@ void main() {
     final PlanLimits free = PlanLimits.of(SellerPlan.free);
 
     expect(find.text('${free.items} items'), findsOneWidget);
-    expect(find.text('${free.activeListings} active listings'), findsOneWidget);
+    expect(find.text('${free.orders} orders'), findsOneWidget);
+    expect(find.text('${free.workspaces} business'), findsOneWidget);
   });
 
   test('the demo business starts on the free tier', () async {

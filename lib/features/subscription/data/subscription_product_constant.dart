@@ -13,12 +13,7 @@ import '../domain/enums/seller_plan.dart';
 final class SubscriptionProductConstant {
   /// Entitlement identifier → the plan it grants.
   ///
-  /// Both are listed even though `SellerPlan.isAtLeast` makes Business imply
-  /// Pro: RevenueCat reports whichever entitlements are attached, and reading
-  /// the highest one present is what makes an upgrade take effect without a
-  /// restart.
   static const Map<String, SellerPlan> planByEntitlement = <String, SellerPlan>{
-    'pro': SellerPlan.pro,
-    'business': SellerPlan.business,
+    'premium': SellerPlan.premium,
   };
 }

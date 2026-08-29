@@ -1,6 +1,6 @@
 part of 'subscription_screen.dart';
 
-/// The three tiers, priced.
+/// Free and Premium, with Premium priced monthly and yearly.
 ///
 /// **Loaded once into local state rather than watched.** Offerings come from
 /// the store over the network and never change while a screen is open, so a

@@ -33,6 +33,18 @@ class _OfferCard extends ConsumerWidget {
   }
 
   Future<void> _confirmAccept(BuildContext context, WidgetRef ref) async {
+    final PlanBlock block = ref.read(addOrderBlockProvider);
+
+    if (block != PlanBlock.none) {
+      await PlanBlockSheet.show(
+        context,
+        block: block,
+        plan: ref.read(currentPlanProvider),
+      );
+
+      return;
+    }
+
     await showSdDialogV3(
       context,
       SdDialogV3(

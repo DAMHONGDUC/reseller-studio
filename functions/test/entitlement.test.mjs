@@ -12,33 +12,33 @@ const past = now - 24 * 60 * 60 * 1000;
 
 describe('which plan a RevenueCat event leaves the seller on', () => {
   it('grants the highest entitlement the event carries', () => {
-    const event = { entitlement_ids: ['pro', 'business'], expiration_at_ms: future };
+    const event = { entitlement_ids: ['premium'], expiration_at_ms: future };
 
     // A seller who upgraded mid-period holds both for a while, and picking
     // either at random is how Business renders as Pro.
-    assert.equal(planFromEvent(event, 'PRODUCT_CHANGE', now), 'business');
+    assert.equal(planFromEvent(event, 'PRODUCT_CHANGE', now), 'premium');
   });
 
   it('keeps the plan through a cancellation, until it actually lapses', () => {
     const cancelled = {
-      entitlement_ids: ['pro'],
+      entitlement_ids: ['premium'],
       expiration_at_ms: future,
       cancel_reason: 'CUSTOMER_SUPPORT',
     };
 
     // Cancelling is not lapsing. A switch on the event type is how somebody
     // who cancels on the last day of a year loses eleven months they paid for.
-    assert.equal(planFromEvent(cancelled, 'CANCELLATION', now), 'pro');
+    assert.equal(planFromEvent(cancelled, 'CANCELLATION', now), 'premium');
     assert.equal(willRenew(cancelled), false);
   });
 
   it('drops to free once the period has run out', () => {
     assert.equal(
-      planFromEvent({ entitlement_ids: ['pro'], expiration_at_ms: past }, 'RENEWAL', now),
+      planFromEvent({ entitlement_ids: ['premium'], expiration_at_ms: past }, 'RENEWAL', now),
       'free',
     );
     assert.equal(
-      planFromEvent({ entitlement_ids: ['pro'], expiration_at_ms: future }, 'EXPIRATION', now),
+      planFromEvent({ entitlement_ids: ['premium'], expiration_at_ms: future }, 'EXPIRATION', now),
       'free',
     );
   });
