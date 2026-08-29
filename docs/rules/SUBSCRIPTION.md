@@ -35,13 +35,36 @@ any action that can be blocked by an entitlement.
   management, and never doubles as the purchase surface. Premium gates and
   upgrade banners open the paywall route, while More → Subscription opens the
   management screen.
-- **The paywall has a fixed footer below its scrolling content.** Owner's
-  rule. Restore Purchases lives in that footer, and its last row is Terms of
-  Use and Privacy Policy as underlined text links. The legal links never scroll
-  away, and they do not render as a card, list rows, or icon actions; their
-  compact placement keeps the purchase choice primary while leaving both App
-  Store-required destinations directly reachable. `SubscriptionScreen` does
-  not repeat Restore Purchases.
+- **The paywall has a fixed footer below its scrolling content, and that
+  footer is one row.** Owner's rule, and it replaces a footer built from a
+  full-width Restore button stacked over a row of legal links — two controls
+  and a fifth of the sheet spent on the three things a seller taps least.
+  Restore Purchases, Terms of Use and Privacy Policy are compact underlined
+  text links side by side, dot-separated, wrapping to a second line rather
+  than growing a second control. Nothing in the footer scrolls away, none of
+  it renders as a card, list rows or icon actions, and `SubscriptionScreen`
+  still does not repeat Restore Purchases.
+- **The paywall sells with one choice and one button.** Owner's rule. The
+  billing periods are selectable option cards side by side, yearly selected
+  when the sheet opens and marked as the better value; one primary CTA buys
+  whichever is selected. Two full-width purchase buttons is what this
+  replaced: it made the sheet tall, gave neither option a recommendation, and
+  put an irreversible charge behind whichever button a thumb happened to
+  reach. The selection is a controller (`PaywallSelectionController`), never
+  widget state, so what is selected and what is bought cannot disagree.
+- **The sheet is sized by its content, and what Premium includes reads in two
+  columns.** Owner's rule. No height fraction — a fixed 90% sheet holding
+  compact content is a band of dead space above the footer. Allowances and
+  features render as short two-column lines rather than a single column of
+  nine rows, because the seller is scanning what they get, not reading it.
+- **What is on sale is a provider, never screen state.**
+  `planOfferingsProvider` loads it, `PlanOfferingCatalogue` imposes the order
+  and picks the default, and the screen watches the `AsyncValue`. A failed
+  load renders its own message and a retry — the earlier version caught the
+  error into a local `bool` and showed an empty sheet, which reads as "there
+  is nothing to buy" when the truth is that the store did not answer. The
+  store's own ordering is not relied on: it is not guaranteed, and a paywall
+  whose recommended option moves between launches is one nobody trusts.
 
 ## Enforcement
 
