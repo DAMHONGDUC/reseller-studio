@@ -378,8 +378,30 @@ one that opens a sheet of verbs.
   own layout; each wraps its content in a `Row` with the glyph as the last
   child, rather than growing a private idea of what a tappable card looks
   like.
-- **The end glyph is `textTertiary` at `SdIconV3.smallSize`.** It is a hint,
-  not content — a chevron with the weight of the title competes with it.
+- **The end glyph is `AppRowChevron`, and nothing draws one inline.** Owner's
+  rule. Five call sites had grown their own — three at `smallSize` in
+  `textTertiary`, one a raw `Icon` at Material's default in `textSecondary` —
+  so a seller scrolling Home met three sizes of the same promise. The widget
+  owns the glyph, the size and the colour; a call site passes nothing.
+- **It is `textSecondary` at `SdIconV3.defaultSize`.** Owner's rule, and it
+  **reverses `textTertiary` at `SdIconV3.smallSize`**. The old pair was
+  argued as "a hint, not content", and the hint lost: at 16 points in the
+  faintest grey the app has, the one mark saying a card opens something was
+  the thing sellers did not see. An affordance is not decoration — it is the
+  instruction, and it is read before the content it sits beside. It still
+  never outweighs the title: the title is `semiBold3` text, the glyph is a
+  grey the tier above faint.
+- **A tappable end glyph keeps a 44pt target, and the target overhangs the
+  padding rather than pushing the glyph inward.** Owner's rule, and it
+  **reverses "the whole target stays inside the card's padding"**. Centring a
+  20pt glyph in a 44pt box that stops at the content edge sets the glyph 12
+  points short of every plain chevron in the app, so the item card's dots and
+  arrow sat out of line with the column of chevrons on Orders and Offers —
+  which `row_affordance_test.dart` had been failing on. The overhang is
+  invisible: it is ink over the card's own inset. The misalignment was not.
+  `AppRowIconButton` (`core/widgets/`) is that control — the actions dots, a
+  row's delete — and it lays out at the glyph's width while its `InkResponse`
+  overflows to the target.
 - **Cards that are not rows are out of scope.** Home's three shortcut cards
   are columns — a glyph over a label, three across — and a chevron on each
   would be three arrows pointing at nothing. So are the stat tiles and the
