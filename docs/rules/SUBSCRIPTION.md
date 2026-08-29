@@ -62,6 +62,13 @@ any action that can be blocked by an entitlement.
   Compactness comes from the content — short two-column lines rather than a
   single column of nine rows, because the seller is scanning what they get,
   not reading it — never from the sheet's own height.
+- **What Premium includes sits in its own frame.** Owner's rule. The
+  two-column checklist is an `SdCardV3` well under the tagline; ticks floating
+  on the sheet's own surface had no edge, so they read as loose text between
+  the title and the prices rather than as the thing being bought. Sunken
+  rather than elevated, because it is read and never tapped — the option cards
+  under it are the raised, tappable half of the sheet, and two surfaces at the
+  same depth would leave nothing saying which one is the choice.
 - **What is on sale is a provider, never screen state.**
   `planOfferingsProvider` loads it, `PlanOfferingCatalogue` imposes the order
   and picks the default, and the screen watches the `AsyncValue`. A failed
