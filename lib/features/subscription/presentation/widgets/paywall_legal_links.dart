@@ -38,6 +38,7 @@ class PaywallLegalLinks extends StatelessWidget {
               onPressed: () => _open(context, termsUrl),
               child: Text(
                 context.l10n.legalTermsOfUse,
+                style: const TextStyle(decoration: TextDecoration.underline),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -56,6 +57,7 @@ class PaywallLegalLinks extends StatelessWidget {
               onPressed: () => _open(context, privacyUrl),
               child: Text(
                 context.l10n.legalPrivacyPolicy,
+                style: const TextStyle(decoration: TextDecoration.underline),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

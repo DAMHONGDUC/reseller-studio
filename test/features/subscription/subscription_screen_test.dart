@@ -16,6 +16,7 @@ void main() {
     expect(find.text('View Premium plans'), findsOneWidget);
     expect(find.textContaining('per month'), findsNothing);
     expect(find.textContaining('per year'), findsNothing);
+    expect(find.text('Restore purchases'), findsNothing);
   });
 
   testWidgets('the seller is told which plan is theirs', (

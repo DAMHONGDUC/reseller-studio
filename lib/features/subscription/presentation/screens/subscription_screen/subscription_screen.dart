@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
-import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
@@ -12,7 +11,6 @@ import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/subscription_status.dart';
 import '../../../domain/enums/seller_plan.dart';
 import '../../../providers.dart';
-import '../../controllers/subscription_controller.dart';
 import '../../subscription_labels.dart';
 
 part 'subscription_screen_current_card.dart';
@@ -29,38 +27,12 @@ part 'subscription_screen_current_card.dart';
 class SubscriptionScreen extends ConsumerWidget {
   const SubscriptionScreen({super.key});
 
-  Future<void> _restore(BuildContext context, WidgetRef ref) async {
-    try {
-      final SubscriptionStatus status = await ref
-          .read(subscriptionControllerProvider.notifier)
-          .restore();
-
-      if (!context.mounted) return;
-
-      SdSnackBarUtilsV3.success(
-        context,
-        status.plan.isPaid
-            ? '${SubscriptionLabels.name(status.plan)} restored'
-            : 'Nothing to restore on this account',
-      );
-    } catch (error) {
-      // Already logged by the controller.
-      if (!context.mounted) return;
-
-      SdSnackBarUtilsV3.error(
-        context,
-        FailurePresenter.message(context, error),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final SellerPlan plan = ref.watch(currentPlanProvider);
     final SubscriptionStatus? status = ref
         .watch(subscriptionStatusProvider)
         .value;
-    final bool isBusy = ref.watch(subscriptionControllerProvider);
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.moreSubscription),
@@ -79,23 +51,17 @@ class SubscriptionScreen extends ConsumerWidget {
             ),
           ],
           SizedBox(height: SdContentPaddingV3.sectionGap),
-          AppListCard(
-            children: <Widget>[
-              AppListRow(
-                title: context.l10n.subscriptionRestorePurchases,
-                subtitle: context.l10n.subscriptionIfYouAlreadyPaidOnAnother,
-                icon: AppIconConstant.restore,
-                onTap: isBusy ? null : () => _restore(context, ref),
-              ),
-              if (status != null && status.source != SubscriptionSource.none)
+          if (status != null && status.source != SubscriptionSource.none)
+            AppListCard(
+              children: <Widget>[
                 AppListRow(
                   title: context.l10n.subscriptionManageBilling,
                   subtitle: _billingHome(status.source),
                   icon: AppIconConstant.creditCard,
                   showChevron: false,
                 ),
-            ],
-          ),
+              ],
+            ),
           SizedBox(height: SdContentPaddingV3.bottomGap),
         ],
       ),

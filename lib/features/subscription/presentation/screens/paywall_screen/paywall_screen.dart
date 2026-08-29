@@ -17,6 +17,7 @@ import '../../widgets/paywall_legal_links.dart';
 
 part 'paywall_screen_offerings.dart';
 part 'paywall_screen_plan_card.dart';
+part 'paywall_screen_footer.dart';
 
 /// The only surface that sells Premium.
 ///
@@ -34,31 +35,33 @@ class PaywallScreen extends ConsumerWidget {
     return SdBottomSheetV3(
       title: context.l10n.paywallTitle,
       heightFactor: heightFactor,
-      child: ListView(
+      child: Column(
         children: <Widget>[
-          _PaywallOfferings(isBusy: isBusy),
-          SizedBox(height: SdSpacingConstant.h8),
-          Text(
-            AppEnv.hasBillingConfig
-                ? context.l10n.paywallStoreAccountNote
-                : context.l10n.paywallUnavailable,
-            style: context.textTheme3.bodySmall!.copyWith(
-              color: context.sdTheme3.textSecondary,
+          Expanded(
+            child: ListView(
+              children: <Widget>[
+                _PaywallOfferings(isBusy: isBusy),
+                SizedBox(height: SdSpacingConstant.h8),
+                Text(
+                  AppEnv.hasBillingConfig
+                      ? context.l10n.paywallStoreAccountNote
+                      : context.l10n.paywallUnavailable,
+                  style: context.textTheme3.bodySmall!.copyWith(
+                    color: context.sdTheme3.textSecondary,
+                  ),
+                ),
+                SizedBox(height: SdSpacingConstant.h12),
+                Text(
+                  context.l10n.subscriptionRenewalTerms,
+                  style: context.textTheme3.bodySmall!.copyWith(
+                    color: context.sdTheme3.textSecondary,
+                  ),
+                ),
+                SizedBox(height: SdSpacingConstant.h16),
+              ],
             ),
           ),
-          SizedBox(height: SdSpacingConstant.h12),
-          Text(
-            context.l10n.subscriptionRenewalTerms,
-            style: context.textTheme3.bodySmall!.copyWith(
-              color: context.sdTheme3.textSecondary,
-            ),
-          ),
-          SizedBox(height: SdSpacingConstant.h8),
-          PaywallLegalLinks(
-            termsUrl: AppEnv.termsOfServiceUrl,
-            privacyUrl: AppEnv.privacyPolicyUrl,
-          ),
-          SizedBox(height: SdContentPaddingV3.bottomGap),
+          const _PaywallFooter(),
         ],
       ),
     );

@@ -16,6 +16,15 @@ void main() {
     expect(find.text('Unlock Premium'), findsOneWidget);
     expect(find.textContaining(r'$9.99 per month'), findsOneWidget);
     expect(find.textContaining(r'$89.99 per year'), findsOneWidget);
+    expect(find.text('Restore purchases'), findsOneWidget);
+    expect(
+      find.ancestor(
+        of: find.text('Restore purchases'),
+        matching: find.byType(Scrollable),
+      ),
+      findsNothing,
+      reason: 'restore belongs to the fixed footer, not scrolling content',
+    );
   });
 
   testWidgets('legal destinations are text links in one bottom row', (
@@ -38,11 +47,19 @@ void main() {
       findsOneWidget,
     );
     expect(
+      tester.widget<Text>(find.text('Terms of Use')).style?.decoration,
+      TextDecoration.underline,
+    );
+    expect(
       find.ancestor(
         of: find.text('Privacy Policy'),
         matching: find.byType(TextButton),
       ),
       findsOneWidget,
+    );
+    expect(
+      tester.widget<Text>(find.text('Privacy Policy')).style?.decoration,
+      TextDecoration.underline,
     );
   });
 }

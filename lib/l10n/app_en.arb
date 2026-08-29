@@ -2518,6 +2518,19 @@
   "@subscriptionRestorePurchases": {
     "description": "Shown on the subscription screens."
   },
+  "subscriptionPlanRestored": "{plan} restored",
+  "@subscriptionPlanRestored": {
+    "description": "Success message after restoring a paid subscription.",
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "subscriptionNothingToRestore": "Nothing to restore on this account",
+  "@subscriptionNothingToRestore": {
+    "description": "Message after restore finds no paid subscription."
+  },
   "subscriptionIfYouAlreadyPaidOnAnother": "If you already paid on another device",
   "@subscriptionIfYouAlreadyPaidOnAnother": {
     "description": "Shown on the subscription screens."
