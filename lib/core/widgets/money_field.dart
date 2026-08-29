@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:system_design/index.dart';
 
 import '../money/currency_decimals.dart';
+import '../money/currency_input_formatter.dart';
 
 /// A field that takes an amount of money.
 ///
@@ -63,9 +63,7 @@ class MoneyField extends StatelessWidget {
     errorText: errorText,
     helperText: helperText,
     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-    inputFormatters: <TextInputFormatter>[
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-    ],
+    inputFormatters: <CurrencyInputFormatter>[CurrencyInputFormatter(currency)],
     textInputAction: textInputAction,
     onChanged: onChanged,
     onSubmitted: onSubmitted,

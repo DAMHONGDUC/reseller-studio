@@ -93,7 +93,7 @@ void main() {
     test('a VND amount round-trips with no decimal point', () {
       const Money amount = Money(450000, 'VND');
 
-      expect(amount.toInputString(), '450000');
+      expect(amount.toInputString(), '450,000');
       expect(Money.tryParse(amount.toInputString(), 'VND'), amount);
     });
 
