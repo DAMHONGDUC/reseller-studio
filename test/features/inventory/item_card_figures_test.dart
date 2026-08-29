@@ -130,6 +130,37 @@ void main() {
     expect(taps, 1);
   });
 
+  testWidgets('the Price target is circular and uses the Cost content gap', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(cost: const Money(4500, 'USD')),
+        now: testNow,
+        onMarketPrices: () {},
+      ),
+    );
+
+    final Finder priceTarget = find.ancestor(
+      of: find.text('Price'),
+      matching: find.byType(InkResponse),
+    );
+    final InkResponse ink = tester.widget<InkResponse>(priceTarget);
+    final Finder arrow = find.descendant(
+      of: priceTarget,
+      matching: find.byType(SdIconV3),
+    );
+
+    expect(ink.highlightShape, BoxShape.circle);
+    expect(ink.customBorder, isA<CircleBorder>());
+    expect(tester.getSize(priceTarget), Size.square(SdSpacingConstant.r44));
+    expect(
+      tester.getRect(arrow).top - tester.getRect(find.text('Price')).bottom,
+      moreOrLessEquals(SdSpacingConstant.h2),
+    );
+  });
+
   testWidgets('an item that has left inventory keeps the slot, not the arrow', (
     WidgetTester tester,
   ) async {

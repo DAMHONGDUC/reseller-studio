@@ -46,7 +46,17 @@ class _MoneyCell extends StatelessWidget {
 
     return Tooltip(
       message: tooltip!,
-      child: InkWell(onTap: handleTap, child: cell),
+      child: InkResponse(
+        onTap: handleTap,
+        radius: SdSpacingConstant.r22,
+        containedInkWell: true,
+        highlightShape: BoxShape.circle,
+        customBorder: const CircleBorder(),
+        child: SizedBox.square(
+          dimension: _CardIconButton.slotSize,
+          child: Align(alignment: Alignment.centerLeft, child: cell),
+        ),
+      ),
     );
   }
 }
