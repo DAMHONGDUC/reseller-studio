@@ -60,3 +60,33 @@ building either.
 - The empty state's action is the same one the button is. Orders used to point
   the seller at Inventory because it had no create action of its own; that
   sentence in `docs/rules/SCREENS.md` now applies to Listings alone.
+
+## Order transitions are domain rules, never button rules
+
+- **Only `toShip` may become `shipped`.** An unpaid order cannot leave, and a
+  return request belongs to the returns workflow rather than Shipping Queue.
+- **Every transition validates the current state below the UI.** A stale
+  screen or a second device may call a controller after the record moved; a
+  hidden button is not a data boundary.
+- **Shipping Queue contains `toShip` alone.** Returns remain actionable, but
+  their action is receiving the item rather than shipping it again.
+
+## Sale and return inventory writes are atomic
+
+Creating an order and decrementing the item are one commit. Closing a return
+and restoring its quantities are one commit. A network failure between two
+writes must never leave an order without the inventory move it claims.
+
+## Orders point at business marketplaces
+
+An order stores the seller-owned marketplace id plus a name snapshot. New
+sales choose from active marketplace records; deleting or renaming a market
+does not rewrite the historical name already printed on an order.
+
+## Refund and timeline facts
+
+- A refund is positive and cannot exceed the sale price. Returning an item
+  alone does not erase revenue; the recorded refund is what reduces it.
+- Each lifecycle event stores its own timestamp. The timeline includes order,
+  shipment, delivery, return request, returned item, refund, and settlement;
+  current status is not a substitute for when a past event happened.
