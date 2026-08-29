@@ -990,6 +990,10 @@
       }
     }
   },
+  "inventoryMarketPrices": "Prices on each marketplace",
+  "@inventoryMarketPrices": {
+    "description": "Tooltip and semantics label of the arrow on the Inventory card that opens the cross-list screen."
+  },
   "inventoryNotListed": "Not listed",
   "@inventoryNotListed": {
     "description": "Red Inventory card badge on an item that is on no marketplace yet."

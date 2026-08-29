@@ -58,6 +58,8 @@ class _ItemList extends ConsumerWidget {
             // The same sheet the detail screen opens — one list of verbs, so
             // an action added there cannot go missing here.
             onActions: () => ItemActionsSheet.show(context, item),
+            // The row shows no price per marketplace; this is where they are.
+            onMarketPrices: () => context.push(AppRoutes.crossList(item.id)),
           );
         },
       ),

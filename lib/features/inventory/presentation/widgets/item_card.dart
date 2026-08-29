@@ -10,6 +10,7 @@ import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 
+part 'item_card_icon_button.dart';
 part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
 part 'item_card_money_line.dart';
@@ -43,6 +44,7 @@ class ItemCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.onActions,
+    this.onMarketPrices,
     this.isSelected = false,
     this.isSelecting = false,
     super.key,
@@ -74,6 +76,14 @@ class ItemCard extends StatelessWidget {
   /// button that opened a sheet for one item mid-bulk-edit would lose the
   /// forty rows the seller had just picked.
   final VoidCallback? onActions;
+
+  /// Opens the cross-list screen, where every marketplace's own price is.
+  ///
+  /// **The card does not push the route itself** — the same reason [onTap] is
+  /// a callback: a widget that knows its destination cannot be put on a
+  /// screen that wants another one. Null on a list that only navigates, and
+  /// ignored while a selection is open.
+  final VoidCallback? onMarketPrices;
 
   final bool isSelected;
 
@@ -134,76 +144,26 @@ class ItemCard extends StatelessWidget {
                   ],
                 ),
               ),
+              // `more_vert`, not the detail screen's `tune` — owner's rule.
+              // A glyph is all the width allows next to a title and a price,
+              // so it has to be one a seller already knows.
               if (onActions != null && !isSelecting)
-                _ActionsButton(onPressed: onActions!),
+                _CardIconButton(
+                  icon: AppIconConstant.moreVert,
+                  tooltip: context.l10n.commonActions,
+                  onPressed: onActions!,
+                ),
             ],
           ),
           // The rule makes the band deliberate rather than a block that
           // happens to start further left than everything above it.
           SdDividerV3(gap: SdSpacingConstant.h12),
-          _MoneyLine(item: item),
+          _MoneyLine(
+            item: item,
+            onMarketPrices: isSelecting ? null : onMarketPrices,
+          ),
           _UpdatedLine(item: item),
         ],
-      ),
-    ),
-  );
-}
-
-/// The row's way into `ItemActionsSheet`.
-///
-/// **`more_vert`, not the detail screen's `tune`** — owner's rule. A glyph is
-/// all the width allows next to a title and a price, so it has to be one a
-/// seller already knows, and the overflow dots are what every list row on the
-/// platform uses to mean "more you can do to this". `tune` reads as filtering
-/// when it is not sitting beside the word Actions.
-///
-/// **A round 44pt target, centred on the glyph** — owner's rule. The button
-/// was a 36×44 box with the dots pinned to its right edge: a squeezed target,
-/// and a ripple that came up as a rounded rectangle nowhere near the thing it
-/// was acknowledging. `InkResponse` with a circular highlight is what an
-/// icon-only control looks like everywhere else on the platform.
-///
-/// **The glyph still sits on the card's content edge**, where every
-/// `AppRowChevron` sits — a column of end glyphs that does not line up reads
-/// as a mistake even to somebody who cannot say which card is wrong. So the
-/// target is centred on the glyph and the whole button is nudged outward by
-/// what centring cost it, overhanging the card's padding rather than pushing
-/// the dots inward. That is also why it is not an `IconButton`: Material 3
-/// builds one from a `ButtonStyle` and ignores `constraints`, so its 48pt
-/// target centres the glyph well short of where it belongs.
-class _ActionsButton extends StatelessWidget {
-  const _ActionsButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  /// Half the glyph's own width, which is the gap centring leaves between it
-  /// and the target's edge — and therefore exactly how far the target has to
-  /// move to put the glyph back on the card's content edge.
-  static double get _edgeNudge =>
-      (SdSpacingConstant.r44 - SdIconV3.smallSize) / 2;
-
-  @override
-  Widget build(BuildContext context) => Transform.translate(
-    offset: Offset(_edgeNudge, 0),
-    child: Tooltip(
-      message: context.l10n.commonActions,
-      child: InkResponse(
-        onTap: onPressed,
-        radius: SdSpacingConstant.r22,
-        containedInkWell: true,
-        highlightShape: BoxShape.circle,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: SdSpacingConstant.r44,
-          height: SdSpacingConstant.r44,
-          child: Center(
-            child: SdIconV3(
-              AppIconConstant.moreVert,
-              size: SdIconV3.smallSize,
-              color: context.sdTheme3.textTertiary,
-            ),
-          ),
-        ),
       ),
     ),
   );

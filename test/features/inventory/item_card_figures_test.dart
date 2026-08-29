@@ -59,7 +59,7 @@ void main() {
     expect(find.text('0'), findsOneWidget);
   });
 
-  testWidgets('the band states cost and asking price, and no profit', (
+  testWidgets('the band states cost, and neither asking price nor profit', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -73,13 +73,12 @@ void main() {
       ),
     );
 
-    // Label at the card's left edge, figure at its right, so the two amounts
-    // line up in a column whatever their labels measure.
     expect(find.text('Cost'), findsOneWidget);
     expect(find.text(r'$45.00'), findsOneWidget);
-    expect(find.text('Asking'), findsOneWidget);
-    expect(find.text(r'$185.00'), findsOneWidget);
-    // Expected profit is the detail screen's, not the row's.
+    // What the item is asked for is a per-marketplace number, and the arrow
+    // is what leads to them. Expected profit is the detail screen's.
+    expect(find.text('Asking'), findsNothing);
+    expect(find.text(r'$185.00'), findsNothing);
     expect(find.text('Profit'), findsNothing);
     expect(find.text(r'$140.00'), findsNothing);
   });
@@ -90,23 +89,65 @@ void main() {
     await pumpScreen(
       tester,
       ItemCard(
-        item: itemWith(
-          cost: const Money(4500, 'USD'),
-          asking: const Money(18500, 'USD'),
-        ),
+        item: itemWith(cost: const Money(4500, 'USD')),
         now: testNow,
+        onMarketPrices: () {},
       ),
     );
 
     // The divider spans the card's content width, so it is what the band's
-    // two outer cells have to reach.
+    // two ends have to reach. The arrow overhangs the card's padding by
+    // design, so it is the glyph rather than its target that lines up.
     final Rect band = tester.getRect(find.byType(SdDividerV3));
 
     expect(tester.getRect(find.text('Qty')).left, moreOrLessEquals(band.left));
     expect(
-      tester.getRect(find.text(r'$185.00')).right,
-      moreOrLessEquals(band.right),
+      tester
+          .getRect(
+            find.descendant(
+              of: find.byTooltip('Prices on each marketplace'),
+              matching: find.byType(SdIconV3),
+            ),
+          )
+          .right,
+      moreOrLessEquals(band.right, epsilon: 0.5),
     );
+  });
+
+  testWidgets('the arrow opens the marketplace prices', (
+    WidgetTester tester,
+  ) async {
+    int taps = 0;
+
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(cost: const Money(4500, 'USD')),
+        now: testNow,
+        onMarketPrices: () => taps++,
+      ),
+    );
+
+    await tester.tap(find.byTooltip('Prices on each marketplace'));
+
+    expect(taps, 1);
+  });
+
+  testWidgets('an item that has left inventory keeps the slot, not the arrow', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(status: ItemStatus.sold),
+        now: testNow,
+        onMarketPrices: () {},
+      ),
+    );
+
+    // The cross-list screen refuses a sold item, so the row must not offer a
+    // way in — but the space stays, or Qty and Cost move on that row alone.
+    expect(find.byTooltip('Prices on each marketplace'), findsNothing);
   });
 
   testWidgets('a Quick Add row says the figures are missing, never zero', (
@@ -120,9 +161,9 @@ void main() {
       ),
     );
 
-    // Hard rule 5: both figures render an em dash rather than a zero, which
+    // Hard rule 5: the cost renders an em dash rather than a zero, which
     // would tell the seller the item was free.
-    expect(find.text('—'), findsNWidgets(2));
+    expect(find.text('—'), findsOneWidget);
   });
 
   testWidgets('the row does not show state age', (WidgetTester tester) async {

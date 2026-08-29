@@ -89,9 +89,9 @@ void main() {
     expect(find.text('eBay'), findsNothing);
     expect(find.text('Depop'), findsNothing);
     expect(find.text('Poshmark'), findsNothing);
-    // The item's own asking price stays; a listing's is not on the row any
-    // more.
-    expect(find.text(r'$45.00'), findsOneWidget);
+    // No price at all: a listing's belongs to the cross-list screen, and the
+    // item's own asking price left the row with it.
+    expect(find.text(r'$45.00'), findsNothing);
     expect(find.text(r'$40.00'), findsNothing);
     expect(find.text(r'$50.00'), findsNothing);
   });
