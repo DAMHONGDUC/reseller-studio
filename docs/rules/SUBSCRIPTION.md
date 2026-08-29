@@ -52,11 +52,16 @@ any action that can be blocked by an entitlement.
   put an irreversible charge behind whichever button a thumb happened to
   reach. The selection is a controller (`PaywallSelectionController`), never
   widget state, so what is selected and what is bought cannot disagree.
-- **The sheet is sized by its content, and what Premium includes reads in two
-  columns.** Owner's rule. No height fraction — a fixed 90% sheet holding
-  compact content is a band of dead space above the footer. Allowances and
-  features render as short two-column lines rather than a single column of
-  nine rows, because the seller is scanning what they get, not reading it.
+- **The paywall sheet is nine tenths of the screen, and what Premium includes
+  reads in two columns.** Owner's rule, and it reverses a content-sized sheet.
+  This is the one surface where a fixed fraction is worth paying for: a sheet
+  whose height follows whatever the store returned is a different screen on
+  every open, and the strip of page left showing above it is what says the
+  sheet can be dismissed. The scrolling content takes the space the footer
+  does not, so the links keep the bottom edge whatever the content's height.
+  Compactness comes from the content — short two-column lines rather than a
+  single column of nine rows, because the seller is scanning what they get,
+  not reading it — never from the sheet's own height.
 - **What is on sale is a provider, never screen state.**
   `planOfferingsProvider` loads it, `PlanOfferingCatalogue` imposes the order
   and picks the default, and the screen watches the `AsyncValue`. A failed
