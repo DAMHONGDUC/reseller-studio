@@ -134,6 +134,29 @@ void main() {
     );
   });
 
+  testWidgets('the Cost column does not move between two cards', (
+    WidgetTester tester,
+  ) async {
+    // A column of money that shuffles sideways as it scrolls is the one thing
+    // this app must not do — the rule `AppListRow.trailingText` states one
+    // level down. Cells that all measured themselves under `spaceBetween` put
+    // the middle one wherever its own content left it, so `Cost` sat at a
+    // different place on every row.
+    await pumpScreen(
+      tester,
+      ItemCard(item: itemWith(cost: const Money(4500, 'USD')), now: testNow),
+    );
+
+    final double narrow = tester.getRect(find.text('Cost')).left;
+
+    await pumpScreen(
+      tester,
+      ItemCard(item: itemWith(cost: const Money(123456, 'USD')), now: testNow),
+    );
+
+    expect(tester.getRect(find.text('Cost')).left, moreOrLessEquals(narrow));
+  });
+
   testWidgets('the arrow opens the marketplace prices', (
     WidgetTester tester,
   ) async {

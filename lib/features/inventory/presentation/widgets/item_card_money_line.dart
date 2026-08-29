@@ -14,11 +14,13 @@ part of 'item_card.dart';
 /// inside the top row they were squeezed between a photo and a button. Across
 /// the foot, the labels share one baseline and the figures share the next.
 ///
-/// **Spaced apart, not divided into shares** — owner's rule. The cells
-/// measure themselves and `spaceBetween` puts the gaps where the content
-/// leaves them: the count holds the card's left edge and the arrow holds its
-/// right. Fixed flex shares spent width on a two-character count and then
-/// ellipsized a four-figure price.
+/// **Qty and Cost take equal shares; the arrow measures itself** — owner's
+/// rule, reversing "spaced apart, not divided into shares". Cells that all
+/// measured themselves put the gaps where the content left them, so the
+/// middle one sat at a different place on every card and `Cost` shuffled
+/// sideways down the list. Shares were rejected when three cells held money
+/// and a four-figure price ellipsized; the third now holds a chevron, so the
+/// two carrying figures split everything else and neither is close.
 ///
 /// **The arrow is the same glyph every other card ends with** — owner's
 /// rule. It is `AppRowChevron`, so it cannot come out a size or a grey of its
@@ -46,23 +48,26 @@ class _MoneyLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: <Widget>[
-      _MoneyCell(
-        label: context.l10n.itemQuantityShort,
-        content: Text(
-          item.quantityOnHand.toString(),
-          style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
-            color: context.sdTheme3.textPrimary,
+      Expanded(
+        child: _MoneyCell(
+          label: context.l10n.itemQuantityShort,
+          content: Text(
+            item.quantityOnHand.toString(),
+            style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
+              color: context.sdTheme3.textPrimary,
+            ),
           ),
         ),
       ),
-      _MoneyCell(
-        label: context.l10n.itemCost,
-        content: Text(
-          context.money(item.purchasePrice),
-          style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
-            color: context.sdTheme3.textSecondary,
+      Expanded(
+        child: _MoneyCell(
+          label: context.l10n.itemCost,
+          content: Text(
+            context.money(item.purchasePrice),
+            style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
+              color: context.sdTheme3.textSecondary,
+            ),
           ),
         ),
       ),
