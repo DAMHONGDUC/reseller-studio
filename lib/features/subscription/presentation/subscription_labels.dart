@@ -24,19 +24,33 @@ final class SubscriptionLabels {
     SellerPlan.premium => 'Unlimited selling, without usage ceilings',
   };
 
+  /// **Two or three words each.** The paywall lists these in two columns, and
+  /// a line that wraps there costs the sheet a row of height for one word.
+  /// "Businesses" rather than "workspaces": that is what the app calls one
+  /// everywhere the seller can read it.
   static String feature(PlanFeature feature) => switch (feature) {
-    PlanFeature.advancedAnalytics => 'Every analytics drill-down',
-    PlanFeature.reports => 'CSV reports and exports',
+    PlanFeature.advancedAnalytics => 'Advanced analytics',
+    PlanFeature.reports => 'CSV reports',
     PlanFeature.automation => 'Automation',
     PlanFeature.team => 'Team members',
-    PlanFeature.multipleWorkspaces => 'Multiple workspaces',
-    PlanFeature.advancedPermissions => 'Roles and permissions',
+    PlanFeature.multipleWorkspaces => 'Multiple businesses',
+    PlanFeature.advancedPermissions => 'Roles & permissions',
   };
 
   static String period(BillingPeriod period) => switch (period) {
     BillingPeriod.monthly => 'per month',
     BillingPeriod.yearly => 'per year',
   };
+
+  /// What one option card is titled. Deliberately not [period]: a card headed
+  /// "per year" reads as a price fragment, and the price is the line under it.
+  static String periodName(BillingPeriod period) => switch (period) {
+    BillingPeriod.monthly => 'Monthly',
+    BillingPeriod.yearly => 'Yearly',
+  };
+
+  /// The mark on the option the paywall recommends.
+  static const String bestValue = 'Best value';
 
   /// What a plan holds, one line per ceiling.
   ///

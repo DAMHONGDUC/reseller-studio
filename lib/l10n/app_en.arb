@@ -2510,6 +2510,14 @@
   "@paywallUnavailable": {
     "description": "Shown on the paywall when RevenueCat configuration is incomplete."
   },
+  "paywallContinue": "Continue",
+  "@paywallContinue": {
+    "description": "The paywall's single purchase button, buying the selected billing period."
+  },
+  "paywallPlansFailed": "Could not load the plans.",
+  "@paywallPlansFailed": {
+    "description": "Shown on the paywall when the store did not answer with what is on sale."
+  },
   "subscriptionChangeAnyTimeTheStoreHandles": "Change any time — the store handles the proration",
   "@subscriptionChangeAnyTimeTheStoreHandles": {
     "description": "Shown on the subscription screens."
@@ -2844,7 +2852,7 @@
   "@legalCouldNotOpen": {
     "description": "Shown when no browser handled a legal link."
   },
-  "subscriptionRenewalTerms": "Plans renew automatically at the price shown until you cancel. Your store account is charged when a period ends, and you can cancel any time from its subscription settings.",
+  "subscriptionRenewalTerms": "Renews automatically at the price shown until you cancel, from your store account's subscription settings.",
   "@subscriptionRenewalTerms": {
     "description": "Auto-renew disclosure on the paywall. App Store guideline 3.1.2 requires it in the binary."
   },

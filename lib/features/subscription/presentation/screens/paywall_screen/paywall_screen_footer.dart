@@ -1,6 +1,6 @@
 part of 'paywall_screen.dart';
 
-/// Fixed below the paywall's scrolling product content.
+/// Fixed below the paywall's scrolling product content, and one row of links.
 class _PaywallFooter extends ConsumerWidget {
   const _PaywallFooter();
 
@@ -34,24 +34,10 @@ class _PaywallFooter extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bool isBusy = ref.watch(subscriptionControllerProvider);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SdButtonV3(
-          variant: SdButtonVariantV3.text,
-          label: context.l10n.subscriptionRestorePurchases,
-          expand: true,
-          busy: isBusy,
-          onPressed: () => _restore(context, ref),
-        ),
-        PaywallLegalLinks(
-          termsUrl: AppEnv.termsOfServiceUrl,
-          privacyUrl: AppEnv.privacyPolicyUrl,
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => PaywallFooterLinks(
+    termsUrl: AppEnv.termsOfServiceUrl,
+    privacyUrl: AppEnv.privacyPolicyUrl,
+    isRestoring: ref.watch(subscriptionControllerProvider),
+    onRestore: () => _restore(context, ref),
+  );
 }

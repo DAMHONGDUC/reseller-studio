@@ -18,14 +18,33 @@ import '../orders/providers.dart';
 import '../workspace/domain/entities/workspace.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/plan_limits.dart';
+import 'domain/entities/plan_offering.dart';
 import 'domain/entities/subscription_status.dart';
 import 'domain/enums/plan_feature.dart';
 import 'domain/enums/seller_plan.dart';
 import 'domain/services/plan_gate.dart';
+import 'domain/services/plan_offering_catalogue.dart';
+import 'presentation/controllers/subscription_controller.dart';
 
 final StreamProvider<SubscriptionStatus> subscriptionStatusProvider =
     StreamProvider<SubscriptionStatus>((Ref ref) {
       return ref.watch(subscriptionRepositoryProvider).watchStatus();
+    });
+
+/// What is on sale, in the order the paywall presents it.
+///
+/// **A provider, never screen state.** The `AsyncValue` is what gives the
+/// sheet a loading, an error *and* a data case; the local `bool` this replaced
+/// could not tell the last two apart, so a store that failed to answer
+/// rendered as a sheet with nothing to buy. Retrying is
+/// `ref.invalidate(planOfferingsProvider)`.
+final FutureProvider<List<PlanOffering>> planOfferingsProvider =
+    FutureProvider<List<PlanOffering>>((Ref ref) async {
+      final List<PlanOffering> offerings = await ref
+          .read(subscriptionControllerProvider.notifier)
+          .loadOfferings();
+
+      return PlanOfferingCatalogue.ordered(offerings);
     });
 
 /// The plan every gate reads.
