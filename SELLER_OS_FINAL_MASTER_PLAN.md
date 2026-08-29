@@ -857,7 +857,8 @@ Roles:
 ### Subscription
 - Current plan
 - Billing
-- Upgrade
+- Upgrade through the routed `PaywallScreen` bottom sheet
+- Manage the current plan in the separate `SubscriptionScreen`
 - Downgrade
 - Restore purchase
 

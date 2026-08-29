@@ -141,6 +141,7 @@ final class AppRoutes {
   /// nested in Settings: a blocked action pushes straight here, and a paywall
   /// two levels deep is one nobody reaches from the moment it matters.
   static const String subscription = '/more/subscription';
+  static const String paywall = '/more/paywall';
 
   // --- Global, reachable from anywhere ---
 

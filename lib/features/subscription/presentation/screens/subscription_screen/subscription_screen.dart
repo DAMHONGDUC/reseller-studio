@@ -1,17 +1,14 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
-import '../../../../../core/config/app_env.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
-import '../../../../../core/widgets/legal_links_card.dart';
-import '../../../domain/entities/plan_offering.dart';
 import '../../../domain/entities/subscription_status.dart';
 import '../../../domain/enums/seller_plan.dart';
 import '../../../providers.dart';
@@ -19,16 +16,12 @@ import '../../controllers/subscription_controller.dart';
 import '../../subscription_labels.dart';
 
 part 'subscription_screen_current_card.dart';
-part 'subscription_screen_offerings.dart';
-part 'subscription_screen_plan_card.dart';
 
 /// Subscription — what the seller is on, and what the other plans give
 /// (plan §25's Subscription block, over §27's Free/Premium model).
 ///
-/// **One screen, not a paywall and a settings page.** A seller who opens this
-/// from More is asking the same question a blocked action asks on their
-/// behalf: what do I have, and what would I get. Splitting that into two
-/// screens means two places to keep the plan copy true.
+/// This screen manages an existing relationship with the store. Buying lives
+/// on `PaywallScreen`, whose route is presented as a bottom sheet.
 ///
 /// Cancelling is deliberately not here: neither store lets an app cancel a
 /// subscription, so the honest thing is to say where it is done rather than
@@ -76,13 +69,15 @@ class SubscriptionScreen extends ConsumerWidget {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           _CurrentPlanCard(plan: plan, status: status),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          SdSectionHeaderV3(
-            title: context.l10n.subscriptionPlans,
-            subtitle: context.l10n.subscriptionChangeAnyTimeTheStoreHandles,
-            first: true,
-          ),
-          _Offerings(currentPlan: plan, isBusy: isBusy),
+          if (!plan.isPaid) ...<Widget>[
+            SizedBox(height: SdContentPaddingV3.sectionGap),
+            SdButtonV3(
+              variant: SdButtonVariantV3.primary,
+              label: context.l10n.subscriptionViewPremiumPlans,
+              expand: true,
+              onPressed: () => context.push(AppRoutes.paywall),
+            ),
+          ],
           SizedBox(height: SdContentPaddingV3.sectionGap),
           AppListCard(
             children: <Widget>[
@@ -101,29 +96,6 @@ class SubscriptionScreen extends ConsumerWidget {
                 ),
             ],
           ),
-          SizedBox(height: SdSpacingConstant.h16),
-          Text(
-            AppEnv.hasBillingConfig
-                ? 'Your plan is tied to your store account, not to this '
-                      'device. Signing in on another phone brings it with you.'
-                : 'Billing is not set up in this build, so everything is on '
-                      'the Free plan. Nothing here can be bought yet.',
-            style: context.textTheme3.bodySmall!.copyWith(
-              color: context.sdTheme3.textSecondary,
-            ),
-          ),
-          // App Store guideline 3.1.2: the renewal terms and both policy
-          // links have to be on the page that sells the subscription, not
-          // only in the store listing.
-          SizedBox(height: SdSpacingConstant.h12),
-          Text(
-            context.l10n.subscriptionRenewalTerms,
-            style: context.textTheme3.bodySmall!.copyWith(
-              color: context.sdTheme3.textSecondary,
-            ),
-          ),
-          SdSectionHeaderV3(title: context.l10n.legalSection),
-          const LegalLinksCard(),
           SizedBox(height: SdContentPaddingV3.bottomGap),
         ],
       ),

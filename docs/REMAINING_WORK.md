@@ -127,11 +127,12 @@ Marketplace OAuth secrets go in **Secret Manager**, never `env/*.json`.
   the repo's binary. Worth an explicit decision before submission.
 - **Premium billing still needs live App Store configuration.**
   `PlanLimits.byPlan` holds the approved Free ceilings and the UI gates them;
-  `planByEntitlement` in `subscription/entitlement.ts` mirrors
-  `SubscriptionProductConstant`. The RevenueCat entitlement, monthly and
-  yearly products, webhook secret, and App Store review products still have
-  to be created and deployed. Inventory and Order counts also need trusted
-  server-side enforcement before the client gates become a security boundary.
+  `planByEntitlement` in `subscription/entitlement.ts` mirrors the entitlement
+  identifier supplied to the Flutter build. The RevenueCat entitlement,
+  monthly and yearly products, webhook secret, and App Store review products
+  still have to be created and deployed. Inventory and Order counts also need
+  trusted server-side enforcement before the client gates become a security
+  boundary.
 - **`selleros://` deep links are declared on both platforms but untested end
   to end.** There is now something that produces one — a push carries a
   `route` and `PushController` follows it — but it still needs a device and a

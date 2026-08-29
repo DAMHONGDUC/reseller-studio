@@ -2494,6 +2494,22 @@
   "@subscriptionPlans": {
     "description": "Shown on the subscription screens."
   },
+  "subscriptionViewPremiumPlans": "View Premium plans",
+  "@subscriptionViewPremiumPlans": {
+    "description": "Button on subscription management that opens the paywall."
+  },
+  "paywallTitle": "Unlock Premium",
+  "@paywallTitle": {
+    "description": "Title of the Premium purchase bottom sheet."
+  },
+  "paywallStoreAccountNote": "Premium is tied to your store account and follows you to another device.",
+  "@paywallStoreAccountNote": {
+    "description": "Store account note shown on the Premium paywall."
+  },
+  "paywallUnavailable": "Purchases are not available in this build yet.",
+  "@paywallUnavailable": {
+    "description": "Shown on the paywall when RevenueCat configuration is incomplete."
+  },
   "subscriptionChangeAnyTimeTheStoreHandles": "Change any time — the store handles the proration",
   "@subscriptionChangeAnyTimeTheStoreHandles": {
     "description": "Shown on the subscription screens."

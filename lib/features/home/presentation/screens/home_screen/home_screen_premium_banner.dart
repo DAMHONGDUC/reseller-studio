@@ -25,7 +25,7 @@ class _HomePremiumBanner extends ConsumerWidget {
       ),
       child: SdCardV3(
         padding: SdContentPaddingV3.row,
-        onTap: () => context.push(AppRoutes.subscription),
+        onTap: () => context.push(AppRoutes.paywall),
         semanticLabel: context.l10n.homePremiumBannerAction,
         borderColor: context.colorScheme3.primary,
         child: Row(

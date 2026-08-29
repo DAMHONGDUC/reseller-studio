@@ -109,7 +109,7 @@ class PlanBlockSheet extends ConsumerWidget {
               // Pop first: leaving the sheet up behind a pushed screen means
               // the seller comes back to a sheet they already dealt with.
               Navigator.of(context).pop();
-              context.push(AppRoutes.subscription);
+              context.push(AppRoutes.paywall);
             },
           ),
           SizedBox(height: SdSpacingConstant.h8),
