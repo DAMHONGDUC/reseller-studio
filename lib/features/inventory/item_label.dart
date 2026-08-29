@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../../core/extensions/context_extensions.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/utils/date_time_utils.dart';
 import 'domain/entities/item.dart';
 import 'domain/entities/storage_location.dart';
@@ -22,21 +21,6 @@ final class ItemStatusLabel {
   };
 }
 
-/// **A value's colour lives on its own enum** — owner's rule, see
-/// `docs/rules/DESIGN_SYSTEM.md`. One value, one colour, wherever it is drawn:
-/// the tag on the item form and the badge on the card both ask this, so they
-/// cannot come out as two shades of nearly the same thing.
-extension ItemStatusColor on ItemStatus {
-  /// **The four indices are chosen, not incidental**: grey for a draft that
-  /// claims nothing, green for stock, blue for a sale, amber for a withdrawal.
-  Color color(BuildContext context) => AppColors.tag(context, switch (this) {
-    ItemStatus.draft => 7,
-    ItemStatus.inStock => 0,
-    ItemStatus.sold => 1,
-    ItemStatus.archived => 5,
-  });
-}
-
 /// The condition grades resellers actually use in listings.
 final class ItemConditionLabel {
   static String of(BuildContext context, ItemCondition condition) =>
@@ -49,23 +33,6 @@ final class ItemConditionLabel {
         ItemCondition.poor => context.l10n.conditionPoor,
         ItemCondition.forParts => context.l10n.conditionForParts,
       };
-}
-
-/// The grade's own colour, best to worst.
-///
-/// **The palette is ordered light-to-serious**, so the seven grades read as a
-/// scale by index alone: new is green, for-parts is red. They are deliberately
-/// not the semantic tokens — "Fair" is a grade, not a warning.
-extension ItemConditionColor on ItemCondition {
-  Color color(BuildContext context) => AppColors.tag(context, switch (this) {
-    ItemCondition.newWithTags => 0,
-    ItemCondition.newWithoutTags => 1,
-    ItemCondition.likeNew => 2,
-    ItemCondition.good => 3,
-    ItemCondition.fair => 4,
-    ItemCondition.poor => 5,
-    ItemCondition.forParts => 6,
-  });
 }
 
 /// Warehouse, shelf, bin.

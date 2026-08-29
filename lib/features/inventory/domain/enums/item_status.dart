@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/theme/app_colors.dart';
+
 /// Where an item is in its life (plan §29).
 ///
 /// ```text
@@ -47,6 +51,22 @@ enum ItemStatus {
   bool get isListable => isOnHand;
 }
 
+/// **A status's colour lives on the status** — owner's rule. One value, one
+/// colour, wherever it is drawn: the radio on the item form and the badge on
+/// the card both ask this, so they cannot come out as two shades of nearly
+/// the same thing. Adding a state breaks this switch, which is the point.
+///
+/// **The four hues are chosen, not incidental**: grey for a draft that claims
+/// nothing, green for stock, blue for a sale, amber for a withdrawal.
+extension ItemStatusColor on ItemStatus {
+  Color color(BuildContext context) => AppColors.tag(context, switch (this) {
+    ItemStatus.draft => 7,
+    ItemStatus.inStock => 0,
+    ItemStatus.sold => 1,
+    ItemStatus.archived => 5,
+  });
+}
+
 /// The condition grades resellers actually use in listings.
 ///
 /// Deliberately the vocabulary the marketplaces share, so cross-listing does
@@ -59,4 +79,21 @@ enum ItemCondition {
   fair,
   poor,
   forParts,
+}
+
+/// The grade's own colour, best to worst.
+///
+/// **The palette is ordered light-to-serious**, so the seven grades read as a
+/// scale by index alone: new is green, for-parts is red. They are deliberately
+/// not the semantic tokens — "Fair" is a grade, not a warning.
+extension ItemConditionColor on ItemCondition {
+  Color color(BuildContext context) => AppColors.tag(context, switch (this) {
+    ItemCondition.newWithTags => 0,
+    ItemCondition.newWithoutTags => 1,
+    ItemCondition.likeNew => 2,
+    ItemCondition.good => 3,
+    ItemCondition.fair => 4,
+    ItemCondition.poor => 5,
+    ItemCondition.forParts => 6,
+  });
 }

@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_photo.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
+import '../../domain/enums/item_status.dart';
 import '../../item_label.dart';
 
 part 'item_card_marketplaces.dart';
