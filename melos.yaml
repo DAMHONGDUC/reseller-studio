@@ -25,78 +25,78 @@ ide:
 # was last pointed at is the failure this prevents. One script serves both and
 # takes the flavour as $1 — these entries are the only thing duplicated.
 #
-# **Underscore-prefixed files in tool/ are not commands.** `_common.sh`,
+# **Underscore-prefixed files in packages/system_design/tool/ are not commands.** `_common.sh`,
 # `_clean.sh`, `_url-scheme.sh` are sourced or called by others and are never
 # named here.
 #
 # Each script is one line on purpose. Melos echoes the whole `run:` body
 # before AND after every run, with no flag to turn it off, so a multi-line
 # block buries the output it is meant to introduce. The bodies live in
-# `tool/*.sh`, which also makes them lintable and runnable under dash — the
+# `packages/system_design/tool/*.sh`, which also makes them lintable and runnable under dash — the
 # shell melos actually uses on Linux, and the one macOS hides from you.
 scripts:
   set-up:
     description: Wipe, then everything a fresh clone needs. Idempotent.
-    run: sh tool/set-up.sh
+    run: sh packages/system_design/tool/set-up.sh
 
   deep-set-up:
     description: set-up, plus Xcode's derived data. Costs a cold build.
-    run: sh tool/deep-set-up.sh
+    run: sh packages/system_design/tool/deep-set-up.sh
 
   prepare-env-dev:
     description: Install dev's config — env files and the native files.
-    run: sh tool/prepare-env.sh dev
+    run: sh packages/system_design/tool/prepare-env.sh dev
 
   prepare-env-prod:
     description: Install prod's config — env files and the native files.
-    run: sh tool/prepare-env.sh prod
+    run: sh packages/system_design/tool/prepare-env.sh prod
 
   run:
     description: Run the app. `melos run run -- prod` for release config.
-    run: sh tool/run.sh
+    run: sh packages/system_design/tool/run.sh
 
   gen:
     description: Localizations and codegen, nothing else.
-    run: sh tool/gen.sh
+    run: sh packages/system_design/tool/gen.sh
 
   analyze:
     description: Zero findings, or fail. Exactly what CI runs.
-    run: sh tool/analyze.sh
+    run: sh packages/system_design/tool/analyze.sh
 
   test:
     description: The test suite. For CI and full sweeps, not per-change.
-    run: sh tool/test.sh
+    run: sh packages/system_design/tool/test.sh
 
   test-rules:
     description: firestore.rules against the emulator. Needs Java.
-    run: sh tool/test-rules.sh
+    run: sh packages/system_design/tool/test-rules.sh
 
   preflight:
     description: Everything that must be true before a build is worth uploading.
-    run: sh tool/preflight.sh
+    run: sh packages/system_design/tool/preflight.sh
 
   build-ipa-dev:
     description: The IPA, dev config attached. The only place an archive is made.
-    run: sh tool/build-ipa.sh dev
+    run: sh packages/system_design/tool/build-ipa.sh dev
 
   build-ipa-prod:
     description: The IPA, prod config attached. The only place an archive is made.
-    run: sh tool/build-ipa.sh prod
+    run: sh packages/system_design/tool/build-ipa.sh prod
 
   deploy-firebase-dev:
     description: Rules, indexes and functions to the dev alias. Confirms first.
-    run: sh tool/deploy-firebase.sh dev
+    run: sh packages/system_design/tool/deploy-firebase.sh dev
 
   deploy-firebase-prod:
     description: Rules, indexes and functions to the prod alias. Confirms first.
-    run: sh tool/deploy-firebase.sh prod
+    run: sh packages/system_design/tool/deploy-firebase.sh prod
 
   release-dev:
     description: dev config, dev Firebase, then TestFlight. Confirms first.
-    run: sh tool/release.sh dev
+    run: sh packages/system_design/tool/release.sh dev
 
   release-prod:
     description: prod config, prod Firebase, then TestFlight. Confirms first.
-    run: sh tool/release.sh prod
+    run: sh packages/system_design/tool/release.sh prod
 
 sdkPath: .fvm/flutter_sdk

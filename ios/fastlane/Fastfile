@@ -5,7 +5,7 @@
 #   bundle exec fastlane preflight             # three minutes, no build
 #   bundle exec fastlane beta flavor:prod bump:true notes:"..."
 #
-# **This file never archives.** `tool/build-ipa.sh` does, because the app's
+# **This file never archives.** `packages/system_design/tool/build-ipa.sh` does, because the app's
 # configuration arrives through `--dart-define-from-file` and `gym` knows
 # nothing about that flag. See docs/rules/RELEASE.md.
 
@@ -67,7 +67,8 @@ platform :ios do
     end
 
     # 4. The build. Always through the script — see the header.
-    sh("cd #{REPO_ROOT.shellescape} && sh tool/build-ipa.sh #{flavor} #{export_options.to_s.shellescape}")
+    export_flag = "--export-options-plist=#{export_options}".shellescape
+    sh("cd #{REPO_ROOT.shellescape} && sh packages/system_design/tool/build-ipa.sh #{flavor} #{export_flag}")
 
     ipa = Dir[File.join(REPO_ROOT, "build/ios/ipa/*.ipa")].first
     UI.user_error!("no .ipa in build/ios/ipa") if ipa.nil?

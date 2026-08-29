@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 
 import { planFromEvent, willRenew } from '../lib/subscription/entitlement.js';
 
-// The compiled module, not the source: `tool/test-rules.sh` runs plain node,
+// The compiled module, not the source: the shared `test-rules.sh` runs plain node,
 // and `npm run build` is what CI runs before it.
 
 const now = Date.UTC(2026, 7, 23);
