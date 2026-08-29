@@ -21,7 +21,8 @@ Read this file before changing anything in `lib/features/inventory/`.
   a label above its content; only the content differs, using the arrow instead
   of an amount, and the label-to-content gap is the same in both cells. The
   whole Price cell is one circular tap target that opens the marketplace price
-  list, rather than making the seller hit the arrow alone.
+  list, rather than making the seller hit the arrow alone. The complete label
+  and arrow stack is centred inside that circle.
 
 ## Item action feedback
 
