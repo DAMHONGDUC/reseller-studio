@@ -183,8 +183,9 @@ which is what lets the amounts be compared at a glance.
     actions button does: every tap ticks a row then, and a push would lose the
     rows the seller had just picked.
   - **It is the same 44pt round target the actions button is**
-    (`_CardIconButton`), so the two glyphs on the card's content edge are one
-    control drawn twice rather than two that happen to look alike.
+    (`AppRowIconButton`, in `core/widgets/` — the card no longer keeps a
+    private one), so the two glyphs on the card's content edge are one control
+    drawn twice rather than two that happen to look alike.
 - **The quantity leads** — owner's rule that the row carry what is left. It
   replaces the old `×3` badge: a figure with a permanent cell is one a seller
   can find without reading the chips.
