@@ -9,7 +9,8 @@ any action that can be blocked by an entitlement.
   Monthly and yearly are billing periods for the same entitlement, not two
   feature tiers; choosing either unlocks the same product capabilities.
 - **Free is limited by Inventory usage, Order usage, and business count.**
-  Owner's rule. A Free seller can create only one business. Premium gates sit
+  Owner's rule. The ceilings live only in `PlanLimits.free`; documents and UI
+  copy read those fields and never repeat their values. Premium gates sit
   before the blocked create action, so the seller never fills a form and then
   learns that it cannot be saved.
 - **A downgrade never deletes existing records.** The gate blocks the next
