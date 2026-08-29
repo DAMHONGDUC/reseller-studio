@@ -27,7 +27,9 @@ class _MoneyCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget cell = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: onTap == null
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
@@ -54,7 +56,7 @@ class _MoneyCell extends StatelessWidget {
         customBorder: const CircleBorder(),
         child: SizedBox.square(
           dimension: _CardIconButton.slotSize,
-          child: Align(alignment: Alignment.centerLeft, child: cell),
+          child: Center(child: cell),
         ),
       ),
     );

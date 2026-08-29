@@ -156,6 +156,14 @@ void main() {
     expect(ink.customBorder, isA<CircleBorder>());
     expect(tester.getSize(priceTarget), Size.square(SdSpacingConstant.r44));
     expect(
+      tester.getCenter(find.text('Price')).dx,
+      moreOrLessEquals(tester.getCenter(priceTarget).dx),
+    );
+    expect(
+      tester.getCenter(arrow).dx,
+      moreOrLessEquals(tester.getCenter(priceTarget).dx),
+    );
+    expect(
       tester.getRect(arrow).top - tester.getRect(find.text('Price')).bottom,
       moreOrLessEquals(SdSpacingConstant.h2),
     );
