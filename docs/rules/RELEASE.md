@@ -1,7 +1,7 @@
 # Release
 
-Read this before touching `env_assets/`, `tool/prepare-env.sh`,
-`tool/build-ipa.sh`, anything under `ios/fastlane/`, or
+Read this before touching `env_assets/`, `packages/system_design/tool/prepare-env.sh`,
+`packages/system_design/tool/build-ipa.sh`, anything under `ios/fastlane/`, or
 `.github/workflows/release.yml`.
 
 Two halves, and they are independent: **env config is what a build carries,
@@ -18,7 +18,7 @@ second is useless without it.
 **Nothing ties the two together.** `env/prod.json` beside a dev
 `GoogleService-Info.plist` compiles, installs, launches, and writes into the
 wrong Firestore. Every guard below exists because of that one gap:
-`tool/prepare-env.sh` keeps the halves in step, and `verify_flavor_config` in
+`packages/system_design/tool/prepare-env.sh` keeps the halves in step, and `verify_flavor_config` in
 the beta lane is the last place a mismatch can be caught.
 
 `ios/Runner/Info.plist` is in that list because it carries the Google sign-in
@@ -60,7 +60,7 @@ The script's contract, and none of it is optional:
   leaves the tree half one environment and half the other, and nothing on disk
   says so.
 - **It copies bytes and never reads them** (hard rule 9). The one derived value
-  is the sign-in URL scheme, and that is `tool/_url-scheme.sh` — **one
+  is the sign-in URL scheme, and that is `packages/system_design/tool/_url-scheme.sh` — **one
   implementation, shared with the release workflow**, because two copies of
   derived data is what makes them drift.
 - **`ios/Runner/Info.plist` comes from `env_assets/<flavour>-Info.plist`, like
@@ -89,7 +89,7 @@ flavour, so **never commit it**.
 
 ## No one ever archives from Xcode
 
-`tool/build-ipa.sh` — `melos run build-ipa-dev` / `-prod` — is the only place an archive is made, and **the fastlane
+`packages/system_design/tool/build-ipa.sh` — `melos run build-ipa-dev` / `-prod` — is the only place an archive is made, and **the fastlane
 lane shells out to it rather than calling `gym`**. The reason is not taste:
 the app's whole configuration arrives through `--dart-define-from-file`, a flag
 `xcodebuild`, `gym` and Product > Archive all know nothing about. An archive
@@ -115,7 +115,7 @@ Every step that can fail cheaply runs before the twenty-five minute one.
    twenty-five minutes.
 3. CI only: `setup_ci` → `match(readonly: true)` → entitlement check → manual
    signing → write `ExportOptions.plist`.
-4. Build, through `tool/build-ipa.sh`.
+4. Build, through `packages/system_design/tool/build-ipa.sh`.
 5. Upload, not waiting for processing — nothing in the lane reads the result
    and macOS minutes bill at 10x. A changelog is the exception: it is the only
    thing on the build that says dev or prod, and attaching one costs the wait.
@@ -151,7 +151,7 @@ every "profile doesn't include the … entitlement".
   multi-target apps a TODO. With automatic signing this never shows; with
   manual signing an extension gets no profile and `exportArchive` fails after
   the full build. The lane writes the plist itself with every id in it, and
-  `tool/build-ipa.sh` drops its own `--export-method` when a caller passes one.
+  `packages/system_design/tool/build-ipa.sh` drops its own `--export-method` when a caller passes one.
   **One target today. Adding an extension means adding its id to the Matchfile
   and to that plist**, and nothing will remind you.
 - **Delete the empty auth variable.** Actions sets every `${{ secrets.X }}` a

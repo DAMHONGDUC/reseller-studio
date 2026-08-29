@@ -14,7 +14,7 @@ than a second local script tree.
 ## The set
 
 Sixteen commands. Every one is `melos run <name>`, and every body is a file in
-`tool/`.
+`packages/system_design/tool/`.
 
 | Command | Script | Promise |
 |---|---|---|
@@ -214,7 +214,7 @@ joins its extra args into one command line before a shell sees them.
 Melos echoes the whole `run:` block before **and** after every run, with no
 flag to turn it off, so a multi-line body buries the output it introduces. A
 file is also the only version that can be linted and run directly. Adding a
-command is a `tool/*.sh` plus one line in `melos.yaml` — **a `run:` longer than
+command is a `packages/system_design/tool/*.sh` plus one line in `melos.yaml` — **a `run:` longer than
 one line is the smell.** Every command also carries a real `description:`; that
 is what `melos run` prints.
 
@@ -225,7 +225,7 @@ Melos runs scripts through `/bin/sh`, which is dash on Linux: `set -o pipefail`,
 `/bin/sh` is bash under another name. Check before committing:
 
 ```bash
-dash -n tool/<name>.sh
+dash -n packages/system_design/tool/<name>.sh
 ```
 
 ### Every script opens the same way
@@ -236,7 +236,7 @@ set -eu
 . "$(dirname "$0")/_common.sh"
 ```
 
-`tool/_common.sh` holds what they share:
+`packages/system_design/tool/_common.sh` holds what they share:
 
 - `cd "${MELOS_ROOT_PATH:-.}"` — every path in every script is repo-relative.
 - **SDK resolution**, exported as `$FL` / `$DT`: `fvm flutter` when `.fvmrc`
