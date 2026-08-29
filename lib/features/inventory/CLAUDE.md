@@ -225,6 +225,12 @@ is live on** — no names and no amounts.
   their shared height.** Status, Stale, condition and marketplace count do not
   mix tag and badge primitives. They are read-only on the card, so their tap
   handling is disabled while their labels and colours stay visible.
+- **A card tag has no radio or selection indicator.** The card reports facts;
+  it does not offer choices, so the control affordance would promise a tap
+  that intentionally does nothing. `SdTagV3` keeps its indicator on selection
+  forms and hides it only for this display-only use.
+- **The marketplace-count tag is neutral grey.** Distribution count is
+  metadata, not an info state competing with status, Stale or condition.
 - **The count is deduped by marketplace**, so two listing records on one
   platform still read as one market.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds both
