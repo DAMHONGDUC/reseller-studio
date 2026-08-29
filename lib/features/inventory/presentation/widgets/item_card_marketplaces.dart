@@ -22,7 +22,7 @@ class _Marketplaces extends StatelessWidget {
       padding: EdgeInsets.only(top: SdSpacingConstant.h8),
       child: _ReadOnlyTag(
         label: context.l10n.inventoryMarketCount(count),
-        color: context.sdTheme3.info,
+        color: context.sdTheme3.textSecondary,
         icon: AppIconConstant.storefront,
       ),
     );

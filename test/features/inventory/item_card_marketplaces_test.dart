@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -67,6 +68,17 @@ void main() {
       hasLength(1),
     );
     expect(tester.getSize(statusTag).height, tester.getSize(marketTag).height);
+    expect(
+      find.descendant(
+        of: allTags,
+        matching: find.byIcon(Icons.radio_button_checked_rounded),
+      ),
+      findsNothing,
+    );
+    expect(
+      tester.widget<SdTagV3>(marketTag).color,
+      tester.element(marketTag).sdTheme3.textSecondary,
+    );
     expect(find.byType(SdBadgeV3), findsNothing);
     expect(find.text('<1d'), findsNothing);
     expect(find.text('eBay'), findsNothing);

@@ -66,6 +66,7 @@ class _ReadOnlyTag extends StatelessWidget {
       selected: true,
       onSelected: _ignoreSelection,
       icon: icon,
+      showSelectionIndicator: false,
     ),
   );
 
