@@ -71,13 +71,13 @@ class OrdersScreen extends ConsumerWidget {
       appBar: SdAppBarV3(
         title: context.l10n.navOrders,
         actions: <Widget>[
-          IconButton(
-            icon: const SdIconV3(AppIconConstant.localOffer),
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.localOffer,
             tooltip: context.l10n.offersTitle,
             onPressed: () => context.push(AppRoutes.offers),
           ),
-          IconButton(
-            icon: const SdIconV3(AppIconConstant.localShipping),
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.localShipping,
             tooltip: context.l10n.shippingQueueTitle,
             onPressed: () => context.push(AppRoutes.shippingQueue),
           ),

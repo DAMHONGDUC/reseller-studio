@@ -109,7 +109,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // The inbox first, then search: one says something happened, the
           // other is a place to go looking.
           const NotificationBell(),
-          IconButton(
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.search,
+            tooltip: context.l10n.homeShortcutSearch,
             // Global search is reached from Home because Home is where a
             // seller starts (plan §5's global entry points). It sits outside
             // the shell so it can send them into any tab.
@@ -118,8 +120,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               context.push(AppRoutes.search);
             },
-            icon: const Icon(AppIconConstant.search),
-            tooltip: context.l10n.homeShortcutSearch,
           ),
           SizedBox(width: SdSpacingConstant.w8),
         ],

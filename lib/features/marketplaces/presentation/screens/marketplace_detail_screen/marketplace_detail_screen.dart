@@ -163,14 +163,11 @@ class _MarketplaceDetailScreenState
             : context.l10n.marketplaceEditTitle,
         actions: <Widget>[
           if (id != null)
-            IconButton(
+            SdAppBarActionButtonV3(
+              icon: AppIconConstant.delete,
               tooltip: context.l10n.actionDelete,
+              tint: context.sdTheme3.danger,
               onPressed: state.isSaving ? null : () => _confirmDelete(id),
-              icon: SdIconV3(
-                AppIconConstant.delete,
-                size: SdSpacingConstant.r24,
-                color: context.sdTheme3.danger,
-              ),
             ),
         ],
       ),

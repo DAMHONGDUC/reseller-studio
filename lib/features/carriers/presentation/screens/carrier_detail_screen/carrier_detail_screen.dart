@@ -105,14 +105,11 @@ class _CarrierDetailScreenState extends ConsumerState<CarrierDetailScreen>
             : context.l10n.carrierEditTitle,
         actions: <Widget>[
           if (id != null)
-            IconButton(
+            SdAppBarActionButtonV3(
+              icon: AppIconConstant.delete,
               tooltip: context.l10n.actionDelete,
+              tint: context.sdTheme3.danger,
               onPressed: isSaving ? null : () => _confirmDelete(id),
-              icon: SdIconV3(
-                AppIconConstant.delete,
-                size: SdSpacingConstant.r24,
-                color: context.sdTheme3.danger,
-              ),
             ),
         ],
       ),

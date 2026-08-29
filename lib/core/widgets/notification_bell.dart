@@ -22,16 +22,18 @@ import '../router/navigation_utils.dart';
 class NotificationBell extends ConsumerWidget {
   const NotificationBell({super.key});
 
-  /// How far the dot is pulled past the glyph's corner. Intrinsic to this
-  /// widget — what it *is*, not configuration about it. The diameter is
-  /// `SdSpacingConstant.w8`, read at build time because it scales.
-  static double get dotInset => -SdSpacingConstant.w2;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final int unread = ref.watch(unreadNotificationCountProvider);
 
-    return IconButton(
+    return SdAppBarActionButtonV3(
+      icon: AppIconConstant.notifications,
+      tooltip: unread == 0
+          ? context.l10n.notificationsTitle
+          : context.l10n.notificationsUnread(unread),
+      // The dot's size and where it sits on the glyph's corner belong to the
+      // button — this widget only knows whether there is anything to mark.
+      dotColor: unread > 0 ? context.sdTheme3.danger : null,
       onPressed: () {
         // A signed-out visitor has an empty inbox by definition — the rows
         // live under their user document, and there is not one.
@@ -39,28 +41,6 @@ class NotificationBell extends ConsumerWidget {
 
         context.push(AppRoutes.notifications);
       },
-      tooltip: unread == 0
-          ? context.l10n.notificationsTitle
-          : context.l10n.notificationsUnread(unread),
-      icon: Stack(
-        clipBehavior: Clip.none,
-        children: <Widget>[
-          const Icon(AppIconConstant.notifications),
-          if (unread > 0)
-            Positioned(
-              top: dotInset,
-              right: dotInset,
-              child: Container(
-                width: SdSpacingConstant.w8,
-                height: SdSpacingConstant.w8,
-                decoration: BoxDecoration(
-                  color: context.sdTheme3.danger,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

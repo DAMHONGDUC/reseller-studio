@@ -63,10 +63,10 @@ class NotificationsScreen extends ConsumerWidget {
           // Only while there is something to clear. A control that does
           // nothing is worse than no control.
           if (unread > 0)
-            IconButton(
-              onPressed: () => _markAllRead(context, ref, notifications),
-              icon: const Icon(AppIconConstant.markEmailRead),
+            SdAppBarActionButtonV3(
+              icon: AppIconConstant.markEmailRead,
               tooltip: context.l10n.notificationsMarkAllRead,
+              onPressed: () => _markAllRead(context, ref, notifications),
             ),
           SizedBox(width: SdSpacingConstant.w8),
         ],
