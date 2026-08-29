@@ -22,13 +22,18 @@ dev plist compiles, installs, launches and writes into the wrong Firestore.
 `env_assets/` is where your copies live — **`docs/rules/RELEASE.md` is the
 authority on both**, and this file does not repeat it.
 
-- `env/*.example.json` is checked in and is the key list; `env/dev.json` and
-  `env/prod.json` are gitignored. `melos run set-up` copies the templates when
-  the real files are missing and **never overwrites** an existing one.
-- **Adding a key means adding it to both templates and to `AppEnv`.**
-  `test/core/config/app_env_test.dart` fails if the two flavours' key sets
-  diverge — a key in one and not the other is a build that works locally and
-  fails in CI.
+- **`env/env.example.json` is the one checked-in template and it is the key
+  list**; `env/dev.json` and `env/prod.json` are gitignored. `melos run set-up`
+  copies it into each missing flavour file and **never overwrites** an existing
+  one. One template rather than one per flavour: the two only ever differed by
+  the values a developer fills in, so the key list lived twice and went stale
+  in one copy — which is exactly how the RevenueCat keys ended up misspelled in
+  the template while `AppEnv` read the right names.
+- **It is also the one file under `env/` a session may read or write** — root
+  `CLAUDE.md` carries that rule and the reason.
+- **Adding a key means adding it to the template and to `AppEnv`.**
+  `test/core/config/app_env_test.dart` pins the two against each other and
+  fails loudly when they disagree.
 - **The templates carry exactly the keys `AppEnv` reads — no more, no less.**
   Owner's rule. A key nothing reads is an afternoon somebody spends filling in
   a value that changes nothing, and a key `AppEnv` reads and the template omits

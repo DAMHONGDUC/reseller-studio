@@ -50,9 +50,12 @@ Ordered, and the order is the contract:
    developer mid-edit in one of them should still get a working set-up.
 3. Dependencies, each package then the app.
 4. Localizations and codegen (`gen.sh`).
-5. **Env templates** — copy `env/<flavour>.example.json` for each missing one,
-   collect the names, and warn loudly at the end where it is still on screen.
-   Never overwrite: a developer's `dev.json` holds ids they filled in.
+5. **Env templates** — copy `env/env.example.json` into each missing flavour
+   file, collect the names, and warn loudly at the end where it is still on
+   screen. One template serves both flavours: they only ever differed by the
+   values a developer fills in, and a second checked-in copy is a key list that
+   goes stale in one place and not the other. Never overwrite: a developer's
+   `dev.json` holds ids they filled in.
 6. `npm ci` in `functions/` when it exists.
 7. `pod install`, macOS only, when a `Podfile` exists.
 

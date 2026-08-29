@@ -36,8 +36,8 @@ already done the harm, whether it was `cat`, a `git diff`, a `PlistBuddy Print`
 or a Python script echoing what it just wrote. Redirect to the file, never to
 stdout.
 
-To find out **which** keys exist, read `env/*.example.json` — it is checked in,
-it is the key list, and it carries no values. To find out how a key is used,
+To find out **which** keys exist, read `env/env.example.json` — it is checked
+in, it is the key list, and it carries no values. To find out how a key is used,
 read `lib/core/config/app_env.dart`, which is the only file allowed to name
 one.
 
@@ -82,9 +82,10 @@ passphrase.
 
 **Still allowed, and the rule would be unworkable without them:**
 
-- `env/prod.example.json` — checked in, placeholders only, and it is the
-  answer to "which keys does prod have?". `test/core/config/app_env_test.dart`
-  reads it, on purpose.
+- `env/env.example.json` — checked in, placeholders only, and it is the
+  answer to "which keys does a build have?". `test/core/config/app_env_test.dart`
+  reads it, on purpose, and it is the single file under `env/` a session may
+  open.
 - `lib/core/config/app_env.dart`, which is how a key is *used*.
 - `tool/prepare-env.sh prod` and the release scripts. They **copy** prod files
   and never echo them — the read/print line above applies unchanged. Running
