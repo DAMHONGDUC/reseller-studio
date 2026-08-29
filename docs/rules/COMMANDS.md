@@ -13,7 +13,7 @@ than a second local script tree.
 
 ## The set
 
-Sixteen commands. Every one is `melos run <name>`, and every body is a file in
+Fourteen commands. Every one is `melos run <name>`, and every body is a file in
 `packages/system_design/tool/`.
 
 | Command | Script | Promise |
@@ -22,17 +22,15 @@ Sixteen commands. Every one is `melos run <name>`, and every body is a file in
 | `deep-set-up` | `deep-set-up.sh` | `set-up` plus Xcode's derived data. Costs a cold build. |
 | `prepare-env-dev` | `prepare-env.sh dev` | Install dev's config — env files + native files. |
 | `prepare-env-prod` | `prepare-env.sh prod` | The same, prod's native files. |
-| `run` | `run.sh` | The app, against a flavour's env config. |
 | `gen` | `gen.sh` | Localizations and codegen, nothing else. |
 | `analyze` | `analyze.sh` | Zero findings, or fail. What CI runs. |
 | `test` | `test.sh` | The test suite. |
-| `test-rules` | `test-rules.sh` | `firestore.rules` against the emulator. |
 | `preflight` | `preflight.sh` | Everything that must be true before a build is worth uploading. |
 | `build-ipa-dev` | `build-ipa.sh dev` | The IPA, dev config attached. |
 | `build-ipa-prod` | `build-ipa.sh prod` | The IPA, prod config attached. |
 | `deploy-firebase-dev` | `deploy-firebase.sh dev` | Rules, indexes and functions to the dev alias. |
 | `deploy-firebase-prod` | `deploy-firebase.sh prod` | The same, prod alias. |
-| `release-dev` | `release.sh dev` | dev config, dev Firebase, then TestFlight. |
+| `release-dev` | `release.sh dev` | dev config, preflight, dev Firebase, then TestFlight. |
 | `release-prod` | `release.sh prod` | The same, prod. |
 
 Three shapes recur, and they are the pattern to copy:
@@ -42,12 +40,17 @@ Three shapes recur, and they are the pattern to copy:
   was last pointed at is the failure this prevents.
 - **One script serves both flavours, taking the flavour as `$1`.** The
   `melos.yaml` entry is the only thing that is duplicated.
-- **Underscore-prefixed files are not commands.** `_common.sh`, `_clean.sh`,
-  `_url-scheme.sh` — sourced or called by others, never named in `melos.yaml`.
+- **Underscore-prefixed files are not commands.** `_common.sh` and `_clean.sh`
+  are sourced or called by others, never named in `melos.yaml`.
 - **A command that chains others calls their scripts, never their steps.**
-  `release.sh` runs `prepare-env.sh`, `deploy-firebase.sh` and the beta lane in
-  order; it re-implements none of them, so the confirm prompt and every check
-  are the same ones a step run on its own gets.
+  `release.sh` runs `prepare-env.sh`, `preflight.sh`, `deploy-firebase.sh` and
+  the beta lane in order; it re-implements none of them, so the confirm prompt
+  and every check are the same ones a step run on its own gets.
+
+**There is no `run`, `test-rules` or `_url-scheme` script. `preflight` stays
+and every `release-*` command must run it.** Owner's rule. The release chain is
+the one place that owns the full go/no-go check, so neither flavour may deploy
+or upload after a failed preflight.
 
 ## What each one actually does
 
@@ -126,17 +129,6 @@ thing to verify a change: scope to the file that changed. `*_tmp_test.dart` is
 gitignored because the scratch harnesses hang the runner by design and
 `flutter test` with no arguments picks them up.
 
-### `test-rules`
-
-`firestore.rules` against the emulator, plus the pure function tests. Starts
-and stops the emulator itself and needs **Java**. Uses the `firebase` CLI from
-`functions/node_modules`, deliberately not whatever is on PATH: a globally
-installed CLI is a `pkg` bundle carrying its own node, and the child process it
-spawns resolves `node` to that bundle, which does not understand `--test`.
-**It builds `functions/` first** — the suite runs under plain node and imports
-the compiled `functions/lib/`, so a stale `lib/` would quietly test last week's
-code.
-
 ### `preflight`
 
 Everything that must be true before a build is worth uploading: the Firebase
@@ -188,11 +180,11 @@ Its contract, in order:
 script while `RELEASE_ACTIONS.md` still named it, and the bucket the app
 uploads to was the one nobody was deploying rules for.
 
-### `release-*` — the three commands that were always run together
+### `release-*` — the four commands that are always run together
 
-Config, Firebase, TestFlight — `prepare-env.sh`, `deploy-firebase.sh`, then the
-`beta` lane. What the command adds over typing them is the two things a person
-gets wrong at 2am:
+Config, preflight, Firebase, TestFlight — `prepare-env.sh`, `preflight.sh`,
+`deploy-firebase.sh`, then the `beta` lane. What the command adds over typing
+them is the two things a person gets wrong at 2am:
 
 - **The order, which is a rule and not a preference.** Backend first: a build
   that reaches a tester ahead of the rules it needs fails on a query nobody can
@@ -278,8 +270,8 @@ the upload.
 
 **Never run the app bare.** With no `--dart-define-from-file` every `AppEnv`
 getter falls back to its default, which is a silently different app from the
-one CI builds. `melos run run` and the **"Reseller Studio (dev)"** VS Code launch
-configuration both pass it.
+one CI builds. The **"Reseller Studio (dev)"** VS Code launch configuration
+passes it.
 
 Running before Firebase exists: sign-in cannot succeed, and **there is no
 bypass** (hard rule 1). The app opens on the signed-out shell. **Mock data does

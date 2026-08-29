@@ -59,29 +59,18 @@ The script's contract, and none of it is optional:
 - **Check every source first, copy after.** A run that dies on the third file
   leaves the tree half one environment and half the other, and nothing on disk
   says so.
-- **It copies bytes and never reads them** (hard rule 9). The one derived value
-  is the sign-in URL scheme, and that is `packages/system_design/tool/_url-scheme.sh` — **one
-  implementation, shared with the release workflow**, because two copies of
-  derived data is what makes them drift.
+- **It copies bytes and never reads them** (hard rule 9). The installed
+  `Info.plist` is complete as supplied; the pipeline has no script that derives
+  or patches a URL scheme after the copy.
 - **`ios/Runner/Info.plist` comes from `env_assets/<flavour>-Info.plist`, like
   every other native file.** Owner's rule. The Runner target reads one path, so
   the flavour's plist is copied onto it rather than patched into the tracked
   one — a hand-edit that survives a flavour switch is the same hazard as a dev
   `GoogleService-Info.plist` beside `env/prod.json`, one file lower down.
-- **`_url-scheme.sh` runs after the copies, never before.** It writes into the
-  plist that was just installed; the other order derives the entry and then
-  overwrites it. It is **not** an exception to the replace rule: it keeps
-  nothing from the file the copy overwrote, and it deletes any existing
-  `google-sign-in` entry before adding this flavour's, so a re-run replaces
-  rather than appends.
-
-**What the flavour plists may differ in: nothing the pipeline derives.** CI has
-no `Info.plist` secret — `.github/workflows/release.yml` builds on the tracked
-file and calls the same `_url-scheme.sh`. So a local copy that differs from
-`ios/Runner/Info.plist` in anything except the derived `google-sign-in` entry
-is a difference that never reaches a TestFlight build. Real changes — a usage
-string, the `selleros` deep-link scheme, an orientation — go into the tracked
-file first and into `env_assets/` afterwards.
+**The flavour plists are complete build inputs.** Each one already carries its
+Google sign-in callback alongside the shared usage strings, deep-link scheme
+and orientations; the release workflow installs the selected file without a
+second derivation step.
 
 **`ios/Runner/Info.plist` is tracked, and `prepare-env` overwrites it.** That
 is deliberate and it leaves the working tree dirty: the installed file pins one
@@ -127,6 +116,8 @@ Every step that can fail cheaply runs before the twenty-five minute one.
 
 `preflight` is everything a release depends on except the build — three minutes
 instead of twenty-eight, and every credential failure ever met surfaces in it.
+Both `release-dev` and `release-prod` run it after installing the selected
+configuration and before any deploy or upload; a failure stops the chain.
 **`flavor:` is optional there and is skipped rather than defaulted**:
 defaulting to prod would fail a rehearsal on a dev machine over the one
 question it was not asked.
