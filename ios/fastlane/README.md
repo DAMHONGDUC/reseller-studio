@@ -23,10 +23,10 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Build and upload to TestFlight
 
-### ios preflight
+### ios pre_build
 
 ```sh
-[bundle exec] fastlane ios preflight
+[bundle exec] fastlane ios pre_build
 ```
 
 Everything a release depends on except the build

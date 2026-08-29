@@ -1,7 +1,7 @@
 # Release checklist
 
 These tasks require an external account, credential, private key or production
-decision. Complete them in order. Run `melos run preflight` before release.
+decision. Complete them in order. Run `melos run pre-build` before release.
 
 ## Blocking setup
 
@@ -62,7 +62,7 @@ this checklist. A downgrade keeps existing records and blocks only new creates.
 | Signing | Create a private certificates repo and a read-only fine-grained PAT |
 | Local Fastlane | Fill `ios/fastlane/.env`, then run `bundle exec fastlane certificates` |
 | GitHub Actions | Add the secrets listed in [`docs/release/CREDENTIALS.md`](docs/release/CREDENTIALS.md) |
-| Rehearsal | From `ios/`, run `bundle exec fastlane preflight`, then `CI=true bundle exec fastlane preflight` |
+| Rehearsal | From `ios/`, run `bundle exec fastlane pre_build`, then `CI=true bundle exec fastlane pre_build` |
 | First upload | Use `bump:false` with a known-free build number |
 
 Do not archive from Xcode. It omits `--dart-define-from-file` and can produce a

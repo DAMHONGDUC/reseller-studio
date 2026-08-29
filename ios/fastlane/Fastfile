@@ -2,7 +2,7 @@
 # fail cheaply runs before the twenty-five minute one.
 #
 #   bundle exec fastlane certificates          # local only, once
-#   bundle exec fastlane preflight             # three minutes, no build
+#   bundle exec fastlane pre_build             # three minutes, no build
 #   bundle exec fastlane beta flavor:prod bump:true notes:"..."
 #
 # **This file never archives.** `packages/system_design/tool/build-ipa.sh` does, because the app's
@@ -98,7 +98,7 @@ platform :ios do
   end
 
   desc "Everything a release depends on except the build"
-  lane :preflight do |options|
+  lane :pre_build do |options|
     # `flavor:` is optional and SKIPPED when absent, never defaulted.
     # Defaulting to prod would fail a rehearsal on a dev machine over the one
     # question it was not asked.
@@ -119,10 +119,10 @@ platform :ios do
       match(type: "appstore", readonly: true, api_key: key)
       verify_entitlements_in_profile
     else
-      UI.important("CI is not set — skipping match. Re-run as `CI=true bundle exec fastlane preflight`")
+      UI.important("CI is not set — skipping match. Re-run as `CI=true bundle exec fastlane pre_build`")
     end
 
-    UI.success("preflight clean")
+    UI.success("pre-build clean")
   end
 
   desc "Create or refresh the signing certificates and profiles. Local only."

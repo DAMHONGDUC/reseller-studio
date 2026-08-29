@@ -62,9 +62,9 @@ scripts:
     description: The test suite. For CI and full sweeps, not per-change.
     run: sh packages/system_design/tool/test.sh
 
-  preflight:
-    description: Everything that must be true before a build is worth uploading.
-    run: sh packages/system_design/tool/preflight.sh
+  pre-build:
+    description: Check iOS and Android before either platform is built.
+    run: sh packages/system_design/tool/pre-build.sh
 
   build-ipa-dev:
     description: The IPA, dev config attached. The only place an archive is made.
@@ -83,11 +83,11 @@ scripts:
     run: sh packages/system_design/tool/deploy-firebase.sh prod
 
   release-dev:
-    description: dev config, preflight, dev Firebase, then TestFlight.
+    description: dev config, pre-build, dev Firebase, then TestFlight.
     run: sh packages/system_design/tool/release.sh dev
 
   release-prod:
-    description: prod config, preflight, prod Firebase, then TestFlight.
+    description: prod config, pre-build, prod Firebase, then TestFlight.
     run: sh packages/system_design/tool/release.sh prod
 
 sdkPath: .fvm/flutter_sdk

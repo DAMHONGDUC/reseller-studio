@@ -31,18 +31,18 @@ void main() {
   });
 
   test(
-    'release runs preflight before deploy and removed scripts stay absent',
+    'release runs pre-build before deploy and removed scripts stay absent',
     () {
       final String release = File(
         'packages/system_design/tool/release.sh',
       ).readAsStringSync();
-      final int preflight = release.indexOf('sh "\$SCRIPT_DIR/preflight.sh"');
+      final int preBuild = release.indexOf('sh "\$SCRIPT_DIR/pre-build.sh"');
       final int deploy = release.indexOf(
         'sh "\$SCRIPT_DIR/deploy-firebase.sh"',
       );
 
-      expect(preflight, greaterThanOrEqualTo(0));
-      expect(deploy, greaterThan(preflight));
+      expect(preBuild, greaterThanOrEqualTo(0));
+      expect(deploy, greaterThan(preBuild));
 
       for (final String name in <String>['run', 'test-rules', '_url-scheme']) {
         expect(
@@ -52,4 +52,17 @@ void main() {
       }
     },
   );
+
+  test('pre-build checks Android configuration and release signing', () {
+    final String preBuild = File(
+      'packages/system_design/tool/pre-build.sh',
+    ).readAsStringSync();
+
+    expect(preBuild, contains('com.google.gms.google-services'));
+    expect(preBuild, contains('com.dd.reseller.studio'));
+    expect(preBuild, contains('android.permission.CAMERA'));
+    expect(preBuild, contains('android:scheme="selleros"'));
+    expect(preBuild, contains('flutter_deeplinking_enabled'));
+    expect(preBuild, contains('signingConfigs.getByName("debug")'));
+  });
 }

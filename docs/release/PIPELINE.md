@@ -33,8 +33,8 @@
 Run both from `ios/`:
 
 ```sh
-bundle exec fastlane preflight
-CI=true bundle exec fastlane preflight
+bundle exec fastlane pre_build
+CI=true bundle exec fastlane pre_build
 ```
 
 The first checks the local path; the second checks CI-only behavior without

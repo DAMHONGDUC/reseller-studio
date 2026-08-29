@@ -35,7 +35,7 @@ Firebase and store accounts are not included in the repository. See
 | Generate localization | `melos run gen` |
 | Analyze | `melos run analyze` |
 | Test | `melos run test` |
-| Release checks | `melos run preflight` |
+| Build checks | `melos run pre-build` |
 
 Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 
