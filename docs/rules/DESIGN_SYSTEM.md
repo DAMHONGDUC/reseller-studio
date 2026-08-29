@@ -584,6 +584,14 @@ that drifts, and it drifts invisibly: each file looks right on its own.
 Owner's rules. Every one of them is something a seller read wrong, so each is
 fixed in a single owner rather than at the call sites that got it wrong.
 
+- **Every field that accepts money formats grouping separators while the
+  seller types.** `MoneyField` owns that behavior for the whole app: call
+  sites provide the currency and parse its normalized text with `Money`, but
+  never implement their own formatter. Existing values are formatted when
+  loaded as well, so an edit form and a create form do not display the same
+  amount differently. The formatter preserves the currency's decimal limit,
+  cursor position and the distinction between an empty value and zero.
+
 - **Anywhere a keyboard can open, a tap outside the field closes it.** Wired
   once in `SdKeyboardDismissV3`, which `SdScaffoldV3` and `SdBottomSheetV3`
   both wrap their content in — no screen writes its own `GestureDetector`, and
