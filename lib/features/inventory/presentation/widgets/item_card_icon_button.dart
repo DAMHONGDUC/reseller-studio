@@ -9,14 +9,9 @@ part of 'item_card.dart';
 /// thing it was acknowledging. `InkResponse` with a circular highlight is what
 /// an icon-only control looks like everywhere else on the platform.
 ///
-/// **The glyph still sits on the card's content edge**, where every
-/// `AppRowChevron` sits — a column of end glyphs that does not line up reads
-/// as a mistake even to somebody who cannot say which card is wrong. So the
-/// target is centred on the glyph and the whole button is nudged outward by
-/// what centring cost it, overhanging the card's padding rather than pushing
-/// the glyph inward. That is also why it is not an `IconButton`: Material 3
-/// builds one from a `ButtonStyle` and ignores `constraints`, so its 48pt
-/// target centres the glyph well short of where it belongs.
+/// The whole target stays inside the card's padding. Aligning only the glyph
+/// to the content edge made the interactive region overhang the right side
+/// and left the card with unequal horizontal padding.
 class _CardIconButton extends StatelessWidget {
   const _CardIconButton({
     required this.icon,
@@ -32,37 +27,28 @@ class _CardIconButton extends StatelessWidget {
 
   final VoidCallback onPressed;
 
-  /// Half the glyph's own width, which is the gap centring leaves between it
-  /// and the target's edge — and therefore exactly how far the target has to
-  /// move to put the glyph back on the card's content edge.
-  static double get _edgeNudge =>
-      (SdSpacingConstant.r44 - SdIconV3.smallSize) / 2;
-
   /// What the button occupies in a row, so a card that has no button for this
   /// item can hold the same space open and keep its columns aligned.
   static double get slotSize => SdSpacingConstant.r44;
 
   @override
-  Widget build(BuildContext context) => Transform.translate(
-    offset: Offset(_edgeNudge, 0),
-    child: Tooltip(
-      message: tooltip,
-      child: InkResponse(
-        onTap: onPressed,
-        radius: SdSpacingConstant.r22,
-        containedInkWell: true,
-        highlightShape: BoxShape.circle,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: slotSize,
-          height: slotSize,
-          child: Center(
-            child: SdIconV3(
-              icon,
-              size: SdIconV3.smallSize,
-              color: context.sdTheme3.textTertiary,
-              semanticLabel: tooltip,
-            ),
+  Widget build(BuildContext context) => Tooltip(
+    message: tooltip,
+    child: InkResponse(
+      onTap: onPressed,
+      radius: SdSpacingConstant.r22,
+      containedInkWell: true,
+      highlightShape: BoxShape.circle,
+      customBorder: const CircleBorder(),
+      child: SizedBox(
+        width: slotSize,
+        height: slotSize,
+        child: Center(
+          child: SdIconV3(
+            icon,
+            size: SdIconV3.smallSize,
+            color: context.sdTheme3.textTertiary,
+            semanticLabel: tooltip,
           ),
         ),
       ),

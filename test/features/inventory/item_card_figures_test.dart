@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/widgets/app_photo.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
@@ -41,6 +42,29 @@ void main() {
 
     expect(find.text('Qty'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
+  });
+
+  testWidgets('the actions target keeps equal horizontal card padding', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(item: itemWith(), now: testNow, onActions: () {}),
+    );
+
+    final Rect card = tester.getRect(find.byType(SdCardV3));
+    final Rect thumbnail = tester.getRect(find.byType(AppPhoto));
+    final Rect actionsTarget = tester.getRect(
+      find.descendant(
+        of: find.byTooltip('Actions'),
+        matching: find.byType(InkResponse),
+      ),
+    );
+
+    expect(
+      thumbnail.left - card.left,
+      moreOrLessEquals(card.right - actionsTarget.right),
+    );
   });
 
   testWidgets('a sold item has none left, and says so as a zero', (
