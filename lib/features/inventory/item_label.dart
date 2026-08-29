@@ -46,9 +46,9 @@ final class LocationKindLabel {
 
 /// How long the item has been in the state it is in — `3d`, `5w`, `2mo`.
 ///
-/// **The duration alone, next to the status badge that names the state.**
-/// "Listed 84d" beside a badge already reading *Listed* says the word twice,
-/// and the row has no width to spare for it.
+/// **The duration alone, above the marketplace count.** Repeating the status
+/// name would add words without adding information, and the card has no width
+/// to spare for them.
 final class ItemAgeLabel {
   static String of(Item item, {required DateTime now}) =>
       DateTimeUtils.compactAge(now.difference(item.stateSince));

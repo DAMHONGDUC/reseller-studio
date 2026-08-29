@@ -53,6 +53,13 @@ void main() {
     );
 
     expect(find.widgetWithText(SdBadgeV3, '3 markets'), findsOneWidget);
+    final double ageY = tester
+        .getTopLeft(find.widgetWithText(SdBadgeV3, '<1d'))
+        .dy;
+    final double marketY = tester
+        .getTopLeft(find.widgetWithText(SdBadgeV3, '3 markets'))
+        .dy;
+    expect(ageY, lessThan(marketY));
     expect(find.text('eBay'), findsNothing);
     expect(find.text('Depop'), findsNothing);
     expect(find.text('Poshmark'), findsNothing);

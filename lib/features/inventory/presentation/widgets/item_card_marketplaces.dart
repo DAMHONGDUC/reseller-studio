@@ -19,7 +19,7 @@ class _Marketplaces extends StatelessWidget {
     if (count == 0) return const SizedBox.shrink();
 
     return Padding(
-      padding: EdgeInsets.only(top: SdSpacingConstant.h8),
+      padding: EdgeInsets.only(top: SdSpacingConstant.h4),
       child: SdBadgeV3(label: context.l10n.inventoryMarketCount(count)),
     );
   }

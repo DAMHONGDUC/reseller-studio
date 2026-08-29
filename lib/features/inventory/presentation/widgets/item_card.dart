@@ -22,7 +22,8 @@ part 'item_card_thumbnail.dart';
 /// One row of Inventory.
 ///
 /// **Two zones.** Beside the photo, what the item *is*: its title and the
-/// badges naming its state, its age and its grade. Below, running to the
+/// badges naming its state and grade, then its age above the marketplace
+/// count. Below, running to the
 /// card's own left edge, what it is *worth*: what it cost, what it is being
 /// asked for, and the marketplaces it is live on — then when the record last
 /// changed. Everything else is on the detail screen.
@@ -133,6 +134,7 @@ class ItemCard extends StatelessWidget {
                     ),
                     SizedBox(height: SdSpacingConstant.h6),
                     _StateBadges(item: item, now: now),
+                    _StateAge(item: item, now: now),
                     _Marketplaces(listings: listings),
                   ],
                 ),

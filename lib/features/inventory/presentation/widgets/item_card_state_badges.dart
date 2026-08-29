@@ -1,6 +1,6 @@
 part of 'item_card.dart';
 
-/// What state the item is in, and how long it has been in it.
+/// What state the item is in.
 ///
 /// **The status badge and the stale badge are separate, and both can show**:
 /// an item can be listed *and* stale, and collapsing that into one marker
@@ -41,13 +41,27 @@ class _StateBadges extends StatelessWidget {
             label: ItemConditionLabel.of(context, item.condition!),
             color: item.condition!.color(context),
           ),
-        // How long it has been in that state, right after the badge that
-        // names it — the two are one sentence.
-        SdBadgeV3(
-          label: ItemAgeLabel.of(item, now: now),
-          icon: AppIconConstant.schedule,
-        ),
       ],
     );
   }
+}
+
+/// How long the item has been in its current state.
+///
+/// Its own line keeps status and condition easy to scan while placing this
+/// quiet context directly above the marketplace count it qualifies.
+class _StateAge extends StatelessWidget {
+  const _StateAge({required this.item, required this.now});
+
+  final Item item;
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(top: SdSpacingConstant.h8),
+    child: SdBadgeV3(
+      label: ItemAgeLabel.of(item, now: now),
+      icon: AppIconConstant.schedule,
+    ),
+  );
 }
