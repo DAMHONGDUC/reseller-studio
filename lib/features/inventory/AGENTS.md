@@ -17,6 +17,10 @@ Read this file before changing anything in `lib/features/inventory/`.
   price line, and one count answers distribution without making a widely
   listed item taller or harder to scan. Count distinct marketplaces so two
   listing records for one platform still read as one market.
+- **The Price cell matches the Cost cell's complete UI.** Owner's rule. It has
+  a label above its content; only the content differs, using the arrow instead
+  of an amount. The whole Price cell is the tap target that opens the
+  marketplace price list, rather than making the seller hit the arrow alone.
 
 ## Item action feedback
 
