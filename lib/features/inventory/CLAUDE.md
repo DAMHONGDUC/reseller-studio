@@ -199,27 +199,86 @@ the age of the state the item is in — `3w`, `2mo` — from `Item.stateSince`.
   says by how far, and an item three days over reads differently from one at
   six months.
 
-## The row names its marketplaces and prices none of them
+## The row counts its marketplaces and prices none of them
 
 Owner's rule, and it replaces the earlier one that put a figure per platform
-on the card. `ItemCard` shows **every marketplace the item is live on, as
-plain badges** — no amounts.
+on the card. `ItemCard` shows **one count of the distinct marketplaces the item
+is live on** — no names and no amounts.
 
 - **A price per platform is not what a list is scanned for.** Where the item
   is takes one glance; what it costs on each takes a comparison, and a
   comparison belongs on the detail screen where the numbers can be laid out.
-- **Every marketplace shows, wrapped rather than cut to one line.** The old
-  line ellipsized, which hid exactly the platform a seller with five listings
-  was looking for. A card grows a row instead.
+- **One compact count replaces the wrapped badge list.** The list made a card
+  grow with every marketplace and slowed scanning; the detail screen keeps the
+  full names for the seller who needs them.
 - **They sit with the state badges, above the money band.** Where an item is
   live is a fact about the item, not a figure — grouping it with the badges
   keeps the band to the three amounts it exists to line up.
-- **Deduped and walked in `Marketplace.values` order**, so two listings on one
-  platform read as one badge and the row cannot reshuffle between builds.
+- **The count is deduped by marketplace**, so two listing records on one
+  platform still read as one market.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds both
-  halves: every name is on the row, and no listing price is.
+  halves: the distinct count is on the row, and no marketplace name or listing
+  price is.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
+
+## Four statuses, and quantity moves between two of them
+
+Owner's rule, and it replaces the six-state lifecycle:
+
+| Status | What it means |
+|---|---|
+| `draft` | Created, not part of sellable inventory yet |
+| `inStock` | On the shelf and for sale — live on a marketplace or not |
+| `sold` | Sold out: the count reached zero through sales |
+| `archived` | Withdrawn without a sale |
+
+- **`listed` and `reserved` are gone.** An item live on eBay is still stock
+  the seller owns, so it is `inStock` with listings beside it; an item held
+  for a buyer was a state nothing in the app could act on. Cross-listing no
+  longer moves the status — `ItemTransition.markListed` stamps `listedAt` and
+  turns a draft into stock, and that timestamp is what staleness, the Stale
+  tab and Home's progress read.
+- **A document written before the change still reads.** `ItemDto` folds
+  `listed` and `reserved` into `inStock`; nothing rewrites them until the item
+  is next saved, and no migration runs.
+- **`isListable` now means `isOnHand`.** A draft can be put on a marketplace —
+  listing it is what makes it stock. What cannot is an item that has left
+  inventory.
+- **The Inventory tabs follow**: All, Draft, In stock, Sold, Stale. Stale is
+  still a query, not a status (`docs/DATA_MODEL.md`).
+
+## Restock adds to the count and brings the row back
+
+Owner's rule. `ItemTransition.restock` takes how many arrived, adds them to
+`quantity`, and moves the item to `inStock` in the same write.
+
+- **The box asks how many arrived, not what the new total is** — that is the
+  number on the receipt in the seller's hand, and the only one they do not
+  have to work out.
+- **It is the way a sold-out row comes back.** Having to un-sell an item by
+  hand before saying more arrived is the step that made sellers create a
+  duplicate item instead — and a duplicate loses the cost history, the
+  listings and the sales the original carries.
+- **An archived item comes back too**: restocking one is the seller saying
+  they have it again.
+- **`Make it in stock` is the draft's own row**, shown only on a draft. It
+  carries no count: the item already has one, and what the seller is saying is
+  that it is ready to sell.
+- Both go through `_bulk`, so forty rows are one write (hard rule 16).
+
+## Quantity is required on the item form, and only there
+
+Owner's rule. The full Add/Edit form refuses to save without a count; **Quick
+Add still asks for a title and nothing else** (hard rule 2), and creates the
+item with one.
+
+- A seller who opened the full form is entering stock, and how many there are
+  is the figure the card, the Sold transition and every count in Analytics are
+  built from.
+- The status picker sits beside it, offering `draft`, `inStock` and
+  `archived`. **`sold` is not in the list**: it is not a correction, it is an
+  order — see `ItemTransition.manualCheck` and the section below.
 
 ## Quantity is what decides whether a record is sold
 

@@ -12,11 +12,11 @@ Read this file before changing anything in `lib/features/inventory/`.
 
 ## Inventory card
 
-- **The card lists every marketplace carrying the item, without marketplace
-  prices.** Owner's rule. The asking price already owns the card's price line;
-  the marketplace line answers distribution only, so repeating a separate
-  figure for each platform adds noise and makes a widely listed item harder to
-  scan.
+- **The card shows only how many marketplaces carry the item, without names or
+  marketplace prices.** Owner's rule. The asking price already owns the card's
+  price line, and one count answers distribution without making a widely
+  listed item taller or harder to scan. Count distinct marketplaces so two
+  listing records for one platform still read as one market.
 
 ## Item action feedback
 
