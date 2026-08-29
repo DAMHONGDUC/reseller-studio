@@ -152,8 +152,14 @@ class _CameraButton extends StatelessWidget {
   Widget build(BuildContext context) => Material(
     color: context.sdTheme3.surfaceElevated,
     shape: const CircleBorder(),
+    // The app bar action's glyph, because this is chrome too — a control over
+    // a camera feed is the last one that may be small.
     child: IconButton(
-      icon: SdIconV3(icon, color: context.sdTheme3.textPrimary),
+      icon: SdIconV3(
+        icon,
+        size: SdAppBarActionButtonV3.glyphSize,
+        color: context.sdTheme3.textPrimary,
+      ),
       tooltip: tooltip,
       onPressed: onPressed,
     ),
