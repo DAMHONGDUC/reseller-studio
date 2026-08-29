@@ -61,6 +61,33 @@ building either.
   the seller at Inventory because it had no create action of its own; that
   sentence in `docs/rules/SCREENS.md` now applies to Listings alone.
 
+## The next move is pinned; every other verb is in the sheet
+
+Owner's rule, and it replaced a column of full-width buttons at the foot of
+the detail screen.
+
+- **One pinned button, and it is the move the status implies**: `toShip` ships,
+  `shipped` gets marked delivered, a requested return gets taken back in.
+  `_NextMove` sits outside the `ListView` (`AppPinnedAction` in the scaffold's
+  bottom slot), so it holds the bottom edge whatever the list is scrolled to.
+  A seller draining a To Ship queue used to scroll two screens — past items,
+  profit, shipping and the timeline — to reach the one button they came for.
+- **Nothing is pinned when the order is finished.** Delivered, refunded and
+  cancelled have no next step, and a bar holding a bookkeeping verb would make
+  the rare thing look like the expected one.
+- **Everything else lives in `OrderActionsSheet`**, opened from a small
+  Actions button in the app bar — the same grammar `ItemActionsSheet` gives
+  Inventory. Four equally loud full-width buttons said four things mattered
+  equally, when Record fees and payout is a monthly job and Ship it is a daily
+  one.
+- **The sheet lists the pinned move as well.** The button is the fast path;
+  the sheet is the complete list, so a verb added there cannot go missing from
+  what a seller learned to open.
+- **The label is `commonActions`**, one key for both features: it is one word
+  doing one job, and two keys is how the two sheets end up called different
+  things.
+- `test/features/orders/order_actions_placement_test.dart` pins all of it.
+
 ## Order transitions are domain rules, never button rules
 
 - **Only `toShip` may become `shipped`.** An unpaid order cannot leave, and a
