@@ -158,12 +158,23 @@ keeping written down:
 Across the foot the labels share one baseline and the figures share the next,
 which is what lets the amounts be compared at a glance.
 
-- **The cells are spaced apart, not divided into shares** — owner's rule.
-  `MainAxisAlignment.spaceBetween` on cells that measure themselves: quantity
-  holds the card's left edge, the arrow holds its right, and the gaps fall
-  where the content leaves them. Fixed flex shares spent width on a
-  two-character count and then ellipsized a four-figure price, which is the
-  failure this replaces.
+- **Qty and Cost take equal shares; the arrow measures itself** — owner's
+  rule, and it **reverses "spaced apart, not divided into shares"**. Cells
+  that all measured themselves under `spaceBetween` put the gaps where the
+  content left them, which meant the middle cell sat at a different place on
+  every card: scrolling the list, `Cost` and its figure shuffled sideways row
+  by row. That is the one thing a column of money must not do, and it is the
+  rule `AppListRow.trailingText` already states one level down.
+  - **The old rule's reason expired.** Shares were rejected because they
+    "spent width on a two-character count and then ellipsized a four-figure
+    price" — true when three cells held money. The third now holds a 20pt
+    chevron, so the two that carry figures split everything else and neither
+    is close to ellipsizing.
+  - **Quantity still holds the card's left edge and the arrow still holds its
+    right**, which is the half of the old rule that was about the band's ends
+    rather than its middle. `test/features/inventory/item_card_figures_test.dart`
+    pins both, and pins that Cost does not move between two cards whose
+    amounts differ.
 - **The asking price is not on the row** — owner's rule. What the item is
   asked for is a per-marketplace number, so one figure on the card is a price
   that may be true nowhere; the row points at the screen that lists them all
