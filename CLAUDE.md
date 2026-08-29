@@ -200,19 +200,27 @@ the plan's navigation tree (§38): `auth`, `workspace`, `home`,
 **Create a layer folder only when it gets its first file** — no empty
 placeholder folders.
 
-**The one Flutter import allowed in `domain/`: an enum's own colour.** Owner's
-rule. `Color color(BuildContext)` is declared as an extension *in the enum's
-own file* — `ItemStatusColor` and `ItemConditionColor` in
-`inventory/domain/enums/item_status.dart` — so a value is asked what colour it
-is and there is exactly one answer, and adding a case breaks the switch that
-hands it out. A presenter class holding the same switch is what this replaced,
-and it is the shape that let a badge and a tag drift apart.
+**How an enum is displayed lives on that enum, in its own file.** Owner's
+rule, and the one place `domain/` is allowed to import Flutter.
+`ItemStatusDisplay` and `ItemConditionDisplay` in
+`inventory/domain/enums/item_status.dart` carry **both** halves —
+`String label(BuildContext)` and `Color color(BuildContext)` — so a value is
+asked and there is exactly one answer, and adding a case breaks the switches
+that hand them out. A presenter class holding the same switches is what this
+replaced, and it is the shape that let a badge and a tag drift apart.
 
-- **Only the colour.** No widget, no `AppLocalizations`, no repository: the
-  words for an enum still live in the feature's `*Label` presenter (hard rule
-  7), and everything else in `domain/` stays pure Dart.
-- The palette comes from `AppColors`, because the app owns it
-  (`docs/rules/DESIGN_SYSTEM.md`, which carries the rest of this rule).
+- **Display only.** No widget, no repository, no provider: an extension that
+  says what a value *looks like* and *reads as*, and nothing else. Everything
+  else in `domain/` stays pure Dart.
+- **The strings still come from ARB through `context.l10n`** (hard rule 7).
+  What moved is where the switch lives, not where the words are written.
+- The palette comes from `AppColors` through `AppTagHue`, because the app owns
+  it (`docs/rules/DESIGN_SYSTEM.md`, which carries the rest of this rule).
+
+**Never index a palette by number.** Owner's rule. `ItemStatus.draft => 7` said
+nothing about what 7 was and made the reader count list entries to find out;
+`AppTagHue.grey` says it. Any set of colours a switch chooses from is a named
+enum, never a list plus an index.
 
 **Dependency rule**: `presentation → domain ← data` inside a feature. Across
 features, import only another feature's `domain/` or its `providers.dart`,

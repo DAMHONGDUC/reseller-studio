@@ -741,12 +741,17 @@ quietly re-invent one.
   one short doc comment stating its UI meaning and one blank line before the
   next entry.** The name alone is not enough when one glyph serves several
   workflows, and the separation keeps future icon-source swaps reviewable.
-- **An enum's colour lives on that enum, as an extension** — owner's rule.
-  `extension ItemStatusColor on ItemStatus { Color color(BuildContext) }`, and
-  the same shape for `ItemCondition`. Not a static on a presenter class, not a
-  switch at a call site: the value is asked what colour it is, so there is
-  exactly one answer and adding a case to the enum breaks the switch that
-  hands it out.
+- **An enum's colour — and its label — live on that enum, as one extension in
+  the enum's own file** — owner's rule. `ItemStatusDisplay` sits in
+  `domain/enums/item_status.dart` beside the enum, carrying
+  `label(BuildContext)` and `color(BuildContext)`; `ItemCondition` has the
+  same. Not a static on a presenter class, not a switch at a call site: the
+  value is asked, so there is exactly one answer and adding a case breaks the
+  switch that hands it out. It is the one thing in `domain/` allowed to import
+  Flutter — root `CLAUDE.md` carries that exception.
+- **The hue is named, never numbered.** `AppTagHue.grey`, not an index into a
+  list: a number tells the reader nothing and makes them count entries to find
+  out what it was.
 - **Every place that draws that value as a tag draws it in that colour** —
   owner's rule, the other half of the one above. The tag on a form and the
   badge on a card are the same value; two hues for it is the seller learning

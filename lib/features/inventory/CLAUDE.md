@@ -311,13 +311,14 @@ that each opened a sheet.
   at once. Both groups are built from `SdTagV3` through one `_TagGroupField`,
   extracted on its second use so the two cannot answer the same shape of
   question two ways.
-- **Every tag has its own colour, and the colour lives on the enum** —
-  owner's rule: `ItemStatusColor` and `ItemConditionColor` are extensions on
-  `ItemStatus` and `ItemCondition`, so a value is *asked* what colour it is
-  and there is exactly one answer. They map onto `AppColors.tagSeries`, which
-  exists because the semantic tones run out at five and three of the four
-  statuses shared `neutral`: a row of radios in one grey is a shape test, not
-  a colour one. The general rule is in `docs/rules/DESIGN_SYSTEM.md`.
+- **Both the colour and the words live on the enum** — owner's rule:
+  `ItemStatusDisplay` and `ItemConditionDisplay` are extensions declared in
+  `domain/enums/item_status.dart` itself, carrying `label(context)` and
+  `color(context)`, so a value is *asked* and there is exactly one answer.
+  They pick a named `AppTagHue`, which exists because the semantic tones run
+  out at five and three of the four statuses shared `neutral`: a row of radios
+  in one grey is a shape test, not a colour one. The general rule is in
+  `docs/rules/DESIGN_SYSTEM.md`.
 - **Every place that draws one as a tag uses that colour** — the radio on the
   form, the badge on the card, the badge on the detail screen. `SdBadgeV3`
   takes the colour rather than a tone for these two.
