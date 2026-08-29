@@ -178,8 +178,18 @@ Every new workspace starts with the carriers defined by
 ### `orders/{orderId}`
 
 `salePriceMinor`, `feesMinor`, `shippingCostMinor`, `refundMinor`,
-`payoutMinor`, `status`, `marketplaceId`, `externalOrderId`, `orderedAt`,
-`shipByDate`, plus an `items` array of `{itemId, quantity, unitPriceMinor}`.
+`payoutMinor`, `status`, `marketplaceId`, `marketplaceName`,
+`externalOrderId`, `orderedAt`, `shipByDate`, `shippedAt`, `deliveredAt`,
+`returnRequestedAt`, `returnedAt`, `refundedAt`, `settledAt`, plus a `lines`
+array of `{itemId, title, quantity, unitPriceMinor, unitCostMinor}`.
+
+`marketplaceId` points at the business-owned marketplace record while
+`marketplaceName` is the sale-time snapshot shown in history. Renaming or
+soft-deleting the marketplace must not rewrite an order that already happened.
+
+Lifecycle timestamps are facts, not values inferred from current `status`: a
+returned order can later be refunded, and both events must remain on its
+timeline.
 
 The line items are **embedded, not a subcollection**. An order has a handful
 of lines, they are always read with the order, and they never change after the
