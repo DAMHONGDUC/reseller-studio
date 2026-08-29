@@ -48,13 +48,19 @@ with background they did not ask for, and don't narrate the options that were
 not taken. Two labelled rows and a sentence each beat three paragraphs saying
 the same thing.
 
-**`env/` is off limits. Never read, write, move or rename anything in it.**
-Owner's rule. The tool permissions already deny that path, and a denied path
-is a decision rather than an obstacle to route around — `git mv`, `git show`
-and a shell heredoc all reach a file the deny rule covers, and reaching for
-one of them because the file tool refused is the same act with an extra step.
-If a change needs something in there, say exactly what is needed and stop.
-The owner makes it.
+**`env/` is off limits, with exactly one exception: `env/env.example.json`.**
+Owner's rule. Never read, write, move or rename anything else in there —
+`dev.json` and `prod.json` are the owner's filled-in config, and no session
+needs to see them to change what the app reads. The template is the opposite
+case: it holds no value anyone filled in, it *is* the list of keys a build
+takes, and it is what goes stale the moment `AppEnv` grows a getter — so it is
+maintained like any other source file in this repo.
+The tool permissions are the wider boundary, and a denied path is a decision
+rather than an obstacle to route around — `git mv`, `git show` and a shell
+heredoc all reach a file the deny rule covers, and reaching for one of them
+because the file tool refused is the same act with an extra step. If a change
+needs something in there, say exactly what is needed and stop. The owner
+makes it.
 
 ## Where the rest of the rules live
 
