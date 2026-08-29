@@ -143,8 +143,8 @@ answers it with a split, ruled off by a hairline:
   badges — state and grade on the first, the marketplaces on the second — all
   in one column beside the photo, sharing one left edge.
 - **Below: what it is worth.** A band across the card's full width — how many
-  are left, then cost and asking price, each a label with its figure under
-  it.
+  are left and what they cost, each a label with its figure under it, then an
+  arrow into the marketplace prices.
 
 The shape is the answer to two failed ones, and both failures are worth
 keeping written down:
@@ -158,15 +158,33 @@ keeping written down:
 Across the foot the labels share one baseline and the figures share the next,
 which is what lets the amounts be compared at a glance.
 
-- **The three cells are spaced apart, not divided into shares** — owner's
-  rule. `MainAxisAlignment.spaceBetween` on cells that measure themselves:
-  quantity holds the card's left edge, the asking price holds its right, and
-  the gaps fall where the content leaves them. Fixed flex shares spent width
-  on a two-character count and then ellipsized a four-figure price, which is
-  the failure this replaces.
-- **The last cell aligns its figure to the card's right edge**, because a
-  space-between row that ends on a left-aligned amount reads as a column that
-  did not reach.
+- **The cells are spaced apart, not divided into shares** — owner's rule.
+  `MainAxisAlignment.spaceBetween` on cells that measure themselves: quantity
+  holds the card's left edge, the arrow holds its right, and the gaps fall
+  where the content leaves them. Fixed flex shares spent width on a
+  two-character count and then ellipsized a four-figure price, which is the
+  failure this replaces.
+- **The asking price is not on the row** — owner's rule. What the item is
+  asked for is a per-marketplace number, so one figure on the card is a price
+  that may be true nowhere; the row points at the screen that lists them all
+  instead of printing the item's own.
+- **The band ends in an arrow into `AppRoutes.crossList`** — owner's rule, and
+  it is what replaced that figure. That screen is where every marketplace's
+  price is, so the row answers "what is it going for?" by opening the place
+  that can answer it per platform rather than by averaging the question away.
+  - **The card does not navigate; it takes `onMarketPrices`**, the way it
+    already takes `onTap` and `onActions`. A widget that pushes its own route
+    cannot be put on a screen that wants a different destination.
+  - **Only an item that can be listed gets one.** The cross-list screen
+    refuses a sold or archived item, so an arrow on that row would be an
+    affordance leading to a refusal. Those rows keep the arrow's space as an
+    empty slot, so Qty and Cost stay in one column down the whole list.
+  - **It goes while a bulk selection is open**, for the same reason the
+    actions button does: every tap ticks a row then, and a push would lose the
+    rows the seller had just picked.
+  - **It is the same 44pt round target the actions button is**
+    (`_CardIconButton`), so the two glyphs on the card's content edge are one
+    control drawn twice rather than two that happen to look alike.
 - **The quantity leads** — owner's rule that the row carry what is left. It
   replaces the old `×3` badge: a figure with a permanent cell is one a seller
   can find without reading the chips.
@@ -182,8 +200,8 @@ which is what lets the amounts be compared at a glance.
 - **`SdDividerV3` between the zones**, not a gap alone: it makes the band
   deliberate rather than a block that happens to start further left than
   everything above it.
-- **Both amounts render `—` when unknown** (hard rule 5), never `0`: an item
-  added through Quick Add has neither, and a zero would tell the seller it was
+- **The cost renders `—` when unknown** (hard rule 5), never `0`: an item
+  added through Quick Add has none, and a zero would tell the seller it was
   free.
 - **Expected profit is not on the row** — owner's rule. `Item.expectedProfit`
   is derived from an asking price nobody has been offered yet and ignores fees
