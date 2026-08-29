@@ -764,6 +764,11 @@ quietly re-invent one.
   five tones can say. The app maps its enum to a hue (`AppColors.tagSeries`)
   and hands it over, which is the same division as everywhere else: the
   package never learns what a domain value means.
+- **A tag reused as read-only card metadata uses its compact display
+  presentation.** It removes selection affordances and uses the component's
+  smaller internal padding while keeping the same label, colour and height as
+  every other display tag. Inventory and Order cards use this presentation;
+  form tags keep the full interactive size.
 - **A tag's colour is never its only signal.** The label is spelled out and
   the chosen one draws a filled radio as well as a filled ground.
 - **Dividers: one thickness, one colour, and between items only**
