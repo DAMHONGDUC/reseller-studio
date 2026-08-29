@@ -4,6 +4,13 @@ Read this when running, building, generating or deploying. **This file is the
 authority on the command set, and the only place it is explained.** The README
 may list the names; it never gets a second explanation.
 
+**Command scripts live in `packages/system_design/tool/`, never in the app
+repo's `tool/`.** Owner's rule. The same setup, analysis, test and release
+pipeline serves every app that consumes the submodule; keeping another copy in
+the app lets fixes land in one pipeline while the other silently stays stale.
+App-specific checks are still scripts in that shared command directory rather
+than a second local script tree.
+
 ## The set
 
 Sixteen commands. Every one is `melos run <name>`, and every body is a file in
