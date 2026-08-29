@@ -111,6 +111,7 @@ class _RefundSheetState extends ConsumerState<RefundSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.refundTitle,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

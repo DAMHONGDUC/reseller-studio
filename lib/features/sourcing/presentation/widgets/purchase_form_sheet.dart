@@ -113,6 +113,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.sourcingNewPurchase,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

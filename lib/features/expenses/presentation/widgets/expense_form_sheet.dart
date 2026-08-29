@@ -152,6 +152,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.expensesNewExpense,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

@@ -847,6 +847,10 @@
   "@commonClear": {
     "description": "Drops a bulk selection."
   },
+  "commonClose": "Close",
+  "@commonClose": {
+    "description": "Tooltip and semantics label on every bottom sheet's close button."
+  },
   "commonNoneYet": "None yet",
   "@commonNoneYet": {
     "description": "Picker placeholder when the list it would show is empty."

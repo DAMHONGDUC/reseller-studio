@@ -62,14 +62,15 @@ Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 ## Release
 
 ```sh
-melos run prepare-env-dev
-cd ios && bundle exec fastlane beta flavor:dev bump:true notes:"dev" && cd ..
+melos run release-dev
 ```
 
 ```sh
-melos run prepare-env-prod
-cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"prod" && cd ..
+melos run release-prod
 ```
+
+Config, Firebase and TestFlight in that order, and it stops at the first
+failure. Add a TestFlight note with `melos run release-prod -- what changed`.
 
 Do not archive from Xcode. The release lane supplies the build-time
 configuration required by Firebase.

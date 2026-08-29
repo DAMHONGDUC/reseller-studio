@@ -161,6 +161,7 @@ class OrderActionsSheet extends ConsumerWidget {
 
     return SdBottomSheetV3(
       title: context.l10n.orderTitle(order.marketplaceName),
+      closeTooltip: context.l10n.commonClose,
       child: AppSheetOptionList(
         itemCount: rows.length,
         itemBuilder: (BuildContext context, int index) => rows[index],

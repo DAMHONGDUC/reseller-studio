@@ -82,8 +82,7 @@ binary without Firebase configuration.
 ## Release command
 
 ```sh
-melos run prepare-env-prod
-cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"release notes"
+melos run release-prod -- release notes
 ```
 
 Detailed pipeline behavior: [`docs/release/PIPELINE.md`](docs/release/PIPELINE.md).

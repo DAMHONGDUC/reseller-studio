@@ -116,6 +116,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.markSoldTitle,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

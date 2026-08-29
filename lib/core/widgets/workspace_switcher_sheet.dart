@@ -122,6 +122,7 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
 
     return SdBottomSheetV3(
       title: context.l10n.workspaceSwitchTitle,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[

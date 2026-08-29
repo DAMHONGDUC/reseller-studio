@@ -68,6 +68,7 @@ class _CounterSheetState extends ConsumerState<_CounterSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.offerCounterTitle(context.money(widget.offer.amount)),
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

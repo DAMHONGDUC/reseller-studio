@@ -62,6 +62,7 @@ class PlanBlockSheet extends ConsumerWidget {
 
     return SdBottomSheetV3(
       title: context.l10n.subscriptionUpgradeToContinue,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -91,4 +91,12 @@ scripts:
     description: Rules, indexes and functions to the prod alias. Confirms first.
     run: sh tool/deploy-firebase.sh prod
 
+  release-dev:
+    description: dev config, dev Firebase, then TestFlight. Confirms first.
+    run: sh tool/release.sh dev
+
+  release-prod:
+    description: prod config, prod Firebase, then TestFlight. Confirms first.
+    run: sh tool/release.sh prod
+
 sdkPath: .fvm/flutter_sdk

@@ -107,6 +107,7 @@ class _RestockSheetState extends ConsumerState<RestockSheet> {
   @override
   Widget build(BuildContext context) => SdBottomSheetV3(
     title: context.l10n.itemActionRestock,
+    closeTooltip: context.l10n.commonClose,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[

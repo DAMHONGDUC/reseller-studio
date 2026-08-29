@@ -47,6 +47,7 @@ class _FlowOverviewSheetState extends State<FlowOverviewSheet> {
   @override
   Widget build(BuildContext context) => SdBottomSheetV3(
     title: context.l10n.flowOverviewTitle,
+    closeTooltip: context.l10n.commonClose,
     heightFactor: FlowOverviewSheet.heightFactor,
     child: ListView(
       padding: EdgeInsets.zero,

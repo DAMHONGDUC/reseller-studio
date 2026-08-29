@@ -38,6 +38,7 @@ class PaywallScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => SdBottomSheetV3(
     title: context.l10n.paywallTitle,
+    closeTooltip: context.l10n.commonClose,
     heightFactor: heightFactor,
     child: Column(
       children: <Widget>[
