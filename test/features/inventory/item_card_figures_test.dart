@@ -75,6 +75,7 @@ void main() {
 
     expect(find.text('Cost'), findsOneWidget);
     expect(find.text(r'$45.00'), findsOneWidget);
+    expect(find.text('Price'), findsNothing);
     // What the item is asked for is a per-marketplace number, and the arrow
     // is what leads to them. Expected profit is the detail screen's.
     expect(find.text('Asking'), findsNothing);
@@ -96,20 +97,12 @@ void main() {
     );
 
     // The divider spans the card's content width, so it is what the band's
-    // two ends have to reach. The arrow overhangs the card's padding by
-    // design, so it is the glyph rather than its target that lines up.
+    // two ends have to reach.
     final Rect band = tester.getRect(find.byType(SdDividerV3));
 
     expect(tester.getRect(find.text('Qty')).left, moreOrLessEquals(band.left));
     expect(
-      tester
-          .getRect(
-            find.descendant(
-              of: find.byTooltip('Prices on each marketplace'),
-              matching: find.byType(SdIconV3),
-            ),
-          )
-          .right,
+      tester.getRect(find.text('Price')).right,
       moreOrLessEquals(band.right, epsilon: 0.5),
     );
   });
@@ -128,7 +121,11 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byTooltip('Prices on each marketplace'));
+    expect(find.text('Price'), findsOneWidget);
+
+    // The label is part of the target, not decoration above an icon-only
+    // button.
+    await tester.tap(find.text('Price'));
 
     expect(taps, 1);
   });
@@ -147,6 +144,7 @@ void main() {
 
     // The cross-list screen refuses a sold item, so the row must not offer a
     // way in — but the space stays, or Qty and Cost move on that row alone.
+    expect(find.text('Price'), findsOneWidget);
     expect(find.byTooltip('Prices on each marketplace'), findsNothing);
   });
 

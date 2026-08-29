@@ -1,6 +1,6 @@
 part of 'item_card.dart';
 
-/// One figure in the money band — its label, and the amount under it.
+/// One cell in the money band — its label, and its content under it.
 ///
 /// **Label above, not beside.** Set side by side, `Cost`, `Asking` and
 /// `Profit` are three different lengths, so every amount started at a
@@ -14,34 +14,39 @@ part of 'item_card.dart';
 class _MoneyCell extends StatelessWidget {
   const _MoneyCell({
     required this.label,
-    required this.value,
-    required this.color,
+    required this.content,
+    this.onTap,
+    this.tooltip,
   });
 
   final String label;
-  final String value;
-  final Color color;
+  final Widget content;
+  final VoidCallback? onTap;
+  final String? tooltip;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: <Widget>[
-      Text(
-        label,
-        style: context.textTheme3.bodySmall!.faint3(context),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      SizedBox(height: SdSpacingConstant.h2),
-      Text(
-        value,
-        style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
-          color: color,
+  Widget build(BuildContext context) {
+    final Widget cell = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          label,
+          style: context.textTheme3.bodySmall!.faint3(context),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    ],
-  );
+        SizedBox(height: SdSpacingConstant.h2),
+        content,
+      ],
+    );
+
+    final VoidCallback? handleTap = onTap;
+    if (handleTap == null) return cell;
+
+    return Tooltip(
+      message: tooltip!,
+      child: InkWell(onTap: handleTap, child: cell),
+    );
+  }
 }

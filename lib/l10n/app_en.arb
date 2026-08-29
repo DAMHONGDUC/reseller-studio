@@ -992,7 +992,11 @@
   },
   "inventoryMarketPrices": "Prices on each marketplace",
   "@inventoryMarketPrices": {
-    "description": "Tooltip and semantics label of the arrow on the Inventory card that opens the cross-list screen."
+    "description": "Tooltip and semantics label of the Price cell on the Inventory card that opens the cross-list screen."
+  },
+  "inventoryPrice": "Price",
+  "@inventoryPrice": {
+    "description": "Label above the marketplace-prices arrow on an Inventory card."
   },
   "inventoryNotListed": "Not listed",
   "@inventoryNotListed": {

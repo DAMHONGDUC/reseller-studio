@@ -45,26 +45,43 @@ class _MoneyLine extends StatelessWidget {
     children: <Widget>[
       _MoneyCell(
         label: context.l10n.itemQuantityShort,
-        value: item.quantityOnHand.toString(),
-        color: context.sdTheme3.textPrimary,
+        content: Text(
+          item.quantityOnHand.toString(),
+          style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
+            color: context.sdTheme3.textPrimary,
+          ),
+        ),
       ),
       _MoneyCell(
         label: context.l10n.itemCost,
-        value: context.money(item.purchasePrice),
-        color: context.sdTheme3.textSecondary,
+        content: Text(
+          context.money(item.purchasePrice),
+          style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
+            color: context.sdTheme3.textSecondary,
+          ),
+        ),
       ),
       if (onMarketPrices == null)
         const SizedBox.shrink()
       // An item that has left inventory cannot be listed, so the screen the
-      // arrow opens would refuse it. The slot stays open rather than closing,
-      // which keeps Qty and Cost in one column down the whole list.
+      // arrow opens would refuse it. The labelled cell stays rather than
+      // closing, which keeps Qty and Cost in one column down the whole list.
       else if (!item.status.isListable)
-        SizedBox.square(dimension: _CardIconButton.slotSize)
+        _MoneyCell(
+          label: context.l10n.inventoryPrice,
+          content: SizedBox.square(dimension: SdIconV3.smallSize),
+        )
       else
-        _CardIconButton(
-          icon: AppIconConstant.chevronRight,
+        _MoneyCell(
+          label: context.l10n.inventoryPrice,
+          content: SdIconV3(
+            AppIconConstant.chevronRight,
+            size: SdIconV3.smallSize,
+            color: context.sdTheme3.textTertiary,
+            semanticLabel: context.l10n.inventoryMarketPrices,
+          ),
           tooltip: context.l10n.inventoryMarketPrices,
-          onPressed: onMarketPrices!,
+          onTap: onMarketPrices!,
         ),
     ],
   );
