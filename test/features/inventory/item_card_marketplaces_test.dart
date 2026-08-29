@@ -21,8 +21,12 @@ void main() {
     askingPrice: const Money(4500, 'USD'),
   );
 
-  Listing listingOn(Marketplace marketplace, int minorUnits) => Listing(
-    id: 'lst-${marketplace.name}',
+  Listing listingOn(
+    Marketplace marketplace,
+    int minorUnits, {
+    String suffix = '',
+  }) => Listing(
+    id: 'lst-${marketplace.name}$suffix',
     itemId: item.id,
     marketplace: marketplace,
     title: item.title,
@@ -31,7 +35,7 @@ void main() {
     createdAt: testNow,
   );
 
-  testWidgets('the card names every marketplace and prices none of them', (
+  testWidgets('the card counts distinct marketplaces and prices none of them', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -41,15 +45,17 @@ void main() {
         now: testNow,
         listings: <Listing>[
           listingOn(Marketplace.ebay, 4500),
+          listingOn(Marketplace.ebay, 4200, suffix: '-duplicate'),
           listingOn(Marketplace.depop, 4000),
           listingOn(Marketplace.poshmark, 5000),
         ],
       ),
     );
 
-    expect(find.widgetWithText(SdBadgeV3, 'eBay'), findsOneWidget);
-    expect(find.widgetWithText(SdBadgeV3, 'Depop'), findsOneWidget);
-    expect(find.widgetWithText(SdBadgeV3, 'Poshmark'), findsOneWidget);
+    expect(find.widgetWithText(SdBadgeV3, '3 markets'), findsOneWidget);
+    expect(find.text('eBay'), findsNothing);
+    expect(find.text('Depop'), findsNothing);
+    expect(find.text('Poshmark'), findsNothing);
     // The item's own asking price stays; a listing's is not on the row any
     // more.
     expect(find.text(r'$45.00'), findsOneWidget);
@@ -57,16 +63,11 @@ void main() {
     expect(find.text(r'$50.00'), findsNothing);
   });
 
-  testWidgets('an item on no marketplace names none', (
+  testWidgets('an item on no marketplace shows no marketplace count', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, ItemCard(item: item, now: testNow));
 
-    for (final Marketplace marketplace in Marketplace.values) {
-      expect(
-        find.widgetWithText(SdBadgeV3, marketplace.displayName),
-        findsNothing,
-      );
-    }
+    expect(find.textContaining('market'), findsNothing);
   });
 }

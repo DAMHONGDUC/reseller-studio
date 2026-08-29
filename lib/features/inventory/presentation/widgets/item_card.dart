@@ -6,7 +6,6 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/widgets/app_photo.dart';
 import '../../../listings/domain/entities/listing.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../item_label.dart';
@@ -49,7 +48,7 @@ class ItemCard extends StatelessWidget {
 
   final Item item;
 
-  /// This item's live listings, for the marketplace badges.
+  /// This item's live listings, for the distinct marketplace count.
   ///
   /// **Passed in, not watched per card.** The list groups one `listingsProvider`
   /// read by item id; a family watch on every row would be one subscription

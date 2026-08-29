@@ -12,7 +12,7 @@ import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.d
 import '../../support/pump_app.dart';
 
 void main() {
-  testWidgets('Inventory card lists every marketplace without listing prices', (
+  testWidgets('Inventory card counts marketplaces without names or prices', (
     WidgetTester tester,
   ) async {
     final Item item = Item(
@@ -50,8 +50,9 @@ void main() {
       ItemCard(item: item, now: testNow, listings: listings),
     );
 
-    expect(find.text('eBay'), findsOneWidget);
-    expect(find.text('Etsy'), findsOneWidget);
+    expect(find.text('2 markets'), findsOneWidget);
+    expect(find.text('eBay'), findsNothing);
+    expect(find.text('Etsy'), findsNothing);
     expect(find.textContaining('45.12'), findsNothing);
     expect(find.textContaining('40.99'), findsNothing);
   });

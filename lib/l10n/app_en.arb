@@ -968,6 +968,15 @@
       }
     }
   },
+  "inventoryMarketCount": "{count, plural, =1{1 market} other{{count} markets}}",
+  "@inventoryMarketCount": {
+    "description": "Compact Inventory card badge showing the number of distinct marketplaces carrying the item.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "itemMinimumPrice": "Minimum price",
   "@itemMinimumPrice": {
     "description": "The floor for offers and bulk repricing."
