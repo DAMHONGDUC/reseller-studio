@@ -46,9 +46,17 @@ class ListingsScreen extends ConsumerStatefulWidget {
 }
 
 class _ListingsScreenState extends ConsumerState<ListingsScreen> {
+  late final ListingSelectionController _selectionController;
+
   /// Null is the "All" tab. A nullable selection rather than a sixth enum
   /// case, so the filter is the status itself and nothing has to translate.
   ListingStatus? _filter;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectionController = ref.read(listingSelectionProvider.notifier);
+  }
 
   /// Leaving the screen must not leave rows ticked behind it: the selection
   /// lives in a provider, which outlives this `State`.
@@ -56,9 +64,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
   void dispose() {
     // Scheduled rather than called: disposing a widget mid-frame cannot write
     // to a provider that other widgets are still building against.
-    Future<void>.microtask(
-      () => ref.read(listingSelectionProvider.notifier).clear(),
-    );
+    Future<void>.microtask(_selectionController.clear);
     super.dispose();
   }
 

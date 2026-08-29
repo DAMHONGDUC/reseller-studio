@@ -130,6 +130,35 @@ final class MoreConstant {
       ],
     ),
     MoreSection(
+      kind: MoreSectionKind.business,
+      destinations: <MoreDestination>[
+        MoreDestination(
+          kind: MoreDestinationKind.marketplaces,
+          icon: AppIconConstant.hub,
+          route: AppRoutes.marketplaces,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.carriers,
+          icon: AppIconConstant.localShipping,
+          route: AppRoutes.carriers,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.team,
+          icon: AppIconConstant.group,
+          route: AppRoutes.team,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.activity,
+          icon: AppIconConstant.history,
+          route: AppRoutes.activity,
+          isBuilt: true,
+        ),
+      ],
+    ),
+    MoreSection(
       kind: MoreSectionKind.finance,
       destinations: <MoreDestination>[
         MoreDestination(
@@ -164,35 +193,7 @@ final class MoreConstant {
         ),
       ],
     ),
-    MoreSection(
-      kind: MoreSectionKind.business,
-      destinations: <MoreDestination>[
-        MoreDestination(
-          kind: MoreDestinationKind.marketplaces,
-          icon: AppIconConstant.hub,
-          route: AppRoutes.marketplaces,
-          isBuilt: true,
-        ),
-        MoreDestination(
-          kind: MoreDestinationKind.carriers,
-          icon: AppIconConstant.localShipping,
-          route: AppRoutes.carriers,
-          isBuilt: true,
-        ),
-        MoreDestination(
-          kind: MoreDestinationKind.team,
-          icon: AppIconConstant.group,
-          route: AppRoutes.team,
-          isBuilt: true,
-        ),
-        MoreDestination(
-          kind: MoreDestinationKind.activity,
-          icon: AppIconConstant.history,
-          route: AppRoutes.activity,
-          isBuilt: true,
-        ),
-      ],
-    ),
+
     MoreSection(
       kind: MoreSectionKind.account,
       destinations: <MoreDestination>[
