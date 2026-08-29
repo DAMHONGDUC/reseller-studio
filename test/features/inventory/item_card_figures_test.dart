@@ -98,13 +98,10 @@ void main() {
     expect(find.text('—'), findsNWidgets(3));
   });
 
-  testWidgets('the row carries how long the item has been in its state', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('the row does not show state age', (WidgetTester tester) async {
     await pumpScreen(tester, ItemCard(item: itemWith(), now: testNow));
 
-    // Live 21 days ago, so the separate metadata badge reads in weeks.
-    expect(find.widgetWithText(SdBadgeV3, '3w'), findsOneWidget);
-    expect(find.widgetWithText(SdBadgeV3, 'In stock'), findsOneWidget);
+    expect(find.text('3w'), findsNothing);
+    expect(find.widgetWithText(SdTagV3, 'In stock'), findsOneWidget);
   });
 }

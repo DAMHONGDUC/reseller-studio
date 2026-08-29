@@ -10,7 +10,7 @@ import '../../support/pump_app.dart';
 /// **One value, one colour, wherever it is drawn** — owner's rule.
 ///
 /// The colour lives on the enum as an extension, so the tag on the item form
-/// and the badge on the card cannot come out as two shades of nearly the same
+/// and the read-only tag on the card cannot come out as two shades of nearly the same
 /// thing.
 void main() {
   Item itemWith(ItemStatus status, ItemCondition condition) => Item(
@@ -22,7 +22,7 @@ void main() {
     condition: condition,
   );
 
-  testWidgets('the card paints each badge the colour its enum gives', (
+  testWidgets('the card paints each tag the colour its enum gives', (
     WidgetTester tester,
   ) async {
     late Color statusColor;
@@ -44,15 +44,11 @@ void main() {
     );
 
     expect(
-      tester
-          .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'Archived'))
-          .color,
+      tester.widget<SdTagV3>(find.widgetWithText(SdTagV3, 'Archived')).color,
       statusColor,
     );
     expect(
-      tester
-          .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'For parts'))
-          .color,
+      tester.widget<SdTagV3>(find.widgetWithText(SdTagV3, 'For parts')).color,
       conditionColor,
     );
   });

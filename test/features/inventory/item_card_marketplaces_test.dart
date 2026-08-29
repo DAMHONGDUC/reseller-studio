@@ -16,9 +16,10 @@ void main() {
     title: 'Vintage jacket',
     quantity: 1,
     status: ItemStatus.inStock,
-    createdAt: testNow,
-    listedAt: testNow,
+    createdAt: testNow.subtract(const Duration(days: 100)),
+    listedAt: testNow.subtract(const Duration(days: 100)),
     askingPrice: const Money(4500, 'USD'),
+    condition: ItemCondition.good,
   );
 
   Listing listingOn(
@@ -52,14 +53,22 @@ void main() {
       ),
     );
 
-    expect(find.widgetWithText(SdBadgeV3, '3 markets'), findsOneWidget);
-    final double ageY = tester
-        .getTopLeft(find.widgetWithText(SdBadgeV3, '<1d'))
-        .dy;
-    final double marketY = tester
-        .getTopLeft(find.widgetWithText(SdBadgeV3, '3 markets'))
-        .dy;
-    expect(ageY, lessThan(marketY));
+    final Finder statusTag = find.widgetWithText(SdTagV3, 'In stock');
+    final Finder marketTag = find.widgetWithText(SdTagV3, '3 markets');
+    final Finder allTags = find.byType(SdTagV3);
+
+    expect(marketTag, findsOneWidget);
+    expect(allTags, findsNWidgets(4));
+    expect(
+      List<double>.generate(
+        4,
+        (int index) => tester.getSize(allTags.at(index)).height,
+      ).toSet(),
+      hasLength(1),
+    );
+    expect(tester.getSize(statusTag).height, tester.getSize(marketTag).height);
+    expect(find.byType(SdBadgeV3), findsNothing);
+    expect(find.text('<1d'), findsNothing);
     expect(find.text('eBay'), findsNothing);
     expect(find.text('Depop'), findsNothing);
     expect(find.text('Poshmark'), findsNothing);

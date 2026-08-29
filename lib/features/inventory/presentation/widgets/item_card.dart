@@ -10,7 +10,6 @@ import '../../../listings/domain/entities/listing.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
-import '../../item_label.dart';
 
 part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
@@ -22,8 +21,8 @@ part 'item_card_thumbnail.dart';
 /// One row of Inventory.
 ///
 /// **Two zones.** Beside the photo, what the item *is*: its title and the
-/// badges naming its state and grade, then its age above the marketplace
-/// count. Below, running to the
+/// equal-height tags naming its state, grade and marketplace count. Below,
+/// running to the
 /// card's own left edge, what it is *worth*: what it cost, what it is being
 /// asked for, and the marketplaces it is live on — then when the record last
 /// changed. Everything else is on the detail screen.
@@ -134,7 +133,6 @@ class ItemCard extends StatelessWidget {
                     ),
                     SizedBox(height: SdSpacingConstant.h6),
                     _StateBadges(item: item, now: now),
-                    _StateAge(item: item, now: now),
                     _Marketplaces(listings: listings),
                   ],
                 ),
