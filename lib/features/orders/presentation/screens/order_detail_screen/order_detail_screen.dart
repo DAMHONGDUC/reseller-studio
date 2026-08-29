@@ -12,6 +12,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/utils/link_utils.dart';
+import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../expenses/domain/entities/expense.dart';
@@ -67,15 +68,9 @@ class OrderDetailScreen extends ConsumerWidget {
         subtitle: value?.externalOrderId,
         actions: <Widget>[
           if (value != null)
-            Padding(
-              padding: EdgeInsets.only(right: SdSpacingConstant.w8),
-              child: SdButtonV3(
-                variant: SdButtonVariantV3.secondary,
-                size: SdButtonSizeV3.small,
-                label: context.l10n.commonActions,
-                icon: AppIconConstant.tune,
-                onPressed: () => OrderActionsSheet.show(context, value),
-              ),
+            AppDetailActionButton(
+              label: context.l10n.commonActions,
+              onPressed: () => OrderActionsSheet.show(context, value),
             ),
         ],
       ),

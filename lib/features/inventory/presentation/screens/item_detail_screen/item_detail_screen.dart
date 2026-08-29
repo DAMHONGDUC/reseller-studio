@@ -5,6 +5,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_photo.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
@@ -48,15 +49,9 @@ class ItemDetailScreen extends ConsumerWidget {
         subtitle: value?.sku,
         actions: <Widget>[
           if (value != null)
-            Padding(
-              padding: EdgeInsets.only(right: SdSpacingConstant.w8),
-              child: SdButtonV3(
-                variant: SdButtonVariantV3.secondary,
-                size: SdButtonSizeV3.small,
-                label: context.l10n.commonActions,
-                icon: AppIconConstant.tune,
-                onPressed: () => ItemActionsSheet.show(context, value),
-              ),
+            AppDetailActionButton(
+              label: context.l10n.commonActions,
+              onPressed: () => ItemActionsSheet.show(context, value),
             ),
         ],
       ),
