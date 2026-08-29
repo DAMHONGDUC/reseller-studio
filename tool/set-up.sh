@@ -66,9 +66,12 @@ step "env files"
 # see `melos run prepare-env-dev`.
 CREATED=""
 
+# One template serves both flavours: the two files only ever differed by the
+# values a developer fills in, and a second checked-in copy is a key list that
+# goes stale in one place and not the other.
 for FLAVOUR in dev prod; do
   if [ ! -f "env/$FLAVOUR.json" ]; then
-    cp "env/$FLAVOUR.example.json" "env/$FLAVOUR.json"
+    cp "env/env.example.json" "env/$FLAVOUR.json"
     CREATED="$CREATED env/$FLAVOUR.json"
   fi
 done

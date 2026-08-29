@@ -9,40 +9,18 @@ import 'package:reseller_studio/core/config/dev_flags.dart';
 /// between "what the file asked for" and "what the build allows" has to hold.
 /// Both are the kind of thing that breaks silently.
 void main() {
-  Map<String, dynamic> readEnv(String name) =>
-      jsonDecode(File('env/$name.example.json').readAsStringSync())
+  Map<String, dynamic> readTemplate() =>
+      jsonDecode(File('env/env.example.json').readAsStringSync())
           as Map<String, dynamic>;
 
-  group('env templates', () {
-    test('dev and prod declare exactly the same keys', () {
-      final Set<String> dev = readEnv('dev').keys.toSet();
-      final Set<String> prod = readEnv('prod').keys.toSet();
-
-      // A key in one flavour and not the other is a build that works on a
-      // developer's machine and fails in CI, which is the worst place to
-      // find out.
-      expect(
-        dev.difference(prod),
-        isEmpty,
-        reason: 'keys in dev.example.json missing from prod.example.json',
-      );
-      expect(
-        prod.difference(dev),
-        isEmpty,
-        reason: 'keys in prod.example.json missing from dev.example.json',
-      );
-    });
-
-    test('prod never ships the development switches on', () {
-      final Map<String, dynamic> prod = readEnv('prod');
-
-      expect(prod['MOCK_DATA_DEFAULT'], isFalse);
-      expect(prod['VERBOSE_LOGGING'], isFalse);
-      expect(prod['FLAVOR'], 'prod');
-    });
-
-    test('the templates carry exactly the keys AppEnv reads', () {
-      // The list every reader of these files trusts, pinned. A key nothing
+  group('env template', () {
+    // **One template, not one per flavour.** `dev.example.json` and
+    // `prod.example.json` only ever differed by values a developer fills in,
+    // so the key list lived twice and went stale in one copy — which is
+    // exactly what happened to REVENUECAT_*. `set-up.sh` seeds both flavours
+    // from this file.
+    test('the template carries exactly the keys AppEnv reads', () {
+      // The list every reader of this file trusts, pinned. A key nothing
       // reads is a placeholder somebody will spend an afternoon filling in;
       // a key AppEnv reads and the template omits is a value that silently
       // defaults to '' — which is how REVENUECAT_* went missing. Dart cannot
@@ -68,23 +46,31 @@ void main() {
         'DEFAULT_COUNTRY',
       };
 
-      expect(readEnv('dev').keys.toSet(), read);
+      expect(readTemplate().keys.toSet(), read);
+    });
+
+    test('the development switches are declared, whatever they are set to', () {
+      // Their *values* are not asserted any more: one template seeds both
+      // flavours, so there is no checked-in prod file to hold to `false`.
+      // What stops a switch reaching a store build is `DevFlags` ANDing each
+      // one with `!kReleaseMode` — pinned by the `DevFlags guards AppEnv`
+      // group below, which is the guarantee that actually ships.
+      expect(readTemplate().containsKey('MOCK_DATA_DEFAULT'), isTrue);
+      expect(readTemplate().containsKey('VERBOSE_LOGGING'), isTrue);
     });
 
     test('no template carries anything that looks like a secret', () {
-      // Everything in these files is compiled into the binary and is
-      // trivially extractable, so a key named *SECRET* or *PRIVATE* is a
-      // mistake by definition — hard rule 10. Client *ids* are fine.
-      for (final String flavour in <String>['dev', 'prod']) {
-        for (final String key in readEnv(flavour).keys) {
-          expect(
-            key.toUpperCase(),
-            isNot(anyOf(contains('SECRET'), contains('PRIVATE'))),
-            reason:
-                '$flavour.example.json declares $key — secrets belong in '
-                'Secret Manager, read only by a Cloud Function.',
-          );
-        }
+      // Everything in this file is compiled into the binary and is trivially
+      // extractable, so a key named *SECRET* or *PRIVATE* is a mistake by
+      // definition — hard rule 10. Client *ids* are fine.
+      for (final String key in readTemplate().keys) {
+        expect(
+          key.toUpperCase(),
+          isNot(anyOf(contains('SECRET'), contains('PRIVATE'))),
+          reason:
+              'env.example.json declares $key — secrets belong in Secret '
+              'Manager, read only by a Cloud Function.',
+        );
       }
     });
   });
