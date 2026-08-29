@@ -62,6 +62,12 @@ any action that can be blocked by an entitlement.
   Compactness comes from the content — short two-column lines rather than a
   single column of nine rows, because the seller is scanning what they get,
   not reading it — never from the sheet's own height.
+- **The purchase block holds the bottom of the sheet.** Owner's rule. What
+  Premium includes stays at the top under the title, while the option cards,
+  the button and the fine print sit against the footer — so on a sheet fixed
+  at nine tenths of the screen the slack falls between the two halves instead
+  of under the last line. The thumb rests at the bottom of the phone, and that
+  is where the thing it taps belongs.
 - **What Premium includes sits in its own frame.** Owner's rule. The
   two-column checklist is an `SdCardV3` well under the tagline; ticks floating
   on the sheet's own surface had no edge, so they read as loose text between
