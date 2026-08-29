@@ -243,6 +243,11 @@ Owner's rules, all of them read from one place so no screen types them:
   canvas. **The title stays `titleMedium`**: a screen title is a
   label, not a headline, and the screen's own content is what should be
   loud.
+- **A labelled action in a detail screen's app bar uses the medium button
+  proportions.** Owner's rule. The small button keeps `labelLarge` text while
+  scaling down its glyph and gap, so the word outweighs the icon and the pair
+  reads as two unrelated sizes. `AppDetailActionButton` is the shared app-side
+  wrapper; detail screens do not rebuild its padding or button size.
 - **A screen whose search box is the point uses `SdSearchHeaderV3`, not an
   app bar with a field under it.** The field docks into the title's row as
   the list scrolls and the filter strip pins under it, so scrolled chrome
