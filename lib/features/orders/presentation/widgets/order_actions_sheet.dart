@@ -143,7 +143,7 @@ class OrderActionsSheet extends ConsumerWidget {
       if (order.status.countsAsRevenue || order.status == OrderStatus.returned)
         AppSheetActionRow(
           icon: AppIconConstant.currencyExchange,
-          label: context.l10n.refundAction,
+          label: context.l10n.orderRefundBuyer,
           onTap: () {
             Navigator.of(context).pop();
             RefundSheet.show(context, order);

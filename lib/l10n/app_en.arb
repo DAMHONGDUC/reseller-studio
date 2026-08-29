@@ -1771,19 +1771,19 @@
   "@orderMarkedDelivered": {
     "description": "Confirmation."
   },
-  "orderOpenReturn": "Open a return",
+  "orderOpenReturn": "Open a return from the buyer",
   "@orderOpenReturn": {
-    "description": "Starts the return flow."
+    "description": "Starts the return flow. Names the direction: the item is coming back to the seller."
   },
   "orderReturnOpened": "Return opened",
   "@orderReturnOpened": {
     "description": "Confirmation."
   },
-  "orderItemCameBack": "It came back",
+  "orderItemCameBack": "Item is back with you",
   "@orderItemCameBack": {
-    "description": "Closes a return: the item is physically back."
+    "description": "Closes a return: the item is physically back with the seller."
   },
-  "orderReturnDialogTitle": "The item came back",
+  "orderReturnDialogTitle": "The item is back with you",
   "@orderReturnDialogTitle": {
     "description": "Dialog title when closing a return."
   },
@@ -2999,7 +2999,11 @@
   },
   "refundAction": "Refund",
   "@refundAction": {
-    "description": "Button that opens the refund sheet, and its confirm."
+    "description": "Confirm inside the refund sheet, under a title that already says who is refunded."
+  },
+  "orderRefundBuyer": "Refund the buyer",
+  "@orderRefundBuyer": {
+    "description": "Row in the order actions sheet that opens the refund sheet. Names the direction: money goes out to the buyer."
   },
   "refundRecorded": "Refund recorded",
   "@refundRecorded": {

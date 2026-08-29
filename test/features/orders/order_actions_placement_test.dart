@@ -44,7 +44,7 @@ void main() {
 
     expect(find.byType(OrderActionsSheet), findsOneWidget);
     expect(find.text('Record fees and payout'), findsOneWidget);
-    expect(find.text('Open a return'), findsOneWidget);
+    expect(find.text('Open a return from the buyer'), findsOneWidget);
   });
 
   testWidgets('the sheet lists the move that is pinned as well', (
