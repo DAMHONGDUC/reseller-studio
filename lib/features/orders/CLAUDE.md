@@ -88,6 +88,15 @@ the detail screen.
   things.
 - `test/features/orders/order_actions_placement_test.dart` pins all of it.
 
+## The order row's tags are the compact display badge
+
+Owner's rule, given for Inventory and applied here in the same turn: status,
+marketplace and Late are read-only metadata sitting beside a title and a
+price, so they are `SdBadgeV3` at `SdBadgeSizeV3.compact` — the same
+presentation `ItemCard` uses. Two cards a seller scans one after the other
+must not tag the same kind of fact at two sizes.
+`docs/rules/DESIGN_SYSTEM.md` carries the rule itself.
+
 ## Order transitions are domain rules, never button rules
 
 - **Only `toShip` may become `shipped`.** An unpaid order cannot leave, and a

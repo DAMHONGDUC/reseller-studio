@@ -764,11 +764,14 @@ quietly re-invent one.
   five tones can say. The app maps its enum to a hue (`AppColors.tagSeries`)
   and hands it over, which is the same division as everywhere else: the
   package never learns what a domain value means.
-- **A tag reused as read-only card metadata uses its compact display
-  presentation.** It removes selection affordances and uses the component's
-  smaller internal padding while keeping the same label, colour and height as
-  every other display tag. Inventory and Order cards use this presentation;
-  form tags keep the full interactive size.
+- **Read-only card metadata is `SdBadgeV3` at `SdBadgeSizeV3.compact`** —
+  owner's rule, and it settles which component a card tag is. The tag is the
+  interactive picker and carries a picker's padding and border; a list row
+  reports facts, so it draws the badge, and `compact` scales the inset, the
+  glyph and the gap together — the same shape smaller, never differently
+  proportioned. The label keeps its size, because the word is the signal.
+  Inventory and Order cards use this presentation; form tags keep the full
+  interactive `SdTagV3`.
 - **A tag's colour is never its only signal.** The label is spelled out and
   the chosen one draws a filled radio as well as a filled ground.
 - **Dividers: one thickness, one colour, and between items only**

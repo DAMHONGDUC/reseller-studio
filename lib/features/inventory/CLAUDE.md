@@ -139,12 +139,12 @@ Owner's rule — the row must be **good-looking, sensible and complete**, in
 that order of argument and none of them at the cost of the others. `ItemCard`
 answers it with a split, ruled off by a hairline:
 
-- **Above: what the item is.** Photo, title, then equal-height `SdTagV3`
-  components naming its state, stale state, condition and marketplace count —
-  all in one column beside the photo, sharing one left edge.
+- **Above: what the item is.** Photo, title, then compact display badges
+  naming its state, stale state, condition and where it stands on the
+  marketplaces — all in one column beside the photo, sharing one left edge.
 - **Below: what it is worth.** A band across the card's full width — how many
-  are left, then cost, asking price and expected profit, each a label with its
-  figure under it.
+  are left, then cost and asking price, each a label with its figure under
+  it.
 
 The shape is the answer to two failed ones, and both failures are worth
 keeping written down:
@@ -175,14 +175,14 @@ which is what lets the amounts be compared at a glance.
 - **`SdDividerV3` between the zones**, not a gap alone: it makes the band
   deliberate rather than a block that happens to start further left than
   everything above it.
-- **The three amounts render `—` when unknown** (hard rule 5), never `0`: an
-  item added through Quick Add has none of them, and a zero would tell the
-  seller it was free. The dash is `textTertiary` even in the profit cell — an em dash is not
-  a figure, so it is not tinted as good news or bad.
-- **The profit is derived, never stored** (hard rule 3), and it is deliberately
-  rough: `Item.expectedProfit` ignores fees and shipping, because which
-  marketplace takes them is not known until the item sells. `ProfitBreakdown`
-  is the real number, on a completed order.
+- **Both amounts render `—` when unknown** (hard rule 5), never `0`: an item
+  added through Quick Add has neither, and a zero would tell the seller it was
+  free.
+- **Expected profit is not on the row** — owner's rule. `Item.expectedProfit`
+  is derived from an asking price nobody has been offered yet and ignores fees
+  and shipping, so on a list it took a cell the width of a real figure to say
+  something rougher than either number beside it. The detail screen still
+  shows it, and `ProfitBreakdown` on a completed order is the real one.
 
 ## The row carries the grade, and the date it last changed
 
@@ -219,23 +219,32 @@ is live on** — no names and no amounts.
 - **One compact count replaces the wrapped badge list.** The list made a card
   grow with every marketplace and slowed scanning; the detail screen keeps the
   full names for the seller who needs them.
-- **The count sits below the other tags, above the money band.** Where an item
-  is live is a fact about the item, not a money figure.
-- **Every chip-like element on the card is `SdTagV3` and the component owns
-  their shared height.** Status, Stale, condition and marketplace count do not
-  mix tag and badge primitives. They are read-only on the card, so their tap
-  handling is disabled while their labels and colours stay visible.
-- **A card tag has no radio or selection indicator.** The card reports facts;
-  it does not offer choices, so the control affordance would promise a tap
-  that intentionally does nothing. `SdTagV3` keeps its indicator on selection
-  forms and hides it only for this display-only use.
+- **The count flows in the same `Wrap` as the other tags** — owner's rule that
+  the row be compact. It replaces a line of its own under them: where an item
+  is live is a fact about the item like its grade, and a second line bought
+  nothing but height.
+- **An item on no marketplace says so, in red** — owner's rule. Nothing at all
+  read as "no platforms worth naming" when the truth was stock earning
+  nothing, which is the one thing on this row a seller can fix today. Only an
+  item that *could* be listed gets it: a sold or archived item is not late, it
+  is finished, and it shows no marketplace tag at all.
+- **Every chip-like element on the card is `SdBadgeV3` at
+  `SdBadgeSizeV3.compact`, never `SdTagV3`** — owner's rule that the card's
+  tags be smaller, and it replaces the read-only-tag wrapper the row used to
+  carry. The tag is the item form's picker and wears a picker's padding and
+  border; the card reports, so it draws the design system's marker for
+  reporting at the size a list row can afford. The colour still comes from the
+  enum through `SdBadgeV3.color`, so one value is one hue on the card and on
+  the form.
 - **The marketplace-count tag is neutral grey.** Distribution count is
-  metadata, not an info state competing with status, Stale or condition.
+  metadata, not an info state competing with status, Stale or condition. The
+  unlisted tag is the exception and is `danger`, because it is the one that
+  asks for an action.
 - **The count is deduped by marketplace**, so two listing records on one
   platform still read as one market.
-- `test/features/inventory/item_card_marketplaces_test.dart` holds both
-  halves: the distinct count is on the row, and no marketplace name or listing
-  price is.
+- `test/features/inventory/item_card_marketplaces_test.dart` holds all three:
+  the distinct count is on the row, no marketplace name or listing price is,
+  and an unlisted item on the shelf shows the red tag.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
 
