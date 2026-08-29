@@ -171,7 +171,7 @@
   "itemExpectedProfit": "Lợi nhuận dự kiến",
   "itemCostHelp": "Số tiền bạn đã trả. Để trống nếu chưa biết.",
   "itemTitleFallback": "Món hàng",
-  "itemActions": "Thao tác",
+  "commonActions": "Thao tác",
   "itemLoadFailed": "Không tải được món này",
   "itemNotFound": "Không tìm thấy món này",
   "itemPricing": "Giá cả",

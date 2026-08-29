@@ -189,7 +189,7 @@ class _ActionsButton extends StatelessWidget {
   Widget build(BuildContext context) => Transform.translate(
     offset: Offset(_edgeNudge, 0),
     child: Tooltip(
-      message: context.l10n.itemActions,
+      message: context.l10n.commonActions,
       child: InkResponse(
         onTap: onPressed,
         radius: SdSpacingConstant.r22,

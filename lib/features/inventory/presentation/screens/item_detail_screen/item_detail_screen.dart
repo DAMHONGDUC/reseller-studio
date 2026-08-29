@@ -53,7 +53,7 @@ class ItemDetailScreen extends ConsumerWidget {
               child: SdButtonV3(
                 variant: SdButtonVariantV3.secondary,
                 size: SdButtonSizeV3.small,
-                label: context.l10n.itemActions,
+                label: context.l10n.commonActions,
                 icon: AppIconConstant.tune,
                 onPressed: () => ItemActionsSheet.show(context, value),
               ),

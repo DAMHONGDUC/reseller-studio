@@ -36,8 +36,6 @@ class _OrderBody extends ConsumerWidget {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSectionTitle(title: context.l10n.orderTimeline),
         _Timeline(order: order),
-        SizedBox(height: SdContentPaddingV3.sectionGap),
-        _OrderActions(order: order),
         SizedBox(height: SdContentPaddingV3.bottomGap),
       ],
     );

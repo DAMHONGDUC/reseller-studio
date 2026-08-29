@@ -1014,9 +1014,9 @@
   "@itemTitleFallback": {
     "description": "App bar title while the item is still loading."
   },
-  "itemActions": "Actions",
-  "@itemActions": {
-    "description": "Tooltip on the button that opens the item action sheet."
+  "commonActions": "Actions",
+  "@commonActions": {
+    "description": "Opens the sheet of verbs for the record on screen — an item, an order. One key because it is one word doing one job in two features."
   },
   "itemLoadFailed": "Could not load this item",
   "@itemLoadFailed": {
