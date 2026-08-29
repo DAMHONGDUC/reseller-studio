@@ -19,7 +19,7 @@ void main() {
       id: 'item',
       title: 'Cross-listed item',
       quantity: 1,
-      status: ItemStatus.listed,
+      status: ItemStatus.inStock,
       createdAt: testNow,
       askingPrice: const Money(10000, 'USD'),
       listedAt: testNow,

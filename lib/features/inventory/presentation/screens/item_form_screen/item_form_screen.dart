@@ -23,6 +23,8 @@ import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_category.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../domain/enums/item_status.dart';
+import '../../../domain/services/item_transition.dart';
+import '../../../item_block_presenter.dart';
 import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../controllers/item_form_controller.dart';
@@ -109,8 +111,20 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
   Future<void> _submit() async {
     final NavigatorState navigator = Navigator.of(context);
 
+    final int? quantity = int.tryParse(_quantity.text.trim());
+
     if (_title.text.trim().isEmpty) {
       SdSnackBarUtilsV3.error(context, context.l10n.quickAddEmptyTitleError);
+
+      return;
+    }
+
+    // **Quantity is required on this form** — owner's rule. Quick Add is the
+    // one-field path and still asks for a title alone (hard rule 2); a seller
+    // who opened the full form is entering stock, and how many there are is
+    // the figure every count on the card and in Analytics is built from.
+    if (quantity == null || quantity < 0) {
+      SdSnackBarUtilsV3.error(context, context.l10n.itemQuantityRequired);
 
       return;
     }
@@ -190,8 +204,14 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                     SdTextFieldV3(
                       label: context.l10n.commonQuantity,
                       controller: _quantity,
+                      isRequired: true,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.next,
+                    ),
+                    _StatusField(
+                      state: state,
+                      quantity: _quantity,
+                      askingPrice: _asking,
                     ),
                     _ConditionField(state: state),
                     _CategoryField(state: state),

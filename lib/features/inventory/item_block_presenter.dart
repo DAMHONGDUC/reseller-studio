@@ -16,6 +16,8 @@ final class ItemBlockPresenter {
           context.l10n.itemBlockMissingSalePrice,
         ItemTransitionBlock.wrongStatus => context.l10n.itemBlockWrongStatus,
         ItemTransitionBlock.noQuantity => context.l10n.itemBlockNoQuantity,
+        ItemTransitionBlock.needsSaleRecord =>
+          context.l10n.itemBlockNeedsSaleRecord,
       };
 
   /// Every reason at once, one per line.

@@ -138,9 +138,11 @@ class ItemActionsController extends Notifier<bool> {
           ),
       ]);
 
+      // Going live stamps the staleness clock and makes a draft stock; it is
+      // not a status of its own any more.
       await items.save(
         isNew && item.status.isListable
-            ? ItemTransition.apply(priced, ItemStatus.listed, now: now)
+            ? ItemTransition.markListed(priced, now: now)
             : priced,
       );
 
@@ -215,6 +217,28 @@ class ItemActionsController extends Notifier<bool> {
     const <String, Object>{},
     // A recorded instant, not a derived one, so it is the wall clock rather
     // than `clockProvider`.
+    (Item item) =>
+        ItemTransition.apply(item, ItemStatus.inStock, now: DateTime.now()),
+  );
+
+  /// [count] more of each on the shelf, and back in stock with them.
+  ///
+  /// **One `_bulk`, so forty restocked rows are one write** (hard rule 16),
+  /// and every one goes through `ItemTransition.restock` — the count and the
+  /// status move together or not at all.
+  Future<void> restock(List<Item> items, int count) => _bulk(
+    'Restock items',
+    items,
+    <String, Object>{'count': count},
+    // A recorded instant, not a derived one, so it is the wall clock.
+    (Item item) => ItemTransition.restock(item, count, now: DateTime.now()),
+  );
+
+  /// Onto the shelf: what turns a draft into stock the seller is selling.
+  Future<void> makeInStock(List<Item> items) => _bulk(
+    'Make items in stock',
+    items,
+    const <String, Object>{},
     (Item item) =>
         ItemTransition.apply(item, ItemStatus.inStock, now: DateTime.now()),
   );

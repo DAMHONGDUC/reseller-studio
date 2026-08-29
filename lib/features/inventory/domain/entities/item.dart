@@ -112,12 +112,15 @@ class Item {
   /// When the item entered the state it is in now — what "how long has this
   /// sat?" is measured from.
   ///
-  /// Sold reads from [soldAt], listed from [listedAt], everything else from
-  /// [createdAt]. One timestamp per state, so a row can show an age without
-  /// each screen picking its own field and disagreeing about what it means.
+  /// Sold reads from [soldAt], stock from [listedAt] when it has one,
+  /// everything else from [createdAt]. One timestamp per state, so a row can
+  /// show an age without each screen picking its own field and disagreeing
+  /// about what it means.
   DateTime get stateSince => switch (status) {
     ItemStatus.sold => soldAt ?? createdAt,
-    ItemStatus.listed => listedAt ?? createdAt,
+    // On the shelf and live somewhere: how long it has been sitting is
+    // measured from the day it went up, not the day it was entered.
+    ItemStatus.inStock => listedAt ?? createdAt,
     _ => createdAt,
   };
 

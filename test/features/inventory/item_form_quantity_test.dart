@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/domain/services/item_transition.dart';
 import 'package:reseller_studio/features/inventory/presentation/controllers/item_form_controller.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
 
@@ -45,6 +46,71 @@ void main() {
     // The sale is undone with it: a row on the shelf carrying a sold date is
     // one every export reads as sold.
     expect(restocked.soldAt, isNull);
+  });
+
+  test('the seller can put a draft on the shelf from the form', () async {
+    final ProviderContainer container = mockContainer();
+
+    await warmUp(container);
+
+    final Item draft = await saved(container, 'itm-10');
+    final ItemFormController form = container.read(
+      itemFormControllerProvider.notifier,
+    );
+
+    expect(draft.status, ItemStatus.draft, reason: 'the fixture starts draft');
+
+    form.seed(draft);
+
+    expect(form.checkStatus(ItemStatus.inStock, quantity: '1').isAllowed, true);
+
+    form.selectStatus(ItemStatus.inStock);
+    await form.submit(title: draft.title, quantity: '1');
+
+    expect((await saved(container, 'itm-10')).status, ItemStatus.inStock);
+  });
+
+  test('an empty shelf cannot be moved anywhere', () async {
+    final ProviderContainer container = mockContainer();
+
+    await warmUp(container);
+
+    final Item sold = await saved(container, 'itm-1');
+    final ItemFormController form = container.read(
+      itemFormControllerProvider.notifier,
+    );
+
+    form.seed(sold);
+
+    // Nothing to move: the same requirement the actions sheet enforces, and
+    // the reason Restock exists — it puts stock behind the row first.
+    expect(
+      form.checkStatus(ItemStatus.archived, quantity: '0').blocks,
+      contains(ItemTransitionBlock.noQuantity),
+    );
+  });
+
+  test('sold is never set by hand — a sale writes an order', () async {
+    final ProviderContainer container = mockContainer();
+
+    await warmUp(container);
+
+    final Item inStock = await saved(container, 'itm-11');
+    final ItemFormController form = container.read(
+      itemFormControllerProvider.notifier,
+    );
+
+    form.seed(inStock);
+
+    // Hard rule 3: revenue, fees and profit are read from the order, so a row
+    // Inventory calls sold that the ledger has never heard of is the dirty
+    // data this refusal exists to stop.
+    expect(
+      form
+          .checkStatus(ItemStatus.sold, quantity: '2', askingPrice: '42.00')
+          .blocks,
+      contains(ItemTransitionBlock.needsSaleRecord),
+    );
   });
 
   test('editing an item keeps the timestamps it was not asked about', () async {

@@ -8,7 +8,7 @@ void main() {
   final DateTime listed = DateTime(2026, 3, 1);
   final DateTime sold = DateTime(2026, 5, 1);
 
-  Item itemWith({ItemStatus status = ItemStatus.listed}) => Item(
+  Item itemWith({ItemStatus status = ItemStatus.inStock}) => Item(
     id: 'itm-1',
     title: 'Jacket',
     quantity: 1,
@@ -34,7 +34,7 @@ void main() {
   group('stateSince', () {
     test('reads the timestamp of the state the item is in', () {
       expect(itemWith(status: ItemStatus.sold).stateSince, sold);
-      expect(itemWith(status: ItemStatus.listed).stateSince, listed);
+      expect(itemWith(status: ItemStatus.inStock).stateSince, listed);
       expect(itemWith(status: ItemStatus.draft).stateSince, created);
     });
 

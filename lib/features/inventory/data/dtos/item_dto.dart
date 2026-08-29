@@ -34,9 +34,7 @@ final class ItemDto {
       id: doc.id,
       title: FirestoreMapper.stringOrNull(data['title']) ?? '',
       quantity: FirestoreMapper.intOrNull(data['quantity']) ?? 1,
-      status:
-          FirestoreMapper.enumOrNull(ItemStatus.values, data['status']) ??
-          ItemStatus.draft,
+      status: _status(data['status']),
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       purchasePrice: FirestoreMapper.moneyOrNull(
         data['purchasePriceMinor'],
@@ -75,6 +73,17 @@ final class ItemDto {
   /// Nulls are pruned rather than written: a written null clears a field, and
   /// every write here is a merge, so an entity that simply does not carry a
   /// value must leave what is stored alone.
+  /// The stored status, with the two states that were removed folded into
+  /// the one that replaced them.
+  ///
+  /// **A document written before the enum shrank must still read.** `listed`
+  /// and `reserved` were both stock the seller owned, so both are [inStock];
+  /// anything unrecognised is a draft, which is the state that claims least.
+  static ItemStatus _status(Object? raw) => switch (raw) {
+    'listed' || 'reserved' => ItemStatus.inStock,
+    _ => FirestoreMapper.enumOrNull(ItemStatus.values, raw) ?? ItemStatus.draft,
+  };
+
   static Map<String, Object?> toMap(Item item, {required String createdBy}) =>
       FirestoreMapper.pruned(<String, Object?>{
         'title': item.title,

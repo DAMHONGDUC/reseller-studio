@@ -174,7 +174,7 @@ final Provider<List<Item>> staleItemsProvider = Provider<List<Item>>((Ref ref) {
       items
           .where(
             (Item item) =>
-                item.status == ItemStatus.listed &&
+                item.status.isOnHand &&
                 StaleInventoryPolicy.isStale(
                   item.listedAt,
                   now: now,

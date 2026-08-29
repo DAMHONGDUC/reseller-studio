@@ -25,6 +25,7 @@ class ItemFormState {
   const ItemFormState({
     this.itemId,
     this.status = ItemStatus.draft,
+    this.savedStatus = ItemStatus.draft,
     this.condition,
     this.categoryId,
     this.locationId,
@@ -44,7 +45,15 @@ class ItemFormState {
   /// writes a new document or merges into an existing one.
   final String? itemId;
 
+  /// The status the form will write — the seeded one until the seller picks
+  /// another.
   final ItemStatus status;
+
+  /// What the record says today, kept because a move has to start from where
+  /// the item actually is: `ItemTransition.apply` refuses a jump it is asked
+  /// to make from its own destination.
+  final ItemStatus savedStatus;
+
   final ItemCondition? condition;
   final String? categoryId;
   final String? locationId;
@@ -85,6 +94,7 @@ class ItemFormState {
   ItemFormState copyWith({
     String? itemId,
     ItemStatus? status,
+    ItemStatus? savedStatus,
     ItemCondition? condition,
     String? categoryId,
     String? locationId,
@@ -101,6 +111,7 @@ class ItemFormState {
   }) => ItemFormState(
     itemId: itemId ?? this.itemId,
     status: status ?? this.status,
+    savedStatus: savedStatus ?? this.savedStatus,
     condition: condition ?? this.condition,
     categoryId: categoryId ?? this.categoryId,
     locationId: locationId ?? this.locationId,
@@ -139,6 +150,7 @@ class ItemFormController extends Notifier<ItemFormState> {
   void seed(Item item) => state = ItemFormState(
     itemId: item.id,
     status: item.status,
+    savedStatus: item.status,
     condition: item.condition,
     categoryId: item.categoryId,
     locationId: item.locationId,
@@ -149,6 +161,39 @@ class ItemFormController extends Notifier<ItemFormState> {
     createdAt: item.createdAt,
     listedAt: item.listedAt,
     soldAt: item.soldAt,
+  );
+
+  /// Whether the seller may set [target] from the form, given what is typed
+  /// in the boxes right now.
+  ///
+  /// **Checked against the pending values, not the saved record.** A price
+  /// typed a second ago is a price: refusing "list this" over a field the
+  /// seller has already filled in is the form arguing with itself.
+  ItemTransitionCheck checkStatus(
+    ItemStatus target, {
+    String quantity = '',
+    String askingPrice = '',
+  }) => ItemTransition.manualCheck(_candidate(quantity, askingPrice), target);
+
+  /// Take the pick. The move itself happens in [submit], where the record is
+  /// written — a status changed on a form the seller then abandons is one
+  /// nothing should have saved.
+  void selectStatus(ItemStatus value) => state = state.copyWith(status: value);
+
+  /// The item as the boxes currently describe it, for a check that has to run
+  /// before anything is saved.
+  Item _candidate(String quantity, String askingPrice) => Item(
+    id: state.itemId ?? '',
+    title: '',
+    quantity: int.tryParse(quantity.trim()) ?? 1,
+    status: state.savedStatus,
+    createdAt: state.createdAt ?? DateTime.now(),
+    askingPrice: Money.tryParse(
+      askingPrice,
+      ref.read(workspaceCurrencyProvider),
+    ),
+    listedAt: state.listedAt,
+    soldAt: state.soldAt,
   );
 
   void selectCondition(ItemCondition value) =>
@@ -307,7 +352,9 @@ class ItemFormController extends Notifier<ItemFormState> {
         // One is the answer for almost every reseller item, so an empty or
         // unparseable box means one rather than nothing.
         quantity: int.tryParse(quantity.trim()) ?? 1,
-        status: state.status,
+        // The status the record has, not the one that was picked: a move has
+        // to start from where the item is, and `apply` below is what makes it.
+        status: state.savedStatus,
         createdAt: state.createdAt ?? now,
         purchasePrice: Money.tryParse(purchasePrice, currency),
         askingPrice: Money.tryParse(askingPrice, currency),
@@ -327,9 +374,16 @@ class ItemFormController extends Notifier<ItemFormState> {
         soldAt: state.soldAt,
       );
 
+      // A picked status is a state change like any other: it goes through the
+      // transition, which is what stamps `listedAt` and refuses a move the
+      // seller could not have made.
+      final Item moved = state.status == state.savedStatus
+          ? item
+          : ItemTransition.apply(item, state.status, now: now);
+
       // Putting stock behind a sold row is the seller saying they have the
       // thing again — the domain decides what that means, not the form.
-      final Item saved = ItemTransition.restocked(item, now: now);
+      final Item saved = ItemTransition.restocked(moved, now: now);
 
       await ref.read(itemRepositoryProvider).save(saved);
       await _saveListingPrices(id);

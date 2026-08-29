@@ -102,7 +102,7 @@ class InventoryMetrics {
         .toList();
 
     final List<Item> listed = items
-        .where((Item item) => item.status == ItemStatus.listed)
+        .where((Item item) => item.status.isOnHand && item.listedAt != null)
         .toList();
 
     // Days from listing to sale, over the sold items that recorded both. An

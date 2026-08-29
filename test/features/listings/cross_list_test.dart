@@ -33,26 +33,24 @@ void main() {
     ItemStatus status = ItemStatus.inStock,
     Money? asking,
     DateTime? listedAt,
+    int quantity = 1,
   }) => Item(
     id: id,
     title: 'Wool coat',
-    quantity: 1,
+    quantity: quantity,
     status: status,
     createdAt: testNow,
     askingPrice: asking,
     listedAt: listedAt,
   );
 
-    Future<List<Listing>> listingsFor(
+  Future<List<Listing>> listingsFor(
     ProviderContainer container,
     String itemId,
   ) async {
     container.listen<AsyncValue<List<Listing>>>(
       listingsForItemProvider(itemId),
-      (
-        AsyncValue<List<Listing>>? previous,
-        AsyncValue<List<Listing>> next,
-      ) {},
+      (AsyncValue<List<Listing>>? previous, AsyncValue<List<Listing>> next) {},
       fireImmediately: true,
     );
 
@@ -69,7 +67,7 @@ void main() {
       // Depop as well.
       expect(
         ItemTransition.crossListCheck(
-          item(id: 'i-1', status: ItemStatus.listed),
+          item(id: 'i-1', status: ItemStatus.inStock),
         ).isAllowed,
         isTrue,
       );
@@ -148,7 +146,9 @@ void main() {
           .watchItem('x-2')
           .first;
 
-      expect(saved!.status, ItemStatus.listed);
+      // Going live is not a status any more: what it changes is the clock,
+      // and a draft becoming stock the seller is selling.
+      expect(saved!.status, ItemStatus.inStock);
       expect(saved.askingPrice, const Money(3000, 'USD'));
       expect(saved.listedAt, isNotNull);
     });
@@ -160,7 +160,7 @@ void main() {
         final DateTime firstListed = testNow.subtract(const Duration(days: 40));
         final Item coat = item(
           id: 'x-3',
-          status: ItemStatus.listed,
+          status: ItemStatus.inStock,
           asking: const Money(5000, 'USD'),
           listedAt: firstListed,
         );
@@ -184,7 +184,7 @@ void main() {
         // Staleness is measured from the first time it went live anywhere, so
         // adding a marketplace must not reset the clock.
         expect(saved!.listedAt, firstListed);
-        expect(saved.status, ItemStatus.listed);
+        expect(saved.status, ItemStatus.inStock);
         expect(saved.askingPrice, const Money(4000, 'USD'));
       },
     );
@@ -290,7 +290,10 @@ void main() {
       expect(
         tester
             .widgetList<SdIconV3>(
-              find.descendant(of: ebayRow.first, matching: find.byType(SdIconV3)),
+              find.descendant(
+                of: ebayRow.first,
+                matching: find.byType(SdIconV3),
+              ),
             )
             .any((SdIconV3 icon) => icon.fill == 1),
         isTrue,
@@ -317,17 +320,20 @@ void main() {
       expect(find.text('Cross-list'), findsNothing);
     });
 
-    test('the row is gated by crossListCheck, so it survives the first sale '
-        'listing', () {
-      // The deleted `List` sheet used `check(item, listed)`, which refuses an
-      // item already on a marketplace — the exact item this flow exists for.
-      final Item listed = item(id: 'i-listed', status: ItemStatus.listed);
+    test('the row is gated by crossListCheck, so a sold row is the only one '
+        'it refuses', () {
+      final Item onShelf = item(id: 'i-listed', status: ItemStatus.inStock);
+      final Item sold = item(
+        id: 'i-sold',
+        status: ItemStatus.sold,
+        quantity: 0,
+      );
 
-      expect(ItemTransition.crossListCheck(listed).isAllowed, isTrue);
+      expect(ItemTransition.crossListCheck(onShelf).isAllowed, isTrue);
       expect(
-        ItemTransition.check(listed, ItemStatus.listed).isAllowed,
+        ItemTransition.crossListCheck(sold).isAllowed,
         isFalse,
-        reason: 'the old gate would have refused it, which was the bug',
+        reason: 'an item that has left inventory cannot be put on a platform',
       );
     });
   });
@@ -343,7 +349,9 @@ void main() {
       final CrossListState current = state(
         price: const Money(4500, 'USD'),
         selected: <Marketplace>{Marketplace.depop},
-        prices: const <Marketplace, Money>{Marketplace.depop: Money(4000, 'USD')},
+        prices: const <Marketplace, Money>{
+          Marketplace.depop: Money(4000, 'USD'),
+        },
       );
 
       expect(current.priceFor(Marketplace.ebay), const Money(4500, 'USD'));

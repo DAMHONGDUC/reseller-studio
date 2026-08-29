@@ -37,6 +37,79 @@ class _FormSection extends StatelessWidget {
   );
 }
 
+/// The item's state, editable — with the rules that keep the data honest.
+///
+/// **Every status is offered and the refusal explains itself** — owner's
+/// rule. A picker that hid what it would not accept teaches nothing; one that
+/// says "Add an asking price to list this" teaches the rule and points at the
+/// fix, the same way the actions sheet does.
+///
+/// **Sold is the one it always refuses.** A sale writes an order, and revenue,
+/// fees and profit are read from that order (hard rule 3) — flipping the flag
+/// on its own would leave a row Inventory calls sold and the ledger has never
+/// heard of. `ItemTransition.manualCheck` holds that rule, not this widget.
+class _StatusField extends ConsumerWidget {
+  const _StatusField({
+    required this.state,
+    required this.quantity,
+    required this.askingPrice,
+  });
+
+  final ItemFormState state;
+
+  /// The boxes as they are right now, so a price typed a second ago counts.
+  final TextEditingController quantity;
+  final TextEditingController askingPrice;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => PickerField(
+    label: context.l10n.itemStatus,
+    icon: AppIconConstant.inventory,
+    value: ItemStatusLabel.of(context, state.status),
+    onTap: () async {
+      final ItemStatus? picked = await OptionPickerSheet.show<ItemStatus>(
+        context,
+        title: context.l10n.itemStatus,
+        selected: state.status,
+        // Sold is left out rather than offered and refused: it is not a
+        // correction, it is an order — `ItemTransition.manualCheck` says the
+        // same thing to anything that asks.
+        options: ItemStatus.values
+            .where((ItemStatus status) => status != ItemStatus.sold)
+            .map(
+              (ItemStatus status) => PickerOption<ItemStatus>(
+                value: status,
+                label: ItemStatusLabel.of(context, status),
+              ),
+            )
+            .toList(),
+      );
+
+      if (picked == null || !context.mounted) return;
+
+      final ItemFormController form = ref.read(
+        itemFormControllerProvider.notifier,
+      );
+      final ItemTransitionCheck check = form.checkStatus(
+        picked,
+        quantity: quantity.text,
+        askingPrice: askingPrice.text,
+      );
+
+      if (!check.isAllowed) {
+        SdSnackBarUtilsV3.error(
+          context,
+          ItemBlockPresenter.messages(context, check.blocks),
+        );
+
+        return;
+      }
+
+      form.selectStatus(picked);
+    },
+  );
+}
+
 /// The condition grades resellers actually use in listings.
 class _ConditionField extends ConsumerWidget {
   const _ConditionField({required this.state});

@@ -30,19 +30,19 @@ final Provider<List<ItemCategory>> defaultItemCategoriesProvider =
 /// The tabs across the top of Inventory (plan §7).
 ///
 /// **[stale] is not an [ItemStatus]** and this enum is where the difference
-/// becomes visible: four of these map to a status, and one is a question
-/// about how long something has been listed. See `StaleInventoryPolicy`.
+/// becomes visible: three of these map to a status, and one is a question
+/// about how long something has been live. See `StaleInventoryPolicy`.
 enum InventoryFilter {
   all,
-  listed,
-  reserved,
+  draft,
+  inStock,
   sold,
   stale;
 
   String get label => switch (this) {
     InventoryFilter.all => 'All',
-    InventoryFilter.listed => 'Listed',
-    InventoryFilter.reserved => 'Reserved',
+    InventoryFilter.draft => 'Draft',
+    InventoryFilter.inStock => 'In stock',
     InventoryFilter.sold => 'Sold',
     InventoryFilter.stale => 'Stale',
   };
@@ -51,11 +51,13 @@ enum InventoryFilter {
   bool matches(Item item, {required DateTime now, Duration? staleThreshold}) =>
       switch (this) {
         InventoryFilter.all => true,
-        InventoryFilter.listed => item.status == ItemStatus.listed,
-        InventoryFilter.reserved => item.status == ItemStatus.reserved,
+        InventoryFilter.draft => item.status == ItemStatus.draft,
+        InventoryFilter.inStock => item.status == ItemStatus.inStock,
         InventoryFilter.sold => item.status == ItemStatus.sold,
+        // Still on the shelf, and live a long time ago — the money that has
+        // not moved, which is the whole point of the tab.
         InventoryFilter.stale =>
-          item.status == ItemStatus.listed &&
+          item.status.isOnHand &&
               StaleInventoryPolicy.isStale(
                 item.listedAt,
                 now: now,

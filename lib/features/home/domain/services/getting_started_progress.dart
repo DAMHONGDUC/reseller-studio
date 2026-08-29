@@ -18,12 +18,13 @@ import '../enums/getting_started_step.dart';
 final class GettingStartedProgress {
   const GettingStartedProgress._();
 
-  /// Statuses that prove an item reached a marketplace, whether or not a
-  /// `Listing` document survives to say so.
+  /// Proof that an item reached a marketplace, whether or not a `Listing`
+  /// document survives to say so.
+  ///
+  /// The clock rather than the status: `listed` stopped being a state, and
+  /// `listedAt` is the fact it left behind.
   static bool _hasBeenListed(Item item) =>
-      item.status == ItemStatus.listed ||
-      item.status == ItemStatus.reserved ||
-      item.status == ItemStatus.sold;
+      item.listedAt != null || item.status == ItemStatus.sold;
 
   static Set<GettingStartedStep> completed({
     required List<Item> items,

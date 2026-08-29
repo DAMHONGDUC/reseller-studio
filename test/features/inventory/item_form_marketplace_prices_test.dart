@@ -35,10 +35,23 @@ void main() {
         const <Listing>[];
   }
 
+  /// The marketplace prices sit below the fold: a `ListView` does not build
+  /// what is off screen, so the section has to be scrolled to before it can
+  /// be found.
+  Future<void> scrollToPrices(WidgetTester tester) async {
+    await tester.scrollUntilVisible(
+      find.text('eBay'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('the form shows a price field per live listing', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const ItemFormScreen(itemId: 'itm-4'));
+    await scrollToPrices(tester);
 
     expect(find.text('eBay'), findsOneWidget);
     expect(find.text('Depop'), findsOneWidget);
@@ -57,6 +70,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const ItemFormScreen(itemId: 'itm-4'));
+    await scrollToPrices(tester);
 
     final Finder ebay = find.ancestor(
       of: find.text('eBay'),

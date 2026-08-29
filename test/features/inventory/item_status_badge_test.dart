@@ -8,25 +8,25 @@ import 'package:system_design/index.dart';
 import '../../support/pump_app.dart';
 
 void main() {
-  testWidgets('Listed uses the same badge tone in Inventory and Item Detail', (
+  testWidgets('In stock uses the same badge tone in Inventory and Detail', (
     WidgetTester tester,
   ) async {
     final Item item = Item(
       id: 'listed',
       title: 'Listed item',
       quantity: 1,
-      status: ItemStatus.listed,
+      status: ItemStatus.inStock,
       createdAt: testNow,
       listedAt: testNow,
     );
     await pumpScreen(tester, ItemCard(item: item, now: testNow));
     final SdBadgeToneV3 inventoryTone = tester
-        .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'Listed'))
+        .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'In stock'))
         .tone;
 
     await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-4'));
     final SdBadgeToneV3 detailTone = tester
-        .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'Listed'))
+        .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'In stock'))
         .tone;
 
     expect(inventoryTone, SdBadgeToneV3.success);

@@ -17,17 +17,13 @@ final class ItemStatusLabel {
   static String of(BuildContext context, ItemStatus status) => switch (status) {
     ItemStatus.draft => context.l10n.itemStatusDraft,
     ItemStatus.inStock => context.l10n.itemStatusInStock,
-    ItemStatus.listed => context.l10n.itemStatusListed,
-    ItemStatus.reserved => context.l10n.itemStatusReserved,
     ItemStatus.sold => context.l10n.itemStatusSold,
     ItemStatus.archived => context.l10n.itemStatusArchived,
   };
 
   static SdBadgeToneV3 tone(ItemStatus status) => switch (status) {
     ItemStatus.draft => SdBadgeToneV3.neutral,
-    ItemStatus.inStock => SdBadgeToneV3.info,
-    ItemStatus.listed => SdBadgeToneV3.success,
-    ItemStatus.reserved => SdBadgeToneV3.warning,
+    ItemStatus.inStock => SdBadgeToneV3.success,
     ItemStatus.sold => SdBadgeToneV3.neutral,
     ItemStatus.archived => SdBadgeToneV3.neutral,
   };

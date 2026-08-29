@@ -17,12 +17,13 @@ import '../../support/pump_app.dart';
 /// off the shelf, or an order imported — and "sale recorded" sitting above an
 /// unticked "list it" reads as a broken checklist rather than a flexible one.
 void main() {
-  Item item(ItemStatus status) => Item(
+  Item item(ItemStatus status, {DateTime? listedAt}) => Item(
     id: 'i-1',
     title: 'A jacket',
     status: status,
     quantity: 1,
     createdAt: testNow,
+    listedAt: listedAt,
   );
 
   Order order() => Order(
@@ -49,14 +50,17 @@ void main() {
   });
 
   test('a draft item ticks only the first step', () {
-    expect(progress(items: <Item>[item(ItemStatus.draft)]), <GettingStartedStep>{
-      GettingStartedStep.addItem,
-    });
+    expect(
+      progress(items: <Item>[item(ItemStatus.draft)]),
+      <GettingStartedStep>{GettingStartedStep.addItem},
+    );
   });
 
   test('an item that reached a marketplace ticks the first two', () {
     expect(
-      progress(items: <Item>[item(ItemStatus.listed)]),
+      // `listed` stopped being a status; the clock it left behind is the
+      // proof that the item reached a platform.
+      progress(items: <Item>[item(ItemStatus.inStock, listedAt: testNow)]),
       <GettingStartedStep>{
         GettingStartedStep.addItem,
         GettingStartedStep.listItem,
@@ -65,13 +69,10 @@ void main() {
   });
 
   test('a sold item counts as listed, even with no listing document', () {
-    expect(
-      progress(items: <Item>[item(ItemStatus.sold)]),
-      <GettingStartedStep>{
-        GettingStartedStep.addItem,
-        GettingStartedStep.listItem,
-      },
-    );
+    expect(progress(items: <Item>[item(ItemStatus.sold)]), <GettingStartedStep>{
+      GettingStartedStep.addItem,
+      GettingStartedStep.listItem,
+    });
   });
 
   test('an order ticks everything, however the seller got there', () {

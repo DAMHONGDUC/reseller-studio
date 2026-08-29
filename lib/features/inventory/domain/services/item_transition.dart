@@ -20,6 +20,12 @@ enum ItemTransitionBlock {
 
   /// Nothing on the shelf to move.
   noQuantity,
+
+  /// The seller picked `sold` by hand. A sale writes an order — that is where
+  /// revenue, fees and profit come from (hard rule 3) — so the status cannot
+  /// be set on its own without leaving a row Inventory calls sold and the
+  /// ledger has never heard of.
+  needsSaleRecord,
 }
 
 /// The result of asking whether an item may change status.
@@ -59,13 +65,6 @@ final class ItemTransition {
     if (item.quantity <= 0) blocks.add(ItemTransitionBlock.noQuantity);
 
     switch (target) {
-      case ItemStatus.listed:
-        if (!item.status.isListable) {
-          blocks.add(ItemTransitionBlock.wrongStatus);
-        }
-        if (item.askingPrice == null) {
-          blocks.add(ItemTransitionBlock.missingPrice);
-        }
       case ItemStatus.sold:
         if (item.status == ItemStatus.sold ||
             item.status == ItemStatus.archived) {
@@ -73,10 +72,6 @@ final class ItemTransition {
         }
         if (item.askingPrice == null) {
           blocks.add(ItemTransitionBlock.missingSalePrice);
-        }
-      case ItemStatus.reserved:
-        if (item.status != ItemStatus.listed) {
-          blocks.add(ItemTransitionBlock.wrongStatus);
         }
       case ItemStatus.draft:
       case ItemStatus.inStock:
@@ -117,6 +112,43 @@ final class ItemTransition {
         ? const ItemTransitionCheck.allowed()
         : ItemTransitionCheck.blocked(blocks);
   }
+
+  /// Whether the seller may set [target] by hand, on the item form.
+  ///
+  /// **Everything [check] refuses, plus `sold`** — owner's rule that the
+  /// status be editable without letting dirty data in. Picking a state is a
+  /// correction: an item is a draft, it is in stock, it is live somewhere, it
+  /// is put aside, it is withdrawn. A *sale* is not a correction — it is an
+  /// order, with a price, a marketplace and a buyer, and the whole profit half
+  /// of the product reads that order rather than this flag. So `sold` is
+  /// reached through Mark as sold, which writes both.
+  ///
+  /// Coming *out* of sold is not blocked here: a sale that did not happen is
+  /// exactly the correction this exists for, and `restocked` does the same
+  /// from the count.
+  static ItemTransitionCheck manualCheck(Item item, ItemStatus target) {
+    if (target != ItemStatus.sold) return check(item, target);
+
+    return ItemTransitionCheck.blocked(<ItemTransitionBlock>[
+      ...check(item, target).blocks,
+      ItemTransitionBlock.needsSaleRecord,
+    ]);
+  }
+
+  /// [item] marked as live on a marketplace.
+  ///
+  /// **Going live is not a status move any more** — owner's rule, since an
+  /// item on eBay is still stock the seller owns. What it does change is
+  /// `listedAt`, the clock staleness is measured from, and a draft becomes
+  /// stock the moment it is offered for sale.
+  ///
+  /// **The clock is set once and never moved by a relist**: an item listed in
+  /// March and cross-listed in June has been sitting since March, and that is
+  /// the number the seller has to see.
+  static Item markListed(Item item, {required DateTime now}) => item.copyWith(
+    listedAt: item.listedAt ?? now,
+    status: item.status == ItemStatus.draft ? ItemStatus.inStock : item.status,
+  );
 
   /// One unit out the door.
   ///
@@ -159,6 +191,27 @@ final class ItemTransition {
     return apply(item, ItemStatus.inStock, now: now);
   }
 
+  /// [count] more of [item] on the shelf.
+  ///
+  /// **Restocking adds to the count and puts the row back in stock** —
+  /// owner's rule. A seller who buys five more of something that sold out is
+  /// not creating a new item: it is the same record, with the same cost
+  /// history and the same listings, and having to un-sell it by hand first
+  /// was the step that made people create a duplicate instead.
+  ///
+  /// Adds rather than replaces: the box asks how many arrived, which is the
+  /// number on the receipt in the seller's hand. An archived item comes back
+  /// too — restocking it is the seller saying they have it again.
+  static Item restock(Item item, int count, {required DateTime now}) {
+    final Item stocked = item.copyWith(quantity: item.quantity + count);
+
+    if (count <= 0) {
+      throw StateError('Cannot restock item ${item.id} by $count');
+    }
+
+    return apply(stocked, ItemStatus.inStock, now: now);
+  }
+
   /// [item] moved to [target], with the timestamps that move implies.
   ///
   /// **Throws if the move is blocked.** Callers check first; this is the
@@ -175,9 +228,6 @@ final class ItemTransition {
 
     return item.copyWith(
       status: target,
-      // First time live anywhere is what staleness is measured from, so it is
-      // set once and never moved by a relist.
-      listedAt: target == ItemStatus.listed ? item.listedAt ?? now : null,
       soldAt: target == ItemStatus.sold ? now : null,
       // Coming back onto the shelf undoes the sale, and the date has to go
       // with it: an item on hand that still carries a sold date is one every

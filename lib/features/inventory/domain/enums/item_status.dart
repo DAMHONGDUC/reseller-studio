@@ -1,13 +1,19 @@
 /// Where an item is in its life (plan §29).
 ///
 /// ```text
-/// draft → inStock → listed → reserved → sold
-///                     ↑         │
-///                     └─────────┘   (offer declined / expired)
+/// draft → inStock → sold
+///            ↓
+///        archived
 /// ```
 ///
-/// **`stale` is deliberately not here.** Stale is a *query* — listed, and
-/// listed a long time ago — not a state something transitions into. As a
+/// **Four states, and the count is what moves between the last two** —
+/// owner's rule. `listed` and `reserved` were removed: an item live on a
+/// marketplace is still stock the seller owns, so it is `inStock` with
+/// listings beside it, and `listedAt` — not a status — is what staleness is
+/// measured from. A document written before that reads back as [inStock].
+///
+/// **`stale` is deliberately not here either.** Stale is a *query* — on hand,
+/// and listed a long time ago — not a state something transitions into. As a
 /// status it would need a nightly job flipping thousands of documents, and a
 /// seller who repriced would wait for that job before the item left the Stale
 /// tab. See `StaleInventoryPolicy` and `docs/DATA_MODEL.md`.
@@ -16,17 +22,11 @@ enum ItemStatus {
   /// when only a title was given.
   draft,
 
-  /// On the shelf, not listed anywhere.
+  /// On the shelf and for sale — whether or not it is live on a marketplace.
   inStock,
 
-  /// Live on at least one marketplace.
-  listed,
-
-  /// An offer was accepted, or a buyer is committed, but the sale has not
-  /// completed. Held back from other listings so it cannot be sold twice.
-  reserved,
-
-  /// Sold. Terminal for the item, though the order may still be in flight.
+  /// Sold out: the count reached zero through sales. Terminal until the
+  /// seller restocks, though the orders may still be in flight.
   sold,
 
   /// Withdrawn from inventory without a sale — damaged, lost, kept, returned
@@ -38,16 +38,13 @@ enum ItemStatus {
   /// `sold` and `archived` are out: neither is on the shelf, and counting
   /// them would overstate inventory value, which is a number sellers use for
   /// insurance and tax.
-  bool get isOnHand => switch (this) {
-    ItemStatus.draft ||
-    ItemStatus.inStock ||
-    ItemStatus.listed ||
-    ItemStatus.reserved => true,
-    ItemStatus.sold || ItemStatus.archived => false,
-  };
+  bool get isOnHand => this == ItemStatus.draft || this == ItemStatus.inStock;
 
-  /// Whether this item can be listed on a marketplace right now.
-  bool get isListable => this == ItemStatus.draft || this == ItemStatus.inStock;
+  /// Whether the item may be put on a marketplace right now.
+  ///
+  /// A draft can be: listing it is what makes it stock. What cannot is an
+  /// item that has left inventory.
+  bool get isListable => isOnHand;
 }
 
 /// The condition grades resellers actually use in listings.

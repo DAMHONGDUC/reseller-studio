@@ -36,21 +36,21 @@ void main() {
     });
   });
 
-  group('listing needs a price', () {
+  group('selling needs a sale price', () {
     test('is blocked when no asking price was entered', () {
       final ItemTransitionCheck result = ItemTransition.check(
         item(),
-        ItemStatus.listed,
+        ItemStatus.sold,
       );
 
       expect(result.isAllowed, isFalse);
-      expect(result.blocks, contains(ItemTransitionBlock.missingPrice));
+      expect(result.blocks, contains(ItemTransitionBlock.missingSalePrice));
     });
 
     test('is allowed once a price is set', () {
       final ItemTransitionCheck result = ItemTransition.check(
         item(askingPrice: const Money(4500, 'USD')),
-        ItemStatus.listed,
+        ItemStatus.sold,
       );
 
       expect(result.isAllowed, isTrue);
@@ -59,7 +59,7 @@ void main() {
     test('reports every reason at once, not the first', () {
       final ItemTransitionCheck result = ItemTransition.check(
         item(status: ItemStatus.sold, quantity: 0),
-        ItemStatus.listed,
+        ItemStatus.sold,
       );
 
       expect(
@@ -67,9 +67,20 @@ void main() {
         containsAll(<ItemTransitionBlock>[
           ItemTransitionBlock.noQuantity,
           ItemTransitionBlock.wrongStatus,
-          ItemTransitionBlock.missingPrice,
+          ItemTransitionBlock.missingSalePrice,
         ]),
       );
+    });
+
+    test('a hand-picked sold is refused whatever else is right', () {
+      // Hard rule 3: revenue and profit are read from the order, so the flag
+      // is set by recording the sale, never on its own.
+      final ItemTransitionCheck result = ItemTransition.manualCheck(
+        item(askingPrice: const Money(4500, 'USD')),
+        ItemStatus.sold,
+      );
+
+      expect(result.blocks, contains(ItemTransitionBlock.needsSaleRecord));
     });
   });
 
@@ -83,7 +94,7 @@ void main() {
           askingPrice: const Money(4500, 'USD'),
           listedAt: firstListing,
         ),
-        ItemStatus.listed,
+        ItemStatus.inStock,
         now: now,
       );
 
@@ -92,14 +103,18 @@ void main() {
 
     test('throws rather than writing a half-valid item', () {
       expect(
-        () => ItemTransition.apply(item(), ItemStatus.listed, now: now),
+        () => ItemTransition.apply(
+          item(status: ItemStatus.sold, quantity: 0),
+          ItemStatus.inStock,
+          now: now,
+        ),
         throwsStateError,
       );
     });
 
     test('selling one of several leaves the rest where they were', () {
       final Item listed = item(
-        status: ItemStatus.listed,
+        status: ItemStatus.inStock,
         askingPrice: const Money(4500, 'USD'),
         quantity: 3,
         listedAt: now,
@@ -110,14 +125,14 @@ void main() {
       // Two still on the shelf, so the row is not sold and its staleness
       // clock is untouched.
       expect(afterSale.quantity, 2);
-      expect(afterSale.status, ItemStatus.listed);
+      expect(afterSale.status, ItemStatus.inStock);
       expect(afterSale.soldAt, isNull);
       expect(afterSale.listedAt, now);
     });
 
     test('the sale that empties the shelf is the one that sells the row', () {
       final Item listed = item(
-        status: ItemStatus.listed,
+        status: ItemStatus.inStock,
         askingPrice: const Money(4500, 'USD'),
         listedAt: now,
       );
@@ -149,6 +164,53 @@ void main() {
       expect(restocked.status, ItemStatus.inStock);
       expect(restocked.soldAt, isNull);
       expect(restocked.quantityOnHand, 4);
+    });
+
+    test('restocking adds to the count and puts the row back in stock', () {
+      final Item soldOut = item(
+        status: ItemStatus.sold,
+        quantity: 0,
+        soldAt: now,
+      );
+
+      final Item restocked = ItemTransition.restock(soldOut, 5, now: now);
+
+      // Adds rather than replaces: the box asks how many arrived.
+      expect(restocked.quantity, 5);
+      expect(restocked.status, ItemStatus.inStock);
+      expect(restocked.soldAt, isNull);
+    });
+
+    test('restocking an item that still has stock adds to what is there', () {
+      final Item onShelf = item(quantity: 2);
+
+      expect(ItemTransition.restock(onShelf, 3, now: now).quantity, 5);
+    });
+
+    test('restocking by nothing is refused', () {
+      expect(
+        () => ItemTransition.restock(item(quantity: 1), 0, now: now),
+        throwsStateError,
+      );
+    });
+
+    test('going live stamps the clock instead of moving the status', () {
+      final Item draft = item(status: ItemStatus.draft);
+
+      final Item live = ItemTransition.markListed(draft, now: now);
+
+      // A draft becomes stock the seller is selling; anything already on the
+      // shelf keeps the state it had.
+      expect(live.status, ItemStatus.inStock);
+      expect(live.listedAt, now);
+      expect(
+        ItemTransition.markListed(
+          item(listedAt: now.subtract(const Duration(days: 40))),
+          now: now,
+        ).listedAt,
+        now.subtract(const Duration(days: 40)),
+        reason: 'a relist must not reset the staleness clock',
+      );
     });
 
     test('a count does not undo an archive', () {

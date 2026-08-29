@@ -107,15 +107,15 @@ void main() {
       );
 
       expect(counts[InventoryFilter.all], 11);
-      expect(counts[InventoryFilter.listed], 3);
-      expect(counts[InventoryFilter.reserved], 1);
+      expect(counts[InventoryFilter.inStock], 6);
+      expect(counts[InventoryFilter.draft], 2);
       expect(counts[InventoryFilter.sold], 3);
       // itm-4 (listed 84 days ago) and itm-5 (66) are past the 60-day
       // threshold; itm-6 (20 days) is not.
       expect(counts[InventoryFilter.stale], 2);
     });
 
-    test('stale is a subset of listed, never its own status', () async {
+    test('stale is a subset of stock, never its own status', () async {
       final ProviderContainer container = mockContainer();
 
       await warmUp(container);
@@ -125,9 +125,9 @@ void main() {
       );
 
       expect(
-        counts[InventoryFilter.stale]! <= counts[InventoryFilter.listed]!,
+        counts[InventoryFilter.stale]! <= counts[InventoryFilter.inStock]!,
         isTrue,
-        reason: 'a stale item is still a listed item',
+        reason: 'a stale item is still stock the seller is holding',
       );
     });
   });
@@ -212,7 +212,7 @@ void main() {
       // item can be listed *and* stale, and collapsing that into one marker
       // loses the fact that it is still live and still earning nothing.
       expect(find.text('Stale'), findsWidgets);
-      expect(find.text('Listed'), findsWidgets);
+      expect(find.text('In stock'), findsWidgets);
     });
 
     testWidgets('Item detail exposes a labelled Actions button', (

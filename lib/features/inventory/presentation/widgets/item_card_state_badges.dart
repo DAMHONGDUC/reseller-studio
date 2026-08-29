@@ -13,8 +13,10 @@ class _StateBadges extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Stale is a question about stock that went live and did not move, so it
+    // asks the clock rather than the status: `listed` is not a state any more.
     final bool isStale =
-        item.status == ItemStatus.listed &&
+        item.status.isOnHand &&
         StaleInventoryPolicy.isStale(item.listedAt, now: now);
 
     return Wrap(

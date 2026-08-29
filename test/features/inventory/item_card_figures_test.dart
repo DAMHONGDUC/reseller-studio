@@ -15,7 +15,7 @@ void main() {
   Item itemWith({
     Money? cost,
     Money? asking,
-    ItemStatus status = ItemStatus.listed,
+    ItemStatus status = ItemStatus.inStock,
   }) => Item(
     id: 'itm-1',
     title: 'Vintage jacket',
@@ -103,9 +103,9 @@ void main() {
   ) async {
     await pumpScreen(tester, ItemCard(item: itemWith(), now: testNow));
 
-    // Listed 21 days ago, so the badge reads in weeks — beside the badge that
+    // Live 21 days ago, so the badge reads in weeks — beside the badge that
     // says which state those weeks were spent in.
     expect(find.widgetWithText(SdBadgeV3, '3w'), findsOneWidget);
-    expect(find.widgetWithText(SdBadgeV3, 'Listed'), findsOneWidget);
+    expect(find.widgetWithText(SdBadgeV3, 'In stock'), findsOneWidget);
   });
 }

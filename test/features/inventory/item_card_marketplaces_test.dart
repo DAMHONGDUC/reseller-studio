@@ -15,7 +15,7 @@ void main() {
     id: 'itm-1',
     title: 'Vintage jacket',
     quantity: 1,
-    status: ItemStatus.listed,
+    status: ItemStatus.inStock,
     createdAt: testNow,
     listedAt: testNow,
     askingPrice: const Money(4500, 'USD'),

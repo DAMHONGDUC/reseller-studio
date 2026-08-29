@@ -116,6 +116,14 @@
   "@itemBlockWrongStatus": {
     "description": "Why a transition is refused because the item's current status is not a valid starting point."
   },
+  "itemStatus": "Status",
+  "@itemStatus": {
+    "description": "Field label on the item form for the item's state."
+  },
+  "itemBlockNeedsSaleRecord": "Use Actions → Mark as sold, so the order is recorded with it",
+  "@itemBlockNeedsSaleRecord": {
+    "description": "Why the status picker refuses Sold: a sale writes an order, and profit is derived from orders."
+  },
   "itemBlockNoQuantity": "Nothing left in stock to move",
   "@itemBlockNoQuantity": {
     "description": "Why a transition is refused because quantity is zero."
@@ -840,11 +848,7 @@
   },
   "itemStatusListed": "Listed",
   "@itemStatusListed": {
-    "description": "Item status: live on at least one marketplace."
-  },
-  "itemStatusReserved": "Reserved",
-  "@itemStatusReserved": {
-    "description": "Item status: an offer was accepted but the sale has not completed."
+    "description": "Analytics row: how many on-hand items have been put on a marketplace. Not a status any more — `listed` left the enum, `listedAt` is what it counts."
   },
   "itemStatusSold": "Sold",
   "@itemStatusSold": {
@@ -1111,6 +1115,31 @@
   "itemActionMarkSold": "Mark as sold",
   "@itemActionMarkSold": {
     "description": "Records a sale. Creates the order too — profit is derived from orders."
+  },
+  "itemActionRestock": "Restock",
+  "@itemActionRestock": {
+    "description": "Adds stock to an item and puts it back in stock."
+  },
+  "itemActionMakeInStock": "Make it in stock",
+  "@itemActionMakeInStock": {
+    "description": "Moves a draft onto the shelf, ready to sell."
+  },
+  "restockHowMany": "How many arrived",
+  "@restockHowMany": {
+    "description": "Field label in the restock sheet — what is added to the count, not the new total."
+  },
+  "restockHelp": "{count, plural, =0{Nothing on the shelf right now} =1{1 on the shelf right now} other{{count} on the shelf right now}}",
+  "@restockHelp": {
+    "description": "Helper under the restock field: what the count is today, so the seller can see what they are adding to.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "restockCountRequired": "Enter how many arrived",
+  "@restockCountRequired": {
+    "description": "Shown when the restock box is empty or not a positive number."
   },
   "itemActionArchive": "Archive",
   "@itemActionArchive": {
@@ -2528,6 +2557,10 @@
         "type": "int"
       }
     }
+  },
+  "itemQuantityRequired": "Enter how many you have",
+  "@itemQuantityRequired": {
+    "description": "Shown when the item form's quantity box is empty or not a number."
   },
   "itemQuantityShort": "Qty",
   "@itemQuantityShort": {
