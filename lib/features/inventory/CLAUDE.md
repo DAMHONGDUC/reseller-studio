@@ -139,9 +139,9 @@ Owner's rule — the row must be **good-looking, sensible and complete**, in
 that order of argument and none of them at the cost of the others. `ItemCard`
 answers it with a split, ruled off by a hairline:
 
-- **Above: what the item is.** Photo, title, the badges naming its state and
-  condition, then its state age directly above the marketplace count — all in
-  one column beside the photo, sharing one left edge.
+- **Above: what the item is.** Photo, title, then equal-height `SdTagV3`
+  components naming its state, stale state, condition and marketplace count —
+  all in one column beside the photo, sharing one left edge.
 - **Below: what it is worth.** A band across the card's full width — how many
   are left, then cost, asking price and expected profit, each a label with its
   figure under it.
@@ -201,21 +201,11 @@ Owner's rule.
   a date the seller can type is not a record of anything. See
   `docs/DATA_MODEL.md` for how `updatedAt` is written.
 
-## The row says how long, not only what
+## The row does not show state age
 
-Owner's rule, part of the same one above. A badge carries the age of the state
-the item is in — `3w`, `2mo` — from `Item.stateSince`.
-
-- **One timestamp per state**: sold reads `soldAt`, listed reads `listedAt`,
-  everything else `createdAt`. A screen picking its own field is how two
-  places end up disagreeing about what "how long has this sat" means.
-- **The duration is its own line directly above the marketplace count.** It
-  stays visually associated with distribution without crowding the status,
-  stale and condition badges. The compact duration alone avoids repeating the
-  status name.
-- **It is not the stale badge.** Stale says a threshold was crossed; the age
-  says by how far, and an item three days over reads differently from one at
-  six months.
+Owner's rule. The compact `Now` / age tag is absent from `ItemCard`; the row
+reports actionable state instead of elapsed metadata. `now` still enters the
+card as an injected clock value solely to decide whether the Stale tag applies.
 
 ## The row counts its marketplaces and prices none of them
 
@@ -229,9 +219,12 @@ is live on** — no names and no amounts.
 - **One compact count replaces the wrapped badge list.** The list made a card
   grow with every marketplace and slowed scanning; the detail screen keeps the
   full names for the seller who needs them.
-- **The count sits below the state-age line, above the money band.** Where an
-  item is live is a fact about the item, not a money figure; this order also
-  keeps the age immediately above the count as one quiet metadata block.
+- **The count sits below the other tags, above the money band.** Where an item
+  is live is a fact about the item, not a money figure.
+- **Every chip-like element on the card is `SdTagV3` and the component owns
+  their shared height.** Status, Stale, condition and marketplace count do not
+  mix tag and badge primitives. They are read-only on the card, so their tap
+  handling is disabled while their labels and colours stay visible.
 - **The count is deduped by marketplace**, so two listing records on one
   platform still read as one market.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds both
