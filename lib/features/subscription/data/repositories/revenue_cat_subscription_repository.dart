@@ -11,6 +11,7 @@ import '../../domain/entities/plan_offering.dart';
 import '../../domain/entities/subscription_status.dart';
 import '../../domain/enums/seller_plan.dart';
 import '../../domain/repositories/subscription_repository.dart';
+import '../revenue_cat_product_mapper.dart';
 
 /// Entitlement read from RevenueCat (plan §27).
 ///
@@ -53,7 +54,7 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
           const <Package>[];
 
       final List<PlanOffering> rows = packages
-          .map(_offeringFrom)
+          .map(RevenueCatProductMapper.offering)
           .nonNulls
           .toList();
 
@@ -214,21 +215,4 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
     Store.promotional => SubscriptionSource.promotional,
     _ => SubscriptionSource.none,
   };
-
-  /// Null for a package outside the two billing periods this app sells.
-  static PlanOffering? _offeringFrom(Package package) {
-    if (package.packageType != PackageType.monthly &&
-        package.packageType != PackageType.annual) {
-      return null;
-    }
-
-    return PlanOffering(
-      productId: package.storeProduct.identifier,
-      plan: SellerPlan.premium,
-      period: package.packageType == PackageType.annual
-          ? BillingPeriod.yearly
-          : BillingPeriod.monthly,
-      formattedPrice: package.storeProduct.priceString,
-    );
-  }
 }
