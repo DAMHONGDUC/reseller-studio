@@ -193,14 +193,14 @@ final class AppBootstrap {
   /// sign-in, not at startup where there is no user yet.
   static Future<void> _initializeBilling() async {
     final String key = defaultTargetPlatform == TargetPlatform.android
-        ? AppEnv.revenueCatApiKeyAndroid
-        : AppEnv.revenueCatApiKeyIos;
+        ? AppEnv.revenueCatAndroidKey
+        : AppEnv.revenueCatIosKey;
 
     if (key.isEmpty) {
       SdLogger.warning(
         LogTagConstant.bootstrap,
         'No RevenueCat key in this build — every seller reads as Free. '
-        'Fill REVENUECAT_*_API_KEY in env/${AppEnv.flavor.name}.json.',
+        'Fill the RevenueCat build configuration for this flavor.',
       );
 
       return;

@@ -3,6 +3,7 @@ import 'package:reseller_studio/features/home/presentation/screens/home_screen/h
 
 import '../../support/pump_app.dart';
 import 'empty_business.dart';
+import 'premium_subscription.dart';
 
 /// The order of Home is a product decision, and this is what holds it.
 ///
@@ -16,7 +17,11 @@ void main() {
   testWidgets('Needs Attention comes before Performance and Flow overview', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     expect(
       topOf(tester, 'Needs Attention'),
@@ -31,7 +36,11 @@ void main() {
   testWidgets('Getting started is above Needs Attention when it shows', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen(), overrides: emptyBusiness());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: [...emptyBusiness(), ...premiumSubscription()],
+    );
 
     expect(
       topOf(tester, 'Getting started'),
@@ -40,7 +49,11 @@ void main() {
   });
 
   testWidgets('the shortcut row is still first', (WidgetTester tester) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     expect(
       topOf(tester, 'Quick Action'),

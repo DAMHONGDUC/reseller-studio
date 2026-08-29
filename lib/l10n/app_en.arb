@@ -429,6 +429,18 @@
   "@homeShortcutSearch": {
     "description": "Home shortcut card, and the app bar tooltip, for global search."
   },
+  "homePremiumBannerTitle": "Go Premium",
+  "@homePremiumBannerTitle": {
+    "description": "Compact Premium banner title on Home for Free sellers."
+  },
+  "homePremiumBannerSubtitle": "Remove every usage limit",
+  "@homePremiumBannerSubtitle": {
+    "description": "Compact Premium banner supporting text on Home."
+  },
+  "homePremiumBannerAction": "View Premium plans",
+  "@homePremiumBannerAction": {
+    "description": "Accessibility label for the tappable Premium banner on Home."
+  },
   "homeQuickRecordPurchase": "Record a purchase",
   "@homeQuickRecordPurchase": {
     "description": "Quick Access tile: log a buy from a source."

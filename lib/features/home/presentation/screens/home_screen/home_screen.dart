@@ -22,6 +22,8 @@ import '../../../../offers/domain/entities/offer.dart';
 import '../../../../offers/providers.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
+import '../../../../subscription/domain/enums/seller_plan.dart';
+import '../../../../subscription/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/enums/getting_started_step.dart';
@@ -37,6 +39,7 @@ part 'home_screen_flow_overview.dart';
 part 'home_screen_getting_started.dart';
 part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
+part 'home_screen_premium_banner.dart';
 part 'home_screen_quick_action.dart';
 part 'home_screen_recent_activity.dart';
 part 'home_screen_shortcuts.dart';
@@ -125,6 +128,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
+          const _HomePremiumBanner(),
           _HomeShortcuts(onQuickAction: _toQuickAction),
           const _GettingStarted(),
           SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),

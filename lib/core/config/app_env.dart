@@ -162,12 +162,20 @@ final class AppEnv {
   // One key per store, because RevenueCat issues one per store and using the
   // wrong one fails at configure time rather than at purchase time.
 
-  static const String revenueCatApiKeyIos = String.fromEnvironment(
-    'REVENUECAT_API_KEY_IOS',
+  static const String revenueCatIosKey = String.fromEnvironment(
+    'REVENUECAT_IOS_KEY',
   );
 
-  static const String revenueCatApiKeyAndroid = String.fromEnvironment(
-    'REVENUECAT_API_KEY_ANDROID',
+  static const String revenueCatAndroidKey = String.fromEnvironment(
+    'REVENUECAT_ANDROID_KEY',
+  );
+
+  static const String revenueCatEntitlement = String.fromEnvironment(
+    'REVENUECAT_ENTITLEMENT',
+  );
+
+  static const String revenueCatOffering = String.fromEnvironment(
+    'REVENUECAT_OFFERING',
   );
 
   /// Whether billing was configured for **either** store.
@@ -176,7 +184,9 @@ final class AppEnv {
   /// "set up and the seller is on Free" — two states that look identical from
   /// an empty offerings list and want very different screens.
   static bool get hasBillingConfig =>
-      revenueCatApiKeyIos.isNotEmpty || revenueCatApiKeyAndroid.isNotEmpty;
+      (revenueCatIosKey.isNotEmpty || revenueCatAndroidKey.isNotEmpty) &&
+      revenueCatEntitlement.isNotEmpty &&
+      revenueCatOffering.isNotEmpty;
 
   // --- Workspace defaults ---
   //

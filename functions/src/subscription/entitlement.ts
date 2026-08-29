@@ -1,8 +1,8 @@
 import { seatsByPlan } from '../lib/firestore';
 
 /**
- * Entitlement identifier → plan, mirroring
- * `SubscriptionProductConstant.planByEntitlement` in the app.
+ * Entitlement identifier → plan, mirroring the RevenueCat entitlement passed
+ * to the Flutter build through `AppEnv`.
  *
  * A second deliberate duplicate, for the same reason `seatsByPlan` is one:
  * the app needs it to render the paywall and the backend needs it where a

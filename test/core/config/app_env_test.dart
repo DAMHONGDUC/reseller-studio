@@ -58,8 +58,10 @@ void main() {
         'FUNCTIONS_REGION',
         'GOOGLE_SIGN_IN_CLIENT_ID_IOS',
         'GOOGLE_SIGN_IN_SERVER_CLIENT_ID',
-        'REVENUECAT_API_KEY_IOS',
-        'REVENUECAT_API_KEY_ANDROID',
+        'REVENUECAT_IOS_KEY',
+        'REVENUECAT_ANDROID_KEY',
+        'REVENUECAT_ENTITLEMENT',
+        'REVENUECAT_OFFERING',
         'PRIVACY_POLICY_URL',
         'TERMS_OF_SERVICE_URL',
         'DEFAULT_CURRENCY',
@@ -95,6 +97,10 @@ void main() {
       expect(AppEnv.appDisplayName, isNotEmpty);
       expect(AppEnv.functionsRegion, isNotEmpty);
       expect(AppEnv.defaultCurrency, 'USD');
+      expect(AppEnv.revenueCatIosKey, isEmpty);
+      expect(AppEnv.revenueCatAndroidKey, isEmpty);
+      expect(AppEnv.revenueCatEntitlement, isEmpty);
+      expect(AppEnv.revenueCatOffering, isEmpty);
     });
 
     test('reports Firebase as unconfigured when no project id was passed', () {

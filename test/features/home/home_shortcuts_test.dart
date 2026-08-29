@@ -6,6 +6,7 @@ import 'package:reseller_studio/features/home/presentation/screens/home_screen/h
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
+import 'premium_subscription.dart';
 
 /// The three cards that open Home.
 ///
@@ -23,7 +24,11 @@ void main() {
   testWidgets('all three are on screen before anything is scrolled', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
@@ -39,7 +44,11 @@ void main() {
   testWidgets('they sit above every section of the dashboard', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
@@ -58,7 +67,11 @@ void main() {
   testWidgets('the Quick Access card scrolls Home to Quick Access', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
     final ScrollableState scrollable = tester.state(
@@ -85,7 +98,11 @@ void main() {
   testWidgets('Scan replaces Flow overview in the shortcut row', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
