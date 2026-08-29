@@ -19,7 +19,7 @@ class _MarketplaceRow extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Text(
-              row.marketplace.displayName,
+              row.marketplaceName,
               style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
                 color: context.sdTheme3.textPrimary,
               ),

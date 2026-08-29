@@ -56,7 +56,7 @@ class OrderDetailScreen extends ConsumerWidget {
       appBar: SdAppBarV3(
         title: value == null
             ? context.l10n.orderTitleFallback
-            : context.l10n.orderTitle(value.marketplace.displayName),
+            : context.l10n.orderTitle(value.marketplaceName),
         subtitle: value?.externalOrderId,
       ),
       body: switch (order) {

@@ -1,3 +1,4 @@
+import '../../../inventory/domain/entities/item.dart';
 import '../entities/order.dart';
 
 /// Reading and writing orders. See `ItemRepository` for why these are
@@ -12,4 +13,10 @@ abstract interface class OrderRepository {
   Future<Order?> findById(String id);
 
   Future<void> save(Order order);
+
+  /// Writes the order and decrements its inventory item as one commit.
+  Future<void> recordSale(Order order, Item item);
+
+  /// Writes the returned order and restores line quantities as one commit.
+  Future<void> closeReturn(Order order, {required bool restock});
 }

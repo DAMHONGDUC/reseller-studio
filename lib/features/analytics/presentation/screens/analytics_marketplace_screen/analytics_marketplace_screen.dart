@@ -41,7 +41,7 @@ class AnalyticsMarketplaceScreen extends ConsumerWidget {
                 SizedBox(height: SdContentPaddingV3.topGap),
                 for (final MarketplacePerformance row in rows) ...<Widget>[
                   MetricCard(
-                    title: row.marketplace.displayName,
+                    title: row.marketplaceName,
                     rows: <Widget>[
                       MetricRow(
                         label: context.l10n.commonRevenue,

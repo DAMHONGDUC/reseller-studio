@@ -53,7 +53,7 @@ class ShippingQueueScreen extends ConsumerWidget {
                       .map(
                         (Order order) => AppListRow(
                           title: order.lines.isEmpty
-                              ? order.marketplace.displayName
+                              ? order.marketplaceName
                               : order.lines.first.title,
                           subtitle: _deadlineLine(context, order, now),
                           icon: AppIconConstant.package,
@@ -80,7 +80,7 @@ class ShippingQueueScreen extends ConsumerWidget {
   /// "Due in 2d" reads as an instruction; a date reads as a fact to work out.
   static String _deadlineLine(BuildContext context, Order order, DateTime now) {
     final DateTime? deadline = order.shipByDate;
-    final String marketplace = order.marketplace.displayName;
+    final String marketplace = order.marketplaceName;
 
     if (deadline == null) return context.l10n.shippingNoDeadline(marketplace);
 

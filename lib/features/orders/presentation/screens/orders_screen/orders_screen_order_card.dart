@@ -59,7 +59,7 @@ class _OrderCard extends StatelessWidget {
                       label: OrderStatusLabel.of(context, order.status),
                       tone: _statusTone(order.status),
                     ),
-                    SdBadgeV3(label: order.marketplace.displayName),
+                    SdBadgeV3(label: order.marketplaceName),
                     if (isOverdue)
                       SdBadgeV3(
                         label: context.l10n.orderLate,

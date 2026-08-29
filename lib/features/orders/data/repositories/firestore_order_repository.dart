@@ -6,6 +6,7 @@ import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
+import '../../../inventory/domain/entities/item.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/repositories/order_repository.dart';
 import '../dtos/order_dto.dart';
@@ -59,6 +60,119 @@ class FirestoreOrderRepository implements OrderRepository {
       'orderId': order.id,
       'status': order.status.name,
       'lines': order.lines.length,
+    });
+  });
+
+  @override
+  Future<void> recordSale(Order order, Item item) => FailureMapper.guard(
+    'record sale',
+    () async {
+      final DocumentReference<Map<String, Object?>> orderRef = _context
+          .collections
+          .orders
+          .doc(order.id);
+      final DocumentReference<Map<String, Object?>> itemRef = _context
+          .collections
+          .items
+          .doc(item.id);
+
+      await orderRef.firestore.runTransaction((Transaction transaction) async {
+        final DocumentSnapshot<Map<String, Object?>> itemDoc = await transaction
+            .get(itemRef);
+        final Map<String, Object?> data =
+            itemDoc.data() ?? const <String, Object?>{};
+        final int quantity = data['quantity'] is int
+            ? data['quantity']! as int
+            : item.quantity;
+        final String status = data['status'] is String
+            ? data['status']! as String
+            : item.status.name;
+
+        if (!itemDoc.exists ||
+            quantity <= 0 ||
+            status == 'sold' ||
+            status == 'archived') {
+          throw StateError('Item ${item.id} is no longer sellable');
+        }
+
+        final int left = quantity - 1;
+        transaction.set(
+          orderRef,
+          OrderDto.toMap(order, createdBy: _context.uid),
+          SetOptions(merge: true),
+        );
+        transaction.update(itemRef, <String, Object?>{
+          'quantity': left,
+          'status': left == 0 ? 'sold' : 'inStock',
+          if (left == 0) 'soldAt': Timestamp.fromDate(order.orderedAt),
+          if (data['askingPriceMinor'] == null)
+            'askingPriceMinor': order.salePrice.minor,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      });
+
+      SdLogger.info(LogTagConstant.order, 'Sale committed', <String, Object>{
+        'orderId': order.id,
+        'itemId': item.id,
+      });
+    },
+  );
+
+  @override
+  Future<void> closeReturn(
+    Order order, {
+    required bool restock,
+  }) => FailureMapper.guard('close return', () async {
+    final DocumentReference<Map<String, Object?>> orderRef = _context
+        .collections
+        .orders
+        .doc(order.id);
+
+    await orderRef.firestore.runTransaction((Transaction transaction) async {
+      final Map<String, int> quantities = <String, int>{};
+      for (final OrderLine line in order.lines) {
+        quantities.update(
+          line.itemId,
+          (int value) => value + line.quantity,
+          ifAbsent: () => line.quantity,
+        );
+      }
+
+      final Map<DocumentReference<Map<String, Object?>>, int> current =
+          <DocumentReference<Map<String, Object?>>, int>{};
+      if (restock) {
+        for (final MapEntry<String, int> entry in quantities.entries) {
+          final DocumentReference<Map<String, Object?>> itemRef = _context
+              .collections
+              .items
+              .doc(entry.key);
+          final DocumentSnapshot<Map<String, Object?>> itemDoc =
+              await transaction.get(itemRef);
+          if (!itemDoc.exists) continue;
+          final Object? raw = itemDoc.data()?['quantity'];
+          current[itemRef] = raw is int ? raw : 0;
+        }
+      }
+
+      transaction.set(
+        orderRef,
+        OrderDto.toMap(order, createdBy: _context.uid),
+        SetOptions(merge: true),
+      );
+      for (final MapEntry<DocumentReference<Map<String, Object?>>, int> entry
+          in current.entries) {
+        transaction.update(entry.key, <String, Object?>{
+          'quantity': entry.value + quantities[entry.key.id]!,
+          'status': 'inStock',
+          'soldAt': FieldValue.delete(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+    });
+
+    SdLogger.info(LogTagConstant.order, 'Return committed', <String, Object>{
+      'orderId': order.id,
+      'restock': restock,
     });
   });
 

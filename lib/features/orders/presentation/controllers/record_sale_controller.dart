@@ -6,8 +6,6 @@ import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
-import '../../../inventory/domain/repositories/item_repository.dart';
-import '../../../inventory/domain/services/item_transition.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/order.dart';
@@ -40,52 +38,52 @@ class RecordSaleController extends Notifier<bool> {
   Future<String> record(
     Item item, {
     required Money salePrice,
-    required Marketplace marketplace,
+    Marketplace? marketplace,
+    String? marketplaceId,
+    String? marketplaceName,
     required DateTime soldAt,
     String? buyerName,
   }) async {
     final OrderRepository orders = ref.read(orderRepositoryProvider);
-    final ItemRepository items = ref.read(itemRepositoryProvider);
     final String orderId = _uuid.v4();
+    final String resolvedMarketplaceId =
+        marketplaceId ?? marketplace?.name ?? 'other';
+    final String resolvedMarketplaceName =
+        marketplaceName ?? marketplace?.displayName ?? 'Other';
 
     SdLogger.action(LogTagConstant.order, 'Record sale', <String, Object>{
       'itemId': item.id,
-      'marketplace': marketplace.name,
+      'marketplaceId': resolvedMarketplaceId,
       'salePriceMinor': salePrice.minor,
     });
 
     state = true;
 
     try {
-      await orders.save(
-        Order(
-          id: orderId,
-          status: OrderStatus.toShip,
-          marketplace: marketplace,
-          lines: <OrderLine>[
-            OrderLine(
-              itemId: item.id,
-              title: item.title,
-              quantity: 1,
-              unitPrice: salePrice,
-              // Null when nobody entered a cost — the order's profit is then
-              // `—` rather than the whole sale price (hard rule 5).
-              unitCost: item.purchasePrice,
-            ),
-          ],
-          salePrice: salePrice,
-          orderedAt: soldAt,
-          buyerName: buyerName,
-        ),
+      final Order order = Order(
+        id: orderId,
+        status: OrderStatus.toShip,
+        marketplaceRecordId: resolvedMarketplaceId,
+        marketplaceNameSnapshot: resolvedMarketplaceName,
+        lines: <OrderLine>[
+          OrderLine(
+            itemId: item.id,
+            title: item.title,
+            quantity: 1,
+            unitPrice: salePrice,
+            // Null when nobody entered a cost — the order's profit is then
+            // `—` rather than the whole sale price (hard rule 5).
+            unitCost: item.purchasePrice,
+          ),
+        ],
+        salePrice: salePrice,
+        orderedAt: soldAt,
+        buyerName: buyerName,
       );
 
-      // One unit, not the whole row: `sell` moves the status only when the
-      // sale empties the shelf, so selling one of ten leaves nine listed.
-      await items.save(
-        ItemTransition.sell(
-          item.copyWith(askingPrice: item.askingPrice ?? salePrice),
-          now: soldAt,
-        ),
+      await orders.recordSale(
+        order,
+        item.copyWith(askingPrice: item.askingPrice ?? salePrice),
       );
 
       SdLogger.info(LogTagConstant.order, 'Sale recorded', <String, Object>{
@@ -93,7 +91,7 @@ class RecordSaleController extends Notifier<bool> {
         'orderId': orderId,
       });
       AppAnalytics.instance.itemSold(
-        marketplace: marketplace.name,
+        marketplace: resolvedMarketplaceId,
         // The share of sales with no cost is the health metric for the whole
         // "insight" half of the product — it is what makes profit unknowable.
         hadCost: item.purchasePrice != null,

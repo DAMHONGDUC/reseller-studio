@@ -116,10 +116,10 @@ searchResultsProvider = Provider<List<SearchHit>>((Ref ref) {
           kind: SearchHitKind.order,
           id: order.id,
           title: order.lines.isEmpty
-              ? order.marketplace.displayName
+              ? order.marketplaceName
               : order.lines.first.title,
           status: order.status,
-          detail: order.marketplace.displayName,
+          detail: order.marketplaceName,
         ),
       );
     }

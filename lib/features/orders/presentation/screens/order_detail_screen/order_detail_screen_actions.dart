@@ -79,8 +79,7 @@ class _OrderActions extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        if (order.status == OrderStatus.toShip ||
-            order.status == OrderStatus.awaitingPayment)
+        if (order.status == OrderStatus.toShip)
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
             label: context.l10n.orderShipIt,
@@ -134,8 +133,7 @@ class _OrderActions extends ConsumerWidget {
         // `awaitingPayment` — there is nothing to give back — and not a
         // cancelled order, which never took the money in the first place.
         if (order.status.countsAsRevenue ||
-            order.status == OrderStatus.returned ||
-            order.status == OrderStatus.refunded) ...<Widget>[
+            order.status == OrderStatus.returned) ...<Widget>[
           SizedBox(height: SdSpacingConstant.h8),
           SdButtonV3(
             variant: SdButtonVariantV3.outlined,

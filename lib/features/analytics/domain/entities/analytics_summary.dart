@@ -136,7 +136,8 @@ class AnalyticsSummary {
 /// One platform's contribution (plan §9, Marketplace section).
 class MarketplacePerformance {
   const MarketplacePerformance({
-    required this.marketplace,
+    required this.marketplaceId,
+    required this.marketplaceName,
     required this.revenue,
     required this.profit,
     required this.fees,
@@ -144,7 +145,8 @@ class MarketplacePerformance {
   });
 
   factory MarketplacePerformance.from({
-    required Marketplace marketplace,
+    required String marketplaceId,
+    required String marketplaceName,
     required List<Order> orders,
     required String currency,
   }) {
@@ -164,7 +166,8 @@ class MarketplacePerformance {
         .toList();
 
     return MarketplacePerformance(
-      marketplace: marketplace,
+      marketplaceId: marketplaceId,
+      marketplaceName: marketplaceName,
       revenue: revenue,
       profit: profits.totalOfKnown(),
       fees: fees,
@@ -172,7 +175,13 @@ class MarketplacePerformance {
     );
   }
 
-  final Marketplace marketplace;
+  final String marketplaceId;
+  final String marketplaceName;
+
+  Marketplace get marketplace => Marketplace.values.firstWhere(
+    (Marketplace value) => value.name == marketplaceId,
+    orElse: () => Marketplace.other,
+  );
   final Money revenue;
 
   /// Null when any order on this platform had an unknown cost.

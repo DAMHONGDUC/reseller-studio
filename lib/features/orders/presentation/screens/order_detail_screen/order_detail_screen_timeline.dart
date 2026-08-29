@@ -19,6 +19,17 @@ class _Timeline extends StatelessWidget {
         _TimelineEntry(context.l10n.orderStatusShipped, order.shippedAt!),
       if (order.deliveredAt != null)
         _TimelineEntry(context.l10n.orderStatusDelivered, order.deliveredAt!),
+      if (order.returnRequestedAt != null)
+        _TimelineEntry(
+          context.l10n.orderStatusReturnRequested,
+          order.returnRequestedAt!,
+        ),
+      if (order.returnedAt != null)
+        _TimelineEntry(context.l10n.orderStatusReturned, order.returnedAt!),
+      if (order.refundedAt != null)
+        _TimelineEntry(context.l10n.orderStatusRefunded, order.refundedAt!),
+      if (order.settledAt != null)
+        _TimelineEntry(context.l10n.settleTitle, order.settledAt!),
     ];
 
     return SdCardV3(

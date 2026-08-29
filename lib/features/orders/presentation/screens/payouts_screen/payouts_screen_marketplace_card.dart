@@ -20,7 +20,7 @@ class _MarketplaceCard extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       SdSectionHeaderV3(
-        title: row.marketplace.displayName,
+        title: row.marketplaceName,
         subtitle: row.awaitingIsEstimated
             ? context.l10n.payoutsEstimatedNote
             : null,

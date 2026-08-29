@@ -96,7 +96,7 @@ class _StatusCard extends StatelessWidget {
           SizedBox(height: SdSpacingConstant.h4),
           Text(
             <String>[
-              order.marketplace.displayName,
+              order.marketplaceName,
               DateTimeUtils.mediumDate(
                 order.orderedAt,
                 locale: context.localeTag,

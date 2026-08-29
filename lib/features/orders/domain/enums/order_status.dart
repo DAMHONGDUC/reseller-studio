@@ -52,9 +52,9 @@ enum OrderStatus {
     OrderStatus.toShip ||
     OrderStatus.shipped ||
     OrderStatus.delivered ||
-    OrderStatus.returnRequested => true,
+    OrderStatus.returnRequested ||
+    OrderStatus.returned => true,
     OrderStatus.awaitingPayment ||
-    OrderStatus.returned ||
     OrderStatus.refunded ||
     OrderStatus.cancelled => false,
   };

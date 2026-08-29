@@ -3,7 +3,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/inventory/domain/entities/item.dart';
-import '../../features/marketplaces/domain/enums/marketplace.dart';
+import '../../features/marketplaces/domain/entities/marketplace.dart';
+import '../../features/marketplaces/providers.dart';
 import '../../features/orders/providers.dart';
 import '../../features/workspace/providers.dart';
 import '../constants/date_picker_constant.dart';
@@ -53,7 +54,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
   final TextEditingController _buyer = TextEditingController();
 
-  Marketplace _marketplace = Marketplace.ebay;
+  Marketplace? _marketplace;
   DateTime _soldAt = DateTime.now();
 
   @override
@@ -67,8 +68,10 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final NavigatorState navigator = Navigator.of(context);
     final String currency = ref.read(workspaceCurrencyProvider);
     final Money? price = Money.tryParse(_price.text, currency);
+    final List<Marketplace> marketplaces = ref.read(activeMarketplacesProvider);
+    final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
 
-    if (price == null) {
+    if (price == null || marketplace == null) {
       SdSnackBarUtilsV3.error(context, context.l10n.markSoldPriceRequired);
 
       return;
@@ -80,7 +83,8 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           .record(
             widget.item,
             salePrice: price,
-            marketplace: _marketplace,
+            marketplaceId: marketplace.id,
+            marketplaceName: marketplace.name,
             soldAt: _soldAt,
             buyerName: _buyer.text.trim().isEmpty ? null : _buyer.text.trim(),
           );
@@ -105,6 +109,10 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final bool isBusy = ref.watch(recordSaleControllerProvider);
     final String currency = ref.watch(workspaceCurrencyProvider);
     final DateTime now = DateTime.now();
+    final List<Marketplace> marketplaces = ref.watch(
+      activeMarketplacesProvider,
+    );
+    final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
 
     return SdBottomSheetV3(
       title: context.l10n.markSoldTitle,
@@ -121,19 +129,19 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
             label: context.l10n.markSoldOn,
-            value: _marketplace.displayName,
+            value: marketplace?.name,
             onTap: () async {
               final Marketplace? picked =
                   await OptionPickerSheet.show<Marketplace>(
                     context,
                     title: context.l10n.commonMarketplace,
-                    selected: _marketplace,
-                    options: Marketplace.values
+                    selected: marketplace,
+                    options: marketplaces
                         .map(
                           (Marketplace marketplace) =>
                               PickerOption<Marketplace>(
                                 value: marketplace,
-                                label: marketplace.displayName,
+                                label: marketplace.name,
                               ),
                         )
                         .toList(),
@@ -176,7 +184,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             label: context.l10n.markSoldSubmit,
             expand: true,
             busy: isBusy,
-            onPressed: isBusy ? null : _submit,
+            onPressed: isBusy || marketplace == null ? null : _submit,
           ),
         ],
       ),

@@ -104,6 +104,10 @@ class _RefundSheetState extends ConsumerState<RefundSheet> {
     final bool isBusy = ref.watch(orderActionsControllerProvider);
     final String currency = ref.watch(workspaceCurrencyProvider);
     final Money? already = widget.order.refund;
+    final bool isValid =
+        _typed != null &&
+        _typed!.minor > 0 &&
+        _typed! <= widget.order.salePrice;
 
     return SdBottomSheetV3(
       title: context.l10n.refundTitle,
@@ -141,7 +145,7 @@ class _RefundSheetState extends ConsumerState<RefundSheet> {
             label: context.l10n.refundAction,
             expand: true,
             busy: isBusy,
-            onPressed: isBusy || _typed == null ? null : _submit,
+            onPressed: isBusy || !isValid ? null : _submit,
           ),
         ],
       ),

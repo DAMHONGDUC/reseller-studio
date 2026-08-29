@@ -34,7 +34,7 @@ class _ActivityRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  order.marketplace.displayName,
+                  order.marketplaceName,
                   style: context.textTheme3.bodySmall!.muted3(context),
                 ),
               ],

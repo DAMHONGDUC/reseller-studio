@@ -1,12 +1,12 @@
 import '../../../../core/money/money.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
-import '../../../marketplaces/domain/services/marketplace_fee_policy.dart';
 import '../entities/order.dart';
 
 /// What one marketplace still owes, and what it has already paid.
 class MarketplacePayout {
   const MarketplacePayout({
-    required this.marketplace,
+    required this.marketplaceId,
+    required this.marketplaceName,
     required this.settled,
     required this.awaiting,
     required this.settledTotal,
@@ -14,7 +14,13 @@ class MarketplacePayout {
     required this.awaitingIsEstimated,
   });
 
-  final Marketplace marketplace;
+  final String marketplaceId;
+  final String marketplaceName;
+
+  Marketplace get marketplace => Marketplace.values.firstWhere(
+    (Marketplace value) => value.name == marketplaceId,
+    orElse: () => Marketplace.other,
+  );
 
   /// Orders whose payout the seller has recorded, newest first.
   final List<Order> settled;
@@ -56,17 +62,17 @@ final class PayoutReconciliation {
     List<Order> orders, {
     Map<String, double> feeRates = const <String, double>{},
   }) {
-    final Map<Marketplace, List<Order>> grouped = <Marketplace, List<Order>>{};
+    final Map<String, List<Order>> grouped = <String, List<Order>>{};
 
     for (final Order order in orders) {
       if (!order.status.countsAsRevenue) continue;
 
-      grouped.putIfAbsent(order.marketplace, () => <Order>[]).add(order);
+      grouped.putIfAbsent(order.marketplaceId, () => <Order>[]).add(order);
     }
 
     final List<MarketplacePayout> rows = grouped.entries
         .map(
-          (MapEntry<Marketplace, List<Order>> entry) =>
+          (MapEntry<String, List<Order>> entry) =>
               _payout(entry.key, entry.value, feeRates),
         )
         .toList();
@@ -91,7 +97,7 @@ final class PayoutReconciliation {
     final Money fees =
         order.fees ??
         order.salePrice.applyRate(
-          MarketplaceFeePolicy.rateFor(order.marketplace, overrides: feeRates),
+          feeRates[order.marketplaceId] ?? order.marketplace.estimatedFeeRate,
         );
 
     return order.salePrice -
@@ -104,7 +110,7 @@ final class PayoutReconciliation {
   static bool isEstimated(Order order) => order.fees == null;
 
   static MarketplacePayout _payout(
-    Marketplace marketplace,
+    String marketplaceId,
     List<Order> orders,
     Map<String, double> feeRates,
   ) {
@@ -117,7 +123,8 @@ final class PayoutReconciliation {
           ..sort((Order a, Order b) => a.orderedAt.compareTo(b.orderedAt));
 
     return MarketplacePayout(
-      marketplace: marketplace,
+      marketplaceId: marketplaceId,
+      marketplaceName: orders.first.marketplaceName,
       settled: settled,
       awaiting: awaiting,
       settledTotal: settled.map((Order order) => order.payout).totalOfKnown(),

@@ -7,6 +7,7 @@ import '../../expenses/domain/repositories/expense_repository.dart';
 import '../../inventory/domain/entities/item.dart';
 import '../../inventory/domain/entities/item_category.dart';
 import '../../inventory/domain/entities/storage_location.dart';
+import '../../inventory/domain/enums/item_status.dart';
 import '../../inventory/domain/repositories/catalog_repository.dart';
 import '../../inventory/domain/repositories/item_repository.dart';
 import '../../listings/domain/entities/listing.dart';
@@ -217,6 +218,50 @@ class InMemoryOrderRepository implements OrderRepository {
     order,
     (Order other) => other.id == order.id,
   );
+
+  @override
+  Future<void> recordSale(Order order, Item item) async {
+    final int index = _store.items.indexWhere(
+      (Item current) => current.id == item.id,
+    );
+    if (index == -1 ||
+        _store.items[index].quantity <= 0 ||
+        _store.items[index].status == ItemStatus.sold ||
+        _store.items[index].status == ItemStatus.archived) {
+      throw StateError('Item ${item.id} is no longer sellable');
+    }
+
+    final Item current = _store.items[index];
+    final int left = current.quantity - 1;
+    _store.items[index] = current.copyWith(
+      askingPrice: current.askingPrice ?? order.salePrice,
+      quantity: left,
+      status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
+      soldAt: left == 0 ? order.orderedAt : null,
+    );
+    _store.upsert(_store.orders, order, (Order other) => other.id == order.id);
+  }
+
+  @override
+  Future<void> closeReturn(Order order, {required bool restock}) async {
+    if (restock) {
+      for (final OrderLine line in order.lines) {
+        final int index = _store.items.indexWhere(
+          (Item item) => item.id == line.itemId,
+        );
+        if (index == -1) continue;
+
+        final Item item = _store.items[index];
+        _store.items[index] = item.copyWith(
+          quantity: item.quantity + line.quantity,
+          status: ItemStatus.inStock,
+          clearSoldAt: true,
+        );
+      }
+    }
+
+    _store.upsert(_store.orders, order, (Order other) => other.id == order.id);
+  }
 }
 
 class InMemoryMarketplaceRepository implements MarketplaceRepository {

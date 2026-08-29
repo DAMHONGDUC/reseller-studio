@@ -126,7 +126,7 @@ class ReportController extends Notifier<bool> {
         rows.add(<String>[
           order.id,
           DateTimeUtils.isoDate(order.orderedAt),
-          order.marketplace.displayName,
+          order.marketplaceName,
           order.status.name,
           line.title,
           '${line.quantity}',

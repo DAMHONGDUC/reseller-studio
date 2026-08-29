@@ -52,10 +52,12 @@ class Order {
   const Order({
     required this.id,
     required this.status,
-    required this.marketplace,
     required this.lines,
     required this.salePrice,
     required this.orderedAt,
+    this.marketplace = Marketplace.other,
+    this.marketplaceRecordId,
+    this.marketplaceNameSnapshot,
     this.fees,
     this.shippingCost,
     this.refund,
@@ -67,12 +69,22 @@ class Order {
     this.shipByDate,
     this.shippedAt,
     this.deliveredAt,
+    this.returnRequestedAt,
+    this.returnedAt,
+    this.refundedAt,
+    this.settledAt,
     this.notes,
   });
 
   final String id;
   final OrderStatus status;
   final Marketplace marketplace;
+  final String? marketplaceRecordId;
+  final String? marketplaceNameSnapshot;
+
+  String get marketplaceId => marketplaceRecordId ?? marketplace.name;
+  String get marketplaceName =>
+      marketplaceNameSnapshot ?? marketplace.displayName;
   final List<OrderLine> lines;
 
   /// What the buyer paid in total, before the platform took its cut.
@@ -107,6 +119,10 @@ class Order {
 
   final DateTime? shippedAt;
   final DateTime? deliveredAt;
+  final DateTime? returnRequestedAt;
+  final DateTime? returnedAt;
+  final DateTime? refundedAt;
+  final DateTime? settledAt;
   final String? notes;
 
   /// Cost of goods across every line, or null when any line's cost is
@@ -148,7 +164,7 @@ class Order {
   bool? isOverdue(DateTime now) {
     final DateTime? deadline = shipByDate;
 
-    if (deadline == null || !status.needsAction) return null;
+    if (deadline == null || status != OrderStatus.toShip) return null;
 
     return now.isAfter(deadline);
   }
@@ -175,11 +191,16 @@ class Order {
     DateTime? shipByDate,
     DateTime? shippedAt,
     DateTime? deliveredAt,
+    DateTime? returnRequestedAt,
+    DateTime? returnedAt,
+    DateTime? refundedAt,
+    DateTime? settledAt,
     String? notes,
   }) => Order(
     id: id,
     status: status ?? this.status,
-    marketplace: marketplace,
+    marketplaceRecordId: marketplaceId,
+    marketplaceNameSnapshot: marketplaceName,
     lines: lines,
     salePrice: salePrice,
     orderedAt: orderedAt,
@@ -194,6 +215,10 @@ class Order {
     shipByDate: shipByDate ?? this.shipByDate,
     shippedAt: shippedAt ?? this.shippedAt,
     deliveredAt: deliveredAt ?? this.deliveredAt,
+    returnRequestedAt: returnRequestedAt ?? this.returnRequestedAt,
+    returnedAt: returnedAt ?? this.returnedAt,
+    refundedAt: refundedAt ?? this.refundedAt,
+    settledAt: settledAt ?? this.settledAt,
     notes: notes ?? this.notes,
   );
 }
