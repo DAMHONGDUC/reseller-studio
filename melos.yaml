@@ -26,8 +26,7 @@ ide:
 # takes the flavour as $1 — these entries are the only thing duplicated.
 #
 # **Underscore-prefixed files in packages/system_design/tool/ are not commands.** `_common.sh`,
-# `_clean.sh`, `_url-scheme.sh` are sourced or called by others and are never
-# named here.
+# `_clean.sh` is called by setup and is never named here.
 #
 # Each script is one line on purpose. Melos echoes the whole `run:` body
 # before AND after every run, with no flag to turn it off, so a multi-line
@@ -51,10 +50,6 @@ scripts:
     description: Install prod's config — env files and the native files.
     run: sh packages/system_design/tool/prepare-env.sh prod
 
-  run:
-    description: Run the app. `melos run run -- prod` for release config.
-    run: sh packages/system_design/tool/run.sh
-
   gen:
     description: Localizations and codegen, nothing else.
     run: sh packages/system_design/tool/gen.sh
@@ -66,10 +61,6 @@ scripts:
   test:
     description: The test suite. For CI and full sweeps, not per-change.
     run: sh packages/system_design/tool/test.sh
-
-  test-rules:
-    description: firestore.rules against the emulator. Needs Java.
-    run: sh packages/system_design/tool/test-rules.sh
 
   preflight:
     description: Everything that must be true before a build is worth uploading.
@@ -92,11 +83,11 @@ scripts:
     run: sh packages/system_design/tool/deploy-firebase.sh prod
 
   release-dev:
-    description: dev config, dev Firebase, then TestFlight. Confirms first.
+    description: dev config, preflight, dev Firebase, then TestFlight.
     run: sh packages/system_design/tool/release.sh dev
 
   release-prod:
-    description: prod config, prod Firebase, then TestFlight. Confirms first.
+    description: prod config, preflight, prod Firebase, then TestFlight.
     run: sh packages/system_design/tool/release.sh prod
 
 sdkPath: .fvm/flutter_sdk

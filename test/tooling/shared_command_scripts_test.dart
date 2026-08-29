@@ -10,7 +10,7 @@ void main() {
       multiLine: true,
     ).allMatches(melos);
 
-    expect(commands, hasLength(16));
+    expect(commands, hasLength(14));
 
     for (final RegExpMatch command in commands) {
       final String path = command.group(1)!;
@@ -29,4 +29,27 @@ void main() {
 
     expect(localScripts, isEmpty);
   });
+
+  test(
+    'release runs preflight before deploy and removed scripts stay absent',
+    () {
+      final String release = File(
+        'packages/system_design/tool/release.sh',
+      ).readAsStringSync();
+      final int preflight = release.indexOf('sh "\$SCRIPT_DIR/preflight.sh"');
+      final int deploy = release.indexOf(
+        'sh "\$SCRIPT_DIR/deploy-firebase.sh"',
+      );
+
+      expect(preflight, greaterThanOrEqualTo(0));
+      expect(deploy, greaterThan(preflight));
+
+      for (final String name in <String>['run', 'test-rules', '_url-scheme']) {
+        expect(
+          File('packages/system_design/tool/$name.sh').existsSync(),
+          isFalse,
+        );
+      }
+    },
+  );
 }

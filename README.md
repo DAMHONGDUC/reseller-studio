@@ -32,11 +32,9 @@ Firebase and store accounts are not included in the repository. See
 
 | Task | Command |
 |---|---|
-| Run | `melos run run` |
 | Generate localization | `melos run gen` |
 | Analyze | `melos run analyze` |
 | Test | `melos run test` |
-| Test Firestore rules | `melos run test-rules` |
 | Release checks | `melos run preflight` |
 
 Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).

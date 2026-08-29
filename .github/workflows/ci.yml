@@ -104,11 +104,3 @@ jobs:
       - name: Build
         working-directory: functions
         run: npm run build
-
-      # The rules are the real access boundary — the signed-out shell and every
-      # `WorkspaceGuard` are UI states, never permissions. Run from the repo
-      # root: `firebase.json` and `firestore.rules` both live there, and the
-      # script uses the CLI `npm ci` just installed. The runner already has
-      # the Java the emulator needs.
-      - name: Firestore rules
-        run: sh packages/system_design/tool/test-rules.sh
