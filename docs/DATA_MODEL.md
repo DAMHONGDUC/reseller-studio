@@ -124,11 +124,21 @@ document. Without the copy, every Inventory query becomes N+1 reads. They are
 written by the same transaction that writes the item, and a Cloud Function
 trigger fixes them if the purchase is edited.
 
-Statuses: `draft`, `inStock`, `listed`, `reserved`, `sold`, `archived`.
-`stale` is **not** a status — it is a query (`status == listed` and
-`listedAt` older than the workspace's threshold). Storing it as a status would
-mean a nightly job flipping thousands of documents, and a seller who reprices
-an item would have to wait for that job to see it leave the Stale tab.
+Statuses: `draft`, `inStock`, `sold`, `archived` — four, and `quantity` is
+what moves a row between the middle two. `listed` and `reserved` were removed:
+an item live on a marketplace is still stock the seller owns, so it stays
+`inStock` with its listings beside it. **A document written before that still
+reads**: `ItemDto` folds both old values into `inStock`, and nothing rewrites
+them until the item is next saved.
+
+`stale` is **not** a status either — it is a query (on hand, and `listedAt`
+older than the workspace's threshold). Storing it as a status would mean a
+nightly job flipping thousands of documents, and a seller who reprices an item
+would have to wait for that job to see it leave the Stale tab.
+
+`listedAt` survives the removal and carries more weight for it: it is the only
+record that an item ever reached a platform, so it is what staleness, the
+Stale tab and Home's getting-started progress all read.
 
 ### `categories/{categoryId}`
 
