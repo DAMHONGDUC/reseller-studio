@@ -734,6 +734,15 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
 - Sheets: always `showSdBottomSheetV3` — it must use the root navigator so
   sheets cover the floating glass tab bar; raw `showModalBottomSheet` slides
   under it.
+- **Every sheet carries a close icon, and the chrome draws it.** Owner's rule,
+  and it covers everything presented as a bottom sheet — a menu, a picker, a
+  form, a screen shown as a sheet. `SdBottomSheetV3` puts the button at the
+  end of its title row and pops its own route, and `closeTooltip` is required
+  so a new sheet cannot compile without one. The grab handle and the barrier
+  tap are conventions a seller has to already know; a visible control is the
+  one exit nothing has to teach, and it sits where the thumb already is.
+  - **No sheet draws its own.** A second close inside the content is two
+    controls doing one job, and only one of them is the one people find.
 - **A sheet sizes to its content, unless it is a document.** `SdBottomSheetV3`
   is `mainAxisSize.min` by default, which is right for a menu: a sheet taller
   than its rows is a sheet with dead space under the seller's thumb. A sheet
