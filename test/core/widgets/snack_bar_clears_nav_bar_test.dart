@@ -106,12 +106,15 @@ void main() {
     );
   });
 
-  testWidgets('by default it comes from the top', (WidgetTester tester) async {
+  testWidgets('a top message clears the app bar controls', (
+    WidgetTester tester,
+  ) async {
     late BuildContext screenContext;
 
     await pumpScreen(
       tester,
       SdScaffoldV3(
+        appBar: const SdAppBarV3(title: 'Detail'),
         body: _ContextProbe(
           onContext: (BuildContext context) => screenContext = context,
         ),
@@ -121,13 +124,10 @@ void main() {
     SdSnackBarUtilsV3.success(screenContext, 'Saved');
     await tester.pumpAndSettle();
 
-    final double screenHeight =
-        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    final Rect appBar = tester.getRect(find.byType(AppBar));
+    final Rect message = tester.getRect(find.byType(SdSnackBarCardV3));
 
-    expect(
-      tester.getRect(find.byType(SdSnackBarCardV3)).top,
-      lessThan(screenHeight / 2),
-    );
+    expect(message.top, greaterThanOrEqualTo(appBar.bottom));
   });
 
   testWidgets('and it never takes a tap from the screen under it', (
