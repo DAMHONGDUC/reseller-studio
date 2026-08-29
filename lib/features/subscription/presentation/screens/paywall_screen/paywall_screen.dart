@@ -62,16 +62,16 @@ class PaywallScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
+                        const _PaywallBenefits(),
+
+                        SizedBox(height: SdSpacingConstant.h12),
                         Column(
-                          children: [
-                            const _PaywallBenefits(),
+                          children: <Widget>[
+                            const _PaywallOfferings(),
                             SizedBox(height: SdSpacingConstant.h16),
                             const _PaywallDisclosure(),
                           ],
                         ),
-
-                        SizedBox(height: SdSpacingConstant.h12),
-                        const _PaywallOfferings(),
                       ],
                     ),
                   ),

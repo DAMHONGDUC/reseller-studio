@@ -140,12 +140,11 @@ void main() {
 
       final List<Order> pending = container.read(ordersNeedingActionProvider);
 
-      // ord-5 (deadline yesterday), ord-4 (deadline tomorrow), then ord-6
-      // (return requested, no deadline) last.
+      // Shipping Queue is fulfillment-only: ord-5 (deadline yesterday), then
+      // ord-4 (deadline tomorrow). Return requests have their own workflow.
       expect(pending.map((Order order) => order.id).toList(), <String>[
         'ord-5',
         'ord-4',
-        'ord-6',
       ]);
       expect(pending.first.isOverdue(testNow), isTrue);
     });

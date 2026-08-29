@@ -120,6 +120,8 @@ enum QuickActionKind {
   addSource,
   addCategory,
   addLocation,
+  addMarketplace,
+  addCarrier,
   inviteTeammate,
   analytics,
   about,
@@ -224,6 +226,16 @@ final class QuickActionConstant {
       kind: QuickActionSectionKind.business,
       actions: <QuickAction>[
         QuickAction(
+          kind: QuickActionKind.addMarketplace,
+          icon: AppIconConstant.hub,
+          route: AppRoutes.marketplaces,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addCarrier,
+          icon: AppIconConstant.localShipping,
+          route: AppRoutes.carriers,
+        ),
+        QuickAction(
           kind: QuickActionKind.inviteTeammate,
           icon: AppIconConstant.groupAdd,
           route: AppRoutes.team,
@@ -266,6 +278,8 @@ final class QuickActionLabel {
         QuickActionKind.addSource => context.l10n.homeQuickAddSource,
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
+        QuickActionKind.addMarketplace => context.l10n.marketplaceAdd,
+        QuickActionKind.addCarrier => context.l10n.carrierAdd,
         QuickActionKind.inviteTeammate => context.l10n.teamInvite,
         QuickActionKind.analytics => context.l10n.navAnalytics,
         QuickActionKind.about => context.l10n.moreAbout,
