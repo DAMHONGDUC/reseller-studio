@@ -243,6 +243,28 @@ Owner's rules, all of them read from one place so no screen types them:
   canvas. **The title stays `titleMedium`**: a screen title is a
   label, not a headline, and the screen's own content is what should be
   loud.
+- **An icon-only app bar action is `SdAppBarActionButtonV3`, and no screen
+  builds an `IconButton` in an app bar.** Owner's rule. The same control was
+  drawn six ways: Home's search and the notification bell as raw `Icon`s at
+  whatever `IconTheme` happened to set, Orders' two at `SdIconV3.defaultSize`,
+  the marketplace and carrier deletes at `r24`, and the search header's own
+  privately inside its delegate. Three sizes of one control, on bars a seller
+  moves between all day. The widget owns the slot, the glyph size, the colour
+  and the shrink-wrapped tap target; `SdSearchHeaderV3` renders its actions
+  through it too, so a docked header and a plain bar cannot come out
+  different.
+  - **The glyph is `SdAppBarActionButtonV3.glyphSize`, which is larger than
+    `SdIconV3.defaultSize`.** Owner's rule, and the same argument as the end
+    glyph below: a control at the top of every screen that a seller has to
+    look for is one they stop reaching for. It is the size the two delete
+    actions had already drifted to on their own.
+  - **An unread mark is `dotColor`, not a `Stack` at the call site.** The dot
+    sits on the glyph's corner, and only the button knows where the glyph is —
+    `NotificationBell` used to pin one to a raw `Icon` whose size it did not
+    control.
+  - **`onPressed` is nullable**, because a disabled action is a real state: a
+    delete is refused while a save is in flight, and hiding the row instead
+    would move everything beside it.
 - **A labelled action in a detail screen's app bar uses the medium button
   proportions.** Owner's rule. The small button keeps `labelLarge` text while
   scaling down its glyph and gap, so the word outweighs the icon and the pair
