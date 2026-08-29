@@ -66,7 +66,7 @@ class _StatusField extends ConsumerWidget {
     children: <Widget>[
       for (final ItemStatus status in ItemStatus.values)
         SdTagV3(
-          label: ItemStatusLabel.of(context, status),
+          label: status.label(context),
           color: status.color(context),
           selected: state.status == status,
           onSelected: () => ref
@@ -131,7 +131,7 @@ class _ConditionField extends ConsumerWidget {
     children: <Widget>[
       for (final ItemCondition condition in ItemCondition.values)
         SdTagV3(
-          label: ItemConditionLabel.of(context, condition),
+          label: condition.label(context),
           color: condition.color(context),
           selected: state.condition == condition,
           onSelected: () => ref

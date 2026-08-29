@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../../inventory/domain/enums/item_status.dart';
-import '../../inventory/item_label.dart';
 import '../../listings/domain/enums/listing_status.dart';
 import '../../listings/listing_label.dart';
 import '../../orders/domain/enums/order_status.dart';
@@ -28,7 +27,7 @@ final class SearchSubtitle {
 
   static String? _status(BuildContext context, Enum? status) =>
       switch (status) {
-        final ItemStatus value => ItemStatusLabel.of(context, value),
+        final ItemStatus value => value.label(context),
         final OrderStatus value => OrderStatusLabel.of(context, value),
         final ListingStatus value => ListingStatusLabel.of(context, value),
         _ => null,

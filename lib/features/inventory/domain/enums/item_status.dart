@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/theme/app_tag_hue.dart';
 
 /// Where an item is in its life (plan §29).
 ///
@@ -51,20 +52,26 @@ enum ItemStatus {
   bool get isListable => isOnHand;
 }
 
-/// **A status's colour lives on the status** — owner's rule. One value, one
-/// colour, wherever it is drawn: the radio on the item form and the badge on
-/// the card both ask this, so they cannot come out as two shades of nearly
-/// the same thing. Adding a state breaks this switch, which is the point.
-///
-/// **The four hues are chosen, not incidental**: grey for a draft that claims
-/// nothing, green for stock, blue for a sale, amber for a withdrawal.
-extension ItemStatusColor on ItemStatus {
-  Color color(BuildContext context) => AppColors.tag(context, switch (this) {
-    ItemStatus.draft => 7,
-    ItemStatus.inStock => 0,
-    ItemStatus.sold => 1,
-    ItemStatus.archived => 5,
-  });
+/// **How a status is shown lives on the status** — owner's rule: its words and
+/// its colour, both on the enum, so a value is asked and there is exactly one
+/// answer. Adding a state breaks these switches, which is the point.
+extension ItemStatusDisplay on ItemStatus {
+  String label(BuildContext context) => switch (this) {
+    ItemStatus.draft => context.l10n.itemStatusDraft,
+    ItemStatus.inStock => context.l10n.itemStatusInStock,
+    ItemStatus.sold => context.l10n.itemStatusSold,
+    ItemStatus.archived => context.l10n.itemStatusArchived,
+  };
+
+  /// **The four hues are chosen, not incidental**: grey for a draft that
+  /// claims nothing, green for stock, blue for a sale, amber for a
+  /// withdrawal.
+  Color color(BuildContext context) => switch (this) {
+    ItemStatus.draft => AppTagHue.grey,
+    ItemStatus.inStock => AppTagHue.green,
+    ItemStatus.sold => AppTagHue.blue,
+    ItemStatus.archived => AppTagHue.amber,
+  }.of(context);
 }
 
 /// The condition grades resellers actually use in listings.
@@ -81,19 +88,29 @@ enum ItemCondition {
   forParts,
 }
 
-/// The grade's own colour, best to worst.
+/// How a grade is shown — its words, and its own colour.
 ///
-/// **The palette is ordered light-to-serious**, so the seven grades read as a
-/// scale by index alone: new is green, for-parts is red. They are deliberately
-/// not the semantic tokens — "Fair" is a grade, not a warning.
-extension ItemConditionColor on ItemCondition {
-  Color color(BuildContext context) => AppColors.tag(context, switch (this) {
-    ItemCondition.newWithTags => 0,
-    ItemCondition.newWithoutTags => 1,
-    ItemCondition.likeNew => 2,
-    ItemCondition.good => 3,
-    ItemCondition.fair => 4,
-    ItemCondition.poor => 5,
-    ItemCondition.forParts => 6,
-  });
+/// **The hues run best-to-worst**, so the seven read as a scale: new is green,
+/// for-parts is red. They are deliberately not the semantic tokens — "Fair" is
+/// a grade, not a warning.
+extension ItemConditionDisplay on ItemCondition {
+  String label(BuildContext context) => switch (this) {
+    ItemCondition.newWithTags => context.l10n.conditionNewWithTags,
+    ItemCondition.newWithoutTags => context.l10n.conditionNewWithoutTags,
+    ItemCondition.likeNew => context.l10n.conditionLikeNew,
+    ItemCondition.good => context.l10n.conditionGood,
+    ItemCondition.fair => context.l10n.conditionFair,
+    ItemCondition.poor => context.l10n.conditionPoor,
+    ItemCondition.forParts => context.l10n.conditionForParts,
+  };
+
+  Color color(BuildContext context) => switch (this) {
+    ItemCondition.newWithTags => AppTagHue.green,
+    ItemCondition.newWithoutTags => AppTagHue.blue,
+    ItemCondition.likeNew => AppTagHue.violet,
+    ItemCondition.good => AppTagHue.indigo,
+    ItemCondition.fair => AppTagHue.teal,
+    ItemCondition.poor => AppTagHue.amber,
+    ItemCondition.forParts => AppTagHue.red,
+  }.of(context);
 }

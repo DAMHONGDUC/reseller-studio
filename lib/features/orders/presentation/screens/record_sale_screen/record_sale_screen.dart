@@ -10,7 +10,7 @@ import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/mark_sold_sheet.dart';
 import '../../../../inventory/domain/entities/item.dart';
-import '../../../../inventory/item_label.dart';
+import '../../../../inventory/domain/enums/item_status.dart';
 import '../../../../inventory/providers.dart';
 import '../../../providers.dart';
 

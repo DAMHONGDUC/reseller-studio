@@ -32,7 +32,7 @@ class _SaleItemRow extends StatelessWidget {
   /// Where it is, and what it is called on the shelf. The SKU earns its place
   /// because two items can carry the same title and only one of them sold.
   String _subtitle(BuildContext context) =>
-      <String>[ItemStatusLabel.of(context, item.status), ?item.sku].join(' · ');
+      <String>[item.status.label(context), ?item.sku].join(' · ');
 
   /// Picking an item opens the sheet; a recorded sale closes this screen so
   /// the seller lands back on Orders with the new order under them.

@@ -12,7 +12,6 @@ import '../../../../listings/providers.dart';
 import '../../../../sourcing/providers.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/enums/item_status.dart';
-import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../widgets/item_actions_sheet.dart';
 

@@ -24,7 +24,7 @@ class _StateBadges extends StatelessWidget {
       runSpacing: SdSpacingConstant.h4,
       children: <Widget>[
         SdBadgeV3(
-          label: ItemStatusLabel.of(context, item.status),
+          label: item.status.label(context),
           color: item.status.color(context),
         ),
         if (isStale)
@@ -38,7 +38,7 @@ class _StateBadges extends StatelessWidget {
         // item to justify.
         if (item.condition != null)
           SdBadgeV3(
-            label: ItemConditionLabel.of(context, item.condition!),
+            label: item.condition!.label(context),
             color: item.condition!.color(context),
           ),
       ],
