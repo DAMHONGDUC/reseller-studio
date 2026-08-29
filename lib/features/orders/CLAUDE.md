@@ -119,6 +119,23 @@ An order stores the seller-owned marketplace id plus a name snapshot. New
 sales choose from active marketplace records; deleting or renaming a market
 does not rewrite the historical name already printed on an order.
 
+## Return and refund labels say which way the thing moved
+
+Owner's rule. The two words name opposite movements — the **item** comes back
+to the seller, the **money** goes out to the buyer — and a label that names
+only the noun leaves the seller working out which one is happening. Every verb,
+sheet title and dialog title spells the direction out: "Open a return from the
+buyer", "Item is back with you", "Refund the buyer".
+
+- **The status labels stay short** — `Returned`, `Refunded`. They are read as
+  a tag in a column of a dozen rows, where the extra words cost more than the
+  ambiguity does; the direction is spelled out on the actions, which are what
+  change something.
+- **The sheet's confirm keeps the short word.** It sits under a title that has
+  already said who is being refunded, so `refundAction` is "Refund" and
+  `orderRefundBuyer` is the row in `OrderActionsSheet` — two labels because
+  one of them has a title above it and the other has nothing.
+
 ## Refund and timeline facts
 
 - A refund is positive and cannot exceed the sale price. Returning an item
