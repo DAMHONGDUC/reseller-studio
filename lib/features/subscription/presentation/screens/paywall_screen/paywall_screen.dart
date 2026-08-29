@@ -8,12 +8,12 @@ import '../../../../../core/config/app_env.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/widgets/legal_links_card.dart';
 import '../../../domain/entities/plan_offering.dart';
 import '../../../domain/entities/subscription_status.dart';
 import '../../../domain/enums/seller_plan.dart';
 import '../../controllers/subscription_controller.dart';
 import '../../subscription_labels.dart';
+import '../../widgets/paywall_legal_links.dart';
 
 part 'paywall_screen_offerings.dart';
 part 'paywall_screen_plan_card.dart';
@@ -53,8 +53,11 @@ class PaywallScreen extends ConsumerWidget {
               color: context.sdTheme3.textSecondary,
             ),
           ),
-          SdSectionHeaderV3(title: context.l10n.legalSection),
-          const LegalLinksCard(),
+          SizedBox(height: SdSpacingConstant.h8),
+          PaywallLegalLinks(
+            termsUrl: AppEnv.termsOfServiceUrl,
+            privacyUrl: AppEnv.privacyPolicyUrl,
+          ),
           SizedBox(height: SdContentPaddingV3.bottomGap),
         ],
       ),
