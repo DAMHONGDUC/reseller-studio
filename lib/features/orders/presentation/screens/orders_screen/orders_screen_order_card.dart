@@ -55,16 +55,24 @@ class _OrderCard extends StatelessWidget {
                   spacing: SdSpacingConstant.w6,
                   runSpacing: SdSpacingConstant.h4,
                   children: <Widget>[
+                    // Compact, the same presentation the Inventory row uses:
+                    // read-only card metadata sitting beside a title and a
+                    // price cannot spend a picker's padding.
                     SdBadgeV3(
                       label: OrderStatusLabel.of(context, order.status),
                       tone: _statusTone(order.status),
+                      size: SdBadgeSizeV3.compact,
                     ),
-                    SdBadgeV3(label: order.marketplaceName),
+                    SdBadgeV3(
+                      label: order.marketplaceName,
+                      size: SdBadgeSizeV3.compact,
+                    ),
                     if (isOverdue)
                       SdBadgeV3(
                         label: context.l10n.orderLate,
                         tone: SdBadgeToneV3.danger,
                         icon: AppIconConstant.priorityHigh,
+                        size: SdBadgeSizeV3.compact,
                       ),
                   ],
                 ),

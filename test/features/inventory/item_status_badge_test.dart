@@ -37,8 +37,8 @@ void main() {
       ),
     );
 
-    final Color inventoryColor = tester
-        .widget<SdTagV3>(find.widgetWithText(SdTagV3, 'In stock'))
+    final Color? inventoryColor = tester
+        .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'In stock'))
         .color;
 
     await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-11'));

@@ -1,7 +1,12 @@
 part of 'item_card.dart';
 
 /// The band across the foot of the card: how many are left, what they cost,
-/// what they are being asked for, what that would leave.
+/// and what they are being asked for.
+///
+/// **Expected profit is not here** — owner's rule. It is a figure derived from
+/// an asking price nobody has been offered yet, so on a list row it competes
+/// with the two facts beside it while claiming less than either. The detail
+/// screen still shows it.
 ///
 /// **Cells across the card's full width** — owner's rule that the row be
 /// harmonious, answered with a grid. Stacked as lines the figures made the
@@ -23,51 +28,33 @@ class _MoneyLine extends StatelessWidget {
   final Item item;
 
   @override
-  Widget build(BuildContext context) {
-    final Money? profit = item.expectedProfit;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          flex: 2,
-          child: _MoneyCell(
-            label: context.l10n.itemQuantityShort,
-            value: item.quantityOnHand.toString(),
-            color: context.sdTheme3.textPrimary,
-          ),
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Expanded(
+        flex: 2,
+        child: _MoneyCell(
+          label: context.l10n.itemQuantityShort,
+          value: item.quantityOnHand.toString(),
+          color: context.sdTheme3.textPrimary,
         ),
-        Expanded(
-          flex: 3,
-          child: _MoneyCell(
-            label: context.l10n.itemCost,
-            value: context.money(item.purchasePrice),
-            color: context.sdTheme3.textSecondary,
-          ),
+      ),
+      Expanded(
+        flex: 3,
+        child: _MoneyCell(
+          label: context.l10n.itemCost,
+          value: context.money(item.purchasePrice),
+          color: context.sdTheme3.textSecondary,
         ),
-        Expanded(
-          flex: 3,
-          child: _MoneyCell(
-            label: context.l10n.itemAsking,
-            value: context.money(item.askingPrice),
-            color: context.sdTheme3.textPrimary,
-          ),
+      ),
+      Expanded(
+        flex: 3,
+        child: _MoneyCell(
+          label: context.l10n.itemAsking,
+          value: context.money(item.askingPrice),
+          color: context.sdTheme3.textPrimary,
         ),
-        Expanded(
-          flex: 3,
-          child: _MoneyCell(
-            label: context.l10n.itemProfit,
-            value: context.money(profit),
-            // Hard rule 5: an em dash is not a figure, so it must not be
-            // tinted as though it were good news or bad.
-            color: profit == null
-                ? context.sdTheme3.textTertiary
-                : profit.isNegative
-                ? context.sdTheme3.loss
-                : context.sdTheme3.profit,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
 }

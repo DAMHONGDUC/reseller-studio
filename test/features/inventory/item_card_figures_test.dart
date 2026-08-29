@@ -58,7 +58,7 @@ void main() {
     expect(find.text('0'), findsOneWidget);
   });
 
-  testWidgets('the band states cost, asking price and profit', (
+  testWidgets('the band states cost and asking price, and no profit', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -72,14 +72,15 @@ void main() {
       ),
     );
 
-    // Label at the card's left edge, figure at its right, so the three
-    // amounts line up in a column whatever their labels measure.
+    // Label at the card's left edge, figure at its right, so the two amounts
+    // line up in a column whatever their labels measure.
     expect(find.text('Cost'), findsOneWidget);
     expect(find.text(r'$45.00'), findsOneWidget);
     expect(find.text('Asking'), findsOneWidget);
     expect(find.text(r'$185.00'), findsOneWidget);
-    expect(find.text('Profit'), findsOneWidget);
-    expect(find.text(r'$140.00'), findsOneWidget);
+    // Expected profit is the detail screen's, not the row's.
+    expect(find.text('Profit'), findsNothing);
+    expect(find.text(r'$140.00'), findsNothing);
   });
 
   testWidgets('a Quick Add row says the figures are missing, never zero', (
@@ -95,13 +96,13 @@ void main() {
 
     // Hard rule 5: both figures render an em dash rather than a zero, which
     // would tell the seller the item was free.
-    expect(find.text('—'), findsNWidgets(3));
+    expect(find.text('—'), findsNWidgets(2));
   });
 
   testWidgets('the row does not show state age', (WidgetTester tester) async {
     await pumpScreen(tester, ItemCard(item: itemWith(), now: testNow));
 
     expect(find.text('3w'), findsNothing);
-    expect(find.widgetWithText(SdTagV3, 'In stock'), findsOneWidget);
+    expect(find.widgetWithText(SdBadgeV3, 'In stock'), findsOneWidget);
   });
 }

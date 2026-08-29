@@ -54,9 +54,9 @@ void main() {
       ),
     );
 
-    final Finder statusTag = find.widgetWithText(SdTagV3, 'In stock');
-    final Finder marketTag = find.widgetWithText(SdTagV3, '3 markets');
-    final Finder allTags = find.byType(SdTagV3);
+    final Finder statusTag = find.widgetWithText(SdBadgeV3, 'In stock');
+    final Finder marketTag = find.widgetWithText(SdBadgeV3, '3 markets');
+    final Finder allTags = find.byType(SdBadgeV3);
 
     expect(marketTag, findsOneWidget);
     expect(allTags, findsNWidgets(4));
@@ -76,10 +76,15 @@ void main() {
       findsNothing,
     );
     expect(
-      tester.widget<SdTagV3>(marketTag).color,
+      tester.widget<SdBadgeV3>(marketTag).color,
       tester.element(marketTag).sdTheme3.textSecondary,
     );
-    expect(find.byType(SdBadgeV3), findsNothing);
+    // The card reports; it never offers the form's picker.
+    expect(find.byType(SdTagV3), findsNothing);
+    expect(
+      tester.widget<SdBadgeV3>(marketTag).size,
+      SdBadgeSizeV3.compact,
+    );
     expect(find.text('<1d'), findsNothing);
     expect(find.text('eBay'), findsNothing);
     expect(find.text('Depop'), findsNothing);
@@ -91,11 +96,32 @@ void main() {
     expect(find.text(r'$50.00'), findsNothing);
   });
 
-  testWidgets('an item on no marketplace shows no marketplace count', (
+  testWidgets('an item nobody has listed says so, in red', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, ItemCard(item: item, now: testNow));
 
+    final Finder unlisted = find.widgetWithText(SdBadgeV3, 'Not listed');
+
+    expect(unlisted, findsOneWidget);
+    expect(find.textContaining('market'), findsNothing);
+    expect(
+      tester.widget<SdBadgeV3>(unlisted).color,
+      tester.element(unlisted).sdTheme3.danger,
+    );
+  });
+
+  testWidgets('an item that has left inventory is not called unlisted', (
+    WidgetTester tester,
+  ) async {
+    // Sold and archived are finished, not late: a red tag asking for a
+    // listing would be pointing at work nobody has to do.
+    await pumpScreen(
+      tester,
+      ItemCard(item: item.copyWith(status: ItemStatus.sold), now: testNow),
+    );
+
+    expect(find.text('Not listed'), findsNothing);
     expect(find.textContaining('market'), findsNothing);
   });
 }

@@ -990,6 +990,10 @@
       }
     }
   },
+  "inventoryNotListed": "Not listed",
+  "@inventoryNotListed": {
+    "description": "Red Inventory card badge on an item that is on no marketplace yet."
+  },
   "itemMinimumPrice": "Minimum price",
   "@itemMinimumPrice": {
     "description": "The floor for offers and bulk repricing."

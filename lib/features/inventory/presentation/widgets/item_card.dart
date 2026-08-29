@@ -3,7 +3,6 @@ import 'package:system_design/index.dart';
 
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/money/money.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/widgets/app_photo.dart';
 import '../../../listings/domain/entities/listing.dart';
@@ -21,10 +20,9 @@ part 'item_card_thumbnail.dart';
 /// One row of Inventory.
 ///
 /// **Two zones.** Beside the photo, what the item *is*: its title and the
-/// equal-height tags naming its state, grade and marketplace count. Below,
-/// running to the
-/// card's own left edge, what it is *worth*: what it cost, what it is being
-/// asked for, and the marketplaces it is live on — then when the record last
+/// compact tags naming its state, grade and marketplace count. Below, running
+/// to the card's own left edge, what it is *worth*: how many are left, what
+/// they cost and what they are being asked for — then when the record last
 /// changed. Everything else is on the detail screen.
 ///
 /// The figures start at the edge rather than after the photo — owner's rule.
@@ -132,8 +130,7 @@ class ItemCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: SdSpacingConstant.h6),
-                    _StateBadges(item: item, now: now),
-                    _Marketplaces(listings: listings),
+                    _StateBadges(item: item, now: now, listings: listings),
                   ],
                 ),
               ),
