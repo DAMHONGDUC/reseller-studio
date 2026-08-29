@@ -114,7 +114,7 @@ Every step that can fail cheaply runs before the twenty-five minute one.
    is a gap in the numbering; a build whose number is in no commit is the thing
    this ordering exists to prevent.
 
-`preflight` is everything a release depends on except the build — three minutes
+`pre-build` is everything a release depends on except the build — three minutes
 instead of twenty-eight, and every credential failure ever met surfaces in it.
 Both `release-dev` and `release-prod` run it after installing the selected
 configuration and before any deploy or upload; a failure stops the chain.

@@ -32,7 +32,7 @@ about how the backend is written.
 - **Rules tests read `firestore.rules` itself, never a copy.** A copy would let
   the two drift, which is the one way a rules test fails: passing while
   production is open. The standalone `test-rules` command and its CI step are
-  deliberately absent by owner's rule; release uses `preflight` as its gate.
+  deliberately absent by owner's rule; release uses `pre-build` as its gate.
 
 ## Queries
 

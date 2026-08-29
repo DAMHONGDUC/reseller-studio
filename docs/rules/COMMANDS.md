@@ -25,12 +25,12 @@ Fourteen commands. Every one is `melos run <name>`, and every body is a file in
 | `gen` | `gen.sh` | Localizations and codegen, nothing else. |
 | `analyze` | `analyze.sh` | Zero findings, or fail. What CI runs. |
 | `test` | `test.sh` | The test suite. |
-| `preflight` | `preflight.sh` | Everything that must be true before a build is worth uploading. |
+| `pre-build` | `pre-build.sh` | iOS and Android checks that must pass before a build. |
 | `build-ipa-dev` | `build-ipa.sh dev` | The IPA, dev config attached. |
 | `build-ipa-prod` | `build-ipa.sh prod` | The IPA, prod config attached. |
 | `deploy-firebase-dev` | `deploy-firebase.sh dev` | Rules, indexes and functions to the dev alias. |
 | `deploy-firebase-prod` | `deploy-firebase.sh prod` | The same, prod alias. |
-| `release-dev` | `release.sh dev` | dev config, preflight, dev Firebase, then TestFlight. |
+| `release-dev` | `release.sh dev` | dev config, pre-build, dev Firebase, then TestFlight. |
 | `release-prod` | `release.sh prod` | The same, prod. |
 
 Three shapes recur, and they are the pattern to copy:
@@ -43,14 +43,14 @@ Three shapes recur, and they are the pattern to copy:
 - **Underscore-prefixed files are not commands.** `_common.sh` and `_clean.sh`
   are sourced or called by others, never named in `melos.yaml`.
 - **A command that chains others calls their scripts, never their steps.**
-  `release.sh` runs `prepare-env.sh`, `preflight.sh`, `deploy-firebase.sh` and
+  `release.sh` runs `prepare-env.sh`, `pre-build.sh`, `deploy-firebase.sh` and
   the beta lane in order; it re-implements none of them, so the confirm prompt
   and every check are the same ones a step run on its own gets.
 
-**There is no `run`, `test-rules` or `_url-scheme` script. `preflight` stays
-and every `release-*` command must run it.** Owner's rule. The release chain is
-the one place that owns the full go/no-go check, so neither flavour may deploy
-or upload after a failed preflight.
+**There is no `run`, `test-rules` or `_url-scheme` script. `pre-build` is the
+cross-platform gate and every `release-*` command must run it.** Owner's rule.
+It checks both iOS and Android before either flavour deploys or uploads, so a
+platform-specific missing config cannot survive until the build itself.
 
 ## What each one actually does
 
@@ -129,12 +129,12 @@ thing to verify a change: scope to the file that changed. `*_tmp_test.dart` is
 gitignored because the scratch harnesses hang the runner by design and
 `flutter test` with no arguments picks them up.
 
-### `preflight`
+### `pre-build`
 
-Everything that must be true before a build is worth uploading: the Firebase
-and sign-in files, no auth bypass in `lib/`, the icon not being Flutter's, the
-iOS usage strings, the legal URLs, the release credentials, and a clean
-analyze. Exits non-zero on an unmet blocker, so it is the check
+Everything that must be true before a build is worth uploading: shared
+Firebase and auth checks, iOS configuration and signing, Android application,
+Firebase, permissions, deep links and signing, legal URLs, release credentials
+and a clean analyze. Exits non-zero on an unmet blocker, so it is the check
 `RELEASE_ACTIONS.md` cannot be.
 
 ### `prepare-env-*` and `build-ipa-*`
@@ -182,7 +182,7 @@ uploads to was the one nobody was deploying rules for.
 
 ### `release-*` — the four commands that are always run together
 
-Config, preflight, Firebase, TestFlight — `prepare-env.sh`, `preflight.sh`,
+Config, pre-build, Firebase, TestFlight — `prepare-env.sh`, `pre-build.sh`,
 `deploy-firebase.sh`, then the `beta` lane. What the command adds over typing
 them is the two things a person gets wrong at 2am:
 
@@ -242,7 +242,7 @@ set -eu
   `[ -t 1 ]` and a `TERM` check both mean "never colour at all". Melos passes
   ANSI through and CI renders it.
 
-`preflight.sh` is the one script without `set -e`, and it says why: every check
+`pre-build.sh` is the one script without `set -e`, and it says why: every check
 must run so the output is the whole list rather than the first failure.
 
 ### Pin the runner exactly, and know why you are on that major
@@ -285,11 +285,11 @@ Three fastlane lanes, run from `ios/`. `docs/rules/RELEASE.md` is the authority
 on what each does and why the order matters.
 
 ```bash
-bundle exec fastlane preflight
+bundle exec fastlane pre_build
 ```
 
-- `preflight` — everything a release depends on except the build. Three minutes
-  instead of twenty-eight. Run `CI=true bundle exec fastlane preflight` after
+- `pre_build` — everything a release depends on except the build. Three minutes
+  instead of twenty-eight. Run `CI=true bundle exec fastlane pre_build` after
   it: the CI half is the one most likely to break.
 - `certificates` — **local only**, and refuses to run on a runner.
   `force:true` regenerates the profiles after enabling a capability.
