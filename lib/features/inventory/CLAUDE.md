@@ -256,6 +256,11 @@ Owner's rule. `ItemTransition.restock` takes how many arrived, adds them to
 - **The box asks how many arrived, not what the new total is** — that is the
   number on the receipt in the seller's hand, and the only one they do not
   have to work out.
+- **The sheet does the arithmetic out loud** — owner's rule: what is on the
+  shelf now, and what will be there after, updating as the seller types. A box
+  that only takes an addend leaves them adding in their head to check they
+  typed the right thing. The total is `—` until the box holds a usable count,
+  never the current figure (hard rule 5).
 - **It is the way a sold-out row comes back.** Having to un-sell an item by
   hand before saying more arrived is the step that made sellers create a
   duplicate item instead — and a duplicate loses the cost history, the
@@ -276,9 +281,28 @@ item with one.
 - A seller who opened the full form is entering stock, and how many there are
   is the figure the card, the Sold transition and every count in Analytics are
   built from.
-- The status picker sits beside it, offering `draft`, `inStock` and
-  `archived`. **`sold` is not in the list**: it is not a correction, it is an
-  order — see `ItemTransition.manualCheck` and the section below.
+
+## The status is four radios, each wearing its tag's colour
+
+Owner's rule, and it replaced a picker row that opened a sheet.
+
+- **Radios, not a sheet.** There are four states and they answer one question;
+  hiding them behind a row costs two taps to see what the choices even are.
+- **Each option carries `ItemStatusLabel.color`** — resolved from the badge
+  tone, so the chosen radio and the tag on the card are the same colour by
+  construction rather than by two switches agreeing. Colour is never the only
+  signal: the label is spelled out and the radio is filled.
+- **`sold` is offered like the rest** — owner's rule, after it was refused for
+  a while. Setting it records that the stock has gone and **empties the count
+  with it** (`ItemTransition.apply`), so the card cannot offer two left of
+  something gone. It writes **no order**: revenue and profit still come from
+  orders (hard rule 3), so a sale that has to show up in the figures is
+  recorded through Mark as sold.
+- **`sold` wears `info` rather than `neutral`.** With four states left, three
+  greys made the radio group a shape test instead of a colour one.
+- **Every pick still goes through `ItemTransition.check`**, against what is
+  typed in the boxes rather than the saved record — a price entered a second
+  ago is a price. A refusal says which requirement is missing.
 
 ## Quantity is what decides whether a record is sold
 
