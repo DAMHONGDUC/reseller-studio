@@ -28,6 +28,13 @@ any action that can be blocked by an entitlement.
   and it disappears for Premium sellers so a paid customer is never advertised
   the product they already own. It stays a banner rather than a fourth shortcut
   because Home's shortcut list is closed.
+- **Buying and managing Premium are separate destinations.** Owner's rule.
+  `PaywallScreen` owns the monthly and yearly purchase actions; it has its own
+  route and that route presents it as a bottom sheet. `SubscriptionScreen` is
+  a separate full screen for the current plan, restore, and store billing
+  management, and never doubles as the purchase surface. Premium gates and
+  upgrade banners open the paywall route, while More → Subscription opens the
+  management screen.
 
 ## Enforcement
 
