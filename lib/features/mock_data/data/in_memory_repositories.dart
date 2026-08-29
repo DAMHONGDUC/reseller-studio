@@ -1,14 +1,19 @@
 import 'dart:async';
 
+import '../../carriers/domain/entities/carrier.dart';
+import '../../carriers/domain/repositories/carrier_repository.dart';
 import '../../expenses/domain/entities/expense.dart';
 import '../../expenses/domain/repositories/expense_repository.dart';
 import '../../inventory/domain/entities/item.dart';
 import '../../inventory/domain/entities/item_category.dart';
 import '../../inventory/domain/entities/storage_location.dart';
+import '../../inventory/domain/enums/item_status.dart';
 import '../../inventory/domain/repositories/catalog_repository.dart';
 import '../../inventory/domain/repositories/item_repository.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/repositories/listing_repository.dart';
+import '../../marketplaces/domain/entities/marketplace.dart';
+import '../../marketplaces/domain/repositories/marketplace_repository.dart';
 import '../../offers/domain/entities/offer.dart';
 import '../../offers/domain/repositories/offer_repository.dart';
 import '../../orders/domain/entities/order.dart';
@@ -20,6 +25,9 @@ import '../../subscription/domain/entities/plan_offering.dart';
 import '../../subscription/domain/entities/subscription_status.dart';
 import '../../subscription/domain/enums/seller_plan.dart';
 import '../../subscription/domain/repositories/subscription_repository.dart';
+import '../../workspace/domain/entities/user_profile.dart';
+import '../../workspace/domain/entities/workspace.dart';
+import '../../workspace/domain/repositories/workspace_repository.dart';
 import '../domain/mock_dataset.dart';
 
 /// The mutable world behind every in-memory repository.
@@ -42,7 +50,10 @@ class MockStore {
       expenses = List<Expense>.of(dataset.expenses),
       categories = List<ItemCategory>.of(dataset.categories),
       locations = List<StorageLocation>.of(dataset.locations),
-      offers = List<Offer>.of(dataset.offers);
+      offers = List<Offer>.of(dataset.offers),
+      marketplaces = List<Marketplace>.of(dataset.marketplaces),
+      carriers = List<Carrier>.of(dataset.carriers),
+      workspace = dataset.workspace;
 
   /// Seeded from the current clock, so the demo data is always recent.
   factory MockStore.seeded({DateTime? now}) =>
@@ -59,6 +70,15 @@ class MockStore {
   final List<ItemCategory> categories;
   final List<StorageLocation> locations;
   final List<Offer> offers;
+  final List<Marketplace> marketplaces;
+  final List<Carrier> carriers;
+
+  /// The demo business itself, mutable because Settings can now change it.
+  ///
+  /// Copied off the dataset rather than read through it: the dataset is the
+  /// known-good seed every test asserts against, and an edit that reached back
+  /// into it would change what the next screen was checked against.
+  Workspace workspace;
 
   /// The demo business starts on the free tier, so the limits and the paywall
   /// are what a developer sees first. `InMemorySubscriptionRepository` moves
@@ -135,12 +155,22 @@ class InMemoryItemRepository implements ItemRepository {
   );
 
   @override
-  Future<void> save(Item item) async =>
-      _store.upsert(_store.items, item, (Item other) => other.id == item.id);
+  Future<void> save(Item item) async => _store.upsert(
+    _store.items,
+    // Firestore stamps this server-side; mock mode has no server, so the
+    // repository does it — otherwise "last updated" would be blank in the
+    // only mode the app can be developed against.
+    _stamped(item),
+    (Item other) => other.id == item.id,
+  );
+
+  /// [item] with the moment it was written on it.
+  static Item _stamped(Item item) => item.copyWith(updatedAt: DateTime.now());
 
   @override
   Future<void> saveAll(List<Item> items) async {
-    for (final Item item in items) {
+    for (final Item row in items) {
+      final Item item = _stamped(row);
       final int index = _store.items.indexWhere((Item o) => o.id == item.id);
 
       if (index == -1) {
@@ -198,6 +228,134 @@ class InMemoryOrderRepository implements OrderRepository {
     order,
     (Order other) => other.id == order.id,
   );
+
+  @override
+  Future<void> recordSale(Order order, Item item) async {
+    final int index = _store.items.indexWhere(
+      (Item current) => current.id == item.id,
+    );
+    if (index == -1 ||
+        _store.items[index].quantity <= 0 ||
+        _store.items[index].status == ItemStatus.sold ||
+        _store.items[index].status == ItemStatus.archived) {
+      throw StateError('Item ${item.id} is no longer sellable');
+    }
+
+    final Item current = _store.items[index];
+    final int left = current.quantity - 1;
+    _store.items[index] = current.copyWith(
+      askingPrice: current.askingPrice ?? order.salePrice,
+      quantity: left,
+      status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
+      soldAt: left == 0 ? order.orderedAt : null,
+    );
+    _store.upsert(_store.orders, order, (Order other) => other.id == order.id);
+  }
+
+  @override
+  Future<void> closeReturn(Order order, {required bool restock}) async {
+    if (restock) {
+      for (final OrderLine line in order.lines) {
+        final int index = _store.items.indexWhere(
+          (Item item) => item.id == line.itemId,
+        );
+        if (index == -1) continue;
+
+        final Item item = _store.items[index];
+        _store.items[index] = item.copyWith(
+          quantity: item.quantity + line.quantity,
+          status: ItemStatus.inStock,
+          clearSoldAt: true,
+        );
+      }
+    }
+
+    _store.upsert(_store.orders, order, (Order other) => other.id == order.id);
+  }
+}
+
+class InMemoryMarketplaceRepository implements MarketplaceRepository {
+  const InMemoryMarketplaceRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<Marketplace>> watchMarketplaces() =>
+      _store.watch(() => List<Marketplace>.of(_store.marketplaces));
+
+  @override
+  Future<void> save(Marketplace marketplace) async => _store.upsert(
+    _store.marketplaces,
+    marketplace,
+    (Marketplace other) => other.id == marketplace.id,
+  );
+
+  @override
+  Future<void> saveAll(List<Marketplace> marketplaces) async {
+    for (final Marketplace marketplace in marketplaces) {
+      _store.upsert(
+        _store.marketplaces,
+        marketplace,
+        (Marketplace other) => other.id == marketplace.id,
+      );
+    }
+  }
+
+  @override
+  Future<void> delete(String marketplaceId) async {
+    final int index = _store.marketplaces.indexWhere(
+      (Marketplace other) => other.id == marketplaceId,
+    );
+
+    if (index == -1) return;
+
+    // Soft, like the real one (hard rule 15).
+    _store.marketplaces[index] = _store.marketplaces[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
+class InMemoryCarrierRepository implements CarrierRepository {
+  const InMemoryCarrierRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<Carrier>> watchCarriers() =>
+      _store.watch(() => List<Carrier>.of(_store.carriers));
+
+  @override
+  Future<void> save(Carrier carrier) async => _store.upsert(
+    _store.carriers,
+    carrier,
+    (Carrier other) => other.id == carrier.id,
+  );
+
+  @override
+  Future<void> saveAll(List<Carrier> carriers) async {
+    for (final Carrier carrier in carriers) {
+      _store.upsert(
+        _store.carriers,
+        carrier,
+        (Carrier other) => other.id == carrier.id,
+      );
+    }
+  }
+
+  @override
+  Future<void> delete(String carrierId) async {
+    final int index = _store.carriers.indexWhere(
+      (Carrier carrier) => carrier.id == carrierId,
+    );
+    if (index == -1) return;
+
+    _store.carriers[index] = _store.carriers[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
 }
 
 class InMemoryListingRepository implements ListingRepository {
@@ -459,28 +617,16 @@ class InMemorySubscriptionRepository implements SubscriptionRepository {
   /// reason the real ones are — see `PlanOffering`.
   static const List<PlanOffering> catalogue = <PlanOffering>[
     PlanOffering(
-      productId: 'mock_pro_monthly',
-      plan: SellerPlan.pro,
+      productId: 'mock_premium_monthly',
+      plan: SellerPlan.premium,
       period: BillingPeriod.monthly,
       formattedPrice: r'$9.99',
     ),
     PlanOffering(
-      productId: 'mock_pro_yearly',
-      plan: SellerPlan.pro,
+      productId: 'mock_premium_yearly',
+      plan: SellerPlan.premium,
       period: BillingPeriod.yearly,
       formattedPrice: r'$89.99',
-    ),
-    PlanOffering(
-      productId: 'mock_business_monthly',
-      plan: SellerPlan.business,
-      period: BillingPeriod.monthly,
-      formattedPrice: r'$24.99',
-    ),
-    PlanOffering(
-      productId: 'mock_business_yearly',
-      plan: SellerPlan.business,
-      period: BillingPeriod.yearly,
-      formattedPrice: r'$229.99',
     ),
   ];
 
@@ -505,6 +651,14 @@ class InMemorySubscriptionRepository implements SubscriptionRepository {
   @override
   Future<SubscriptionStatus> restore() async => _read();
 
+  /// The demo has no account to identify (`mock_data/CLAUDE.md`) and no
+  /// backend for the webhook to write to, so both are inert.
+  @override
+  Future<void> identify(String uid) async {}
+
+  @override
+  Future<void> forget() async {}
+
   SubscriptionStatus _read() => _store.plan.isPaid
       ? SubscriptionStatus(
           plan: _store.plan,
@@ -520,4 +674,73 @@ final class MockPlanConstant {
   /// How far out a mock purchase renews. A month, so the Subscription screen
   /// has a plausible date to render rather than an empty row.
   static const Duration mockRenewal = Duration(days: 30);
+}
+
+/// The demo business, editable the way the real one is.
+///
+/// **The account half is deliberately inert.** Mock mode has no account by
+/// construction (`lib/features/mock_data/CLAUDE.md`), so a profile, a second
+/// workspace and a "reopen this one next time" pointer have nothing to mean.
+/// They are no-ops rather than throws: a demo that crashed on sign-in
+/// bookkeeping would be a worse backend than none.
+class InMemoryWorkspaceRepository implements WorkspaceRepository {
+  const InMemoryWorkspaceRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<Workspace?> watchWorkspace(String workspaceId) =>
+      _store.watch(() => _store.workspace);
+
+  @override
+  Stream<List<Member>> watchMembers(String workspaceId) =>
+      _store.watch(() => _store.dataset.members);
+
+  @override
+  Future<void> updateWorkspace(Workspace workspace) async {
+    _store.workspace = workspace;
+    _store.notifyChanged();
+  }
+
+  @override
+  Stream<UserProfile?> watchProfile(String uid) =>
+      Stream<UserProfile?>.value(null);
+
+  @override
+  Future<void> ensureProfile({
+    required String uid,
+    String? displayName,
+    String? email,
+    String? photoUrl,
+  }) async {}
+
+  /// Returns the demo business rather than making a second one: the mock
+  /// world holds exactly one, and handing back a new id would point every
+  /// repository at a workspace with nothing in it.
+  @override
+  Future<String> createWorkspace({
+    required String name,
+    required String country,
+    required String currency,
+    required String ownerId,
+    String? ownerName,
+    String? ownerEmail,
+    String? businessType,
+    required List<Marketplace> marketplaces,
+    required List<ItemCategory> categories,
+    required List<Carrier> carriers,
+  }) async => _store.workspace.id;
+
+  /// **Does nothing, and the demo never offers it.** The mock world holds one
+  /// business and no account, so there is no owner to authorise the delete and
+  /// nothing to fall back to afterwards — Settings draws the control only for
+  /// a real owner, which mock mode has no way to be.
+  @override
+  Future<void> deleteWorkspace(String workspaceId) async {}
+
+  @override
+  Future<void> setLastWorkspace({
+    required String uid,
+    required String workspaceId,
+  }) async {}
 }

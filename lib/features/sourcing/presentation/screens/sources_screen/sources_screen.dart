@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
@@ -27,21 +27,19 @@ class SourcesScreen extends ConsumerWidget {
   Future<void> _add(BuildContext context, WidgetRef ref) async {
     final String? name = await NameEntrySheet.show(
       context,
-      title: 'New source',
-      label: 'Name',
-      hint: 'Goodwill — Riverside',
+      title: context.l10n.sourcingNewSource,
+      label: context.l10n.commonName,
+      hint: context.l10n.sourcingGoodwillRiverside,
     );
 
     if (name == null || !context.mounted) return;
 
     try {
+      // No success message on an add: the new row appears in the list behind
+      // the sheet, which is the confirmation (owner's rule).
       await ref
           .read(sourcingControllerProvider.notifier)
           .saveSource(name: name);
-
-      if (!context.mounted) return;
-
-      SdSnackBarUtilsV3.success(context, 'Source added');
     } catch (error) {
       // Already logged by the controller.
       if (!context.mounted) return;
@@ -66,21 +64,19 @@ class SourcesScreen extends ConsumerWidget {
     };
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Sources'),
+      appBar: SdAppBarV3(title: context.l10n.analyticsSources),
       addLabel: 'Add a source',
       onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<Source>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when sources.isEmpty => SdEmptyStateV3(
-          icon: Symbols.storefront_rounded,
-          title: 'No sources yet',
-          message:
-              'Record where stock comes from and the app can tell you which '
-              'places are worth going back to.',
+          icon: AppIconConstant.storefront,
+          title: context.l10n.analyticsNoSourcesYet,
+          message: context.l10n.sourcingRecordWhereStockComesFromAnd,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Add a source',
+            label: context.l10n.homeQuickAddSource,
             onPressed: () => _add(context, ref),
           ),
         ),
@@ -98,7 +94,7 @@ class SourcesScreen extends ConsumerWidget {
                       ? null
                       : '${row.itemsBought} bought · ${row.itemsSold} sold · '
                             'spent ${context.money(row.spend, compact: true)}',
-                  icon: Symbols.storefront_rounded,
+                  icon: AppIconConstant.storefront,
                   showChevron: false,
                   trailing: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -109,7 +105,7 @@ class SourcesScreen extends ConsumerWidget {
                             .copyWith(color: _roiColour(context, row?.roi)),
                       ),
                       Text(
-                        'ROI',
+                        context.l10n.commonRoi,
                         style: context.textTheme3.bodySmall!.faint3(context),
                       ),
                     ],

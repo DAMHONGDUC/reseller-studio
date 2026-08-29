@@ -73,7 +73,9 @@ class _WorkflowRow extends StatelessWidget {
                     width: nodeSize,
                     height: nodeSize,
                     decoration: BoxDecoration(
-                      color: accent.withValues(alpha: _nodeAlpha),
+                      color: accent.withValues(
+                        alpha: SdIconTileV3.backgroundOpacity,
+                      ),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -130,7 +132,4 @@ class _WorkflowRow extends StatelessWidget {
       ),
     );
   }
-
-  /// How much accent the node carries behind its glyph.
-  static const double _nodeAlpha = 0.12;
 }

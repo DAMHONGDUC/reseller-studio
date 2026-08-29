@@ -38,7 +38,7 @@ class _AccountCard extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.settingsDeleteAccountConfirmTitle,
         message: context.l10n.settingsDeleteAccountConfirmBody,
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.settingsDeleteAccountConfirm,
@@ -87,12 +87,12 @@ class _AccountCard extends ConsumerWidget {
           AppListRow(
             title: context.l10n.settingsSignedOut,
             subtitle: context.l10n.settingsSignedOutBody,
-            icon: Symbols.person_rounded,
+            icon: AppIconConstant.person,
             showChevron: false,
           ),
           AppListRow(
             title: context.l10n.workspaceSignInAction,
-            icon: Symbols.login_rounded,
+            icon: AppIconConstant.login,
             onTap: () => context.push(AppRoutes.login),
           ),
         ],
@@ -104,22 +104,20 @@ class _AccountCard extends ConsumerWidget {
         AppListRow(
           title: name ?? email ?? context.l10n.settingsSignedIn,
           subtitle: email,
-          icon: Symbols.person_rounded,
+          icon: AppIconConstant.person,
           showChevron: false,
         ),
         AppListRow(
           title: context.l10n.settingsSignOut,
-          icon: Symbols.logout_rounded,
+          icon: AppIconConstant.logout,
           iconTint: context.sdTheme3.textSecondary,
-          showChevron: false,
           onTap: () => _confirmSignOut(context, ref),
         ),
         AppListRow(
           title: context.l10n.settingsDeleteAccount,
           subtitle: context.l10n.settingsDeleteAccountPermanent,
-          icon: Symbols.delete_forever_rounded,
+          icon: AppIconConstant.deleteForever,
           iconTint: context.sdTheme3.danger,
-          showChevron: false,
           onTap: () => _confirmDelete(context, ref),
         ),
       ],

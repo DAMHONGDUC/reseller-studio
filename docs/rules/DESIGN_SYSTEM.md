@@ -7,23 +7,41 @@ or widget that renders `Sd*` v3 components.
 
 Tokens and string-free widgets live in `packages/system_design`, a **separate
 git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired
-in as a path dependency. There is exactly one import, and it is the index:
+in as a path dependency. There are two imports and no others — the index for
+anything with a look, and `common.dart` for the shared app infrastructure that
+has none:
 
 ```dart
-import 'package:system_design/index.dart';
+import 'package:system_design/index.dart';   // tokens and widgets
+import 'package:system_design/common.dart';  // SdLogger, SdCrashReporter
 ```
 
-**The package holds two generations and Seller OS renders on v3.**
+**`common.dart` is pure Dart on purpose** — it exports no widget, so a
+feature's `domain/` can log without importing Flutter. `index.dart` re-exports
+it, so a widget file that already imports the index has `SdLogger` and never
+needs both lines.
+
+**The package holds two generations and Reseller Studio renders on v3.**
 
 | | `v2/` | `v3/` |
 | --- | --- | --- |
-| Renders | BaroEase | **Seller OS** |
+| Renders | BaroEase | **Reseller Studio** |
 | Palette | dark only | light + dark |
 | App bar | frosted glass, body scrolls behind | opaque, takes layout space |
 | Tab bar | floating glass pill | floating **liquid glass** pill |
 | Context getters | `context.sdTheme` | `context.sdTheme3` |
 
 ### The tab bar is liquid glass and that makes its geometry layout
+
+`SdBottomNavigationV3` is the complete tab frame: it owns the extended
+scaffold, `SdFloatingBarScopeV3`, swipe handling and `SdGlassNavBarV3`.
+`AppShell` supplies app routes and localized labels only; rebuilding the frame
+there would leave swipe and glass clearance as app-specific behaviour.
+
+Horizontal swipes move one adjacent tab. A horizontal scrollable inside a tab
+wins Flutter's gesture arena, so filter strips and carousels keep their own
+gesture; a swipe at either end does nothing. Taps and swipes call the same
+`onSelected` callback, which keeps routing and analytics on one path.
 
 `SdGlassNavBarV3` floats over the content in the iOS 26 idiom — a detached
 superellipse pill the body scrolls behind and refracts through. Three things
@@ -85,15 +103,83 @@ decides the arguments the look would otherwise keep re-opening:
 - It wears `SdElevationV3.modal`, not `.raised`. It floats over every screen
   and never scrolls away, so it belongs in the same depth band as a sheet
   rather than at the height of the cards passing under it.
-- **The current tab is marked by the glyph filling in, and by nothing behind
-  it.** `SdIconV3.fill` drives the font's `FILL` axis, so one glyph morphs
-  rather than two swapping — weight is a real second signal alongside colour,
-  which colour alone must never be. **An indicator pill was tried and
-  removed**: a shape behind the icon is Material's idiom and reads as a
-  foreign control sitting inside iOS chrome. Do not put it back.
-- The corner stays a `LiquidRoundedSuperellipse`, not a circular radius.
+- **The current tab is marked by the glyph filling in *and* by a glass
+  capsule behind it, and the capsule slides.** Owner's rule, and it **reverses
+  the earlier "nothing behind the glyph"** — see below for what changed and
+  why. `SdIconV3.fill` drives the font's `FILL` axis, so one glyph morphs
+  rather than two swapping; weight stays a real second signal alongside
+  colour, which colour alone must never be.
+- The corner stays a `LiquidRoundedSuperellipse`, not a circular radius —
+  the capsule's too, at the same family of corner as the bar it sits in.
 
 `test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds all three.
+
+#### The bar is glyphs only — no words on any tab
+
+Owner's rule, given as the sibling app's own bar: **five equal segments, one
+icon each, and nothing written under them.** It replaces the earlier "always
+rendered — five glyphs with no words is a memory test", and the argument that
+lost is that the bar is five destinations a seller opens every day, not a menu
+they read. The words cost a line of type across the whole width of the chrome
+to say what the seller learned on their second launch.
+
+- **The label has not gone; it stopped being painted.**
+  `SdNavDestinationV3.label` is still required and is still the `Semantics`
+  label of every segment, with the segment marked `container: true` so a
+  screen reader hears one node saying one name. Nothing about the bar is
+  icon-only to somebody who cannot see it.
+- **The segments stay equal, and the capsule keeps sliding at one width.**
+  There is no expanding segment: an icon-only bar has nothing to expand for,
+  and equal thirds are what make the row read as one control.
+- **The glyph still fills in.** `SdIconV3.fill` on the font's `FILL` axis is
+  now the *only* signal besides colour and the capsule, so it matters more
+  rather than less — colour alone must never be the mark.
+
+#### The selected capsule is a tinted thumb inside the glass bar
+
+Owner's rule, taken from the reference switcher. The bar is the one Liquid
+Glass surface; the selected segment is a **tinted `DecoratedBox`** sliding
+inside it. A second Liquid Glass layer made the active segment too subtle over
+light content, so it stopped reading as a switcher.
+
+Two things follow:
+
+- **The thumb uses the primary colour at `selectedThumbOpacity`.** It is clear
+  enough to mark the selected icon without becoming a solid Material button.
+  The filled glyph is the second signal, so colour is never the only one.
+- **It slides; it does not fade in and out.** One thumb moving is what says the
+  tabs are one control. `SdMotionV3.normal` on `SdMotionV3.emphasized` moves
+  it from the current segment to the next, and a re-tap does nothing.
+- **It slides; it does not fade in and out.** One capsule moving is what says
+  the tabs are one row. `SdMotionV3.normal` on `SdMotionV3.emphasized` — the
+  motion enters and leaves in one animation, so `standard` would land it
+  abruptly. Tapping mid-flight redirects the capsule from where it *is*, not
+  from the tab it was heading to.
+- **It stays one segment wide while it slides.** The icon-only bar has no
+  label to make room for, so a stretch is unrelated motion. `AnimatedAlign`
+  moves the capsule; `FractionallySizedBox` keeps it at `1 / count` of the
+  track and `selectedTabInset` separates it from neighbouring segments.
+
+The geometry is `SdContentPaddingV3.selectedTabInset` inside the bar on every
+side, and nothing types that number at a call site.
+
+**The switcher stays compact and keeps its horizontal outer inset.** Owner's
+rule, reversing the edge-to-edge variant: `floatingBarHorizontal` detaches the
+visible pill from the screen edges while every equal segment remains a full
+touch target. Compactness comes from the chrome's height, never from shrinking
+the icon or its tappable region.
+
+**The glass is tuned sheer and refractive, not frosted** — owner's rule, and
+it is the one that decides how the bar is read at a glance. A high-alpha fill
+with a heavy blur is a frosted panel: it says "surface", and the page under it
+stops existing. The tuning is the other way — a low `glassColor` alpha, a
+thick pane at a real `refractiveIndex`, and enough `lightIntensity` for the
+specular rim to draw the shape's edge. What keeps the labels legible is the
+blur plus that rim, never opacity.
+
+**`chromaticAberration` stays 0 on this bar.** It sits over columns of money,
+and colour fringing on small tabular figures is the fastest way to make a
+number hard to read. Every other glass knob is tunable; this one is a rule.
 
 `navBarOffset` uses the same clamped rule as `SdContentPaddingV2` — owner's
 call, so both apps' floating bars sit identically. `maxNavBarOffset` lands
@@ -157,6 +243,33 @@ Owner's rules, all of them read from one place so no screen types them:
   canvas. **The title stays `titleMedium`**: a screen title is a
   label, not a headline, and the screen's own content is what should be
   loud.
+- **An icon-only app bar action is `SdAppBarActionButtonV3`, and no screen
+  builds an `IconButton` in an app bar.** Owner's rule. The same control was
+  drawn six ways: Home's search and the notification bell as raw `Icon`s at
+  whatever `IconTheme` happened to set, Orders' two at `SdIconV3.defaultSize`,
+  the marketplace and carrier deletes at `r24`, and the search header's own
+  privately inside its delegate. Three sizes of one control, on bars a seller
+  moves between all day. The widget owns the slot, the glyph size, the colour
+  and the shrink-wrapped tap target; `SdSearchHeaderV3` renders its actions
+  through it too, so a docked header and a plain bar cannot come out
+  different.
+  - **The glyph is `SdAppBarActionButtonV3.glyphSize`, which is larger than
+    `SdIconV3.defaultSize`.** Owner's rule, and the same argument as the end
+    glyph below: a control at the top of every screen that a seller has to
+    look for is one they stop reaching for. It is the size the two delete
+    actions had already drifted to on their own.
+  - **An unread mark is `dotColor`, not a `Stack` at the call site.** The dot
+    sits on the glyph's corner, and only the button knows where the glyph is —
+    `NotificationBell` used to pin one to a raw `Icon` whose size it did not
+    control.
+  - **`onPressed` is nullable**, because a disabled action is a real state: a
+    delete is refused while a save is in flight, and hiding the row instead
+    would move everything beside it.
+- **A labelled action in a detail screen's app bar uses the medium button
+  proportions.** Owner's rule. The small button keeps `labelLarge` text while
+  scaling down its glyph and gap, so the word outweighs the icon and the pair
+  reads as two unrelated sizes. `AppDetailActionButton` is the shared app-side
+  wrapper; detail screens do not rebuild its padding or button size.
 - **A screen whose search box is the point uses `SdSearchHeaderV3`, not an
   app bar with a field under it.** The field docks into the title's row as
   the list scrolls and the filter strip pins under it, so scrolled chrome
@@ -183,6 +296,17 @@ Owner's rules, all of them read from one place so no screen types them:
   misalignment even when both are centred. The leftover splits evenly top and
   bottom. **A control docking into the bar pads itself; it does not fill the
   bar.**
+- **A row in a sheet that can be the chosen one is `AppSelectableRow`**
+  (`core/widgets/`). It owns the ground, the corner and the hit target, and
+  nothing else — what "chosen" looks like inside stays the sheet's, because
+  the picker ticks the row while the workspace switcher fills its icon tile.
+  Two things it settles that a hand-rolled `InkWell` kept getting wrong: a
+  one-line row is otherwise only as tall as its text, which is under the 44pt
+  Apple asks for; and the chosen row said so only with a tick at the far right,
+  which is a long way from the label somebody is actually reading. **Colour is
+  never the only signal** — the ground comes with a weight change and a glyph.
+  Rows separated by a gap rather than a hairline: each carries its own rounded
+  ground, and a rule cutting through that reads as two competing shapes.
 - **The rule between two rows is `SdDividerV3`, never Material's `Divider`.**
   Material reserves a whole `height` around a rule only `thickness` tall, and
   defaults that height to 16 — so a call site asking for a hairline silently
@@ -252,7 +376,60 @@ requires the extension. Pass `theme: AppTheme.light`, and install
 also pulls.** That is harmless — BaroEase never imports v3 — but it means a
 change there is not local to this project. Commit the gitlink deliberately.
 
-why: see DECISIONS.md § Seller OS pays for v2's dependencies
+why: see DECISIONS.md § Reseller Studio pays for v2's dependencies
+
+## A card that is a row is info at the start and an affordance at the end
+
+Owner's rule. **Every row-shaped card lays out `space-between`: the information
+at the start, and at the end one glyph telling the seller something happens
+when they tap it** — a chevron for a row that opens something, `more_vert` for
+one that opens a sheet of verbs.
+
+- **A tappable row without an end glyph is the bug this rule exists for.** The
+  whole card is a tap target and nothing on it says so, so the seller learns
+  the screen by poking at it. `AppListRow` has always drawn the chevron by
+  default; the violations were rows that passed `showChevron: false` while
+  still passing an `onTap`.
+- **The converse still holds, and it is the older rule**: an inert row draws
+  no chevron. "An affordance that leads nowhere is worse than none" —
+  `AppListRow.showChevron`. So `showChevron: false` is correct **only** on a
+  row with no `onTap`, or one whose `trailing` widget is itself the
+  interaction (a switch, a delete button).
+- **A card built by hand rather than from `AppListRow` obeys it too.** The
+  order card, the offer card and the receipt row are `SdCardV3`s with their
+  own layout; each wraps its content in a `Row` with the glyph as the last
+  child, rather than growing a private idea of what a tappable card looks
+  like.
+- **The end glyph is `AppRowChevron`, and nothing draws one inline.** Owner's
+  rule. Five call sites had grown their own — three at `smallSize` in
+  `textTertiary`, one a raw `Icon` at Material's default in `textSecondary` —
+  so a seller scrolling Home met three sizes of the same promise. The widget
+  owns the glyph, the size and the colour; a call site passes nothing.
+- **It is `textSecondary` at `SdIconV3.defaultSize`.** Owner's rule, and it
+  **reverses `textTertiary` at `SdIconV3.smallSize`**. The old pair was
+  argued as "a hint, not content", and the hint lost: at 16 points in the
+  faintest grey the app has, the one mark saying a card opens something was
+  the thing sellers did not see. An affordance is not decoration — it is the
+  instruction, and it is read before the content it sits beside. It still
+  never outweighs the title: the title is `semiBold3` text, the glyph is a
+  grey the tier above faint.
+- **A tappable end glyph keeps a 44pt target, and the target overhangs the
+  padding rather than pushing the glyph inward.** Owner's rule, and it
+  **reverses "the whole target stays inside the card's padding"**. Centring a
+  20pt glyph in a 44pt box that stops at the content edge sets the glyph 12
+  points short of every plain chevron in the app, so the item card's dots and
+  arrow sat out of line with the column of chevrons on Orders and Offers —
+  which `row_affordance_test.dart` had been failing on. The overhang is
+  invisible: it is ink over the card's own inset. The misalignment was not.
+  `AppRowIconButton` (`core/widgets/`) is that control — the actions dots, a
+  row's delete — and it lays out at the glyph's width while its `InkResponse`
+  overflows to the target.
+- **Cards that are not rows are out of scope.** Home's three shortcut cards
+  are columns — a glyph over a label, three across — and a chevron on each
+  would be three arrows pointing at nothing. So are the stat tiles and the
+  hero card, which are figures rather than rows.
+- `test/core/widgets/row_affordance_test.dart` reads the source and fails on a
+  tappable `AppListRow` that hides its chevron and offers no trailing widget.
 
 ## Spacing — one class owns it, and nothing else does
 
@@ -311,7 +488,7 @@ below for why they are not repeated here.
 | `bottom(context, {floatingNav})` | where the last item ends. `floatingNav: true` on the five tab screens only |
 | `detailBottom(context)` | the plain rule for everything else: the device's safe area **floored** at `minDetailBottom`, and **deliberately not `bottomGap` on top of it** — a device reporting a deep inset already gives more room than the floor asks for, and stacking a gap on it makes a detail screen look like it ends early |
 | `floatingBarHeight` / `floatingBarRadius` | the glass bar's height, and its radius **derived** as half of it |
-| `floatingBarHorizontal` | side margin shared by every floating bar |
+| `floatingBarHorizontal` | the outer horizontal inset that detaches the floating bar from the screen edges |
 | `navBarOffset(context)` | the device's bottom inset **clamped** between `minNavBarOffset` and `maxNavBarOffset` |
 | `floatingBarInset(context)` | offset + height — the bar's whole footprint, what content and overlays must clear |
 | `statusBarInset(context)` | the status bar, for the one thing that draws chrome from the top of the window itself |
@@ -415,7 +592,7 @@ that drifts, and it drifts invisibly: each file looks right on its own.
 
 - **Colour is never the only signal.** A state told by colour is also told by
   an icon, a label or a shape. `SdBadgeV3` always carries a label for exactly
-  this reason — Seller OS draws a dozen states across items, listings, orders
+  this reason — Reseller Studio draws a dozen states across items, listings, orders
   and offers, and a colour-only marker is a memory test.
 - **One loud element per screen.** `SdHeroStatV3` is a filled, gradient card
   and a screen gets at most one; everything else is an `SdStatTileV3`. Four
@@ -439,17 +616,66 @@ that drifts, and it drifts invisibly: each file looks right on its own.
 ## Dimensions and colour
 
 - **Responsive sizing via `flutter_screenutil`** (design size 390×844,
-  `minTextAdapt: true` — `SellerOsApp.designSize`), but NEVER as raw literals
+  `minTextAdapt: true` — `ResellerStudioApp.designSize`), but NEVER as raw literals
   in widgets: every dimension goes through `SdSpacingConstant` —
   `w*` horizontal, `h*` vertical, `r*` square/radius, `sp*` font.
   `SdSpacingConstant` lives in the package's generation-neutral `core/`, so it
   is the same class v2 uses; there is no `V3` suffix and none is coming.
 - **Colour comes from `AppColors` (`lib/core/theme/`), never from the
-  package.** This is where Seller OS differs from BaroEase, whose palette
+  package.** This is where Reseller Studio differs from BaroEase, whose palette
   ships inside `system_design`: here the app owns the palette and hands it to
   the design system as an `SdThemeV3` theme extension. So a *screen* reads
   `context.colorScheme3` / `context.sdTheme3` or names an `AppColors` constant;
   a *package widget* reads the extension and never names a colour at all.
+
+## Forms and input
+
+Owner's rules. Every one of them is something a seller read wrong, so each is
+fixed in a single owner rather than at the call sites that got it wrong.
+
+- **Every field that accepts money formats grouping separators while the
+  seller types.** `MoneyField` owns that behavior for the whole app: call
+  sites provide the currency and parse its normalized text with `Money`, but
+  never implement their own formatter. Existing values are formatted when
+  loaded as well, so an edit form and a create form do not display the same
+  amount differently. The formatter preserves the currency's decimal limit,
+  cursor position and the distinction between an empty value and zero.
+
+- **Anywhere a keyboard can open, a tap outside the field closes it.** Wired
+  once in `SdKeyboardDismissV3`, which `SdScaffoldV3` and `SdBottomSheetV3`
+  both wrap their content in — no screen writes its own `GestureDetector`, and
+  no form leaves the platform's own gesture as the only way out. The hit test
+  is translucent, so it is reached only when nothing nearer claims the tap, and
+  a scroll drag defeats a tap, so scrolling is untouched.
+  - **A sheet needs it as much as a screen does.** A sheet is a route of its
+    own and is not inside the scaffold underneath it, so it inherits nothing
+    from that wrapper — and a sheet is where most of this app's typing happens.
+  - A field that owns its own trough and is not in either container
+    (`SdSearchFieldV3` docked in an app bar) is the exception the wrapper
+    cannot reach; the screen holding it dismisses on scroll instead.
+
+- **A placeholder is fainter than any real text, and it has its own colour
+  slot.** `SdThemeV3.textPlaceholder`, read through `.placeholder3(context)`.
+  It sits a step below `textTertiary` on purpose: tertiary is the faintest
+  colour still meant to be *read* — a caption, a timestamp, a disabled label —
+  and a hint drawn in it was being taken for a value the field already held.
+  Anything standing in for a value the seller has not given yet takes this: a
+  text field's hint, a search field's hint, `PickerField`'s "not set". Helper
+  and error text keep their own colours — those are text to read, not text
+  standing in for something absent.
+
+- **A required field is marked with an asterisk, and the widget draws it.**
+  `isRequired: true` on `SdTextFieldV3`, `MoneyField` or `PickerField` appends
+  it after the label in `SdThemeV3.danger`. No call site concatenates a
+  `*` into a string, or the marker ends up inside an ARB value where a
+  translator has to know to keep it and a screen reader reads it as a word.
+  - **The marker follows what the form actually blocks on**, which is hard
+    rule 2's state-based validation: a field is starred on the screen where
+    submitting without it fails, and unstarred on every screen where it does
+    not. A price is not required to create an item and is required to list one,
+    so the same value is starred in one sheet and bare in another.
+  - It never replaces the error: a starred field that is left empty still
+    reports it under the field on submit.
 
 ## Snackbars, dialogs and sheets
 
@@ -458,6 +684,29 @@ All three are built in `v3/` and in use across the app. **Never reach into
 stopgap — a stopgap is how the app ends up with two snackbar looks.
 `WIDGET_RULES.md` governs how to build a new one.
 
+- **A message comes from the top, and it never takes a tap.** Owner's rule,
+  and both halves are one decision: a card at the bottom sits under the
+  thumb that just pressed the button, and a card anywhere that swallows
+  touches makes the seller wait out an animation before they can carry on.
+  `SdSnackBarPlacementV3.top` is the default, and the host wraps the card in
+  an `IgnorePointer` — so tap-to-dismiss is gone on purpose, and the timer is
+  the only thing that takes a message away.
+- **A top message starts below the app bar, never over it.** Owner's rule.
+  Back and app-bar actions are primary navigation controls; a transient
+  message may not obscure them even though it ignores taps. The shared host
+  clears the status bar plus `kToolbarHeight`, so every call site gets the
+  same safe position without screen-specific offsets.
+- **An add that worked says nothing.** Owner's rule. A sheet closing and the
+  new row appearing behind it is the confirmation; a card on top of it is the
+  app telling the seller what they can already see, and it costs the top of
+  the screen for two seconds every time they add a row. So no
+  `SdSnackBarUtilsV3.success` on a create or add flow.
+  - **Failure always speaks**, on every flow, because nothing on screen says
+    it (hard rule 6 decides the words).
+  - **A result the seller cannot see still speaks.** A bulk action on forty
+    rows, an invite sent to somebody else, a copy to the clipboard, a delete
+    of the record whose screen is now gone — those are successes with no
+    visible evidence, and they keep their message.
 - Snackbars: always `SdSnackBarUtilsV3.success/error/info` — never raw
   `ScaffoldMessenger.showSnackBar`. It draws the app's own card and shows one
   message at a time. Pass a finished localized string; the kind picks the icon
@@ -467,8 +716,8 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   one sends its messages to the screen *underneath*, where the very sheet that
   raised them covers them up. Widget tests do not catch it: `find.text`
   matches a widget the user cannot see. Placement is a second prop —
-  `SdSnackBarPlacementV3.bottom` is the default and what every screen wants,
-  `top` is for a route that owns the bottom of the screen. Assert on
+  `SdSnackBarPlacementV3.top` is the default and what every screen wants;
+  `bottom` is for a route that owns the top of the screen. Assert on
   `SdSnackBarCardV3`, the only public handle on what a static presenter drew.
   - **Drawing into the root overlay means it cannot see the glass nav bar**,
     and for a while it landed inside the band the bar occupies on all five
@@ -485,6 +734,27 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
 - Sheets: always `showSdBottomSheetV3` — it must use the root navigator so
   sheets cover the floating glass tab bar; raw `showModalBottomSheet` slides
   under it.
+- **A sheet sizes to its content, unless it is a document.** `SdBottomSheetV3`
+  is `mainAxisSize.min` by default, which is right for a menu: a sheet taller
+  than its rows is a sheet with dead space under the seller's thumb. A sheet
+  that is *read* rather than chosen from — the flow overview — passes
+  `heightFactor` and takes that share of the screen instead, so its scrollbar
+  starts at a predictable place and the page behind stays visible enough to
+  say the sheet is dismissable.
+  - **It is a fraction, never a number of points.** A height typed in points
+    is a height that is wrong on the next device.
+- **A sheet's options are separated by a rule, not by air.** Owner's rule, and
+  it covers every list of choices in a sheet — an actions sheet, a picker, the
+  workspace switcher. `AppSheetOptionList` (`core/widgets/`) lays the rows out
+  and puts `SdDividerV3` between them, so no sheet spaces its own and they
+  cannot drift apart. A column of same-weight rows with only a gap between
+  them reads as one block of text a seller has to parse before they can count
+  the choices.
+  - Between items only, per the divider rule below: nothing above the first row
+    or below the last.
+  - The rule keeps a small gap either side, because a picker's chosen row draws
+    a rounded ground and a hairline flush against that corner reads as two
+    shapes fighting.
 - Use `SdPressableScaleV3` for tactile button feedback.
 
 ## The rest of the primitives
@@ -510,6 +780,49 @@ quietly re-invent one.
 - **Icons: `SdIconV3`, and it always resolves to a concrete size.** A bare
   `Icon` inherits the ambient `IconTheme`, so the same glyph comes out at
   different sizes depending on what happens to wrap it.
+- **Semantic glyph choices live in `AppIconConstant`.** Owner's rule. Feature
+  and shared widget code asks for meanings such as `delete` and `add`; that
+  one file decides whether each meaning uses Flutter `Icons` or Material
+  Symbols, so changing the glyph library never becomes a screen-by-screen
+  migration. **No file under `lib/` references `Icons.*` or `Symbols.*`
+  directly except that registry**, and a source test enforces the boundary.
+  `SdIconV3` still owns rendering, size and colour. **Every registry entry has
+  one short doc comment stating its UI meaning and one blank line before the
+  next entry.** The name alone is not enough when one glyph serves several
+  workflows, and the separation keeps future icon-source swaps reviewable.
+- **An enum's colour — and its label — live on that enum, as one extension in
+  the enum's own file** — owner's rule. `ItemStatusDisplay` sits in
+  `domain/enums/item_status.dart` beside the enum, carrying
+  `label(BuildContext)` and `color(BuildContext)`; `ItemCondition` has the
+  same. Not a static on a presenter class, not a switch at a call site: the
+  value is asked, so there is exactly one answer and adding a case breaks the
+  switch that hands it out. It is the one thing in `domain/` allowed to import
+  Flutter — root `CLAUDE.md` carries that exception.
+- **The hue is named, never numbered.** `AppTagHue.grey`, not an index into a
+  list: a number tells the reader nothing and makes them count entries to find
+  out what it was.
+- **Every place that draws that value as a tag draws it in that colour** —
+  owner's rule, the other half of the one above. The tag on a form and the
+  badge on a card are the same value; two hues for it is the seller learning
+  the palette twice. `SdBadgeV3.color` exists for exactly this, and it
+  overrides the tone.
+- **Tags: `SdTagV3` for a group of choices, `SdBadgeV3` for a state the app is
+  reporting.** The badge is read-only and takes a *tone* from the five the
+  package knows; the tag is tapped and takes a **colour**, because a set that
+  must be told apart — four statuses, seven condition grades — runs past what
+  five tones can say. The app maps its enum to a hue (`AppColors.tagSeries`)
+  and hands it over, which is the same division as everywhere else: the
+  package never learns what a domain value means.
+- **Read-only card metadata is `SdBadgeV3` at `SdBadgeSizeV3.compact`** —
+  owner's rule, and it settles which component a card tag is. The tag is the
+  interactive picker and carries a picker's padding and border; a list row
+  reports facts, so it draws the badge, and `compact` scales the inset, the
+  glyph and the gap together — the same shape smaller, never differently
+  proportioned. The label keeps its size, because the word is the signal.
+  Inventory and Order cards use this presentation; form tags keep the full
+  interactive `SdTagV3`.
+- **A tag's colour is never its only signal.** The label is spelled out and
+  the chosen one draws a filled radio as well as a filled ground.
 - **Dividers: one thickness, one colour, and between items only**
   (`if (index > 0)`). A rule above the first row lands on the container's edge
   and reads as a border it does not have. Its height equals its thickness — see
@@ -526,9 +839,8 @@ quietly re-invent one.
 - **Charts hide their marks from screen readers and expose a summary instead.**
   A chart without that label is silence to VoiceOver, and this app's analytics
   is mostly charts.
-- **Tapping outside a focused field drops focus**, wired once in `SdScaffoldV3`
-  with a translucent hit test so it never eats a tap meant for a button or a
-  row.
+- **Tapping outside a focused field drops focus** — see Forms and input
+  above, which owns that rule and says where it is wired.
 - Every `Text` carries an explicit `style:` — root `CLAUDE.md`, Syntax. Not
   repeated here.
 

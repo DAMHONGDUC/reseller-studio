@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
+import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/date_time_utils.dart';
@@ -34,10 +35,6 @@ class PurchaseFormSheet extends ConsumerStatefulWidget {
 }
 
 class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
-  /// How far back the date picker opens. Five years covers the tax records a
-  /// reseller keeps.
-  static const int pickerYearsBack = 5;
-
   final TextEditingController _total = TextEditingController();
   final TextEditingController _notes = TextEditingController();
 
@@ -95,7 +92,6 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
       if (!mounted) return;
 
       navigator.pop();
-      SdSnackBarUtilsV3.success(context, 'Purchase recorded');
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -116,19 +112,22 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
     final DateTime now = DateTime.now();
 
     return SdBottomSheetV3(
-      title: 'New purchase',
+      title: context.l10n.sourcingNewPurchase,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           PickerField(
-            label: 'Date',
-            icon: Symbols.calendar_month_rounded,
+            label: context.l10n.commonDate,
+            isRequired: true,
+            icon: AppIconConstant.calendarMonth,
             value: DateTimeUtils.mediumDate(_date, locale: context.localeTag),
             onTap: () async {
               final DateTime? picked = await showDatePicker(
                 context: context,
                 initialDate: _date,
-                firstDate: DateTime(now.year - pickerYearsBack),
+                firstDate: DateTime(
+                  now.year - DatePickerConstant.taxRecordYearsBack,
+                ),
                 // A purchase cannot be from next month, and one filed there
                 // breaks every period report it lands in.
                 lastDate: now,
@@ -141,8 +140,8 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
-            label: 'Source (optional)',
-            icon: Symbols.storefront_rounded,
+            label: context.l10n.sourcingSourceOptional,
+            icon: AppIconConstant.storefront,
             value: names[_sourceId],
             placeholder: sources.isEmpty ? 'None yet' : 'Not set',
             onTap: sources.isEmpty
@@ -153,7 +152,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
                 : () async {
                     final String? picked = await OptionPickerSheet.show<String>(
                       context,
-                      title: 'Source',
+                      title: context.l10n.commonSource,
                       selected: _sourceId,
                       options: sources
                           .map(
@@ -172,7 +171,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           MoneyField(
-            label: 'Total paid (optional)',
+            label: context.l10n.sourcingTotalPaidOptional,
             controller: _total,
             currency: ref.watch(workspaceCurrencyProvider),
             helperText: 'What the receipt says, not the sum of the items',
@@ -180,7 +179,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
-            label: 'Notes (optional)',
+            label: context.l10n.sourcingNotesOptional,
             controller: _notes,
             maxLines: 2,
             textInputAction: TextInputAction.done,

@@ -79,16 +79,15 @@ class _HomeShortcutCard extends StatelessWidget {
   }
 
   /// `push` for search because it sits outside the shell and comes back here;
-  /// `go` for Analytics because it is a tab, and pushing a branch root over
-  /// Home would leave the seller on the wrong tab with a back button.
+  /// Scan is pushed above Home and returns to the same dashboard position.
   void _open(BuildContext context) {
     switch (shortcut.kind) {
       case HomeShortcutKind.quickAction:
         onQuickAction();
       case HomeShortcutKind.search:
         context.push(AppRoutes.search);
-      case HomeShortcutKind.analytics:
-        context.go(AppRoutes.analytics);
+      case HomeShortcutKind.scan:
+        context.push(AppRoutes.scanner);
     }
   }
 }

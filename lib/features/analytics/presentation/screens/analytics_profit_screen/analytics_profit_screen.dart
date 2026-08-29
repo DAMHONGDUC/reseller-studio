@@ -50,30 +50,30 @@ class AnalyticsProfitScreen extends ConsumerWidget {
     final Money? profit = summary.netProfit;
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Profit'),
+      appBar: SdAppBarV3(title: context.l10n.orderProfitPrefix),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           MetricCard(
-            title: 'The statement',
+            title: context.l10n.analyticsTheStatement,
             rows: <Widget>[
               MetricRow(
-                label: 'Revenue',
+                label: context.l10n.commonRevenue,
                 value: context.money(summary.revenue),
               ),
               MetricRow(
-                label: 'Cost of goods sold',
+                label: context.l10n.analyticsCostOfGoodsSold,
                 value: context.money(summary.costOfGoodsSold),
               ),
               MetricRow(
-                label: 'Other expenses',
+                label: context.l10n.orderOtherExpenses,
                 value: context.money(overheads),
                 caption: 'Overheads not charged to an order',
               ),
               SdDividerV3(gap: SdSpacingConstant.h8),
               MetricRow(
-                label: 'Net profit',
+                label: context.l10n.commonNetProfit,
                 value: context.money(profit),
                 isEmphasis: true,
                 // An em dash is not a figure, so it is never tinted as good
@@ -85,7 +85,7 @@ class AnalyticsProfitScreen extends ConsumerWidget {
                     : context.sdTheme3.profit,
               ),
               MetricRow(
-                label: 'Margin',
+                label: context.l10n.commonMargin,
                 value: context.percent(summary.margin, decimals: 1),
                 caption: 'How much of each unit taken you kept',
               ),
@@ -95,9 +95,7 @@ class AnalyticsProfitScreen extends ConsumerWidget {
             SizedBox(height: SdSpacingConstant.h16),
             SdCardV3(
               child: Text(
-                'Some sold items have no recorded cost, so profit cannot be '
-                'worked out for them. Add the cost on those items and this '
-                'fills in — it is never guessed.',
+                context.l10n.analyticsSomeSoldItemsHaveNoRecorded,
                 style: context.textTheme3.bodySmall!.copyWith(
                   color: context.sdTheme3.warning,
                 ),

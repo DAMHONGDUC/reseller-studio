@@ -43,7 +43,7 @@ class _ListingRow extends StatelessWidget {
             if (listing.viewCount != null) ...<Widget>[
               SizedBox(width: SdSpacingConstant.w8),
               Text(
-                '${listing.viewCount} views',
+                context.l10n.listingViewCount(listing.viewCount!),
                 style: context.textTheme3.bodySmall!.faint3(context),
               ),
             ],

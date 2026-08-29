@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/extensions/context_extensions.dart';
-import 'package:seller_os/core/widgets/app_list_row.dart';
-import 'package:seller_os/features/home/home_constant.dart';
-import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/core/extensions/context_extensions.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
+import 'package:reseller_studio/core/widgets/app_list_row.dart';
+import 'package:reseller_studio/features/home/home_constant.dart';
+import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 
 import '../../support/pump_app.dart';
 
@@ -44,6 +45,35 @@ void main() {
     }
   });
 
+  testWidgets('titled sections share one Quick Action card', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const HomeScreen());
+    await toEnd(tester);
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+    final Finder card = find.ancestor(
+      of: find.text(
+        QuickActionLabel.of(context, QuickActionConstant.actions.first.kind),
+      ),
+      matching: find.byType(AppListCard),
+    );
+
+    expect(card, findsOneWidget);
+    for (final QuickActionSection section in QuickActionConstant.sections) {
+      expect(
+        find.descendant(
+          of: card,
+          matching: find.text(
+            QuickActionSectionLabel.of(context, section.kind),
+          ),
+        ),
+        findsOneWidget,
+        reason: '${section.kind.name} has no title inside the shared card',
+      );
+    }
+  });
+
   testWidgets('every action is a row, and they are the last thing on Home', (
     WidgetTester tester,
   ) async {
@@ -57,7 +87,10 @@ void main() {
     final double sectionTop = tester
         .getRect(
           find.text(
-            QuickActionLabel.of(context, QuickActionConstant.actions.first.kind),
+            QuickActionLabel.of(
+              context,
+              QuickActionConstant.actions.first.kind,
+            ),
           ),
         )
         .top;
@@ -85,7 +118,10 @@ void main() {
       find.descendant(
         of: find.ancestor(
           of: find.text(
-            QuickActionLabel.of(context, QuickActionConstant.actions.first.kind),
+            QuickActionLabel.of(
+              context,
+              QuickActionConstant.actions.first.kind,
+            ),
           ),
           matching: find.byType(AppListCard),
         ),
@@ -103,9 +139,14 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
-    // Owner's rule: the one row here that does not create something goes at
-    // the end, so a seller scanning for "add" never steps over it.
+    // Owner's rule: the two rows here that do not create something go at the
+    // end — About last, Analytics just above it — so a seller scanning for
+    // "add" never steps over them.
     expect(QuickActionConstant.actions.last.kind, QuickActionKind.about);
+    expect(
+      QuickActionConstant.actions[QuickActionConstant.actions.length - 2].kind,
+      QuickActionKind.analytics,
+    );
 
     final double aboutTop = tester
         .getRect(find.text(context.l10n.moreAbout))
@@ -161,8 +202,9 @@ void main() {
   test('every screen with an add button is reachable from Quick Access', () {
     final List<String> screens = <String>[];
 
-    for (final FileSystemEntity entity
-        in Directory('lib/features').listSync(recursive: true)) {
+    for (final FileSystemEntity entity in Directory(
+      'lib/features',
+    ).listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
 
       final String source = entity.readAsStringSync();
@@ -188,6 +230,10 @@ void main() {
       'sources_screen': '/more/sourcing/sources',
       'purchases_screen': '/more/sourcing/purchases/new',
       'inventory_screen': '/inventory/quick-add',
+      'orders_screen': '/orders/record-sale',
+      'marketplaces_screen': '/more/marketplaces',
+      'carriers_screen': '/more/carriers',
+      'team_screen': '/more/team',
     };
 
     for (final String path in screens) {
@@ -199,13 +245,38 @@ void main() {
       expect(
         expected,
         isNotNull,
-        reason: '$path has an add button that this audit does not know about '
+        reason:
+            '$path has an add button that this audit does not know about '
             '— add it to Quick Access and to this map',
       );
       expect(
         routes,
         contains(expected),
         reason: '$path creates something Quick Access cannot start',
+      );
+    }
+  });
+
+  test('a branch root is opened with go, never pushed', () {
+    // Owner's rule via `docs/rules/SCREENS.md`: pushing a tab root over Home
+    // leaves the seller on the wrong tab with a back button they should not
+    // have. Read off the shell's own branch roots so a new tab cannot be added
+    // to this list as a push by accident.
+    const Set<String> branchRoots = <String>{
+      AppRoutes.home,
+      AppRoutes.inventory,
+      AppRoutes.orders,
+      AppRoutes.analytics,
+      AppRoutes.more,
+    };
+
+    for (final QuickAction action in QuickActionConstant.actions) {
+      expect(
+        action.open,
+        branchRoots.contains(action.route)
+            ? QuickActionOpen.goTab
+            : QuickActionOpen.push,
+        reason: '${action.kind.name} opens the wrong way',
       );
     }
   });

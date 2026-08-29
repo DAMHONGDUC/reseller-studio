@@ -1,6 +1,7 @@
 import 'package:image_picker/image_picker.dart';
+import 'package:system_design/common.dart';
 
-import '../logging/app_logger.dart';
+import '../constants/log_tag_constant.dart';
 import 'file_uploader.dart';
 
 /// Picking a receipt or a photo and putting it in storage, in one call.
@@ -46,7 +47,7 @@ final class DocumentPicker {
 
     // The folder and the record, never the file's own name — a scanned
     // receipt's filename can carry a customer's name (hard rule 9).
-    AppLogger.info('Document attached', <String, Object>{
+    SdLogger.info(LogTagConstant.storage, 'Document attached', <String, Object>{
       'folder': folder.folderName,
       'recordId': recordId,
     });

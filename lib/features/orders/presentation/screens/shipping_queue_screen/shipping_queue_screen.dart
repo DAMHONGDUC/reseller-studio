@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
@@ -40,7 +40,7 @@ class ShippingQueueScreen extends ConsumerWidget {
       ),
       body: orders.isEmpty
           ? SdEmptyStateV3(
-              icon: Symbols.local_shipping_rounded,
+              icon: AppIconConstant.localShipping,
               title: context.l10n.shippingQueueEmptyTitle,
               message: context.l10n.shippingQueueEmptyBody,
             )
@@ -53,10 +53,10 @@ class ShippingQueueScreen extends ConsumerWidget {
                       .map(
                         (Order order) => AppListRow(
                           title: order.lines.isEmpty
-                              ? order.marketplace.displayName
+                              ? order.marketplaceName
                               : order.lines.first.title,
                           subtitle: _deadlineLine(context, order, now),
-                          icon: Symbols.package_2_rounded,
+                          icon: AppIconConstant.package,
                           iconTint: (order.isOverdue(now) ?? false)
                               ? context.sdTheme3.danger
                               : context.colorScheme3.primary,
@@ -80,7 +80,7 @@ class ShippingQueueScreen extends ConsumerWidget {
   /// "Due in 2d" reads as an instruction; a date reads as a fact to work out.
   static String _deadlineLine(BuildContext context, Order order, DateTime now) {
     final DateTime? deadline = order.shipByDate;
-    final String marketplace = order.marketplace.displayName;
+    final String marketplace = order.marketplaceName;
 
     if (deadline == null) return context.l10n.shippingNoDeadline(marketplace);
 

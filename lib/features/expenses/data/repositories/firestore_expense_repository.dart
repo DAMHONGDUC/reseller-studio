@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/expense.dart';
 import '../../domain/repositories/expense_repository.dart';
 import '../dtos/expense_dto.dart';
@@ -39,24 +40,26 @@ class FirestoreExpenseRepository implements ExpenseRepository {
               SetOptions(merge: true),
             );
 
-        AppLogger.info('Expense saved', <String, Object>{
+        SdLogger.info(LogTagConstant.expense, 'Expense saved', <String, Object>{
           'expenseId': expense.id,
           'category': expense.category.name,
         });
       });
 
   @override
-  Future<void> delete(String id) => FailureMapper.guard(
-    'delete expense',
-    () async {
-      await _context.collections.expenses.doc(id).set(<String, Object?>{
-        'deletedAt': Timestamp.fromDate(DateTime.now()),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+  Future<void> delete(String id) =>
+      FailureMapper.guard('delete expense', () async {
+        await _context.collections.expenses.doc(id).set(<String, Object?>{
+          'deletedAt': Timestamp.fromDate(DateTime.now()),
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
 
-      AppLogger.info('Expense soft-deleted', <String, Object>{'expenseId': id});
-    },
-  );
+        SdLogger.info(
+          LogTagConstant.expense,
+          'Expense soft-deleted',
+          <String, Object>{'expenseId': id},
+        );
+      });
 
   Expense _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
       ExpenseDto.toEntity(doc, fallbackCurrency: _context.currency);

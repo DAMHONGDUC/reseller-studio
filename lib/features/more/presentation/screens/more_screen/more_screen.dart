@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../auth/providers.dart';
 import '../../../more_constant.dart';
 
 part 'more_screen_more_row.dart';
+part 'more_screen_section.dart';
 
 /// More — "where do I manage everything else?".
 ///
 /// Everything the plan deliberately kept off the bottom bar: Sourcing,
 /// Listings, Expenses, Reports, Receipts, Categories, Locations,
-/// Marketplaces, Team, Settings (plan §10).
+/// Marketplaces, Carriers, Team, Settings (plan §10).
 ///
 /// **This screen growing is fine. The bottom bar growing is not** — five tabs
 /// is a product decision (hard rule 13), and this list is where the pressure
@@ -32,13 +33,9 @@ class MoreScreen extends ConsumerWidget {
     // Signed out, every other destination is a view onto a business that has
     // not been named yet — so the list is Settings alone rather than eleven
     // rows that all bounce back here (owner's rule).
-    final List<MoreDestination> destinations = signedIn
-        ? MoreConstant.destinations
-        : MoreConstant.destinations
-              .where(
-                (MoreDestination d) => d.kind == MoreDestinationKind.settings,
-              )
-              .toList();
+    final List<MoreSection> sections = MoreConstant.sectionsFor(
+      signedIn: signedIn,
+    );
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.navMore),
@@ -46,24 +43,8 @@ class MoreScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SdSectionHeaderV3(title: context.l10n.moreManage, first: true),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
-            ),
-            child: SdCardV3(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: <Widget>[
-                  for (final MoreDestination destination in destinations)
-                    _MoreRow(
-                      destination: destination,
-                      isLast: destination == destinations.last,
-                    ),
-                ],
-              ),
-            ),
-          ),
+          for (int index = 0; index < sections.length; index++)
+            _MoreSection(section: sections[index], first: index == 0),
         ],
       ),
     );

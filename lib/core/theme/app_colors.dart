@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Seller OS's palette. **The design system does not own this** — the package
+/// Reseller Studio's palette. **The design system does not own this** — the package
 /// declares colour *slots* (`SdThemeV3`) and this app fills them in, which is
 /// why `packages/system_design` never names a colour and why BaroEase can
 /// render the same widgets in a completely different scheme.
@@ -55,9 +55,15 @@ final class AppColors {
   static const Color textSecondary = Color(0xFF5B6472);
   static const Color textTertiary = Color(0xFF8D96A4);
 
+  /// A step fainter than tertiary, and only ever used for text standing in
+  /// for a value that is not there — a field's hint, a picker's "not set". A
+  /// hint drawn at tertiary was being read as a value the field already held.
+  static const Color textPlaceholder = Color(0xFFB4BCC8);
+
   static const Color textPrimaryDark = Color(0xFFF2F4F8);
   static const Color textSecondaryDark = Color(0xFFA3ACBB);
   static const Color textTertiaryDark = Color(0xFF6E7887);
+  static const Color textPlaceholderDark = Color(0xFF525B68);
 
   // --- Money ---
   //
@@ -112,6 +118,33 @@ final class AppColors {
     Color(0xFF6DA4FF),
     Color(0xFFFF7A70),
   ];
+
+  // --- Tags ---
+
+  /// Hues for a set of values that has to be told apart at a glance — the
+  /// item statuses, the condition grades. Picked by name through `AppTagHue`,
+  /// never by index.
+  ///
+  /// **Why not the semantic tokens.** `success`, `warning`, `danger` and
+  /// `info` say what a state *means*; a set of seven condition grades needs
+  /// seven colours that only have to differ, and reusing the meaning colours
+  /// for them would make "Fair" read as a warning.
+  static const Color tagGreen = Color(0xFF0F7A57);
+  static const Color tagGreenDark = Color(0xFF43C79A);
+  static const Color tagBlue = Color(0xFF2160C4);
+  static const Color tagBlueDark = Color(0xFF6DA4FF);
+  static const Color tagViolet = Color(0xFF8E3BC0);
+  static const Color tagVioletDark = Color(0xFFC48BEA);
+  static const Color tagIndigo = Color(0xFF3D50DF);
+  static const Color tagIndigoDark = Color(0xFF8792FF);
+  static const Color tagTeal = Color(0xFF0E7490);
+  static const Color tagTealDark = Color(0xFF4FC3D9);
+  static const Color tagAmber = Color(0xFFA96A00);
+  static const Color tagAmberDark = Color(0xFFE8A33D);
+  static const Color tagRed = Color(0xFFB8342A);
+  static const Color tagRedDark = Color(0xFFFF7A70);
+  static const Color tagGrey = Color(0xFF5B6472);
+  static const Color tagGreyDark = Color(0xFFA3ACBB);
 
   // --- Scrim and shadow ---
 

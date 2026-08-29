@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -44,21 +44,19 @@ class PurchasesScreen extends ConsumerWidget {
     final Map<String, String> sourceNames = ref.watch(sourceNamesProvider);
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Purchases'),
+      appBar: SdAppBarV3(title: context.l10n.sourcingPurchases),
       addLabel: 'Record a purchase',
       onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<Purchase>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when purchases.isEmpty => SdEmptyStateV3(
-          icon: Symbols.local_mall_rounded,
-          title: 'No purchases yet',
-          message:
-              'Record a buying trip and every item you add to it traces back '
-              'to what you paid.',
+          icon: AppIconConstant.localMall,
+          title: context.l10n.sourcingNoPurchasesYet,
+          message: context.l10n.sourcingRecordABuyingTripAndEvery,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Record a purchase',
+            label: context.l10n.homeQuickRecordPurchase,
             onPressed: () => _add(context, ref),
           ),
         ),
@@ -79,7 +77,7 @@ class PurchasesScreen extends ConsumerWidget {
                         if (purchase.itemCount > 0)
                           '${purchase.itemCount} items',
                       ].join(' · '),
-                      icon: Symbols.local_mall_rounded,
+                      icon: AppIconConstant.localMall,
                       trailingText: context.money(purchase.totalCost),
                       onTap: () =>
                           context.push(AppRoutes.purchase(purchase.id)),

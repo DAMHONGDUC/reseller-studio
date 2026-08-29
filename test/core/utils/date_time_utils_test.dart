@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/utils/date_time_utils.dart';
+import 'package:reseller_studio/core/utils/date_time_utils.dart';
 
 /// All date arithmetic in the app goes through one class (owner's rule), so
 /// these are the tests for the parts that are easy to get subtly wrong.
@@ -19,10 +19,7 @@ void main() {
 
     test('a deadline already past comes back negative', () {
       expect(
-        DateTimeUtils.daysBetween(
-          DateTime(2026, 8, 12),
-          DateTime(2026, 8, 9),
-        ),
+        DateTimeUtils.daysBetween(DateTime(2026, 8, 12), DateTime(2026, 8, 9)),
         -3,
       );
     });

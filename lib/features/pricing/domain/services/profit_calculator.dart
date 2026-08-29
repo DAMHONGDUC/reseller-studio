@@ -175,14 +175,42 @@ class PurchaseEvaluation {
 /// workspace's threshold. Storing it would mean a nightly job flipping
 /// thousands of documents, and a seller who reprices would have to wait for
 /// that job before the item left the Stale tab.
+/// When a business is running out of things to sell.
+///
+/// **A separate question from staleness, and the opposite one.** Stale is
+/// stock that will not move; low is not having stock at all — the first says
+/// reprice, the second says go sourcing, and folding them together hides
+/// both (plan §22 lists them separately for the same reason).
+final class LowStockPolicy {
+  /// How few items on hand before the workspace is told, when it has not set
+  /// its own.
+  ///
+  /// 10: below a couple of days' worth for an active reseller, and high
+  /// enough to land while there is still time to go and buy something.
+  static const int defaultThreshold = 10;
+
+  /// True when there is stock, and less of it than [threshold].
+  ///
+  /// **Zero is deliberately not low.** A workspace with nothing on hand is a
+  /// new one, and telling somebody who has nothing that they have nothing is
+  /// the notification that gets notifications turned off.
+  static bool isLow(int onHandCount, {int threshold = defaultThreshold}) =>
+      onHandCount > 0 && onHandCount < threshold;
+}
+
 final class StaleInventoryPolicy {
   /// How long a listing sits before it counts as stale, when the workspace
-  /// has not set its own.
+  /// has not set its own, in days.
   ///
   /// 60 days: long enough that seasonal stock is not flagged the moment it is
   /// out of season, short enough to catch something before a full quarter's
   /// capital is tied up in it.
-  static const Duration defaultThreshold = Duration(days: 60);
+  ///
+  /// Kept as an `int` as well as a [Duration] because `Workspace` stores days
+  /// and a `const` default cannot call `.inDays`.
+  static const int defaultThresholdDays = 60;
+
+  static const Duration defaultThreshold = Duration(days: defaultThresholdDays);
 
   /// True when [listedAt] is further back than [threshold].
   ///

@@ -36,6 +36,7 @@ final class AppTheme {
       textPrimary: AppColors.textPrimary,
       textSecondary: AppColors.textSecondary,
       textTertiary: AppColors.textTertiary,
+      textPlaceholder: AppColors.textPlaceholder,
       border: AppColors.border,
       divider: AppColors.divider,
       profit: AppColors.profit,
@@ -71,6 +72,7 @@ final class AppTheme {
       textPrimary: AppColors.textPrimaryDark,
       textSecondary: AppColors.textSecondaryDark,
       textTertiary: AppColors.textTertiaryDark,
+      textPlaceholder: AppColors.textPlaceholderDark,
       border: AppColors.borderDark,
       divider: AppColors.dividerDark,
       profit: AppColors.profitDark,
@@ -133,7 +135,7 @@ final class AppTheme {
     splashFactory: InkSparkle.splashFactory,
     // The one place the status bar style is decided. `SdAppBarV3` builds a
     // real `AppBar`, which turns this into the `AnnotatedRegion` covering the
-    // top of every route that has a bar; `SellerOsApp` reads it back out for
+    // top of every route that has a bar; `ResellerStudioApp` reads it back out for
     // the routes that do not. No screen ever calls `SystemChrome`.
     appBarTheme: AppBarTheme(systemOverlayStyle: statusBarStyle(brightness)),
   );

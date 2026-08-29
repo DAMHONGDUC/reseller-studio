@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
+import '../constants/log_tag_constant.dart';
 import '../error/failure_mapper.dart';
-import '../logging/app_logger.dart';
 import 'file_uploader.dart';
 
 /// Firebase Storage, behind the [FileUploader] interface.
@@ -43,7 +44,7 @@ class FirebaseFileUploader implements FileUploader {
 
     // The record id and the folder, never the file's own name — a photo
     // filename can carry a customer's name off a scanned receipt.
-    AppLogger.info('File uploaded', <String, Object>{
+    SdLogger.info(LogTagConstant.storage, 'File uploaded', <String, Object>{
       'folder': folder.folderName,
       'recordId': recordId,
     });
@@ -61,7 +62,8 @@ class FirebaseFileUploader implements FileUploader {
           // so this does not propagate — but it is still logged, because a
           // delete failing for any *other* reason is how orphaned files
           // accumulate unnoticed (hard rule 8).
-          AppLogger.error(
+          SdLogger.error(
+            LogTagConstant.storage,
             'Could not delete stored file',
             error: error,
             stackTrace: stackTrace,

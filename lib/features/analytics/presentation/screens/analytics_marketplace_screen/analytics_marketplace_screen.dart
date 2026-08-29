@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../domain/entities/analytics_summary.dart';
 import '../../../providers.dart';
@@ -28,12 +28,12 @@ class AnalyticsMarketplaceScreen extends ConsumerWidget {
     );
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'By marketplace'),
+      appBar: SdAppBarV3(title: context.l10n.analyticsByMarketplace),
       body: rows.isEmpty
-          ? const SdEmptyStateV3(
-              icon: Symbols.hub_rounded,
-              title: 'Nothing has sold yet',
-              message: 'Record a sale and this ranks your platforms by return.',
+          ? SdEmptyStateV3(
+              icon: AppIconConstant.hub,
+              title: context.l10n.analyticsNothingHasSoldYet,
+              message: context.l10n.analyticsRecordASaleAndThisRanks,
             )
           : ListView(
               padding: SdContentPaddingV3.screen(context),
@@ -41,15 +41,15 @@ class AnalyticsMarketplaceScreen extends ConsumerWidget {
                 SizedBox(height: SdContentPaddingV3.topGap),
                 for (final MarketplacePerformance row in rows) ...<Widget>[
                   MetricCard(
-                    title: row.marketplace.displayName,
+                    title: row.marketplaceName,
                     rows: <Widget>[
                       MetricRow(
-                        label: 'Revenue',
+                        label: context.l10n.commonRevenue,
                         value: context.money(row.revenue),
                         isEmphasis: true,
                       ),
                       MetricRow(
-                        label: 'Profit',
+                        label: context.l10n.orderProfitPrefix,
                         value: context.money(row.profit),
                         valueColor: row.profit == null
                             ? null
@@ -57,13 +57,19 @@ class AnalyticsMarketplaceScreen extends ConsumerWidget {
                             ? context.sdTheme3.loss
                             : context.sdTheme3.profit,
                       ),
-                      MetricRow(label: 'Fees', value: context.money(row.fees)),
                       MetricRow(
-                        label: 'Fee rate',
+                        label: context.l10n.commonFees,
+                        value: context.money(row.fees),
+                      ),
+                      MetricRow(
+                        label: context.l10n.analyticsFeeRate,
                         value: context.percent(row.feeRate, decimals: 1),
                         caption: 'What this platform actually took',
                       ),
-                      MetricRow(label: 'Orders', value: '${row.orderCount}'),
+                      MetricRow(
+                        label: context.l10n.commonOrders,
+                        value: '${row.orderCount}',
+                      ),
                     ],
                   ),
                   SizedBox(height: SdContentPaddingV3.sectionGap),

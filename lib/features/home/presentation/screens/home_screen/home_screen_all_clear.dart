@@ -8,7 +8,7 @@ class _AllClear extends StatelessWidget {
     child: Row(
       children: <Widget>[
         SdIconTileV3(
-          icon: Symbols.check_circle_rounded,
+          icon: AppIconConstant.checkCircle,
           tint: context.sdTheme3.success,
         ),
         SizedBox(width: SdSpacingConstant.w12),
@@ -17,13 +17,13 @@ class _AllClear extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'All clear',
+                context.l10n.homeAllClear,
                 style: context.textTheme3.titleSmall!.semiBold3.copyWith(
                   color: context.sdTheme3.textPrimary,
                 ),
               ),
               Text(
-                'Nothing needs your attention right now.',
+                context.l10n.homeNothingNeedsYourAttentionRightNow,
                 style: context.textTheme3.bodySmall!.muted3(context),
               ),
             ],

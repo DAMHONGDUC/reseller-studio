@@ -3,21 +3,26 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/theme/app_theme.dart';
-import 'package:seller_os/core/time/app_clock.dart';
-import 'package:seller_os/features/expenses/domain/entities/expense.dart';
-import 'package:seller_os/features/expenses/providers.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/inventory/providers.dart';
-import 'package:seller_os/features/listings/domain/entities/listing.dart';
-import 'package:seller_os/features/listings/providers.dart';
-import 'package:seller_os/features/mock_data/data/in_memory_repositories.dart';
-import 'package:seller_os/features/mock_data/domain/mock_dataset.dart';
-import 'package:seller_os/features/mock_data/providers.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/providers.dart';
-import 'package:seller_os/l10n/gen/app_localizations.dart';
-import 'package:seller_os/seller_os_app.dart';
+// `Override` is not in the main entrypoint's `show` list; `misc.dart` is
+// where hooks_riverpod exports it.
+import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/theme/app_theme.dart';
+import 'package:reseller_studio/core/time/app_clock.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/expenses/providers.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/providers.dart';
+import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
+import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
+import 'package:reseller_studio/features/mock_data/providers.dart';
+import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
+import 'package:reseller_studio/features/offers/providers.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/l10n/gen/app_localizations.dart';
+import 'package:reseller_studio/reseller_studio_app.dart';
 
 /// The instant the seeded dataset is generated against in every test.
 ///
@@ -58,7 +63,15 @@ class _AlwaysMock extends DataModeController {
 /// A test that pumps a bare `MaterialApp` is testing a tree the app never
 /// builds — `context.sdTheme3` asserts without the theme extension and
 /// `SdSpacingConstant` throws without screenutil.
-Future<void> pumpScreen(WidgetTester tester, Widget screen) async {
+///
+/// [overrides] are appended after the mock wiring, so a test can replace one
+/// provider — the inbox, say, which has no mock backend to seed — without
+/// rebuilding the scope by hand.
+Future<void> pumpScreen(
+  WidgetTester tester,
+  Widget screen, {
+  List<Override> overrides = const <Override>[],
+}) async {
   // The default test surface is 800×600 — wider and much shorter than any
   // phone, which makes rows that are fine on device overflow here and hides
   // real overflows behind fake ones. Pin it to the device the layouts were
@@ -82,9 +95,10 @@ Future<void> pumpScreen(WidgetTester tester, Widget screen) async {
         mockStoreProvider.overrideWith(
           (Ref ref) => MockStore(MockDataset.seed(now: testNow)),
         ),
+        ...overrides,
       ],
       child: ScreenUtilInit(
-        designSize: SellerOsApp.designSize,
+        designSize: ResellerStudioApp.designSize,
         builder: (BuildContext context, Widget? _) => MaterialApp(
           theme: AppTheme.light,
           localizationsDelegates: const <LocalizationsDelegate<Object>>[
@@ -155,6 +169,11 @@ Future<void> warmUp(ProviderContainer container) async {
   container.listen<AsyncValue<List<Listing>>>(
     listingsProvider,
     (AsyncValue<List<Listing>>? previous, AsyncValue<List<Listing>> next) {},
+    fireImmediately: true,
+  );
+  container.listen<AsyncValue<List<Offer>>>(
+    offersProvider,
+    (AsyncValue<List<Offer>>? previous, AsyncValue<List<Offer>> next) {},
     fireImmediately: true,
   );
 

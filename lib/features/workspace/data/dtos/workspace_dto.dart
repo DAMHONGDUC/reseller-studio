@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../listings/domain/enums/listing_status.dart';
+import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/workspace.dart';
 
@@ -21,7 +22,21 @@ final class WorkspaceDto {
       businessType: FirestoreMapper.stringOrNull(data['businessType']),
       logoUrl: FirestoreMapper.stringOrNull(data['logoUrl']),
       staleThresholdDays:
-          FirestoreMapper.intOrNull(data['staleThresholdDays']) ?? 60,
+          FirestoreMapper.intOrNull(data['staleThresholdDays']) ??
+          StaleInventoryPolicy.defaultThresholdDays,
+      lowStockThreshold:
+          FirestoreMapper.intOrNull(data['lowStockThreshold']) ??
+          LowStockPolicy.defaultThreshold,
+      // Only the corrections the seller made; a platform absent here uses its
+      // published rate. Anything unparseable is dropped rather than defaulted
+      // to zero, which would claim the platform works for free.
+      marketplaceFeeRates: <String, double>{
+        for (final MapEntry<String, Object?> entry
+            in (data['marketplaceFeeRates'] as Map<String, Object?>? ??
+                    const <String, Object?>{})
+                .entries)
+          if (entry.value is num) entry.key: (entry.value! as num).toDouble(),
+      },
     );
   }
 
@@ -39,6 +54,8 @@ final class WorkspaceDto {
         'businessType': workspace.businessType,
         'logoUrl': workspace.logoUrl,
         'staleThresholdDays': workspace.staleThresholdDays,
+        'lowStockThreshold': workspace.lowStockThreshold,
+        'marketplaceFeeRates': workspace.marketplaceFeeRates,
         'updatedAt': FirestoreMapper.serverTimestamp,
       });
 }

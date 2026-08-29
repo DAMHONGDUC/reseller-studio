@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/auth/providers.dart';
+import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
 import '../router/app_routes.dart';
 
@@ -36,7 +36,7 @@ class SignedOutView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             SdIconV3(
-              Symbols.lock_rounded,
+              AppIconConstant.lock,
               size: SdSpacingConstant.r44,
               color: context.sdTheme3.textSecondary,
             ),

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../providers.dart';
+import '../../search_subtitle.dart';
 
 /// Global search (plan §21) — items, orders, listings and sources at once.
 ///
@@ -57,10 +59,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   static IconData _iconFor(SearchHitKind kind) => switch (kind) {
-    SearchHitKind.item => Symbols.inventory_2_rounded,
-    SearchHitKind.order => Symbols.receipt_long_rounded,
-    SearchHitKind.listing => Symbols.sell_rounded,
-    SearchHitKind.source => Symbols.storefront_rounded,
+    SearchHitKind.item => AppIconConstant.inventory,
+    SearchHitKind.order => AppIconConstant.receiptLong,
+    SearchHitKind.listing => AppIconConstant.sell,
+    SearchHitKind.source => AppIconConstant.storefront,
   };
 
   @override
@@ -69,7 +71,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final List<SearchHit> hits = ref.watch(searchResultsProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Search'),
+      appBar: SdAppBarV3(title: context.l10n.homeShortcutSearch),
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
@@ -82,7 +84,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               // The screen exists to be typed into; a keyboard the seller has
               // to summon costs a tap on every search.
               autofocus: true,
-              hint: 'Title, SKU, barcode, order or tracking number',
+              hint: context.l10n.searchTitleSkuBarcodeOrderOrTracking,
               clearTooltip: 'Clear search',
               onChanged: (String value) =>
                   ref.read(searchQueryProvider.notifier).update(value),
@@ -91,17 +93,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Expanded(
             child: switch (hits) {
               _ when query.trim().length < SearchConstant.minimumQueryLength =>
-                const SdEmptyStateV3(
-                  icon: Symbols.search_rounded,
-                  title: 'Search everything',
-                  message:
-                      'Items, orders, listings and sources — type at least '
-                      'two characters.',
+                SdEmptyStateV3(
+                  icon: AppIconConstant.search,
+                  title: context.l10n.searchSearchEverything,
+                  message: context.l10n.searchItemsOrdersListingsAndSourcesType,
                 ),
-              _ when hits.isEmpty => const SdEmptyStateV3(
-                icon: Symbols.search_off_rounded,
-                title: 'Nothing matches',
-                message: 'Try a shorter piece of the name or code.',
+              _ when hits.isEmpty => SdEmptyStateV3(
+                icon: AppIconConstant.searchOff,
+                title: context.l10n.searchNothingMatches,
+                message: context.l10n.searchTryAShorterPieceOfThe,
               ),
               _ => ListView(
                 padding: SdContentPaddingV3.screen(context),
@@ -111,7 +111,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         .map(
                           (SearchHit hit) => AppListRow(
                             title: hit.title,
-                            subtitle: hit.subtitle,
+                            subtitle: SearchSubtitle.of(context, hit),
                             icon: _iconFor(hit.kind),
                             onTap: () => _open(hit),
                           ),

@@ -2,9 +2,10 @@ import 'dart:io';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../expenses/domain/entities/expense.dart';
@@ -14,18 +15,28 @@ import '../../../inventory/domain/entities/item.dart';
 import '../../../inventory/providers.dart';
 import '../../../orders/domain/entities/order.dart';
 import '../../../orders/providers.dart';
+import '../../../tax/domain/entities/tax_summary.dart';
+import '../../../tax/providers.dart';
 import '../../domain/services/csv_builder.dart';
 
 /// Which report is being exported.
 enum ReportKind {
   sales,
   inventory,
-  expenses;
+  expenses,
+
+  /// The year-end summary, one row per line of the jurisdiction's form.
+  ///
+  /// The only kind that exports a *period* rather than everything: a return is
+  /// filed for one year, and a file spanning four would have to be split
+  /// before it was any use.
+  tax;
 
   String get fileStem => switch (this) {
     ReportKind.sales => 'sales',
     ReportKind.inventory => 'inventory',
     ReportKind.expenses => 'expenses',
+    ReportKind.tax => 'tax-summary',
   };
 }
 
@@ -50,7 +61,9 @@ class ReportController extends Notifier<bool> {
   /// would mean managing an export folder nobody asked for.
   Future<void> export(ReportKind kind) async {
     state = true;
-    AppLogger.action('Export report', <String, Object>{'kind': kind.name});
+    SdLogger.action(LogTagConstant.report, 'Export report', <String, Object>{
+      'kind': kind.name,
+    });
     AppAnalytics.instance.reportExported(kind: kind.name);
 
     try {
@@ -58,6 +71,7 @@ class ReportController extends Notifier<bool> {
         ReportKind.sales => _salesCsv(),
         ReportKind.inventory => _inventoryCsv(),
         ReportKind.expenses => _expensesCsv(),
+        ReportKind.tax => _taxCsv(),
       };
 
       // `Directory.systemTemp` rather than `path_provider`: it is the same
@@ -74,16 +88,17 @@ class ReportController extends Notifier<bool> {
       await SharePlus.instance.share(
         ShareParams(
           files: <XFile>[XFile(file.path)],
-          subject: 'Seller OS — ${kind.fileStem} export',
+          subject: 'Reseller Studio — ${kind.fileStem} export',
         ),
       );
 
-      AppLogger.info('Report exported', <String, Object>{
+      SdLogger.info(LogTagConstant.report, 'Report exported', <String, Object>{
         'kind': kind.name,
         'bytes': csv.length,
       });
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.report,
         'Failed to export report',
         error: error,
         stackTrace: stackTrace,
@@ -111,7 +126,7 @@ class ReportController extends Notifier<bool> {
         rows.add(<String>[
           order.id,
           DateTimeUtils.isoDate(order.orderedAt),
-          order.marketplace.displayName,
+          order.marketplaceName,
           order.status.name,
           line.title,
           '${line.quantity}',
@@ -221,6 +236,50 @@ class ReportController extends Notifier<bool> {
     );
   }
 
+  /// The selected tax year, as the lines of its own jurisdiction's form.
+  ///
+  /// **Two columns, not a spreadsheet of transactions**: this is the sheet a
+  /// seller reads down beside their return, ticking lines off. The rows behind
+  /// each figure are the sales and expenses exports.
+  ///
+  /// Mileage gets its own two rows because it is deducted at a published rate
+  /// per mile rather than at what was spent — an accountant who saw only the
+  /// money would deduct the fuel twice.
+  String _taxCsv() {
+    final TaxSummary summary = ref.read(taxSummaryProvider);
+
+    return CsvBuilder.build(
+      headers: const <String>['Line', 'Amount', 'Currency'],
+      rows: <List<String>>[
+        <String>['Tax year', summary.year.label, ''],
+        <String>['Revenue', _major(summary.revenue), summary.currency],
+        <String>[
+          'Cost of goods',
+          _major(summary.costOfGoods),
+          summary.currency,
+        ],
+        for (final TaxLineTotal line in summary.lines)
+          <String>[line.line, _major(line.amount), summary.currency],
+        <String>['Mileage distance', _distance(summary.mileageDistance), ''],
+        <String>[
+          'Mileage deduction',
+          _major(summary.mileageDeduction),
+          summary.currency,
+        ],
+        <String>[
+          'Total deductions',
+          _major(summary.totalDeductions),
+          summary.currency,
+        ],
+        <String>[
+          'Net before tax',
+          _major(summary.netBeforeTax),
+          summary.currency,
+        ],
+      ],
+    );
+  }
+
   /// **An unknown amount exports as an empty cell, never as 0** (hard rule 5).
   /// A zero in a spreadsheet is a number an accountant will sum; a blank is a
   /// question they will ask.
@@ -228,6 +287,10 @@ class ReportController extends Notifier<bool> {
 
   static String _date(DateTime? value) =>
       value == null ? '' : DateTimeUtils.isoDate(value);
+
+  /// No miles is a real zero here, not an unknown: the year's distance is a
+  /// sum, and a sum of nothing is nothing.
+  static String _distance(double value) => value.toStringAsFixed(1);
 }
 
 final NotifierProvider<ReportController, bool> reportControllerProvider =

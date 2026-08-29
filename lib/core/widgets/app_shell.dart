@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../analytics/app_analytics.dart';
+import '../constants/app_icon_constant.dart';
+import '../constants/log_tag_constant.dart';
 import '../constants/nav_tab_constant.dart';
 import '../extensions/context_extensions.dart';
-import '../logging/app_logger.dart';
 
 /// The five-tab frame every signed-in screen lives in.
 ///
@@ -33,7 +33,7 @@ import '../logging/app_logger.dart';
 /// and the router cannot report it. This is a widget lifecycle rather than a
 /// controller only because there is no controller between a tab tap and the
 /// shell — the event still goes through [AppAnalytics] and sits next to its
-/// [AppLogger.action], and it is never raised from `build`.
+/// [SdLogger.action], and it is never raised from `build`.
 class AppShell extends StatefulWidget {
   const AppShell({required this.shell, super.key});
 
@@ -68,58 +68,56 @@ class _AppShellState extends State<AppShell> {
     final String? tab = NavTabConstant.nameAt(index);
 
     if (tab == null) {
-      AppLogger.warning('Tab index outside NavTabConstant', <String, Object>{
-        'index': index,
-      });
+      SdLogger.warning(
+        LogTagConstant.navigation,
+        'Tab index outside NavTabConstant',
+        <String, Object>{'index': index},
+      );
 
       return;
     }
 
-    AppLogger.action('Tab viewed', <String, Object>{'tab': tab});
+    SdLogger.action(LogTagConstant.navigation, 'Tab viewed', <String, Object>{
+      'tab': tab,
+    });
     AppAnalytics.instance.tabViewed(tab: tab);
   }
 
   @override
-  Widget build(BuildContext context) => SdScaffoldV3(
-    extendBody: true,
-    // Marks everything under the tabs as having the glass bar below it. The
-    // only reader is the snackbar, which draws into the root overlay above
-    // the shell and could not otherwise tell the bar is there.
-    body: SdFloatingBarScopeV3(child: widget.shell),
-    bottomNavigationBar: SdGlassNavBarV3(
-      selectedIndex: widget.shell.currentIndex,
-      onSelected: (int index) => widget.shell.goBranch(
-        index,
-        // Re-tapping the active tab pops that branch to its root.
-        initialLocation: index == widget.shell.currentIndex,
+  Widget build(BuildContext context) => SdBottomNavigationV3(
+    body: widget.shell,
+    destinations: <SdNavDestinationV3>[
+      SdNavDestinationV3(
+        icon: AppIconConstant.home,
+        selectedIcon: AppIconConstant.home,
+        label: context.l10n.navHome,
       ),
-      destinations: <SdNavDestinationV3>[
-        SdNavDestinationV3(
-          icon: Symbols.home_rounded,
-          selectedIcon: Symbols.home_rounded,
-          label: context.l10n.navHome,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.inventory_2_rounded,
-          selectedIcon: Symbols.inventory_2_rounded,
-          label: context.l10n.navInventory,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.receipt_long_rounded,
-          selectedIcon: Symbols.receipt_long_rounded,
-          label: context.l10n.navOrders,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.bar_chart_rounded,
-          selectedIcon: Symbols.bar_chart_rounded,
-          label: context.l10n.navAnalytics,
-        ),
-        SdNavDestinationV3(
-          icon: Symbols.menu_rounded,
-          selectedIcon: Symbols.menu_rounded,
-          label: context.l10n.navMore,
-        ),
-      ],
+      SdNavDestinationV3(
+        icon: AppIconConstant.inventory,
+        selectedIcon: AppIconConstant.inventory,
+        label: context.l10n.navInventory,
+      ),
+      SdNavDestinationV3(
+        icon: AppIconConstant.receiptLong,
+        selectedIcon: AppIconConstant.receiptLong,
+        label: context.l10n.navOrders,
+      ),
+      SdNavDestinationV3(
+        icon: AppIconConstant.barChart,
+        selectedIcon: AppIconConstant.barChart,
+        label: context.l10n.navAnalytics,
+      ),
+      SdNavDestinationV3(
+        icon: AppIconConstant.menu,
+        selectedIcon: AppIconConstant.menu,
+        label: context.l10n.navMore,
+      ),
+    ],
+    selectedIndex: widget.shell.currentIndex,
+    onSelected: (int index) => widget.shell.goBranch(
+      index,
+      // Re-tapping the active tab pops that branch to its root.
+      initialLocation: index == widget.shell.currentIndex,
     ),
   );
 }

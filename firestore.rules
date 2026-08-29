@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Seller OS security rules.
+// Reseller Studio security rules.
 //
 // The whole model in one sentence: **every business document lives under a
 // workspace, and access is decided by the caller's membership document in
@@ -8,6 +8,10 @@ rules_version = '2';
 // that is the point — a flat collection would make every rule re-derive
 // ownership from a field on the document, which is one forgotten `where`
 // clause away from a data leak between two sellers.
+//
+//   users/{uid}
+//     devices/{deviceId}        ← FCM tokens, written by the app
+//     notifications/{id}        ← the inbox, written only by functions
 //
 //   workspaces/{workspaceId}
 //     members/{uid}          ← the ACL. Role lives here, nowhere else.
@@ -20,14 +24,13 @@ rules_version = '2';
 //     expenses/{expenseId}
 //     locations/{locationId}
 //     categories/{categoryId}
-//     marketplaces/{marketplaceId}
 //     activity/{activityId}  ← audit log, append-only, never edited
 //
 // Roles (plan §24): owner > admin > member > viewer.
 //
 // **Anything a client must not be able to forge is written by a Cloud
 // Function with the Admin SDK, which bypasses these rules entirely.** That is
-// the enforcement for marketplace tokens, payouts and subscription state —
+// the enforcement for payouts and subscription state —
 // not a rule here, because a rule can only check what the client sent.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -70,13 +73,42 @@ service cloud.firestore {
       return isMember(workspaceId) && role(workspaceId) == 'owner';
     }
 
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
     // --- Users -----------------------------------------------------------
 
     // A user's own profile. Nobody reads anyone else's: a team member's name
     // is denormalised onto the membership document, so the team screen never
     // needs to reach across into another user's record.
     match /users/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read, write: if isSelf(uid);
+
+      // The devices this person is signed in on, and the FCM token for each.
+      // Written by the app because only the app can learn the token; read by
+      // the notification functions through the Admin SDK, which bypasses
+      // these rules. Nobody else may read one — a token is a way to push
+      // arbitrary text onto somebody's phone.
+      match /devices/{deviceId} {
+        allow read: if isSelf(uid);
+        allow write: if isSelf(uid);
+      }
+
+      // The notification inbox (plan §22). **Written only by Cloud
+      // Functions**, the same reasoning as the audit log: a notification a
+      // client can create is one that can claim any business made any sale.
+      //
+      // The one thing the reader may do is mark it read, and the rule names
+      // that field rather than trusting the app to send only that — an update
+      // free to rewrite the body would put the create rule back where it
+      // started.
+      match /notifications/{notificationId} {
+        allow read: if isSelf(uid);
+        allow update: if isSelf(uid)
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readAt']);
+        allow create, delete: if false;
+      }
     }
 
     // --- Workspaces ------------------------------------------------------
@@ -128,8 +160,9 @@ service cloud.firestore {
                       && memberUid != request.auth.uid;
 
         // The last owner cannot be demoted or removed, or the workspace
-        // becomes unadministrable. Enforced in the `updateMemberRole`
-        // callable, which can count the owners; a rule cannot.
+        // becomes unadministrable. Enforced in the `removeMember` callable,
+        // which does both jobs because the check is one count either way; a
+        // rule cannot take that count at all.
       }
 
       // --- Business records ----------------------------------------------
@@ -146,18 +179,9 @@ service cloud.firestore {
       match /expenses/{expenseId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /locations/{locationId}        { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /categories/{categoryId}       { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
+      match /marketplaces/{marketplaceId}  { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
+      match /carriers/{carrierId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /receipts/{receiptId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-
-      // --- Marketplace connections ---------------------------------------
-
-      // Readable so the app can show connection status, but **never writable
-      // by a client**: the document holds OAuth tokens, and the plan is
-      // explicit that secrets stay server-side (§14, §32). Connect and
-      // disconnect are callables.
-      match /marketplaces/{marketplaceId} {
-        allow read: if canRead(workspaceId);
-        allow write: if false;
-      }
 
       // --- Audit log ------------------------------------------------------
 

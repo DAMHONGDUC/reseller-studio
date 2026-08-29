@@ -14,7 +14,7 @@ class _ActivityRow extends StatelessWidget {
       child: Row(
         children: <Widget>[
           SdIconTileV3(
-            icon: Symbols.shopping_bag_rounded,
+            icon: AppIconConstant.shoppingBag,
             tint: context.sdTheme3.textSecondary,
             size: SdIconTileSizeV3.small,
           ),
@@ -34,7 +34,7 @@ class _ActivityRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  order.marketplace.displayName,
+                  order.marketplaceName,
                   style: context.textTheme3.bodySmall!.muted3(context),
                 ),
               ],

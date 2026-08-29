@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/home/home_constant.dart';
-import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/core/extensions/context_extensions.dart';
+import 'package:reseller_studio/features/home/home_constant.dart';
+import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
+import 'premium_subscription.dart';
 
 /// The three cards that open Home.
 ///
@@ -22,7 +24,11 @@ void main() {
   testWidgets('all three are on screen before anything is scrolled', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
@@ -38,7 +44,11 @@ void main() {
   testWidgets('they sit above every section of the dashboard', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
@@ -57,7 +67,11 @@ void main() {
   testWidgets('the Quick Access card scrolls Home to Quick Access', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const HomeScreen());
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
     final ScrollableState scrollable = tester.state(
@@ -78,6 +92,28 @@ void main() {
         QuickActionLabel.of(context, QuickActionConstant.actions.last.kind),
       ),
       findsWidgets,
+    );
+  });
+
+  testWidgets('Scan replaces Flow overview in the shortcut row', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+
+    expect(cardFor(context, HomeShortcutKind.scan), findsOneWidget);
+    expect(find.text(context.l10n.homeFlowOverview), findsOneWidget);
+    expect(
+      find.ancestor(
+        of: find.text(context.l10n.flowOverviewIntro),
+        matching: find.byType(SdCardV3),
+      ),
+      findsOneWidget,
     );
   });
 

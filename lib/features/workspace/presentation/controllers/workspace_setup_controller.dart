@@ -1,9 +1,13 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/config/app_env.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../auth/providers.dart';
+import '../../../carriers/providers.dart';
+import '../../../inventory/providers.dart';
+import '../../../marketplaces/providers.dart';
 import '../../domain/repositories/workspace_repository.dart';
 import '../../providers.dart';
 
@@ -77,7 +81,8 @@ class WorkspaceSetupController extends Notifier<WorkspaceSetupState> {
     if (name.isEmpty || state.isSaving) return null;
 
     if (uid == null) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.workspace,
         'Workspace setup submitted with nobody signed in',
         error: StateError('No uid at workspace creation'),
       );
@@ -86,11 +91,15 @@ class WorkspaceSetupController extends Notifier<WorkspaceSetupState> {
     }
 
     state = state.copyWith(isSaving: true);
-    AppLogger.action('Workspace setup submitted', <String, Object>{
-      'country': state.country,
-      'currency': state.currency,
-      'hasBusinessType': state.businessType != null,
-    });
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Workspace setup submitted',
+      <String, Object>{
+        'country': state.country,
+        'currency': state.currency,
+        'hasBusinessType': state.businessType != null,
+      },
+    );
 
     try {
       final String id = await repository.createWorkspace(
@@ -101,6 +110,9 @@ class WorkspaceSetupController extends Notifier<WorkspaceSetupState> {
         ownerName: ref.read(authUserProvider).value?.displayName,
         ownerEmail: ref.read(authUserProvider).value?.email,
         businessType: state.businessType,
+        marketplaces: ref.read(defaultMarketplacesProvider),
+        categories: ref.read(defaultItemCategoriesProvider),
+        carriers: ref.read(defaultCarriersProvider),
       );
 
       AppAnalytics.instance.workspaceCreated(
@@ -112,7 +124,8 @@ class WorkspaceSetupController extends Notifier<WorkspaceSetupState> {
 
       return id;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.workspace,
         'Workspace creation failed',
         error: error,
         stackTrace: stackTrace,

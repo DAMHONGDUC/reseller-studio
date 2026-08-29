@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/expenses/domain/entities/expense.dart';
-import 'package:seller_os/features/listings/domain/enums/listing_status.dart';
-import 'package:seller_os/features/marketplaces/domain/enums/marketplace.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/domain/enums/order_status.dart';
-import 'package:seller_os/features/tax/domain/entities/tax_summary.dart';
-import 'package:seller_os/features/tax/domain/entities/tax_year.dart';
-import 'package:seller_os/features/tax/domain/enums/tax_jurisdiction.dart';
-import 'package:seller_os/features/tax/domain/services/tax_summary_calculator.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
+import 'package:reseller_studio/features/tax/domain/entities/tax_summary.dart';
+import 'package:reseller_studio/features/tax/domain/entities/tax_year.dart';
+import 'package:reseller_studio/features/tax/domain/enums/tax_jurisdiction.dart';
+import 'package:reseller_studio/features/tax/domain/services/tax_summary_calculator.dart';
 
 /// Rows are placed against a tax-year boundary on purpose: the only thing
 /// worth testing here is what falls in and what falls out.

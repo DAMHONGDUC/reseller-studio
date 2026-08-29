@@ -22,7 +22,7 @@ class _MockDataCard extends ConsumerWidget {
           Row(
             children: <Widget>[
               SdIconV3(
-                Symbols.science_rounded,
+                AppIconConstant.science,
                 color: mode.isMock
                     ? context.sdTheme3.warning
                     : context.sdTheme3.textSecondary,

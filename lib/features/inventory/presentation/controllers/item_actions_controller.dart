@@ -1,24 +1,27 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../listings/domain/repositories/listing_repository.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../mock_data/providers.dart';
-import '../../../orders/domain/entities/order.dart';
-import '../../../orders/domain/enums/order_status.dart';
-import '../../../orders/domain/repositories/order_repository.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../domain/repositories/item_repository.dart';
 import '../../domain/services/item_transition.dart';
 
-/// Everything a seller does *to* an item once it exists: list it, sell it,
-/// reprice it, move it, archive it — one at a time or forty at once.
+/// Everything a seller does *to* an item once it exists: list it, reprice it,
+/// move it, archive it — one at a time or forty at once.
+///
+/// **Selling is not here.** It writes an order, so it belongs to the feature
+/// that owns orders — `RecordSaleController`, reached through
+/// `orders/providers.dart`. What stays is [check], which the Actions sheet
+/// asks before it opens the sheet.
 ///
 /// **The bulk paths are not a loop over the single one.** Hard rule 16 makes
 /// bulk first class: `saveAll` batches the write, so forty repriced rows are
@@ -42,149 +45,129 @@ class ItemActionsController extends Notifier<bool> {
   ItemTransitionCheck check(Item item, ItemStatus target) =>
       ItemTransition.check(item, target);
 
-  /// Put an item on a marketplace (plan §29: listing needs a price and a
-  /// marketplace).
+  /// Whether more marketplaces may be added (plan §13).
+  ItemTransitionCheck crossListCheck(Item item) =>
+      ItemTransition.crossListCheck(item);
+
+  /// Put one item on several marketplaces at once (plan §13).
   ///
-  /// Writes the listing and moves the item in the same call, because a listed
-  /// item with no listing — or a listing whose item still says `inStock` — is
-  /// a state no screen knows how to render.
-  Future<void> listItem(
+  /// **One `saveAll`, not a loop over [listItem].** Cross-listing is a single
+  /// user intent that must not half-succeed: four separate writes is a state
+  /// where the item is on two marketplaces, the screen showed an error, and
+  /// nobody can tell which two.
+  ///
+  /// **The item's status moves only if it has not already.** An item already
+  /// `listed` is exactly the case this exists for — it is on eBay and the
+  /// seller wants Depop too — and `ItemTransition.apply` would refuse that
+  /// move as `wrongStatus`. What it always gets is the price, because that is
+  /// what every new listing was created at.
+  ///
+  /// **A price per marketplace, not one price for all of them** — owner's
+  /// rule. The platforms reward different numbers and take different cuts, so
+  /// [prices] carries what each one is actually listed at. The screen resolves
+  /// its shared default and its overrides into that map; nothing here has to
+  /// know which was which.
+  ///
+  /// [askingPrice] is what the *item* is worth — the form's shared price, not
+  /// any one platform's. Null leaves the item's own asking price alone, which
+  /// is right when every platform was priced individually and none of them is
+  /// the item's number.
+  ///
+  /// **[reprice] carries live listings whose price changed** — owner's rule:
+  /// one screen answers "what does this cost on each platform", whether the
+  /// listing exists yet or not. They ride in the same `saveAll` as the new
+  /// ones, because adding a marketplace and correcting another are one
+  /// intent when the seller pressed one button.
+  ///
+  /// Marketplaces the item is already on are the caller's to keep out of
+  /// [prices]; the screen ticks them and offers their price instead, and
+  /// passing one anyway would create a second listing on the same platform.
+  Future<void> crossList(
     Item item, {
-    required Marketplace marketplace,
-    required Money price,
-    String? title,
+    required Map<Marketplace, Money> prices,
+    Money? askingPrice,
+    List<Listing> reprice = const <Listing>[],
   }) async {
     final ListingRepository listings = ref.read(listingRepositoryProvider);
     final ItemRepository items = ref.read(itemRepositoryProvider);
     final DateTime now = DateTime.now();
-    final String listingId = _uuid.v4();
 
-    AppLogger.action('List item', <String, Object>{
+    if (prices.isEmpty && reprice.isEmpty) return;
+
+    SdLogger.action(LogTagConstant.listing, 'Cross-list item', <String, Object>{
       'itemId': item.id,
-      'marketplace': marketplace.name,
-      'priceMinor': price.minor,
+      'prices': <String, int>{
+        for (final MapEntry<Marketplace, Money> entry in prices.entries)
+          entry.key.name: entry.value.minor,
+      },
+      'repriced': <String, int>{
+        for (final Listing listing in reprice)
+          listing.marketplace.name: listing.price.minor,
+      },
     });
 
     state = true;
 
     try {
-      // The item carries the asking price the listing was created at, so the
-      // inventory row and the marketplace agree without a join.
-      final Item priced = item.copyWith(askingPrice: price);
+      final Item priced = askingPrice == null
+          ? item
+          : item.copyWith(askingPrice: askingPrice);
+      // Nothing new to list means nothing to move the item for: a reprice on
+      // its own must not re-stamp `listedAt` and reset the staleness clock.
+      final bool isNew = prices.isNotEmpty;
 
-      await listings.save(
-        Listing(
-          id: listingId,
-          itemId: item.id,
-          marketplace: marketplace,
-          title: title?.trim().isNotEmpty ?? false ? title!.trim() : item.title,
-          price: price,
-          // Draft, not active: nothing is integrated yet, so claiming the
-          // listing is live on eBay would be a lie the app cannot back up.
-          status: ListingStatus.draft,
-          createdAt: now,
-        ),
-      );
+      await listings.saveAll(<Listing>[
+        // One batch for both halves: a seller who added Depop and cut the
+        // eBay price pressed one button, and half of that landing is a state
+        // nobody can read back.
+        ...reprice,
+        for (final MapEntry<Marketplace, Money> entry in prices.entries)
+          Listing(
+            id: _uuid.v4(),
+            itemId: item.id,
+            marketplace: entry.key,
+            // Per-marketplace titles are the point of the entity, but they
+            // diverge when a seller optimises one — not at creation, where a
+            // second box per platform would be four boxes for one intent.
+            title: item.title,
+            price: entry.value,
+            // Draft, not active: nothing is integrated yet, so claiming the
+            // listing is live on eBay would be a lie the app cannot back up.
+            status: ListingStatus.draft,
+            createdAt: now,
+          ),
+      ]);
 
+      // Going live stamps the staleness clock and makes a draft stock; it is
+      // not a status of its own any more.
       await items.save(
-        ItemTransition.apply(priced, ItemStatus.listed, now: now),
+        isNew && item.status.isListable
+            ? ItemTransition.markListed(priced, now: now)
+            : priced,
       );
 
-      AppLogger.info('Item listed', <String, Object>{
-        'itemId': item.id,
-        'listingId': listingId,
-      });
-      AppAnalytics.instance.itemListed(marketplace: marketplace.name);
+      SdLogger.info(
+        LogTagConstant.listing,
+        'Item cross-listed',
+        <String, Object>{
+          'itemId': item.id,
+          'count': prices.length + reprice.length,
+        },
+      );
+      AppAnalytics.instance.bulkAction(
+        action: 'Cross-list item',
+        count: prices.length + reprice.length,
+      );
     } catch (error, stackTrace) {
-      AppLogger.error(
-        'Failed to list item',
+      SdLogger.error(
+        LogTagConstant.listing,
+        'Failed to cross-list item',
         error: error,
         stackTrace: stackTrace,
         data: <String, Object>{
           'itemId': item.id,
-          'marketplace': marketplace.name,
+          'marketplaces': prices.keys.map((Marketplace m) => m.name).toList(),
         },
-      );
-
-      rethrow;
-    } finally {
-      state = false;
-    }
-  }
-
-  /// Record a sale (plan §28's manual order).
-  ///
-  /// **Creates the order as well as moving the item**, because profit is
-  /// derived from orders and an item marked sold with no order would vanish
-  /// from every figure the product is judged on.
-  Future<String> markSold(
-    Item item, {
-    required Money salePrice,
-    required Marketplace marketplace,
-    required DateTime soldAt,
-    String? buyerName,
-  }) async {
-    final OrderRepository orders = ref.read(orderRepositoryProvider);
-    final ItemRepository items = ref.read(itemRepositoryProvider);
-    final String orderId = _uuid.v4();
-
-    AppLogger.action('Mark item sold', <String, Object>{
-      'itemId': item.id,
-      'marketplace': marketplace.name,
-      'salePriceMinor': salePrice.minor,
-    });
-
-    state = true;
-
-    try {
-      await orders.save(
-        Order(
-          id: orderId,
-          status: OrderStatus.toShip,
-          marketplace: marketplace,
-          lines: <OrderLine>[
-            OrderLine(
-              itemId: item.id,
-              title: item.title,
-              quantity: 1,
-              unitPrice: salePrice,
-              // Null when nobody entered a cost — the order's profit is then
-              // `—` rather than the whole sale price (hard rule 5).
-              unitCost: item.purchasePrice,
-            ),
-          ],
-          salePrice: salePrice,
-          orderedAt: soldAt,
-          buyerName: buyerName,
-        ),
-      );
-
-      await items.save(
-        ItemTransition.apply(
-          item.copyWith(askingPrice: item.askingPrice ?? salePrice),
-          ItemStatus.sold,
-          now: soldAt,
-        ),
-      );
-
-      AppLogger.info('Item sold', <String, Object>{
-        'itemId': item.id,
-        'orderId': orderId,
-      });
-      AppAnalytics.instance.itemSold(
-        marketplace: marketplace.name,
-        // The share of sales with no cost is the health metric for the whole
-        // "insight" half of the product — it is what makes profit unknowable.
-        hadCost: item.purchasePrice != null,
-      );
-
-      return orderId;
-    } catch (error, stackTrace) {
-      AppLogger.error(
-        'Failed to mark item sold',
-        error: error,
-        stackTrace: stackTrace,
-        data: <String, Object>{'itemId': item.id},
       );
 
       rethrow;
@@ -221,25 +204,59 @@ class ItemActionsController extends Notifier<bool> {
     (Item item) => item.copyWith(status: ItemStatus.archived),
   );
 
-  /// Back onto the shelf from the archive.
+  /// Back onto the shelf — from the archive, or from a sale that did not
+  /// happen.
+  ///
+  /// **Through `ItemTransition`, not a bare `copyWith`.** Returning an item is
+  /// a state change like any other, and the transition is what knows a sold
+  /// date has to go with it; a copy that only moved the status left a row on
+  /// the shelf that every export still read as sold.
   Future<void> restore(List<Item> items) => _bulk(
     'Restore items',
     items,
     const <String, Object>{},
-    (Item item) => item.copyWith(status: ItemStatus.inStock),
+    // A recorded instant, not a derived one, so it is the wall clock rather
+    // than `clockProvider`.
+    (Item item) =>
+        ItemTransition.apply(item, ItemStatus.inStock, now: DateTime.now()),
+  );
+
+  /// [count] more of each on the shelf, and back in stock with them.
+  ///
+  /// **One `_bulk`, so forty restocked rows are one write** (hard rule 16),
+  /// and every one goes through `ItemTransition.restock` — the count and the
+  /// status move together or not at all.
+  Future<void> restock(List<Item> items, int count) => _bulk(
+    'Restock items',
+    items,
+    <String, Object>{'count': count},
+    // A recorded instant, not a derived one, so it is the wall clock.
+    (Item item) => ItemTransition.restock(item, count, now: DateTime.now()),
+  );
+
+  /// Onto the shelf: what turns a draft into stock the seller is selling.
+  Future<void> makeInStock(List<Item> items) => _bulk(
+    'Make items in stock',
+    items,
+    const <String, Object>{},
+    (Item item) =>
+        ItemTransition.apply(item, ItemStatus.inStock, now: DateTime.now()),
   );
 
   /// Soft delete (hard rule 15) — the row stays joinable by the orders and
   /// purchases that reference it.
   Future<void> delete(String itemId) async {
-    AppLogger.action('Delete item', <String, Object>{'itemId': itemId});
+    SdLogger.action(LogTagConstant.item, 'Delete item', <String, Object>{
+      'itemId': itemId,
+    });
 
     state = true;
 
     try {
       await ref.read(itemRepositoryProvider).delete(itemId);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to delete item',
         error: error,
         stackTrace: stackTrace,
@@ -265,7 +282,7 @@ class ItemActionsController extends Notifier<bool> {
   ) async {
     if (items.isEmpty) return;
 
-    AppLogger.action(describe, <String, Object>{
+    SdLogger.action(LogTagConstant.item, describe, <String, Object>{
       'count': items.length,
       ...data,
     });
@@ -278,7 +295,8 @@ class ItemActionsController extends Notifier<bool> {
           .read(itemRepositoryProvider)
           .saveAll(items.map(change).toList());
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to $describe',
         error: error,
         stackTrace: stackTrace,

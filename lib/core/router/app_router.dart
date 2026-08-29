@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
+import '../../features/activity/presentation/screens/activity_screen/activity_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_categories_screen/analytics_categories_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_inventory_screen/analytics_inventory_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_marketplace_screen/analytics_marketplace_screen.dart';
@@ -11,6 +13,8 @@ import '../../features/analytics/presentation/screens/analytics_screen/analytics
 import '../../features/analytics/presentation/screens/analytics_sources_screen/analytics_sources_screen.dart';
 import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
 import '../../features/auth/providers.dart';
+import '../../features/carriers/presentation/screens/carrier_detail_screen/carrier_detail_screen.dart';
+import '../../features/carriers/presentation/screens/carriers_screen/carriers_screen.dart';
 import '../../features/expenses/presentation/screens/expenses_screen/expenses_screen.dart';
 import '../../features/home/presentation/screens/home_screen/home_screen.dart';
 import '../../features/inventory/presentation/screens/categories_screen/categories_screen.dart';
@@ -20,15 +24,20 @@ import '../../features/inventory/presentation/screens/item_form_screen/item_form
 import '../../features/inventory/presentation/screens/locations_screen/locations_screen.dart';
 import '../../features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
 import '../../features/inventory/presentation/screens/scanner_screen/scanner_screen.dart';
+import '../../features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
 import '../../features/listings/presentation/screens/listings_screen/listings_screen.dart';
+import '../../features/marketplaces/presentation/screens/marketplace_detail_screen/marketplace_detail_screen.dart';
 import '../../features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import '../../features/more/presentation/screens/about_screen/about_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen/notifications_screen.dart';
 import '../../features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen/onboarding_screen.dart';
 import '../../features/onboarding/providers.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
+import '../../features/orders/presentation/screens/payouts_screen/payouts_screen.dart';
+import '../../features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
 import '../../features/receipts/presentation/screens/receipts_screen/receipts_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen/reports_screen.dart';
@@ -39,16 +48,19 @@ import '../../features/sourcing/presentation/screens/purchase_evaluator_screen/p
 import '../../features/sourcing/presentation/screens/purchases_screen/purchases_screen.dart';
 import '../../features/sourcing/presentation/screens/sources_screen/sources_screen.dart';
 import '../../features/sourcing/presentation/screens/sourcing_screen/sourcing_screen.dart';
+import '../../features/subscription/presentation/screens/paywall_screen/paywall_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen/subscription_screen.dart';
 import '../../features/tax/presentation/screens/tax_screen/tax_screen.dart';
 import '../../features/workspace/presentation/screens/team_screen/team_screen.dart';
+import '../../features/workspace/presentation/screens/workspace_detail_screen/workspace_detail_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
 import '../../features/workspace/providers.dart';
+import '../constants/log_tag_constant.dart';
 import '../extensions/context_extensions.dart';
-import '../logging/app_logger.dart';
 import '../widgets/app_shell.dart';
 import '../widgets/signed_out_view.dart';
 import '../widgets/splash_screen.dart';
+import 'app_bottom_sheet_page.dart';
 import 'app_navigator_key.dart';
 import 'app_routes.dart';
 
@@ -160,6 +172,15 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const WorkspaceSetupScreen(),
       ),
+      // After `workspaceCreate` on purpose: go_router matches in declaration
+      // order, and `/workspace/new` would otherwise be read as an id.
+      GoRoute(
+        path: AppRoutes.workspaceDetailPath,
+        builder: (BuildContext context, GoRouterState state) =>
+            WorkspaceDetailScreen(
+              workspaceId: state.pathParameters['workspaceId']!,
+            ),
+      ),
       // Outside the shell: search covers the whole app rather than one tab,
       // and it is reached from every one of them.
       GoRoute(
@@ -184,6 +205,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                       title: context.l10n.navHome,
                       child: const HomeScreen(),
                     ),
+                routes: <RouteBase>[
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'notifications',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const NotificationsScreen(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -239,6 +268,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                               itemId: state.pathParameters['itemId'],
                             ),
                       ),
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'cross-list',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            CrossListScreen(
+                              itemId: state.pathParameters['itemId']!,
+                            ),
+                      ),
                     ],
                   ),
                 ],
@@ -266,6 +303,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'offers',
                     builder: (BuildContext context, GoRouterState state) =>
                         const OffersScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'record-sale',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const RecordSaleScreen(),
                   ),
                   // Last among the order sub-routes on purpose: a literal
                   // segment declared after `:orderId` would be swallowed by
@@ -401,6 +444,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'payouts',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const PayoutsScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'reports',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ReportsScreen(),
@@ -422,12 +471,59 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'marketplaces',
                     builder: (BuildContext context, GoRouterState state) =>
                         const MarketplacesScreen(),
+                    routes: <RouteBase>[
+                      // Before the `:marketplaceId` route, or 'new' matches it
+                      // and the form opens looking for a record called "new".
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'new',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const MarketplaceDetailScreen(),
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: ':marketplaceId',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            MarketplaceDetailScreen(
+                              marketplaceId:
+                                  state.pathParameters['marketplaceId'],
+                            ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'carriers',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const CarriersScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'new',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const CarrierDetailScreen(),
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: ':carrierId',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            CarrierDetailScreen(
+                              carrierId: state.pathParameters['carrierId'],
+                            ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
                     path: 'team',
                     builder: (BuildContext context, GoRouterState state) =>
                         const TeamScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'activity',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const ActivityScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -440,6 +536,17 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'subscription',
                     builder: (BuildContext context, GoRouterState state) =>
                         const SubscriptionScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'paywall',
+                    pageBuilder: (BuildContext context, GoRouterState state) =>
+                        AppBottomSheetPage<void>(
+                          key: state.pageKey,
+                          name: state.name,
+                          builder: (BuildContext context) =>
+                              const PaywallScreen(),
+                        ),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -458,7 +565,8 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       // A route that does not exist is a bug in the app, not something to
       // show the user a stack trace about. Log it and put them somewhere
       // real. Plan §31: never expose a raw technical error.
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.navigation,
         'Navigate to unknown route',
         error: StateError('No route for ${state.uri}'),
       );

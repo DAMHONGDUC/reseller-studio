@@ -26,4 +26,19 @@ abstract interface class SubscriptionRepository {
   /// Re-reads entitlement from the store. Required by App Store review for
   /// any app selling a subscription.
   Future<SubscriptionStatus> restore();
+
+  /// Tell the billing provider which account this is.
+  ///
+  /// **The webhook depends on it.** Without this call the provider invents an
+  /// anonymous id, and the Cloud Function that mirrors entitlement into
+  /// Firestore has no way to tell which seller — so a paying account still
+  /// reads as Free to every rule and every seat check.
+  ///
+  /// It also carries a purchase across devices: the same uid on a new phone
+  /// is the same customer.
+  Future<void> identify(String uid);
+
+  /// Forget the account at sign-out, so the next person to sign in on this
+  /// phone does not inherit the last one's entitlement.
+  Future<void> forget();
 }

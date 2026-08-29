@@ -1,8 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/document_picker.dart';
 import '../../../../core/storage/file_uploader.dart';
@@ -43,7 +44,7 @@ class SourcingController extends Notifier<bool> {
     if (trimmed.isEmpty) return null;
 
     state = true;
-    AppLogger.action('Save source', <String, Object>{
+    SdLogger.action(LogTagConstant.sourcing, 'Save source', <String, Object>{
       'sourceId': sourceId,
       'isNew': id == null,
       'hasType': type != null,
@@ -67,7 +68,8 @@ class SourcingController extends Notifier<bool> {
 
       return sourceId;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.sourcing,
         'Failed to save source',
         error: error,
         stackTrace: stackTrace,
@@ -82,12 +84,15 @@ class SourcingController extends Notifier<bool> {
 
   Future<void> deleteSource(String id) async {
     state = true;
-    AppLogger.action('Delete source', <String, Object>{'sourceId': id});
+    SdLogger.action(LogTagConstant.sourcing, 'Delete source', <String, Object>{
+      'sourceId': id,
+    });
 
     try {
       await ref.read(sourceRepositoryProvider).delete(id);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.sourcing,
         'Failed to delete source',
         error: error,
         stackTrace: stackTrace,
@@ -120,7 +125,7 @@ class SourcingController extends Notifier<bool> {
     final String currency = ref.read(workspaceCurrencyProvider);
 
     state = true;
-    AppLogger.action('Save purchase', <String, Object>{
+    SdLogger.action(LogTagConstant.sourcing, 'Save purchase', <String, Object>{
       'purchaseId': purchaseId,
       'isNew': id == null,
       'hasSource': sourceId != null,
@@ -145,7 +150,8 @@ class SourcingController extends Notifier<bool> {
 
       return purchaseId;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.sourcing,
         'Failed to save purchase',
         error: error,
         stackTrace: stackTrace,
@@ -176,7 +182,8 @@ class SourcingController extends Notifier<bool> {
         fromCamera: fromCamera,
       );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.sourcing,
         'Failed to attach a receipt',
         error: error,
         stackTrace: stackTrace,
@@ -191,12 +198,17 @@ class SourcingController extends Notifier<bool> {
 
   Future<void> deletePurchase(String id) async {
     state = true;
-    AppLogger.action('Delete purchase', <String, Object>{'purchaseId': id});
+    SdLogger.action(
+      LogTagConstant.sourcing,
+      'Delete purchase',
+      <String, Object>{'purchaseId': id},
+    );
 
     try {
       await ref.read(purchaseRepositoryProvider).delete(id);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.sourcing,
         'Failed to delete purchase',
         error: error,
         stackTrace: stackTrace,

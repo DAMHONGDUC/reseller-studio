@@ -38,10 +38,7 @@ class _LoginFeatureRow extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      SdIconTileV3(
-        icon: feature.icon,
-        tint: context.colorScheme3.primary,
-      ),
+      SdIconTileV3(icon: feature.icon, tint: context.colorScheme3.primary),
       SizedBox(width: SdSpacingConstant.w12),
       Expanded(
         child: Column(

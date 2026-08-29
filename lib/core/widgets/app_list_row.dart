@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
+
+import 'app_row_chevron.dart';
 
 /// The row every list of records in this app is made of.
 ///
@@ -21,6 +22,7 @@ class AppListRow extends StatelessWidget {
     this.trailing,
     this.trailingText,
     this.onTap,
+    this.onLongPress,
     this.showChevron = true,
     super.key,
   });
@@ -45,6 +47,11 @@ class AppListRow extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  /// Starts a bulk selection where a screen has one. Long-press rather than a
+  /// tick box in every row: the box would be permanent chrome for a mode most
+  /// sellers open twice a month.
+  final VoidCallback? onLongPress;
+
   /// The chevron says "this opens something". A row that only displays, or
   /// one whose trailing widget is the interaction, must turn it off — an
   /// affordance that leads nowhere is worse than none.
@@ -56,6 +63,7 @@ class AppListRow extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       borderRadius: SdRadiusV3.cardAll,
       child: Padding(
         padding: SdContentPaddingV3.row,
@@ -99,11 +107,7 @@ class AppListRow extends StatelessWidget {
                 ),
               )
             else if (showChevron && onTap != null)
-              SdIconV3(
-                Symbols.chevron_right_rounded,
-                size: SdIconV3.smallSize,
-                color: context.sdTheme3.textTertiary,
-              ),
+              const AppRowChevron(),
           ],
         ),
       ),
@@ -116,13 +120,19 @@ class AppListRow extends StatelessWidget {
 /// The divider is drawn here rather than by each row, so the last row does not
 /// have to know it is last.
 class AppListCard extends StatelessWidget {
-  const AppListCard({required this.children, super.key});
+  const AppListCard({required this.children, this.borderColor, super.key});
 
   final List<Widget> children;
+
+  /// Tints the edge, forwarded to `SdCardV3`. Its rule applies unchanged:
+  /// colour is never the only signal, so a tinted card always carries a label
+  /// saying the same thing.
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) => SdCardV3(
     padding: EdgeInsets.zero,
+    borderColor: borderColor,
     child: Column(
       children: <Widget>[
         for (int i = 0; i < children.length; i++) ...<Widget>[

@@ -1,7 +1,7 @@
-name: seller_os
-description: "Seller OS — the operating system for resellers: source, list, sell, ship, profit."
+name: reseller_studio
+description: "Reseller Studio — the operating system for resellers: source, list, sell, ship, profit."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+3
 
 environment:
   sdk: ^3.12.2
@@ -23,7 +23,7 @@ dependencies:
     sdk: flutter
   # The design system reads dimensions through screenutil, so the app must
   # install ScreenUtilInit above MaterialApp or every SdSpacingConstant getter
-  # throws. See lib/seller_os_app.dart.
+  # throws. See lib/reseller_studio_app.dart.
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.3.0
   go_router: ^17.3.0
@@ -40,9 +40,14 @@ dependencies:
   shared_preferences: ^2.5.5
   # The shared design system. Its own git repo, checked out here as a
   # submodule — tokens, theme and string-free widgets live there, not in
-  # lib/core. Seller OS renders on its v3 generation and never touches v2.
+  # lib/core. Reseller Studio renders on its v3 generation and never touches v2.
+  simple_icons: ^16.23.0
   system_design:
     path: packages/system_design
+  # Flutter team's own plugin, and the only way to open the policy pages the
+  # App Store requires a link to. No service behind it — it hands the URL to
+  # the OS.
+  url_launcher: ^6.3.1
   uuid: ^4.5.3
 
 dev_dependencies:

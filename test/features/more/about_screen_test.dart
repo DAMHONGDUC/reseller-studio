@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/extensions/context_extensions.dart';
-import 'package:seller_os/core/router/app_routes.dart';
-import 'package:seller_os/features/more/more_constant.dart';
-import 'package:seller_os/features/more/presentation/screens/about_screen/about_screen.dart';
-import 'package:seller_os/features/more/workflow_constant.dart';
-import 'package:seller_os/features/settings/presentation/screens/settings_screen/settings_screen.dart';
+import 'package:reseller_studio/core/extensions/context_extensions.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
+import 'package:reseller_studio/features/more/more_constant.dart';
+import 'package:reseller_studio/features/more/presentation/screens/about_screen/about_screen.dart';
+import 'package:reseller_studio/features/more/workflow_constant.dart';
+import 'package:reseller_studio/features/settings/presentation/screens/settings_screen/settings_screen.dart';
 
 import '../../support/pump_app.dart';
 
@@ -96,6 +96,15 @@ void main() {
     await pumpScreen(tester, const SettingsScreen());
 
     final BuildContext context = tester.element(find.byType(SettingsScreen));
+
+    // Below the fold since the workspace block became editable — scrolled to
+    // rather than asserted in place, because where it sits is layout and what
+    // this test is about is that it is there at all.
+    await tester.scrollUntilVisible(
+      find.text(context.l10n.moreAbout),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
 
     expect(find.text(context.l10n.moreAbout), findsOneWidget);
   });

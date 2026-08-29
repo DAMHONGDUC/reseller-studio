@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -33,12 +33,12 @@ class PurchaseDetailScreen extends ConsumerWidget {
         .firstOrNull;
 
     if (purchase == null) {
-      return const SdScaffoldV3(
-        appBar: SdAppBarV3(title: 'Purchase'),
+      return SdScaffoldV3(
+        appBar: SdAppBarV3(title: context.l10n.workflowPurchase),
         body: SdEmptyStateV3(
-          icon: Symbols.search_off_rounded,
-          title: 'Purchase not found',
-          message: 'It may have been deleted.',
+          icon: AppIconConstant.searchOff,
+          title: context.l10n.sourcingPurchaseNotFound,
+          message: context.l10n.commonMayHaveBeenDeleted,
         ),
       );
     }
@@ -66,18 +66,18 @@ class PurchaseDetailScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Receipt total',
+                  label: context.l10n.sourcingReceiptTotal,
                   value: context.money(purchase.totalCost),
-                  icon: Symbols.receipt_rounded,
+                  icon: AppIconConstant.receipt,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Apportioned',
+                  label: context.l10n.sourcingApportioned,
                   value: context.money(apportioned),
                   caption: '${items.length} items',
-                  icon: Symbols.function_rounded,
+                  icon: AppIconConstant.function,
                 ),
               ),
             ],
@@ -97,7 +97,7 @@ class PurchaseDetailScreen extends ConsumerWidget {
           ],
           SizedBox(height: SdContentPaddingV3.sectionGap),
           Text(
-            'Items',
+            context.l10n.commonItems,
             style: context.textTheme3.titleSmall!.semiBold3.copyWith(
               color: context.sdTheme3.textPrimary,
             ),
@@ -106,8 +106,7 @@ class PurchaseDetailScreen extends ConsumerWidget {
           if (items.isEmpty)
             SdCardV3(
               child: Text(
-                'Nothing is linked to this purchase yet. Add items and set '
-                'their purchase on the item form.',
+                context.l10n.sourcingNothingIsLinkedToThisPurchase,
                 style: context.textTheme3.bodyMedium!.muted3(context),
               ),
             )
@@ -143,7 +142,7 @@ class _ApportionmentNote extends StatelessWidget {
     if (gap.isZero) {
       return SdCardV3(
         child: Text(
-          'Every penny of this receipt is on an item.',
+          context.l10n.sourcingEveryPennyOfThisReceiptIs,
           style: context.textTheme3.bodySmall!.copyWith(
             color: context.sdTheme3.success,
           ),

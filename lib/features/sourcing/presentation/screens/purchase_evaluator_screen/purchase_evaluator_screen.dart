@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/barcode_scanner_page.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
+import '../../../../inventory/domain/entities/item.dart';
+import '../../../../inventory/providers.dart';
 import '../../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
+import '../../../../orders/domain/entities/order.dart';
+import '../../../../orders/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';
 import '../../../../workspace/providers.dart';
+import '../../../domain/services/sold_before_lookup.dart';
 
 /// "Should I buy this?" — the calculation a reseller does standing in a shop
 /// with the item in their hand (plan §11).
@@ -41,6 +49,49 @@ class _PurchaseEvaluatorScreenState
 
   Marketplace _marketplace = Marketplace.ebay;
 
+  /// The last scan's answer, kept so the card stays on screen while the seller
+  /// adjusts the numbers underneath it.
+  SoldBefore? _soldBefore;
+
+  /// Whether the sale price in the field came from [_soldBefore] rather than
+  /// from the seller. It stops the helper claiming credit for a number they
+  /// typed themselves.
+  bool _saleFromHistory = false;
+
+  /// Opens the camera, then answers the code out of the seller's own records.
+  ///
+  /// **No network, by design.** A comps lookup needs a marketplace API and a
+  /// signal; this needs neither, and "you sold this for £28 in March" is a
+  /// better answer than a stranger's asking price anyway.
+  Future<void> _scan() async {
+    final String? code = await BarcodeScannerPage.show(
+      context,
+      title: context.l10n.sourcingScanTitle,
+      hint: context.l10n.sourcingScanHint,
+    );
+
+    if (code == null || !mounted) return;
+
+    final SoldBefore? found = SoldBeforeLookup.find(
+      code: code,
+      items: ref.read(itemsProvider).value ?? const <Item>[],
+      orders: ref.read(ordersProvider).value ?? const <Order>[],
+    );
+
+    if (found == null) {
+      setState(() => _soldBefore = null);
+      SdSnackBarUtilsV3.info(context, context.l10n.sourcingScanNoHistory);
+
+      return;
+    }
+
+    setState(() {
+      _soldBefore = found;
+      _sale.text = found.salePrice.toInputString();
+      _saleFromHistory = true;
+    });
+  }
+
   @override
   void dispose() {
     _buy.dispose();
@@ -60,7 +111,12 @@ class _PurchaseEvaluatorScreenState
     // The fee is estimated from the platform's published rate. It is a
     // planning number and is never written to an order — the real fee arrives
     // from the marketplace when the sale settles.
-    final Money fees = sale?.applyRate(_marketplace.estimatedFeeRate) ?? zero;
+    final Map<String, double> feeRates = ref.read(marketplaceFeeRatesProvider);
+    final Money fees =
+        sale?.applyRate(
+          MarketplaceFeePolicy.rateFor(_marketplace, overrides: feeRates),
+        ) ??
+        zero;
 
     final PurchaseEvaluation? evaluation = sale == null
         ? null
@@ -72,18 +128,27 @@ class _PurchaseEvaluatorScreenState
           );
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Should I buy this?'),
+      appBar: SdAppBarV3(title: context.l10n.sourcingShouldIBuyThis),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           _Verdict(evaluation: evaluation, marketplace: _marketplace),
           SizedBox(height: SdContentPaddingV3.sectionGap),
+          _SoldBeforeCard(found: _soldBefore),
+          SdButtonV3(
+            variant: SdButtonVariantV3.outlined,
+            label: context.l10n.sourcingScanAction,
+            icon: AppIconConstant.qrCodeScanner,
+            expand: true,
+            onPressed: _scan,
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
           SdCardV3(
             child: Column(
               children: <Widget>[
                 MoneyField(
-                  label: 'Buy price',
+                  label: context.l10n.sourcingBuyPrice,
                   controller: _buy,
                   currency: currency,
                   textInputAction: TextInputAction.next,
@@ -91,24 +156,27 @@ class _PurchaseEvaluatorScreenState
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 MoneyField(
-                  label: 'What you think it sells for',
+                  label: context.l10n.sourcingWhatYouThinkItSellsFor,
                   controller: _sale,
                   currency: currency,
+                  helperText: _saleFromHistory
+                      ? context.l10n.sourcingSalePriceFilled
+                      : null,
                   textInputAction: TextInputAction.next,
-                  onChanged: (_) => setState(() {}),
+                  onChanged: (_) => setState(() => _saleFromHistory = false),
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 PickerField(
-                  label: 'Marketplace',
-                  icon: Symbols.storefront_rounded,
+                  label: context.l10n.commonMarketplace,
+                  icon: AppIconConstant.storefront,
                   value:
                       '${_marketplace.displayName} · '
-                      '${(_marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% fee',
+                      '${(MarketplaceFeePolicy.rateFor(_marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
                   onTap: () async {
                     final Marketplace?
                     picked = await OptionPickerSheet.show<Marketplace>(
                       context,
-                      title: 'Marketplace',
+                      title: context.l10n.commonMarketplace,
                       selected: _marketplace,
                       options: Marketplace.values
                           .map(
@@ -118,7 +186,7 @@ class _PurchaseEvaluatorScreenState
                               value: marketplace,
                               label: marketplace.displayName,
                               caption:
-                                  '${(marketplace.estimatedFeeRate * 100).toStringAsFixed(1)}% estimated fee',
+                                  '${(MarketplaceFeePolicy.rateFor(marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
                             ),
                           )
                           .toList(),
@@ -131,7 +199,7 @@ class _PurchaseEvaluatorScreenState
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
                 MoneyField(
-                  label: 'Postage you will pay',
+                  label: context.l10n.sourcingPostageYouWillPay,
                   controller: _shipping,
                   currency: currency,
                   textInputAction: TextInputAction.done,
@@ -169,7 +237,7 @@ class _Verdict extends StatelessWidget {
     if (row == null) {
       return SdCardV3(
         child: Text(
-          'Enter what it would sell for and this fills in.',
+          context.l10n.sourcingEnterWhatItWouldSellFor,
           style: context.textTheme3.bodyMedium!.muted3(context),
         ),
       );
@@ -184,31 +252,31 @@ class _Verdict extends StatelessWidget {
           SdBadgeV3(
             label: clears ? 'Worth buying' : 'Too expensive',
             tone: clears ? SdBadgeToneV3.success : SdBadgeToneV3.danger,
-            icon: clears
-                ? Symbols.thumb_up_rounded
-                : Symbols.thumb_down_rounded,
+            icon: clears ? AppIconConstant.thumbUp : AppIconConstant.thumbDown,
           ),
           SizedBox(height: SdSpacingConstant.h12),
           _EvaluationRow(
-            label: 'Expected profit',
+            label: context.l10n.itemExpectedProfit,
             value: context.money(row.expectedProfit),
             valueColor: row.expectedProfit.isNegative
                 ? context.sdTheme3.loss
                 : context.sdTheme3.profit,
           ),
           _EvaluationRow(
-            label: 'Expected ROI',
+            label: context.l10n.sourcingExpectedRoi,
             value: context.percent(row.expectedRoi),
           ),
           _EvaluationRow(
-            label: 'Most you should pay',
+            label: context.l10n.sourcingMostYouShouldPay,
             value: context.money(row.maximumBuyPrice),
             isEmphasis: true,
           ),
           SizedBox(height: SdSpacingConstant.h8),
           Text(
-            'To clear ${(PurchaseEvaluation.defaultTargetRoi * 100).round()}% '
-            'ROI after ${marketplace.displayName} fees and postage.',
+            context.l10n.sourcingTargetRoiNote(
+              (PurchaseEvaluation.defaultTargetRoi * 100).round().toString(),
+              marketplace.displayName,
+            ),
             style: context.textTheme3.bodySmall!.faint3(context),
           ),
         ],
@@ -253,4 +321,64 @@ class _EvaluationRow extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// What this thing fetched last time, when a scan found it.
+///
+/// **Absent rather than empty when nothing matched.** A card saying "no
+/// history" on every visit is a row the eye learns to skip, and the snackbar
+/// has already said so once.
+class _SoldBeforeCard extends StatelessWidget {
+  const _SoldBeforeCard({required this.found});
+
+  final SoldBefore? found;
+
+  @override
+  Widget build(BuildContext context) {
+    final SoldBefore? sale = found;
+
+    if (sale == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: SdSpacingConstant.h16),
+      child: SdCardV3(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              context.l10n.sourcingSoldBefore,
+              style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+                color: context.sdTheme3.textPrimary,
+              ),
+            ),
+            SizedBox(height: SdSpacingConstant.h4),
+            Text(
+              context.l10n.sourcingSoldOnceFor(
+                sale.title,
+                context.money(sale.salePrice),
+                DateTimeUtils.mediumDate(
+                  sale.soldAt,
+                  locale: context.localeTag,
+                ),
+              ),
+              style: context.textTheme3.bodyMedium!.copyWith(
+                color: context.sdTheme3.textPrimary,
+              ),
+            ),
+            SizedBox(height: SdSpacingConstant.h4),
+            Text(
+              context.l10n.sourcingSoldTimes(
+                sale.timesSold,
+                DateTimeUtils.mediumDate(
+                  sale.soldAt,
+                  locale: context.localeTag,
+                ),
+              ),
+              style: context.textTheme3.bodySmall!.faint3(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

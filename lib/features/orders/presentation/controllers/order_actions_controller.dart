@@ -1,14 +1,13 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
-import '../../../inventory/domain/entities/item.dart';
-import '../../../inventory/domain/enums/item_status.dart';
-import '../../../inventory/domain/repositories/item_repository.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/enums/order_status.dart';
+import '../../domain/services/order_transition.dart';
 
 /// Moving an order along: ship it, deliver it, refund it, take it back.
 ///
@@ -41,12 +40,12 @@ class OrderActionsController extends Notifier<bool> {
 
     return _save(
       'Ship order',
-      order.copyWith(
-        status: OrderStatus.shipped,
+      OrderTransition.ship(
+        order,
+        at: shippedAt ?? DateTime.now(),
         carrier: carrier,
         trackingNumber: trackingNumber,
         shippingCost: shippingCost,
-        shippedAt: shippedAt ?? DateTime.now(),
       ),
       <String, Object>{
         'hasTracking': trackingNumber != null,
@@ -57,7 +56,7 @@ class OrderActionsController extends Notifier<bool> {
 
   Future<void> markDelivered(Order order) => _save(
     'Deliver order',
-    order.copyWith(status: OrderStatus.delivered, deliveredAt: DateTime.now()),
+    OrderTransition.deliver(order, at: DateTime.now()),
     const <String, Object>{},
   );
 
@@ -69,7 +68,12 @@ class OrderActionsController extends Notifier<bool> {
   Future<void> recordSettlement(Order order, {Money? fees, Money? payout}) =>
       _save(
         'Record settlement',
-        order.copyWith(fees: fees, payout: payout),
+        OrderTransition.settle(
+          order,
+          at: DateTime.now(),
+          fees: fees,
+          payout: payout,
+        ),
         <String, Object>{'hasFees': fees != null, 'hasPayout': payout != null},
       );
 
@@ -78,7 +82,7 @@ class OrderActionsController extends Notifier<bool> {
 
     return _save(
       'Open return',
-      order.copyWith(status: OrderStatus.returnRequested),
+      OrderTransition.requestReturn(order, at: DateTime.now()),
       const <String, Object>{},
     );
   }
@@ -89,53 +93,53 @@ class OrderActionsController extends Notifier<bool> {
   /// comes back damaged, and silently restocking a broken item would have the
   /// seller sell it twice.
   Future<void> markReturned(Order order, {required bool restock}) async {
-    await _save(
-      'Close return',
-      order.copyWith(status: OrderStatus.returned),
-      <String, Object>{'restock': restock},
+    final Order returned = OrderTransition.closeReturn(
+      order,
+      at: DateTime.now(),
     );
 
-    if (!restock) return;
-
-    final ItemRepository items = ref.read(itemRepositoryProvider);
+    SdLogger.action(LogTagConstant.order, 'Close return', <String, Object>{
+      'orderId': order.id,
+      'restock': restock,
+    });
+    state = true;
 
     try {
-      final List<Item> restocked = <Item>[];
-
-      for (final OrderLine line in order.lines) {
-        final Item? item = await items.findById(line.itemId);
-
-        if (item == null) continue;
-
-        restocked.add(item.copyWith(status: ItemStatus.inStock));
-      }
-
-      await items.saveAll(restocked);
-
-      AppLogger.info('Returned items restocked', <String, Object>{
-        'orderId': order.id,
-        'count': restocked.length,
-      });
+      await ref
+          .read(orderRepositoryProvider)
+          .closeReturn(returned, restock: restock);
     } catch (error, stackTrace) {
-      // The order is already back; failing to restock is a second, smaller
-      // problem and must not report the whole return as failed.
-      AppLogger.error(
-        'Failed to restock returned items',
+      SdLogger.error(
+        LogTagConstant.order,
+        'Failed to close return',
         error: error,
         stackTrace: stackTrace,
         data: <String, Object>{'orderId': order.id},
       );
 
       rethrow;
+    } finally {
+      state = false;
     }
   }
 
-  /// Money back to the buyer, in part or in full.
-  Future<void> refund(Order order, Money amount) => _save(
-    'Refund order',
-    order.copyWith(status: OrderStatus.refunded, refund: amount),
-    <String, Object>{'refundMinor': amount.minor},
-  );
+  /// Money back to the buyer, in part or in full (plan §16).
+  ///
+  /// **Only a full refund changes the status.** A goodwill £10 off a £100
+  /// order that the buyer kept is still a sale: flipping it to `refunded`
+  /// would make `countsAsRevenue` false and erase the whole £100 from every
+  /// figure, when what actually happened is that £90 was earned. A partial
+  /// refund is carried by `Order.refund`, which every revenue line already
+  /// subtracts.
+  Future<void> refund(Order order, Money amount) {
+    final bool isFull = amount == order.salePrice;
+
+    return _save(
+      'Refund order',
+      OrderTransition.refund(order, amount, at: DateTime.now()),
+      <String, Object>{'refundMinor': amount.minor, 'isFull': isFull},
+    );
+  }
 
   Future<void> cancel(Order order) => _save(
     'Cancel order',
@@ -149,7 +153,7 @@ class OrderActionsController extends Notifier<bool> {
     Order order,
     Map<String, Object> data,
   ) async {
-    AppLogger.action(describe, <String, Object>{
+    SdLogger.action(LogTagConstant.order, describe, <String, Object>{
       'orderId': order.id,
       'status': order.status.name,
       ...data,
@@ -160,7 +164,8 @@ class OrderActionsController extends Notifier<bool> {
     try {
       await ref.read(orderRepositoryProvider).save(order);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.order,
         'Failed to $describe',
         error: error,
         stackTrace: stackTrace,

@@ -10,6 +10,10 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - build/**
+    # `functions/` is TypeScript and has its own toolchain — but its
+    # `node_modules` carries Dart *templates* from firebase-tools that do not
+    # compile, and the analyzer walks into them.
+    - functions/**
 
 linter:
   rules:

@@ -5,16 +5,15 @@ import '../enums/seller_plan.dart';
 /// Why an action was refused, so the caller can say something useful.
 ///
 /// A bool would make every call site invent its own message, and the message
-/// is the whole product here: "Free holds 50 items" is a reason to upgrade,
+/// is the whole product here: naming the Free ceiling is a reason to upgrade,
 /// "not allowed" is a reason to leave.
 enum PlanBlock {
   /// Allowed. Named rather than represented by null so a `switch` over the
   /// result is exhaustive.
   none,
   itemLimit,
-  listingLimit,
-  marketplaceLimit,
-  memberLimit,
+  orderLimit,
+  workspaceLimit,
   featureLocked,
 }
 
@@ -31,40 +30,23 @@ final class PlanGate {
   /// Whether one more item may be created.
   ///
   /// **Compares against the limit, never against the limit minus one.** Off
-  /// by one here is a seller on Free who can hold 49 items and cannot say
-  /// why.
+  /// by one here makes the advertised last slot unusable.
   static PlanBlock canAddItem(SellerPlan plan, {required int currentItems}) =>
       _underLimit(currentItems, PlanLimits.of(plan).items)
       ? PlanBlock.none
       : PlanBlock.itemLimit;
 
-  static PlanBlock canListItem(
-    SellerPlan plan, {
-    required int currentActiveListings,
-  }) => _underLimit(currentActiveListings, PlanLimits.of(plan).activeListings)
+  static PlanBlock canAddOrder(SellerPlan plan, {required int currentOrders}) =>
+      _underLimit(currentOrders, PlanLimits.of(plan).orders)
       ? PlanBlock.none
-      : PlanBlock.listingLimit;
+      : PlanBlock.orderLimit;
 
-  static PlanBlock canConnectMarketplace(
+  static PlanBlock canAddWorkspace(
     SellerPlan plan, {
-    required int currentMarketplaces,
-  }) => _underLimit(currentMarketplaces, PlanLimits.of(plan).marketplaces)
+    required int currentWorkspaces,
+  }) => _underLimit(currentWorkspaces, PlanLimits.of(plan).workspaces)
       ? PlanBlock.none
-      : PlanBlock.marketplaceLimit;
-
-  static PlanBlock canInviteMember(
-    SellerPlan plan, {
-    required int currentMembers,
-  }) {
-    // Team is a Business capability before it is a seat count: Free and Pro
-    // are one-person plans, so the honest block is "this plan has no team",
-    // not "you have run out of seats".
-    if (!has(plan, PlanFeature.team)) return PlanBlock.featureLocked;
-
-    return _underLimit(currentMembers, PlanLimits.of(plan).members)
-        ? PlanBlock.none
-        : PlanBlock.memberLimit;
-  }
+      : PlanBlock.workspaceLimit;
 
   /// Whether a plan includes a capability at all.
   static bool has(SellerPlan plan, PlanFeature feature) =>
@@ -72,23 +54,12 @@ final class PlanGate {
 
   /// The cheapest plan that clears [block], or null where nothing is wrong.
   ///
-  /// What the paywall opens on. Sending a Free seller who hit the item limit
-  /// straight to Pro beats a price grid they have to read.
+  /// What the paywall opens on. Every paid capability belongs to Premium, so
+  /// a blocked seller never has to compare feature tiers.
   static SellerPlan? upgradeFor(PlanBlock block, {required SellerPlan from}) =>
-      switch (block) {
-        PlanBlock.none => null,
-        PlanBlock.itemLimit || PlanBlock.listingLimit => SellerPlan.pro,
-        PlanBlock.marketplaceLimit => _next(from),
-        PlanBlock.memberLimit || PlanBlock.featureLocked => SellerPlan.business,
-      };
+      block == PlanBlock.none ? null : SellerPlan.premium;
 
   /// Null limit means unlimited — see `PlanLimits`.
   static bool _underLimit(int current, int? limit) =>
       limit == null || current < limit;
-
-  /// One tier up, or the top one if there is nowhere left to go.
-  static SellerPlan _next(SellerPlan from) =>
-      from.index + 1 < SellerPlan.values.length
-      ? SellerPlan.values[from.index + 1]
-      : SellerPlan.business;
 }

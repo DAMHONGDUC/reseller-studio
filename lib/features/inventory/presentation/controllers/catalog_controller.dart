@@ -1,7 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/storage_location.dart';
@@ -32,7 +33,7 @@ class CatalogController extends Notifier<bool> {
     if (trimmed.isEmpty) return;
 
     state = true;
-    AppLogger.action('Save category', <String, Object>{
+    SdLogger.action(LogTagConstant.catalog, 'Save category', <String, Object>{
       'categoryId': categoryId,
       'isNew': id == null,
     });
@@ -49,7 +50,8 @@ class CatalogController extends Notifier<bool> {
             ),
           );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.catalog,
         'Failed to save category',
         error: error,
         stackTrace: stackTrace,
@@ -64,12 +66,15 @@ class CatalogController extends Notifier<bool> {
 
   Future<void> deleteCategory(String id) async {
     state = true;
-    AppLogger.action('Delete category', <String, Object>{'categoryId': id});
+    SdLogger.action(LogTagConstant.catalog, 'Delete category', <String, Object>{
+      'categoryId': id,
+    });
 
     try {
       await ref.read(categoryRepositoryProvider).delete(id);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.catalog,
         'Failed to delete category',
         error: error,
         stackTrace: stackTrace,
@@ -95,7 +100,7 @@ class CatalogController extends Notifier<bool> {
     if (trimmed.isEmpty) return;
 
     state = true;
-    AppLogger.action('Save location', <String, Object>{
+    SdLogger.action(LogTagConstant.catalog, 'Save location', <String, Object>{
       'locationId': locationId,
       'kind': kind.name,
       'isNew': id == null,
@@ -115,7 +120,8 @@ class CatalogController extends Notifier<bool> {
             ),
           );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.catalog,
         'Failed to save location',
         error: error,
         stackTrace: stackTrace,
@@ -130,12 +136,15 @@ class CatalogController extends Notifier<bool> {
 
   Future<void> deleteLocation(String id) async {
     state = true;
-    AppLogger.action('Delete location', <String, Object>{'locationId': id});
+    SdLogger.action(LogTagConstant.catalog, 'Delete location', <String, Object>{
+      'locationId': id,
+    });
 
     try {
       await ref.read(locationRepositoryProvider).delete(id);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.catalog,
         'Failed to delete location',
         error: error,
         stackTrace: stackTrace,

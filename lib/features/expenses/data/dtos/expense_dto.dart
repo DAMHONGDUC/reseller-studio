@@ -38,6 +38,9 @@ final class ExpenseDto {
       mileage: FirestoreMapper.doubleOrNull(data['mileage']),
       orderId: FirestoreMapper.stringOrNull(data['orderId']),
       isRecurring: FirestoreMapper.boolOr(data['isRecurring'], fallback: false),
+      recurringSeriesId: FirestoreMapper.stringOrNull(
+        data['recurringSeriesId'],
+      ),
       deletedAt: FirestoreMapper.dateOrNull(data['deletedAt']),
     );
   }
@@ -58,6 +61,10 @@ final class ExpenseDto {
     'mileage': expense.mileage,
     'orderId': expense.orderId,
     'isRecurring': expense.isRecurring,
+    // Points at the first occurrence. Null on the first one itself, and on
+    // anything written before the field existed — `Expense.seriesId` reads
+    // both as their own series.
+    'recurringSeriesId': expense.recurringSeriesId,
     'deletedAt': expense.deletedAt == null
         ? null
         : Timestamp.fromDate(expense.deletedAt!),

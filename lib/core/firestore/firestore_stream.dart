@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
+import '../constants/log_tag_constant.dart';
 import '../error/failure_mapper.dart';
-import '../logging/app_logger.dart';
 
 /// Turning Firestore's snapshot streams into streams of entities.
 ///
@@ -53,7 +54,8 @@ final class FirestoreStream {
     StackTrace stackTrace,
     String operation,
   ) {
-    AppLogger.error(
+    SdLogger.error(
+      LogTagConstant.firestore,
       'Failed to $operation',
       error: error,
       stackTrace: stackTrace,

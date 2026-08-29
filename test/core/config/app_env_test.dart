@@ -2,62 +2,75 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/config/app_env.dart';
-import 'package:seller_os/core/config/dev_flags.dart';
+import 'package:reseller_studio/core/config/app_env.dart';
+import 'package:reseller_studio/core/config/dev_flags.dart';
 
 /// The env files and the class that reads them have to agree, and the guard
 /// between "what the file asked for" and "what the build allows" has to hold.
 /// Both are the kind of thing that breaks silently.
 void main() {
-  Map<String, dynamic> readEnv(String name) =>
-      jsonDecode(File('env/$name.example.json').readAsStringSync())
+  Map<String, dynamic> readTemplate() =>
+      jsonDecode(File('env/env.example.json').readAsStringSync())
           as Map<String, dynamic>;
 
-  group('env templates', () {
-    test('dev and prod declare exactly the same keys', () {
-      final Set<String> dev = readEnv('dev').keys.toSet();
-      final Set<String> prod = readEnv('prod').keys.toSet();
+  group('env template', () {
+    // **One template, not one per flavour.** `dev.example.json` and
+    // `prod.example.json` only ever differed by values a developer fills in,
+    // so the key list lived twice and went stale in one copy — which is
+    // exactly what happened to REVENUECAT_*. `set-up.sh` seeds both flavours
+    // from this file.
+    test('the template carries exactly the keys AppEnv reads', () {
+      // The list every reader of this file trusts, pinned. A key nothing
+      // reads is a placeholder somebody will spend an afternoon filling in;
+      // a key AppEnv reads and the template omits is a value that silently
+      // defaults to '' — which is how REVENUECAT_* went missing. Dart cannot
+      // reflect over AppEnv, so this list is maintained by hand and failing
+      // loudly is the whole point.
+      const Set<String> read = <String>{
+        'FLAVOR',
+        'APP_DISPLAY_NAME',
+        'MOCK_DATA_DEFAULT',
+        'VERBOSE_LOGGING',
+        'FIREBASE_PROJECT_ID',
+        'FIREBASE_APP_ID_IOS',
+        'FUNCTIONS_REGION',
+        'GOOGLE_SIGN_IN_CLIENT_ID_IOS',
+        'GOOGLE_SIGN_IN_SERVER_CLIENT_ID',
+        'REVENUECAT_IOS_KEY',
+        'REVENUECAT_ANDROID_KEY',
+        'REVENUECAT_ENTITLEMENT',
+        'REVENUECAT_OFFERING',
+        'PRIVACY_POLICY_URL',
+        'TERMS_OF_SERVICE_URL',
+        'DEFAULT_CURRENCY',
+        'DEFAULT_COUNTRY',
+      };
 
-      // A key in one flavour and not the other is a build that works on a
-      // developer's machine and fails in CI, which is the worst place to
-      // find out.
-      expect(
-        dev.difference(prod),
-        isEmpty,
-        reason: 'keys in dev.example.json missing from prod.example.json',
-      );
-      expect(
-        prod.difference(dev),
-        isEmpty,
-        reason: 'keys in prod.example.json missing from dev.example.json',
-      );
+      expect(readTemplate().keys.toSet(), read);
     });
 
-    test('prod never ships the development switches on', () {
-      final Map<String, dynamic> prod = readEnv('prod');
-
-      // BYPASS_AUTH is no longer read by the app — the flag is deleted. The
-      // key may still sit in the templates until they are tidied, and false
-      // is the only value that was ever right for prod.
-      expect(prod['BYPASS_AUTH'] ?? false, isFalse);
-      expect(prod['MOCK_DATA_DEFAULT'], isFalse);
-      expect(prod['FLAVOR'], 'prod');
+    test('the development switches are declared, whatever they are set to', () {
+      // Their *values* are not asserted any more: one template seeds both
+      // flavours, so there is no checked-in prod file to hold to `false`.
+      // What stops a switch reaching a store build is `DevFlags` ANDing each
+      // one with `!kReleaseMode` — pinned by the `DevFlags guards AppEnv`
+      // group below, which is the guarantee that actually ships.
+      expect(readTemplate().containsKey('MOCK_DATA_DEFAULT'), isTrue);
+      expect(readTemplate().containsKey('VERBOSE_LOGGING'), isTrue);
     });
 
     test('no template carries anything that looks like a secret', () {
-      // Everything in these files is compiled into the binary and is
-      // trivially extractable, so a key named *SECRET* or *PRIVATE* is a
-      // mistake by definition — hard rule 10. Client *ids* are fine.
-      for (final String flavour in <String>['dev', 'prod']) {
-        for (final String key in readEnv(flavour).keys) {
-          expect(
-            key.toUpperCase(),
-            isNot(anyOf(contains('SECRET'), contains('PRIVATE'))),
-            reason:
-                '$flavour.example.json declares $key — secrets belong in '
-                'Secret Manager, read only by a Cloud Function.',
-          );
-        }
+      // Everything in this file is compiled into the binary and is trivially
+      // extractable, so a key named *SECRET* or *PRIVATE* is a mistake by
+      // definition — hard rule 10. Client *ids* are fine.
+      for (final String key in readTemplate().keys) {
+        expect(
+          key.toUpperCase(),
+          isNot(anyOf(contains('SECRET'), contains('PRIVATE'))),
+          reason:
+              'env.example.json declares $key — secrets belong in Secret '
+              'Manager, read only by a Cloud Function.',
+        );
       }
     });
   });
@@ -70,6 +83,10 @@ void main() {
       expect(AppEnv.appDisplayName, isNotEmpty);
       expect(AppEnv.functionsRegion, isNotEmpty);
       expect(AppEnv.defaultCurrency, 'USD');
+      expect(AppEnv.revenueCatIosKey, isEmpty);
+      expect(AppEnv.revenueCatAndroidKey, isEmpty);
+      expect(AppEnv.revenueCatEntitlement, isEmpty);
+      expect(AppEnv.revenueCatOffering, isEmpty);
     });
 
     test('reports Firebase as unconfigured when no project id was passed', () {

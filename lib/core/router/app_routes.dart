@@ -41,19 +41,31 @@ final class AppRoutes {
   /// of it. This one is an ordinary pushed route that pops when it is done.
   static const String workspaceCreate = '/workspace/new';
 
+  /// Editing one business. **It names a record**, so a signed-out visitor is
+  /// bounced to Home like every other detail route (hard rule 1), and it is
+  /// deliberately not under Settings: the switcher opens it too, on a business
+  /// the seller is not currently standing in.
+  static const String workspaceDetailPath = '/workspace/:workspaceId';
+
   // --- Shell branch 1: Home ---
 
-  // `/home/notifications` (§22) and `/home/activity` (§23) are deliberately
-  // absent: both features are blocked on Cloud Functions, and a constant
-  // whose path no route serves is a deep link that fails silently. They come
-  // back with their screens.
   static const String home = '/home';
+
+  /// The inbox (§22). Under Home because that is where the bell is, and the
+  /// bell is on Home because Home is the screen a seller opens to find out
+  /// what happened while they were not looking.
+  static const String notifications = '/home/notifications';
 
   // --- Shell branch 2: Inventory ---
 
   static const String inventory = '/inventory';
   static const String itemDetail = '/inventory/item/:itemId';
   static const String editItemPath = '/inventory/item/:itemId/edit';
+
+  /// Cross-listing (§13), nested under the item it publishes. Reached from
+  /// the item's action sheet, never from a list — the flow starts with one
+  /// item already chosen.
+  static const String crossListPath = '/inventory/item/:itemId/cross-list';
   static const String addItem = '/inventory/add';
   static const String quickAdd = '/inventory/quick-add';
   static const String scanner = '/inventory/scanner';
@@ -63,6 +75,14 @@ final class AppRoutes {
 
   static const String orders = '/orders';
   static const String orderDetail = '/orders/:orderId';
+
+  /// Recording a sale from the Orders side — the second of the two ways an
+  /// order is created (`lib/features/orders/CLAUDE.md`). It picks the item
+  /// first and then opens the same sheet Inventory's Mark as sold does.
+  ///
+  /// A route rather than a sheet raised from the tab, because Quick Action on
+  /// Home has to be able to start every create action the app has.
+  static const String recordSale = '/orders/record-sale';
   static const String shippingQueue = '/orders/shipping-queue';
   static const String offers = '/orders/offers';
   // No `/orders/returns`: returns are opened and closed from order detail
@@ -93,19 +113,35 @@ final class AppRoutes {
   static const String purchaseEvaluator = '/more/sourcing/evaluate';
   static const String listings = '/more/listings';
   static const String expenses = '/more/expenses';
+
+  /// What each marketplace owes against what it paid (plan §8). Under More
+  /// rather than inside Orders: it is a weekly reconciliation against a bank
+  /// statement, not part of draining today's queue.
+  static const String payouts = '/more/payouts';
   static const String reports = '/more/reports';
   static const String receipts = '/more/receipts';
   static const String tax = '/more/tax';
   static const String categories = '/more/categories';
   static const String marketplaces = '/more/marketplaces';
+  static const String addMarketplace = '/more/marketplaces/new';
+  static const String marketplaceDetailPath =
+      '/more/marketplaces/:marketplaceId';
+  static const String carriers = '/more/carriers';
+  static const String addCarrier = '/more/carriers/new';
+  static const String carrierDetailPath = '/more/carriers/:carrierId';
   static const String team = '/more/team';
   static const String settings = '/more/settings';
+
+  /// The audit log (§23). Under More rather than under Home: it is something
+  /// you go and check, not something you are told.
+  static const String activity = '/more/activity';
   static const String about = '/more/about';
 
   /// Plan §25's Subscription block, over §27's tiers. Under More rather than
   /// nested in Settings: a blocked action pushes straight here, and a paywall
   /// two levels deep is one nobody reaches from the moment it matters.
   static const String subscription = '/more/subscription';
+  static const String paywall = '/more/paywall';
 
   // --- Global, reachable from anywhere ---
 
@@ -115,9 +151,18 @@ final class AppRoutes {
   ///
   /// `AppRoutes.item('abc')` rather than `'/inventory/item/abc'`, so the one
   /// place that knows the segment layout is this file.
+  static String marketplace(String marketplaceId) =>
+      '/more/marketplaces/$marketplaceId';
+
+  static String carrier(String carrierId) => '/more/carriers/$carrierId';
+
   static String item(String itemId) => '/inventory/item/$itemId';
   static String editItem(String itemId) => '/inventory/item/$itemId/edit';
+  static String crossList(String itemId) =>
+      '/inventory/item/$itemId/cross-list';
   static String order(String orderId) => '/orders/$orderId';
+  static String workspaceDetail(String workspaceId) =>
+      '/workspace/$workspaceId';
   static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';

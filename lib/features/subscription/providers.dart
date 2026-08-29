@@ -12,25 +12,46 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
-import '../listings/domain/entities/listing.dart';
-import '../listings/providers.dart';
 import '../mock_data/providers.dart';
+import '../orders/domain/entities/order.dart';
+import '../orders/providers.dart';
+import '../workspace/domain/entities/workspace.dart';
+import '../workspace/providers.dart';
 import 'domain/entities/plan_limits.dart';
+import 'domain/entities/plan_offering.dart';
 import 'domain/entities/subscription_status.dart';
 import 'domain/enums/plan_feature.dart';
 import 'domain/enums/seller_plan.dart';
 import 'domain/services/plan_gate.dart';
+import 'domain/services/plan_offering_catalogue.dart';
+import 'presentation/controllers/subscription_controller.dart';
 
 final StreamProvider<SubscriptionStatus> subscriptionStatusProvider =
     StreamProvider<SubscriptionStatus>((Ref ref) {
       return ref.watch(subscriptionRepositoryProvider).watchStatus();
     });
 
+/// What is on sale, in the order the paywall presents it.
+///
+/// **A provider, never screen state.** The `AsyncValue` is what gives the
+/// sheet a loading, an error *and* a data case; the local `bool` this replaced
+/// could not tell the last two apart, so a store that failed to answer
+/// rendered as a sheet with nothing to buy. Retrying is
+/// `ref.invalidate(planOfferingsProvider)`.
+final FutureProvider<List<PlanOffering>> planOfferingsProvider =
+    FutureProvider<List<PlanOffering>>((Ref ref) async {
+      final List<PlanOffering> offerings = await ref
+          .read(subscriptionControllerProvider.notifier)
+          .loadOfferings();
+
+      return PlanOfferingCatalogue.ordered(offerings);
+    });
+
 /// The plan every gate reads.
 ///
 /// **Falls back to Free while the entitlement is still loading**, and that
 /// direction is deliberate: showing a paying seller the free tier for a
-/// moment is a cosmetic bug, whereas defaulting to Business would hand the
+/// moment is a cosmetic bug, whereas defaulting to Premium would hand the
 /// whole app away on every cold start.
 final Provider<SellerPlan> currentPlanProvider = Provider<SellerPlan>((
   Ref ref,
@@ -73,11 +94,16 @@ final Provider<int> countedItemsProvider = Provider<int>((Ref ref) {
       .length;
 });
 
-final Provider<int> countedListingsProvider = Provider<int>((Ref ref) {
-  final List<Listing> listings =
-      ref.watch(listingsProvider).value ?? const <Listing>[];
+final Provider<int> countedOrdersProvider = Provider<int>((Ref ref) {
+  final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
 
-  return listings.where((Listing listing) => listing.status.isLive).length;
+  return orders.length;
+});
+
+final Provider<int> countedWorkspacesProvider = Provider<int>((Ref ref) {
+  final List<Workspace> workspaces = ref.watch(workspacesProvider);
+
+  return workspaces.length;
 });
 
 /// Whether one more item may be created, and why not when it may not.
@@ -92,11 +118,20 @@ final Provider<PlanBlock> addItemBlockProvider = Provider<PlanBlock>((Ref ref) {
   );
 });
 
-final Provider<PlanBlock> listItemBlockProvider = Provider<PlanBlock>((
+final Provider<PlanBlock> addOrderBlockProvider = Provider<PlanBlock>((
   Ref ref,
 ) {
-  return PlanGate.canListItem(
+  return PlanGate.canAddOrder(
     ref.watch(currentPlanProvider),
-    currentActiveListings: ref.watch(countedListingsProvider),
+    currentOrders: ref.watch(countedOrdersProvider),
+  );
+});
+
+final Provider<PlanBlock> addWorkspaceBlockProvider = Provider<PlanBlock>((
+  Ref ref,
+) {
+  return PlanGate.canAddWorkspace(
+    ref.watch(currentPlanProvider),
+    currentWorkspaces: ref.watch(countedWorkspacesProvider),
   );
 });

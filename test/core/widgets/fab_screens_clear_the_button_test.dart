@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/expenses/presentation/screens/expenses_screen/expenses_screen.dart';
-import 'package:seller_os/features/inventory/presentation/screens/categories_screen/categories_screen.dart';
-import 'package:seller_os/features/inventory/presentation/screens/locations_screen/locations_screen.dart';
-import 'package:seller_os/features/sourcing/presentation/screens/purchases_screen/purchases_screen.dart';
-import 'package:seller_os/features/sourcing/presentation/screens/sources_screen/sources_screen.dart';
+import 'package:reseller_studio/features/expenses/presentation/screens/expenses_screen/expenses_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/categories_screen/categories_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/locations_screen/locations_screen.dart';
+import 'package:reseller_studio/features/sourcing/presentation/screens/purchases_screen/purchases_screen.dart';
+import 'package:reseller_studio/features/sourcing/presentation/screens/sources_screen/sources_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
@@ -71,7 +71,8 @@ void main() {
       expect(
         lowest,
         lessThanOrEqualTo(tester.getRect(fab).top),
-        reason: '$name draws content to $lowest; the button starts at '
+        reason:
+            '$name draws content to $lowest; the button starts at '
             '${tester.getRect(fab).top}',
       );
     });

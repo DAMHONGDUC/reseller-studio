@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Seller OS",
+  "appTitle": "Reseller Studio",
   "@appTitle": {
     "description": "The app's own name. Not translated in either locale."
   },
@@ -115,6 +115,27 @@
   "itemBlockWrongStatus": "This item cannot move there from where it is",
   "@itemBlockWrongStatus": {
     "description": "Why a transition is refused because the item's current status is not a valid starting point."
+  },
+  "itemUpdatedAt": "Updated {date}",
+  "@itemUpdatedAt": {
+    "description": "Last line of an inventory row: when the record last changed.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "itemAdded": "Added",
+  "@itemAdded": {
+    "description": "Detail row label: when the item was created. Read-only — no form offers it."
+  },
+  "itemLastUpdated": "Last updated",
+  "@itemLastUpdated": {
+    "description": "Detail row label: when the record last changed. Read-only."
+  },
+  "itemStatus": "Status",
+  "@itemStatus": {
+    "description": "Field label on the item form for the item's state."
   },
   "itemBlockNoQuantity": "Nothing left in stock to move",
   "@itemBlockNoQuantity": {
@@ -304,77 +325,61 @@
   "@businessTypeHobbySeller": {
     "description": "Business type option."
   },
-  "currencyUsd": "US Dollar ($)",
-  "@currencyUsd": {
-    "description": "Currency option shown at workspace setup."
-  },
-  "currencyEur": "Euro (€)",
-  "@currencyEur": {
-    "description": "Currency option."
-  },
-  "currencyGbp": "British Pound (£)",
-  "@currencyGbp": {
-    "description": "Currency option."
-  },
-  "currencyVnd": "Vietnamese Dong (₫)",
-  "@currencyVnd": {
-    "description": "Currency option. Has no minor unit — see CurrencyDecimals."
-  },
-  "currencyAud": "Australian Dollar",
-  "@currencyAud": {
-    "description": "Currency option."
-  },
-  "currencyCad": "Canadian Dollar",
-  "@currencyCad": {
-    "description": "Currency option."
-  },
-  "currencyJpy": "Japanese Yen (¥)",
-  "@currencyJpy": {
-    "description": "Currency option. Has no minor unit."
-  },
-  "currencySgd": "Singapore Dollar",
-  "@currencySgd": {
-    "description": "Currency option."
-  },
   "countryUs": "United States",
   "@countryUs": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 US."
   },
   "countryGb": "United Kingdom",
   "@countryGb": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 GB."
   },
   "countryVn": "Vietnam",
   "@countryVn": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 VN."
   },
   "countryAu": "Australia",
   "@countryAu": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 AU."
   },
   "countryCa": "Canada",
   "@countryCa": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 CA."
   },
   "countryDe": "Germany",
   "@countryDe": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 DE."
   },
   "countryFr": "France",
   "@countryFr": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 FR."
   },
   "countryJp": "Japan",
   "@countryJp": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 JP."
   },
   "countrySg": "Singapore",
   "@countrySg": {
-    "description": "Country option."
+    "description": "Country name for ISO 3166-1 alpha-2 SG."
   },
   "moreManage": "Manage",
   "@moreManage": {
     "description": "Section header above the More screen list."
+  },
+  "moreSectionOperations": "Operations",
+  "@moreSectionOperations": {
+    "description": "More section for sourcing, listings, categories, and locations."
+  },
+  "moreSectionFinance": "Finance",
+  "@moreSectionFinance": {
+    "description": "More section for expenses, payouts, reports, receipts, and tax."
+  },
+  "moreSectionBusiness": "Business",
+  "@moreSectionBusiness": {
+    "description": "More section for marketplaces, team, and activity."
+  },
+  "moreSectionAccount": "Account",
+  "@moreSectionAccount": {
+    "description": "More section for subscription and settings."
   },
   "moreSourcing": "Sourcing",
   "@moreSourcing": {
@@ -424,6 +429,18 @@
   "@homeShortcutSearch": {
     "description": "Home shortcut card, and the app bar tooltip, for global search."
   },
+  "homePremiumBannerTitle": "Go Premium",
+  "@homePremiumBannerTitle": {
+    "description": "Compact Premium banner title on Home for Free sellers."
+  },
+  "homePremiumBannerSubtitle": "Remove every usage limit",
+  "@homePremiumBannerSubtitle": {
+    "description": "Compact Premium banner supporting text on Home."
+  },
+  "homePremiumBannerAction": "View Premium plans",
+  "@homePremiumBannerAction": {
+    "description": "Accessibility label for the tappable Premium banner on Home."
+  },
   "homeQuickRecordPurchase": "Record a purchase",
   "@homeQuickRecordPurchase": {
     "description": "Quick Access tile: log a buy from a source."
@@ -440,7 +457,7 @@
   "@settingsApp": {
     "description": "Settings section holding what the app is and how it works."
   },
-  "moreAbout": "About Seller OS",
+  "moreAbout": "About Reseller Studio",
   "@moreAbout": {
     "description": "More destination: what the app is and how it works."
   },
@@ -452,7 +469,7 @@
   "@aboutTagline": {
     "description": "One-line description of the app, under its name."
   },
-  "aboutIntro": "Seller OS is not an inventory tracker. It follows one item all the way from the shelf you found it on to what it actually earned you — so the next thing you buy is a decision instead of a guess.",
+  "aboutIntro": "Reseller Studio is not an inventory tracker. It follows one item all the way from the shelf you found it on to what it actually earned you — so the next thing you buy is a decision instead of a guess.",
   "@aboutIntro": {
     "description": "Paragraph introducing what the app is for."
   },
@@ -595,7 +612,15 @@
   },
   "settingsThemeSystem": "System",
   "@settingsThemeSystem": {
-    "description": "Current theme value — follows the device setting."
+    "description": "Theme option — follows the device setting."
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Theme option — always the light palette."
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Theme option — always the dark palette."
   },
   "settingsLanguage": "Language",
   "@settingsLanguage": {
@@ -649,7 +674,7 @@
   "@settingsDeleteAccountConfirmTitle": {
     "description": "Confirmation dialog title for account deletion."
   },
-  "settingsDeleteAccountConfirmBody": "This cannot be undone. Your sign-in is removed and you lose access to every workspace you own.",
+  "settingsDeleteAccountConfirmBody": "This cannot be undone. Your sign-in goes, and so does every business you are the only owner of — its items, orders, receipts and photos. A business somebody else owns keeps its records; you are removed from it.",
   "@settingsDeleteAccountConfirmBody": {
     "description": "Says exactly what is lost. Deletion is irreversible."
   },
@@ -697,25 +722,57 @@
   "@marketplacesTitle": {
     "description": "Marketplaces screen title."
   },
-  "marketplacesSyncOffTitle": "Syncing is not switched on yet",
-  "@marketplacesSyncOffTitle": {
-    "description": "Explains why nothing is connected."
+  "marketplaceAdd": "Add marketplace",
+  "@marketplaceAdd": {
+    "description": "Marketplace add/edit screen."
   },
-  "marketplacesSyncOffBody": "Connections run on the server so your marketplace passwords and tokens never touch this app. Until that is live, list and sell manually — everything else in Seller OS works the same either way.",
-  "@marketplacesSyncOffBody": {
-    "description": "Why marketplace OAuth is server-side. Hard rule 10: no secret ships in the Flutter binary."
+  "marketplaceEditTitle": "Edit marketplace",
+  "@marketplaceEditTitle": {
+    "description": "Marketplace add/edit screen."
   },
-  "marketplacesConnected": "Connected",
-  "@marketplacesConnected": {
-    "description": "Connection status badge."
+  "marketplaceNameLabel": "Name",
+  "@marketplaceNameLabel": {
+    "description": "Marketplace add/edit screen."
   },
-  "marketplacesComingSoon": "Coming soon",
-  "@marketplacesComingSoon": {
-    "description": "Connection status badge for a platform with no integration yet."
+  "marketplaceNameHint": "eBay, Vinted, Sunday market",
+  "@marketplaceNameHint": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceFeeLabel": "Fee",
+  "@marketplaceFeeLabel": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceFeeHelper": "What this platform takes, as a percentage of the sale. A fee an order reports still wins.",
+  "@marketplaceFeeHelper": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceFeeInvalid": "Enter a percentage between 0 and 100.",
+  "@marketplaceFeeInvalid": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceNameRequired": "Give it a name.",
+  "@marketplaceNameRequired": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplacesEmptyTitle": "No marketplaces yet",
+  "@marketplacesEmptyTitle": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplacesEmptyBody": "Add the places you sell, so a listing can say where it is and what that costs.",
+  "@marketplacesEmptyBody": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceDeleteTitle": "Delete this marketplace?",
+  "@marketplaceDeleteTitle": {
+    "description": "Marketplace add/edit screen."
+  },
+  "marketplaceDeleteBody": "Listings and orders that name it keep it — it just stops being offered when you list something new.",
+  "@marketplaceDeleteBody": {
+    "description": "Marketplace add/edit screen."
   },
   "marketplacesEstimatedFee": "Estimated fee",
   "@marketplacesEstimatedFee": {
-    "description": "Caption on a marketplace row. A published rate for planning, never used as accounting."
+    "description": "Caption on a marketplace row. A planning estimate, never used as accounting."
   },
   "moreComingSoon": "Soon",
   "@moreComingSoon": {
@@ -816,11 +873,7 @@
   },
   "itemStatusListed": "Listed",
   "@itemStatusListed": {
-    "description": "Item status: live on at least one marketplace."
-  },
-  "itemStatusReserved": "Reserved",
-  "@itemStatusReserved": {
-    "description": "Item status: an offer was accepted but the sale has not completed."
+    "description": "Analytics row: how many on-hand items have been put on a marketplace. Not a status any more — `listed` left the enum, `listedAt` is what it counts."
   },
   "itemStatusSold": "Sold",
   "@itemStatusSold": {
@@ -927,6 +980,40 @@
   "@itemAskingPrice": {
     "description": "What the item is listed at, or intended to be."
   },
+  "itemMarketplacePrices": "Prices on marketplaces",
+  "@itemMarketplacePrices": {
+    "description": "Row in the item form opening the marketplace pricing screen."
+  },
+  "itemMarketplacePricesOn": "{count, plural, =0{Not listed anywhere yet} =1{Listed on 1 marketplace} other{Listed on {count} marketplaces}}",
+  "@itemMarketplacePricesOn": {
+    "description": "Subtitle under that row: how many marketplaces the item is on.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inventoryMarketCount": "{count, plural, =1{1 market} other{{count} markets}}",
+  "@inventoryMarketCount": {
+    "description": "Compact Inventory card badge showing the number of distinct marketplaces carrying the item.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inventoryMarketPrices": "Prices on each marketplace",
+  "@inventoryMarketPrices": {
+    "description": "Tooltip and semantics label of the Price cell on the Inventory card that opens the cross-list screen."
+  },
+  "inventoryPrice": "Price",
+  "@inventoryPrice": {
+    "description": "Label above the marketplace-prices arrow on an Inventory card."
+  },
+  "inventoryNotListed": "Not listed",
+  "@inventoryNotListed": {
+    "description": "Red Inventory card badge on an item that is on no marketplace yet."
+  },
   "itemMinimumPrice": "Minimum price",
   "@itemMinimumPrice": {
     "description": "The floor for offers and bulk repricing."
@@ -951,9 +1038,9 @@
   "@itemTitleFallback": {
     "description": "App bar title while the item is still loading."
   },
-  "itemActions": "Actions",
-  "@itemActions": {
-    "description": "Tooltip on the button that opens the item action sheet."
+  "commonActions": "Actions",
+  "@commonActions": {
+    "description": "Opens the sheet of verbs for the record on screen — an item, an order. One key because it is one word doing one job in two features."
   },
   "itemLoadFailed": "Could not load this item",
   "@itemLoadFailed": {
@@ -1055,7 +1142,7 @@
   "@itemAddSourceFirst": {
     "description": "Says where to go when the source picker is empty."
   },
-  "itemActionList": "List on a marketplace",
+  "itemActionList": "List on marketplaces",
   "@itemActionList": {
     "description": "Opens the sheet that puts an item on a marketplace."
   },
@@ -1075,13 +1162,37 @@
   "@itemActionMarkSold": {
     "description": "Records a sale. Creates the order too — profit is derived from orders."
   },
+  "itemActionRestock": "Restock",
+  "@itemActionRestock": {
+    "description": "Adds stock to an item and puts it back in stock."
+  },
+  "itemActionMakeInStock": "Make it in stock",
+  "@itemActionMakeInStock": {
+    "description": "Moves a draft onto the shelf, ready to sell."
+  },
+  "restockHowMany": "How many arrived",
+  "@restockHowMany": {
+    "description": "Field label in the restock sheet — what is added to the count, not the new total."
+  },
+  "restockOnShelfNow": "On the shelf now",
+  "@restockOnShelfNow": {
+    "description": "Restock sheet: how many the item has before anything is added."
+  },
+  "restockNewTotal": "New total",
+  "@restockNewTotal": {
+    "description": "Restock sheet: what the count becomes once the arrivals are added. An em dash until the box holds a usable number."
+  },
+  "restockCountRequired": "Enter how many arrived",
+  "@restockCountRequired": {
+    "description": "Shown when the restock box is empty or not a positive number."
+  },
   "itemActionArchive": "Archive",
   "@itemActionArchive": {
     "description": "Withdraw from inventory without a sale."
   },
   "itemActionRestore": "Put back in stock",
   "@itemActionRestore": {
-    "description": "Undo an archive."
+    "description": "Brings an item that has left inventory back onto the shelf — an archive undone, or a sale that did not happen."
   },
   "itemMoved": "Moved",
   "@itemMoved": {
@@ -1102,31 +1213,6 @@
   "itemDeleteConfirmBody": "It disappears from your inventory. Orders and purchases that reference it keep working.",
   "@itemDeleteConfirmBody": {
     "description": "Explains that deleting is soft — hard rule 15 keeps the row joinable."
-  },
-  "listItemTitle": "List this item",
-  "@listItemTitle": {
-    "description": "Sheet title."
-  },
-  "listItemPrice": "Listing price",
-  "@listItemPrice": {
-    "description": "What the item goes up at."
-  },
-  "listItemSubmit": "List it",
-  "@listItemSubmit": {
-    "description": "Confirm button on the listing sheet."
-  },
-  "listItemPriceRequired": "Enter a listing price first",
-  "@listItemPriceRequired": {
-    "description": "Plan §29: listing needs a price, and this is where it is asked for."
-  },
-  "listItemDone": "Listed on {marketplace}",
-  "@listItemDone": {
-    "description": "Confirmation after a listing is created.",
-    "placeholders": {
-      "marketplace": {
-        "type": "String"
-      }
-    }
   },
   "marketplaceManualCaption": "Manual — no sync yet",
   "@marketplaceManualCaption": {
@@ -1163,6 +1249,26 @@
   "markSoldDone": "Sold — the order is in Orders",
   "@markSoldDone": {
     "description": "Confirmation. Says where the order went, because marking sold creates one."
+  },
+  "recordSaleTitle": "Record a sale",
+  "@recordSaleTitle": {
+    "description": "The Orders tab's create button, its screen title, and the Quick Action row. The second of the two ways an order is created."
+  },
+  "recordSaleSearchHint": "Search title, SKU or barcode",
+  "@recordSaleSearchHint": {
+    "description": "Search field on the record-sale screen."
+  },
+  "recordSaleNoMatch": "No items match that search.",
+  "@recordSaleNoMatch": {
+    "description": "Record-sale screen, when the search hides everything on the shelf."
+  },
+  "recordSaleNothingToSellTitle": "Nothing on the shelf",
+  "@recordSaleNothingToSellTitle": {
+    "description": "Record-sale screen, when the business has no item that could be sold."
+  },
+  "recordSaleNothingToSellBody": "An order names what sold, so add an item to inventory first.",
+  "@recordSaleNothingToSellBody": {
+    "description": "Record-sale empty state: says why inventory comes first."
   },
   "repriceTitle": "Reprice",
   "@repriceTitle": {
@@ -1685,19 +1791,19 @@
   "@orderMarkedDelivered": {
     "description": "Confirmation."
   },
-  "orderOpenReturn": "Open a return",
+  "orderOpenReturn": "Open a return from the buyer",
   "@orderOpenReturn": {
-    "description": "Starts the return flow."
+    "description": "Starts the return flow. Names the direction: the item is coming back to the seller."
   },
   "orderReturnOpened": "Return opened",
   "@orderReturnOpened": {
     "description": "Confirmation."
   },
-  "orderItemCameBack": "It came back",
+  "orderItemCameBack": "Item is back with you",
   "@orderItemCameBack": {
-    "description": "Closes a return: the item is physically back."
+    "description": "Closes a return: the item is physically back with the seller."
   },
-  "orderReturnDialogTitle": "The item came back",
+  "orderReturnDialogTitle": "The item is back with you",
   "@orderReturnDialogTitle": {
     "description": "Dialog title when closing a return."
   },
@@ -1983,5 +2089,3301 @@
         "type": "int"
       }
     }
+  },
+  "analyticsByCategory": "By category",
+  "@analyticsByCategory": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNothingIsCategorisedYet": "Nothing is categorised yet",
+  "@analyticsNothingIsCategorisedYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsPutYourItemsIntoCategoriesAnd": "Put your items into categories and this tells you which ones actually earn.",
+  "@analyticsPutYourItemsIntoCategoriesAnd": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhatYouHold": "What you hold",
+  "@analyticsWhatYouHold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsInventoryValue": "Inventory value",
+  "@analyticsInventoryValue": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsItemsOnHand": "Items on hand",
+  "@analyticsItemsOnHand": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsHowFastItMoves": "How fast it moves",
+  "@analyticsHowFastItMoves": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsItemsSold": "Items sold",
+  "@analyticsItemsSold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageDaysToSell": "Average days to sell",
+  "@analyticsAverageDaysToSell": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageAgeOfStock": "Average age of stock",
+  "@analyticsAverageAgeOfStock": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsByMarketplace": "By marketplace",
+  "@analyticsByMarketplace": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNothingHasSoldYet": "Nothing has sold yet",
+  "@analyticsNothingHasSoldYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsRecordASaleAndThisRanks": "Record a sale and this ranks your platforms by return.",
+  "@analyticsRecordASaleAndThisRanks": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsFeeRate": "Fee rate",
+  "@analyticsFeeRate": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsTheStatement": "The statement",
+  "@analyticsTheStatement": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsCostOfGoodsSold": "Cost of goods sold",
+  "@analyticsCostOfGoodsSold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSomeSoldItemsHaveNoRecorded": "Some sold items have no recorded cost, so profit cannot be worked out for them. Add the cost on those items and this fills in — it is never guessed.",
+  "@analyticsSomeSoldItemsHaveNoRecorded": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSales": "Sales",
+  "@analyticsSales": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsVolume": "Volume",
+  "@analyticsVolume": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsUnitsSold": "Units sold",
+  "@analyticsUnitsSold": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverages": "Averages",
+  "@analyticsAverages": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageOrderValue": "Average order value",
+  "@analyticsAverageOrderValue": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsAverageSellingPrice": "Average selling price",
+  "@analyticsAverageSellingPrice": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsCancelledAndRefundedOrdersAreLeft": "Cancelled and refunded orders are left out. Counting either would make these figures disagree with your bank.",
+  "@analyticsCancelledAndRefundedOrdersAreLeft": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsOverview": "Overview",
+  "@analyticsOverview": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhereTheMoneyActuallyComesFrom": "Where the money actually comes from",
+  "@analyticsWhereTheMoneyActuallyComesFrom": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsGoDeeper": "Go deeper",
+  "@analyticsGoDeeper": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsTheSameFiguresOneQuestionAt": "The same figures, one question at a time",
+  "@analyticsTheSameFiguresOneQuestionAt": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsRevenueOrdersUnitsAverages": "Revenue, orders, units, averages",
+  "@analyticsRevenueOrdersUnitsAverages": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsTheFullStatementLineByLine": "The full statement, line by line",
+  "@analyticsTheFullStatementLineByLine": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsValueSellThroughDaysToSell": "Value, sell-through, days to sell, stale stock",
+  "@analyticsValueSellThroughDaysToSell": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhatEachPlatformReallyTook": "What each platform really took",
+  "@analyticsWhatEachPlatformReallyTook": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhichKindsOfStockEarn": "Which kinds of stock earn",
+  "@analyticsWhichKindsOfStockEarn": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSources": "Sources",
+  "@analyticsSources": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsWhereToGoBackToRanked": "Where to go back to — ranked by ROI",
+  "@analyticsWhereToGoBackToRanked": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNoSalesYet": "No sales yet",
+  "@analyticsNoSalesYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsMarketplacePerformanceAppearsOnceYouHave": "Marketplace performance appears once you have orders.",
+  "@analyticsMarketplacePerformanceAppearsOnceYouHave": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsBySource": "By source",
+  "@analyticsBySource": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsNoSourcesYet": "No sources yet",
+  "@analyticsNoSourcesYet": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsRecordWhereStockComesFromAnd": "Record where stock comes from and this ranks the places worth going back to.",
+  "@analyticsRecordWhereStockComesFromAnd": {
+    "description": "Shown on the analytics screens."
+  },
+  "analyticsSpent": "Spent",
+  "@analyticsSpent": {
+    "description": "Shown on the analytics screens."
+  },
+  "sourcingPurchaseNotFound": "Purchase not found",
+  "@sourcingPurchaseNotFound": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingReceiptTotal": "Receipt total",
+  "@sourcingReceiptTotal": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingApportioned": "Apportioned",
+  "@sourcingApportioned": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNothingIsLinkedToThisPurchase": "Nothing is linked to this purchase yet. Add items and set their purchase on the item form.",
+  "@sourcingNothingIsLinkedToThisPurchase": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingEveryPennyOfThisReceiptIs": "Every penny of this receipt is on an item.",
+  "@sourcingEveryPennyOfThisReceiptIs": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingShouldIBuyThis": "Should I buy this?",
+  "@sourcingShouldIBuyThis": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingBuyPrice": "Buy price",
+  "@sourcingBuyPrice": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingWhatYouThinkItSellsFor": "What you think it sells for",
+  "@sourcingWhatYouThinkItSellsFor": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingPostageYouWillPay": "Postage you will pay",
+  "@sourcingPostageYouWillPay": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingExpectedRoi": "Expected ROI",
+  "@sourcingExpectedRoi": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingMostYouShouldPay": "Most you should pay",
+  "@sourcingMostYouShouldPay": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingEnterWhatItWouldSellFor": "Enter what it would sell for and this fills in.",
+  "@sourcingEnterWhatItWouldSellFor": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingPurchases": "Purchases",
+  "@sourcingPurchases": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNoPurchasesYet": "No purchases yet",
+  "@sourcingNoPurchasesYet": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingRecordABuyingTripAndEvery": "Record a buying trip and every item you add to it traces back to what you paid.",
+  "@sourcingRecordABuyingTripAndEvery": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNewSource": "New source",
+  "@sourcingNewSource": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingGoodwillRiverside": "Goodwill — Riverside",
+  "@sourcingGoodwillRiverside": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingRecordWhereStockComesFromAnd": "Record where stock comes from and the app can tell you which places are worth going back to.",
+  "@sourcingRecordWhereStockComesFromAnd": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingBuyingTrips": "Buying trips",
+  "@sourcingBuyingTrips": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingEveryBuyingTripAndWhatIt": "Every buying trip and what it cost",
+  "@sourcingEveryBuyingTripAndWhatIt": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingWorkOutProfitRoiAndThe": "Work out profit, ROI and the most you should pay",
+  "@sourcingWorkOutProfitRoiAndThe": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNewPurchase": "New purchase",
+  "@sourcingNewPurchase": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingSourceOptional": "Source (optional)",
+  "@sourcingSourceOptional": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingTotalPaidOptional": "Total paid (optional)",
+  "@sourcingTotalPaidOptional": {
+    "description": "Shown on the sourcing screens."
+  },
+  "sourcingNotesOptional": "Notes (optional)",
+  "@sourcingNotesOptional": {
+    "description": "Shown on the sourcing screens."
+  },
+  "expensesDeleteThisExpense": "Delete this expense?",
+  "@expensesDeleteThisExpense": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesItStopsCountingAgainstYourProfit": "It stops counting against your profit.",
+  "@expensesItStopsCountingAgainstYourProfit": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesNoExpensesYet": "No expenses yet",
+  "@expensesNoExpensesYet": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesPackagingPostageStorageMileageTheCosts": "Packaging, postage, storage, mileage — the costs that come off your profit but do not belong to one item.",
+  "@expensesPackagingPostageStorageMileageTheCosts": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesTotalRecorded": "Total recorded",
+  "@expensesTotalRecorded": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesEverything": "Everything",
+  "@expensesEverything": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesNewExpense": "New expense",
+  "@expensesNewExpense": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesVendorOptional": "Vendor (optional)",
+  "@expensesVendorOptional": {
+    "description": "Shown on the expenses screens."
+  },
+  "expensesHappensEveryMonth": "Happens every month",
+  "@expensesHappensEveryMonth": {
+    "description": "Shown on the expenses screens."
+  },
+  "reportsEverythingToDate": "Everything to date",
+  "@reportsEverythingToDate": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsExport": "Export",
+  "@reportsExport": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsCsvReadyForASpreadsheetOr": "CSV, ready for a spreadsheet or an accountant",
+  "@reportsCsvReadyForASpreadsheetOr": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsOneRowPerItemSoldWith": "One row per item sold, with fees and payout",
+  "@reportsOneRowPerItemSoldWith": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsEverythingYouHoldWithCostAnd": "Everything you hold, with cost and location",
+  "@reportsEverythingYouHoldWithCostAnd": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsEveryCostByCategoryAndDate": "Every cost, by category and date",
+  "@reportsEveryCostByCategoryAndDate": {
+    "description": "Shown on the reports screens."
+  },
+  "reportsAmountsExportAsPlainNumbersSo": "Amounts export as plain numbers so a spreadsheet can add them up. Anything you have not recorded exports as an empty cell, never as zero.",
+  "@reportsAmountsExportAsPlainNumbersSo": {
+    "description": "Shown on the reports screens."
+  },
+  "taxDeductions": "Deductions",
+  "@taxDeductions": {
+    "description": "Shown on the tax screens."
+  },
+  "taxNetBeforeTax": "Net before tax",
+  "@taxNetBeforeTax": {
+    "description": "Shown on the tax screens."
+  },
+  "taxTheseAreYourOwnRecordsGrouped": "These are your own records grouped into the lines your return asks for. Nothing here applies allowances, thresholds or rates, and it is not tax advice — check it with whoever files for you.",
+  "@taxTheseAreYourOwnRecordsGrouped": {
+    "description": "Shown on the tax screens."
+  },
+  "taxExpensesByLine": "Expenses by line",
+  "@taxExpensesByLine": {
+    "description": "Shown on the tax screens."
+  },
+  "taxYourCategoriesGroupedTheWayThe": "Your categories, grouped the way the form asks",
+  "@taxYourCategoriesGroupedTheWayThe": {
+    "description": "Shown on the tax screens."
+  },
+  "taxMileage": "Mileage",
+  "@taxMileage": {
+    "description": "Shown on the tax screens."
+  },
+  "taxDeductedAtThePublishedRateNot": "Deducted at the published rate, not at what you spent",
+  "@taxDeductedAtThePublishedRateNot": {
+    "description": "Shown on the tax screens."
+  },
+  "taxDistance": "Distance",
+  "@taxDistance": {
+    "description": "Shown on the tax screens."
+  },
+  "taxDeduction": "Deduction",
+  "@taxDeduction": {
+    "description": "Shown on the tax screens."
+  },
+  "homeNeedsAttention": "Needs Attention",
+  "@homeNeedsAttention": {
+    "description": "Shown on the home screens."
+  },
+  "homePerformance": "Performance",
+  "@homePerformance": {
+    "description": "Shown on the home screens."
+  },
+  "homeRecentActivity": "Recent Activity",
+  "@homeRecentActivity": {
+    "description": "Shown on the home screens."
+  },
+  "homeAllClear": "All clear",
+  "@homeAllClear": {
+    "description": "Shown on the home screens."
+  },
+  "homeNothingNeedsYourAttentionRightNow": "Nothing needs your attention right now.",
+  "@homeNothingNeedsYourAttentionRightNow": {
+    "description": "Shown on the home screens."
+  },
+  "homeOrdersToShip": "Orders to ship",
+  "@homeOrdersToShip": {
+    "description": "Shown on the home screens."
+  },
+  "homeItemsToList": "Items to list",
+  "@homeItemsToList": {
+    "description": "Shown on the home screens."
+  },
+  "homeStaleInventory": "Stale inventory",
+  "@homeStaleInventory": {
+    "description": "Shown on the home screens."
+  },
+  "homeStock": "Stock",
+  "@homeStock": {
+    "description": "Shown on the home screens."
+  },
+  "subscriptionPlans": "Plans",
+  "@subscriptionPlans": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionViewPremiumPlans": "View Premium plans",
+  "@subscriptionViewPremiumPlans": {
+    "description": "Button on subscription management that opens the paywall."
+  },
+  "paywallTitle": "Unlock Premium",
+  "@paywallTitle": {
+    "description": "Title of the Premium purchase bottom sheet."
+  },
+  "paywallStoreAccountNote": "Premium is tied to your store account and follows you to another device.",
+  "@paywallStoreAccountNote": {
+    "description": "Store account note shown on the Premium paywall."
+  },
+  "paywallUnavailable": "Purchases are not available in this build yet.",
+  "@paywallUnavailable": {
+    "description": "Shown on the paywall when RevenueCat configuration is incomplete."
+  },
+  "paywallContinue": "Continue",
+  "@paywallContinue": {
+    "description": "The paywall's single purchase button, buying the selected billing period."
+  },
+  "paywallPlansFailed": "Could not load the plans.",
+  "@paywallPlansFailed": {
+    "description": "Shown on the paywall when the store did not answer with what is on sale."
+  },
+  "subscriptionChangeAnyTimeTheStoreHandles": "Change any time — the store handles the proration",
+  "@subscriptionChangeAnyTimeTheStoreHandles": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionRestorePurchases": "Restore purchases",
+  "@subscriptionRestorePurchases": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionPlanRestored": "{plan} restored",
+  "@subscriptionPlanRestored": {
+    "description": "Success message after restoring a paid subscription.",
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "subscriptionNothingToRestore": "Nothing to restore on this account",
+  "@subscriptionNothingToRestore": {
+    "description": "Message after restore finds no paid subscription."
+  },
+  "subscriptionIfYouAlreadyPaidOnAnother": "If you already paid on another device",
+  "@subscriptionIfYouAlreadyPaidOnAnother": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionManageBilling": "Manage billing",
+  "@subscriptionManageBilling": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionYourPlan": "Your plan",
+  "@subscriptionYourPlan": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionUpgradeToContinue": "Upgrade to continue",
+  "@subscriptionUpgradeToContinue": {
+    "description": "Shown on the subscription screens."
+  },
+  "subscriptionNotNow": "Not now",
+  "@subscriptionNotNow": {
+    "description": "Shown on the subscription screens."
+  },
+  "searchTitleSkuBarcodeOrderOrTracking": "Title, SKU, barcode, order or tracking number",
+  "@searchTitleSkuBarcodeOrderOrTracking": {
+    "description": "Shown on the search screens."
+  },
+  "searchSearchEverything": "Search everything",
+  "@searchSearchEverything": {
+    "description": "Shown on the search screens."
+  },
+  "searchItemsOrdersListingsAndSourcesType": "Items, orders, listings and sources — type at least two characters.",
+  "@searchItemsOrdersListingsAndSourcesType": {
+    "description": "Shown on the search screens."
+  },
+  "searchNothingMatches": "Nothing matches",
+  "@searchNothingMatches": {
+    "description": "Shown on the search screens."
+  },
+  "searchTryAShorterPieceOfThe": "Try a shorter piece of the name or code.",
+  "@searchTryAShorterPieceOfThe": {
+    "description": "Shown on the search screens."
+  },
+  "listingsListAnItemFromItsDetail": "List an item from its detail screen and it shows up.",
+  "@listingsListAnItemFromItsDetail": {
+    "description": "Shown on the listings screens."
+  },
+  "receiptsMissing": "Missing",
+  "@receiptsMissing": {
+    "description": "Shown on the receipts screens."
+  },
+  "receiptsNoReceiptsYet": "No receipts yet",
+  "@receiptsNoReceiptsYet": {
+    "description": "Shown on the receipts screens."
+  },
+  "receiptsPhotographAReceiptWhenYouRecord": "Photograph a receipt when you record a purchase or an expense and it shows up here.",
+  "@receiptsPhotographAReceiptWhenYouRecord": {
+    "description": "Shown on the receipts screens."
+  },
+  "analyticsOrderCount": "{count, plural, =1{1 order} other{{count} orders}}",
+  "@analyticsOrderCount": {
+    "description": "Order count beside a figure. Plural because one order is common on a new account.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsMarginValue": "Margin {value}",
+  "@analyticsMarginValue": {
+    "description": "Margin percentage under the profit statement. The value arrives already formatted.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsMarketplaceRowDetail": "{orders} · fees {fees} ({rate}) · profit {profit}",
+  "@analyticsMarketplaceRowDetail": {
+    "description": "One marketplace's line under its bar. Every value arrives formatted.",
+    "placeholders": {
+      "orders": {
+        "type": "String"
+      },
+      "fees": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "profit": {
+        "type": "String"
+      }
+    }
+  },
+  "listingViewCount": "{count, plural, =1{1 view} other{{count} views}}",
+  "@listingViewCount": {
+    "description": "Views on a marketplace listing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemQuantityRequired": "Enter how many you have",
+  "@itemQuantityRequired": {
+    "description": "Shown when the item form's quantity box is empty or not a number."
+  },
+  "itemQuantityShort": "Qty",
+  "@itemQuantityShort": {
+    "description": "Label of the inventory row's quantity cell — how many are still on hand. Short because it shares a band with three amounts."
+  },
+  "itemQuantityTimes": "×{quantity}",
+  "@itemQuantityTimes": {
+    "description": "How many of an item. The × is a multiplication sign, not the letter x.",
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "reportsAsOf": "As of {date}",
+  "@reportsAsOf": {
+    "description": "When the figures on the Reports screen were taken. The date arrives formatted for the locale.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taxYearLabel": "Year {year}",
+  "@taxYearLabel": {
+    "description": "App bar title on the tax screen. The label is a tax year, which is not a calendar year in every country.",
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplacesEstimatedFeeLine": "{rate}% {label}",
+  "@marketplacesEstimatedFeeLine": {
+    "description": "A marketplace's estimated fee rate. Replaces composing the number and the words at the call site.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptKindPurchase": "Purchase",
+  "@receiptKindPurchase": {
+    "description": "A receipt attached to a purchase."
+  },
+  "receiptKindExpense": "Expense",
+  "@receiptKindExpense": {
+    "description": "A receipt attached to an expense."
+  },
+  "receiptSubtitle": "{kind} · {date}",
+  "@receiptSubtitle": {
+    "description": "Second line of a receipt row.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingTargetRoiNote": "To clear {rate}% ROI after {marketplace} fees and postage.",
+  "@sourcingTargetRoiNote": {
+    "description": "Explains the maximum buy price on the purchase evaluator.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "subscriptionPriceLine": "{price} {period}",
+  "@subscriptionPriceLine": {
+    "description": "A plan button: the store's formatted price and the billing period.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "activityTitle": "Activity",
+  "@activityTitle": {
+    "description": "App bar title of the audit log screen."
+  },
+  "activityEmptyTitle": "No activity yet",
+  "@activityEmptyTitle": {
+    "description": "Empty state heading on the activity screen."
+  },
+  "activityEmptyMessage": "Changes your team makes to items, orders and listings show up here.",
+  "@activityEmptyMessage": {
+    "description": "Empty state body. Written for the normal case — a new workspace — not for the missing-backend case."
+  },
+  "activityItemCreated": "Item added",
+  "@activityItemCreated": {
+    "description": "Audit line: an item was created."
+  },
+  "activityItemUpdated": "Item changed",
+  "@activityItemUpdated": {
+    "description": "Audit line: an item was edited."
+  },
+  "activityItemDeleted": "Item removed",
+  "@activityItemDeleted": {
+    "description": "Audit line: an item was deleted or archived."
+  },
+  "activityOrderCreated": "Order added",
+  "@activityOrderCreated": {
+    "description": "Audit line: an order was created."
+  },
+  "activityOrderUpdated": "Order changed",
+  "@activityOrderUpdated": {
+    "description": "Audit line: an order was edited."
+  },
+  "activityOrderDeleted": "Order removed",
+  "@activityOrderDeleted": {
+    "description": "Audit line: an order was deleted."
+  },
+  "activityListingCreated": "Listing added",
+  "@activityListingCreated": {
+    "description": "Audit line: a listing was created."
+  },
+  "activityListingUpdated": "Listing changed",
+  "@activityListingUpdated": {
+    "description": "Audit line: a listing was edited."
+  },
+  "activityListingDeleted": "Listing removed",
+  "@activityListingDeleted": {
+    "description": "Audit line: a listing was deleted."
+  },
+  "activityRecordChanged": "Record changed",
+  "@activityRecordChanged": {
+    "description": "Audit line for an entry written by a newer build, whose type or action this build does not recognise."
+  },
+  "activityByTeammate": "By a teammate",
+  "@activityByTeammate": {
+    "description": "Shown when an entry names an actor who is not the signed-in seller."
+  },
+  "activityBySystem": "Automatic",
+  "@activityBySystem": {
+    "description": "Shown when an entry has no human actor — a sync job or a trigger."
+  },
+  "moreActivity": "Activity",
+  "@moreActivity": {
+    "description": "More screen row leading to the audit log."
+  },
+  "listingStatusDraft": "Draft",
+  "@listingStatusDraft": {
+    "description": "A listing that has not been published to its marketplace yet."
+  },
+  "listingStatusActive": "Active",
+  "@listingStatusActive": {
+    "description": "A listing that is live on its marketplace."
+  },
+  "listingStatusPaused": "Paused",
+  "@listingStatusPaused": {
+    "description": "A listing the seller has temporarily taken down."
+  },
+  "listingStatusEnded": "Ended",
+  "@listingStatusEnded": {
+    "description": "A listing that ran out of time or was withdrawn."
+  },
+  "listingStatusSold": "Sold",
+  "@listingStatusSold": {
+    "description": "A listing whose item has sold."
+  },
+  "listingStatusError": "Needs attention",
+  "@listingStatusError": {
+    "description": "A listing that failed to publish or sync."
+  },
+  "listingDaysLive": "live {count}d",
+  "@listingDaysLive": {
+    "description": "How many days a listing has been live, shown compactly beside its marketplace.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "legalSection": "Legal",
+  "@legalSection": {
+    "description": "Section header above the terms and privacy links."
+  },
+  "legalTermsOfUse": "Terms of Use",
+  "@legalTermsOfUse": {
+    "description": "Row that opens the terms of use in a browser."
+  },
+  "legalTermsOfUseNote": "What you agree to by using Reseller Studio.",
+  "@legalTermsOfUseNote": {
+    "description": "Supporting line under the terms of use row."
+  },
+  "legalPrivacyPolicy": "Privacy Policy",
+  "@legalPrivacyPolicy": {
+    "description": "Row that opens the privacy policy in a browser."
+  },
+  "legalPrivacyPolicyNote": "What we store, and what we never do with it.",
+  "@legalPrivacyPolicyNote": {
+    "description": "Supporting line under the privacy policy row."
+  },
+  "legalCouldNotOpen": "Could not open that page.",
+  "@legalCouldNotOpen": {
+    "description": "Shown when no browser handled a legal link."
+  },
+  "subscriptionRenewalTerms": "Renews automatically at the price shown until you cancel, from your store account's subscription settings.",
+  "@subscriptionRenewalTerms": {
+    "description": "Auto-renew disclosure on the paywall. App Store guideline 3.1.2 requires it in the binary."
+  },
+  "mileageUnitMiles": "Miles",
+  "@mileageUnitMiles": {
+    "description": "The distance unit a US or UK mileage rate is set in."
+  },
+  "mileageUnitKilometres": "Kilometres",
+  "@mileageUnitKilometres": {
+    "description": "The distance unit for a jurisdiction that rates by kilometre."
+  },
+  "expensesDistanceDriven": "Distance driven",
+  "@expensesDistanceDriven": {
+    "description": "Label on the mileage field of the expense form."
+  },
+  "expensesDistanceRequired": "Enter how far you drove",
+  "@expensesDistanceRequired": {
+    "description": "Shown when a mileage expense is saved with no distance."
+  },
+  "expensesMileageDeducts": "Deducts about {amount} at this year's published rate",
+  "@expensesMileageDeducts": {
+    "description": "Live estimate under the mileage field.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "expensesMileageNoRate": "No published rate for that date yet",
+  "@expensesMileageNoRate": {
+    "description": "Shown when no mileage rate covers the date on the form."
+  },
+  "expensesAmountOptionalMileage": "Optional — a trip is deducted by distance, not by what you spent",
+  "@expensesAmountOptionalMileage": {
+    "description": "Helper under the amount field while the category is mileage."
+  },
+  "expensesAmountRequired": "Enter what it cost",
+  "@expensesAmountRequired": {
+    "description": "Shown when an expense is saved with no amount."
+  },
+  "expensesRecurringDue": "Due now",
+  "@expensesRecurringDue": {
+    "description": "Section header above the recurring costs waiting to be recorded."
+  },
+  "expensesRecurringDueNote": "Costs you marked as monthly. Nothing is recorded until you tap it.",
+  "@expensesRecurringDueNote": {
+    "description": "Explains that a recurring expense is proposed, never posted on its own."
+  },
+  "expensesRecurringDueOn": "Due {date}",
+  "@expensesRecurringDueOn": {
+    "description": "The date a recurring cost is owed for.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expensesRecurringRecord": "Record",
+  "@expensesRecurringRecord": {
+    "description": "Button that posts the month a recurring cost is owed for."
+  },
+  "expensesRecurringRecorded": "Recorded",
+  "@expensesRecurringRecorded": {
+    "description": "Confirmation after posting a recurring cost."
+  },
+  "payoutsTitle": "Payouts",
+  "@payoutsTitle": {
+    "description": "Screen that reconciles what each marketplace owes against what it paid."
+  },
+  "payoutsTagline": "What each marketplace still owes you",
+  "@payoutsTagline": {
+    "description": "Supporting line under the Payouts row in More."
+  },
+  "payoutsAwaiting": "Awaiting",
+  "@payoutsAwaiting": {
+    "description": "Stat label for money a marketplace has not paid out yet."
+  },
+  "payoutsSettled": "Settled",
+  "@payoutsSettled": {
+    "description": "Stat label for payouts the seller has already recorded."
+  },
+  "payoutsOrdersAwaiting": "{count, plural, =1{1 order} other{{count} orders}} with no payout recorded",
+  "@payoutsOrdersAwaiting": {
+    "description": "Caption under a marketplace's awaiting total.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "payoutsEstimatedNote": "Includes an estimated fee where the platform has not reported one",
+  "@payoutsEstimatedNote": {
+    "description": "Warns that part of the awaiting figure is a guess."
+  },
+  "payoutsNothingOutstanding": "Everything is settled",
+  "@payoutsNothingOutstanding": {
+    "description": "Empty state when no order is missing a payout."
+  },
+  "payoutsNothingOutstandingNote": "Every order that earned money has a payout recorded against it.",
+  "@payoutsNothingOutstandingNote": {
+    "description": "Supporting line on the settled-up empty state."
+  },
+  "payoutsExpected": "Expected",
+  "@payoutsExpected": {
+    "description": "What an order should pay out: sale price less refund, fees and postage."
+  },
+  "payoutsFeeIsEstimated": "Fee estimated — the platform has not reported one",
+  "@payoutsFeeIsEstimated": {
+    "description": "Caption when the expected figure leans on the marketplace's estimated rate."
+  },
+  "payoutsFeeIsReported": "Fee as the platform reported it",
+  "@payoutsFeeIsReported": {
+    "description": "Caption when the expected figure uses a real reported fee."
+  },
+  "payoutsOrderedOn": "Ordered {date}",
+  "@payoutsOrderedOn": {
+    "description": "When an order awaiting settlement was placed.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutsNoSalesYet": "Nothing has sold yet",
+  "@payoutsNoSalesYet": {
+    "description": "Empty state on Payouts when no order has earned money."
+  },
+  "payoutsNoSalesYetNote": "Once an order is paid for, what the marketplace owes you shows up here.",
+  "@payoutsNoSalesYetNote": {
+    "description": "Supporting line on the no-sales empty state."
+  },
+  "workspaceEditBusiness": "Business",
+  "@workspaceEditBusiness": {
+    "description": "Section header over the editable workspace settings."
+  },
+  "workspaceEditNote": "Changing the country changes which tax rules this business files under.",
+  "@workspaceEditNote": {
+    "description": "Warns that the country drives the tax jurisdiction."
+  },
+  "workspaceRenameTitle": "Rename this business",
+  "@workspaceRenameTitle": {
+    "description": "Title of the sheet that renames a workspace."
+  },
+  "workspaceCurrencyNote": "Only changes what new amounts default to. Nothing already recorded is converted.",
+  "@workspaceCurrencyNote": {
+    "description": "Warns that changing the currency does not convert stored money."
+  },
+  "workspaceStaleAfterDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@workspaceStaleAfterDays": {
+    "description": "How long a listing sits before it counts as stale.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workspaceSaved": "Saved",
+  "@workspaceSaved": {
+    "description": "Confirmation after changing a workspace setting."
+  },
+  "workspaceReadOnlyNote": "Only an owner or admin can change these.",
+  "@workspaceReadOnlyNote": {
+    "description": "Shown to a member or viewer instead of the editable rows."
+  },
+  "homeOrdersOverdue": "{count, plural, =1{1 overdue} other{{count} overdue}}",
+  "@homeOrdersOverdue": {
+    "description": "Detail under Home's orders row when at least one order has passed its ship-by date.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeOrdersNoneOverdue": "none overdue",
+  "@homeOrdersNoneOverdue": {
+    "description": "Detail under Home's orders row when orders are pending but none is late."
+  },
+  "homeItemsToListDetail": "in stock, not listed anywhere",
+  "@homeItemsToListDetail": {
+    "description": "Detail under Home's items-to-list row."
+  },
+  "homeStaleDetail": "listed over {count, plural, =1{1 day} other{{count} days}}",
+  "@homeStaleDetail": {
+    "description": "Detail under Home's stale row. The number is the workspace's own threshold.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refundTitle": "Refund the buyer",
+  "@refundTitle": {
+    "description": "Title of the sheet that records money returned to a buyer."
+  },
+  "refundAmount": "Refund amount",
+  "@refundAmount": {
+    "description": "Field for how much is going back to the buyer."
+  },
+  "refundFullHelp": "The whole sale. This order stops counting as revenue.",
+  "@refundFullHelp": {
+    "description": "Helper when the amount covers the entire sale price."
+  },
+  "refundPartialHelp": "Part of the sale. The rest still counts as revenue.",
+  "@refundPartialHelp": {
+    "description": "Helper when the amount is less than the sale price."
+  },
+  "refundOverHelp": "More than the buyer paid. Check the amount.",
+  "@refundOverHelp": {
+    "description": "Warning when the refund exceeds the sale price."
+  },
+  "refundSoldFor": "Sold for",
+  "@refundSoldFor": {
+    "description": "The sale price, shown above the refund field for comparison."
+  },
+  "refundWholeSale": "Refund the whole sale",
+  "@refundWholeSale": {
+    "description": "Shortcut that fills the field with the full sale price."
+  },
+  "refundAction": "Refund",
+  "@refundAction": {
+    "description": "Confirm inside the refund sheet, under a title that already says who is refunded."
+  },
+  "orderRefundBuyer": "Refund the buyer",
+  "@orderRefundBuyer": {
+    "description": "Row in the order actions sheet that opens the refund sheet. Names the direction: money goes out to the buyer."
+  },
+  "refundRecorded": "Refund recorded",
+  "@refundRecorded": {
+    "description": "Confirmation after recording a refund."
+  },
+  "refundAlreadyRecorded": "{amount} already refunded",
+  "@refundAlreadyRecorded": {
+    "description": "Shown when the order already carries a refund.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsTaxSummary": "Tax summary",
+  "@reportsTaxSummary": {
+    "description": "Export row for the year-end summary."
+  },
+  "reportsTaxSummaryNote": "{year}, one row per line of your return. Change the year on the Tax screen.",
+  "@reportsTaxSummaryNote": {
+    "description": "Says which year the tax export covers and where to change it.",
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "homeOffersWaiting": "Offers waiting",
+  "@homeOffersWaiting": {
+    "description": "Needs Attention row for offers the seller has not answered."
+  },
+  "homeOffersClosingIn": "soonest closes in {left}",
+  "@homeOffersClosingIn": {
+    "description": "How long until the most urgent offer lapses.",
+    "placeholders": {
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "homeOffersNoDeadline": "no deadline on any of them",
+  "@homeOffersNoDeadline": {
+    "description": "Shown when no waiting offer carries an expiry."
+  },
+  "orderTrackParcel": "Track this parcel",
+  "@orderTrackParcel": {
+    "description": "Tooltip on the button that opens the carrier's tracking page."
+  },
+  "orderCopyTracking": "Copy tracking number",
+  "@orderCopyTracking": {
+    "description": "Tooltip on the button that copies the tracking number."
+  },
+  "orderTrackingCopied": "Tracking number copied",
+  "@orderTrackingCopied": {
+    "description": "Confirmation after copying a tracking number."
+  },
+  "sourcingScanTitle": "Scan the item",
+  "@sourcingScanTitle": {
+    "description": "Title of the camera opened from the purchase evaluator."
+  },
+  "sourcingScanHint": "Point at the barcode. We check it against what you have sold before.",
+  "@sourcingScanHint": {
+    "description": "Hint over the camera in the purchase evaluator."
+  },
+  "sourcingScanAction": "Scan a barcode",
+  "@sourcingScanAction": {
+    "description": "Button on the evaluator that opens the camera."
+  },
+  "sourcingSoldBefore": "You sold this before",
+  "@sourcingSoldBefore": {
+    "description": "Header of the card showing a past sale of the scanned item."
+  },
+  "sourcingSoldOnceFor": "{title} — {price} on {date}",
+  "@sourcingSoldOnceFor": {
+    "description": "The one past sale that matched a scanned code.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingSoldTimes": "{count, plural, =1{once} other{{count} times}}, most recently {date}",
+  "@sourcingSoldTimes": {
+    "description": "How often the scanned item has sold.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingScanNoHistory": "Nothing in your records carries that code",
+  "@sourcingScanNoHistory": {
+    "description": "Shown when a scanned code matches nothing the seller has sold."
+  },
+  "sourcingSalePriceFilled": "Filled in from your last sale. Change it if this one is different.",
+  "@sourcingSalePriceFilled": {
+    "description": "Explains that the expected sale price came from history."
+  },
+  "workspaceDelete": "Delete this business",
+  "@workspaceDelete": {
+    "description": "Destructive row in Settings that ends one workspace."
+  },
+  "workspaceDeletePermanent": "Its items, orders, receipts and photos go with it",
+  "@workspaceDeletePermanent": {
+    "description": "Subtitle saying what deleting a business takes with it."
+  },
+  "workspaceDeleteConfirmTitle": "Delete this business?",
+  "@workspaceDeleteConfirmTitle": {
+    "description": "Confirmation dialog title for deleting a workspace."
+  },
+  "workspaceDeleteConfirmBody": "{name} and everything in it goes — items, orders, expenses, receipts and photos, for every member. This cannot be undone. Your account and any other business you belong to are untouched.",
+  "@workspaceDeleteConfirmBody": {
+    "description": "Says exactly what is lost when a business is deleted.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceDeleteConfirm": "Delete this business",
+  "@workspaceDeleteConfirm": {
+    "description": "The destructive confirm button."
+  },
+  "notificationsTitle": "Notifications",
+  "@notificationsTitle": {
+    "description": "Title of the inbox screen, and the bell's tooltip when nothing is unread."
+  },
+  "notificationsUnread": "{count, plural, =1{1 unread notification} other{{count} unread notifications}}",
+  "@notificationsUnread": {
+    "description": "The bell's tooltip and screen-reader label when something is unread.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsMarkAllRead": "Mark all read",
+  "@notificationsMarkAllRead": {
+    "description": "App bar action that clears the unread badge."
+  },
+  "notificationsEmptyTitle": "Nothing to catch up on",
+  "@notificationsEmptyTitle": {
+    "description": "Empty state title for the inbox."
+  },
+  "notificationsEmptyMessage": "New orders, offers and reminders land here.",
+  "@notificationsEmptyMessage": {
+    "description": "Empty state body for the inbox."
+  },
+  "notificationOrderCreated": "You have a new order",
+  "@notificationOrderCreated": {
+    "description": "Inbox row for an order that arrived."
+  },
+  "notificationOfferReceived": "A buyer made an offer",
+  "@notificationOfferReceived": {
+    "description": "Inbox row for an offer received."
+  },
+  "notificationShipmentsDue": "{count, plural, =1{1 order is past its ship-by date} other{{count} orders are past their ship-by date}}",
+  "@notificationShipmentsDue": {
+    "description": "Inbox row for the daily shipping reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationStaleInventory": "{count, plural, =1{1 listing has been up a long time} other{{count} listings have been up a long time}}",
+  "@notificationStaleInventory": {
+    "description": "Inbox row for the daily stale inventory reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMemberJoined": "Somebody joined the business",
+  "@notificationMemberJoined": {
+    "description": "Inbox row for a new teammate."
+  },
+  "notificationSomethingHappened": "Something happened in your business",
+  "@notificationSomethingHappened": {
+    "description": "Fallback row for a notification type this build does not know."
+  },
+  "crossListTitle": "List on marketplaces",
+  "@crossListTitle": {
+    "description": "Title of the cross-listing screen."
+  },
+  "crossListPrice": "Asking price",
+  "@crossListPrice": {
+    "description": "The one price every new listing is created at."
+  },
+  "crossListPriceHelper": "What a marketplace starts at when you tick it. Each one keeps its own price below.",
+  "@crossListPriceHelper": {
+    "description": "Explains that the price is shared across the new listings."
+  },
+  "crossListPriceOwn": "Own price",
+  "@crossListPriceOwn": {
+    "description": "Badge on a review row priced differently from the shared price."
+  },
+  "crossListSetPriceFor": "Price on {marketplace}",
+  "@crossListSetPriceFor": {
+    "description": "Title of the sheet setting one marketplace’s own price.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "crossListUseShared": "Use the shared price",
+  "@crossListUseShared": {
+    "description": "Clears a marketplace’s own price, putting it back on the shared one."
+  },
+  "crossListPickMarketplaces": "Marketplaces",
+  "@crossListPickMarketplaces": {
+    "description": "Heading over the marketplace picker."
+  },
+  "crossListAlreadyListed": "Already on",
+  "@crossListAlreadyListed": {
+    "description": "Badge on a marketplace this item already has a listing on."
+  },
+  "crossListReview": "Review",
+  "@crossListReview": {
+    "description": "Heading over the per-marketplace fee estimate."
+  },
+  "crossListAfterFees": "{fee} fee · {net} left",
+  "@crossListAfterFees": {
+    "description": "One marketplace's estimated fee and what is left of the price.",
+    "placeholders": {
+      "fee": {
+        "type": "String"
+      },
+      "net": {
+        "type": "String"
+      }
+    }
+  },
+  "crossListFeesEstimated": "Fees are estimates for planning. The real figure arrives with the order.",
+  "@crossListFeesEstimated": {
+    "description": "Says the fee rates are not accounting."
+  },
+  "crossListPublish": "Save",
+  "@crossListPublish": {
+    "description": "The commit action before any marketplace is picked."
+  },
+  "crossListPublishCount": "{count, plural, =1{Save 1 marketplace} other{Save {count} marketplaces}}",
+  "@crossListPublishCount": {
+    "description": "The commit action, naming how many marketplaces it will create listings on.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "crossListDone": "{count, plural, =1{Saved 1 marketplace} other{Saved {count} marketplaces}}",
+  "@crossListDone": {
+    "description": "Confirmation after publishing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "teamInvite": "Invite a teammate",
+  "@teamInvite": {
+    "description": "The add button on the Team screen, and its Quick Action row."
+  },
+  "teamInviteTitle": "Invite a teammate",
+  "@teamInviteTitle": {
+    "description": "Title of the invite sheet."
+  },
+  "teamInviteEmail": "Email address",
+  "@teamInviteEmail": {
+    "description": "The one field an invitation needs."
+  },
+  "teamInviteEmailHint": "them@example.com",
+  "@teamInviteEmailHint": {
+    "description": "Placeholder for the invite email field."
+  },
+  "teamInviteEmailInvalid": "That does not look like an email address",
+  "@teamInviteEmailInvalid": {
+    "description": "Shown under the field when the address cannot be sent to."
+  },
+  "teamInviteSend": "Send invitation",
+  "@teamInviteSend": {
+    "description": "The commit action on the invite sheet."
+  },
+  "teamInviteSent": "Invitation sent",
+  "@teamInviteSent": {
+    "description": "Confirmation after inviting somebody."
+  },
+  "teamRole": "Role",
+  "@teamRole": {
+    "description": "Label for the role picker."
+  },
+  "teamChangeRole": "Change role",
+  "@teamChangeRole": {
+    "description": "Action on a teammate that changes what they may do."
+  },
+  "teamRoleChanged": "Role changed",
+  "@teamRoleChanged": {
+    "description": "Confirmation after changing somebody's role."
+  },
+  "teamRemove": "Remove from business",
+  "@teamRemove": {
+    "description": "Destructive action that ends somebody's membership."
+  },
+  "teamRemoveConfirmTitle": "Remove this teammate?",
+  "@teamRemoveConfirmTitle": {
+    "description": "Confirmation dialog title for removing a member."
+  },
+  "teamRemoveConfirmBody": "{name} loses access to this business. Nothing they recorded is deleted, and you can invite them again.",
+  "@teamRemoveConfirmBody": {
+    "description": "Says what removing somebody does and does not do.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRemoved": "Removed from the business",
+  "@teamRemoved": {
+    "description": "Confirmation after removing a member."
+  },
+  "teamMemberFallback": "This teammate",
+  "@teamMemberFallback": {
+    "description": "Stands in when a member has neither a name nor an email recorded."
+  },
+  "teamRolesTitle": "What each role can do",
+  "@teamRolesTitle": {
+    "description": "Heading over the role explanations on the Team screen."
+  },
+  "teamInvitePending": "Invitation waiting for you",
+  "@teamInvitePending": {
+    "description": "Subtitle on an invitation row in the workspace switcher."
+  },
+  "teamInviteAccept": "Join",
+  "@teamInviteAccept": {
+    "description": "Accepts an invitation from the workspace switcher."
+  },
+  "teamInviteAccepted": "You have joined the business",
+  "@teamInviteAccepted": {
+    "description": "Confirmation after accepting an invitation."
+  },
+  "teamInviteUnnamed": "A business",
+  "@teamInviteUnnamed": {
+    "description": "Stands in when an invitation carries no business name."
+  },
+  "roleOwnerDescription": "Everything, including deleting the business",
+  "@roleOwnerDescription": {
+    "description": "One line saying what an owner may do."
+  },
+  "roleAdminDescription": "Change the business, invite and remove people",
+  "@roleAdminDescription": {
+    "description": "One line saying what an admin may do."
+  },
+  "roleMemberDescription": "Create and edit records",
+  "@roleMemberDescription": {
+    "description": "One line saying what a member may do."
+  },
+  "roleViewerDescription": "Look, but change nothing",
+  "@roleViewerDescription": {
+    "description": "One line saying what a viewer may do."
+  },
+  "listingSelectedCount": "{count} selected",
+  "@listingSelectedCount": {
+    "description": "How many listings are ticked for a bulk action.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingRepriceTitle": "{count, plural, =1{Reprice this listing} other{Reprice {count} listings}}",
+  "@listingRepriceTitle": {
+    "description": "Title of the bulk reprice sheet on Listings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingRepriceHelp": "The same price goes on every listing you picked. Nothing is sent to a marketplace.",
+  "@listingRepriceHelp": {
+    "description": "Says what a bulk reprice does, and what it does not."
+  },
+  "listingRepriceDone": "{count, plural, =1{Listing repriced} other{{count} listings repriced}}",
+  "@listingRepriceDone": {
+    "description": "Confirmation after a bulk reprice.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingPause": "Pause",
+  "@listingPause": {
+    "description": "Bulk action that hides listings without ending them."
+  },
+  "listingEnd": "End",
+  "@listingEnd": {
+    "description": "Bulk action that takes listings down."
+  },
+  "listingStatusChanged": "{count, plural, =1{Listing is now {status}} other{{count} listings are now {status}}}",
+  "@listingStatusChanged": {
+    "description": "Confirmation after a bulk status change.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceLowStock": "Tell me when stock is low",
+  "@workspaceLowStock": {
+    "description": "Settings row for the low-inventory threshold."
+  },
+  "workspaceLowStockItems": "{count, plural, =1{Under 1 item} other{Under {count} items}}",
+  "@workspaceLowStockItems": {
+    "description": "The low-stock threshold, as a count of items on hand.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationLowInventory": "{count, plural, =1{Only 1 item left in stock} other{Only {count} items left in stock}}",
+  "@notificationLowInventory": {
+    "description": "Inbox line for the low-inventory reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countryAf": "Afghanistan",
+  "@countryAf": {
+    "description": "Country name for ISO 3166-1 alpha-2 AF."
+  },
+  "countryAl": "Albania",
+  "@countryAl": {
+    "description": "Country name for ISO 3166-1 alpha-2 AL."
+  },
+  "countryDz": "Algeria",
+  "@countryDz": {
+    "description": "Country name for ISO 3166-1 alpha-2 DZ."
+  },
+  "countryAd": "Andorra",
+  "@countryAd": {
+    "description": "Country name for ISO 3166-1 alpha-2 AD."
+  },
+  "countryAo": "Angola",
+  "@countryAo": {
+    "description": "Country name for ISO 3166-1 alpha-2 AO."
+  },
+  "countryAi": "Anguilla",
+  "@countryAi": {
+    "description": "Country name for ISO 3166-1 alpha-2 AI."
+  },
+  "countryAq": "Antarctica",
+  "@countryAq": {
+    "description": "Country name for ISO 3166-1 alpha-2 AQ."
+  },
+  "countryAg": "Antigua & Barbuda",
+  "@countryAg": {
+    "description": "Country name for ISO 3166-1 alpha-2 AG."
+  },
+  "countryAr": "Argentina",
+  "@countryAr": {
+    "description": "Country name for ISO 3166-1 alpha-2 AR."
+  },
+  "countryAm": "Armenia",
+  "@countryAm": {
+    "description": "Country name for ISO 3166-1 alpha-2 AM."
+  },
+  "countryAw": "Aruba",
+  "@countryAw": {
+    "description": "Country name for ISO 3166-1 alpha-2 AW."
+  },
+  "countryAt": "Austria",
+  "@countryAt": {
+    "description": "Country name for ISO 3166-1 alpha-2 AT."
+  },
+  "countryAz": "Azerbaijan",
+  "@countryAz": {
+    "description": "Country name for ISO 3166-1 alpha-2 AZ."
+  },
+  "countryBs": "Bahamas",
+  "@countryBs": {
+    "description": "Country name for ISO 3166-1 alpha-2 BS."
+  },
+  "countryBh": "Bahrain",
+  "@countryBh": {
+    "description": "Country name for ISO 3166-1 alpha-2 BH."
+  },
+  "countryBd": "Bangladesh",
+  "@countryBd": {
+    "description": "Country name for ISO 3166-1 alpha-2 BD."
+  },
+  "countryBb": "Barbados",
+  "@countryBb": {
+    "description": "Country name for ISO 3166-1 alpha-2 BB."
+  },
+  "countryBy": "Belarus",
+  "@countryBy": {
+    "description": "Country name for ISO 3166-1 alpha-2 BY."
+  },
+  "countryBe": "Belgium",
+  "@countryBe": {
+    "description": "Country name for ISO 3166-1 alpha-2 BE."
+  },
+  "countryBz": "Belize",
+  "@countryBz": {
+    "description": "Country name for ISO 3166-1 alpha-2 BZ."
+  },
+  "countryBj": "Benin",
+  "@countryBj": {
+    "description": "Country name for ISO 3166-1 alpha-2 BJ."
+  },
+  "countryBm": "Bermuda",
+  "@countryBm": {
+    "description": "Country name for ISO 3166-1 alpha-2 BM."
+  },
+  "countryBt": "Bhutan",
+  "@countryBt": {
+    "description": "Country name for ISO 3166-1 alpha-2 BT."
+  },
+  "countryBo": "Bolivia",
+  "@countryBo": {
+    "description": "Country name for ISO 3166-1 alpha-2 BO."
+  },
+  "countryBa": "Bosnia & Herzegovina",
+  "@countryBa": {
+    "description": "Country name for ISO 3166-1 alpha-2 BA."
+  },
+  "countryBw": "Botswana",
+  "@countryBw": {
+    "description": "Country name for ISO 3166-1 alpha-2 BW."
+  },
+  "countryBv": "Bouvet Island",
+  "@countryBv": {
+    "description": "Country name for ISO 3166-1 alpha-2 BV."
+  },
+  "countryBr": "Brazil",
+  "@countryBr": {
+    "description": "Country name for ISO 3166-1 alpha-2 BR."
+  },
+  "countryIo": "British Indian Ocean Territory",
+  "@countryIo": {
+    "description": "Country name for ISO 3166-1 alpha-2 IO."
+  },
+  "countryBn": "Brunei",
+  "@countryBn": {
+    "description": "Country name for ISO 3166-1 alpha-2 BN."
+  },
+  "countryBg": "Bulgaria",
+  "@countryBg": {
+    "description": "Country name for ISO 3166-1 alpha-2 BG."
+  },
+  "countryBf": "Burkina Faso",
+  "@countryBf": {
+    "description": "Country name for ISO 3166-1 alpha-2 BF."
+  },
+  "countryBi": "Burundi",
+  "@countryBi": {
+    "description": "Country name for ISO 3166-1 alpha-2 BI."
+  },
+  "countryKh": "Cambodia",
+  "@countryKh": {
+    "description": "Country name for ISO 3166-1 alpha-2 KH."
+  },
+  "countryCm": "Cameroon",
+  "@countryCm": {
+    "description": "Country name for ISO 3166-1 alpha-2 CM."
+  },
+  "countryCv": "Cape Verde",
+  "@countryCv": {
+    "description": "Country name for ISO 3166-1 alpha-2 CV."
+  },
+  "countryBq": "Caribbean NL",
+  "@countryBq": {
+    "description": "Country name for ISO 3166-1 alpha-2 BQ."
+  },
+  "countryKy": "Cayman Islands",
+  "@countryKy": {
+    "description": "Country name for ISO 3166-1 alpha-2 KY."
+  },
+  "countryCf": "Central African Rep.",
+  "@countryCf": {
+    "description": "Country name for ISO 3166-1 alpha-2 CF."
+  },
+  "countryTd": "Chad",
+  "@countryTd": {
+    "description": "Country name for ISO 3166-1 alpha-2 TD."
+  },
+  "countryCl": "Chile",
+  "@countryCl": {
+    "description": "Country name for ISO 3166-1 alpha-2 CL."
+  },
+  "countryCn": "China",
+  "@countryCn": {
+    "description": "Country name for ISO 3166-1 alpha-2 CN."
+  },
+  "countryCx": "Christmas Island",
+  "@countryCx": {
+    "description": "Country name for ISO 3166-1 alpha-2 CX."
+  },
+  "countryCc": "Cocos (Keeling) Islands",
+  "@countryCc": {
+    "description": "Country name for ISO 3166-1 alpha-2 CC."
+  },
+  "countryCo": "Colombia",
+  "@countryCo": {
+    "description": "Country name for ISO 3166-1 alpha-2 CO."
+  },
+  "countryKm": "Comoros",
+  "@countryKm": {
+    "description": "Country name for ISO 3166-1 alpha-2 KM."
+  },
+  "countryCd": "Congo (Dem. Rep.)",
+  "@countryCd": {
+    "description": "Country name for ISO 3166-1 alpha-2 CD."
+  },
+  "countryCg": "Congo (Rep.)",
+  "@countryCg": {
+    "description": "Country name for ISO 3166-1 alpha-2 CG."
+  },
+  "countryCk": "Cook Islands",
+  "@countryCk": {
+    "description": "Country name for ISO 3166-1 alpha-2 CK."
+  },
+  "countryCr": "Costa Rica",
+  "@countryCr": {
+    "description": "Country name for ISO 3166-1 alpha-2 CR."
+  },
+  "countryHr": "Croatia",
+  "@countryHr": {
+    "description": "Country name for ISO 3166-1 alpha-2 HR."
+  },
+  "countryCu": "Cuba",
+  "@countryCu": {
+    "description": "Country name for ISO 3166-1 alpha-2 CU."
+  },
+  "countryCw": "Curaçao",
+  "@countryCw": {
+    "description": "Country name for ISO 3166-1 alpha-2 CW."
+  },
+  "countryCy": "Cyprus",
+  "@countryCy": {
+    "description": "Country name for ISO 3166-1 alpha-2 CY."
+  },
+  "countryCz": "Czech Republic",
+  "@countryCz": {
+    "description": "Country name for ISO 3166-1 alpha-2 CZ."
+  },
+  "countryCi": "Côte d’Ivoire",
+  "@countryCi": {
+    "description": "Country name for ISO 3166-1 alpha-2 CI."
+  },
+  "countryDk": "Denmark",
+  "@countryDk": {
+    "description": "Country name for ISO 3166-1 alpha-2 DK."
+  },
+  "countryDj": "Djibouti",
+  "@countryDj": {
+    "description": "Country name for ISO 3166-1 alpha-2 DJ."
+  },
+  "countryDm": "Dominica",
+  "@countryDm": {
+    "description": "Country name for ISO 3166-1 alpha-2 DM."
+  },
+  "countryDo": "Dominican Republic",
+  "@countryDo": {
+    "description": "Country name for ISO 3166-1 alpha-2 DO."
+  },
+  "countryTl": "East Timor",
+  "@countryTl": {
+    "description": "Country name for ISO 3166-1 alpha-2 TL."
+  },
+  "countryEc": "Ecuador",
+  "@countryEc": {
+    "description": "Country name for ISO 3166-1 alpha-2 EC."
+  },
+  "countryEg": "Egypt",
+  "@countryEg": {
+    "description": "Country name for ISO 3166-1 alpha-2 EG."
+  },
+  "countrySv": "El Salvador",
+  "@countrySv": {
+    "description": "Country name for ISO 3166-1 alpha-2 SV."
+  },
+  "countryGq": "Equatorial Guinea",
+  "@countryGq": {
+    "description": "Country name for ISO 3166-1 alpha-2 GQ."
+  },
+  "countryEr": "Eritrea",
+  "@countryEr": {
+    "description": "Country name for ISO 3166-1 alpha-2 ER."
+  },
+  "countryEe": "Estonia",
+  "@countryEe": {
+    "description": "Country name for ISO 3166-1 alpha-2 EE."
+  },
+  "countrySz": "Eswatini (Swaziland)",
+  "@countrySz": {
+    "description": "Country name for ISO 3166-1 alpha-2 SZ."
+  },
+  "countryEt": "Ethiopia",
+  "@countryEt": {
+    "description": "Country name for ISO 3166-1 alpha-2 ET."
+  },
+  "countryFk": "Falkland Islands",
+  "@countryFk": {
+    "description": "Country name for ISO 3166-1 alpha-2 FK."
+  },
+  "countryFo": "Faroe Islands",
+  "@countryFo": {
+    "description": "Country name for ISO 3166-1 alpha-2 FO."
+  },
+  "countryFj": "Fiji",
+  "@countryFj": {
+    "description": "Country name for ISO 3166-1 alpha-2 FJ."
+  },
+  "countryFi": "Finland",
+  "@countryFi": {
+    "description": "Country name for ISO 3166-1 alpha-2 FI."
+  },
+  "countryGf": "French Guiana",
+  "@countryGf": {
+    "description": "Country name for ISO 3166-1 alpha-2 GF."
+  },
+  "countryPf": "French Polynesia",
+  "@countryPf": {
+    "description": "Country name for ISO 3166-1 alpha-2 PF."
+  },
+  "countryTf": "French S. Terr.",
+  "@countryTf": {
+    "description": "Country name for ISO 3166-1 alpha-2 TF."
+  },
+  "countryGa": "Gabon",
+  "@countryGa": {
+    "description": "Country name for ISO 3166-1 alpha-2 GA."
+  },
+  "countryGm": "Gambia",
+  "@countryGm": {
+    "description": "Country name for ISO 3166-1 alpha-2 GM."
+  },
+  "countryGe": "Georgia",
+  "@countryGe": {
+    "description": "Country name for ISO 3166-1 alpha-2 GE."
+  },
+  "countryGh": "Ghana",
+  "@countryGh": {
+    "description": "Country name for ISO 3166-1 alpha-2 GH."
+  },
+  "countryGi": "Gibraltar",
+  "@countryGi": {
+    "description": "Country name for ISO 3166-1 alpha-2 GI."
+  },
+  "countryGr": "Greece",
+  "@countryGr": {
+    "description": "Country name for ISO 3166-1 alpha-2 GR."
+  },
+  "countryGl": "Greenland",
+  "@countryGl": {
+    "description": "Country name for ISO 3166-1 alpha-2 GL."
+  },
+  "countryGd": "Grenada",
+  "@countryGd": {
+    "description": "Country name for ISO 3166-1 alpha-2 GD."
+  },
+  "countryGp": "Guadeloupe",
+  "@countryGp": {
+    "description": "Country name for ISO 3166-1 alpha-2 GP."
+  },
+  "countryGu": "Guam",
+  "@countryGu": {
+    "description": "Country name for ISO 3166-1 alpha-2 GU."
+  },
+  "countryGt": "Guatemala",
+  "@countryGt": {
+    "description": "Country name for ISO 3166-1 alpha-2 GT."
+  },
+  "countryGg": "Guernsey",
+  "@countryGg": {
+    "description": "Country name for ISO 3166-1 alpha-2 GG."
+  },
+  "countryGn": "Guinea",
+  "@countryGn": {
+    "description": "Country name for ISO 3166-1 alpha-2 GN."
+  },
+  "countryGw": "Guinea-Bissau",
+  "@countryGw": {
+    "description": "Country name for ISO 3166-1 alpha-2 GW."
+  },
+  "countryGy": "Guyana",
+  "@countryGy": {
+    "description": "Country name for ISO 3166-1 alpha-2 GY."
+  },
+  "countryHt": "Haiti",
+  "@countryHt": {
+    "description": "Country name for ISO 3166-1 alpha-2 HT."
+  },
+  "countryHm": "Heard Island & McDonald Islands",
+  "@countryHm": {
+    "description": "Country name for ISO 3166-1 alpha-2 HM."
+  },
+  "countryHn": "Honduras",
+  "@countryHn": {
+    "description": "Country name for ISO 3166-1 alpha-2 HN."
+  },
+  "countryHk": "Hong Kong",
+  "@countryHk": {
+    "description": "Country name for ISO 3166-1 alpha-2 HK."
+  },
+  "countryHu": "Hungary",
+  "@countryHu": {
+    "description": "Country name for ISO 3166-1 alpha-2 HU."
+  },
+  "countryIs": "Iceland",
+  "@countryIs": {
+    "description": "Country name for ISO 3166-1 alpha-2 IS."
+  },
+  "countryIn": "India",
+  "@countryIn": {
+    "description": "Country name for ISO 3166-1 alpha-2 IN."
+  },
+  "countryId": "Indonesia",
+  "@countryId": {
+    "description": "Country name for ISO 3166-1 alpha-2 ID."
+  },
+  "countryIr": "Iran",
+  "@countryIr": {
+    "description": "Country name for ISO 3166-1 alpha-2 IR."
+  },
+  "countryIq": "Iraq",
+  "@countryIq": {
+    "description": "Country name for ISO 3166-1 alpha-2 IQ."
+  },
+  "countryIe": "Ireland",
+  "@countryIe": {
+    "description": "Country name for ISO 3166-1 alpha-2 IE."
+  },
+  "countryIm": "Isle of Man",
+  "@countryIm": {
+    "description": "Country name for ISO 3166-1 alpha-2 IM."
+  },
+  "countryIl": "Israel",
+  "@countryIl": {
+    "description": "Country name for ISO 3166-1 alpha-2 IL."
+  },
+  "countryIt": "Italy",
+  "@countryIt": {
+    "description": "Country name for ISO 3166-1 alpha-2 IT."
+  },
+  "countryJm": "Jamaica",
+  "@countryJm": {
+    "description": "Country name for ISO 3166-1 alpha-2 JM."
+  },
+  "countryJe": "Jersey",
+  "@countryJe": {
+    "description": "Country name for ISO 3166-1 alpha-2 JE."
+  },
+  "countryJo": "Jordan",
+  "@countryJo": {
+    "description": "Country name for ISO 3166-1 alpha-2 JO."
+  },
+  "countryKz": "Kazakhstan",
+  "@countryKz": {
+    "description": "Country name for ISO 3166-1 alpha-2 KZ."
+  },
+  "countryKe": "Kenya",
+  "@countryKe": {
+    "description": "Country name for ISO 3166-1 alpha-2 KE."
+  },
+  "countryKi": "Kiribati",
+  "@countryKi": {
+    "description": "Country name for ISO 3166-1 alpha-2 KI."
+  },
+  "countryKp": "Korea (North)",
+  "@countryKp": {
+    "description": "Country name for ISO 3166-1 alpha-2 KP."
+  },
+  "countryKr": "Korea (South)",
+  "@countryKr": {
+    "description": "Country name for ISO 3166-1 alpha-2 KR."
+  },
+  "countryKw": "Kuwait",
+  "@countryKw": {
+    "description": "Country name for ISO 3166-1 alpha-2 KW."
+  },
+  "countryKg": "Kyrgyzstan",
+  "@countryKg": {
+    "description": "Country name for ISO 3166-1 alpha-2 KG."
+  },
+  "countryLa": "Laos",
+  "@countryLa": {
+    "description": "Country name for ISO 3166-1 alpha-2 LA."
+  },
+  "countryLv": "Latvia",
+  "@countryLv": {
+    "description": "Country name for ISO 3166-1 alpha-2 LV."
+  },
+  "countryLb": "Lebanon",
+  "@countryLb": {
+    "description": "Country name for ISO 3166-1 alpha-2 LB."
+  },
+  "countryLs": "Lesotho",
+  "@countryLs": {
+    "description": "Country name for ISO 3166-1 alpha-2 LS."
+  },
+  "countryLr": "Liberia",
+  "@countryLr": {
+    "description": "Country name for ISO 3166-1 alpha-2 LR."
+  },
+  "countryLy": "Libya",
+  "@countryLy": {
+    "description": "Country name for ISO 3166-1 alpha-2 LY."
+  },
+  "countryLi": "Liechtenstein",
+  "@countryLi": {
+    "description": "Country name for ISO 3166-1 alpha-2 LI."
+  },
+  "countryLt": "Lithuania",
+  "@countryLt": {
+    "description": "Country name for ISO 3166-1 alpha-2 LT."
+  },
+  "countryLu": "Luxembourg",
+  "@countryLu": {
+    "description": "Country name for ISO 3166-1 alpha-2 LU."
+  },
+  "countryMo": "Macau",
+  "@countryMo": {
+    "description": "Country name for ISO 3166-1 alpha-2 MO."
+  },
+  "countryMg": "Madagascar",
+  "@countryMg": {
+    "description": "Country name for ISO 3166-1 alpha-2 MG."
+  },
+  "countryMw": "Malawi",
+  "@countryMw": {
+    "description": "Country name for ISO 3166-1 alpha-2 MW."
+  },
+  "countryMy": "Malaysia",
+  "@countryMy": {
+    "description": "Country name for ISO 3166-1 alpha-2 MY."
+  },
+  "countryMv": "Maldives",
+  "@countryMv": {
+    "description": "Country name for ISO 3166-1 alpha-2 MV."
+  },
+  "countryMl": "Mali",
+  "@countryMl": {
+    "description": "Country name for ISO 3166-1 alpha-2 ML."
+  },
+  "countryMt": "Malta",
+  "@countryMt": {
+    "description": "Country name for ISO 3166-1 alpha-2 MT."
+  },
+  "countryMh": "Marshall Islands",
+  "@countryMh": {
+    "description": "Country name for ISO 3166-1 alpha-2 MH."
+  },
+  "countryMq": "Martinique",
+  "@countryMq": {
+    "description": "Country name for ISO 3166-1 alpha-2 MQ."
+  },
+  "countryMr": "Mauritania",
+  "@countryMr": {
+    "description": "Country name for ISO 3166-1 alpha-2 MR."
+  },
+  "countryMu": "Mauritius",
+  "@countryMu": {
+    "description": "Country name for ISO 3166-1 alpha-2 MU."
+  },
+  "countryYt": "Mayotte",
+  "@countryYt": {
+    "description": "Country name for ISO 3166-1 alpha-2 YT."
+  },
+  "countryMx": "Mexico",
+  "@countryMx": {
+    "description": "Country name for ISO 3166-1 alpha-2 MX."
+  },
+  "countryFm": "Micronesia",
+  "@countryFm": {
+    "description": "Country name for ISO 3166-1 alpha-2 FM."
+  },
+  "countryMd": "Moldova",
+  "@countryMd": {
+    "description": "Country name for ISO 3166-1 alpha-2 MD."
+  },
+  "countryMc": "Monaco",
+  "@countryMc": {
+    "description": "Country name for ISO 3166-1 alpha-2 MC."
+  },
+  "countryMn": "Mongolia",
+  "@countryMn": {
+    "description": "Country name for ISO 3166-1 alpha-2 MN."
+  },
+  "countryMe": "Montenegro",
+  "@countryMe": {
+    "description": "Country name for ISO 3166-1 alpha-2 ME."
+  },
+  "countryMs": "Montserrat",
+  "@countryMs": {
+    "description": "Country name for ISO 3166-1 alpha-2 MS."
+  },
+  "countryMa": "Morocco",
+  "@countryMa": {
+    "description": "Country name for ISO 3166-1 alpha-2 MA."
+  },
+  "countryMz": "Mozambique",
+  "@countryMz": {
+    "description": "Country name for ISO 3166-1 alpha-2 MZ."
+  },
+  "countryMm": "Myanmar (Burma)",
+  "@countryMm": {
+    "description": "Country name for ISO 3166-1 alpha-2 MM."
+  },
+  "countryNa": "Namibia",
+  "@countryNa": {
+    "description": "Country name for ISO 3166-1 alpha-2 NA."
+  },
+  "countryNr": "Nauru",
+  "@countryNr": {
+    "description": "Country name for ISO 3166-1 alpha-2 NR."
+  },
+  "countryNp": "Nepal",
+  "@countryNp": {
+    "description": "Country name for ISO 3166-1 alpha-2 NP."
+  },
+  "countryNl": "Netherlands",
+  "@countryNl": {
+    "description": "Country name for ISO 3166-1 alpha-2 NL."
+  },
+  "countryNc": "New Caledonia",
+  "@countryNc": {
+    "description": "Country name for ISO 3166-1 alpha-2 NC."
+  },
+  "countryNz": "New Zealand",
+  "@countryNz": {
+    "description": "Country name for ISO 3166-1 alpha-2 NZ."
+  },
+  "countryNi": "Nicaragua",
+  "@countryNi": {
+    "description": "Country name for ISO 3166-1 alpha-2 NI."
+  },
+  "countryNe": "Niger",
+  "@countryNe": {
+    "description": "Country name for ISO 3166-1 alpha-2 NE."
+  },
+  "countryNg": "Nigeria",
+  "@countryNg": {
+    "description": "Country name for ISO 3166-1 alpha-2 NG."
+  },
+  "countryNu": "Niue",
+  "@countryNu": {
+    "description": "Country name for ISO 3166-1 alpha-2 NU."
+  },
+  "countryNf": "Norfolk Island",
+  "@countryNf": {
+    "description": "Country name for ISO 3166-1 alpha-2 NF."
+  },
+  "countryMk": "North Macedonia",
+  "@countryMk": {
+    "description": "Country name for ISO 3166-1 alpha-2 MK."
+  },
+  "countryMp": "Northern Mariana Islands",
+  "@countryMp": {
+    "description": "Country name for ISO 3166-1 alpha-2 MP."
+  },
+  "countryNo": "Norway",
+  "@countryNo": {
+    "description": "Country name for ISO 3166-1 alpha-2 NO."
+  },
+  "countryOm": "Oman",
+  "@countryOm": {
+    "description": "Country name for ISO 3166-1 alpha-2 OM."
+  },
+  "countryPk": "Pakistan",
+  "@countryPk": {
+    "description": "Country name for ISO 3166-1 alpha-2 PK."
+  },
+  "countryPw": "Palau",
+  "@countryPw": {
+    "description": "Country name for ISO 3166-1 alpha-2 PW."
+  },
+  "countryPs": "Palestine",
+  "@countryPs": {
+    "description": "Country name for ISO 3166-1 alpha-2 PS."
+  },
+  "countryPa": "Panama",
+  "@countryPa": {
+    "description": "Country name for ISO 3166-1 alpha-2 PA."
+  },
+  "countryPg": "Papua New Guinea",
+  "@countryPg": {
+    "description": "Country name for ISO 3166-1 alpha-2 PG."
+  },
+  "countryPy": "Paraguay",
+  "@countryPy": {
+    "description": "Country name for ISO 3166-1 alpha-2 PY."
+  },
+  "countryPe": "Peru",
+  "@countryPe": {
+    "description": "Country name for ISO 3166-1 alpha-2 PE."
+  },
+  "countryPh": "Philippines",
+  "@countryPh": {
+    "description": "Country name for ISO 3166-1 alpha-2 PH."
+  },
+  "countryPn": "Pitcairn",
+  "@countryPn": {
+    "description": "Country name for ISO 3166-1 alpha-2 PN."
+  },
+  "countryPl": "Poland",
+  "@countryPl": {
+    "description": "Country name for ISO 3166-1 alpha-2 PL."
+  },
+  "countryPt": "Portugal",
+  "@countryPt": {
+    "description": "Country name for ISO 3166-1 alpha-2 PT."
+  },
+  "countryPr": "Puerto Rico",
+  "@countryPr": {
+    "description": "Country name for ISO 3166-1 alpha-2 PR."
+  },
+  "countryQa": "Qatar",
+  "@countryQa": {
+    "description": "Country name for ISO 3166-1 alpha-2 QA."
+  },
+  "countryRo": "Romania",
+  "@countryRo": {
+    "description": "Country name for ISO 3166-1 alpha-2 RO."
+  },
+  "countryRu": "Russia",
+  "@countryRu": {
+    "description": "Country name for ISO 3166-1 alpha-2 RU."
+  },
+  "countryRw": "Rwanda",
+  "@countryRw": {
+    "description": "Country name for ISO 3166-1 alpha-2 RW."
+  },
+  "countryRe": "Réunion",
+  "@countryRe": {
+    "description": "Country name for ISO 3166-1 alpha-2 RE."
+  },
+  "countryAs": "Samoa (American)",
+  "@countryAs": {
+    "description": "Country name for ISO 3166-1 alpha-2 AS."
+  },
+  "countryWs": "Samoa (western)",
+  "@countryWs": {
+    "description": "Country name for ISO 3166-1 alpha-2 WS."
+  },
+  "countrySm": "San Marino",
+  "@countrySm": {
+    "description": "Country name for ISO 3166-1 alpha-2 SM."
+  },
+  "countrySt": "Sao Tome & Principe",
+  "@countrySt": {
+    "description": "Country name for ISO 3166-1 alpha-2 ST."
+  },
+  "countrySa": "Saudi Arabia",
+  "@countrySa": {
+    "description": "Country name for ISO 3166-1 alpha-2 SA."
+  },
+  "countrySn": "Senegal",
+  "@countrySn": {
+    "description": "Country name for ISO 3166-1 alpha-2 SN."
+  },
+  "countryRs": "Serbia",
+  "@countryRs": {
+    "description": "Country name for ISO 3166-1 alpha-2 RS."
+  },
+  "countrySc": "Seychelles",
+  "@countrySc": {
+    "description": "Country name for ISO 3166-1 alpha-2 SC."
+  },
+  "countrySl": "Sierra Leone",
+  "@countrySl": {
+    "description": "Country name for ISO 3166-1 alpha-2 SL."
+  },
+  "countrySk": "Slovakia",
+  "@countrySk": {
+    "description": "Country name for ISO 3166-1 alpha-2 SK."
+  },
+  "countrySi": "Slovenia",
+  "@countrySi": {
+    "description": "Country name for ISO 3166-1 alpha-2 SI."
+  },
+  "countrySb": "Solomon Islands",
+  "@countrySb": {
+    "description": "Country name for ISO 3166-1 alpha-2 SB."
+  },
+  "countrySo": "Somalia",
+  "@countrySo": {
+    "description": "Country name for ISO 3166-1 alpha-2 SO."
+  },
+  "countryZa": "South Africa",
+  "@countryZa": {
+    "description": "Country name for ISO 3166-1 alpha-2 ZA."
+  },
+  "countryGs": "South Georgia & the South Sandwich Islands",
+  "@countryGs": {
+    "description": "Country name for ISO 3166-1 alpha-2 GS."
+  },
+  "countrySs": "South Sudan",
+  "@countrySs": {
+    "description": "Country name for ISO 3166-1 alpha-2 SS."
+  },
+  "countryEs": "Spain",
+  "@countryEs": {
+    "description": "Country name for ISO 3166-1 alpha-2 ES."
+  },
+  "countryLk": "Sri Lanka",
+  "@countryLk": {
+    "description": "Country name for ISO 3166-1 alpha-2 LK."
+  },
+  "countryBl": "St Barthelemy",
+  "@countryBl": {
+    "description": "Country name for ISO 3166-1 alpha-2 BL."
+  },
+  "countrySh": "St Helena",
+  "@countrySh": {
+    "description": "Country name for ISO 3166-1 alpha-2 SH."
+  },
+  "countryKn": "St Kitts & Nevis",
+  "@countryKn": {
+    "description": "Country name for ISO 3166-1 alpha-2 KN."
+  },
+  "countryLc": "St Lucia",
+  "@countryLc": {
+    "description": "Country name for ISO 3166-1 alpha-2 LC."
+  },
+  "countrySx": "St Maarten (Dutch)",
+  "@countrySx": {
+    "description": "Country name for ISO 3166-1 alpha-2 SX."
+  },
+  "countryMf": "St Martin (French)",
+  "@countryMf": {
+    "description": "Country name for ISO 3166-1 alpha-2 MF."
+  },
+  "countryPm": "St Pierre & Miquelon",
+  "@countryPm": {
+    "description": "Country name for ISO 3166-1 alpha-2 PM."
+  },
+  "countryVc": "St Vincent",
+  "@countryVc": {
+    "description": "Country name for ISO 3166-1 alpha-2 VC."
+  },
+  "countrySd": "Sudan",
+  "@countrySd": {
+    "description": "Country name for ISO 3166-1 alpha-2 SD."
+  },
+  "countrySr": "Suriname",
+  "@countrySr": {
+    "description": "Country name for ISO 3166-1 alpha-2 SR."
+  },
+  "countrySj": "Svalbard & Jan Mayen",
+  "@countrySj": {
+    "description": "Country name for ISO 3166-1 alpha-2 SJ."
+  },
+  "countrySe": "Sweden",
+  "@countrySe": {
+    "description": "Country name for ISO 3166-1 alpha-2 SE."
+  },
+  "countryCh": "Switzerland",
+  "@countryCh": {
+    "description": "Country name for ISO 3166-1 alpha-2 CH."
+  },
+  "countrySy": "Syria",
+  "@countrySy": {
+    "description": "Country name for ISO 3166-1 alpha-2 SY."
+  },
+  "countryTw": "Taiwan",
+  "@countryTw": {
+    "description": "Country name for ISO 3166-1 alpha-2 TW."
+  },
+  "countryTj": "Tajikistan",
+  "@countryTj": {
+    "description": "Country name for ISO 3166-1 alpha-2 TJ."
+  },
+  "countryTz": "Tanzania",
+  "@countryTz": {
+    "description": "Country name for ISO 3166-1 alpha-2 TZ."
+  },
+  "countryTh": "Thailand",
+  "@countryTh": {
+    "description": "Country name for ISO 3166-1 alpha-2 TH."
+  },
+  "countryTg": "Togo",
+  "@countryTg": {
+    "description": "Country name for ISO 3166-1 alpha-2 TG."
+  },
+  "countryTk": "Tokelau",
+  "@countryTk": {
+    "description": "Country name for ISO 3166-1 alpha-2 TK."
+  },
+  "countryTo": "Tonga",
+  "@countryTo": {
+    "description": "Country name for ISO 3166-1 alpha-2 TO."
+  },
+  "countryTt": "Trinidad & Tobago",
+  "@countryTt": {
+    "description": "Country name for ISO 3166-1 alpha-2 TT."
+  },
+  "countryTn": "Tunisia",
+  "@countryTn": {
+    "description": "Country name for ISO 3166-1 alpha-2 TN."
+  },
+  "countryTr": "Turkey",
+  "@countryTr": {
+    "description": "Country name for ISO 3166-1 alpha-2 TR."
+  },
+  "countryTm": "Turkmenistan",
+  "@countryTm": {
+    "description": "Country name for ISO 3166-1 alpha-2 TM."
+  },
+  "countryTc": "Turks & Caicos Is",
+  "@countryTc": {
+    "description": "Country name for ISO 3166-1 alpha-2 TC."
+  },
+  "countryTv": "Tuvalu",
+  "@countryTv": {
+    "description": "Country name for ISO 3166-1 alpha-2 TV."
+  },
+  "countryUm": "US minor outlying islands",
+  "@countryUm": {
+    "description": "Country name for ISO 3166-1 alpha-2 UM."
+  },
+  "countryUg": "Uganda",
+  "@countryUg": {
+    "description": "Country name for ISO 3166-1 alpha-2 UG."
+  },
+  "countryUa": "Ukraine",
+  "@countryUa": {
+    "description": "Country name for ISO 3166-1 alpha-2 UA."
+  },
+  "countryAe": "United Arab Emirates",
+  "@countryAe": {
+    "description": "Country name for ISO 3166-1 alpha-2 AE."
+  },
+  "countryUy": "Uruguay",
+  "@countryUy": {
+    "description": "Country name for ISO 3166-1 alpha-2 UY."
+  },
+  "countryUz": "Uzbekistan",
+  "@countryUz": {
+    "description": "Country name for ISO 3166-1 alpha-2 UZ."
+  },
+  "countryVu": "Vanuatu",
+  "@countryVu": {
+    "description": "Country name for ISO 3166-1 alpha-2 VU."
+  },
+  "countryVa": "Vatican City",
+  "@countryVa": {
+    "description": "Country name for ISO 3166-1 alpha-2 VA."
+  },
+  "countryVe": "Venezuela",
+  "@countryVe": {
+    "description": "Country name for ISO 3166-1 alpha-2 VE."
+  },
+  "countryVg": "Virgin Islands (UK)",
+  "@countryVg": {
+    "description": "Country name for ISO 3166-1 alpha-2 VG."
+  },
+  "countryVi": "Virgin Islands (US)",
+  "@countryVi": {
+    "description": "Country name for ISO 3166-1 alpha-2 VI."
+  },
+  "countryWf": "Wallis & Futuna",
+  "@countryWf": {
+    "description": "Country name for ISO 3166-1 alpha-2 WF."
+  },
+  "countryEh": "Western Sahara",
+  "@countryEh": {
+    "description": "Country name for ISO 3166-1 alpha-2 EH."
+  },
+  "countryYe": "Yemen",
+  "@countryYe": {
+    "description": "Country name for ISO 3166-1 alpha-2 YE."
+  },
+  "countryZm": "Zambia",
+  "@countryZm": {
+    "description": "Country name for ISO 3166-1 alpha-2 ZM."
+  },
+  "countryZw": "Zimbabwe",
+  "@countryZw": {
+    "description": "Country name for ISO 3166-1 alpha-2 ZW."
+  },
+  "countryAx": "Åland Islands",
+  "@countryAx": {
+    "description": "Country name for ISO 3166-1 alpha-2 AX."
+  },
+  "commonNoResults": "No matches",
+  "@commonNoResults": {
+    "description": "Shown in a picker sheet when the search matches nothing."
+  },
+  "workspaceCountrySearchHint": "Country name or code",
+  "@workspaceCountrySearchHint": {
+    "description": "Placeholder in the country picker search box."
+  },
+  "workspaceCurrencySearchHint": "Currency name or code",
+  "@workspaceCurrencySearchHint": {
+    "description": "Placeholder in the currency picker search box."
+  },
+  "commonOptional": "Optional",
+  "@commonOptional": {
+    "description": "Badge on a workflow step the app never blocks on."
+  },
+  "homeFlowOverview": "Flow overview",
+  "@homeFlowOverview": {
+    "description": "Title in the Home card that opens the flow overview sheet."
+  },
+  "flowOverviewTitle": "How selling works here",
+  "@flowOverviewTitle": {
+    "description": "Title of the flow overview sheet."
+  },
+  "flowOverviewIntro": "Nine steps, and they loop. Work down the list — the ones marked optional can be skipped entirely, because this app only ever asks for something when a record moves.",
+  "@flowOverviewIntro": {
+    "description": "Description in the Home flow card and introduction above the sheet steps."
+  },
+  "workspaceDetailTitle": "Business details",
+  "@workspaceDetailTitle": {
+    "description": "Title of the screen that edits one business."
+  },
+  "workspaceEdit": "Edit business",
+  "@workspaceEdit": {
+    "description": "Opens the business details screen. Also the tooltip on the switcher row."
+  },
+  "workflowSourceHow1": "Add each shop, auction or wholesaler you buy from under More → Sourcing → Sources.",
+  "@workflowSourceHow1": {
+    "description": "Flow overview: what a seller does at the Source step (1 of 3)."
+  },
+  "workflowSourceHow2": "Standing in a shop, open the purchase evaluator: type what it costs and what you think it sells for, and it tells you the margin after fees and postage.",
+  "@workflowSourceHow2": {
+    "description": "Flow overview: what a seller does at the Source step (2 of 3)."
+  },
+  "workflowSourceHow3": "A source is worth recording even for one item — it is what makes the ROI figures later say anything.",
+  "@workflowSourceHow3": {
+    "description": "Flow overview: what a seller does at the Source step (3 of 3)."
+  },
+  "workflowPurchaseHow1": "Record a buying trip as one purchase: the date, the source and the total you paid.",
+  "@workflowPurchaseHow1": {
+    "description": "Flow overview: what a seller does at the Purchase step (1 of 3)."
+  },
+  "workflowPurchaseHow2": "Photograph the receipt onto it, so the paperwork for the tax year is already gathered.",
+  "@workflowPurchaseHow2": {
+    "description": "Flow overview: what a seller does at the Purchase step (2 of 3)."
+  },
+  "workflowPurchaseHow3": "Split the total across the items when you unpack — cost recorded now is profit you can prove later.",
+  "@workflowPurchaseHow3": {
+    "description": "Flow overview: what a seller does at the Purchase step (3 of 3)."
+  },
+  "workflowInventoryHow1": "Quick Add takes a title and nothing else. Everything else — price, photos, category, source — attaches whenever you get to it.",
+  "@workflowInventoryHow1": {
+    "description": "Flow overview: what a seller does at the Inventory step (1 of 3)."
+  },
+  "workflowInventoryHow2": "Add the cost as soon as you know it: every profit figure in the app is derived from it, and an item with no cost shows a dash rather than a wrong number.",
+  "@workflowInventoryHow2": {
+    "description": "Flow overview: what a seller does at the Inventory step (2 of 3)."
+  },
+  "workflowInventoryHow3": "Give things a location and a photo once you have shelves — that is what makes an order findable in a stockroom.",
+  "@workflowInventoryHow3": {
+    "description": "Flow overview: what a seller does at the Inventory step (3 of 3)."
+  },
+  "workflowListHow1": "Open an item and list it: a price and a marketplace are the two things this step needs, and nothing earlier asked for them.",
+  "@workflowListHow1": {
+    "description": "Flow overview: what a seller does at the List step (1 of 3)."
+  },
+  "workflowListHow2": "Cross-list the same item to several marketplaces from its action sheet, with one price.",
+  "@workflowListHow2": {
+    "description": "Flow overview: what a seller does at the List step (2 of 3)."
+  },
+  "workflowListHow3": "Watch the stale marker. It is set per business, and it is the app telling you what to reprice or pull.",
+  "@workflowListHow3": {
+    "description": "Flow overview: what a seller does at the List step (3 of 3)."
+  },
+  "workflowSellHow1": "Mark the item sold and the order is created for you, with the marketplace, the fees and the payout.",
+  "@workflowSellHow1": {
+    "description": "Flow overview: what a seller does at the Sell step (1 of 3)."
+  },
+  "workflowSellHow2": "Record the fees the marketplace actually took, not the ones you expected — they are what the profit is measured against.",
+  "@workflowSellHow2": {
+    "description": "Flow overview: what a seller does at the Sell step (2 of 3)."
+  },
+  "workflowSellHow3": "A counter-offer, a discount or a refund all go on the order, so the final number stays the true one.",
+  "@workflowSellHow3": {
+    "description": "Flow overview: what a seller does at the Sell step (3 of 3)."
+  },
+  "workflowShipHow1": "The shipping queue is sorted by what breaches its deadline first, so the top of the list is the work.",
+  "@workflowShipHow1": {
+    "description": "Flow overview: what a seller does at the Ship step (1 of 3)."
+  },
+  "workflowShipHow2": "Add the carrier and the tracking number as you post, and the buyer-facing side is done.",
+  "@workflowShipHow2": {
+    "description": "Flow overview: what a seller does at the Ship step (2 of 3)."
+  },
+  "workflowShipHow3": "Skip it entirely for a local handover — the app never blocks a sale on shipping information.",
+  "@workflowShipHow3": {
+    "description": "Flow overview: what a seller does at the Ship step (3 of 3)."
+  },
+  "workflowProfitHow1": "Profit is derived, never stored: cost, sale price, fees, postage and overheads, every time you look.",
+  "@workflowProfitHow1": {
+    "description": "Flow overview: what a seller does at the Profit step (1 of 3)."
+  },
+  "workflowProfitHow2": "Record expenses under More → Expenses — postage supplies, mileage, subscriptions — or the profit figure flatters you.",
+  "@workflowProfitHow2": {
+    "description": "Flow overview: what a seller does at the Profit step (2 of 3)."
+  },
+  "workflowProfitHow3": "A dash means something is missing rather than zero. Fill the gap and the number appears.",
+  "@workflowProfitHow3": {
+    "description": "Flow overview: what a seller does at the Profit step (3 of 3)."
+  },
+  "workflowAnalyzeHow1": "Analytics answers which categories, which marketplaces and which sources are worth your time.",
+  "@workflowAnalyzeHow1": {
+    "description": "Flow overview: what a seller does at the Analyze step (1 of 3)."
+  },
+  "workflowAnalyzeHow2": "Compare a period against the one before it rather than reading one month alone.",
+  "@workflowAnalyzeHow2": {
+    "description": "Flow overview: what a seller does at the Analyze step (2 of 3)."
+  },
+  "workflowAnalyzeHow3": "Sell-through and days-to-sell are the two figures that change what you buy next.",
+  "@workflowAnalyzeHow3": {
+    "description": "Flow overview: what a seller does at the Analyze step (3 of 3)."
+  },
+  "workflowSourceBetterHow1": "Take the source and category figures back out with you — that is the whole loop.",
+  "@workflowSourceBetterHow1": {
+    "description": "Flow overview: what a seller does at the SourceBetter step (1 of 3)."
+  },
+  "workflowSourceBetterHow2": "Stop buying what sits. The stale list and the days-to-sell figure both name it.",
+  "@workflowSourceBetterHow2": {
+    "description": "Flow overview: what a seller does at the SourceBetter step (2 of 3)."
+  },
+  "workflowSourceBetterHow3": "Set your ROI target in the purchase evaluator so the decision is made before you pay.",
+  "@workflowSourceBetterHow3": {
+    "description": "Flow overview: what a seller does at the SourceBetter step (3 of 3)."
+  },
+  "flowOverviewOpen": "Open it",
+  "@flowOverviewOpen": {
+    "description": "Button on a flow overview step that opens the screen performing it."
+  },
+  "flowOverviewLoop": "Then round again. What sold, at what margin and where it came from is what decides the next trip — which is why cost and source stay attached to every item.",
+  "@flowOverviewLoop": {
+    "description": "Closing line of the flow overview sheet, under the last step."
+  },
+  "ordersEmptyTitle": "No orders yet",
+  "@ordersEmptyTitle": {
+    "description": "Orders screen, shown when the workspace has no orders at all."
+  },
+  "ordersEmptyBody": "Record a sale here, or mark an item sold in inventory.",
+  "@ordersEmptyBody": {
+    "description": "Orders screen empty state: names both ways an order is created."
+  },
+  "offersEmptyTitle": "No offers yet",
+  "@offersEmptyTitle": {
+    "description": "Offers screen, shown when the workspace has no offers at all."
+  },
+  "offersEmptyBody": "Offers buyers send on your listings show up here.",
+  "@offersEmptyBody": {
+    "description": "Offers screen empty state: says where offers come from."
+  },
+  "listingsEmptyTitle": "No listings yet",
+  "@listingsEmptyTitle": {
+    "description": "Listings screen, shown when the workspace has no listings at all."
+  },
+  "listingsNoMatch": "No listings under this tab.",
+  "@listingsNoMatch": {
+    "description": "Listings screen, shown when a tab is empty but others are not."
+  },
+  "commonGoToInventory": "Go to inventory",
+  "@commonGoToInventory": {
+    "description": "Empty-state button on a list fed by inventory."
+  },
+  "commonViewListings": "View listings",
+  "@commonViewListings": {
+    "description": "Empty-state button on a list fed by listings."
+  },
+  "homeStartHereTitle": "Start here",
+  "@homeStartHereTitle": {
+    "description": "Home, shown in place of \"All clear\" when the workspace has never held anything."
+  },
+  "homeStartHereBody": "Add your first item — a title is all it needs. Cost, photos and the rest can wait.",
+  "@homeStartHereBody": {
+    "description": "Home start-here card: what the first step is."
+  },
+  "homeGettingStarted": "Getting started",
+  "@homeGettingStarted": {
+    "description": "Home section header over the three first-run steps."
+  },
+  "homeGettingStartedProgress": "{done} of {total} done",
+  "@homeGettingStartedProgress": {
+    "description": "Subtitle under the Getting started header.",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStepAddItem": "Add your first item",
+  "@homeStepAddItem": {
+    "description": "Getting started step 1."
+  },
+  "homeStepAddItemDetail": "A title is all it needs.",
+  "@homeStepAddItemDetail": {
+    "description": "Getting started step 1, supporting line."
+  },
+  "homeStepListItem": "Price it and list it",
+  "@homeStepListItem": {
+    "description": "Getting started step 2."
+  },
+  "homeStepListItemDetail": "Open the item, then Actions to list it.",
+  "@homeStepListItemDetail": {
+    "description": "Getting started step 2, supporting line."
+  },
+  "homeStepRecordSale": "Record your first sale",
+  "@homeStepRecordSale": {
+    "description": "Getting started step 3."
+  },
+  "homeStepRecordSaleDetail": "Mark it sold and the order appears in Orders.",
+  "@homeStepRecordSaleDetail": {
+    "description": "Getting started step 3, supporting line."
+  },
+  "currencyAfn": "Afghan Afghani",
+  "@currencyAfn": {
+    "description": "Currency name for ISO 4217 AFN."
+  },
+  "currencyAll": "Albanian Lek",
+  "@currencyAll": {
+    "description": "Currency name for ISO 4217 ALL."
+  },
+  "currencyDzd": "Algerian Dinar",
+  "@currencyDzd": {
+    "description": "Currency name for ISO 4217 DZD."
+  },
+  "currencyAoa": "Angolan Kwanza",
+  "@currencyAoa": {
+    "description": "Currency name for ISO 4217 AOA."
+  },
+  "currencyArs": "Argentine Peso",
+  "@currencyArs": {
+    "description": "Currency name for ISO 4217 ARS."
+  },
+  "currencyAmd": "Armenian Dram",
+  "@currencyAmd": {
+    "description": "Currency name for ISO 4217 AMD."
+  },
+  "currencyAwg": "Aruban Florin",
+  "@currencyAwg": {
+    "description": "Currency name for ISO 4217 AWG."
+  },
+  "currencyAud": "Australian Dollar",
+  "@currencyAud": {
+    "description": "Currency name for ISO 4217 AUD."
+  },
+  "currencyAzn": "Azerbaijani Manat",
+  "@currencyAzn": {
+    "description": "Currency name for ISO 4217 AZN."
+  },
+  "currencyBsd": "Bahamian Dollar",
+  "@currencyBsd": {
+    "description": "Currency name for ISO 4217 BSD."
+  },
+  "currencyBhd": "Bahraini Dinar",
+  "@currencyBhd": {
+    "description": "Currency name for ISO 4217 BHD."
+  },
+  "currencyBdt": "Bangladeshi Taka",
+  "@currencyBdt": {
+    "description": "Currency name for ISO 4217 BDT."
+  },
+  "currencyBbd": "Barbadian Dollar",
+  "@currencyBbd": {
+    "description": "Currency name for ISO 4217 BBD."
+  },
+  "currencyByn": "Belarusian Ruble",
+  "@currencyByn": {
+    "description": "Currency name for ISO 4217 BYN."
+  },
+  "currencyBzd": "Belize Dollar",
+  "@currencyBzd": {
+    "description": "Currency name for ISO 4217 BZD."
+  },
+  "currencyBmd": "Bermudian Dollar",
+  "@currencyBmd": {
+    "description": "Currency name for ISO 4217 BMD."
+  },
+  "currencyBtn": "Bhutanese Ngultrum",
+  "@currencyBtn": {
+    "description": "Currency name for ISO 4217 BTN."
+  },
+  "currencyBob": "Bolivian Boliviano",
+  "@currencyBob": {
+    "description": "Currency name for ISO 4217 BOB."
+  },
+  "currencyBam": "Bosnia-Herzegovina Convertible Mark",
+  "@currencyBam": {
+    "description": "Currency name for ISO 4217 BAM."
+  },
+  "currencyBwp": "Botswanan Pula",
+  "@currencyBwp": {
+    "description": "Currency name for ISO 4217 BWP."
+  },
+  "currencyBrl": "Brazilian Real",
+  "@currencyBrl": {
+    "description": "Currency name for ISO 4217 BRL."
+  },
+  "currencyGbp": "British Pound",
+  "@currencyGbp": {
+    "description": "Currency name for ISO 4217 GBP."
+  },
+  "currencyBnd": "Brunei Dollar",
+  "@currencyBnd": {
+    "description": "Currency name for ISO 4217 BND."
+  },
+  "currencyBgn": "Bulgarian Lev",
+  "@currencyBgn": {
+    "description": "Currency name for ISO 4217 BGN."
+  },
+  "currencyBif": "Burundian Franc",
+  "@currencyBif": {
+    "description": "Currency name for ISO 4217 BIF."
+  },
+  "currencyXpf": "CFP Franc",
+  "@currencyXpf": {
+    "description": "Currency name for ISO 4217 XPF."
+  },
+  "currencyKhr": "Cambodian Riel",
+  "@currencyKhr": {
+    "description": "Currency name for ISO 4217 KHR."
+  },
+  "currencyCad": "Canadian Dollar",
+  "@currencyCad": {
+    "description": "Currency name for ISO 4217 CAD."
+  },
+  "currencyCve": "Cape Verdean Escudo",
+  "@currencyCve": {
+    "description": "Currency name for ISO 4217 CVE."
+  },
+  "currencyXcg": "Caribbean Guilder",
+  "@currencyXcg": {
+    "description": "Currency name for ISO 4217 XCG."
+  },
+  "currencyKyd": "Cayman Islands Dollar",
+  "@currencyKyd": {
+    "description": "Currency name for ISO 4217 KYD."
+  },
+  "currencyXaf": "Central African CFA Franc",
+  "@currencyXaf": {
+    "description": "Currency name for ISO 4217 XAF."
+  },
+  "currencyClp": "Chilean Peso",
+  "@currencyClp": {
+    "description": "Currency name for ISO 4217 CLP."
+  },
+  "currencyCny": "Chinese Yuan",
+  "@currencyCny": {
+    "description": "Currency name for ISO 4217 CNY."
+  },
+  "currencyCop": "Colombian Peso",
+  "@currencyCop": {
+    "description": "Currency name for ISO 4217 COP."
+  },
+  "currencyKmf": "Comorian Franc",
+  "@currencyKmf": {
+    "description": "Currency name for ISO 4217 KMF."
+  },
+  "currencyCdf": "Congolese Franc",
+  "@currencyCdf": {
+    "description": "Currency name for ISO 4217 CDF."
+  },
+  "currencyCrc": "Costa Rican Colón",
+  "@currencyCrc": {
+    "description": "Currency name for ISO 4217 CRC."
+  },
+  "currencyCup": "Cuban Peso",
+  "@currencyCup": {
+    "description": "Currency name for ISO 4217 CUP."
+  },
+  "currencyCzk": "Czech Koruna",
+  "@currencyCzk": {
+    "description": "Currency name for ISO 4217 CZK."
+  },
+  "currencyDkk": "Danish Krone",
+  "@currencyDkk": {
+    "description": "Currency name for ISO 4217 DKK."
+  },
+  "currencyDjf": "Djiboutian Franc",
+  "@currencyDjf": {
+    "description": "Currency name for ISO 4217 DJF."
+  },
+  "currencyDop": "Dominican Peso",
+  "@currencyDop": {
+    "description": "Currency name for ISO 4217 DOP."
+  },
+  "currencyXcd": "East Caribbean Dollar",
+  "@currencyXcd": {
+    "description": "Currency name for ISO 4217 XCD."
+  },
+  "currencyEgp": "Egyptian Pound",
+  "@currencyEgp": {
+    "description": "Currency name for ISO 4217 EGP."
+  },
+  "currencyErn": "Eritrean Nakfa",
+  "@currencyErn": {
+    "description": "Currency name for ISO 4217 ERN."
+  },
+  "currencyEtb": "Ethiopian Birr",
+  "@currencyEtb": {
+    "description": "Currency name for ISO 4217 ETB."
+  },
+  "currencyEur": "Euro",
+  "@currencyEur": {
+    "description": "Currency name for ISO 4217 EUR."
+  },
+  "currencyFkp": "Falkland Islands Pound",
+  "@currencyFkp": {
+    "description": "Currency name for ISO 4217 FKP."
+  },
+  "currencyFjd": "Fijian Dollar",
+  "@currencyFjd": {
+    "description": "Currency name for ISO 4217 FJD."
+  },
+  "currencyGmd": "Gambian Dalasi",
+  "@currencyGmd": {
+    "description": "Currency name for ISO 4217 GMD."
+  },
+  "currencyGel": "Georgian Lari",
+  "@currencyGel": {
+    "description": "Currency name for ISO 4217 GEL."
+  },
+  "currencyGhs": "Ghanaian Cedi",
+  "@currencyGhs": {
+    "description": "Currency name for ISO 4217 GHS."
+  },
+  "currencyGip": "Gibraltar Pound",
+  "@currencyGip": {
+    "description": "Currency name for ISO 4217 GIP."
+  },
+  "currencyGtq": "Guatemalan Quetzal",
+  "@currencyGtq": {
+    "description": "Currency name for ISO 4217 GTQ."
+  },
+  "currencyGnf": "Guinean Franc",
+  "@currencyGnf": {
+    "description": "Currency name for ISO 4217 GNF."
+  },
+  "currencyGyd": "Guyanaese Dollar",
+  "@currencyGyd": {
+    "description": "Currency name for ISO 4217 GYD."
+  },
+  "currencyHtg": "Haitian Gourde",
+  "@currencyHtg": {
+    "description": "Currency name for ISO 4217 HTG."
+  },
+  "currencyHnl": "Honduran Lempira",
+  "@currencyHnl": {
+    "description": "Currency name for ISO 4217 HNL."
+  },
+  "currencyHkd": "Hong Kong Dollar",
+  "@currencyHkd": {
+    "description": "Currency name for ISO 4217 HKD."
+  },
+  "currencyHuf": "Hungarian Forint",
+  "@currencyHuf": {
+    "description": "Currency name for ISO 4217 HUF."
+  },
+  "currencyIsk": "Icelandic Króna",
+  "@currencyIsk": {
+    "description": "Currency name for ISO 4217 ISK."
+  },
+  "currencyInr": "Indian Rupee",
+  "@currencyInr": {
+    "description": "Currency name for ISO 4217 INR."
+  },
+  "currencyIdr": "Indonesian Rupiah",
+  "@currencyIdr": {
+    "description": "Currency name for ISO 4217 IDR."
+  },
+  "currencyIrr": "Iranian Rial",
+  "@currencyIrr": {
+    "description": "Currency name for ISO 4217 IRR."
+  },
+  "currencyIqd": "Iraqi Dinar",
+  "@currencyIqd": {
+    "description": "Currency name for ISO 4217 IQD."
+  },
+  "currencyIls": "Israeli New Shekel",
+  "@currencyIls": {
+    "description": "Currency name for ISO 4217 ILS."
+  },
+  "currencyJmd": "Jamaican Dollar",
+  "@currencyJmd": {
+    "description": "Currency name for ISO 4217 JMD."
+  },
+  "currencyJpy": "Japanese Yen",
+  "@currencyJpy": {
+    "description": "Currency name for ISO 4217 JPY."
+  },
+  "currencyJod": "Jordanian Dinar",
+  "@currencyJod": {
+    "description": "Currency name for ISO 4217 JOD."
+  },
+  "currencyKzt": "Kazakhstani Tenge",
+  "@currencyKzt": {
+    "description": "Currency name for ISO 4217 KZT."
+  },
+  "currencyKes": "Kenyan Shilling",
+  "@currencyKes": {
+    "description": "Currency name for ISO 4217 KES."
+  },
+  "currencyKwd": "Kuwaiti Dinar",
+  "@currencyKwd": {
+    "description": "Currency name for ISO 4217 KWD."
+  },
+  "currencyKgs": "Kyrgystani Som",
+  "@currencyKgs": {
+    "description": "Currency name for ISO 4217 KGS."
+  },
+  "currencyLak": "Laotian Kip",
+  "@currencyLak": {
+    "description": "Currency name for ISO 4217 LAK."
+  },
+  "currencyLbp": "Lebanese Pound",
+  "@currencyLbp": {
+    "description": "Currency name for ISO 4217 LBP."
+  },
+  "currencyLsl": "Lesotho Loti",
+  "@currencyLsl": {
+    "description": "Currency name for ISO 4217 LSL."
+  },
+  "currencyLrd": "Liberian Dollar",
+  "@currencyLrd": {
+    "description": "Currency name for ISO 4217 LRD."
+  },
+  "currencyLyd": "Libyan Dinar",
+  "@currencyLyd": {
+    "description": "Currency name for ISO 4217 LYD."
+  },
+  "currencyMop": "Macanese Pataca",
+  "@currencyMop": {
+    "description": "Currency name for ISO 4217 MOP."
+  },
+  "currencyMkd": "Macedonian Denar",
+  "@currencyMkd": {
+    "description": "Currency name for ISO 4217 MKD."
+  },
+  "currencyMga": "Malagasy Ariary",
+  "@currencyMga": {
+    "description": "Currency name for ISO 4217 MGA."
+  },
+  "currencyMwk": "Malawian Kwacha",
+  "@currencyMwk": {
+    "description": "Currency name for ISO 4217 MWK."
+  },
+  "currencyMyr": "Malaysian Ringgit",
+  "@currencyMyr": {
+    "description": "Currency name for ISO 4217 MYR."
+  },
+  "currencyMvr": "Maldivian Rufiyaa",
+  "@currencyMvr": {
+    "description": "Currency name for ISO 4217 MVR."
+  },
+  "currencyMru": "Mauritanian Ouguiya",
+  "@currencyMru": {
+    "description": "Currency name for ISO 4217 MRU."
+  },
+  "currencyMur": "Mauritian Rupee",
+  "@currencyMur": {
+    "description": "Currency name for ISO 4217 MUR."
+  },
+  "currencyMxn": "Mexican Peso",
+  "@currencyMxn": {
+    "description": "Currency name for ISO 4217 MXN."
+  },
+  "currencyMdl": "Moldovan Leu",
+  "@currencyMdl": {
+    "description": "Currency name for ISO 4217 MDL."
+  },
+  "currencyMnt": "Mongolian Tugrik",
+  "@currencyMnt": {
+    "description": "Currency name for ISO 4217 MNT."
+  },
+  "currencyMad": "Moroccan Dirham",
+  "@currencyMad": {
+    "description": "Currency name for ISO 4217 MAD."
+  },
+  "currencyMzn": "Mozambican Metical",
+  "@currencyMzn": {
+    "description": "Currency name for ISO 4217 MZN."
+  },
+  "currencyMmk": "Myanmar Kyat",
+  "@currencyMmk": {
+    "description": "Currency name for ISO 4217 MMK."
+  },
+  "currencyNad": "Namibian Dollar",
+  "@currencyNad": {
+    "description": "Currency name for ISO 4217 NAD."
+  },
+  "currencyNpr": "Nepalese Rupee",
+  "@currencyNpr": {
+    "description": "Currency name for ISO 4217 NPR."
+  },
+  "currencyAng": "Netherlands Antillean Guilder",
+  "@currencyAng": {
+    "description": "Currency name for ISO 4217 ANG."
+  },
+  "currencyTwd": "New Taiwan Dollar",
+  "@currencyTwd": {
+    "description": "Currency name for ISO 4217 TWD."
+  },
+  "currencyNzd": "New Zealand Dollar",
+  "@currencyNzd": {
+    "description": "Currency name for ISO 4217 NZD."
+  },
+  "currencyNio": "Nicaraguan Córdoba",
+  "@currencyNio": {
+    "description": "Currency name for ISO 4217 NIO."
+  },
+  "currencyNgn": "Nigerian Naira",
+  "@currencyNgn": {
+    "description": "Currency name for ISO 4217 NGN."
+  },
+  "currencyKpw": "North Korean Won",
+  "@currencyKpw": {
+    "description": "Currency name for ISO 4217 KPW."
+  },
+  "currencyNok": "Norwegian Krone",
+  "@currencyNok": {
+    "description": "Currency name for ISO 4217 NOK."
+  },
+  "currencyOmr": "Omani Rial",
+  "@currencyOmr": {
+    "description": "Currency name for ISO 4217 OMR."
+  },
+  "currencyPkr": "Pakistani Rupee",
+  "@currencyPkr": {
+    "description": "Currency name for ISO 4217 PKR."
+  },
+  "currencyPab": "Panamanian Balboa",
+  "@currencyPab": {
+    "description": "Currency name for ISO 4217 PAB."
+  },
+  "currencyPgk": "Papua New Guinean Kina",
+  "@currencyPgk": {
+    "description": "Currency name for ISO 4217 PGK."
+  },
+  "currencyPyg": "Paraguayan Guarani",
+  "@currencyPyg": {
+    "description": "Currency name for ISO 4217 PYG."
+  },
+  "currencyPen": "Peruvian Sol",
+  "@currencyPen": {
+    "description": "Currency name for ISO 4217 PEN."
+  },
+  "currencyPhp": "Philippine Peso",
+  "@currencyPhp": {
+    "description": "Currency name for ISO 4217 PHP."
+  },
+  "currencyPln": "Polish Zloty",
+  "@currencyPln": {
+    "description": "Currency name for ISO 4217 PLN."
+  },
+  "currencyQar": "Qatari Rial",
+  "@currencyQar": {
+    "description": "Currency name for ISO 4217 QAR."
+  },
+  "currencyRon": "Romanian Leu",
+  "@currencyRon": {
+    "description": "Currency name for ISO 4217 RON."
+  },
+  "currencyRub": "Russian Ruble",
+  "@currencyRub": {
+    "description": "Currency name for ISO 4217 RUB."
+  },
+  "currencyRwf": "Rwandan Franc",
+  "@currencyRwf": {
+    "description": "Currency name for ISO 4217 RWF."
+  },
+  "currencyShp": "Saint Helena Pound",
+  "@currencyShp": {
+    "description": "Currency name for ISO 4217 SHP."
+  },
+  "currencySvc": "Salvadoran Colón",
+  "@currencySvc": {
+    "description": "Currency name for ISO 4217 SVC."
+  },
+  "currencyWst": "Samoan Tala",
+  "@currencyWst": {
+    "description": "Currency name for ISO 4217 WST."
+  },
+  "currencySar": "Saudi Riyal",
+  "@currencySar": {
+    "description": "Currency name for ISO 4217 SAR."
+  },
+  "currencyRsd": "Serbian Dinar",
+  "@currencyRsd": {
+    "description": "Currency name for ISO 4217 RSD."
+  },
+  "currencyScr": "Seychellois Rupee",
+  "@currencyScr": {
+    "description": "Currency name for ISO 4217 SCR."
+  },
+  "currencySle": "Sierra Leonean Leone",
+  "@currencySle": {
+    "description": "Currency name for ISO 4217 SLE."
+  },
+  "currencySgd": "Singapore Dollar",
+  "@currencySgd": {
+    "description": "Currency name for ISO 4217 SGD."
+  },
+  "currencySbd": "Solomon Islands Dollar",
+  "@currencySbd": {
+    "description": "Currency name for ISO 4217 SBD."
+  },
+  "currencySos": "Somali Shilling",
+  "@currencySos": {
+    "description": "Currency name for ISO 4217 SOS."
+  },
+  "currencyZar": "South African Rand",
+  "@currencyZar": {
+    "description": "Currency name for ISO 4217 ZAR."
+  },
+  "currencyKrw": "South Korean Won",
+  "@currencyKrw": {
+    "description": "Currency name for ISO 4217 KRW."
+  },
+  "currencySsp": "South Sudanese Pound",
+  "@currencySsp": {
+    "description": "Currency name for ISO 4217 SSP."
+  },
+  "currencyLkr": "Sri Lankan Rupee",
+  "@currencyLkr": {
+    "description": "Currency name for ISO 4217 LKR."
+  },
+  "currencySdg": "Sudanese Pound",
+  "@currencySdg": {
+    "description": "Currency name for ISO 4217 SDG."
+  },
+  "currencySrd": "Surinamese Dollar",
+  "@currencySrd": {
+    "description": "Currency name for ISO 4217 SRD."
+  },
+  "currencySzl": "Swazi Lilangeni",
+  "@currencySzl": {
+    "description": "Currency name for ISO 4217 SZL."
+  },
+  "currencySek": "Swedish Krona",
+  "@currencySek": {
+    "description": "Currency name for ISO 4217 SEK."
+  },
+  "currencyChf": "Swiss Franc",
+  "@currencyChf": {
+    "description": "Currency name for ISO 4217 CHF."
+  },
+  "currencySyp": "Syrian Pound",
+  "@currencySyp": {
+    "description": "Currency name for ISO 4217 SYP."
+  },
+  "currencyStn": "São Tomé and Príncipe Dobra",
+  "@currencyStn": {
+    "description": "Currency name for ISO 4217 STN."
+  },
+  "currencyTjs": "Tajikistani Somoni",
+  "@currencyTjs": {
+    "description": "Currency name for ISO 4217 TJS."
+  },
+  "currencyTzs": "Tanzanian Shilling",
+  "@currencyTzs": {
+    "description": "Currency name for ISO 4217 TZS."
+  },
+  "currencyThb": "Thai Baht",
+  "@currencyThb": {
+    "description": "Currency name for ISO 4217 THB."
+  },
+  "currencyTop": "Tongan Paanga",
+  "@currencyTop": {
+    "description": "Currency name for ISO 4217 TOP."
+  },
+  "currencyTtd": "Trinidad and Tobago Dollar",
+  "@currencyTtd": {
+    "description": "Currency name for ISO 4217 TTD."
+  },
+  "currencyTnd": "Tunisian Dinar",
+  "@currencyTnd": {
+    "description": "Currency name for ISO 4217 TND."
+  },
+  "currencyTry": "Turkish Lira",
+  "@currencyTry": {
+    "description": "Currency name for ISO 4217 TRY."
+  },
+  "currencyTmt": "Turkmenistani Manat",
+  "@currencyTmt": {
+    "description": "Currency name for ISO 4217 TMT."
+  },
+  "currencyUsd": "US Dollar",
+  "@currencyUsd": {
+    "description": "Currency name for ISO 4217 USD."
+  },
+  "currencyUgx": "Ugandan Shilling",
+  "@currencyUgx": {
+    "description": "Currency name for ISO 4217 UGX."
+  },
+  "currencyUah": "Ukrainian Hryvnia",
+  "@currencyUah": {
+    "description": "Currency name for ISO 4217 UAH."
+  },
+  "currencyAed": "United Arab Emirates Dirham",
+  "@currencyAed": {
+    "description": "Currency name for ISO 4217 AED."
+  },
+  "currencyUyu": "Uruguayan Peso",
+  "@currencyUyu": {
+    "description": "Currency name for ISO 4217 UYU."
+  },
+  "currencyUzs": "Uzbekistani Som",
+  "@currencyUzs": {
+    "description": "Currency name for ISO 4217 UZS."
+  },
+  "currencyVuv": "Vanuatu Vatu",
+  "@currencyVuv": {
+    "description": "Currency name for ISO 4217 VUV."
+  },
+  "currencyVes": "Venezuelan Bolívar",
+  "@currencyVes": {
+    "description": "Currency name for ISO 4217 VES."
+  },
+  "currencyVed": "Venezuelan Digital Bolívar",
+  "@currencyVed": {
+    "description": "Currency name for ISO 4217 VED."
+  },
+  "currencyVnd": "Vietnamese Dong",
+  "@currencyVnd": {
+    "description": "Currency name for ISO 4217 VND."
+  },
+  "currencyXof": "West African CFA Franc",
+  "@currencyXof": {
+    "description": "Currency name for ISO 4217 XOF."
+  },
+  "currencyYer": "Yemeni Rial",
+  "@currencyYer": {
+    "description": "Currency name for ISO 4217 YER."
+  },
+  "currencyZmw": "Zambian Kwacha",
+  "@currencyZmw": {
+    "description": "Currency name for ISO 4217 ZMW."
+  },
+  "currencyZwg": "Zimbabwe Gold",
+  "@currencyZwg": {
+    "description": "Currency name for ISO 4217 ZWG."
+  },
+  "settingsShipping": "Shipping",
+  "@settingsShipping": {
+    "description": "Settings section for shipping configuration."
+  },
+  "carriersTitle": "Carriers",
+  "@carriersTitle": {
+    "description": "Title for the business carrier list."
+  },
+  "carriersSettingsSubtitle": "Manage the carriers offered when shipping an order",
+  "@carriersSettingsSubtitle": {
+    "description": "Settings row subtitle for carrier management."
+  },
+  "carrierAdd": "Add carrier",
+  "@carrierAdd": {
+    "description": "Action and screen title for adding a carrier."
+  },
+  "carrierEditTitle": "Edit carrier",
+  "@carrierEditTitle": {
+    "description": "Title for editing an existing carrier."
+  },
+  "carrierNameLabel": "Carrier name",
+  "@carrierNameLabel": {
+    "description": "Label for the editable carrier name."
+  },
+  "carrierNameHint": "For example, Evri",
+  "@carrierNameHint": {
+    "description": "Example shown in an empty carrier name field."
+  },
+  "carriersEmptyTitle": "No carriers yet",
+  "@carriersEmptyTitle": {
+    "description": "Title when a business has no active carriers."
+  },
+  "carriersEmptyBody": "Add the shipping companies your business uses.",
+  "@carriersEmptyBody": {
+    "description": "Message when a business has no active carriers."
+  },
+  "carrierDeleteTitle": "Delete carrier?",
+  "@carrierDeleteTitle": {
+    "description": "Confirmation title before soft-deleting a carrier."
+  },
+  "carrierDeleteBody": "It will be removed from future shipments. Existing orders keep their carrier.",
+  "@carrierDeleteBody": {
+    "description": "Confirmation message before soft-deleting a carrier."
   }
 }

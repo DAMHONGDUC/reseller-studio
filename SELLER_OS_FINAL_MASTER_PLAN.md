@@ -1,4 +1,4 @@
-# Seller OS — Final Master Plan
+# Reseller Studio — Final Master Plan
 
 **Status:** Final  
 **Purpose:** Product + UX + Technical source of truth  
@@ -8,7 +8,7 @@
 
 ## 1. Product Vision
 
-Seller OS is a seller operating system, not just an inventory tracker.
+Reseller Studio is a seller operating system, not just an inventory tracker.
 
 Core lifecycle:
 
@@ -857,7 +857,8 @@ Roles:
 ### Subscription
 - Current plan
 - Billing
-- Upgrade
+- Upgrade through the routed `PaywallScreen` bottom sheet
+- Manage the current plan in the separate `SubscriptionScreen`
 - Downgrade
 - Restore purchase
 
@@ -887,31 +888,31 @@ verification — the identity provider owns all of that.
 
 ## 27. Monetization
 
-Potential plans:
+Plans:
 
 ```text
-Free → Pro → Business
+Free → Premium
 ```
 
 Free:
-- Limited inventory
-- Limited listings
-- Limited marketplace connections
+- Inventory limited by `PlanLimits.items`
+- Orders limited by `PlanLimits.orders`
+- Businesses limited by `PlanLimits.workspaces`
 - Basic analytics
 
-Pro:
+Premium:
 - Unlimited inventory
-- Multiple marketplaces
+- Unlimited orders
+- Unlimited businesses
 - Advanced analytics
 - Automation
 - Reports
-
-Business:
 - Team
-- Multiple workspaces
 - Advanced permissions
 - Advanced reports
-- Higher limits
+
+Premium has one entitlement and two auto-renewing billing periods: monthly and
+yearly. Both products unlock exactly the same capabilities.
 
 Subscription architecture may use App Store/Google Play + RevenueCat or equivalent + Cloud Functions + Firestore.
 
@@ -1259,15 +1260,15 @@ Classify
  ↓
 v3
  ↓
-Seller OS
+Reseller Studio
 ```
 
 Rules:
 1. Check v2 first.
 2. Reuse useful patterns/tokens/components conceptually.
 3. Create the corresponding implementation in v3.
-4. Modify v3 to satisfy Seller OS requirements.
-5. All Seller OS UI uses v3.
+4. Modify v3 to satisfy Reseller Studio requirements.
+5. All Reseller Studio UI uses v3.
 6. Never edit v2 directly.
 7. v3 must not depend on v2.
 8. Centralize design tokens.
@@ -1441,7 +1442,7 @@ The product architecture is considered complete when:
 
 ## 40. Final Rule
 
-**Do not build Seller OS as a collection of screens.**
+**Do not build Reseller Studio as a collection of screens.**
 
 Build it as connected seller workflows:
 

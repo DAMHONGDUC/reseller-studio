@@ -1,8 +1,9 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
@@ -71,10 +72,11 @@ class QuickAddController extends Notifier<QuickAddState> {
     if (title.isEmpty || state.isSaving) return null;
 
     state = state.copyWith(isSaving: true);
-    AppLogger.action('Quick Add submitted', <String, Object>{
-      'itemId': id,
-      'titleLength': title.length,
-    });
+    SdLogger.action(
+      LogTagConstant.quickAdd,
+      'Quick Add submitted',
+      <String, Object>{'itemId': id, 'titleLength': title.length},
+    );
 
     try {
       final Item item = Item(
@@ -87,10 +89,11 @@ class QuickAddController extends Notifier<QuickAddState> {
 
       await repository.save(item);
 
-      AppLogger.info('Quick Add saved', <String, Object>{
-        'itemId': id,
-        'status': ItemStatus.draft.name,
-      });
+      SdLogger.info(
+        LogTagConstant.quickAdd,
+        'Quick Add saved',
+        <String, Object>{'itemId': id, 'status': ItemStatus.draft.name},
+      );
       AppAnalytics.instance.itemCreated(viaQuickAdd: true, hasPhoto: false);
 
       state = state.copyWith(isSaving: false, savedItemId: id);
@@ -99,7 +102,8 @@ class QuickAddController extends Notifier<QuickAddState> {
     } catch (error, stackTrace) {
       // Logged here and rethrown: the log is an extra pair of eyes, never a
       // replacement for the caller's error handling.
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.quickAdd,
         'Quick Add failed to save',
         error: error,
         stackTrace: stackTrace,

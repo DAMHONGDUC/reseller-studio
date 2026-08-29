@@ -3,16 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
+import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../listings/domain/entities/listing.dart';
+import '../../../../listings/providers.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';
@@ -20,11 +23,11 @@ import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
+import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_card.dart';
 import '../../widgets/reprice_sheet.dart';
 
 part 'inventory_screen_bulk_bar.dart';
-part 'inventory_screen_empty_inventory.dart';
 part 'inventory_screen_filter_strip.dart';
 part 'inventory_screen_item_list.dart';
 
@@ -116,12 +119,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 ref.read(inventorySearchProvider.notifier).update(value),
             actions: <SdAppBarActionV3>[
               SdAppBarActionV3(
-                icon: Symbols.add_box_rounded,
+                icon: AppIconConstant.addBox,
                 tooltip: context.l10n.inventoryAddItem,
                 onPressed: () => _add(AppRoutes.addItem),
               ),
               SdAppBarActionV3(
-                icon: Symbols.qr_code_scanner_rounded,
+                icon: AppIconConstant.qrCodeScanner,
                 tooltip: context.l10n.inventoryScan,
                 onPressed: () => context.push(AppRoutes.scanner),
               ),
@@ -145,15 +148,27 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             AsyncError<List<Item>>() => SliverFillRemaining(
               hasScrollBody: false,
               child: SdEmptyStateV3(
-                icon: Symbols.error_rounded,
+                icon: AppIconConstant.error,
                 title: context.l10n.inventoryLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
             ),
             _ when items.isEmpty => SliverFillRemaining(
               hasScrollBody: false,
-              child: _EmptyInventory(
-                hasAnyItems: (source.value ?? const <Item>[]).isNotEmpty,
+              child: AppListEmptyState(
+                hasAny: (source.value ?? const <Item>[]).isNotEmpty,
+                noMatchMessage: context.l10n.inventoryNoMatch,
+                emptyIcon: AppIconConstant.inventory,
+                emptyTitle: context.l10n.inventoryEmptyTitle,
+                emptyMessage: context.l10n.inventoryEmptyBody,
+                // The FAB says the same thing, and it is the wrong place to
+                // find it: on the first empty screen a seller ever sees, the
+                // eye is in the middle, not the corner.
+                emptyAction: SdButtonV3(
+                  variant: SdButtonVariantV3.primary,
+                  label: context.l10n.quickAddTitle,
+                  onPressed: () => _add(AppRoutes.quickAdd),
+                ),
               ),
             ),
             _ => _ItemList(items: items),

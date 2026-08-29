@@ -1,8 +1,9 @@
 import 'package:flutter/widgets.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
+import 'domain/enums/getting_started_step.dart';
 
 /// Numbers the Home feature is tuned by, kept off the widgets that read them.
 ///
@@ -28,15 +29,19 @@ class HomeShortcut {
 }
 
 /// The three ways out of Home.
-enum HomeShortcutKind { quickAction, search, analytics }
+enum HomeShortcutKind { quickAction, search, scan }
 
 /// **The three cards that open Home** — owner's rule.
 ///
 /// Home's own content answers "what needs attention today", and everything
 /// that answers it is *inside* this screen. These three are the ways out: down
-/// to Quick Action, sideways into global search, across to Analytics. They sit
-/// first because a seller who opened the app to *go somewhere* should not have
-/// to read a dashboard on the way.
+/// to Quick Action, sideways into global search, and into the scanner.
+/// They sit first because a seller who opened the app to *go somewhere* should
+/// not have to read a dashboard on the way.
+///
+/// Flow overview now gets a full section immediately below this row. Scan
+/// takes its card because it is a frequent action a seller starts while
+/// holding an item, and the shortcut row is the fastest way into it.
 ///
 /// **Three, and the list is closed.** A fourth would make this a launcher,
 /// which is exactly what keeping the create actions at the bottom exists to
@@ -46,12 +51,12 @@ final class HomeShortcutConstant {
   static const List<HomeShortcut> shortcuts = <HomeShortcut>[
     HomeShortcut(
       kind: HomeShortcutKind.quickAction,
-      icon: Symbols.bolt_rounded,
+      icon: AppIconConstant.bolt,
     ),
-    HomeShortcut(kind: HomeShortcutKind.search, icon: Symbols.search_rounded),
+    HomeShortcut(kind: HomeShortcutKind.search, icon: AppIconConstant.search),
     HomeShortcut(
-      kind: HomeShortcutKind.analytics,
-      icon: Symbols.bar_chart_rounded,
+      kind: HomeShortcutKind.scan,
+      icon: AppIconConstant.barcodeScanner,
     ),
   ];
 }
@@ -65,7 +70,7 @@ final class HomeShortcutLabel {
       switch (kind) {
         HomeShortcutKind.quickAction => context.l10n.homeQuickAction,
         HomeShortcutKind.search => context.l10n.homeShortcutSearch,
-        HomeShortcutKind.analytics => context.l10n.navAnalytics,
+        HomeShortcutKind.scan => context.l10n.inventoryScan,
       };
 }
 
@@ -80,11 +85,28 @@ class QuickAction {
     required this.kind,
     required this.icon,
     required this.route,
+    this.open = QuickActionOpen.push,
   });
 
   final QuickActionKind kind;
   final IconData icon;
+
   final String route;
+
+  /// **How the row opens, as a property of the row.** An enum rather than a
+  /// bool: a third behaviour picked by flags at the call site is how the
+  /// fourth one ends up implemented twice.
+  final QuickActionOpen open;
+}
+
+/// What tapping a Quick Action row does.
+enum QuickActionOpen {
+  /// The common case: a screen above Home that comes back here.
+  push,
+
+  /// A shell branch root. Pushing one over Home leaves the seller on the wrong
+  /// tab with a back button they should not have.
+  goTab,
 }
 
 /// Every create action in the app.
@@ -92,12 +114,36 @@ enum QuickActionKind {
   quickAddItem,
   addItem,
   scan,
+  recordSale,
   recordPurchase,
   addExpense,
   addSource,
   addCategory,
   addLocation,
+  addMarketplace,
+  addCarrier,
+  inviteTeammate,
+  analytics,
   about,
+}
+
+class QuickActionSection {
+  const QuickActionSection({required this.kind, required this.actions});
+
+  final QuickActionSectionKind kind;
+  final List<QuickAction> actions;
+}
+
+enum QuickActionSectionKind { inventory, operations, business, app }
+
+final class QuickActionSectionLabel {
+  static String of(BuildContext context, QuickActionSectionKind kind) =>
+      switch (kind) {
+        QuickActionSectionKind.inventory => context.l10n.navInventory,
+        QuickActionSectionKind.operations => context.l10n.moreSectionOperations,
+        QuickActionSectionKind.business => context.l10n.moreSectionBusiness,
+        QuickActionSectionKind.app => context.l10n.settingsApp,
+      };
 }
 
 /// **Everything this app can create, and — last — the page explaining how
@@ -109,67 +155,114 @@ enum QuickActionKind {
 /// on the screen and wrong for one who opened the app to add something: it is
 /// three taps to record an expense from Home.
 ///
-/// **About is the one row that does not create something, and it goes last** —
-/// owner's rule. It lives two levels deep under Settings, so this is what
-/// keeps it findable; putting it at the end is what stops a seller scanning
-/// for "add" from stepping over it. Nothing else non-create joins it without
-/// the same decision.
+/// **Two rows do not create something, and they ride at the end** — owner's
+/// rule: About last, Analytics just above it. About lives two levels deep
+/// under Settings, so this is what keeps it findable; putting both at the end
+/// is what stops a seller scanning for "add" from stepping over them. Nothing
+/// else non-create joins them without the same decision.
 ///
 /// **Adding a create action anywhere means adding it here.**
 /// `test/features/home/quick_access_test.dart` fails when a screen grows an
 /// `AppAddFabScaffold` this list does not know about, so the two cannot
 /// drift.
 final class QuickActionConstant {
-  static const List<QuickAction> actions = <QuickAction>[
-    // Ordered by how often a reseller reaches for it, not alphabetically.
-    // Quick Add is first because hard rule 2 says the product's speed rests
-    // on it.
-    QuickAction(
-      kind: QuickActionKind.quickAddItem,
-      icon: Symbols.bolt_rounded,
-      route: AppRoutes.quickAdd,
+  static const List<QuickActionSection> sections = <QuickActionSection>[
+    QuickActionSection(
+      kind: QuickActionSectionKind.inventory,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.quickAddItem,
+          icon: AppIconConstant.bolt,
+          route: AppRoutes.quickAdd,
+        ),
+        QuickAction(
+          kind: QuickActionKind.scan,
+          icon: AppIconConstant.barcodeScanner,
+          route: AppRoutes.scanner,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addItem,
+          icon: AppIconConstant.addBox,
+          route: AppRoutes.addItem,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addCategory,
+          icon: AppIconConstant.category,
+          route: AppRoutes.categories,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addLocation,
+          icon: AppIconConstant.shelves,
+          route: AppRoutes.locations,
+        ),
+      ],
     ),
-    QuickAction(
-      kind: QuickActionKind.scan,
-      icon: Symbols.barcode_scanner_rounded,
-      route: AppRoutes.scanner,
+    QuickActionSection(
+      kind: QuickActionSectionKind.operations,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.recordSale,
+          icon: AppIconConstant.payments,
+          route: AppRoutes.recordSale,
+        ),
+        QuickAction(
+          kind: QuickActionKind.recordPurchase,
+          icon: AppIconConstant.shoppingBag,
+          route: AppRoutes.addPurchase,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addExpense,
+          icon: AppIconConstant.receipt,
+          route: AppRoutes.expenses,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addSource,
+          icon: AppIconConstant.storefront,
+          route: AppRoutes.sources,
+        ),
+      ],
     ),
-    QuickAction(
-      kind: QuickActionKind.addItem,
-      icon: Symbols.add_box_rounded,
-      route: AppRoutes.addItem,
+    QuickActionSection(
+      kind: QuickActionSectionKind.business,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.addMarketplace,
+          icon: AppIconConstant.hub,
+          route: AppRoutes.marketplaces,
+        ),
+        QuickAction(
+          kind: QuickActionKind.addCarrier,
+          icon: AppIconConstant.localShipping,
+          route: AppRoutes.carriers,
+        ),
+        QuickAction(
+          kind: QuickActionKind.inviteTeammate,
+          icon: AppIconConstant.groupAdd,
+          route: AppRoutes.team,
+        ),
+      ],
     ),
-    QuickAction(
-      kind: QuickActionKind.recordPurchase,
-      icon: Symbols.shopping_bag_rounded,
-      route: AppRoutes.addPurchase,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addExpense,
-      icon: Symbols.receipt_rounded,
-      route: AppRoutes.expenses,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addSource,
-      icon: Symbols.storefront_rounded,
-      route: AppRoutes.sources,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addCategory,
-      icon: Symbols.category_rounded,
-      route: AppRoutes.categories,
-    ),
-    QuickAction(
-      kind: QuickActionKind.addLocation,
-      icon: Symbols.shelves,
-      route: AppRoutes.locations,
-    ),
-    QuickAction(
-      kind: QuickActionKind.about,
-      icon: Symbols.info_rounded,
-      route: AppRoutes.about,
+    QuickActionSection(
+      kind: QuickActionSectionKind.app,
+      actions: <QuickAction>[
+        QuickAction(
+          kind: QuickActionKind.analytics,
+          icon: AppIconConstant.barChart,
+          route: AppRoutes.analytics,
+          open: QuickActionOpen.goTab,
+        ),
+        QuickAction(
+          kind: QuickActionKind.about,
+          icon: AppIconConstant.info,
+          route: AppRoutes.about,
+        ),
+      ],
     ),
   ];
+
+  static List<QuickAction> get actions => sections
+      .expand((QuickActionSection section) => section.actions)
+      .toList(growable: false);
 }
 
 /// The words for a Quick Access tile.
@@ -179,11 +272,58 @@ final class QuickActionLabel {
         QuickActionKind.quickAddItem => context.l10n.quickAddTitle,
         QuickActionKind.addItem => context.l10n.inventoryAddItem,
         QuickActionKind.scan => context.l10n.inventoryScan,
+        QuickActionKind.recordSale => context.l10n.recordSaleTitle,
         QuickActionKind.recordPurchase => context.l10n.homeQuickRecordPurchase,
         QuickActionKind.addExpense => context.l10n.homeQuickAddExpense,
         QuickActionKind.addSource => context.l10n.homeQuickAddSource,
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
+        QuickActionKind.addMarketplace => context.l10n.marketplaceAdd,
+        QuickActionKind.addCarrier => context.l10n.carrierAdd,
+        QuickActionKind.inviteTeammate => context.l10n.teamInvite,
+        QuickActionKind.analytics => context.l10n.navAnalytics,
         QuickActionKind.about => context.l10n.moreAbout,
       };
+}
+
+/// The words and the glyph for one Getting started step.
+///
+/// Same shape as [HomeShortcutLabel] and [QuickActionLabel], for the same
+/// reason: the enum stays `const` and the strings stay in ARB (hard rule 7).
+final class GettingStartedStepLabel {
+  static String title(BuildContext context, GettingStartedStep step) =>
+      switch (step) {
+        GettingStartedStep.addItem => context.l10n.homeStepAddItem,
+        GettingStartedStep.listItem => context.l10n.homeStepListItem,
+        GettingStartedStep.recordSale => context.l10n.homeStepRecordSale,
+      };
+
+  static String detail(BuildContext context, GettingStartedStep step) =>
+      switch (step) {
+        GettingStartedStep.addItem => context.l10n.homeStepAddItemDetail,
+        GettingStartedStep.listItem => context.l10n.homeStepListItemDetail,
+        GettingStartedStep.recordSale => context.l10n.homeStepRecordSaleDetail,
+      };
+
+  static IconData icon(GettingStartedStep step) => switch (step) {
+    GettingStartedStep.addItem => AppIconConstant.bolt,
+    GettingStartedStep.listItem => AppIconConstant.sell,
+    GettingStartedStep.recordSale => AppIconConstant.payments,
+  };
+
+  /// Where the step is performed. Listing still points at Inventory because it
+  /// starts on an item's Actions sheet; recording a sale has a screen of its
+  /// own, so the checklist opens the action rather than the shelf it is on.
+  static String route(GettingStartedStep step) => switch (step) {
+    GettingStartedStep.addItem => AppRoutes.quickAdd,
+    GettingStartedStep.listItem => AppRoutes.inventory,
+    GettingStartedStep.recordSale => AppRoutes.recordSale,
+  };
+
+  /// Quick Add is pushed over Home; Inventory is a tab, and pushing a branch
+  /// root leaves the seller on the wrong tab with a back button.
+  static QuickActionOpen open(GettingStartedStep step) =>
+      step == GettingStartedStep.addItem
+      ? QuickActionOpen.push
+      : QuickActionOpen.goTab;
 }

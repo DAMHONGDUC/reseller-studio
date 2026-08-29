@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Seller OS</string>
+	<string>Reseller Studio</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,23 +15,48 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>seller_os</string>
+	<string>reseller_studio</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>app.dd.reseller.studio</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.889868801710-o1dlhqp6edq2g9jdsfdgh9i8ts3c22g0</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>google-sign-in</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.889868801710-o1dlhqp6edq2g9jdsfdgh9i8ts3c22g0</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<!-- Both strings name the task, not the permission. iOS hard-crashes on
-	     first access without them, and a reviewer rejects "for camera access". -->
 	<key>NSCameraUsageDescription</key>
-	<string>Seller OS uses the camera to scan barcodes on your inventory and to photograph the items you are listing for sale.</string>
+	<string>Reseller Studio uses the camera to scan barcodes on your inventory and to photograph the items you are listing for sale.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Seller OS needs your photo library so you can attach existing photos to an item, a purchase receipt or an expense.</string>
+	<string>Reseller Studio needs your photo library so you can attach existing photos to an item, a purchase receipt or an expense.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -55,24 +80,6 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<!-- Deep links. Needed by the notification tap targets the plan calls for
-	     (section 22) — a "new order" push has to open that order, not Home.
-	     go_router reads the path, so a link is selleros:///orders/ord-4. -->
-	<key>FlutterDeepLinkingEnabled</key>
-	<true/>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>com.dd.seller.os</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>selleros</string>
-			</array>
-		</dict>
-	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

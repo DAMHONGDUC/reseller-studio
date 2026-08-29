@@ -10,6 +10,19 @@ part of 'login_screen.dart';
 /// It watches the controller itself rather than taking the state down as a
 /// prop, so a sign-in in flight rebuilds these two buttons and not the feature
 /// list above them.
+///
+/// **Both buttons wear `SdButtonVariantV3.vendor`** — black on a light theme,
+/// white on a dark one, and never the app's indigo. Apple allows its sign-in
+/// button in black, white, or white with an outline and nothing else, so the
+/// old `primary` styling was a rejection waiting at review rather than a
+/// style preference. Google's neutral button is the same shape.
+///
+/// **Both marks are `SimpleIcons` glyphs** (owner's rule, hard rule 1) — a
+/// font, not the vendors' own artwork, so nothing here can fail to load and
+/// take the only way into the app down with it. Google's real file exists and
+/// is deliberately not used: two buttons drawn two different ways is the state
+/// where only one of them can break. Both swap to `leading` at once, before an
+/// external build — `RELEASE_ACTIONS.md` blocker 5.
 class _LoginActions extends ConsumerWidget {
   const _LoginActions({required this.onSignIn});
 
@@ -18,12 +31,6 @@ class _LoginActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthFormState state = ref.watch(authControllerProvider);
-    // Apple's guidelines want the mark in the label's colour, so it is read
-    // from the variant rather than assumed.
-    final Color appleForeground = SdButtonStyleV3.of(
-      context,
-      SdButtonVariantV3.primary,
-    ).foreground;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -36,12 +43,9 @@ class _LoginActions extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           SdButtonV3(
-            variant: SdButtonVariantV3.primary,
+            variant: SdButtonVariantV3.vendor,
             label: context.l10n.authContinueWithApple,
-            leading: AuthBrandMark(
-              asset: BrandAssetConstant.appleLogo,
-              tint: appleForeground,
-            ),
+            icon: SimpleIcons.apple,
             expand: true,
             busy: state.isBusyWith(AuthProviderKind.apple),
             onPressed: state.isBusy
@@ -50,11 +54,9 @@ class _LoginActions extends ConsumerWidget {
           ),
           SizedBox(height: SdSpacingConstant.h12),
           SdButtonV3(
-            variant: SdButtonVariantV3.outlined,
+            variant: SdButtonVariantV3.vendor,
             label: context.l10n.authContinueWithGoogle,
-            // Untinted on purpose — the four-colour "G" is the only form
-            // Google's branding guidelines allow.
-            leading: const AuthBrandMark(asset: BrandAssetConstant.googleG),
+            icon: SimpleIcons.google,
             expand: true,
             busy: state.isBusyWith(AuthProviderKind.google),
             onPressed: state.isBusy

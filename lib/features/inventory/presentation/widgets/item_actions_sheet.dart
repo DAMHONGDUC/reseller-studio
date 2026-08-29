@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/app_sheet_action_row.dart';
+import '../../../../core/widgets/app_sheet_option_list.dart';
+import '../../../../core/widgets/mark_sold_sheet.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
+import '../../../subscription/domain/services/plan_gate.dart';
+import '../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../subscription/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/entities/storage_location.dart';
 import '../../domain/enums/item_status.dart';
@@ -15,9 +21,8 @@ import '../../domain/services/item_transition.dart';
 import '../../item_block_presenter.dart';
 import '../../providers.dart';
 import '../controllers/item_actions_controller.dart';
-import 'list_item_sheet.dart';
-import 'mark_sold_sheet.dart';
 import 'reprice_sheet.dart';
+import 'restock_sheet.dart';
 
 /// Everything a seller can do to one item, in one sheet (plan §7).
 ///
@@ -88,28 +93,29 @@ class ItemActionsSheet extends ConsumerWidget {
 
     await _run(
       context,
-      ref,
       () => ref.read(itemActionsControllerProvider.notifier).move(<Item>[
         item,
       ], picked),
-      context.l10n.itemMoved,
     );
   }
 
   Future<void> _archive(BuildContext context, WidgetRef ref) => _run(
     context,
-    ref,
     () =>
         ref.read(itemActionsControllerProvider.notifier).archive(<Item>[item]),
-    context.l10n.itemArchived,
+  );
+
+  Future<void> _makeInStock(BuildContext context, WidgetRef ref) => _run(
+    context,
+    () => ref.read(itemActionsControllerProvider.notifier).makeInStock(<Item>[
+      item,
+    ]),
   );
 
   Future<void> _restore(BuildContext context, WidgetRef ref) => _run(
     context,
-    ref,
     () =>
         ref.read(itemActionsControllerProvider.notifier).restore(<Item>[item]),
-    context.l10n.itemRestored,
   );
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
@@ -118,18 +124,16 @@ class ItemActionsSheet extends ConsumerWidget {
       SdDialogV3(
         title: context.l10n.itemDeleteConfirmTitle,
         message: context.l10n.itemDeleteConfirmBody,
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,
             isDestructive: true,
             onPressed: () => _run(
               context,
-              ref,
               () => ref
                   .read(itemActionsControllerProvider.notifier)
                   .delete(item.id),
-              context.l10n.commonDeleted,
             ),
           ),
           SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
@@ -138,15 +142,10 @@ class ItemActionsSheet extends ConsumerWidget {
     );
   }
 
-  /// The one place an action's result becomes a message.
-  ///
-  /// Closes the sheet first so the confirmation is not covered by the very
-  /// sheet that raised it.
+  /// Runs an action, closes its sheet, and presents failures only.
   Future<void> _run(
     BuildContext context,
-    WidgetRef ref,
     Future<void> Function() action,
-    String done,
   ) async {
     final NavigatorState navigator = Navigator.of(context);
 
@@ -156,8 +155,6 @@ class ItemActionsSheet extends ConsumerWidget {
       if (!context.mounted) return;
 
       if (navigator.canPop()) navigator.pop();
-
-      SdSnackBarUtilsV3.success(context, done);
     } catch (error) {
       // Already logged by the controller.
       if (!context.mounted) return;
@@ -171,109 +168,138 @@ class ItemActionsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isArchived = item.status == ItemStatus.archived;
+    final bool isOnHand = item.status.isOnHand;
+
+    final List<Widget> actions = <Widget>[
+      AppSheetActionRow(
+        icon: AppIconConstant.edit,
+        label: context.l10n.actionEdit,
+        onTap: () {
+          Navigator.of(context).pop();
+          context.push(AppRoutes.editItem(item.id));
+        },
+      ),
+      // **One List row, not List and Cross-list** — owner's rule. The two
+      // read as the same verb to anybody who has not learned the difference,
+      // and the narrower one stopped working after the first listing: a
+      // seller who had listed on eBay tapped List, got a block message, and
+      // the thing they actually wanted was the row underneath.
+      AppSheetActionRow(
+        icon: AppIconConstant.sell,
+        label: context.l10n.itemActionList,
+        onTap: () {
+          final ItemTransitionCheck check = ref
+              .read(itemActionsControllerProvider.notifier)
+              .crossListCheck(item);
+
+          if (!check.isAllowed) {
+            SdSnackBarUtilsV3.error(
+              context,
+              ItemBlockPresenter.messages(context, check.blocks),
+            );
+
+            return;
+          }
+
+          Navigator.of(context).pop();
+          context.push(AppRoutes.crossList(item.id));
+        },
+      ),
+      AppSheetActionRow(
+        icon: AppIconConstant.priceChange,
+        label: context.l10n.itemActionReprice,
+        onTap: () {
+          Navigator.of(context).pop();
+          RepriceSheet.show(context, ref, <Item>[item]);
+        },
+      ),
+      AppSheetActionRow(
+        icon: AppIconConstant.shelves,
+        label: context.l10n.itemActionMove,
+        onTap: () => _move(context, ref),
+      ),
+      AppSheetActionRow(
+        icon: AppIconConstant.payments,
+        label: context.l10n.itemActionMarkSold,
+        onTap: () async {
+          final PlanBlock block = ref.read(addOrderBlockProvider);
+
+          if (block != PlanBlock.none) {
+            Navigator.of(context).pop();
+            await PlanBlockSheet.show(
+              context,
+              block: block,
+              plan: ref.read(currentPlanProvider),
+            );
+
+            return;
+          }
+
+          _guarded(context, ref, ItemStatus.sold, () {
+            Navigator.of(context).pop();
+            MarkSoldSheet.show(context, item);
+          });
+        },
+      ),
+      // **A draft is not stock until the seller says so** — owner's rule, and
+      // the row that says it. Only a draft can take it: everything else is
+      // already on the shelf or has left it.
+      if (item.status == ItemStatus.draft)
+        AppSheetActionRow(
+          icon: AppIconConstant.inventory,
+          label: context.l10n.itemActionMakeInStock,
+          onTap: () => _guarded(
+            context,
+            ref,
+            ItemStatus.inStock,
+            () => _makeInStock(context, ref),
+          ),
+        ),
+      // **Restock is how a sold-out row comes back** — owner's rule. It adds
+      // to the count and moves the status with it, so the seller never has to
+      // un-sell an item by hand before saying more arrived.
+      AppSheetActionRow(
+        icon: AppIconConstant.autorenew,
+        label: context.l10n.itemActionRestock,
+        onTap: () {
+          Navigator.of(context).pop();
+          RestockSheet.show(context, item);
+        },
+      ),
+      // **Archive, or come back — decided by whether the item is on the shelf,
+      // not by whether it is archived.** A sold item had no way back at all:
+      // the row said Archive, and the only route to stock was archiving it
+      // first and then undoing that.
+      AppSheetActionRow(
+        icon: isOnHand ? AppIconConstant.archive : AppIconConstant.unarchive,
+        label: isOnHand
+            ? context.l10n.itemActionArchive
+            : context.l10n.itemActionRestore,
+        onTap: () => isOnHand
+            ? _archive(context, ref)
+            : _guarded(
+                context,
+                ref,
+                ItemStatus.inStock,
+                () => _restore(context, ref),
+              ),
+      ),
+      AppSheetActionRow(
+        icon: AppIconConstant.delete,
+        label: context.l10n.actionDelete,
+        isDestructive: true,
+        onTap: () {
+          Navigator.of(context).pop();
+          _confirmDelete(context, ref);
+        },
+      ),
+    ];
 
     return SdBottomSheetV3(
       title: item.title,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _ActionRow(
-            icon: Symbols.edit_rounded,
-            label: context.l10n.actionEdit,
-            onTap: () {
-              Navigator.of(context).pop();
-              context.push(AppRoutes.editItem(item.id));
-            },
-          ),
-          _ActionRow(
-            icon: Symbols.sell_rounded,
-            label: context.l10n.itemActionList,
-            onTap: () => _guarded(context, ref, ItemStatus.listed, () {
-              Navigator.of(context).pop();
-              ListItemSheet.show(context, item);
-            }),
-          ),
-          _ActionRow(
-            icon: Symbols.price_change_rounded,
-            label: context.l10n.itemActionReprice,
-            onTap: () {
-              Navigator.of(context).pop();
-              RepriceSheet.show(context, <Item>[item]);
-            },
-          ),
-          _ActionRow(
-            icon: Symbols.shelves,
-            label: context.l10n.itemActionMove,
-            onTap: () => _move(context, ref),
-          ),
-          _ActionRow(
-            icon: Symbols.payments_rounded,
-            label: context.l10n.itemActionMarkSold,
-            onTap: () => _guarded(context, ref, ItemStatus.sold, () {
-              Navigator.of(context).pop();
-              MarkSoldSheet.show(context, item);
-            }),
-          ),
-          _ActionRow(
-            icon: isArchived
-                ? Symbols.unarchive_rounded
-                : Symbols.archive_rounded,
-            label: isArchived
-                ? context.l10n.itemActionRestore
-                : context.l10n.itemActionArchive,
-            onTap: () =>
-                isArchived ? _restore(context, ref) : _archive(context, ref),
-          ),
-          _ActionRow(
-            icon: Symbols.delete_rounded,
-            label: context.l10n.actionDelete,
-            isDestructive: true,
-            onTap: () {
-              Navigator.of(context).pop();
-              _confirmDelete(context, ref);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  const _ActionRow({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.isDestructive = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isDestructive;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color tint = isDestructive
-        ? context.sdTheme3.danger
-        : context.sdTheme3.textPrimary;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: SdRadiusV3.cardAll,
-      child: Padding(
-        padding: SdContentPaddingV3.row,
-        child: Row(
-          children: <Widget>[
-            SdIconV3(icon, color: tint),
-            SizedBox(width: SdSpacingConstant.w12),
-            Text(
-              label,
-              style: context.textTheme3.bodyMedium!.copyWith(color: tint),
-            ),
-          ],
-        ),
+      child: AppSheetOptionList(
+        itemCount: actions.length,
+        itemBuilder: (BuildContext context, int index) => actions[index],
       ),
     );
   }

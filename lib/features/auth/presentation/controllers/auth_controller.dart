@@ -1,8 +1,10 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
-import '../../../../core/logging/crash_reporter.dart';
+import '../../../../core/constants/log_tag_constant.dart';
+import '../../../mock_data/providers.dart';
+import '../../../notifications/providers.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -53,13 +55,15 @@ class AuthController extends Notifier<AuthFormState> {
 
       if (uid == null) return false;
 
-      CrashReporter.instance.setUserId(uid);
+      SdCrashReporter.instance.setUserId(uid);
       AppAnalytics.instance.signedIn(provider: provider.name);
       await _ensureProfile(uid);
+      await _identifyForBilling(uid);
 
       return true;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.login,
         'Sign in failed',
         error: error,
         stackTrace: stackTrace,
@@ -72,13 +76,25 @@ class AuthController extends Notifier<AuthFormState> {
     }
   }
 
+  /// **The device is unregistered before the session ends, not after.**
+  /// `users/{uid}/devices` is writable only by that uid, so a delete
+  /// attempted a moment later is refused — and a token left registered is one
+  /// that would buzz the next person to hold this phone with the last
+  /// person's orders.
   Future<void> signOut() async {
     try {
+      await ref.read(pushControllerProvider.notifier).unregister();
+      await ref.read(subscriptionRepositoryProvider).forget();
       await ref.read(authRepositoryProvider).signOut();
-      CrashReporter.instance.setUserId(null);
+      SdCrashReporter.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
     } catch (error, stackTrace) {
-      AppLogger.error('Sign out failed', error: error, stackTrace: stackTrace);
+      SdLogger.error(
+        LogTagConstant.logout,
+        'Sign out failed',
+        error: error,
+        stackTrace: stackTrace,
+      );
 
       rethrow;
     }
@@ -87,15 +103,37 @@ class AuthController extends Notifier<AuthFormState> {
   Future<void> deleteAccount() async {
     try {
       await ref.read(authRepositoryProvider).deleteAccount();
-      CrashReporter.instance.setUserId(null);
+      SdCrashReporter.instance.setUserId(null);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.deleteAccount,
         'Account deletion failed',
         error: error,
         stackTrace: stackTrace,
       );
 
       rethrow;
+    }
+  }
+
+  /// Tell the billing provider which account this is.
+  ///
+  /// **Not allowed to fail the sign-in either**, for the same reason as the
+  /// profile write: the session is valid, and a seller blocked at the login
+  /// screen because a billing SDK was unreachable is the wrong trade. The
+  /// cost of it failing is that the webhook cannot connect a payment to this
+  /// account until the next sign-in, which the log names.
+  Future<void> _identifyForBilling(String uid) async {
+    try {
+      await ref.read(subscriptionRepositoryProvider).identify(uid);
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.subscription,
+        'Billing identity not set — entitlement will not reach the backend',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, String>{'uid': uid},
+      );
     }
   }
 
@@ -122,7 +160,8 @@ class AuthController extends Notifier<AuthFormState> {
         photoUrl: ref.read(authUserProvider).value?.photoURL,
       );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.login,
         'Could not write user profile after sign in',
         error: error,
         stackTrace: stackTrace,

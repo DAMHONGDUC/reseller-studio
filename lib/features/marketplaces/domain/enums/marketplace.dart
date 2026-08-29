@@ -7,6 +7,10 @@
 ///
 /// Adding one means adding a case here and a fee rate below — the compiler
 /// then finds every switch that needs updating, which is the point.
+///
+/// **There is no `hasIntegration`.** Connecting to a platform is not a feature
+/// of this app (owner's rule, hard rule 10), so a flag saying whether it could
+/// be was a promise nothing kept.
 enum Marketplace {
   ebay('eBay'),
   etsy('Etsy'),
@@ -45,11 +49,4 @@ enum Marketplace {
     Marketplace.shopify => 0.029,
     Marketplace.other => 0,
   };
-
-  /// Whether Seller OS can talk to this platform's API yet.
-  ///
-  /// All false today — nothing is integrated (see `CLAUDE.md` "Pending
-  /// setup"). The UI reads this to decide between "Connect" and "Coming
-  /// soon", so it must not claim otherwise.
-  bool get hasIntegration => false;
 }

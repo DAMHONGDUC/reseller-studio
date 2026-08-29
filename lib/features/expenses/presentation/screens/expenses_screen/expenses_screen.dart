@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/utils/mileage_unit_label.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_icon_button.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
+import '../../../../tax/providers.dart';
 import '../../../domain/entities/expense.dart';
+import '../../../domain/services/recurring_expense_schedule.dart';
 import '../../../providers.dart';
 import '../../controllers/expense_controller.dart';
 import '../../widgets/expense_form_sheet.dart';
+
+part 'expenses_screen_due_recurring.dart';
 
 /// Expenses — every business cost that is not the cost of an item (plan §17).
 ///
@@ -34,9 +40,9 @@ class ExpensesScreen extends ConsumerWidget {
     await showSdDialogV3(
       context,
       SdDialogV3(
-        title: 'Delete this expense?',
-        message: 'It stops counting against your profit.',
-        icon: Symbols.warning_rounded,
+        title: context.l10n.expensesDeleteThisExpense,
+        message: context.l10n.expensesItStopsCountingAgainstYourProfit,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,
@@ -80,21 +86,19 @@ class ExpensesScreen extends ConsumerWidget {
         .totalOrNull();
 
     return AppAddFabScaffold(
-      appBar: const SdAppBarV3(title: 'Expenses'),
+      appBar: SdAppBarV3(title: context.l10n.commonExpenses),
       addLabel: 'Add an expense',
       onAdd: () => _add(context),
       body: switch (source) {
         AsyncLoading<List<Expense>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when expenses.isEmpty => SdEmptyStateV3(
-          icon: Symbols.receipt_rounded,
-          title: 'No expenses yet',
-          message:
-              'Packaging, postage, storage, mileage — the costs that come off '
-              'your profit but do not belong to one item.',
+          icon: AppIconConstant.receipt,
+          title: context.l10n.expensesNoExpensesYet,
+          message: context.l10n.expensesPackagingPostageStorageMileageTheCosts,
           action: SdButtonV3(
             variant: SdButtonVariantV3.primary,
-            label: 'Add an expense',
+            label: context.l10n.homeQuickAddExpense,
             onPressed: () => _add(context),
           ),
         ),
@@ -103,14 +107,18 @@ class ExpensesScreen extends ConsumerWidget {
           children: <Widget>[
             SizedBox(height: SdContentPaddingV3.topGap),
             SdStatTileV3(
-              label: 'Total recorded',
+              label: context.l10n.expensesTotalRecorded,
               value: context.money(total),
               caption: '${expenses.length} entries',
-              icon: Symbols.savings_rounded,
+              icon: AppIconConstant.savings,
             ),
+            const _DueRecurring(),
             if (totals.isNotEmpty) ...<Widget>[
               SizedBox(height: SdContentPaddingV3.sectionGap),
-              const SdSectionHeaderV3(title: 'By category', first: true),
+              SdSectionHeaderV3(
+                title: context.l10n.analyticsByCategory,
+                first: true,
+              ),
               AppListCard(
                 children: totals
                     .map(
@@ -124,7 +132,10 @@ class ExpensesScreen extends ConsumerWidget {
               ),
             ],
             SizedBox(height: SdContentPaddingV3.sectionGap),
-            const SdSectionHeaderV3(title: 'Everything', first: true),
+            SdSectionHeaderV3(
+              title: context.l10n.expensesEverything,
+              first: true,
+            ),
             AppListCard(
               children: expenses
                   .map(
@@ -136,6 +147,11 @@ class ExpensesScreen extends ConsumerWidget {
                           locale: context.localeTag,
                         ),
                         if (expense.vendor != null) expense.vendor!,
+                        // The distance is the whole record for a mileage
+                        // trip — its amount is usually zero on purpose.
+                        if (expense.mileage != null)
+                          '${MileageUnitLabel.distance(expense.mileage!)} '
+                              '${MileageUnitLabel.of(context, ref.watch(taxJurisdictionProvider).mileageUnit).toLowerCase()}',
                         if (expense.orderId != null) 'on an order',
                         if (expense.isRecurring) 'recurring',
                       ].join(' · '),
@@ -147,12 +163,9 @@ class ExpensesScreen extends ConsumerWidget {
                             style: context.textTheme3.bodyMedium!.tabular3
                                 .copyWith(color: context.sdTheme3.textPrimary),
                           ),
-                          IconButton(
-                            icon: SdIconV3(
-                              Symbols.delete_rounded,
-                              size: SdIconV3.smallSize,
-                              color: context.sdTheme3.textTertiary,
-                            ),
+                          SizedBox(width: SdSpacingConstant.w12),
+                          AppRowIconButton(
+                            icon: AppIconConstant.delete,
                             tooltip: context.l10n.actionDelete,
                             onPressed: () =>
                                 _confirmDelete(context, ref, expense),

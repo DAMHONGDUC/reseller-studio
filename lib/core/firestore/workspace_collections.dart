@@ -34,6 +34,7 @@ class WorkspaceCollections {
   CollectionReference<Map<String, Object?>> get locations => _sub('locations');
   CollectionReference<Map<String, Object?>> get marketplaces =>
       _sub('marketplaces');
+  CollectionReference<Map<String, Object?>> get carriers => _sub('carriers');
   CollectionReference<Map<String, Object?>> get activity => _sub('activity');
 
   CollectionReference<Map<String, Object?>> _sub(String name) => workspace

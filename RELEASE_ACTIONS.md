@@ -16,12 +16,16 @@ Ordered by what blocks what. Work top to bottom.
 | 2 | Google Sign-In OAuth clients | One of only two ways into the app. | 30 min |
 | 3 | Sign in with Apple (Services ID + key) | The other way in, and **App Store review rejects** an app offering Google without it. | 45 min |
 | 4 | Deploy `firestore.rules`, `firestore.indexes.json`, `storage.rules` | Without rules, Firestore is either locked shut or wide open. | 10 min |
-| 5 | Apple's logo mark in `assets/brand/apple_logo.svg` | Only Apple's design resources supply it, and a redrawn one fails Beta App Review. Google's is shipped and the button slot is built, so this file is all that is left. **The Apple button throws on the login screen until it exists.** | 10 min |
+| 5 | The vendors' own artwork on the sign-in buttons | The buttons currently draw `SimpleIcons` glyphs (owner's rule), which is a **redrawn trademark** — Beta App Review rejects that, and Google's guidelines require their four-colour "G". Nothing is blocked from running; this blocks external TestFlight and submission only. | 30 min |
 | 6 | Bundle id, signing, App Store / Play listings | No build can be uploaded. | 2–3 h |
-| 7 | Privacy policy URL + data-safety answers | Both stores refuse the listing without them. | 1 h |
+| 7 | Privacy policy + terms URLs, hosted, then in `env/*.json` | Both stores refuse the listing without them, and guideline 3.1.2 wants both links **inside** the app — the paywall and About read `PRIVACY_POLICY_URL` and `TERMS_OF_SERVICE_URL` and draw nothing when they are empty. | 1 h |
+| 8 | `.firebaserc`, and `env_assets/` on your machine | Nothing says which Firebase project a flavour is, so `melos run prepare-env-*` has nothing to copy and the release lane's config check cannot run at all. | 20 min |
+| 9 | App Store Connect API key, the private certificates repo, its PAT | No build can be uploaded by anything but a hand-driven Xcode, which this repo forbids. | 1 h |
 
-App icons, the launch screen and the iOS permission strings **are done** and
-are no longer on this list.
+App icons, the launch screen, the iOS permission strings, the **Sign in with
+Apple entitlement** and **account deletion with its data** are done and are no
+longer on this list. `melos run preflight` checks every row above and exits
+non-zero on the ones still unmet — run it rather than reading this table.
 
 ### TestFlight: internal and external are not the same gate
 
@@ -37,8 +41,9 @@ blocks the external half.
 
 1. Create the project (one per environment if you want `dev` and `prod`
    separate; one is fine for launch).
-2. Add an **iOS app** with bundle id `com.dd.seller.os` and an **Android app**
-   with the matching application id.
+2. Add an **iOS app** with bundle id `app.dd.reseller.studio` and an **Android
+   app** with application id `com.dd.reseller.studio`. They deliberately differ
+   — register each one exactly as written, not one id for both.
 3. Run `flutterfire configure` from the repo root. It writes
    `lib/firebase_options.dart`, `ios/Runner/GoogleService-Info.plist` and
    `android/app/google-services.json` — all three are gitignored and all three
@@ -50,10 +55,10 @@ blocks the external half.
    **Firestore**, **Storage**, **Crashlytics**, **Analytics**, **Cloud
    Messaging**.
 6. Create `.firebaserc` (`firebase use --add`) — it does not exist, so
-   `melos run deploy-firebase` cannot run today.
+   `melos run deploy-firebase-*` cannot run today.
 7. Deploy the rules and indexes:
    ```sh
-   melos run deploy-firebase
+   melos run deploy-firebase-prod
    ```
    Use the script rather than a hand-typed `firebase deploy`: it confirms the
    project first, and it is the one place the list of what ships is written
@@ -70,8 +75,7 @@ while Firebase is still missing:
 - to develop against data, turn **mock data on in More → Settings**, which is
   reachable without signing in.
 
-`BYPASS_AUTH` may still sit in `env/*.json`; nothing reads it, and the key can
-be deleted from both files and both templates whenever you are next in there.
+`BYPASS_AUTH` is gone from both templates and both env files — nothing read it.
 
 ### ⚠️ Read this before you deploy the rules
 
@@ -103,7 +107,7 @@ blocking rather than nice-to-have.
    `serverClientId`).
 2. Add the iOS client's reversed client id to `ios/Runner/Info.plist` as a URL
    scheme. `flutterfire configure` does not do this for you.
-3. Put the values in `env/*.json` as `GOOGLE_SIGN_IN_IOS_CLIENT_ID` and
+3. Put the values in `env/*.json` as `GOOGLE_SIGN_IN_CLIENT_ID_IOS` and
    `GOOGLE_SIGN_IN_SERVER_CLIENT_ID` **only if** the bundle id differs from the
    Firebase app's — otherwise leave them empty and the plugin reads the config
    file, which is the normal path.
@@ -118,23 +122,35 @@ blocking rather than nice-to-have.
    Sign in with Apple. Note the Key ID and Team ID.
 3. Paste all of it into Firebase Console → Authentication → Apple.
 4. In Xcode, add the **Sign in with Apple** capability to the Runner target.
-5. `APPLE_SIGN_IN_SERVICE_ID` in `env/*.json` is for reference; the app itself
-   goes through `FirebaseAuth.signInWithProvider`, which handles the nonce.
+   **The repo half is done** — `ios/Runner/Runner.entitlements` declares
+   `com.apple.developer.applesignin` and `CODE_SIGN_ENTITLEMENTS` names it on
+   Debug, Release and Profile. What is left is enabling the capability on the
+   app id in the developer portal so the provisioning profile carries it.
+5. **Nothing goes in `env/*.json` for this.** The app goes through
+   `FirebaseAuth.signInWithProvider`, which handles the nonce and reads the
+   Services ID from the Firebase console — `APPLE_SIGN_IN_SERVICE_ID` was a
+   key nothing read and has been deleted.
 
-### Brand marks — blocker 5, mostly closed
+### Brand marks — blocker 5, deferred to submission
 
-The code is done and Google's mark ships. **One file is left, and only Apple
-can hand it to you.**
+**Both buttons draw a `SimpleIcons` glyph today** (owner's rule), passed as
+`SdButtonV3.icon` so the button sizes and tints them like any other icon
+button. That is what unblocked the demo: the previous version loaded vendor
+SVGs from `assets/brand/`, Apple's file has never existed, and
+`SvgPicture.asset` threw *while the login screen built* — which cost the
+seller Google as well, and with it the only way into the app.
 
-What was built: `SdButtonV3` gained a `leading` slot — `icon` is an `IconData`
-and cannot take an image — so both buttons stay the same widget, the same size
-and the same shape as every other button in the app. `AuthBrandMark` paints
-the artwork and `BrandAssetConstant` holds the paths.
+**It is still a redrawn trademark, and that is a review risk, not a style
+preference.** Two things have to happen before an external build:
 
-| Mark | State |
+| Mark | What submission needs |
 |---|---|
-| Google | **Shipped.** `assets/brand/google_g.svg`, Google's own `logo_googleg_48dp` file, byte-for-byte. Rendered untinted — recolouring it breaches their guidelines. |
-| Apple | **Missing.** Download the design resources and save the logo as `assets/brand/apple_logo.svg`. It is tinted to the button's label colour, which is what Apple's guidelines ask for. |
+| Apple | Apple's own logo from the Sign in with Apple design resources. A substitute fails Beta App Review. |
+| Google | Google's four-colour "G", untinted. `assets/brand/google_g.svg` is already in the repo — their own `logo_googleg_48dp` file, byte-for-byte. |
+
+Swapping back is a small change: `SdButtonV3` still has its `leading` slot for
+artwork that cannot be an `IconData`, which is the slot both buttons used
+before.
 
 - Apple: <https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple>
 - Google: <https://developers.google.com/identity/branding-guidelines>
@@ -143,20 +159,28 @@ Neither mark may be redrawn — an approximated trademark is worse than an
 obvious placeholder, because it looks finished. That is why Apple's is a gap
 rather than a best guess.
 
-### ⚠️ The Apple button is the wrong colour for Apple's guidelines
+### The Apple button's colour is fixed
 
-Separate from the missing file, and it will be read at review. "Continue with
-Apple" renders as `SdButtonVariantV3.primary`, which is the app's indigo
-(`AppColors.brand`). **Apple allows three button styles and no others: black,
-white, or white with an outline.** An indigo one is a rejection risk.
+**Was:** `SdButtonVariantV3.primary`, which is the app's indigo. Apple allows
+three styles and no others — black, white, or white with an outline — so an
+indigo one was a rejection risk sitting on the first screen a reviewer opens.
 
-It is a design decision, not a bug, so it has been left alone — **and the
-login redesign made it more visible, not less**: the two buttons now sit
-pinned together at the bottom, so an indigo Apple button beside an outlined
-Google one is the first thing a reviewer looks at. The two ways out: give the
-Apple button the `outlined` variant, so both match and both are
-white-with-outline; or add a black variant for it alone. Say which and it is a
-few minutes.
+**Now:** both buttons wear `SdButtonVariantV3.vendor`, a variant whose colours
+the app's palette cannot reach: black on a light theme, white on a dark one.
+Google's neutral button is the same shape, so the two match without either
+being tinted. The one place the design system hardcodes a colour, and
+`WIDGET_RULES.md` §4 says why.
+
+**Both marks stay `SimpleIcons` glyphs** — owner's rule, restated after
+Google's own SVG was wired in and taken back out. Google's file ships in
+`assets/brand/` and is deliberately unused: two buttons drawn two different
+ways is the state where only one of them can break, and the one that breaks
+takes the whole gate with it.
+
+**Apple's logo is the asset still missing**, and it is what unblocks the swap
+— both buttons move to `SdButtonV3.leading` in the same change, once
+`assets/brand/apple_logo.svg` exists. Until then blocker 5 stands and the
+glyphs render.
 
 ### I removed a dependency
 
@@ -169,10 +193,11 @@ wrong. If you would rather keep the package, say so and I will switch it back.
 
 ## 3. Store and platform
 
-- **App icons and launch screens are still Flutter's defaults.** Every size,
-  both platforms, plus the adaptive icon on Android.
-- **Bundle id / application id**: iOS is `com.dd.seller.os`. Confirm the
-  Android one matches what you registered.
+- **App icons and launch screens are done** on iOS. Confirm the Android
+  adaptive icon before uploading a Play build.
+- **Bundle id / application id**: iOS is `app.dd.reseller.studio`, Android is
+  `com.dd.reseller.studio`. They are not the same string — confirm each against
+  what you registered in its own store.
 - **Signing**: an iOS distribution certificate and provisioning profile; an
   Android upload keystore. Keep the keystore and its password somewhere you
   will still have them in two years — losing it means you cannot update the app.
@@ -196,17 +221,83 @@ wrong. If you would rather keep the package, say so and I will switch it back.
 
 ---
 
+## 3b. The release pipeline — built, unconfigured
+
+Everything in `ios/fastlane/`, `tool/prepare-env.sh`, `tool/build-ipa.sh` and
+`.github/workflows/release.yml` is written and does nothing yet, because every
+one of them needs a credential only you can create.
+`docs/rules/RELEASE.md` is why it is shaped the way it is;
+`docs/release/CREDENTIALS.md` is what each credential does.
+
+In order — each step is what unblocks the next:
+
+1. **`env_assets/` on your machine.** Gitignored, four files per flavour:
+   `dev.json`, `prod.json`, `<flavour>-google-services.json`,
+   `<flavour>-GoogleService-Info.plist`. Then
+   `melos run prepare-env-dev` puts them where the build reads them.
+2. **`.firebaserc`** — `firebase use --add` for each project, so the aliases
+   are `dev` and `prod`. The lane refuses to build without it, because that
+   file is the only thing that can say a plist belongs to the flavour being
+   built.
+3. **App Store Connect API key**, App Manager role. **Downloadable once** —
+   the `.p8` cannot be fetched again. Keep it outside the repo.
+4. **A private certificates repo**, empty, plus a **fine-grained PAT** scoped
+   to that repo alone with **Contents: Read-only**. CI never writes to it.
+5. **`ios/fastlane/.env`** from `.env.example`, then, from a Mac:
+   ```bash
+   cd ios && bundle install && bundle exec fastlane certificates
+   ```
+6. **Rehearse**, still from `ios/`:
+   ```bash
+   bundle exec fastlane preflight
+   ```
+   then `CI=true bundle exec fastlane preflight`. The second is the half most
+   likely to break.
+7. **The Actions secrets** in `docs/release/CREDENTIALS.md`. Set exactly one
+   `MATCH_GIT_*_AUTHORIZATION`; both, even with one empty, gives
+   `Duplicate header: "Authorization"`.
+   - **Rename `FIREBASE_IOS_APP_ID` to `FIREBASE_APP_ID_IOS`** if you already
+     set it — the env key moved (`docs/rules/ENV.md`) and the workflow now
+     reads the new name. A secret nobody renamed is not an error: the value
+     arrives empty and the dSYM upload is skipped with a warning, so
+     Crashlytics silently stops symbolicating.
+8. **First run with `bump: false`** against a build number you know is free.
+
+Two things to know before the first run:
+
+- **`ios/Runner/Info.plist` goes dirty** every time `prepare-env` runs — it
+  carries a derived, flavour-specific URL scheme. Never commit that entry.
+- **Nobody archives from Xcode.** Product > Archive skips
+  `--dart-define-from-file` and produces a binary that dies on
+  `[core/no-app] No Firebase App '[DEFAULT]' has been created`, which names
+  nothing to do with the cause.
+
+---
+
 ## 4. Cloud Functions — not deployed, and some features wait on them
 
-`functions/` has never had `npm ci` run in it and nothing is deployed. Three
-things in the app are deliberately switched off until it is, and each says so
-on screen rather than failing:
+Nothing is deployed. Several things in the app are deliberately switched off
+until it is, and each says so on screen rather than failing:
 
 | Feature | What it needs |
 |---|---|
-| Marketplace sync (eBay, Etsy, Depop, Poshmark, Mercari, Shopify) | OAuth per platform, secrets in Secret Manager, sync + webhook functions. **The app never sees a token** (hard rule 10). |
-| Team invites | An `inviteMember` callable — `invites/` is `allow write: if false` because the callable is what enforces the seat limit and stops the last owner being removed. |
-| Activity / audit log | Firestore triggers. `activity/` is append-only and client-writable-never, so a client-written log would be worthless as an audit trail. |
+| Marketplace sync (eBay, Etsy, Depop, Poshmark, Mercari, Shopify) | OAuth per platform, secrets in Secret Manager, sync + webhook functions. **The app never sees a token** (hard rule 10). Not written. |
+| Team invites, roles and removal | The three team callables — `invites/` is `allow write: if false` because a callable is what enforces the seat limit and stops the last owner being removed. Written, **and the app now calls them**: the Team screen has an invite button and a role sheet, so before the deploy a seller taps them and gets the generic failure. That is the same bet delete-account already makes, and it is worth knowing before a demo. |
+| Activity / audit log | Firestore triggers. `activity/` is append-only and client-writable-never, so a client-written log would be worthless as an audit trail. Written. |
+| Notifications and pushes | Three triggers plus a scheduled digest. The inbox renders without them and stays empty, because nothing else may write a notification. Written. |
+| The plan being a real limit | `revenueCatWebhook`, below. Written. |
+| Deleting one business | `deleteWorkspace`. Settings offers it to an owner; the delete itself is server-side because Firestore does not cascade. Written. |
+
+### What deploying the notifications needs beyond the deploy
+
+1. **An APNs key in the Firebase console** (Project settings → Cloud
+   Messaging). Without it iOS pushes silently never arrive — the app
+   registers, the send reports success, and no phone rings.
+2. **Cloud Scheduler enabled** on the project. `dailyDigest` is an
+   `onSchedule` function and the first deploy creates the job; the API has to
+   be on for that to succeed.
+3. **Test on a real device.** A simulator has no APNs token, so nothing about
+   push can be checked before you have hardware in your hand.
 
 Marketplace OAuth secrets go in **Secret Manager**, never in `env/*.json` — a
 test in this repo fails any key whose name contains `SECRET` or `PRIVATE`.
@@ -232,13 +323,30 @@ below can be done from this repo.
    products, with a subscription group per tier.
 5. **Two keys into `env/dev.json` and `env/prod.json`** — I could not edit
    `env/`, so these are yours to add to both files and both templates:
-   `REVENUECAT_IOS_API_KEY` and `REVENUECAT_ANDROID_API_KEY`. They are public
+   `REVENUECAT_API_KEY_IOS` and `REVENUECAT_API_KEY_ANDROID`. They are public
    SDK keys and belong there (`docs/rules/ENV.md`).
-6. **The webhook secret is NOT an env key.** It goes in Secret Manager and is
-   read only by the Cloud Function that mirrors entitlement into Firestore —
-   which is not written yet, and is why the plan gates are a UI decision and
-   not yet a security boundary.
-7. **Price the tiers.** `PlanLimits.byPlan` holds the ceilings and
+6. **The webhook secret is NOT an env key.** It goes in Secret Manager as
+   `REVENUECAT_WEBHOOK_TOKEN`, and only `revenueCatWebhook` reads it:
+
+   ```sh
+   printf '%s' '<the value you set in RevenueCat>' | \
+     gcloud secrets create REVENUECAT_WEBHOOK_TOKEN --data-file=-
+   ```
+
+   Then in the RevenueCat dashboard, point the webhook at the deployed
+   function's URL and set the **Authorization header** to that same value. The
+   function answers 401 to anything else and never logs what was sent.
+
+   Until both halves are done, `planFor` reads every workspace as Free
+   however much the seller paid — that is what makes a plan gate a UI
+   decision rather than a boundary.
+
+7. **The entitlement follows the person and lands on the businesses they
+   own.** RevenueCat knows an `app_user_id`, which the app sets to the
+   Firebase uid at sign-in; the webhook grants the plan to every workspace
+   where that uid is `owner`. A business somebody else owns is somebody
+   else's to pay for.
+8. **Price the tiers.** `PlanLimits.byPlan` holds the ceilings and
    `InMemorySubscriptionRepository.catalogue` holds the demo prices; both are
    a first proposal nobody has priced.
 
@@ -262,6 +370,41 @@ The jurisdiction comes from the workspace's country, and only `US` and `GB`
 are recognised; anything else falls back to the US. That matches the launch
 markets in `CLAUDE.md`.
 
+## 4d. Account deletion — done, and it needs the functions deployed
+
+**App Store guideline 5.1.1(v) wants the account *and its data* gone.** The
+old delete removed the login with `user.delete()` and left every document
+where it was, which is the reading Apple rejects.
+
+- `functions/src/account/deleteAccount.ts` is the callable. It deletes the
+  workspaces the seller **solely owns** — subcollections and Storage objects
+  with them — removes only the membership from a business somebody else owns,
+  clears their pending invites, then deletes the Auth user last.
+- **It refuses a stale session.** The Admin SDK does not enforce Firebase's
+  `requires-recent-login`, so the function reads `auth_time` off the token and
+  wants a sign-in inside five minutes. Same guard as before, made explicit.
+- **Until `functions/` is deployed, the Delete account row fails** with the
+  one message hard rule 6 allows. That is section 1 blocker 4's deploy, not a
+  separate task.
+
+## 4e. Legal URLs — two env keys only you can fill
+
+`env/` is not editable from this repo, so both keys are yours to add to
+`env/dev.json`, `env/prod.json` **and both `.example.json` templates** — a key
+in one flavour and not the other fails `test/core/config/app_env_test.dart`:
+
+```json
+"PRIVACY_POLICY_URL": "https://…/privacy",
+"TERMS_OF_SERVICE_URL": "https://…/terms"
+```
+
+- Both are on `AppEnv.missingReleaseKeys`, so a release build without them
+  says so by name in the bootstrap log, and `melos run preflight` blocks.
+- **Empty draws nothing** — no row, no dead link. A reviewer clicking through
+  to a 404 is a worse outcome than an app with no link.
+- `docs/STORE_PRIVACY.md` holds the policy draft to host. Filling its
+  brackets and hosting it is what produces the first URL.
+
 ## 5. Decisions I need from you
 
 Nothing is open. Everything that was here is under **Resolved** below.
@@ -284,7 +427,7 @@ Nothing is open. Everything that was here is under **Resolved** below.
 - **Receipts** (plan §18) are built, with upload.
 - **Analytics drill-downs** (plan §9) are built.
 - **Analytics events** — `AppAnalytics` now exists with a typed method per
-  event, wired beside each `AppLogger.action` in the controllers. It is a
+  event, wired beside each `SdLogger.action` in the controllers. It is a
   no-op until Firebase is configured. **No item title, buyer name or
   credential is ever a parameter** (hard rule 9). The one number worth
   watching is `item_created.via_quick_add`: hard rule 2 says the product's

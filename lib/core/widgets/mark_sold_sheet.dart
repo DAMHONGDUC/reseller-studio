@@ -1,0 +1,193 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/index.dart';
+
+import '../../features/inventory/domain/entities/item.dart';
+import '../../features/marketplaces/domain/entities/marketplace.dart';
+import '../../features/marketplaces/providers.dart';
+import '../../features/orders/providers.dart';
+import '../../features/workspace/providers.dart';
+import '../constants/date_picker_constant.dart';
+import '../error/failure_presenter.dart';
+import '../extensions/context_extensions.dart';
+import '../money/money.dart';
+import '../utils/date_time_utils.dart';
+import 'money_field.dart';
+import 'option_picker_sheet.dart';
+import 'picker_field.dart';
+
+/// Record that an item sold.
+///
+/// **This creates an order, not just a status change.** Profit is derived
+/// from orders (hard rule 3), so an item flipped to `sold` with no order
+/// behind it would disappear from every figure the product is judged on —
+/// revenue, margin, ROI, sell-through, all of it.
+///
+/// **In `core/widgets/` because two features open it** — Inventory's Actions
+/// sheet, and the Orders tab's record-sale screen once it has an item. Those
+/// are the two ways an order is created, and they are one sheet on purpose
+/// (`lib/features/orders/CLAUDE.md`).
+class MarkSoldSheet extends ConsumerStatefulWidget {
+  const MarkSoldSheet({required this.item, super.key});
+
+  final Item item;
+
+  /// True when a sale was recorded, null when the seller dismissed the sheet.
+  ///
+  /// The record-sale screen pops itself on a true so the seller lands back on
+  /// Orders with the new order under them; Inventory's Actions sheet has
+  /// nothing to close and ignores it.
+  static Future<bool?> show(BuildContext context, Item item) =>
+      showSdBottomSheetV3<bool>(
+        context: context,
+        builder: (BuildContext context) => MarkSoldSheet(item: item),
+      );
+
+  @override
+  ConsumerState<MarkSoldSheet> createState() => _MarkSoldSheetState();
+}
+
+class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
+  late final TextEditingController _price = TextEditingController(
+    text: widget.item.askingPrice?.toInputString() ?? '',
+  );
+
+  final TextEditingController _buyer = TextEditingController();
+
+  Marketplace? _marketplace;
+  DateTime _soldAt = DateTime.now();
+
+  @override
+  void dispose() {
+    _price.dispose();
+    _buyer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final NavigatorState navigator = Navigator.of(context);
+    final String currency = ref.read(workspaceCurrencyProvider);
+    final Money? price = Money.tryParse(_price.text, currency);
+    final List<Marketplace> marketplaces = ref.read(activeMarketplacesProvider);
+    final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
+
+    if (price == null || marketplace == null) {
+      SdSnackBarUtilsV3.error(context, context.l10n.markSoldPriceRequired);
+
+      return;
+    }
+
+    try {
+      await ref
+          .read(recordSaleControllerProvider.notifier)
+          .record(
+            widget.item,
+            salePrice: price,
+            marketplaceId: marketplace.id,
+            marketplaceName: marketplace.name,
+            soldAt: _soldAt,
+            buyerName: _buyer.text.trim().isEmpty ? null : _buyer.text.trim(),
+          );
+
+      if (!mounted) return;
+
+      navigator.pop(true);
+      SdSnackBarUtilsV3.success(context, context.l10n.markSoldDone);
+    } catch (error) {
+      // Already logged by the controller.
+      if (!mounted) return;
+
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isBusy = ref.watch(recordSaleControllerProvider);
+    final String currency = ref.watch(workspaceCurrencyProvider);
+    final DateTime now = DateTime.now();
+    final List<Marketplace> marketplaces = ref.watch(
+      activeMarketplacesProvider,
+    );
+    final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
+
+    return SdBottomSheetV3(
+      title: context.l10n.markSoldTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          MoneyField(
+            label: context.l10n.markSoldPrice,
+            isRequired: true,
+            controller: _price,
+            currency: currency,
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          PickerField(
+            label: context.l10n.markSoldOn,
+            value: marketplace?.name,
+            onTap: () async {
+              final Marketplace? picked =
+                  await OptionPickerSheet.show<Marketplace>(
+                    context,
+                    title: context.l10n.commonMarketplace,
+                    selected: marketplace,
+                    options: marketplaces
+                        .map(
+                          (Marketplace marketplace) =>
+                              PickerOption<Marketplace>(
+                                value: marketplace,
+                                label: marketplace.name,
+                              ),
+                        )
+                        .toList(),
+                  );
+
+              if (picked == null) return;
+
+              setState(() => _marketplace = picked);
+            },
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          PickerField(
+            label: context.l10n.markSoldDate,
+            value: DateTimeUtils.mediumDate(_soldAt, locale: context.localeTag),
+            onTap: () async {
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: _soldAt,
+                firstDate: DateTime(
+                  now.year - DatePickerConstant.recentEntryYearsBack,
+                ),
+                lastDate: now,
+              );
+
+              if (picked == null) return;
+
+              setState(() => _soldAt = picked);
+            },
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          SdTextFieldV3(
+            label: context.l10n.markSoldBuyer,
+            controller: _buyer,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submit(),
+          ),
+          SizedBox(height: SdSpacingConstant.h24),
+          SdButtonV3(
+            variant: SdButtonVariantV3.primary,
+            label: context.l10n.markSoldSubmit,
+            expand: true,
+            busy: isBusy,
+            onPressed: isBusy || marketplace == null ? null : _submit,
+          ),
+        ],
+      ),
+    );
+  }
+}

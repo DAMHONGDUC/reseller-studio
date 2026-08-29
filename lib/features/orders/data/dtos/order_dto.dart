@@ -29,12 +29,11 @@ final class OrderDto {
       status:
           FirestoreMapper.enumOrNull(OrderStatus.values, data['status']) ??
           OrderStatus.toShip,
-      marketplace:
-          FirestoreMapper.enumOrNull(
-            Marketplace.values,
-            data['marketplaceId'],
-          ) ??
-          Marketplace.other,
+      marketplaceRecordId:
+          FirestoreMapper.stringOrNull(data['marketplaceId']) ?? 'other',
+      marketplaceNameSnapshot:
+          FirestoreMapper.stringOrNull(data['marketplaceName']) ??
+          _legacyMarketplaceName(data['marketplaceId']),
       lines: lines is List
           ? lines
                 .whereType<Map<Object?, Object?>>()
@@ -63,6 +62,10 @@ final class OrderDto {
       shipByDate: FirestoreMapper.dateOrNull(data['shipByDate']),
       shippedAt: FirestoreMapper.dateOrNull(data['shippedAt']),
       deliveredAt: FirestoreMapper.dateOrNull(data['deliveredAt']),
+      returnRequestedAt: FirestoreMapper.dateOrNull(data['returnRequestedAt']),
+      returnedAt: FirestoreMapper.dateOrNull(data['returnedAt']),
+      refundedAt: FirestoreMapper.dateOrNull(data['refundedAt']),
+      settledAt: FirestoreMapper.dateOrNull(data['settledAt']),
       notes: FirestoreMapper.stringOrNull(data['notes']),
     );
   }
@@ -70,7 +73,8 @@ final class OrderDto {
   static Map<String, Object?> toMap(Order order, {required String createdBy}) =>
       FirestoreMapper.pruned(<String, Object?>{
         'status': order.status.name,
-        'marketplaceId': order.marketplace.name,
+        'marketplaceId': order.marketplaceId,
+        'marketplaceName': order.marketplaceName,
         'currency': order.salePrice.currency,
         'lines': order.lines.map(_lineToMap).toList(),
         'salePriceMinor': order.salePrice.minor,
@@ -86,6 +90,10 @@ final class OrderDto {
         'shipByDate': _timestampOrNull(order.shipByDate),
         'shippedAt': _timestampOrNull(order.shippedAt),
         'deliveredAt': _timestampOrNull(order.deliveredAt),
+        'returnRequestedAt': _timestampOrNull(order.returnRequestedAt),
+        'returnedAt': _timestampOrNull(order.returnedAt),
+        'refundedAt': _timestampOrNull(order.refundedAt),
+        'settledAt': _timestampOrNull(order.settledAt),
         'notes': order.notes,
         'updatedAt': FirestoreMapper.serverTimestamp,
         'createdBy': createdBy,
@@ -121,4 +129,8 @@ final class OrderDto {
 
   static Timestamp? _timestampOrNull(DateTime? value) =>
       value == null ? null : Timestamp.fromDate(value);
+
+  static String _legacyMarketplaceName(Object? raw) =>
+      FirestoreMapper.enumOrNull(Marketplace.values, raw)?.displayName ??
+      Marketplace.other.displayName;
 }

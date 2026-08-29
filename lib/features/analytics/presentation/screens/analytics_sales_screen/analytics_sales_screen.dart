@@ -22,39 +22,45 @@ class AnalyticsSalesScreen extends ConsumerWidget {
     final SalesMetrics metrics = ref.watch(salesMetricsProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Sales'),
+      appBar: SdAppBarV3(title: context.l10n.analyticsSales),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           MetricCard(
-            title: 'Volume',
+            title: context.l10n.analyticsVolume,
             rows: <Widget>[
               MetricRow(
-                label: 'Revenue',
+                label: context.l10n.commonRevenue,
                 value: context.money(metrics.revenue),
                 caption: 'After refunds',
                 isEmphasis: true,
               ),
-              MetricRow(label: 'Orders', value: '${metrics.orderCount}'),
-              MetricRow(label: 'Units sold', value: '${metrics.unitsSold}'),
               MetricRow(
-                label: 'Refunded',
+                label: context.l10n.commonOrders,
+                value: '${metrics.orderCount}',
+              ),
+              MetricRow(
+                label: context.l10n.analyticsUnitsSold,
+                value: '${metrics.unitsSold}',
+              ),
+              MetricRow(
+                label: context.l10n.orderStatusRefunded,
                 value: context.money(metrics.refunded),
               ),
             ],
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           MetricCard(
-            title: 'Averages',
+            title: context.l10n.analyticsAverages,
             rows: <Widget>[
               MetricRow(
-                label: 'Average order value',
+                label: context.l10n.analyticsAverageOrderValue,
                 value: context.money(metrics.averageOrderValue),
                 caption: 'Revenue per order',
               ),
               MetricRow(
-                label: 'Average selling price',
+                label: context.l10n.analyticsAverageSellingPrice,
                 value: context.money(metrics.averageSellingPrice),
                 caption: 'Revenue per unit',
               ),
@@ -62,8 +68,7 @@ class AnalyticsSalesScreen extends ConsumerWidget {
           ),
           SizedBox(height: SdSpacingConstant.h16),
           Text(
-            'Cancelled and refunded orders are left out. Counting either '
-            'would make these figures disagree with your bank.',
+            context.l10n.analyticsCancelledAndRefundedOrdersAreLeft,
             style: context.textTheme3.bodySmall!.faint3(context),
           ),
         ],

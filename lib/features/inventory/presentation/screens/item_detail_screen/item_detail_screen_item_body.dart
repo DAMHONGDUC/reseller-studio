@@ -29,12 +29,19 @@ class _ItemBody extends StatelessWidget {
               spacing: SdSpacingConstant.w6,
               runSpacing: SdSpacingConstant.h4,
               children: <Widget>[
-                SdBadgeV3(label: ItemStatusLabel.of(context, item.status)),
+                SdBadgeV3(
+                  label: item.status.label(context),
+                  color: item.status.color(context),
+                ),
                 if (item.condition != null)
                   SdBadgeV3(
-                    label: ItemConditionLabel.of(context, item.condition!),
+                    label: item.condition!.label(context),
+                    color: item.condition!.color(context),
                   ),
-                if (item.quantity > 1) SdBadgeV3(label: '×${item.quantity}'),
+                if (item.quantity > 1)
+                  SdBadgeV3(
+                    label: context.l10n.itemQuantityTimes(item.quantity),
+                  ),
               ],
             ),
           ],

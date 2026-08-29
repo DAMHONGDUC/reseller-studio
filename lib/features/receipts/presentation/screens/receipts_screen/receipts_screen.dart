@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../../core/widgets/app_stat_tile_row.dart';
 import '../../../providers.dart';
 
 part 'receipts_screen_preview.dart';
@@ -35,40 +37,31 @@ class ReceiptsScreen extends ConsumerWidget {
     final int missing = ref.watch(missingReceiptCountProvider);
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Receipts'),
+      appBar: SdAppBarV3(title: context.l10n.moreReceipts),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: SdStatTileV3(
-                  label: 'Attached',
-                  value: '${receipts.length}',
-                  icon: Symbols.description_rounded,
-                ),
-              ),
-              SizedBox(width: SdSpacingConstant.w8),
-              Expanded(
-                child: SdStatTileV3(
-                  label: 'Missing',
-                  value: '$missing',
-                  caption: 'Purchases and expenses with no document',
-                  tone: missing > 0 ? SdStatToneV3.loss : SdStatToneV3.neutral,
-                  icon: Symbols.warning_rounded,
-                ),
-              ),
-            ],
+          AppStatTileRow(
+            left: SdStatTileV3(
+              label: context.l10n.receiptAttached,
+              value: '${receipts.length}',
+              icon: AppIconConstant.description,
+            ),
+            right: SdStatTileV3(
+              label: context.l10n.receiptsMissing,
+              value: '$missing',
+              caption: 'Purchases and expenses with no document',
+              tone: missing > 0 ? SdStatToneV3.loss : SdStatToneV3.neutral,
+              icon: AppIconConstant.warning,
+            ),
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           if (receipts.isEmpty)
-            const SdEmptyStateV3(
-              icon: Symbols.description_rounded,
-              title: 'No receipts yet',
-              message:
-                  'Photograph a receipt when you record a purchase or an '
-                  'expense and it shows up here.',
+            SdEmptyStateV3(
+              icon: AppIconConstant.description,
+              title: context.l10n.receiptsNoReceiptsYet,
+              message: context.l10n.receiptsPhotographAReceiptWhenYouRecord,
             )
           else
             for (final ReceiptEntry receipt in receipts) ...<Widget>[
@@ -107,9 +100,15 @@ class _ReceiptRow extends StatelessWidget {
               ),
               SizedBox(height: SdSpacingConstant.h2),
               Text(
-                '${receipt.kind == ReceiptKind.purchase ? 'Purchase' : 'Expense'}'
-                ' · '
-                '${DateTimeUtils.mediumDate(receipt.date, locale: context.localeTag)}',
+                context.l10n.receiptSubtitle(
+                  receipt.kind == ReceiptKind.purchase
+                      ? context.l10n.receiptKindPurchase
+                      : context.l10n.receiptKindExpense,
+                  DateTimeUtils.mediumDate(
+                    receipt.date,
+                    locale: context.localeTag,
+                  ),
+                ),
                 style: context.textTheme3.bodySmall!.faint3(context),
               ),
             ],
@@ -121,6 +120,8 @@ class _ReceiptRow extends StatelessWidget {
             color: context.sdTheme3.textPrimary,
           ),
         ),
+        SizedBox(width: SdSpacingConstant.w8),
+        const AppRowChevron(),
       ],
     ),
   );

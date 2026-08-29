@@ -1,6 +1,6 @@
 {
   "name": "seller-os-functions",
-  "description": "Cloud Functions for Seller OS — the trusted half of the app.",
+  "description": "Cloud Functions for Reseller Studio — the trusted half of the app.",
   "main": "lib/index.js",
   "private": true,
   "engines": {
@@ -19,9 +19,11 @@
     "firebase-functions": "^6.5.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@typescript-eslint/eslint-plugin": "^8.46.0",
     "@typescript-eslint/parser": "^8.46.0",
     "eslint": "^8.57.1",
+    "firebase-tools": "^15.27.0",
     "typescript": "^5.9.3"
   }
 }

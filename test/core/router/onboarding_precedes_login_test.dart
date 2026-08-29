@@ -4,13 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/router/app_router.dart';
-import 'package:seller_os/core/router/app_routes.dart';
-import 'package:seller_os/core/theme/app_theme.dart';
-import 'package:seller_os/features/auth/providers.dart';
-import 'package:seller_os/features/workspace/providers.dart';
-import 'package:seller_os/l10n/gen/app_localizations.dart';
-import 'package:seller_os/seller_os_app.dart';
+import 'package:reseller_studio/core/router/app_router.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
+import 'package:reseller_studio/core/theme/app_theme.dart';
+import 'package:reseller_studio/features/auth/providers.dart';
+import 'package:reseller_studio/features/workspace/providers.dart';
+import 'package:reseller_studio/l10n/gen/app_localizations.dart';
+import 'package:reseller_studio/reseller_studio_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// **The intro never becomes a way into the app** (hard rule 1).
@@ -72,17 +72,16 @@ void main() {
       UncontrolledProviderScope(
         container: container,
         child: ScreenUtilInit(
-          designSize: SellerOsApp.designSize,
+          designSize: ResellerStudioApp.designSize,
           builder: (BuildContext context, Widget? _) => MaterialApp.router(
             theme: AppTheme.light,
             routerConfig: router,
-            localizationsDelegates:
-                const <LocalizationsDelegate<Object>>[
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
+            localizationsDelegates: const <LocalizationsDelegate<Object>>[
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
           ),
         ),
       ),

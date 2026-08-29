@@ -1,9 +1,12 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/callable_constant.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/app_failure.dart';
 import '../../../../core/error/failure_mapper.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 /// Apple and Google sign-in, behind the domain interface.
@@ -22,9 +25,13 @@ import '../../domain/repositories/auth_repository.dart';
 /// Nothing here logs an email, a token or a display name (hard rule 9). The
 /// uid is enough to find a session, and it is not a credential.
 class FirebaseAuthRepository implements AuthRepository {
-  const FirebaseAuthRepository(this._auth);
+  const FirebaseAuthRepository(this._auth, this._functions);
 
   final FirebaseAuth _auth;
+
+  /// Only [deleteAccount] uses it, and that is the point: the delete is the
+  /// one thing here a client is not allowed to do for itself.
+  final FirebaseFunctions _functions;
 
   @override
   Future<SignInResult> signInWithApple() =>
@@ -92,7 +99,8 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       await GoogleSignIn.instance.signOut();
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.logout,
         'Google sign-out failed',
         error: error,
         stackTrace: stackTrace,
@@ -101,9 +109,17 @@ class FirebaseAuthRepository implements AuthRepository {
 
     await _auth.signOut();
 
-    AppLogger.action('Signed out');
+    SdLogger.action(LogTagConstant.logout, 'Signed out');
   });
 
+  /// **The function deletes the login too**, so nothing here calls
+  /// `user.delete()`. Doing both would race: the second call arrives with a
+  /// uid that no longer exists and fails on a delete that actually worked.
+  ///
+  /// The local sign-out afterwards is not decoration. Deleting the user
+  /// server-side does not invalidate the token this device is holding, and
+  /// `userChanges` has no event to fire — without it the app sits on a
+  /// signed-in shell for an account that is gone.
   @override
   Future<void> deleteAccount() =>
       FailureMapper.guard('delete account', () async {
@@ -115,9 +131,23 @@ class FirebaseAuthRepository implements AuthRepository {
 
         final String uid = user.uid;
 
-        await user.delete();
+        SdLogger.action(
+          LogTagConstant.deleteAccount,
+          'Delete account',
+          <String, Object>{'uid': uid},
+        );
 
-        AppLogger.action('Account deleted', <String, Object>{'uid': uid});
+        final HttpsCallableResult<Object?> result = await _functions
+            .httpsCallable(CallableConstant.deleteAccount)
+            .call<Object?>();
+
+        await _auth.signOut();
+
+        SdLogger.action(
+          LogTagConstant.deleteAccount,
+          'Account deleted',
+          <String, Object?>{'uid': uid, 'result': result.data},
+        );
       });
 
   /// Firebase types the user on a credential as nullable even on success.
@@ -134,7 +164,7 @@ class FirebaseAuthRepository implements AuthRepository {
       );
     }
 
-    AppLogger.action('Signed in', <String, Object>{
+    SdLogger.action(LogTagConstant.login, 'Signed in', <String, Object>{
       'uid': uid,
       'provider': provider.name,
       'isNewAccount': credential.additionalUserInfo?.isNewUser ?? false,
@@ -146,7 +176,7 @@ class FirebaseAuthRepository implements AuthRepository {
   /// A cancelled sign-in is logged as what it is — the seller closing a sheet
   /// — and never as an error (owner's rule).
   static SignInResult _cancelled(AuthProviderKind provider) {
-    AppLogger.info('Sign-in cancelled', <String, Object>{
+    SdLogger.info(LogTagConstant.login, 'Sign-in cancelled', <String, Object>{
       'provider': provider.name,
     });
 

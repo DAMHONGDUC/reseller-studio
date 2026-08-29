@@ -1,5 +1,5 @@
 /**
- * Seller OS Cloud Functions — the trusted half of the app.
+ * Reseller Studio Cloud Functions — the trusted half of the app.
  *
  * Everything here exists because a client must not be able to do it. The test
  * for whether something belongs in this codebase rather than in Flutter is
@@ -31,10 +31,49 @@ import { initializeApp } from 'firebase-admin/app';
 
 initializeApp();
 
-// Nothing is deployed yet. Add each function as its own module and re-export
-// it here, e.g.:
-//
-//   export { connectMarketplace } from './marketplaces/connectMarketplace';
-//   export { onOrderWritten } from './activity/onOrderWritten';
-//   export { deleteWorkspace } from './workspace/deleteWorkspace';
-export {};
+// Membership. `onMemberWritten` is what keeps `users/{uid}.workspaceIds` in
+// step — without it a seller only sees the businesses they created, never the
+// ones they were invited to.
+export { onMemberWritten } from './workspace/onMemberWritten';
+
+// Deleting one business without deleting the account with it. Firestore does
+// not cascade, so `workspaces/{id}` is `allow delete: if false` for clients
+// and the subcollections are walked here.
+export { deleteWorkspace } from './workspace/deleteWorkspace';
+
+// Team. All three are callables because `firestore.rules` denies clients
+// `invites/` and anyone's own membership document, and because the seat limit
+// and the last-owner check both need a count rules cannot take.
+export { inviteMember } from './team/inviteMember';
+export { acceptInvite } from './team/acceptInvite';
+export { removeMember } from './team/removeMember';
+
+// Account deletion. App Store guideline 5.1.1(v) wants the account *and its
+// data* gone, and Firestore does not cascade — so the subcollections and the
+// Storage objects are walked with the Admin SDK.
+export { deleteAccount } from './account/deleteAccount';
+
+// Audit log. Written only here, so `actorId` cannot be forged (hard rule 12).
+export {
+  onItemWritten,
+  onOrderWritten,
+  onListingWritten,
+} from './activity/onRecordWritten';
+
+// Notifications (§22). The inbox document is written first and the push is a
+// copy of it — a push is best-effort, and a design where it *is* the
+// notification is one that turns itself off when permission does.
+export {
+  onOrderCreated,
+  onOfferCreated,
+  onMemberJoined,
+} from './notifications/onRecordCreated';
+export { dailyDigest } from './notifications/dailyDigest';
+
+// Subscription (§27). Until this runs, `firestore.rules` and the seat check
+// read every workspace as Free however much the seller paid — a rule cannot
+// ask an SDK a question.
+export { revenueCatWebhook } from './subscription/revenueCatWebhook';
+
+// Marketplace OAuth and sync are dropped, not pending — see CLAUDE.md
+// hard rule 10 and docs/REMAINING_WORK.md.

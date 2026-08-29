@@ -1,13 +1,15 @@
+import '../../../carriers/domain/entities/carrier.dart';
+import '../../../inventory/domain/entities/item_category.dart';
+import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../entities/user_profile.dart';
 import '../entities/workspace.dart';
 
 /// Reading and writing workspaces, memberships and the user's own profile.
 ///
-/// One repository for all three because they are written together: creating a
-/// workspace writes the workspace, the owner's membership document and the
-/// user's `workspaceIds` in a single batch. Splitting them would let a client
-/// crash between two writes and leave a workspace nobody is a member of —
-/// which, under `firestore.rules`, nobody could ever read again.
+/// One repository owns creation because its writes have a required order:
+/// workspace, owner membership, then one batch containing the marketplace
+/// defaults and the user's pointer. The pointer is withheld until the business
+/// is ready to read.
 abstract interface class WorkspaceRepository {
   /// The signed-in person's own record, live.
   Stream<UserProfile?> watchProfile(String uid);
@@ -28,8 +30,8 @@ abstract interface class WorkspaceRepository {
     String? photoUrl,
   });
 
-  /// Create a workspace, its owner membership and the user's pointer to it,
-  /// as one batch. Returns the new workspace id.
+  /// Create a workspace, its owner membership, default reference data and the
+  /// user's pointer. Returns the new workspace id.
   Future<String> createWorkspace({
     required String name,
     required String country,
@@ -38,9 +40,20 @@ abstract interface class WorkspaceRepository {
     String? ownerName,
     String? ownerEmail,
     String? businessType,
+    required List<Marketplace> marketplaces,
+    required List<ItemCategory> categories,
+    required List<Carrier> carriers,
   });
 
   Future<void> updateWorkspace(Workspace workspace);
+
+  /// Erase one business: its records, its files and the invitations to it.
+  ///
+  /// **A Cloud Function, not a client delete** — Firestore does not cascade,
+  /// so `workspaces/{id}` is `allow delete: if false` and the subcollections
+  /// are walked with the Admin SDK. Owner only, and the function is what
+  /// checks that; the UI only decides whether to draw the control.
+  Future<void> deleteWorkspace(String workspaceId);
 
   /// Remember which workspace to reopen.
   Future<void> setLastWorkspace({

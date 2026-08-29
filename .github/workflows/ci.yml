@@ -19,11 +19,25 @@ jobs:
 
     steps:
       # `packages/system_design` is a submodule and the analyze step compiles
-      # it standalone, so a shallow checkout without it fails on the first
-      # command rather than the last.
+      # it standalone, so a checkout without it fails on the first command
+      # rather than the last.
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # **CI follows the design system's `main`, not the pinned gitlink.**
+      # Owner's call: the submodule is developed alongside the app, and having
+      # to bump the gitlink here for every widget change is a second commit
+      # nobody remembers. `--remote` takes the branch named in `.gitmodules`,
+      # which is already `main`.
+      #
+      # The trade this makes, and it is a real one: a green run proves the app
+      # builds against the *tip* of the design system, not against the commit
+      # this repo has recorded. A local checkout still uses the gitlink, so the
+      # two can disagree — if CI passes and a laptop does not, that gap is the
+      # first thing to check.
+      - name: Track the design system's main
+        run: git submodule update --remote packages/system_design
 
       # Read from `.fvmrc` rather than pinned here. The version is a number,
       # and a number belongs in one place — repeating it in this file is how a
@@ -56,3 +70,45 @@ jobs:
 
       - name: Test
         run: sh tool/test.sh
+
+  functions:
+    name: Cloud Functions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # No submodule and no Flutter — `functions/` is a standalone TypeScript
+    # package, and coupling it to the app's job would make a Dart failure hide
+    # a broken function.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # The runtime Cloud Functions runs, from `functions/package.json`.
+          node-version: 20
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Lint
+        working-directory: functions
+        run: npm run lint
+
+      # A real build rather than `tsc --noEmit`. It still proves the source
+      # compiles, and the test suite below imports the compiled output —
+      # `functions/test/*.test.mjs` runs under plain node, which cannot read
+      # TypeScript. The deploy builds its own output either way.
+      - name: Build
+        working-directory: functions
+        run: npm run build
+
+      # The rules are the real access boundary — the signed-out shell and every
+      # `WorkspaceGuard` are UI states, never permissions. Run from the repo
+      # root: `firebase.json` and `firestore.rules` both live there, and the
+      # script uses the CLI `npm ci` just installed. The runner already has
+      # the Java the emulator needs.
+      - name: Firestore rules
+        run: sh tool/test-rules.sh

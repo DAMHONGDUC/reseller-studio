@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_icon_button.dart';
 import '../../../../../core/widgets/name_entry_sheet.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../domain/entities/item.dart';
@@ -116,7 +117,7 @@ class LocationsScreen extends ConsumerWidget {
       () => ref
           .read(catalogControllerProvider.notifier)
           .saveLocation(name: name, kind: kind, parentId: parentId),
-      context.l10n.locationAdded,
+      null,
     );
   }
 
@@ -133,7 +134,7 @@ class LocationsScreen extends ConsumerWidget {
         message: itemCount == 0
             ? context.l10n.locationDeleteUnused
             : context.l10n.locationDeleteInUse(itemCount),
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,
@@ -152,15 +153,17 @@ class LocationsScreen extends ConsumerWidget {
     );
   }
 
+  /// A [done] of null is an add: the new row appearing in the list behind is
+  /// the confirmation, so nothing is said (owner's rule).
   Future<void> _write(
     BuildContext context,
     Future<void> Function() action,
-    String done,
+    String? done,
   ) async {
     try {
       await action();
 
-      if (!context.mounted) return;
+      if (!context.mounted || done == null) return;
 
       SdSnackBarUtilsV3.success(context, done);
     } catch (error) {
@@ -192,7 +195,7 @@ class LocationsScreen extends ConsumerWidget {
         AsyncLoading<List<StorageLocation>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when locations.isEmpty => SdEmptyStateV3(
-          icon: Symbols.shelves,
+          icon: AppIconConstant.shelves,
           title: context.l10n.locationsEmptyTitle,
           message: context.l10n.locationsEmptyBody,
           action: SdButtonV3(

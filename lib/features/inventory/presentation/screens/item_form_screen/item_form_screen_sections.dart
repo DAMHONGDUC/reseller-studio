@@ -37,38 +37,108 @@ class _FormSection extends StatelessWidget {
   );
 }
 
+/// The item's state, editable — four tags, each wearing its own colour.
+///
+/// **Tags rather than a picker sheet** — owner's rule. There are four states
+/// and they are the answer to one question, so hiding them behind a row that
+/// opens a sheet costs two taps to see what the choices even are. Laid out,
+/// the seller reads the whole vocabulary at once.
+///
+/// **Switching is free** — owner's rule, and it is the newest one here. No
+/// requirement is checked and no move is refused: the picker is where a
+/// seller corrects what the app got wrong, and a correction that argues back
+/// is the thing they came to fix. What the *verbs* do is unchanged —
+/// `ItemTransition.check` still gates Mark as sold and the bulk paths, which
+/// is where a missing price actually matters.
+///
+/// Setting `sold` still empties the count, because sold means sold out
+/// however it was reached, and it writes **no order**: revenue and profit are
+/// read from orders (hard rule 3), so a sale that has to show up in the
+/// figures is recorded through Mark as sold.
+class _StatusField extends ConsumerWidget {
+  const _StatusField({required this.state});
+
+  final ItemFormState state;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => _TagGroupField(
+    label: context.l10n.itemStatus,
+    children: <Widget>[
+      for (final ItemStatus status in ItemStatus.values)
+        SdTagV3(
+          label: status.label(context),
+          color: status.color(context),
+          selected: state.status == status,
+          onSelected: () => ref
+              .read(itemFormControllerProvider.notifier)
+              .selectStatus(status),
+        ),
+    ],
+  );
+}
+
+/// The label and the wrap that every tag group on this form shares.
+///
+/// Extracted on its second use, which is the trigger the rules name: status
+/// and condition ask the same shape of question and must not answer it two
+/// ways.
+///
+/// **Full width and left-aligned**: `_FormSection` centres what it is given,
+/// so a group that sized to its tags would sit indented while every typed row
+/// beside it starts at the card's edge.
+class _TagGroupField extends StatelessWidget {
+  const _TagGroupField({required this.label, required this.children});
+
+  final String label;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: double.infinity,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        // The same label widget the typed and picked rows use, so one form
+        // cannot label its fields three ways.
+        SdFieldLabelV3(label: label),
+        SizedBox(height: SdSpacingConstant.h6),
+        Wrap(
+          spacing: SdSpacingConstant.w8,
+          runSpacing: SdSpacingConstant.h8,
+          children: children,
+        ),
+      ],
+    ),
+  );
+}
+
 /// The condition grades resellers actually use in listings.
+///
+/// **Tags, like the status above** — owner's rule. Seven grades behind a sheet
+/// is a list nobody opens, and the grade is what a buyer reads first on every
+/// marketplace.
+///
+/// **Each grade has its own colour**, ordered best to worst, so the set reads
+/// as a scale rather than seven equal options.
 class _ConditionField extends ConsumerWidget {
   const _ConditionField({required this.state});
 
   final ItemFormState state;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => PickerField(
+  Widget build(BuildContext context, WidgetRef ref) => _TagGroupField(
     label: context.l10n.itemCondition,
-    icon: Symbols.grade_rounded,
-    value: state.condition == null
-        ? null
-        : ItemConditionLabel.of(context, state.condition!),
-    onTap: () async {
-      final ItemCondition? picked = await OptionPickerSheet.show<ItemCondition>(
-        context,
-        title: context.l10n.itemCondition,
-        selected: state.condition,
-        options: ItemCondition.values
-            .map(
-              (ItemCondition condition) => PickerOption<ItemCondition>(
-                value: condition,
-                label: ItemConditionLabel.of(context, condition),
-              ),
-            )
-            .toList(),
-      );
-
-      if (picked == null) return;
-
-      ref.read(itemFormControllerProvider.notifier).selectCondition(picked);
-    },
+    children: <Widget>[
+      for (final ItemCondition condition in ItemCondition.values)
+        SdTagV3(
+          label: condition.label(context),
+          color: condition.color(context),
+          selected: state.condition == condition,
+          onSelected: () => ref
+              .read(itemFormControllerProvider.notifier)
+              .selectCondition(condition),
+        ),
+    ],
   );
 }
 
@@ -85,7 +155,7 @@ class _CategoryField extends ConsumerWidget {
 
     return PickerField(
       label: context.l10n.commonCategory,
-      icon: Symbols.category_rounded,
+      icon: AppIconConstant.category,
       value: state.categoryId == null ? null : names[state.categoryId],
       placeholder: categories.isEmpty
           ? context.l10n.itemCategoryEmptyHint
@@ -133,7 +203,7 @@ class _LocationField extends ConsumerWidget {
 
     return PickerField(
       label: context.l10n.commonLocation,
-      icon: Symbols.shelves,
+      icon: AppIconConstant.shelves,
       value: state.locationId == null ? null : paths[state.locationId],
       placeholder: locations.isEmpty
           ? context.l10n.itemLocationEmptyHint
@@ -182,7 +252,7 @@ class _SourceField extends ConsumerWidget {
 
     return PickerField(
       label: context.l10n.commonSource,
-      icon: Symbols.storefront_rounded,
+      icon: AppIconConstant.storefront,
       value: state.sourceId == null ? null : names[state.sourceId],
       placeholder: sources.isEmpty ? context.l10n.itemSourceEmptyHint : null,
       onTap: sources.isEmpty
@@ -218,19 +288,13 @@ class _PurchaseDateField extends ConsumerWidget {
 
   final ItemFormState state;
 
-  /// How far back the date picker opens.
-  ///
-  /// Five years covers the tax records a reseller keeps; a picker that opens
-  /// at 1970 makes reaching last Tuesday a scroll.
-  static const int pickerYearsBack = 5;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final DateTime now = DateTime.now();
 
     return PickerField(
       label: context.l10n.itemPurchaseDate,
-      icon: Symbols.calendar_month_rounded,
+      icon: AppIconConstant.calendarMonth,
       value: state.purchaseDate == null
           ? null
           : DateTimeUtils.mediumDate(
@@ -241,7 +305,7 @@ class _PurchaseDateField extends ConsumerWidget {
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: state.purchaseDate ?? now,
-          firstDate: DateTime(now.year - pickerYearsBack),
+          firstDate: DateTime(now.year - DatePickerConstant.taxRecordYearsBack),
           // No future purchase dates: a receipt cannot be from next month, and
           // one filed there breaks every period report it lands in.
           lastDate: now,

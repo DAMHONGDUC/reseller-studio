@@ -10,7 +10,15 @@
         "deviceId": "EA48B046-909E-4708-BAA2-9F5875EC8386"
     },
     {
-      "name": "Seller OS (dev)",
+      "name": "dev-17-pro-max",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": ["--dart-define-from-file=env/dev.json"],
+        "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
+    },
+    {
+      "name": "Reseller Studio (dev)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
@@ -20,7 +28,7 @@
       ]
     },
     {
-      "name": "Seller OS (prod config)",
+      "name": "Reseller Studio (prod config)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
@@ -30,7 +38,7 @@
       ]
     },
     {
-      "name": "Seller OS (dev, profile)",
+      "name": "Reseller Studio (dev, profile)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",

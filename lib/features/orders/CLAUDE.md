@@ -1,0 +1,145 @@
+# Orders — feature rules
+
+Read this before changing anything under `lib/features/orders/`. The root
+`CLAUDE.md` is still the engineering authority; this file only holds what is
+true of orders alone.
+
+## There are exactly two ways to create an order
+
+Owner's rule, and the list is closed.
+
+1. **From an item** — Actions → Mark as sold, on any screen that can open an
+   item: Inventory, item detail, Search, Listings, a purchase, an order line.
+2. **From the Orders tab** — the create button on Orders opens
+   `RecordSaleScreen`, which picks the item first and then opens the same
+   sheet.
+
+The two are one flow entered from either end. A seller thinks *"I just sold
+that thing"* as often as they think *"open the shelf, that one is gone"*, and
+before the second way existed the Orders tab was a screen that could only be
+filled from somewhere else.
+
+**Neither is a second implementation.** Both open `MarkSoldSheet` and both end
+in `RecordSaleController.record`, which writes the order and moves the item
+together. A third caller writing its own order is the bug this rule exists to
+stop — an item flipped to sold with no order behind it disappears from every
+figure the product is judged on (hard rule 3).
+
+**Accepting an offer is not a third way.** `OfferActionsController.accept`
+calls the same controller, because the plan's flow is
+`Offer → Review → Accept → Order`.
+
+**Recording a sale lives in `orders/`, not in `inventory/`.** It creates an
+order; the item move is a consequence. It sat on `ItemActionsController` while
+Inventory was the only door, and Offers already had to import Inventory's
+*presentation* layer to reach it — which the dependency rule forbids. One
+controller in the feature that owns the record, reached through
+`orders/providers.dart`, is what makes every caller legal.
+
+**`MarkSoldSheet` is in `core/widgets/`** for the same reason: two features
+open it, and that is where a widget goes the moment the second one does.
+
+## An order always names an item
+
+`OrderLine.itemId` is non-null, so there is no walk-in sale — nothing sells
+that inventory has never heard of. `RecordSaleScreen` therefore lists what is
+on hand and nothing else, and a workspace with no items sends the seller to
+Inventory rather than offering a form that cannot be completed.
+
+Multi-line orders, and lines that belong to no item, are a product decision
+that has not been made. Both would change the entity, every screen that taps
+through to an item, and what "profit" means for an order — raise it before
+building either.
+
+## The create button obeys the app-wide create rules
+
+- `AppAddFabScaffold` with `floatingNav: true`, because Orders is a tab screen.
+- Quick Action on Home lists **every** create action, so the record-sale route
+  is in `QuickActionConstant` — `test/features/home/quick_action_test.dart`
+  fails the day a screen grows a create button that Home does not offer.
+- The empty state's action is the same one the button is. Orders used to point
+  the seller at Inventory because it had no create action of its own; that
+  sentence in `docs/rules/SCREENS.md` now applies to Listings alone.
+
+## The next move is pinned; every other verb is in the sheet
+
+Owner's rule, and it replaced a column of full-width buttons at the foot of
+the detail screen.
+
+- **One pinned button, and it is the move the status implies**: `toShip` ships,
+  `shipped` gets marked delivered, a requested return gets taken back in.
+  `_NextMove` sits outside the `ListView` (`AppPinnedAction` in the scaffold's
+  bottom slot), so it holds the bottom edge whatever the list is scrolled to.
+  A seller draining a To Ship queue used to scroll two screens — past items,
+  profit, shipping and the timeline — to reach the one button they came for.
+- **Nothing is pinned when the order is finished.** Delivered, refunded and
+  cancelled have no next step, and a bar holding a bookkeeping verb would make
+  the rare thing look like the expected one.
+- **Everything else lives in `OrderActionsSheet`**, opened from a small
+  Actions button in the app bar — the same grammar `ItemActionsSheet` gives
+  Inventory. Four equally loud full-width buttons said four things mattered
+  equally, when Record fees and payout is a monthly job and Ship it is a daily
+  one.
+- **The sheet lists the pinned move as well.** The button is the fast path;
+  the sheet is the complete list, so a verb added there cannot go missing from
+  what a seller learned to open.
+- **The label is `commonActions`**, one key for both features: it is one word
+  doing one job, and two keys is how the two sheets end up called different
+  things.
+- `test/features/orders/order_actions_placement_test.dart` pins all of it.
+
+## The order row's tags are the compact display badge
+
+Owner's rule, given for Inventory and applied here in the same turn: status,
+marketplace and Late are read-only metadata sitting beside a title and a
+price, so they are `SdBadgeV3` at `SdBadgeSizeV3.compact` — the same
+presentation `ItemCard` uses. Two cards a seller scans one after the other
+must not tag the same kind of fact at two sizes.
+`docs/rules/DESIGN_SYSTEM.md` carries the rule itself.
+
+## Order transitions are domain rules, never button rules
+
+- **Only `toShip` may become `shipped`.** An unpaid order cannot leave, and a
+  return request belongs to the returns workflow rather than Shipping Queue.
+- **Every transition validates the current state below the UI.** A stale
+  screen or a second device may call a controller after the record moved; a
+  hidden button is not a data boundary.
+- **Shipping Queue contains `toShip` alone.** Returns remain actionable, but
+  their action is receiving the item rather than shipping it again.
+
+## Sale and return inventory writes are atomic
+
+Creating an order and decrementing the item are one commit. Closing a return
+and restoring its quantities are one commit. A network failure between two
+writes must never leave an order without the inventory move it claims.
+
+## Orders point at business marketplaces
+
+An order stores the seller-owned marketplace id plus a name snapshot. New
+sales choose from active marketplace records; deleting or renaming a market
+does not rewrite the historical name already printed on an order.
+
+## Return and refund labels say which way the thing moved
+
+Owner's rule. The two words name opposite movements — the **item** comes back
+to the seller, the **money** goes out to the buyer — and a label that names
+only the noun leaves the seller working out which one is happening. Every verb,
+sheet title and dialog title spells the direction out: "Open a return from the
+buyer", "Item is back with you", "Refund the buyer".
+
+- **The status labels stay short** — `Returned`, `Refunded`. They are read as
+  a tag in a column of a dozen rows, where the extra words cost more than the
+  ambiguity does; the direction is spelled out on the actions, which are what
+  change something.
+- **The sheet's confirm keeps the short word.** It sits under a title that has
+  already said who is being refunded, so `refundAction` is "Refund" and
+  `orderRefundBuyer` is the row in `OrderActionsSheet` — two labels because
+  one of them has a title above it and the other has nothing.
+
+## Refund and timeline facts
+
+- A refund is positive and cannot exceed the sale price. Returning an item
+  alone does not erase revenue; the recorded refund is what reduces it.
+- Each lifecycle event stores its own timestamp. The timeline includes order,
+  shipment, delivery, return request, returned item, refund, and settlement;
+  current status is not a substitute for when a past event happened.

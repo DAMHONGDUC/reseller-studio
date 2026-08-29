@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/tax/domain/entities/mileage_journey.dart';
-import 'package:seller_os/features/tax/domain/entities/mileage_rate.dart';
-import 'package:seller_os/features/tax/domain/enums/tax_jurisdiction.dart';
-import 'package:seller_os/features/tax/domain/services/mileage_calculator.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/tax/domain/entities/mileage_journey.dart';
+import 'package:reseller_studio/features/tax/domain/entities/mileage_rate.dart';
+import 'package:reseller_studio/features/tax/domain/enums/tax_jurisdiction.dart';
+import 'package:reseller_studio/features/tax/domain/services/mileage_calculator.dart';
 
 /// The UK rate is banded and the US rate is not; the banding is over the
 /// year's total rather than per journey, while the *rate* is per journey.
@@ -111,7 +111,10 @@ void main() {
       expect(
         MileageCalculator.forJourneys(
           journeys: <MileageJourney>[
-            MileageJourney(date: DateTime(2026, DateTime.june), distance: 12000),
+            MileageJourney(
+              date: DateTime(2026, DateTime.june),
+              distance: 12000,
+            ),
           ],
           jurisdiction: TaxJurisdiction.uk,
           currency: 'GBP',
@@ -220,11 +223,7 @@ void main() {
         isNull,
       );
       expect(
-        MileageCalculator.deduction(
-          distance: 500,
-          rate: null,
-          currency: 'USD',
-        ),
+        MileageCalculator.deduction(distance: 500, rate: null, currency: 'USD'),
         isNull,
       );
     });

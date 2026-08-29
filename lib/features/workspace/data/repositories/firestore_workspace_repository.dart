@@ -1,12 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/callable_constant.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_collections.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../carriers/domain/entities/carrier.dart';
+import '../../../inventory/domain/entities/item_category.dart';
 import '../../../listings/domain/enums/listing_status.dart';
+import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/workspace.dart';
@@ -15,20 +21,22 @@ import '../dtos/workspace_dto.dart';
 
 /// Workspaces, memberships and user profiles, in Firestore.
 ///
-/// **Creation is three sequential writes, not one batch, and that is forced
-/// by the security rules.** The membership rule has to read the workspace
-/// document to check that the caller is its `ownerId`, and a rules `get()`
-/// only sees committed data — so a batch containing both would be rejected on
-/// the membership write. The order is therefore workspace → membership →
-/// profile pointer, and a failure partway leaves a workspace the user is not
-/// a member of: invisible to them, and re-running onboarding creates a clean
-/// one. That is the recoverable failure of the three.
+/// **Creation is two prerequisite writes and one final batch, forced by the
+/// security rules.** A rules `get()` sees only committed data, so the order is
+/// workspace → membership → batch(default records + profile pointer).
+/// A failure before the last step leaves the workspace unreachable rather
+/// than exposing a business with only part of its default marketplace list.
 class FirestoreWorkspaceRepository implements WorkspaceRepository {
-  const FirestoreWorkspaceRepository(this._firestore);
+  const FirestoreWorkspaceRepository(this._firestore, this._functions);
 
   static const Uuid _uuid = Uuid();
 
   final FirebaseFirestore _firestore;
+
+  /// Only [deleteWorkspace] uses it. Everything else here is a document the
+  /// rules already let the seller write; the cascade is the one thing they
+  /// cannot do from the client at all.
+  final FirebaseFunctions _functions;
 
   @override
   Stream<UserProfile?> watchProfile(String uid) => FirestoreStream.document(
@@ -75,7 +83,9 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
           SetOptions(merge: true),
         );
 
-    AppLogger.info('Profile ensured', <String, Object>{'uid': uid});
+    SdLogger.info(LogTagConstant.workspace, 'Profile ensured', <String, Object>{
+      'uid': uid,
+    });
   });
 
   @override
@@ -87,6 +97,9 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
     String? ownerName,
     String? ownerEmail,
     String? businessType,
+    required List<Marketplace> marketplaces,
+    required List<ItemCategory> categories,
+    required List<Carrier> carriers,
   }) => FailureMapper.guard('create workspace', () async {
     final String id = _uuid.v4();
     final DateTime now = DateTime.now();
@@ -104,7 +117,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
             'businessType': businessType,
             // The policy class owns this number — it is the algorithm the
             // threshold belongs to, not configuration about a workspace.
-            'staleThresholdDays': StaleInventoryPolicy.defaultThreshold.inDays,
+            'staleThresholdDays': StaleInventoryPolicy.defaultThresholdDays,
             'createdAt': FirestoreMapper.serverTimestamp,
             'updatedAt': FirestoreMapper.serverTimestamp,
             'createdBy': ownerId,
@@ -125,17 +138,68 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
           ),
         );
 
-    await _users.doc(ownerId).set(<String, Object?>{
+    final WriteBatch finalBatch = _firestore.batch();
+    final WorkspaceCollections collections = WorkspaceCollections(
+      _firestore,
+      id,
+    );
+
+    for (final Marketplace marketplace in marketplaces) {
+      finalBatch.set(
+        collections.marketplaces.doc(marketplace.id),
+        FirestoreMapper.pruned(<String, Object?>{
+          'name': marketplace.name,
+          'feeRate': marketplace.feeRate,
+          'createdAt': FirestoreMapper.serverTimestamp,
+          'updatedAt': FirestoreMapper.serverTimestamp,
+          'createdBy': ownerId,
+        }),
+      );
+    }
+
+    for (final ItemCategory category in categories) {
+      finalBatch.set(
+        collections.categories.doc(category.id),
+        FirestoreMapper.pruned(<String, Object?>{
+          'name': category.name,
+          'createdAt': FirestoreMapper.serverTimestamp,
+          'updatedAt': FirestoreMapper.serverTimestamp,
+          'createdBy': ownerId,
+        }),
+      );
+    }
+
+    for (final Carrier carrier in carriers) {
+      finalBatch.set(
+        collections.carriers.doc(carrier.id),
+        FirestoreMapper.pruned(<String, Object?>{
+          'name': carrier.name,
+          'createdAt': FirestoreMapper.serverTimestamp,
+          'updatedAt': FirestoreMapper.serverTimestamp,
+          'createdBy': ownerId,
+        }),
+      );
+    }
+
+    finalBatch.set(_users.doc(ownerId), <String, Object?>{
       'workspaceIds': FieldValue.arrayUnion(<String>[id]),
       'lastWorkspaceId': id,
       'updatedAt': FirestoreMapper.serverTimestamp,
     }, SetOptions(merge: true));
+    await finalBatch.commit();
 
-    AppLogger.action('Workspace created', <String, Object>{
-      'workspaceId': id,
-      'currency': currency,
-      'country': country,
-    });
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Workspace created',
+      <String, Object>{
+        'workspaceId': id,
+        'currency': currency,
+        'country': country,
+        'marketplaceCount': marketplaces.length,
+        'categoryCount': categories.length,
+        'carrierCount': carriers.length,
+      },
+    );
 
     return id;
   });
@@ -147,9 +211,41 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
             .doc(workspace.id)
             .set(WorkspaceDto.toUpdateMap(workspace), SetOptions(merge: true));
 
-        AppLogger.info('Workspace updated', <String, Object>{
-          'workspaceId': workspace.id,
-        });
+        SdLogger.info(
+          LogTagConstant.workspace,
+          'Workspace updated',
+          <String, Object>{'workspaceId': workspace.id},
+        );
+      });
+
+  /// **The function deletes the documents, and the app deletes nothing.**
+  /// `workspaces/{id}` is `allow delete: if false` for clients, so a client
+  /// delete would fail on the parent and leave every subcollection behind —
+  /// invisible to the seller and still billed for.
+  ///
+  /// Nothing here switches workspace afterwards. The membership documents go
+  /// with the business, `onMemberWritten` drops the id from every member's
+  /// `workspaceIds`, and `resolvedWorkspaceId` falls back on its own (hard
+  /// rule 11b) — a switch written here would be a second answer to the same
+  /// question.
+  @override
+  Future<void> deleteWorkspace(String workspaceId) =>
+      FailureMapper.guard('delete workspace', () async {
+        SdLogger.action(
+          LogTagConstant.workspace,
+          'Delete workspace',
+          <String, Object>{'workspaceId': workspaceId},
+        );
+
+        final HttpsCallableResult<Object?> result = await _functions
+            .httpsCallable(CallableConstant.deleteWorkspace)
+            .call<Object?>(<String, Object?>{'workspaceId': workspaceId});
+
+        SdLogger.action(
+          LogTagConstant.workspace,
+          'Workspace deleted',
+          <String, Object?>{'workspaceId': workspaceId, 'result': result.data},
+        );
       });
 
   @override
@@ -162,9 +258,11 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
       'updatedAt': FirestoreMapper.serverTimestamp,
     }, SetOptions(merge: true));
 
-    AppLogger.action('Workspace switched', <String, Object>{
-      'workspaceId': workspaceId,
-    });
+    SdLogger.action(
+      LogTagConstant.workspace,
+      'Workspace switched',
+      <String, Object>{'workspaceId': workspaceId},
+    );
   });
 
   CollectionReference<Map<String, Object?>> get _users =>

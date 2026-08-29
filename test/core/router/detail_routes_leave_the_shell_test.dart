@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/router/app_navigator_key.dart';
-import 'package:seller_os/core/router/app_router.dart';
-import 'package:seller_os/core/router/app_routes.dart';
-import 'package:seller_os/features/auth/providers.dart';
-import 'package:seller_os/features/workspace/providers.dart';
+import 'package:reseller_studio/core/router/app_navigator_key.dart';
+import 'package:reseller_studio/core/router/app_router.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
+import 'package:reseller_studio/features/auth/providers.dart';
+import 'package:reseller_studio/features/workspace/providers.dart';
 
 /// **The glass nav bar belongs to the five tab screens and to nothing else.**
 /// Owner's rule.

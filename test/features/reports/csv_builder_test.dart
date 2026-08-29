@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/reports/domain/services/csv_builder.dart';
+import 'package:reseller_studio/features/reports/domain/services/csv_builder.dart';
 
 /// The escaping is the whole value of this class, and it is exactly the part
 /// that shifts every column after it when it goes wrong — in a file the seller

@@ -24,7 +24,7 @@ The app bar deliberately stays opaque: a blur there costs a shader pass on
 every scroll frame of a list that can run to thousands of rows, whereas the
 tab bar is a fixed strip whose cost does not grow with the content.
 
-## Seller OS pays for v2's dependencies, and one of them warns on every Android build
+## Reseller Studio pays for v2's dependencies, and one of them warns on every Android build
 
 Explains why the `Compiled to invalid SkSL` warning is not to be fixed.
 Referenced from `DESIGN_SYSTEM.md`.
@@ -95,7 +95,7 @@ builder, and that part is not a style choice: the root overlay sits above the
 shell, so a scope inside it is invisible from down there and every message
 would read "no bar".
 
-## Two rules from the sibling app that Seller OS deliberately inverts
+## Two rules from the sibling app that Reseller Studio deliberately inverts
 
 The rulebook these files were ported from is BaroEase's. Most of it transfers
 unchanged. Two rules do not, and both would look like bugs to anyone reading
@@ -140,13 +140,60 @@ from, not when it is read.
 
 `AppRoutes.notifications`, `AppRoutes.activity` and `AppRoutes.returns` had
 zero usages and no route serving their paths. Notifications (§22) and the
-activity log (§23) are blocked on Cloud Functions; returns folded into order
+activity log (§23) were blocked on Cloud Functions; returns folded into order
 detail (§16), so its screen was never built.
 
 Deleted rather than left in place, because a constant that resolves to nothing
 reads as a working destination to the next caller and fails as a deep link
-without saying why. A comment sits where each was, so the gap reads as a
-decision. They come back with their screens.
+without saying why. A comment sat where each was, so the gap read as a
+decision. **Two have since come back with their screens** — `activity` and
+`notifications` — which is the rule working as intended. `returns` stays
+deleted: order detail is where a return is opened and closed.
+
+## The notification is the Firestore row; the push is a copy of it
+
+Plan §22 says "use FCM", which is a delivery mechanism and not a design. The
+design is that `users/{uid}/notifications/{id}` is written first and the push
+is sent afterwards, best-effort.
+
+A push cannot be the notification: permission may be off, the token may be
+stale, the phone may be in a field with no signal, and the seller may swipe it
+away half-read. All four are ordinary, and in a push-only design each one is a
+notification that never existed. Writing the row first means a seller who
+never grants permission still has a working notification centre, and it is why
+`PushMessaging` answers rather than throws everywhere.
+
+Three consequences worth keeping:
+
+- **The inbox lives under the user, not the workspace.** A notification is
+  addressed to a reader; two members of one business each get their own row
+  and each marks their own read. A shared document with a `readBy` array would
+  have every reader writing to a document every other reader is watching.
+- **The row's words are rendered in the app, not read from the document.** A
+  Cloud Function cannot know the reader's locale, so the stored `title` and
+  `body` are the English push text and the inbox builds its own line from
+  `type` and `count` through ARB (hard rule 7). Reading the stored strings
+  would make the inbox permanently English whatever the translation pass does.
+- **The reminders are a digest, one per workspace per day.** Forty stale
+  listings is one line. A seller who gets forty notifications turns
+  notifications off, and then the durable half is all that is left working.
+
+## Cross-listing has its own transition check
+
+`ItemTransition.check(item, listed)` refuses an item that is already `listed`,
+which is correct for the action it guards and exactly wrong for cross-listing:
+the item is on eBay and the seller wants it on Depop as well.
+
+So `crossListCheck` is a second, narrower question — has this item left
+inventory, and is there any of it left — rather than a widening of the first.
+It also does **not** require a price, because the cross-list screen is itself
+where the price is entered; requiring one beforehand would block the screen
+that collects it, which is hard rule 2 backwards.
+
+The write moves the item's status only when it has not already moved, and
+never touches `listedAt` on an item that was already live: staleness is
+measured from the first time something went live anywhere, so adding a
+marketplace must not reset that clock.
 
 ## RevenueCat is approved, and the app never sees a receipt
 
@@ -191,9 +238,66 @@ widget is a wrong deduction the following April.
 
 Explains "Every `catch` logs, wherever it sits" in the root `CLAUDE.md`.
 Inherited from the sibling app (BaroEase), where the rule was written after
-the fact — the reasoning transfers, the incident is not Seller OS's.
+the fact — the reasoning transfers, the incident is not Reseller Studio's.
 
 The rule was written after three features failed silently at once: WeatherKit
 answered every call `401` and the app said "no weather", `sendTestPush` was
 refused by the backend, and neither left a line anywhere. The reason to log a
 caught error is that a caught error is invisible by construction.
+
+## A recurring expense is proposed, never posted on its own
+
+`Expense.isRecurring` was written to Firestore and read by nothing, so the
+switch on the form ("Happens every month") changed no behaviour at all. Two
+ways to make it mean something, and the app takes the second:
+
+1. **Post it automatically** each month — a scheduled Cloud Function, or the
+   client writing the missing occurrences the next time it opens.
+2. **Show it as due and let the seller confirm**, which is what ships.
+
+The reason is that an expense is a tax record. Storage rent that was
+cancelled in March keeps posting in April under option 1, and nobody notices
+until the figure it inflated is on a return. A wrong number a seller has to
+find is worse than a right one they had to tap — and the tap is one tap, on a
+row the app has already filled in.
+
+It is also the cheaper half of the same decision: option 1 needs a deploy
+before the feature exists at all (`functions/` is not deployed), and a client
+that writes the backfill on open makes the same write twice from two devices.
+
+**A series is a field, not an inference.** `recurringSeriesId` points every
+occurrence at the first one, because "the same cost as last month" cannot be
+derived from category and vendor — the vendor is optional and the amount
+moves. A row written before the field existed falls back to its own id, so
+nothing needs migrating.
+
+**Monthly is the only cadence, and adding another is a data change.** The form
+says "every month" and nothing offers weekly, because a cadence nobody asked
+for is a picker on a create flow (hard rule 2). A second cadence becomes a
+field on the series, never an `if` at the call site.
+
+## The tab bar's selected indicator came back, as glass
+
+The earlier rule was "nothing behind the current glyph — an indicator pill is
+Material's idiom and reads as a foreign control inside iOS chrome". It is
+reversed, and the reversal is recorded here because the old reasoning still
+reads as correct on its own terms.
+
+What was tried and removed was a **flat filled shape**: a solid or tinted
+rounded rect painted behind the icon. That really is Material's `NavigationBar`
+indicator, and next to real iOS chrome it reads as one.
+
+But the iOS 26 system tab bar does mark its current tab, and the mark is a
+second piece of Liquid Glass — brighter than the bar, refracting the same page
+through it, sliding between tabs. The old rule was rejecting the *material*
+and generalised too far, to the mark itself. Owner's call is that the bar
+follows the system bar 100%, so the mark returns in the system's material.
+
+The glyph still fills on the `FILL` axis. Colour alone was never allowed to be
+the signal and still is not; the capsule is a third signal, not a replacement
+for the second.
+
+The mechanism is in `docs/rules/DESIGN_SYSTEM.md` — notably why the capsule
+gets its own `LiquidGlassLayer` rather than joining the bar's blend group,
+which is the one thing that looks like a free simplification and silently
+deletes the capsule.

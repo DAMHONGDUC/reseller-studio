@@ -5,15 +5,18 @@ library;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_design/common.dart';
 
 import '../../core/config/app_env.dart';
 import '../../core/config/dev_flags.dart';
+import '../../core/constants/log_tag_constant.dart';
 import '../../core/constants/prefs_key_constant.dart';
 import '../../core/firestore/workspace_context.dart';
-import '../../core/logging/app_logger.dart';
 import '../../core/storage/file_uploader.dart';
 import '../../core/storage/firebase_file_uploader.dart';
 import '../../core/storage/local_file_uploader.dart';
+import '../carriers/data/repositories/firestore_carrier_repository.dart';
+import '../carriers/domain/repositories/carrier_repository.dart';
 import '../expenses/data/repositories/firestore_expense_repository.dart';
 import '../expenses/domain/repositories/expense_repository.dart';
 import '../inventory/data/repositories/firestore_catalog_repositories.dart';
@@ -22,6 +25,8 @@ import '../inventory/domain/repositories/catalog_repository.dart';
 import '../inventory/domain/repositories/item_repository.dart';
 import '../listings/data/repositories/firestore_listing_repository.dart';
 import '../listings/domain/repositories/listing_repository.dart';
+import '../marketplaces/data/repositories/firestore_marketplace_repository.dart';
+import '../marketplaces/domain/repositories/marketplace_repository.dart';
 import '../offers/data/repositories/firestore_offer_repository.dart';
 import '../offers/domain/repositories/offer_repository.dart';
 import '../orders/data/repositories/firestore_order_repository.dart';
@@ -33,6 +38,7 @@ import '../subscription/data/repositories/unconfigured_subscription_repository.d
 import '../subscription/domain/repositories/subscription_repository.dart';
 import '../workspace/providers.dart';
 import 'data/in_memory_repositories.dart';
+import 'domain/services/demo_data_seeder.dart';
 
 /// Where the app's data comes from.
 enum DataMode {
@@ -87,7 +93,10 @@ class DataModeController extends Notifier<DataMode> {
 
   static DataMode _guarded(DataMode mode) {
     if (mode.isMock && !DevFlags.isDebugOrProfile) {
-      AppLogger.warning('Mock data requested in a release build — ignoring');
+      SdLogger.warning(
+        LogTagConstant.mockData,
+        'Mock data requested in a release build — ignoring',
+      );
 
       return DataMode.live;
     }
@@ -103,15 +112,20 @@ class DataModeController extends Notifier<DataMode> {
     final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
 
     if (prefs == null) {
-      AppLogger.warning('Could not persist data mode — preferences not ready');
+      SdLogger.warning(
+        LogTagConstant.mockData,
+        'Could not persist data mode — preferences not ready',
+      );
 
       return;
     }
 
     await prefs.setBool(PrefsKeyConstant.dataModeMock, resolved.isMock);
-    AppLogger.action('Data mode changed', <String, String>{
-      'mode': resolved.name,
-    });
+    SdLogger.action(
+      LogTagConstant.mockData,
+      'Data mode changed',
+      <String, String>{'mode': resolved.name},
+    );
   }
 
   Future<void> toggle() =>
@@ -136,7 +150,7 @@ final Provider<MockStore> mockStoreProvider = Provider<MockStore>((Ref ref) {
   final MockStore store = MockStore.seeded();
 
   ref.onDispose(store.dispose);
-  AppLogger.info('Mock dataset seeded', <String, int>{
+  SdLogger.info(LogTagConstant.mockData, 'Mock dataset seeded', <String, int>{
     'items': store.items.length,
     'orders': store.orders.length,
   });
@@ -232,6 +246,34 @@ final Provider<OfferRepository> offerRepositoryProvider =
       if (context == null) LiveRepositoryGuard.noWorkspace('OfferRepository');
 
       return FirestoreOfferRepository(context);
+    });
+
+final Provider<MarketplaceRepository> marketplaceRepositoryProvider =
+    Provider<MarketplaceRepository>((Ref ref) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return InMemoryMarketplaceRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('MarketplaceRepository');
+      }
+
+      return FirestoreMarketplaceRepository(context);
+    });
+
+final Provider<CarrierRepository> carrierRepositoryProvider =
+    Provider<CarrierRepository>((Ref ref) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return InMemoryCarrierRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) LiveRepositoryGuard.noWorkspace('CarrierRepository');
+
+      return FirestoreCarrierRepository(context);
     });
 
 final Provider<ListingRepository> listingRepositoryProvider =
@@ -358,3 +400,25 @@ final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
 
       return RevenueCatSubscriptionRepository();
     });
+
+/// Writes the demo business through whatever repositories are live.
+///
+/// Deliberately built from the same repository providers every screen reads,
+/// not from the Firestore classes directly: pointed at mock mode it fills the
+/// in-memory store and proves the seeder itself, and pointed at live mode it
+/// fills the seller's real workspace. See [DemoDataSeeder] for why that
+/// second use exists at all.
+final Provider<DemoDataSeeder> demoDataSeederProvider =
+    Provider<DemoDataSeeder>(
+      (Ref ref) => DemoDataSeeder(
+        items: ref.watch(itemRepositoryProvider),
+        listings: ref.watch(listingRepositoryProvider),
+        orders: ref.watch(orderRepositoryProvider),
+        offers: ref.watch(offerRepositoryProvider),
+        expenses: ref.watch(expenseRepositoryProvider),
+        categories: ref.watch(categoryRepositoryProvider),
+        locations: ref.watch(locationRepositoryProvider),
+        sources: ref.watch(sourceRepositoryProvider),
+        purchases: ref.watch(purchaseRepositoryProvider),
+      ),
+    );

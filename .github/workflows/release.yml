@@ -1,0 +1,160 @@
+name: Release
+
+# Manual only. A release is an act, not a side effect of a push.
+on:
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: Which config to build
+        type: choice
+        options: [dev, prod]
+        default: dev
+      bump:
+        description: Take the next free build number and commit it
+        type: boolean
+        default: true
+      notes:
+        description: One line for the testers
+        type: string
+        default: ""
+
+jobs:
+  testflight:
+    name: Build and upload
+    runs-on: macos-15
+    # The bump commit is pushed back, so the job needs write access to
+    # contents. Nothing else here writes anything.
+    permissions:
+      contents: write
+    # macOS bills at 10x. This is set against the bill, not against the build.
+    timeout-minutes: 60
+
+    env:
+      # For the whole job, or Ruby reads files as ASCII-8BIT and dies inside
+      # its own error reporter rather than on the line that failed.
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Same call the CI workflow makes, and for the same reason: the design
+      # system is developed alongside the app and CI follows its `main`.
+      - name: Track the design system's main
+        run: git submodule update --remote packages/system_design
+
+      # The bump commit is the bot's, not whoever pressed the button.
+      - name: Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      # From `.fvmrc`, never pinned here — a version is a number and a number
+      # belongs in one place.
+      - name: Read the pinned Flutter version
+        id: sdk
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.sdk.outputs.version }}
+          channel: stable
+          cache: true
+
+      # `case`, never a `${{ a && b || c }}` ternary. The ternary falls through
+      # to its second branch when the first secret is merely EMPTY, which
+      # silently builds prod with dev config — the exact mistake this whole
+      # pipeline is built to make impossible.
+      - name: Write env/${{ inputs.flavor }}.json
+        env:
+          ENV_DEV_JSON: ${{ secrets.ENV_DEV_JSON }}
+          ENV_PROD_JSON: ${{ secrets.ENV_PROD_JSON }}
+        run: |
+          case "${{ inputs.flavor }}" in
+            dev)  printf '%s' "$ENV_DEV_JSON"  > env/dev.json ;;
+            prod) printf '%s' "$ENV_PROD_JSON" > env/prod.json ;;
+            *) echo "unknown flavor"; exit 1 ;;
+          esac
+          test -s env/${{ inputs.flavor }}.json
+
+      # base64, because the plist is multi-line XML whose newlines must
+      # survive. `plutil -lint` immediately after: a truncated paste is
+      # otherwise indistinguishable from a good one until it throws on a
+      # device.
+      - name: Write GoogleService-Info.plist
+        env:
+          PLIST_DEV: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_DEV }}
+          PLIST_PROD: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_PROD }}
+        run: |
+          case "${{ inputs.flavor }}" in
+            dev)  printf '%s' "$PLIST_DEV"  | base64 --decode > ios/Runner/GoogleService-Info.plist ;;
+            prod) printf '%s' "$PLIST_PROD" | base64 --decode > ios/Runner/GoogleService-Info.plist ;;
+          esac
+          plutil -lint ios/Runner/GoogleService-Info.plist
+
+      # Derived from the plist just written, not carried as a third secret.
+      # The same script `melos run prepare-env-*` uses.
+      - name: Sign-in URL scheme
+        run: sh tool/_url-scheme.sh
+
+      - name: Dependencies
+        run: |
+          flutter pub get
+          (cd packages/system_design && flutter pub get)
+
+      # `lib/l10n/gen/` is gitignored, so nothing compiles until it is built.
+      - name: Localizations
+        run: flutter gen-l10n
+
+      # Pin Ruby BEFORE bundle install. A gem binary only runs under the Ruby
+      # it was installed for. (No `pod install` step: this app has no Podfile —
+      # the Firebase SDKs arrive through Swift Package Manager, which Xcode
+      # resolves during the archive.)
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: ios
+
+      # The .p8 never becomes a repository file that survives the job: it is
+      # written into the runner's temp dir, which is destroyed with the runner.
+      - name: App Store Connect API key
+        env:
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+        run: |
+          printf '%s' "$ASC_KEY_CONTENT" | base64 --decode > "$RUNNER_TEMP/asc.p8"
+          echo "ASC_KEY_FILEPATH=$RUNNER_TEMP/asc.p8" >> "$GITHUB_ENV"
+
+      - name: TestFlight
+        working-directory: ios
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          FIREBASE_APP_ID_IOS: ${{ secrets.FIREBASE_APP_ID_IOS }}
+          # Free text travels as an environment variable, never as a lane
+          # argument: spaces would split into extra fastlane arguments and a
+          # backtick would run.
+          RELEASE_NOTES: ${{ inputs.notes }}
+        run: bundle exec fastlane beta flavor:${{ inputs.flavor }} bump:${{ inputs.bump }}
+
+      - name: Push the build number
+        if: ${{ inputs.bump }}
+        run: git push
+
+      # If TestFlight later rejects the binary, the exact one that went out is
+      # still here.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ipa-${{ inputs.flavor }}
+          path: build/ios/ipa/*.ipa
+          if-no-files-found: ignore

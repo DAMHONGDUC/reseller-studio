@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
@@ -10,6 +10,18 @@ import '../../support/pump_app.dart';
 /// Asserted on rendered rectangles, because "looks centred" is exactly the
 /// judgement that goes wrong by three points and stays wrong for months.
 void main() {
+  /// The header's own trailing action.
+  ///
+  /// **Scoped to the header, not `headerAction()`.** Rows carry
+  /// their own icon buttons now, so the last one in the tree is a card's
+  /// actions button several hundred points down the list.
+  Finder headerAction() => find
+      .descendant(
+        of: find.byType(SdSearchHeaderV3),
+        matching: find.byType(IconButton),
+      )
+      .last;
+
   /// Scrolls far enough for the header to reach `minExtent`.
   Future<void> dock(WidgetTester tester) async {
     await tester.drag(
@@ -26,12 +38,13 @@ void main() {
     await dock(tester);
 
     final Rect field = tester.getRect(find.byType(SdSearchFieldV3));
-    final Rect action = tester.getRect(find.byType(IconButton).last);
+    final Rect action = tester.getRect(headerAction());
 
     expect(
       field.center.dy,
       moreOrLessEquals(action.center.dy, epsilon: 0.5),
-      reason: 'field ${field.top}–${field.bottom}, '
+      reason:
+          'field ${field.top}–${field.bottom}, '
           'action ${action.top}–${action.bottom}',
     );
   });
@@ -42,7 +55,7 @@ void main() {
     await pumpScreen(tester, const InventoryScreen());
     await dock(tester);
 
-    final Rect action = tester.getRect(find.byType(IconButton).last);
+    final Rect action = tester.getRect(headerAction());
 
     // The bug this test exists for: the pill's own rectangle was centred
     // while its text and magnifier sat ten points above the middle of it, so

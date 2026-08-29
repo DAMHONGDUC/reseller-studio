@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
@@ -35,7 +35,10 @@ class TaxScreen extends ConsumerWidget {
     final TaxJurisdiction jurisdiction = ref.watch(taxJurisdictionProvider);
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(title: 'Tax', subtitle: _authority(jurisdiction)),
+      appBar: SdAppBarV3(
+        title: context.l10n.moreTax,
+        subtitle: _authority(jurisdiction),
+      ),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
@@ -46,7 +49,7 @@ class TaxScreen extends ConsumerWidget {
           // would be the same boundary paid for twice.
           SizedBox(height: SdContentPaddingV3.topGap),
           SdSectionHeaderV3(
-            title: 'Year ${summary.year.label}',
+            title: context.l10n.taxYearLabel(summary.year.label),
             subtitle: _period(context, summary.year),
             first: true,
           ),
@@ -54,17 +57,17 @@ class TaxScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Sales',
+                  label: context.l10n.analyticsSales,
                   value: context.money(summary.revenue, compact: true),
-                  icon: Symbols.point_of_sale_rounded,
+                  icon: AppIconConstant.pointOfSale,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Cost of goods',
+                  label: context.l10n.commonCostOfGoods,
                   value: context.money(summary.costOfGoods, compact: true),
-                  icon: Symbols.inventory_2_rounded,
+                  icon: AppIconConstant.inventory,
                 ),
               ),
             ],
@@ -74,17 +77,17 @@ class TaxScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Deductions',
+                  label: context.l10n.taxDeductions,
                   value: context.money(summary.totalDeductions, compact: true),
-                  icon: Symbols.receipt_rounded,
+                  icon: AppIconConstant.receipt,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Net before tax',
+                  label: context.l10n.taxNetBeforeTax,
                   value: context.money(summary.netBeforeTax, compact: true),
-                  icon: Symbols.savings_rounded,
+                  icon: AppIconConstant.savings,
                 ),
               ),
             ],
@@ -95,9 +98,7 @@ class TaxScreen extends ConsumerWidget {
           _MileageCard(summary: summary, jurisdiction: jurisdiction),
           SizedBox(height: SdSpacingConstant.h16),
           Text(
-            'These are your own records grouped into the lines your return '
-            'asks for. Nothing here applies allowances, thresholds or rates, '
-            'and it is not tax advice — check it with whoever files for you.',
+            context.l10n.taxTheseAreYourOwnRecordsGrouped,
             style: context.textTheme3.bodySmall!.copyWith(
               color: context.sdTheme3.textSecondary,
             ),

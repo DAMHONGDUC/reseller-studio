@@ -46,6 +46,25 @@ class _Provenance extends ConsumerWidget {
             label: context.l10n.commonBarcode,
             value: item.barcode ?? dash,
           ),
+          // **Read-only, and only here** — owner's rule. Both are records of
+          // when something happened, so no form offers them: a date a seller
+          // can type is not a record of anything.
+          _DetailRow(
+            label: context.l10n.itemAdded,
+            value: DateTimeUtils.mediumDate(
+              item.createdAt,
+              locale: context.localeTag,
+            ),
+          ),
+          _DetailRow(
+            label: context.l10n.itemLastUpdated,
+            value: item.updatedAt == null
+                ? dash
+                : DateTimeUtils.dateTime(
+                    item.updatedAt!,
+                    locale: context.localeTag,
+                  ),
+          ),
         ],
       ),
     );

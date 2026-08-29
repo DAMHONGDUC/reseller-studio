@@ -4,6 +4,7 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
@@ -12,23 +13,36 @@ import 'domain/entities/item.dart';
 import 'domain/entities/item_category.dart';
 import 'domain/entities/storage_location.dart';
 import 'domain/enums/item_status.dart';
+import 'domain/services/item_search.dart';
+import 'item_category_constant.dart';
+
+/// The normal category records created for every new business.
+final Provider<List<ItemCategory>> defaultItemCategoriesProvider =
+    Provider<List<ItemCategory>>((Ref ref) {
+      final DateTime createdAt = DateTime.now();
+
+      return <ItemCategory>[
+        for (final ItemCategorySeed seed in ItemCategoryConstant.defaults)
+          ItemCategory(id: seed.id, name: seed.name, createdAt: createdAt),
+      ];
+    });
 
 /// The tabs across the top of Inventory (plan §7).
 ///
 /// **[stale] is not an [ItemStatus]** and this enum is where the difference
-/// becomes visible: four of these map to a status, and one is a question
-/// about how long something has been listed. See `StaleInventoryPolicy`.
+/// becomes visible: three of these map to a status, and one is a question
+/// about how long something has been live. See `StaleInventoryPolicy`.
 enum InventoryFilter {
   all,
-  listed,
-  reserved,
+  draft,
+  inStock,
   sold,
   stale;
 
   String get label => switch (this) {
     InventoryFilter.all => 'All',
-    InventoryFilter.listed => 'Listed',
-    InventoryFilter.reserved => 'Reserved',
+    InventoryFilter.draft => 'Draft',
+    InventoryFilter.inStock => 'In stock',
     InventoryFilter.sold => 'Sold',
     InventoryFilter.stale => 'Stale',
   };
@@ -37,11 +51,13 @@ enum InventoryFilter {
   bool matches(Item item, {required DateTime now, Duration? staleThreshold}) =>
       switch (this) {
         InventoryFilter.all => true,
-        InventoryFilter.listed => item.status == ItemStatus.listed,
-        InventoryFilter.reserved => item.status == ItemStatus.reserved,
+        InventoryFilter.draft => item.status == ItemStatus.draft,
+        InventoryFilter.inStock => item.status == ItemStatus.inStock,
         InventoryFilter.sold => item.status == ItemStatus.sold,
+        // Still on the shelf, and live a long time ago — the money that has
+        // not moved, which is the whole point of the tab.
         InventoryFilter.stale =>
-          item.status == ItemStatus.listed &&
+          item.status.isOnHand &&
               StaleInventoryPolicy.isStale(
                 item.listedAt,
                 now: now,
@@ -122,34 +138,12 @@ final Provider<Map<InventoryFilter, int>> inventoryCountsProvider =
       };
     });
 
-/// Which rows are ticked for a bulk action.
+/// Which items are ticked for a bulk action.
 ///
-/// **Bulk is a first-class requirement, not a later nicety** (hard rule 16):
-/// reprice, relist and archive are things a seller does to forty rows at
-/// once, and a screen that only edits one item at a time is why people keep
-/// using spreadsheets.
-///
-/// Selection lives in a provider rather than the screen's `State` so the
-/// action sheet — a different subtree, pushed on the root navigator — can read
-/// it without the screen passing it down.
-class InventorySelectionController extends Notifier<Set<String>> {
-  @override
-  Set<String> build() => const <String>{};
-
-  bool get isActive => state.isNotEmpty;
-
-  void toggle(String itemId) {
-    final Set<String> next = Set<String>.of(state);
-
-    if (!next.remove(itemId)) next.add(itemId);
-
-    state = next;
-  }
-
-  void selectAll(Iterable<String> itemIds) => state = Set<String>.of(itemIds);
-
-  void clear() => state = const <String>{};
-}
+/// The behaviour is `SelectionController` in `core/state/` — Listings ticks
+/// rows the same way, and one copy is what stops the two drifting. What is
+/// here is the item half: this provider, and [selectedItemsProvider] below.
+class InventorySelectionController extends SelectionController {}
 
 final NotifierProvider<InventorySelectionController, Set<String>>
 inventorySelectionProvider =
@@ -271,17 +265,29 @@ final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
   final DateTime now = ref.watch(clockProvider).now();
 
-  return items.where((Item item) {
-    if (!filter.matches(item, now: now)) return false;
+  return items
+      .where(
+        (Item item) =>
+            filter.matches(item, now: now) && ItemSearch.matches(item, query),
+      )
+      .toList();
+});
 
-    if (query.isEmpty) return true;
+/// What a seller could sell right now — everything still on the shelf.
+///
+/// **`sold` and `archived` are out, and so is an empty shelf**: recording a
+/// sale against either is a sale that cannot happen, and offering it is how a
+/// seller ends up with two orders for one item. `isOnHand` is the same test
+/// inventory value is counted with, so the two cannot drift apart.
+///
+/// Source order is kept, whatever the repository hands back: re-sorting here
+/// would make the picker list items in an order Inventory does not.
+final Provider<List<Item>> sellableItemsProvider = Provider<List<Item>>((
+  Ref ref,
+) {
+  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
 
-    // Title, SKU and barcode — the three things a seller has to hand when
-    // looking for a specific item (plan §21). Notes are deliberately not
-    // searched: they are long, and matching them makes the results look
-    // random to someone who typed a SKU.
-    return item.title.toLowerCase().contains(query) ||
-        (item.sku?.toLowerCase().contains(query) ?? false) ||
-        (item.barcode?.toLowerCase().contains(query) ?? false);
-  }).toList();
+  return items
+      .where((Item item) => item.status.isOnHand && item.quantity > 0)
+      .toList();
 });

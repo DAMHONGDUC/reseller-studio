@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../constants/app_icon_constant.dart';
 import '../router/navigation_utils.dart';
 
 /// A scaffold whose create action is the button Inventory has.
@@ -155,7 +155,7 @@ class _AppAddFabScaffoldState extends ConsumerState<AppAddFabScaffold> {
               valueListenable: _expanded,
               builder: (BuildContext context, bool expanded, Widget? _) =>
                   SdFabV3(
-                    icon: Symbols.add_rounded,
+                    icon: AppIconConstant.add,
                     label: widget.addLabel,
                     expanded: expanded,
                     onPressed: _onAdd,

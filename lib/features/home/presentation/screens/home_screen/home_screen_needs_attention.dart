@@ -2,15 +2,42 @@ part of 'home_screen.dart';
 
 /// The four things that can be waiting on a seller, each with its count.
 ///
+/// The four the plan names (§6): orders to ship, offers waiting, items to
+/// list, stale inventory.
+///
 /// A block renders **only when it has something in it**. A permanent list of
 /// zeroes trains the eye to skip the whole section, which defeats the one
 /// thing this screen exists to do.
+///
+/// **With no rows, what the section says depends on whether the business has
+/// started.** "All clear" is a report on work, and a new account has none —
+/// see `WorkspaceActivity`.
 class _NeedsAttention extends ConsumerWidget {
   const _NeedsAttention();
+
+  /// How long the most urgent waiting offer has left.
+  ///
+  /// `pendingOffersProvider` already sorts by deadline, so the first is the
+  /// one that costs money to ignore. Offers with no deadline sort last and are
+  /// said to have none rather than being given a fake one.
+  static String _closingDetail(
+    BuildContext context,
+    List<Offer> offers,
+    DateTime now,
+  ) {
+    final DateTime? soonest = offers.first.expiresAt;
+
+    if (soonest == null) return context.l10n.homeOffersNoDeadline;
+
+    return context.l10n.homeOffersClosingIn(
+      DateTimeUtils.compactRemaining(soonest.difference(now)),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Order> pending = ref.watch(ordersNeedingActionProvider);
+    final List<Offer> offers = ref.watch(pendingOffersProvider);
     final List<Item> stale = ref.watch(staleItemsProvider);
     final List<Item> unlisted = ref.watch(unlistedItemsProvider);
     final DateTime now = ref.watch(clockProvider).now();
@@ -22,33 +49,50 @@ class _NeedsAttention extends ConsumerWidget {
     final List<Widget> rows = <Widget>[
       if (pending.isNotEmpty)
         _AttentionRow(
-          icon: Symbols.local_shipping_rounded,
-          label: 'Orders to ship',
+          icon: AppIconConstant.localShipping,
+          label: context.l10n.homeOrdersToShip,
           count: pending.length,
           // An overdue order is a different problem from a pending one: the
           // penalty has already started. Saying so on the row is the whole
           // value of the block.
-          detail: overdue > 0 ? '$overdue overdue' : 'none overdue',
+          detail: overdue > 0
+              ? context.l10n.homeOrdersOverdue(overdue)
+              : context.l10n.homeOrdersNoneOverdue,
           tint: overdue > 0
               ? context.sdTheme3.danger
               : context.sdTheme3.warning,
           onTap: () => context.go(AppRoutes.orders),
         ),
+      // Second, not last: an offer has somebody else's clock on it, and it is
+      // the only row here that expires whether or not the seller acts.
+      if (offers.isNotEmpty)
+        _AttentionRow(
+          icon: AppIconConstant.localOffer,
+          label: context.l10n.homeOffersWaiting,
+          count: offers.length,
+          detail: _closingDetail(context, offers, now),
+          tint: context.sdTheme3.info,
+          onTap: () => context.push(AppRoutes.offers),
+        ),
       if (unlisted.isNotEmpty)
         _AttentionRow(
-          icon: Symbols.sell_rounded,
-          label: 'Items to list',
+          icon: AppIconConstant.sell,
+          label: context.l10n.homeItemsToList,
           count: unlisted.length,
-          detail: 'in stock, not listed anywhere',
+          detail: context.l10n.homeItemsToListDetail,
           tint: context.sdTheme3.info,
           onTap: () => context.go(AppRoutes.inventory),
         ),
       if (stale.isNotEmpty)
         _AttentionRow(
-          icon: Symbols.hourglass_bottom_rounded,
-          label: 'Stale inventory',
+          icon: AppIconConstant.hourglassBottom,
+          label: context.l10n.homeStaleInventory,
           count: stale.length,
-          detail: 'listed over 60 days',
+          // The workspace's own threshold, never a literal: a business that
+          // set 14 days was being told its stock had sat for 60.
+          detail: context.l10n.homeStaleDetail(
+            ref.watch(staleThresholdProvider).inDays,
+          ),
           tint: context.sdTheme3.warning,
           onTap: () => context.go(AppRoutes.inventory),
         ),
@@ -57,7 +101,13 @@ class _NeedsAttention extends ConsumerWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
       child: rows.isEmpty
-          ? const _AllClear()
+          ? switch (ref.watch(workspaceActivityProvider)) {
+              // Neither answer while the records are still arriving: a
+              // returning seller must not be shown "start here" for a frame.
+              WorkspaceActivity.unknown => const SizedBox.shrink(),
+              WorkspaceActivity.untouched => const _StartHere(),
+              WorkspaceActivity.active => const _AllClear(),
+            }
           : SdCardV3(
               padding: EdgeInsets.zero,
               child: Column(

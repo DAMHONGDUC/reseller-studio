@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -35,7 +35,7 @@ class SourcingScreen extends ConsumerWidget {
         .totalOfKnown();
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Sourcing'),
+      appBar: SdAppBarV3(title: context.l10n.moreSourcing),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
@@ -44,17 +44,17 @@ class SourcingScreen extends ConsumerWidget {
             children: <Widget>[
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Spent',
+                  label: context.l10n.analyticsSpent,
                   value: context.money(spend, compact: true),
-                  icon: Symbols.payments_rounded,
+                  icon: AppIconConstant.payments,
                 ),
               ),
               SizedBox(width: SdSpacingConstant.w8),
               Expanded(
                 child: SdStatTileV3(
-                  label: 'Buying trips',
+                  label: context.l10n.sourcingBuyingTrips,
                   value: '${purchases.length}',
-                  icon: Symbols.local_mall_rounded,
+                  icon: AppIconConstant.localMall,
                 ),
               ),
             ],
@@ -63,23 +63,23 @@ class SourcingScreen extends ConsumerWidget {
           AppListCard(
             children: <Widget>[
               AppListRow(
-                title: 'Purchases',
-                subtitle: 'Every buying trip and what it cost',
-                icon: Symbols.local_mall_rounded,
+                title: context.l10n.sourcingPurchases,
+                subtitle: context.l10n.sourcingEveryBuyingTripAndWhatIt,
+                icon: AppIconConstant.localMall,
                 onTap: () => context.push(AppRoutes.purchases),
               ),
               AppListRow(
-                title: 'Sources',
+                title: context.l10n.analyticsSources,
                 subtitle: sources.isEmpty
                     ? 'Add the shops worth going back to'
                     : '${sources.length} places, ranked by what they return',
-                icon: Symbols.storefront_rounded,
+                icon: AppIconConstant.storefront,
                 onTap: () => context.push(AppRoutes.sources),
               ),
               AppListRow(
-                title: 'Should I buy this?',
-                subtitle: 'Work out profit, ROI and the most you should pay',
-                icon: Symbols.calculate_rounded,
+                title: context.l10n.sourcingShouldIBuyThis,
+                subtitle: context.l10n.sourcingWorkOutProfitRoiAndThe,
+                icon: AppIconConstant.calculate,
                 onTap: () => context.push(AppRoutes.purchaseEvaluator),
               ),
             ],

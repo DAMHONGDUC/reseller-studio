@@ -15,7 +15,6 @@ import '../expenses/providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
-import '../marketplaces/domain/enums/marketplace.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
@@ -136,21 +135,21 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
           ref.watch(ordersProvider).value ?? const <Order>[];
       final String currency = ref.watch(workspaceCurrencyProvider);
 
-      final Map<Marketplace, List<Order>> grouped =
-          <Marketplace, List<Order>>{};
+      final Map<String, List<Order>> grouped = <String, List<Order>>{};
 
       for (final Order order in orders) {
         if (!order.status.countsAsRevenue) continue;
 
-        grouped.putIfAbsent(order.marketplace, () => <Order>[]).add(order);
+        grouped.putIfAbsent(order.marketplaceId, () => <Order>[]).add(order);
       }
 
       final List<MarketplacePerformance> rows =
           grouped.entries
               .map(
-                (MapEntry<Marketplace, List<Order>> entry) =>
+                (MapEntry<String, List<Order>> entry) =>
                     MarketplacePerformance.from(
-                      marketplace: entry.key,
+                      marketplaceId: entry.key,
+                      marketplaceName: entry.value.first.marketplaceName,
                       orders: entry.value,
                       currency: currency,
                     ),
@@ -174,7 +173,7 @@ final Provider<List<Item>> staleItemsProvider = Provider<List<Item>>((Ref ref) {
       items
           .where(
             (Item item) =>
-                item.status == ItemStatus.listed &&
+                item.status.isOnHand &&
                 StaleInventoryPolicy.isStale(
                   item.listedAt,
                   now: now,

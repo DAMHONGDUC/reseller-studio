@@ -1,35 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/router/navigation_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/utils/scroll_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../../core/widgets/notification_bell.dart';
 import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
 import '../../../../inventory/domain/entities/item.dart';
+import '../../../../offers/domain/entities/offer.dart';
+import '../../../../offers/providers.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
+import '../../../../subscription/domain/enums/seller_plan.dart';
+import '../../../../subscription/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
+import '../../../domain/enums/getting_started_step.dart';
+import '../../../domain/enums/workspace_activity.dart';
 import '../../../home_constant.dart';
+import '../../../providers.dart';
+import '../../widgets/flow_overview_sheet.dart';
 
 part 'home_screen_activity_row.dart';
 part 'home_screen_all_clear.dart';
 part 'home_screen_attention_row.dart';
+part 'home_screen_flow_overview.dart';
+part 'home_screen_getting_started.dart';
 part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
+part 'home_screen_premium_banner.dart';
 part 'home_screen_quick_action.dart';
 part 'home_screen_recent_activity.dart';
 part 'home_screen_shortcuts.dart';
+part 'home_screen_start_here.dart';
 
 /// Home — "what do I need to do today?".
 ///
@@ -91,7 +106,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         // second row of chrome on the one screen whose content — what needs
         // attention — is the reason the app was opened.
         actions: <Widget>[
-          IconButton(
+          // The inbox first, then search: one says something happened, the
+          // other is a place to go looking.
+          const NotificationBell(),
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.search,
+            tooltip: context.l10n.homeShortcutSearch,
             // Global search is reached from Home because Home is where a
             // seller starts (plan §5's global entry points). It sits outside
             // the shell so it can send them into any tab.
@@ -100,8 +120,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               context.push(AppRoutes.search);
             },
-            icon: const Icon(Symbols.search_rounded),
-            tooltip: context.l10n.homeShortcutSearch,
           ),
           SizedBox(width: SdSpacingConstant.w8),
         ],
@@ -111,14 +129,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
+          const _HomePremiumBanner(),
           _HomeShortcuts(onQuickAction: _toQuickAction),
-          // Not `first` any more: the shortcut row is above it now, and this
-          // heading needs the gap that separates two sections.
-          const SdSectionHeaderV3(title: 'Needs Attention'),
+          const _GettingStarted(),
+          SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
           const _NeedsAttention(),
-          const SdSectionHeaderV3(title: 'Performance'),
+          SdSectionHeaderV3(title: context.l10n.homePerformance),
           const _PerformanceBlock(),
-          const SdSectionHeaderV3(title: 'Recent Activity'),
+          const _HomeFlowOverview(),
           const _RecentActivity(),
           SdSectionHeaderV3(
             title: context.l10n.homeQuickAction,

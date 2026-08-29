@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
-
 import 'app_photo.dart';
+import 'app_row_icon_button.dart';
 
 /// The receipt slot on a purchase or expense form.
 ///
@@ -59,13 +59,10 @@ class ReceiptField extends StatelessWidget {
                   ),
                 ),
               ),
-              IconButton(
-                icon: SdIconV3(
-                  Symbols.close_rounded,
-                  size: SdIconV3.smallSize,
-                  color: context.sdTheme3.danger,
-                ),
+              AppRowIconButton(
+                icon: AppIconConstant.close,
                 tooltip: context.l10n.receiptRemoveTooltip,
+                tint: context.sdTheme3.danger,
                 onPressed: onRemove,
               ),
             ],
@@ -77,7 +74,7 @@ class ReceiptField extends StatelessWidget {
                 child: SdButtonV3(
                   variant: SdButtonVariantV3.outlined,
                   label: context.l10n.actionPhotograph,
-                  icon: Symbols.photo_camera_rounded,
+                  icon: AppIconConstant.photoCamera,
                   size: SdButtonSizeV3.small,
                   expand: true,
                   busy: isBusy,
@@ -89,7 +86,7 @@ class ReceiptField extends StatelessWidget {
                 child: SdButtonV3(
                   variant: SdButtonVariantV3.outlined,
                   label: context.l10n.actionChoose,
-                  icon: Symbols.photo_library_rounded,
+                  icon: AppIconConstant.photoLibrary,
                   size: SdButtonSizeV3.small,
                   expand: true,
                   busy: isBusy,

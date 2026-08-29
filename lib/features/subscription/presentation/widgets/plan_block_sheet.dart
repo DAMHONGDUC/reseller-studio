@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/app_icon_constant.dart';
+import '../../../../core/constants/log_tag_constant.dart';
+import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../domain/enums/seller_plan.dart';
 import '../../domain/services/plan_gate.dart';
@@ -36,10 +37,14 @@ class PlanBlockSheet extends ConsumerWidget {
   }) {
     if (block == PlanBlock.none) return Future<void>.value();
 
-    AppLogger.action('Paywall shown', <String, String>{
-      'reason': SubscriptionLabels.blockKey(block),
-      'fromPlan': plan.name,
-    });
+    SdLogger.action(
+      LogTagConstant.subscription,
+      'Paywall shown',
+      <String, String>{
+        'reason': SubscriptionLabels.blockKey(block),
+        'fromPlan': plan.name,
+      },
+    );
     AppAnalytics.instance.paywallShown(
       reason: SubscriptionLabels.blockKey(block),
       fromPlan: plan.name,
@@ -56,7 +61,7 @@ class PlanBlockSheet extends ConsumerWidget {
     final SellerPlan? target = PlanGate.upgradeFor(block, from: plan);
 
     return SdBottomSheetV3(
-      title: 'Upgrade to continue',
+      title: context.l10n.subscriptionUpgradeToContinue,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -76,7 +81,7 @@ class PlanBlockSheet extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SdIconV3(
-                      Symbols.check_rounded,
+                      AppIconConstant.check,
                       size: SdIconV3.smallSize,
                       color: context.sdTheme3.success,
                     ),
@@ -104,13 +109,13 @@ class PlanBlockSheet extends ConsumerWidget {
               // Pop first: leaving the sheet up behind a pushed screen means
               // the seller comes back to a sheet they already dealt with.
               Navigator.of(context).pop();
-              context.push(AppRoutes.subscription);
+              context.push(AppRoutes.paywall);
             },
           ),
           SizedBox(height: SdSpacingConstant.h8),
           SdButtonV3(
             variant: SdButtonVariantV3.text,
-            label: 'Not now',
+            label: context.l10n.subscriptionNotNow,
             expand: true,
             onPressed: () => Navigator.of(context).pop(),
           ),

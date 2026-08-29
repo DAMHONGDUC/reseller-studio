@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/widgets/app_filter_strip.dart';
-import 'package:seller_os/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
-import 'package:seller_os/features/offers/presentation/screens/offers_screen/offers_screen.dart';
-import 'package:seller_os/features/orders/presentation/screens/orders_screen/orders_screen.dart';
+import 'package:reseller_studio/core/widgets/app_filter_strip.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:reseller_studio/features/offers/presentation/screens/offers_screen/offers_screen.dart';
+import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
@@ -75,7 +75,8 @@ void main() {
     await pumpScreen(tester, const OrdersScreen());
 
     final double orders =
-        chipRect(tester).top - tester.getRect(find.byType(SdAppBarV3).first).bottom;
+        chipRect(tester).top -
+        tester.getRect(find.byType(SdAppBarV3).first).bottom;
 
     await pumpScreen(tester, const InventoryScreen());
 
@@ -83,7 +84,8 @@ void main() {
     // `appBar`, because `SdSearchHeaderV3` is a sliver that has to live in the
     // scroll view to dock as the list moves.
     expect(
-      chipRect(tester).top - tester.getRect(find.byType(SdSearchFieldV3)).bottom,
+      chipRect(tester).top -
+          tester.getRect(find.byType(SdSearchFieldV3)).bottom,
       moreOrLessEquals(orders, epsilon: 0.5),
     );
   });

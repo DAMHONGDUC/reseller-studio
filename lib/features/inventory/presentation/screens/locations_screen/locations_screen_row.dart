@@ -22,9 +22,9 @@ class _LocationRow extends StatelessWidget {
   };
 
   static IconData iconFor(LocationKind kind) => switch (kind) {
-    LocationKind.warehouse => Symbols.warehouse_rounded,
-    LocationKind.shelf => Symbols.shelves,
-    LocationKind.bin => Symbols.inbox_rounded,
+    LocationKind.warehouse => AppIconConstant.warehouse,
+    LocationKind.shelf => AppIconConstant.shelves,
+    LocationKind.bin => AppIconConstant.inbox,
   };
 
   @override
@@ -39,12 +39,8 @@ class _LocationRow extends StatelessWidget {
       ].join(' · '),
       icon: iconFor(location.kind),
       showChevron: false,
-      trailing: IconButton(
-        icon: SdIconV3(
-          Symbols.delete_rounded,
-          size: SdIconV3.smallSize,
-          color: context.sdTheme3.textTertiary,
-        ),
+      trailing: AppRowIconButton(
+        icon: AppIconConstant.delete,
         tooltip: context.l10n.actionDelete,
         onPressed: () => onDelete(itemCount),
       ),

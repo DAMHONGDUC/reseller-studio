@@ -30,27 +30,30 @@ class AnalyticsInventoryScreen extends ConsumerWidget {
     final String dash = context.l10n.emptyValuePlaceholder;
 
     return SdScaffoldV3(
-      appBar: const SdAppBarV3(title: 'Inventory'),
+      appBar: SdAppBarV3(title: context.l10n.workflowInventory),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           MetricCard(
-            title: 'What you hold',
+            title: context.l10n.analyticsWhatYouHold,
             rows: <Widget>[
               MetricRow(
-                label: 'Inventory value',
+                label: context.l10n.analyticsInventoryValue,
                 value: context.money(metrics.value),
                 caption: 'At cost, not at asking price',
                 isEmphasis: true,
               ),
               MetricRow(
-                label: 'Items on hand',
+                label: context.l10n.analyticsItemsOnHand,
                 value: '${metrics.onHandCount}',
               ),
-              MetricRow(label: 'Listed', value: '${metrics.listedCount}'),
               MetricRow(
-                label: 'Stale',
+                label: context.l10n.itemStatusListed,
+                value: '${metrics.listedCount}',
+              ),
+              MetricRow(
+                label: context.l10n.itemStale,
                 value: '${metrics.staleCount}',
                 caption: 'Listed, and listed a long time ago',
                 valueColor: metrics.staleCount > 0
@@ -61,21 +64,24 @@ class AnalyticsInventoryScreen extends ConsumerWidget {
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           MetricCard(
-            title: 'How fast it moves',
+            title: context.l10n.analyticsHowFastItMoves,
             rows: <Widget>[
-              MetricRow(label: 'Items sold', value: '${metrics.soldCount}'),
               MetricRow(
-                label: 'Sell-through',
+                label: context.l10n.analyticsItemsSold,
+                value: '${metrics.soldCount}',
+              ),
+              MetricRow(
+                label: context.l10n.commonSellThrough,
                 value: context.percent(metrics.sellThrough, decimals: 1),
                 caption: 'Sold as a share of everything ever held',
               ),
               MetricRow(
-                label: 'Average days to sell',
+                label: context.l10n.analyticsAverageDaysToSell,
                 value: _days(metrics.averageDaysToSell, dash),
                 caption: 'From listing to sale',
               ),
               MetricRow(
-                label: 'Average age of stock',
+                label: context.l10n.analyticsAverageAgeOfStock,
                 value: _days(metrics.averageAgeDays, dash),
                 caption: 'How long what you hold has been sitting',
               ),

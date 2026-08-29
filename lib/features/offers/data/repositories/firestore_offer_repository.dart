@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/offer.dart';
 import '../../domain/repositories/offer_repository.dart';
 import '../dtos/offer_dto.dart';
@@ -30,7 +31,7 @@ class FirestoreOfferRepository implements OfferRepository {
           SetOptions(merge: true),
         );
 
-    AppLogger.info('Offer saved', <String, Object>{
+    SdLogger.info(LogTagConstant.offer, 'Offer saved', <String, Object>{
       'offerId': offer.id,
       'status': offer.status.name,
     });

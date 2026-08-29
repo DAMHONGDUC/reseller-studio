@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/features/inventory/domain/entities/item.dart';
-import 'package:seller_os/features/inventory/domain/enums/item_status.dart';
-import 'package:seller_os/features/inventory/presentation/controllers/quick_add_controller.dart';
-import 'package:seller_os/features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
-import 'package:seller_os/features/inventory/providers.dart';
-import 'package:seller_os/features/mock_data/data/in_memory_repositories.dart';
-import 'package:seller_os/features/mock_data/domain/mock_dataset.dart';
-import 'package:seller_os/features/mock_data/providers.dart';
+import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/presentation/controllers/quick_add_controller.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
+import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
+import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
+import 'package:reseller_studio/features/mock_data/providers.dart';
+import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
+import 'package:reseller_studio/features/subscription/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
@@ -122,6 +125,26 @@ void main() {
       // Hard rule 2 as a test: a second field appearing here is the change
       // that needs approval.
       expect(find.byType(SdTextFieldV3), findsOneWidget);
+    });
+
+    testWidgets('the item ceiling blocks Save with the Premium gate', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(
+        tester,
+        const QuickAddScreen(),
+        overrides: <Override>[
+          addItemBlockProvider.overrideWith((Ref ref) => PlanBlock.itemLimit),
+        ],
+      );
+
+      await tester.enterText(find.byType(TextField), 'Nike Air Max 90');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Upgrade to continue'), findsOneWidget);
+      expect(find.textContaining('items. Upgrade'), findsOneWidget);
     });
   });
 }

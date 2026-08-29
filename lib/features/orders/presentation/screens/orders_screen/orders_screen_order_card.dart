@@ -21,74 +21,98 @@ class _OrderCard extends StatelessWidget {
       // A tinted edge, and a "Late" badge saying the same thing — colour is
       // never the only signal.
       borderColor: isOverdue ? context.sdTheme3.danger : null,
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  order.lines.isEmpty
-                      ? context.l10n.orderFallbackTitle(order.id)
-                      : order.lines.first.title,
-                  style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
-                    color: context.sdTheme3.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              SizedBox(width: SdSpacingConstant.w8),
-              Text(
-                context.money(order.salePrice),
-                style: context.textTheme3.bodyLarge!.semiBold3.tabular3
-                    .copyWith(color: context.sdTheme3.textPrimary),
-              ),
-            ],
-          ),
-          SizedBox(height: SdSpacingConstant.h8),
-          Wrap(
-            spacing: SdSpacingConstant.w6,
-            runSpacing: SdSpacingConstant.h4,
-            children: <Widget>[
-              SdBadgeV3(
-                label: OrderStatusLabel.of(context, order.status),
-                tone: _statusTone(order.status),
-              ),
-              SdBadgeV3(label: order.marketplace.displayName),
-              if (isOverdue)
-                SdBadgeV3(
-                  label: context.l10n.orderLate,
-                  tone: SdBadgeToneV3.danger,
-                  icon: Symbols.priority_high_rounded,
-                ),
-            ],
-          ),
-          SizedBox(height: SdSpacingConstant.h8),
-          Row(
-            children: <Widget>[
-              Text(
-                order.buyerName ?? '—',
-                style: context.textTheme3.bodySmall!.muted3(context),
-              ),
-              const Spacer(),
-              Text(
-                '${context.l10n.orderProfitPrefix} ',
-                style: context.textTheme3.bodySmall!.faint3(context),
-              ),
-              Text(
-                context.money(profit),
-                style: context.textTheme3.bodySmall!.semiBold3.tabular3
-                    .copyWith(
-                      color: profit == null
-                          ? context.sdTheme3.textTertiary
-                          : profit.isNegative
-                          ? context.sdTheme3.loss
-                          : context.sdTheme3.profit,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        order.lines.isEmpty
+                            ? context.l10n.orderFallbackTitle(order.id)
+                            : order.lines.first.title,
+                        style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
+                          color: context.sdTheme3.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-              ),
-            ],
+                    SizedBox(width: SdSpacingConstant.w8),
+                    Text(
+                      context.money(order.salePrice),
+                      style: context.textTheme3.bodyLarge!.semiBold3.tabular3
+                          .copyWith(color: context.sdTheme3.textPrimary),
+                    ),
+                  ],
+                ),
+                SizedBox(height: SdSpacingConstant.h8),
+                Wrap(
+                  spacing: SdSpacingConstant.w6,
+                  runSpacing: SdSpacingConstant.h4,
+                  children: <Widget>[
+                    // Compact, the same presentation the Inventory row uses:
+                    // read-only card metadata sitting beside a title and a
+                    // price cannot spend a picker's padding.
+                    SdBadgeV3(
+                      label: OrderStatusLabel.of(context, order.status),
+                      tone: _statusTone(order.status),
+                      size: SdBadgeSizeV3.compact,
+                    ),
+                    SdBadgeV3(
+                      label: order.marketplaceName,
+                      size: SdBadgeSizeV3.compact,
+                    ),
+                    if (isOverdue)
+                      SdBadgeV3(
+                        label: context.l10n.orderLate,
+                        tone: SdBadgeToneV3.danger,
+                        icon: AppIconConstant.priorityHigh,
+                        size: SdBadgeSizeV3.compact,
+                      ),
+                  ],
+                ),
+                SizedBox(height: SdSpacingConstant.h8),
+                Row(
+                  children: <Widget>[
+                    // Expanded, not a bare Text with a Spacer: the buyer name
+                    // is the one thing on this card with no length limit, so
+                    // it is what has to give when the row runs out of width.
+                    Expanded(
+                      child: Text(
+                        order.buyerName ?? '—',
+                        style: context.textTheme3.bodySmall!.muted3(context),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: SdSpacingConstant.w8),
+                    Text(
+                      '${context.l10n.orderProfitPrefix} ',
+                      style: context.textTheme3.bodySmall!.faint3(context),
+                    ),
+                    Text(
+                      context.money(profit),
+                      style: context.textTheme3.bodySmall!.semiBold3.tabular3
+                          .copyWith(
+                            color: profit == null
+                                ? context.sdTheme3.textTertiary
+                                : profit.isNegative
+                                ? context.sdTheme3.loss
+                                : context.sdTheme3.profit,
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+          SizedBox(width: SdSpacingConstant.w8),
+          const AppRowChevron(),
         ],
       ),
     );

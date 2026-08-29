@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/config/dev_flags.dart';
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
 import '../../../../mock_data/providers.dart';
+import '../../../../workspace/country_label.dart';
+import '../../../../workspace/currency_label.dart';
 import '../../../../workspace/domain/entities/workspace.dart';
 import '../../../../workspace/providers.dart';
-import '../../../../workspace/workspace_option_label.dart';
+import '../../controllers/demo_seed_controller.dart';
+import '../../controllers/theme_mode_controller.dart';
 
 part 'settings_screen_account_card.dart';
 part 'settings_screen_appearance_card.dart';
+part 'settings_screen_demo_seed_card.dart';
 part 'settings_screen_mock_data_card.dart';
 part 'settings_screen_mock_summary.dart';
 part 'settings_screen_setting_row.dart';
+part 'settings_screen_workspace_card.dart';
 
 /// Settings (plan §25).
 ///
@@ -45,7 +51,10 @@ class SettingsScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.fullBleed(context),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SdSectionHeaderV3(title: context.l10n.settingsAppearance, first: true),
+          SdSectionHeaderV3(
+            title: context.l10n.settingsAppearance,
+            first: true,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
@@ -59,47 +68,22 @@ class SettingsScreen extends ConsumerWidget {
             ),
             child: const _AccountCard(),
           ),
-          SdSectionHeaderV3(title: context.l10n.settingsWorkspace),
+          SdSectionHeaderV3(
+            title: context.l10n.settingsWorkspace,
+            subtitle: workspace == null ? null : context.l10n.workspaceEditNote,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
             ),
-            child: SdCardV3(
-              child: workspace == null
-                  ? Text(
+            child: workspace == null
+                ? SdCardV3(
+                    child: Text(
                       context.l10n.workspaceNoneLoaded,
                       style: context.textTheme3.bodyMedium!.muted3(context),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _SettingRow(
-                          label: context.l10n.workspaceNameLabel,
-                          value: workspace.name,
-                        ),
-                        _SettingRow(
-                          label: context.l10n.workspaceCountry,
-                          value: WorkspaceOptionLabel.country(
-                            context,
-                            workspace.country,
-                          ),
-                        ),
-                        _SettingRow(
-                          label: context.l10n.workspaceCurrency,
-                          value: WorkspaceOptionLabel.currency(
-                            context,
-                            workspace.currency,
-                          ),
-                        ),
-                        _SettingRow(
-                          label: context.l10n.workspaceStaleAfter,
-                          value: context.l10n.commonDays(
-                            workspace.staleThresholdDays,
-                          ),
-                        ),
-                      ],
                     ),
-            ),
+                  )
+                : _WorkspaceCard(workspace: workspace),
           ),
           SdSectionHeaderV3(title: context.l10n.settingsApp),
           Padding(
@@ -111,7 +95,7 @@ class SettingsScreen extends ConsumerWidget {
                 AppListRow(
                   title: context.l10n.moreAbout,
                   subtitle: context.l10n.aboutTagline,
-                  icon: Symbols.info_rounded,
+                  icon: AppIconConstant.info,
                   onTap: () => context.push(AppRoutes.about),
                 ),
               ],
@@ -127,6 +111,13 @@ class SettingsScreen extends ConsumerWidget {
                 horizontal: SdContentPaddingV3.horizontal,
               ),
               child: const _MockDataCard(),
+            ),
+            SizedBox(height: SdSpacingConstant.h12),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: SdContentPaddingV3.horizontal,
+              ),
+              child: const _DemoSeedCard(),
             ),
           ],
         ],

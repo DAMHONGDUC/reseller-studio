@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../domain/entities/listing.dart';
 import '../../domain/repositories/listing_repository.dart';
 import '../dtos/listing_dto.dart';
@@ -39,7 +40,7 @@ class FirestoreListingRepository implements ListingRepository {
               SetOptions(merge: true),
             );
 
-        AppLogger.info('Listing saved', <String, Object>{
+        SdLogger.info(LogTagConstant.listing, 'Listing saved', <String, Object>{
           'listingId': listing.id,
           'marketplace': listing.marketplace.name,
           'status': listing.status.name,
@@ -67,9 +68,11 @@ class FirestoreListingRepository implements ListingRepository {
 
       await batch.commit();
 
-      AppLogger.info('Listings saved in bulk', <String, Object>{
-        'count': listings.length,
-      });
+      SdLogger.info(
+        LogTagConstant.listing,
+        'Listings saved in bulk',
+        <String, Object>{'count': listings.length},
+      );
     },
   );
 

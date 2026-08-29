@@ -19,6 +19,7 @@ class Item {
     required this.quantity,
     required this.status,
     required this.createdAt,
+    this.updatedAt,
     this.purchasePrice,
     this.askingPrice,
     this.minimumPrice,
@@ -43,6 +44,16 @@ class Item {
   final int quantity;
   final ItemStatus status;
   final DateTime createdAt;
+
+  /// When the record last changed, or null for one nothing has touched since
+  /// it was written.
+  ///
+  /// **Stamped by whoever saves, not derived** — Firestore writes it as a
+  /// server timestamp, so two devices editing the same item cannot disagree
+  /// about which edit was later. It is read-only everywhere in the app: no
+  /// form offers it, because a date the seller can type is not a record of
+  /// anything.
+  final DateTime? updatedAt;
 
   /// What the seller paid. **Null means nobody entered it**, not zero — every
   /// profit figure derived from this item is then `—` rather than wrong. See
@@ -100,6 +111,30 @@ class Item {
     return asking - cost;
   }
 
+  /// How many are still on the shelf.
+  ///
+  /// **Zero once the item is sold or archived, whatever [quantity] says.**
+  /// The field records how many were taken in; a row asking "what is left"
+  /// must not answer with that number after the last one went out the door.
+  /// This is a known zero, not a missing figure — hard rule 5 is about the
+  /// difference.
+  int get quantityOnHand => status.isOnHand ? quantity : 0;
+
+  /// When the item entered the state it is in now — what "how long has this
+  /// sat?" is measured from.
+  ///
+  /// Sold reads from [soldAt], stock from [listedAt] when it has one,
+  /// everything else from [createdAt]. One timestamp per state, so a row can
+  /// show an age without each screen picking its own field and disagreeing
+  /// about what it means.
+  DateTime get stateSince => switch (status) {
+    ItemStatus.sold => soldAt ?? createdAt,
+    // On the shelf and live somewhere: how long it has been sitting is
+    // measured from the day it went up, not the day it was entered.
+    ItemStatus.inStock => listedAt ?? createdAt,
+    _ => createdAt,
+  };
+
   /// The value this item contributes to inventory worth — its cost, times how
   /// many are on hand.
   ///
@@ -114,6 +149,11 @@ class Item {
     return cost * quantity;
   }
 
+  /// **A null argument means "leave it alone", never "clear it"** — which is
+  /// why undoing a sale needs [clearSoldAt]. It is the one field the app ever
+  /// has to unset: an item back on the shelf still carrying a sold date reads
+  /// as sold in an export, and there is no other way to say so through a
+  /// copy.
   Item copyWith({
     String? title,
     int? quantity,
@@ -132,12 +172,15 @@ class Item {
     DateTime? listedAt,
     DateTime? soldAt,
     DateTime? deletedAt,
+    DateTime? updatedAt,
+    bool clearSoldAt = false,
   }) => Item(
     id: id,
     title: title ?? this.title,
     quantity: quantity ?? this.quantity,
     status: status ?? this.status,
     createdAt: createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
     purchasePrice: purchasePrice ?? this.purchasePrice,
     askingPrice: askingPrice ?? this.askingPrice,
     minimumPrice: minimumPrice ?? this.minimumPrice,
@@ -153,7 +196,7 @@ class Item {
     photoUrls: photoUrls ?? this.photoUrls,
     purchaseDate: purchaseDate,
     listedAt: listedAt ?? this.listedAt,
-    soldAt: soldAt ?? this.soldAt,
+    soldAt: clearSoldAt ? null : soldAt ?? this.soldAt,
     deletedAt: deletedAt ?? this.deletedAt,
   );
 }

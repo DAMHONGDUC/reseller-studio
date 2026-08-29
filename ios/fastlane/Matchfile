@@ -1,0 +1,15 @@
+# The private certificates repo. It holds a real distribution certificate's
+# private key, encrypted with MATCH_PASSWORD — which is why it is a separate
+# private repo and not this one.
+git_url(ENV["MATCH_GIT_URL"])
+storage_mode("git")
+
+# App Store distribution only. Development profiles are made by Xcode on the
+# machine that needs them; a shared one buys nothing and is another thing to
+# rotate.
+type("appstore")
+
+# Every bundle id the archive signs. One target today — an app extension added
+# later must be listed here too, or `match` mints no profile for it and
+# `exportArchive` fails after the full build.
+app_identifier(["app.dd.reseller.studio"])

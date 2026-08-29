@@ -98,7 +98,7 @@ class _PhotoTile extends StatelessWidget {
               border: Border.all(color: context.sdTheme3.border),
             ),
             child: SdIconV3(
-              Symbols.close_rounded,
+              AppIconConstant.close,
               size: SdIconV3.smallSize,
               color: context.sdTheme3.danger,
               semanticLabel: context.l10n.itemRemovePhoto,
@@ -126,14 +126,14 @@ class _AddPhotoTile extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     children: <Widget>[
       _AddPhotoButton(
-        icon: Symbols.photo_camera_rounded,
+        icon: AppIconConstant.photoCamera,
         label: context.l10n.itemTakePhoto,
         isBusy: isBusy,
         onTap: onCamera,
       ),
       SizedBox(width: SdSpacingConstant.w8),
       _AddPhotoButton(
-        icon: Symbols.photo_library_rounded,
+        icon: AppIconConstant.photoLibrary,
         label: context.l10n.itemChoosePhoto,
         isBusy: isBusy,
         onTap: onLibrary,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_icon_button.dart';
 import '../../../../../core/widgets/name_entry_sheet.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_category.dart';
@@ -39,7 +40,7 @@ class CategoriesScreen extends ConsumerWidget {
       context,
       () =>
           ref.read(catalogControllerProvider.notifier).saveCategory(name: name),
-      context.l10n.categoryAdded,
+      null,
     );
   }
 
@@ -83,7 +84,7 @@ class CategoriesScreen extends ConsumerWidget {
         message: itemCount == 0
             ? context.l10n.categoryDeleteUnused
             : context.l10n.categoryDeleteInUse(itemCount),
-        icon: Symbols.warning_rounded,
+        icon: AppIconConstant.warning,
         actions: <SdDialogActionV3>[
           SdDialogActionV3(
             label: context.l10n.actionDelete,
@@ -103,15 +104,17 @@ class CategoriesScreen extends ConsumerWidget {
   }
 
   /// The one place a write's outcome becomes a message.
+  /// A [done] of null is an add: the new row appearing in the list behind is
+  /// the confirmation, so nothing is said (owner's rule).
   Future<void> _write(
     BuildContext context,
     Future<void> Function() action,
-    String done,
+    String? done,
   ) async {
     try {
       await action();
 
-      if (!context.mounted) return;
+      if (!context.mounted || done == null) return;
 
       SdSnackBarUtilsV3.success(context, done);
     } catch (error) {
@@ -140,7 +143,7 @@ class CategoriesScreen extends ConsumerWidget {
         AsyncLoading<List<ItemCategory>>() when !source.hasValue =>
           const SdLoadingV3Page(),
         _ when categories.isEmpty => SdEmptyStateV3(
-          icon: Symbols.category_rounded,
+          icon: AppIconConstant.category,
           title: context.l10n.categoriesEmptyTitle,
           message: context.l10n.categoriesEmptyBody,
           action: SdButtonV3(
@@ -162,14 +165,10 @@ class CategoriesScreen extends ConsumerWidget {
                 return AppListRow(
                   title: category.name,
                   subtitle: context.l10n.categoryItemCount(count),
-                  icon: Symbols.category_rounded,
+                  icon: AppIconConstant.category,
                   onTap: () => _rename(context, ref, category),
-                  trailing: IconButton(
-                    icon: SdIconV3(
-                      Symbols.delete_rounded,
-                      size: SdIconV3.smallSize,
-                      color: context.sdTheme3.textTertiary,
-                    ),
+                  trailing: AppRowIconButton(
+                    icon: AppIconConstant.delete,
                     tooltip: context.l10n.actionDelete,
                     onPressed: () =>
                         _confirmDelete(context, ref, category, count),

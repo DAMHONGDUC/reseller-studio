@@ -25,6 +25,11 @@ can never be committed by accident and the templates always can.
 exists in one flavour's file and not the other is a build that works on a
 developer's machine and fails in CI.
 
+**Removing one is the same rule backwards: the examples carry exactly what
+`AppEnv` reads.** A placeholder nothing reads costs somebody an afternoon
+finding a value that changes nothing. `test/core/config/app_env_test.dart`
+pins the list.
+
 ## What must never go in here
 
 > **Everything in these files is compiled into the app binary and is trivially

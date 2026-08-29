@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
@@ -11,9 +11,14 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
+import '../../../../../core/widgets/app_list_empty_state.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/offer.dart';
 import '../../../providers.dart';
@@ -66,14 +71,23 @@ class OffersScreen extends ConsumerWidget {
               AsyncLoading<List<Offer>>() when !source.hasValue =>
                 const SdLoadingV3Page(),
               AsyncError<List<Offer>>() => SdEmptyStateV3(
-                icon: Symbols.error_rounded,
+                icon: AppIconConstant.error,
                 title: context.l10n.offersLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
-              _ when offers.isEmpty => SdEmptyStateV3(
-                icon: Symbols.local_offer_rounded,
-                title: context.l10n.commonNothingHere,
-                message: context.l10n.offersNoMatch,
+              _ when offers.isEmpty => AppListEmptyState(
+                hasAny: (source.value ?? const <Offer>[]).isNotEmpty,
+                noMatchMessage: context.l10n.offersNoMatch,
+                emptyIcon: AppIconConstant.localOffer,
+                emptyTitle: context.l10n.offersEmptyTitle,
+                emptyMessage: context.l10n.offersEmptyBody,
+                // An offer arrives on a listing, so listings is the step a
+                // seller with none has not taken yet.
+                emptyAction: SdButtonV3(
+                  variant: SdButtonVariantV3.primary,
+                  label: context.l10n.commonViewListings,
+                  onPressed: () => context.push(AppRoutes.listings),
+                ),
               ),
               _ => ListView.separated(
                 padding: SdContentPaddingV3.screen(context),

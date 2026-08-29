@@ -13,7 +13,7 @@ or before assuming a piece of infrastructure exists.
   how it is developed against until sign-in works.
   The `FIREBASE_*` keys in `env/*.json` are empty until then; `bootstrap` logs
   one clean warning rather than a Firebase stack trace when it sees that.
-- **`.firebaserc` does not exist**, so `melos run deploy-firebase` cannot run.
+- **`.firebaserc` does not exist**, so `melos run deploy-firebase-*` cannot run.
 - **The v3 design-system commit is local to this machine.** It is committed in
   `packages/system_design` on `main` but **not pushed**. Push it before anyone
   else clones this repo, or their `melos run set-up` will fast-forward the

@@ -6,6 +6,11 @@ part of 'home_screen.dart';
 /// Functions and does not exist yet, and a seller checking Home wants to know
 /// what sold, not that someone edited a SKU. It becomes the real activity
 /// stream when `activity/` is populated.
+///
+/// **It owns its section header.** Home rendered the heading and this widget
+/// decided whether to render anything under it, which on a new account left
+/// "Recent activity" captioning a gap. One widget answers "does this section
+/// exist" or the two answers drift.
 class _RecentActivity extends ConsumerWidget {
   const _RecentActivity();
 
@@ -19,28 +24,36 @@ class _RecentActivity extends ConsumerWidget {
 
     if (recent.isEmpty) return const SizedBox.shrink();
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-      child: SdCardV3(
-        padding: EdgeInsets.zero,
-        child: Column(
-          children: <Widget>[
-            for (int i = 0; i < recent.length; i++) ...<Widget>[
-              _ActivityRow(order: recent[i]),
-              if (i != recent.length - 1)
-                Padding(
-                  padding: EdgeInsets.only(
-                    left:
-                        SdSpacingConstant.w16 +
-                        SdIconTileSizeV3.small.box +
-                        SdSpacingConstant.w12,
-                  ),
-                  child: const SdDividerV3(),
-                ),
-            ],
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SdSectionHeaderV3(title: context.l10n.homeRecentActivity),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: SdContentPaddingV3.horizontal,
+          ),
+          child: SdCardV3(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: <Widget>[
+                for (int i = 0; i < recent.length; i++) ...<Widget>[
+                  _ActivityRow(order: recent[i]),
+                  if (i != recent.length - 1)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left:
+                            SdSpacingConstant.w16 +
+                            SdIconTileSizeV3.small.box +
+                            SdSpacingConstant.w12,
+                      ),
+                      child: const SdDividerV3(),
+                    ),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

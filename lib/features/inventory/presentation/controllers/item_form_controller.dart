@@ -1,15 +1,19 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
+import '../../../../core/constants/photo_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/file_uploader.dart';
+import '../../../listings/domain/entities/listing.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
+import '../../domain/services/item_transition.dart';
 
 /// The choices on the Add/Edit Item form that are not typed.
 ///
@@ -21,6 +25,7 @@ class ItemFormState {
   const ItemFormState({
     this.itemId,
     this.status = ItemStatus.draft,
+    this.savedStatus = ItemStatus.draft,
     this.condition,
     this.categoryId,
     this.locationId,
@@ -29,15 +34,26 @@ class ItemFormState {
     this.purchaseDate,
     this.photoUrls = const <String>[],
     this.createdAt,
+    this.listedAt,
+    this.soldAt,
     this.isSaving = false,
     this.isUploadingPhoto = false,
+    this.listingPrices = const <String, Money>{},
   });
 
   /// Null while creating, set while editing. What decides whether [submit]
   /// writes a new document or merges into an existing one.
   final String? itemId;
 
+  /// The status the form will write — the seeded one until the seller picks
+  /// another.
   final ItemStatus status;
+
+  /// What the record says today, kept because a move has to start from where
+  /// the item actually is: `ItemTransition.apply` refuses a jump it is asked
+  /// to make from its own destination.
+  final ItemStatus savedStatus;
+
   final ItemCondition? condition;
   final String? categoryId;
   final String? locationId;
@@ -51,14 +67,34 @@ class ItemFormState {
   /// would shuffle the list every time somebody fixed a typo.
   final DateTime? createdAt;
 
+  /// Carried for the same reason, and it is not cosmetic: [submit] builds a
+  /// whole `Item`, so a timestamp the form does not hold is one that saving a
+  /// typo fix erases. Losing `listedAt` resets the staleness clock and drops
+  /// the row out of days-to-sell; losing `soldAt` unfiles a sale.
+  final DateTime? listedAt;
+  final DateTime? soldAt;
+
   final bool isSaving;
   final bool isUploadingPhoto;
+
+  /// New prices for the item's live listings, by listing id.
+  ///
+  /// **The marketplace prices are edited in this form, not on another
+  /// screen** — owner's rule. They ride here rather than in the text
+  /// controllers because a listing is a separate document: [submit] has to
+  /// know which ones moved, and a map keyed by id is that answer without
+  /// re-reading the stream to diff it.
+  ///
+  /// Only what the seller changed. An untouched listing is absent, so saving
+  /// an item nobody repriced writes no listing at all.
+  final Map<String, Money> listingPrices;
 
   bool get isEditing => itemId != null;
 
   ItemFormState copyWith({
     String? itemId,
     ItemStatus? status,
+    ItemStatus? savedStatus,
     ItemCondition? condition,
     String? categoryId,
     String? locationId,
@@ -67,11 +103,15 @@ class ItemFormState {
     DateTime? purchaseDate,
     List<String>? photoUrls,
     DateTime? createdAt,
+    DateTime? listedAt,
+    DateTime? soldAt,
     bool? isSaving,
     bool? isUploadingPhoto,
+    Map<String, Money>? listingPrices,
   }) => ItemFormState(
     itemId: itemId ?? this.itemId,
     status: status ?? this.status,
+    savedStatus: savedStatus ?? this.savedStatus,
     condition: condition ?? this.condition,
     categoryId: categoryId ?? this.categoryId,
     locationId: locationId ?? this.locationId,
@@ -80,8 +120,11 @@ class ItemFormState {
     purchaseDate: purchaseDate ?? this.purchaseDate,
     photoUrls: photoUrls ?? this.photoUrls,
     createdAt: createdAt ?? this.createdAt,
+    listedAt: listedAt ?? this.listedAt,
+    soldAt: soldAt ?? this.soldAt,
     isSaving: isSaving ?? this.isSaving,
     isUploadingPhoto: isUploadingPhoto ?? this.isUploadingPhoto,
+    listingPrices: listingPrices ?? this.listingPrices,
   );
 }
 
@@ -93,14 +136,6 @@ class ItemFormState {
 /// field here needs explicit approval.
 class ItemFormController extends Notifier<ItemFormState> {
   static const Uuid _uuid = Uuid();
-
-  /// How wide a photo is stored at.
-  ///
-  /// 1600 is enough for a marketplace listing and small enough that a seller
-  /// on a phone plan is not uploading eight megabytes per item — the Storage
-  /// rules cap at 15MB, and that cap is a backstop, not a target.
-  static const double photoMaxWidth = 1600;
-  static const int photoQuality = 85;
 
   @override
   ItemFormState build() => const ItemFormState();
@@ -115,6 +150,7 @@ class ItemFormController extends Notifier<ItemFormState> {
   void seed(Item item) => state = ItemFormState(
     itemId: item.id,
     status: item.status,
+    savedStatus: item.status,
     condition: item.condition,
     categoryId: item.categoryId,
     locationId: item.locationId,
@@ -123,7 +159,14 @@ class ItemFormController extends Notifier<ItemFormState> {
     purchaseDate: item.purchaseDate,
     photoUrls: item.photoUrls,
     createdAt: item.createdAt,
+    listedAt: item.listedAt,
+    soldAt: item.soldAt,
   );
+
+  /// Take the pick. The move itself happens in [submit], where the record is
+  /// written — a status changed on a form the seller then abandons is one
+  /// nothing should have saved.
+  void selectStatus(ItemStatus value) => state = state.copyWith(status: value);
 
   void selectCondition(ItemCondition value) =>
       state = state.copyWith(condition: value);
@@ -157,8 +200,8 @@ class ItemFormController extends Notifier<ItemFormState> {
     try {
       final XFile? picked = await ImagePicker().pickImage(
         source: fromCamera ? ImageSource.camera : ImageSource.gallery,
-        maxWidth: photoMaxWidth,
-        imageQuality: photoQuality,
+        maxWidth: PhotoConstant.maxWidth,
+        imageQuality: PhotoConstant.quality,
       );
 
       if (picked == null) {
@@ -177,12 +220,14 @@ class ItemFormController extends Notifier<ItemFormState> {
         photoUrls: <String>[...state.photoUrls, url],
       );
 
-      AppLogger.info('Item photo attached', <String, Object>{
-        'recordId': recordId,
-        'count': state.photoUrls.length,
-      });
+      SdLogger.info(
+        LogTagConstant.item,
+        'Item photo attached',
+        <String, Object>{'recordId': recordId, 'count': state.photoUrls.length},
+      );
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Failed to attach item photo',
         error: error,
         stackTrace: stackTrace,
@@ -200,6 +245,49 @@ class ItemFormController extends Notifier<ItemFormState> {
   /// Every money field is parsed with `Money.tryParse`, which returns **null
   /// for an empty box** — an untyped cost stays unknown and renders `—`
   /// rather than claiming the item was free (hard rule 4).
+  /// Writes the repriced listings alongside the item.
+  ///
+  /// **One `saveAll`, after the item.** The seller pressed Save once, so a
+  /// price landing without the item it belongs to is a state nobody can read
+  /// back — and the item is written first because it is the record the
+  /// listings point at.
+  ///
+  /// Reads the listings fresh rather than holding them from when the form
+  /// opened: a teammate may have changed a title in between, and only the
+  /// price is this form's to move.
+  Future<void> _saveListingPrices(String itemId) async {
+    if (state.listingPrices.isEmpty) return;
+
+    final List<Listing> listings = await ref
+        .read(listingRepositoryProvider)
+        .watchListingsForItem(itemId)
+        .first;
+    final List<Listing> changed = <Listing>[
+      for (final Listing listing in listings)
+        if (state.listingPrices[listing.id] != null &&
+            state.listingPrices[listing.id] != listing.price)
+          listing.copyWith(price: state.listingPrices[listing.id]),
+    ];
+
+    if (changed.isEmpty) return;
+
+    await ref.read(listingRepositoryProvider).saveAll(changed);
+  }
+
+  /// Reprice one of the item's live listings. Null puts it back to whatever
+  /// the listing already says, by dropping the edit.
+  void setListingPrice(String listingId, Money? price) {
+    final Map<String, Money> next = <String, Money>{...state.listingPrices};
+
+    if (price == null) {
+      next.remove(listingId);
+    } else {
+      next[listingId] = price;
+    }
+
+    state = state.copyWith(listingPrices: next);
+  }
+
   Future<String?> submit({
     required String title,
     String quantity = '',
@@ -219,11 +307,15 @@ class ItemFormController extends Notifier<ItemFormState> {
     if (trimmed.isEmpty || state.isSaving) return null;
 
     state = state.copyWith(isSaving: true);
-    AppLogger.action('Item form submitted', <String, Object>{
-      'itemId': id,
-      'isEditing': state.isEditing,
-      'photos': state.photoUrls.length,
-    });
+    SdLogger.action(
+      LogTagConstant.item,
+      'Item form submitted',
+      <String, Object>{
+        'itemId': id,
+        'isEditing': state.isEditing,
+        'photos': state.photoUrls.length,
+      },
+    );
 
     try {
       final Item item = Item(
@@ -232,7 +324,9 @@ class ItemFormController extends Notifier<ItemFormState> {
         // One is the answer for almost every reseller item, so an empty or
         // unparseable box means one rather than nothing.
         quantity: int.tryParse(quantity.trim()) ?? 1,
-        status: state.status,
+        // The status the record has, not the one that was picked: a move has
+        // to start from where the item is, and `apply` below is what makes it.
+        status: state.savedStatus,
         createdAt: state.createdAt ?? now,
         purchasePrice: Money.tryParse(purchasePrice, currency),
         askingPrice: Money.tryParse(askingPrice, currency),
@@ -248,13 +342,29 @@ class ItemFormController extends Notifier<ItemFormState> {
         notes: _orNull(notes),
         photoUrls: state.photoUrls,
         purchaseDate: state.purchaseDate,
+        listedAt: state.listedAt,
+        soldAt: state.soldAt,
       );
 
-      await ref.read(itemRepositoryProvider).save(item);
+      // **A picked status is never refused** — owner's rule: the form is where
+      // a seller corrects what the app got wrong. It still goes through the
+      // transition, which is what carries the side effects — a sold row loses
+      // its count, a returning one loses its sold date.
+      final Item moved = state.status == state.savedStatus
+          ? item
+          : ItemTransition.setStatus(item, state.status, now: now);
 
-      AppLogger.info('Item form saved', <String, Object>{
+      // Putting stock behind a sold row is the seller saying they have the
+      // thing again — the domain decides what that means, not the form.
+      final Item saved = ItemTransition.restocked(moved, now: now);
+
+      await ref.read(itemRepositoryProvider).save(saved);
+      await _saveListingPrices(id);
+
+      SdLogger.info(LogTagConstant.item, 'Item form saved', <String, Object>{
         'itemId': id,
-        'status': item.status.name,
+        'status': saved.status.name,
+        'repriced': state.listingPrices.length,
       });
 
       if (!state.isEditing) {
@@ -266,7 +376,8 @@ class ItemFormController extends Notifier<ItemFormState> {
 
       return id;
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.item,
         'Item form failed to save',
         error: error,
         stackTrace: stackTrace,

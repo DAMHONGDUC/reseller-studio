@@ -8,9 +8,10 @@ import '../../../../core/money/money.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../core/widgets/picker_field.dart';
+import '../../../carriers/domain/entities/carrier.dart';
+import '../../../carriers/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/order.dart';
-import '../../orders_constant.dart';
 import '../controllers/order_actions_controller.dart';
 
 /// Ship an order (plan §8's `Pick → Pack → Label → Tracking → Shipped`).
@@ -93,6 +94,7 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
   @override
   Widget build(BuildContext context) {
     final bool isBusy = ref.watch(orderActionsControllerProvider);
+    final List<Carrier> carriers = ref.watch(activeCarriersProvider);
 
     return SdBottomSheetV3(
       title: context.l10n.shipTitle,
@@ -107,10 +109,12 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
                 context,
                 title: context.l10n.orderCarrier,
                 selected: _carrier,
-                options: OrdersConstant.carriers
+                options: carriers
                     .map(
-                      (String carrier) =>
-                          PickerOption<String>(value: carrier, label: carrier),
+                      (Carrier carrier) => PickerOption<String>(
+                        value: carrier.name,
+                        label: carrier.name,
+                      ),
                     )
                     .toList(),
               );
@@ -139,112 +143,6 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
             label: context.l10n.shipSubmit,
-            expand: true,
-            busy: isBusy,
-            onPressed: isBusy ? null : _submit,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Record what the marketplace actually took and paid.
-///
-/// **The payout is the one stored figure that is not derived** (hard rule 3):
-/// it is a fact the platform reported, and it is what a seller reconciles
-/// their bank statement against. Everything else on the profit statement is
-/// computed from it and the costs.
-class SettleOrderSheet extends ConsumerStatefulWidget {
-  const SettleOrderSheet({required this.order, super.key});
-
-  final Order order;
-
-  static Future<void> show(BuildContext context, Order order) =>
-      showSdBottomSheetV3<void>(
-        context: context,
-        builder: (BuildContext context) => SettleOrderSheet(order: order),
-      );
-
-  @override
-  ConsumerState<SettleOrderSheet> createState() => _SettleOrderSheetState();
-}
-
-class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
-  late final TextEditingController _fees = TextEditingController(
-    text: _major(widget.order.fees),
-  );
-  late final TextEditingController _payout = TextEditingController(
-    text: _major(widget.order.payout),
-  );
-
-  static String _major(Money? amount) => amount?.toInputString() ?? '';
-
-  @override
-  void dispose() {
-    _fees.dispose();
-    _payout.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    final NavigatorState navigator = Navigator.of(context);
-    final String currency = ref.read(workspaceCurrencyProvider);
-
-    try {
-      await ref
-          .read(orderActionsControllerProvider.notifier)
-          .recordSettlement(
-            widget.order,
-            fees: Money.tryParse(_fees.text, currency),
-            payout: Money.tryParse(_payout.text, currency),
-          );
-
-      if (!mounted) return;
-
-      navigator.pop();
-      SdSnackBarUtilsV3.success(context, context.l10n.commonSaved);
-    } catch (error) {
-      // Already logged by the controller.
-      if (!mounted) return;
-
-      SdSnackBarUtilsV3.error(
-        context,
-        FailurePresenter.message(context, error),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isBusy = ref.watch(orderActionsControllerProvider);
-    final String currency = ref.watch(workspaceCurrencyProvider);
-
-    return SdBottomSheetV3(
-      title: context.l10n.settleTitle,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          MoneyField(
-            label: context.l10n.orderPlatformFees,
-            controller: _fees,
-            currency: currency,
-            helperText: context.l10n.settleFeesHelp,
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: SdSpacingConstant.h16),
-          MoneyField(
-            label: context.l10n.settlePayout,
-            controller: _payout,
-            currency: currency,
-            helperText: context.l10n.settlePayoutHelp,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _submit(),
-          ),
-          SizedBox(height: SdSpacingConstant.h24),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
-            label: context.l10n.actionSave,
             expand: true,
             busy: isBusy,
             onPressed: isBusy ? null : _submit,

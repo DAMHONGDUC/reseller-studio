@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/core/money/currency_decimals.dart';
-import 'package:seller_os/core/money/money.dart';
+import 'package:reseller_studio/core/money/currency_decimals.dart';
+import 'package:reseller_studio/core/money/money.dart';
 
 /// **A đồng has no cents, and getting that wrong is a factor-of-100 error in
 /// every figure the app shows a Vietnamese seller.** These are the tests that
@@ -16,6 +16,25 @@ void main() {
       expect(CurrencyDecimals.of('VND'), 0);
       expect(CurrencyDecimals.factorFor('VND'), 1);
       expect(CurrencyDecimals.of('JPY'), 0);
+    });
+
+    test('a three-decimal dinar reports three, not the fallback two', () {
+      // These were left out while the picker offered nine currencies. It now
+      // offers every one, so a Kuwaiti business would have had every amount
+      // out by a factor of ten.
+      expect(CurrencyDecimals.of('KWD'), 3);
+      expect(CurrencyDecimals.factorFor('KWD'), 1000);
+
+      for (final String code in <String>[
+        'BHD',
+        'IQD',
+        'JOD',
+        'LYD',
+        'OMR',
+        'TND',
+      ]) {
+        expect(CurrencyDecimals.of(code), 3, reason: code);
+      }
     });
 
     test('the code is matched case-insensitively', () {
@@ -64,10 +83,17 @@ void main() {
       expect(Money.tryParse(amount.toInputString(), 'USD'), amount);
     });
 
+    test('a KWD amount round-trips with three decimal places', () {
+      const Money amount = Money(19990, 'KWD');
+
+      expect(amount.toInputString(), '19.990');
+      expect(Money.tryParse(amount.toInputString(), 'KWD'), amount);
+    });
+
     test('a VND amount round-trips with no decimal point', () {
       const Money amount = Money(450000, 'VND');
 
-      expect(amount.toInputString(), '450000');
+      expect(amount.toInputString(), '450,000');
       expect(Money.tryParse(amount.toInputString(), 'VND'), amount);
     });
 

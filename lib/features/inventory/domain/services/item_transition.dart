@@ -59,13 +59,6 @@ final class ItemTransition {
     if (item.quantity <= 0) blocks.add(ItemTransitionBlock.noQuantity);
 
     switch (target) {
-      case ItemStatus.listed:
-        if (!item.status.isListable) {
-          blocks.add(ItemTransitionBlock.wrongStatus);
-        }
-        if (item.askingPrice == null) {
-          blocks.add(ItemTransitionBlock.missingPrice);
-        }
       case ItemStatus.sold:
         if (item.status == ItemStatus.sold ||
             item.status == ItemStatus.archived) {
@@ -73,10 +66,6 @@ final class ItemTransition {
         }
         if (item.askingPrice == null) {
           blocks.add(ItemTransitionBlock.missingSalePrice);
-        }
-      case ItemStatus.reserved:
-        if (item.status != ItemStatus.listed) {
-          blocks.add(ItemTransitionBlock.wrongStatus);
         }
       case ItemStatus.draft:
       case ItemStatus.inStock:
@@ -90,6 +79,109 @@ final class ItemTransition {
     return blocks.isEmpty
         ? const ItemTransitionCheck.allowed()
         : ItemTransitionCheck.blocked(blocks);
+  }
+
+  /// Whether more marketplaces may be added for this item (plan §13).
+  ///
+  /// **Deliberately not `check(item, listed)`.** That one refuses an item
+  /// that is already listed, which is exactly the item cross-listing is for:
+  /// it is on eBay and the seller wants it on Depop as well. What is refused
+  /// here is an item that has left inventory — a sold or archived one — and
+  /// an empty shelf.
+  ///
+  /// **A price is not required at this point** and asking for one would be
+  /// hard rule 2 backwards: the cross-list screen is itself where the price
+  /// is entered, so requiring it beforehand would block the screen that
+  /// collects it.
+  static ItemTransitionCheck crossListCheck(Item item) {
+    final List<ItemTransitionBlock> blocks = <ItemTransitionBlock>[];
+
+    if (item.quantity <= 0) blocks.add(ItemTransitionBlock.noQuantity);
+
+    if (item.status == ItemStatus.sold || item.status == ItemStatus.archived) {
+      blocks.add(ItemTransitionBlock.wrongStatus);
+    }
+
+    return blocks.isEmpty
+        ? const ItemTransitionCheck.allowed()
+        : ItemTransitionCheck.blocked(blocks);
+  }
+
+  /// [item] marked as live on a marketplace.
+  ///
+  /// **Going live is not a status move any more** — owner's rule, since an
+  /// item on eBay is still stock the seller owns. What it does change is
+  /// `listedAt`, the clock staleness is measured from, and a draft becomes
+  /// stock the moment it is offered for sale.
+  ///
+  /// **The clock is set once and never moved by a relist**: an item listed in
+  /// March and cross-listed in June has been sitting since March, and that is
+  /// the number the seller has to see.
+  static Item markListed(Item item, {required DateTime now}) => item.copyWith(
+    listedAt: item.listedAt ?? now,
+    status: item.status == ItemStatus.draft ? ItemStatus.inStock : item.status,
+  );
+
+  /// One unit out the door.
+  ///
+  /// **Quantity is what decides whether the record is sold** — owner's rule.
+  /// Selling one of ten used to mark the whole row sold and leave the count
+  /// at ten, so the shelf claimed nine items that Inventory said were gone.
+  /// A sale now takes one off the count, and only the sale that empties it
+  /// moves the status.
+  ///
+  /// Throws for the same reason [apply] does: nothing on the shelf to sell,
+  /// no sale price, or an item that has already left inventory.
+  static Item sell(Item item, {required DateTime now}) {
+    final ItemTransitionCheck result = check(item, ItemStatus.sold);
+    final int left = item.quantity - 1;
+
+    if (!result.isAllowed) {
+      throw StateError(
+        'Cannot sell item ${item.id}: '
+        '${result.blocks.map((ItemTransitionBlock b) => b.name).join(', ')}',
+      );
+    }
+
+    // Still stock behind it: the record stays exactly where it was — listed
+    // stays listed, and its staleness clock is not touched.
+    if (left > 0) return item.copyWith(quantity: left);
+
+    return apply(item, ItemStatus.sold, now: now);
+  }
+
+  /// [item] after its count was edited — back on the shelf if the seller put
+  /// stock behind a sold record.
+  ///
+  /// **The other half of the rule above** — owner's rule. A sold row given a
+  /// quantity again is a seller saying they have the thing, and leaving it
+  /// sold made the card claim nothing was left of ten. Nothing else moves:
+  /// archiving is a deliberate withdrawal, and a count does not undo it.
+  static Item restocked(Item item, {required DateTime now}) {
+    if (item.status != ItemStatus.sold || item.quantity <= 0) return item;
+
+    return apply(item, ItemStatus.inStock, now: now);
+  }
+
+  /// [count] more of [item] on the shelf.
+  ///
+  /// **Restocking adds to the count and puts the row back in stock** —
+  /// owner's rule. A seller who buys five more of something that sold out is
+  /// not creating a new item: it is the same record, with the same cost
+  /// history and the same listings, and having to un-sell it by hand first
+  /// was the step that made people create a duplicate instead.
+  ///
+  /// Adds rather than replaces: the box asks how many arrived, which is the
+  /// number on the receipt in the seller's hand. An archived item comes back
+  /// too — restocking it is the seller saying they have it again.
+  static Item restock(Item item, int count, {required DateTime now}) {
+    final Item stocked = item.copyWith(quantity: item.quantity + count);
+
+    if (count <= 0) {
+      throw StateError('Cannot restock item ${item.id} by $count');
+    }
+
+    return apply(stocked, ItemStatus.inStock, now: now);
   }
 
   /// [item] moved to [target], with the timestamps that move implies.
@@ -106,12 +198,33 @@ final class ItemTransition {
       );
     }
 
-    return item.copyWith(
-      status: target,
-      // First time live anywhere is what staleness is measured from, so it is
-      // set once and never moved by a relist.
-      listedAt: target == ItemStatus.listed ? item.listedAt ?? now : null,
-      soldAt: target == ItemStatus.sold ? now : null,
-    );
+    return setStatus(item, target, now: now);
   }
+
+  /// [item] moved to [target] with no gate at all — the seller's own choice.
+  ///
+  /// **The status a seller picks on the form is never refused** — owner's
+  /// rule. That screen is where they correct what the app got wrong, and a
+  /// correction that argues back is the thing they came to fix. The verbs are
+  /// unchanged: [apply] still checks, so Mark as sold and the bulk paths ask
+  /// for what they need.
+  ///
+  /// The side effects come along either way, because they are what keeps the
+  /// record consistent rather than what keeps it legal.
+  static Item setStatus(
+    Item item,
+    ItemStatus target, {
+    required DateTime now,
+  }) => item.copyWith(
+    status: target,
+    // Sold means sold out, whichever way it was reached: the count goes to
+    // zero so the card, the restock box and Analytics all agree with the
+    // status rather than each other.
+    quantity: target == ItemStatus.sold ? 0 : null,
+    soldAt: target == ItemStatus.sold ? now : null,
+    // Coming back onto the shelf undoes the sale, and the date has to go with
+    // it: an item on hand that still carries a sold date is one every export
+    // and every report reads as sold.
+    clearSoldAt: target.isOnHand && item.soldAt != null,
+  );
 }

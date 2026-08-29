@@ -19,7 +19,7 @@ class _MarketplaceRow extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Text(
-              row.marketplace.displayName,
+              row.marketplaceName,
               style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
                 color: context.sdTheme3.textPrimary,
               ),
@@ -45,9 +45,12 @@ class _MarketplaceRow extends StatelessWidget {
       ),
       SizedBox(height: SdSpacingConstant.h6),
       Text(
-        '${row.orderCount} orders · fees ${context.money(row.fees)} '
-        '(${context.percent(row.feeRate, decimals: 1)}) · '
-        'profit ${context.money(row.profit)}',
+        context.l10n.analyticsMarketplaceRowDetail(
+          context.l10n.analyticsOrderCount(row.orderCount),
+          context.money(row.fees),
+          context.percent(row.feeRate, decimals: 1),
+          context.money(row.profit),
+        ),
         style: context.textTheme3.bodySmall!.muted3(context),
       ),
     ],

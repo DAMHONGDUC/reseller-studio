@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/config/app_env.dart';
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/legal_links_card.dart';
 import '../../../workflow_constant.dart';
 
 part 'about_screen_workflow.dart';
@@ -46,6 +47,10 @@ class AboutScreen extends StatelessWidget {
             color: context.sdTheme3.textSecondary,
           ),
         ),
+        // Reachable with no account: About is outside the sign-in gate, and
+        // a reviewer looking for the privacy policy looks here first.
+        SdSectionHeaderV3(title: context.l10n.legalSection),
+        const LegalLinksCard(),
         SizedBox(height: SdContentPaddingV3.bottomGap),
       ],
     ),
@@ -64,7 +69,7 @@ class _Masthead extends StatelessWidget {
         Row(
           children: <Widget>[
             SdIconTileV3(
-              icon: Symbols.storefront_rounded,
+              icon: AppIconConstant.storefront,
               tint: context.colorScheme3.primary,
             ),
             SizedBox(width: SdSpacingConstant.w12),

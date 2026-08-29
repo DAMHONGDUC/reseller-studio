@@ -60,13 +60,36 @@ final class AppEnv {
   /// `Info.plist` and `AndroidManifest.xml` and cannot be set from here.
   static const String appDisplayName = String.fromEnvironment(
     'APP_DISPLAY_NAME',
-    defaultValue: 'Seller OS',
+    defaultValue: 'Reseller Studio',
   );
 
-  static const String supportEmail = String.fromEnvironment(
-    'SUPPORT_EMAIL',
-    defaultValue: 'support@selleros.app',
+  // --- Legal ---
+  //
+  // Owner's rule: the policy addresses are build-time configuration, not
+  // constants, because a staging build points at a draft nobody has had a
+  // lawyer read. See `docs/rules/ENV.md`.
+  //
+  // **No default on purpose.** Every other getter here falls back to
+  // something usable; these two fall back to nothing, because a guessed URL
+  // is a link a reviewer clicks and finds a 404 behind. Empty means the row
+  // is not drawn at all, and `missingReleaseKeys` names the key.
+
+  static const String privacyPolicyUrl = String.fromEnvironment(
+    'PRIVACY_POLICY_URL',
   );
+
+  static const String termsOfServiceUrl = String.fromEnvironment(
+    'TERMS_OF_SERVICE_URL',
+  );
+
+  /// Whether either policy address was configured.
+  ///
+  /// What a legal card reads to decide between drawing itself and staying
+  /// out of the layout — App Store review requires both links (guideline
+  /// 3.1.2), and a half-configured build should show the one it has rather
+  /// than an empty card.
+  static bool get hasLegalLinks =>
+      privacyPolicyUrl.isNotEmpty || termsOfServiceUrl.isNotEmpty;
 
   // --- Development switches ---
   //
@@ -85,42 +108,23 @@ final class AppEnv {
 
   // --- Firebase ---
   //
-  // Mirrors what `flutterfire configure` writes into `firebase_options.dart`.
-  // Both exist on purpose: the generated file is what the SDK reads, and
-  // these are what tooling and the Settings diagnostics screen read without
-  // importing a gitignored file that may not exist yet.
+  // **Two keys, and neither one configures the SDK.** `Firebase.initializeApp`
+  // is called with no options, so the api keys, sender id and buckets come
+  // from `GoogleService-Info.plist` and `google-services.json` — carrying them
+  // here as well was one fact written twice, and the copy nothing read.
+  //
+  // - the project id is how the app tells "no backend configured" apart from
+  //   "configured and unreachable" ([hasFirebaseConfig]);
+  // - the iOS app id is read by `verify_flavor_config` in the beta lane and
+  //   cross-checked against the installed plist, so a build cannot send its
+  //   symbols to another project's Crashlytics.
 
   static const String firebaseProjectId = String.fromEnvironment(
     'FIREBASE_PROJECT_ID',
   );
 
-  static const String firebaseAndroidApiKey = String.fromEnvironment(
-    'FIREBASE_ANDROID_API_KEY',
-  );
-
-  static const String firebaseAndroidAppId = String.fromEnvironment(
-    'FIREBASE_ANDROID_APP_ID',
-  );
-
-  static const String firebaseIosApiKey = String.fromEnvironment(
-    'FIREBASE_IOS_API_KEY',
-  );
-
-  static const String firebaseIosAppId = String.fromEnvironment(
-    'FIREBASE_IOS_APP_ID',
-  );
-
-  static const String firebaseMessagingSenderId = String.fromEnvironment(
-    'FIREBASE_MESSAGING_SENDER_ID',
-  );
-
-  static const String firebaseStorageBucket = String.fromEnvironment(
-    'FIREBASE_STORAGE_BUCKET',
-  );
-
-  static const String firebaseIosBundleId = String.fromEnvironment(
-    'FIREBASE_IOS_BUNDLE_ID',
-    defaultValue: 'com.dd.seller.os',
+  static const String firebaseAppIdIos = String.fromEnvironment(
+    'FIREBASE_APP_ID_IOS',
   );
 
   /// Where callables are deployed. The client must name the same region the
@@ -134,17 +138,17 @@ final class AppEnv {
   //
   // Client *ids*, which are public by design — the OAuth flow shows them in a
   // browser URL. The matching secrets stay server-side.
+  //
+  // Google only. Apple needs nothing in the binary: the app goes through
+  // `FirebaseAuth.signInWithProvider`, and the Services ID lives in the
+  // Firebase console.
 
-  static const String googleSignInIosClientId = String.fromEnvironment(
-    'GOOGLE_SIGN_IN_IOS_CLIENT_ID',
+  static const String googleSignInClientIdIos = String.fromEnvironment(
+    'GOOGLE_SIGN_IN_CLIENT_ID_IOS',
   );
 
   static const String googleSignInServerClientId = String.fromEnvironment(
     'GOOGLE_SIGN_IN_SERVER_CLIENT_ID',
-  );
-
-  static const String appleSignInServiceId = String.fromEnvironment(
-    'APPLE_SIGN_IN_SERVICE_ID',
   );
 
   // --- Billing (RevenueCat) ---
@@ -158,12 +162,20 @@ final class AppEnv {
   // One key per store, because RevenueCat issues one per store and using the
   // wrong one fails at configure time rather than at purchase time.
 
-  static const String revenueCatIosApiKey = String.fromEnvironment(
-    'REVENUECAT_IOS_API_KEY',
+  static const String revenueCatIosKey = String.fromEnvironment(
+    'REVENUECAT_IOS_KEY',
   );
 
-  static const String revenueCatAndroidApiKey = String.fromEnvironment(
-    'REVENUECAT_ANDROID_API_KEY',
+  static const String revenueCatAndroidKey = String.fromEnvironment(
+    'REVENUECAT_ANDROID_KEY',
+  );
+
+  static const String revenueCatEntitlement = String.fromEnvironment(
+    'REVENUECAT_ENTITLEMENT',
+  );
+
+  static const String revenueCatOffering = String.fromEnvironment(
+    'REVENUECAT_OFFERING',
   );
 
   /// Whether billing was configured for **either** store.
@@ -172,7 +184,9 @@ final class AppEnv {
   /// "set up and the seller is on Free" — two states that look identical from
   /// an empty offerings list and want very different screens.
   static bool get hasBillingConfig =>
-      revenueCatIosApiKey.isNotEmpty || revenueCatAndroidApiKey.isNotEmpty;
+      (revenueCatIosKey.isNotEmpty || revenueCatAndroidKey.isNotEmpty) &&
+      revenueCatEntitlement.isNotEmpty &&
+      revenueCatOffering.isNotEmpty;
 
   // --- Workspace defaults ---
   //
@@ -206,12 +220,11 @@ final class AppEnv {
   /// build that fails on the first missing key costs one round trip per key.
   static List<String> get missingReleaseKeys => <String>[
     if (firebaseProjectId.isEmpty) 'FIREBASE_PROJECT_ID',
-    if (firebaseIosApiKey.isEmpty) 'FIREBASE_IOS_API_KEY',
-    if (firebaseIosAppId.isEmpty) 'FIREBASE_IOS_APP_ID',
-    if (firebaseAndroidApiKey.isEmpty) 'FIREBASE_ANDROID_API_KEY',
-    if (firebaseAndroidAppId.isEmpty) 'FIREBASE_ANDROID_APP_ID',
-    if (firebaseMessagingSenderId.isEmpty) 'FIREBASE_MESSAGING_SENDER_ID',
-    if (firebaseStorageBucket.isEmpty) 'FIREBASE_STORAGE_BUCKET',
+    if (firebaseAppIdIos.isEmpty) 'FIREBASE_APP_ID_IOS',
+    // Not a backend key, and still a blocker: App Store review wants both
+    // links reachable from inside the binary (guideline 3.1.2).
+    if (privacyPolicyUrl.isEmpty) 'PRIVACY_POLICY_URL',
+    if (termsOfServiceUrl.isEmpty) 'TERMS_OF_SERVICE_URL',
   ];
 
   /// One line for the log and the Settings diagnostics card.

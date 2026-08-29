@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:simple_icons/simple_icons.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_feature_constant.dart';
-import '../../../../../core/constants/brand_asset_constant.dart';
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/navigation_utils.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../controllers/auth_controller.dart';
-import '../../widgets/auth_brand_mark.dart';
 
 part 'login_screen_actions.dart';
 part 'login_screen_features.dart';
@@ -29,12 +29,16 @@ part 'login_screen_header.dart';
 /// and never has to secure a reset flow.
 ///
 /// Apple is not optional beside Google: App Store guideline 4.8 requires it
-/// wherever a third-party sign-in is offered. Both marks are the vendors' own
-/// files from `assets/brand/` (`BrandAssetConstant`) — neither may be redrawn,
-/// and Google's may not be recoloured.
+/// wherever a third-party sign-in is offered. Both marks come from
+/// `SimpleIcons` (owner's rule); swapping them for the vendors' own artwork is
+/// a submission task, not a build one — `RELEASE_ACTIONS.md` blocker 5.
 ///
-/// The screen navigates nowhere on success: the router's redirect watches auth
-/// state and moves the seller on by itself.
+/// **On success it asks the router to re-decide, and nothing more.** This
+/// screen is *pushed* over the signed-out shell, and an imperative route sits
+/// on top of whatever the redirect chose — so a seller who signed in from a
+/// tab would keep looking at this form. `NavigationUtils.afterSignIn` names
+/// Home; the redirect is still the one thing that turns that into workspace
+/// setup when the account has no business yet.
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
@@ -44,14 +48,24 @@ class LoginScreen extends ConsumerWidget {
     AuthProviderKind provider,
   ) async {
     try {
-      await ref.read(authControllerProvider.notifier).signIn(provider);
+      final bool signedIn = await ref
+          .read(authControllerProvider.notifier)
+          .signIn(provider);
+
+      // False is a cancelled sheet, not a failure — the seller stays here.
+      if (!signedIn || !context.mounted) return;
+
+      NavigationUtils.afterSignIn(context);
     } catch (error) {
       // Already logged by the controller; the seller gets the one message
       // hard rule 6 allows. A cancellation never reaches here — the
       // repository reports it as an outcome, not a throw.
       if (!context.mounted) return;
 
-      SdSnackBarUtilsV3.error(context, FailurePresenter.message(context, error));
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
     }
   }
 

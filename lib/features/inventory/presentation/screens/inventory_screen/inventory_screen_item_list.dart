@@ -9,6 +9,14 @@ class _ItemList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // One `now` for the whole list, so every row agrees on what stale means.
     final DateTime now = ref.watch(clockProvider).now();
+    // Grouped once here rather than watched per card: a family subscription
+    // on every row rebuilds the whole list on any listing write.
+    final Map<String, List<Listing>> listings = <String, List<Listing>>{};
+
+    for (final Listing listing
+        in ref.watch(listingsProvider).value ?? const <Listing>[]) {
+      listings.putIfAbsent(listing.itemId, () => <Listing>[]).add(listing);
+    }
     final Set<String> selected = ref.watch(inventorySelectionProvider);
     final bool isSelecting = selected.isNotEmpty;
 
@@ -33,6 +41,7 @@ class _ItemList extends ConsumerWidget {
 
           return ItemCard(
             item: item,
+            listings: listings[item.id] ?? const <Listing>[],
             now: now,
             isSelecting: isSelecting,
             isSelected: selected.contains(item.id),
@@ -46,6 +55,11 @@ class _ItemList extends ConsumerWidget {
                 : () => context.push(AppRoutes.item(item.id)),
             onLongPress: () =>
                 ref.read(inventorySelectionProvider.notifier).toggle(item.id),
+            // The same sheet the detail screen opens — one list of verbs, so
+            // an action added there cannot go missing here.
+            onActions: () => ItemActionsSheet.show(context, item),
+            // The row shows no price per marketplace; this is where they are.
+            onMarketPrices: () => context.push(AppRoutes.crossList(item.id)),
           );
         },
       ),

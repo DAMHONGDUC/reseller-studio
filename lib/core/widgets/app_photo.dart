@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:system_design/index.dart';
 
-import '../logging/app_logger.dart';
+import '../constants/app_icon_constant.dart';
+import '../constants/log_tag_constant.dart';
 
 /// Renders a stored photo, whichever kind of URL it turned out to be.
 ///
@@ -75,7 +75,8 @@ class AppPhoto extends StatelessWidget {
     StackTrace? stackTrace,
     BorderRadius radius,
   ) {
-    AppLogger.error(
+    SdLogger.error(
+      LogTagConstant.photo,
       'Could not load photo',
       error: error,
       stackTrace: stackTrace,
@@ -107,7 +108,7 @@ class _PhotoPlaceholder extends StatelessWidget {
     ),
     alignment: Alignment.center,
     child: SdIconV3(
-      Symbols.image_rounded,
+      AppIconConstant.image,
       size: SdIconV3.defaultSize,
       color: context.sdTheme3.textTertiary,
     ),

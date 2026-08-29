@@ -1,16 +1,19 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:seller_os/core/money/money.dart';
-import 'package:seller_os/features/analytics/domain/entities/analytics_summary.dart';
-import 'package:seller_os/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
-import 'package:seller_os/features/analytics/providers.dart';
-import 'package:seller_os/features/home/presentation/screens/home_screen/home_screen.dart';
-import 'package:seller_os/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
-import 'package:seller_os/features/inventory/providers.dart';
-import 'package:seller_os/features/orders/domain/entities/order.dart';
-import 'package:seller_os/features/orders/providers.dart';
-import 'package:seller_os/features/settings/presentation/screens/settings_screen/settings_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/analytics/domain/entities/analytics_summary.dart';
+import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
+import 'package:reseller_studio/features/analytics/providers.dart';
+import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
+import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/settings/presentation/screens/settings_screen/settings_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../support/pump_app.dart';
@@ -37,9 +40,7 @@ void main() {
 
       await warmUp(container);
 
-      final AnalyticsSummary summary = container.read(
-        analyticsSummaryProvider,
-      );
+      final AnalyticsSummary summary = container.read(analyticsSummaryProvider);
 
       expect(summary.revenue, const Money(43900, 'USD'));
       expect(summary.netProfit, const Money(1152, 'USD'));
@@ -58,20 +59,23 @@ void main() {
       expect(container.read(analyticsSummaryProvider).isProfitComplete, isTrue);
     });
 
-    test('inventory value counts on-hand items at cost, ignoring unknowns', () async {
-      final ProviderContainer container = mockContainer();
+    test(
+      'inventory value counts on-hand items at cost, ignoring unknowns',
+      () async {
+        final ProviderContainer container = mockContainer();
 
-      await warmUp(container);
+        await warmUp(container);
 
-      // On hand with a known cost: 1500+2800+2200+4100+1500+(900×2) = 13900.
-      // itm-9 and itm-10 are Quick Add leftovers with no cost and are
-      // excluded rather than counted as free — hard rule 5.
-      expect(
-        container.read(analyticsSummaryProvider).inventoryValue,
-        const Money(13900, 'USD'),
-      );
-      expect(container.read(analyticsSummaryProvider).itemsOnHand, 8);
-    });
+        // On hand with a known cost: 1500+2800+2200+4100+1500+(900×2) = 13900.
+        // itm-9 and itm-10 are Quick Add leftovers with no cost and are
+        // excluded rather than counted as free — hard rule 5.
+        expect(
+          container.read(analyticsSummaryProvider).inventoryValue,
+          const Money(13900, 'USD'),
+        );
+        expect(container.read(analyticsSummaryProvider).itemsOnHand, 8);
+      },
+    );
 
     test('marketplace rows are ordered by revenue', () async {
       final ProviderContainer container = mockContainer();
@@ -103,15 +107,15 @@ void main() {
       );
 
       expect(counts[InventoryFilter.all], 11);
-      expect(counts[InventoryFilter.listed], 3);
-      expect(counts[InventoryFilter.reserved], 1);
+      expect(counts[InventoryFilter.inStock], 6);
+      expect(counts[InventoryFilter.draft], 2);
       expect(counts[InventoryFilter.sold], 3);
       // itm-4 (listed 84 days ago) and itm-5 (66) are past the 60-day
       // threshold; itm-6 (20 days) is not.
       expect(counts[InventoryFilter.stale], 2);
     });
 
-    test('stale is a subset of listed, never its own status', () async {
+    test('stale is a subset of stock, never its own status', () async {
       final ProviderContainer container = mockContainer();
 
       await warmUp(container);
@@ -121,9 +125,9 @@ void main() {
       );
 
       expect(
-        counts[InventoryFilter.stale]! <= counts[InventoryFilter.listed]!,
+        counts[InventoryFilter.stale]! <= counts[InventoryFilter.inStock]!,
         isTrue,
-        reason: 'a stale item is still a listed item',
+        reason: 'a stale item is still stock the seller is holding',
       );
     });
   });
@@ -136,12 +140,11 @@ void main() {
 
       final List<Order> pending = container.read(ordersNeedingActionProvider);
 
-      // ord-5 (deadline yesterday), ord-4 (deadline tomorrow), then ord-6
-      // (return requested, no deadline) last.
+      // Shipping Queue is fulfillment-only: ord-5 (deadline yesterday), then
+      // ord-4 (deadline tomorrow). Return requests have their own workflow.
       expect(pending.map((Order order) => order.id).toList(), <String>[
         'ord-5',
         'ord-4',
-        'ord-6',
       ]);
       expect(pending.first.isOverdue(testNow), isTrue);
     });
@@ -174,9 +177,19 @@ void main() {
       // The list sorts newest-created first, so this is the top row.
       expect(find.textContaining('Nike windbreaker'), findsOneWidget);
 
-      // A Quick Add leftover: title only, no cost, no price. Both money cells
+      // A Quick Add leftover: title only, no cost, no price. Every money cell
       // must render an em dash rather than a zero — hard rule 5, proven on a
       // real row rather than asserted in a comment.
+      //
+      // Scrolled to rather than expected on the first screenful: the row
+      // carries three figures now, so fewer of them fit at once.
+      await tester.scrollUntilVisible(
+        find.textContaining('brass hardware'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+
       expect(find.textContaining('brass hardware'), findsOneWidget);
       expect(find.text('—'), findsWidgets);
 
@@ -198,7 +211,23 @@ void main() {
       // item can be listed *and* stale, and collapsing that into one marker
       // loses the fact that it is still live and still earning nothing.
       expect(find.text('Stale'), findsWidgets);
-      expect(find.text('Listed'), findsWidgets);
+      expect(find.text('In stock'), findsWidgets);
+    });
+
+    testWidgets('Item detail exposes a labelled Actions button', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-1'));
+
+      final Finder action = find.widgetWithText(SdButtonV3, 'Actions');
+
+      expect(action, findsOneWidget);
+      expect(find.byIcon(Symbols.more_vert_rounded), findsNothing);
+
+      await tester.tap(action);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ItemActionsSheet), findsOneWidget);
     });
 
     testWidgets('Inventory docks the search field into the bar on scroll', (

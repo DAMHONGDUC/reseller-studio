@@ -21,7 +21,12 @@ class _ContextProbe extends StatelessWidget {
   }
 }
 
-/// A snackbar must not land inside the band the glass nav bar occupies.
+/// Where a message lands, and what it does to the screen under it.
+///
+/// **Messages come from the top by default** (owner's rule), so the two
+/// bottom-placed cases below name the placement explicitly — the nav-bar
+/// clearance they pin is still live for a route that owns the top of the
+/// screen.
 ///
 /// It draws into the root overlay, above the whole app, so nothing in its own
 /// build can see the bar — `SdFloatingBarScopeV3` around the shell body is the
@@ -47,11 +52,15 @@ void main() {
       ),
     );
 
-    SdSnackBarUtilsV3.success(screenContext, 'Saved');
+    SdSnackBarUtilsV3.success(
+      screenContext,
+      'Saved',
+      placement: SdSnackBarPlacementV3.bottom,
+    );
     await tester.pumpAndSettle();
 
-    final double screenHeight = tester.view.physicalSize.height /
-        tester.view.devicePixelRatio;
+    final double screenHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
     final double barTop =
         screenHeight - SdContentPaddingV3.floatingBarInset(screenContext);
 
@@ -76,11 +85,15 @@ void main() {
       ),
     );
 
-    SdSnackBarUtilsV3.success(screenContext, 'Saved');
+    SdSnackBarUtilsV3.success(
+      screenContext,
+      'Saved',
+      placement: SdSnackBarPlacementV3.bottom,
+    );
     await tester.pumpAndSettle();
 
-    final double screenHeight = tester.view.physicalSize.height /
-        tester.view.devicePixelRatio;
+    final double screenHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
 
     // No scope, so nothing is floating over this route and the message keeps
     // the position it had before the scope existed.
@@ -91,5 +104,61 @@ void main() {
         epsilon: 0.5,
       ),
     );
+  });
+
+  testWidgets('a top message clears the app bar controls', (
+    WidgetTester tester,
+  ) async {
+    late BuildContext screenContext;
+
+    await pumpScreen(
+      tester,
+      SdScaffoldV3(
+        appBar: const SdAppBarV3(title: 'Detail'),
+        body: _ContextProbe(
+          onContext: (BuildContext context) => screenContext = context,
+        ),
+      ),
+    );
+
+    SdSnackBarUtilsV3.success(screenContext, 'Saved');
+    await tester.pumpAndSettle();
+
+    final Rect appBar = tester.getRect(find.byType(AppBar));
+    final Rect message = tester.getRect(find.byType(SdSnackBarCardV3));
+
+    expect(message.top, greaterThanOrEqualTo(appBar.bottom));
+  });
+
+  testWidgets('and it never takes a tap from the screen under it', (
+    WidgetTester tester,
+  ) async {
+    late BuildContext screenContext;
+    int taps = 0;
+
+    // A full-screen target under the overlay: whatever the card covers, this
+    // still has to receive.
+    await pumpScreen(
+      tester,
+      SdScaffoldV3(
+        body: GestureDetector(
+          // Opaque, or an empty SizedBox under it answers no hit test and the
+          // tap this asserts on never lands anywhere.
+          behavior: HitTestBehavior.opaque,
+          onTap: () => taps++,
+          child: _ContextProbe(
+            onContext: (BuildContext context) => screenContext = context,
+          ),
+        ),
+      ),
+    );
+
+    SdSnackBarUtilsV3.success(screenContext, 'Saved');
+    await tester.pumpAndSettle();
+
+    await tester.tapAt(tester.getCenter(find.byType(SdSnackBarCardV3)));
+    await tester.pump();
+
+    expect(taps, 1);
   });
 }

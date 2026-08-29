@@ -11,6 +11,8 @@ Everything is under a workspace. There is no top-level `items` or `orders`.
 
 ```text
 users/{uid}                          the person, not their business
+  devices/{token}                    FCM tokens, one per signed-in device
+  notifications/{notificationId}     the inbox — written only by functions
 invites/{inviteId}                   pending team invites, keyed by email
 
 workspaces/{workspaceId}
@@ -21,11 +23,13 @@ workspaces/{workspaceId}
   listings/{listingId}
   offers/{offerId}
   orders/{orderId}
-  expenses/{expenseId}
+  expenses/{expenseId}               one row per occurrence; a monthly cost
+                                     links them with `recurringSeriesId`
   receipts/{receiptId}
   categories/{categoryId}
   locations/{locationId}
-  marketplaces/{marketplaceId}       connection state; tokens are server-only
+  marketplaces/{marketplaceId}
+  carriers/{carrierId}
   activity/{activityId}              append-only audit log
   subscription/{docId}               plan tier, written by webhook only
 ```
@@ -120,11 +124,34 @@ document. Without the copy, every Inventory query becomes N+1 reads. They are
 written by the same transaction that writes the item, and a Cloud Function
 trigger fixes them if the purchase is edited.
 
-Statuses: `draft`, `inStock`, `listed`, `reserved`, `sold`, `archived`.
-`stale` is **not** a status — it is a query (`status == listed` and
-`listedAt` older than the workspace's threshold). Storing it as a status would
-mean a nightly job flipping thousands of documents, and a seller who reprices
-an item would have to wait for that job to see it leave the Stale tab.
+Statuses: `draft`, `inStock`, `sold`, `archived` — four, and `quantity` is
+what moves a row between the middle two. `listed` and `reserved` were removed:
+an item live on a marketplace is still stock the seller owns, so it stays
+`inStock` with its listings beside it. **A document written before that still
+reads**: `ItemDto` folds both old values into `inStock`, and nothing rewrites
+them until the item is next saved.
+
+`stale` is **not** a status either — it is a query (on hand, and `listedAt`
+older than the workspace's threshold). Storing it as a status would mean a
+nightly job flipping thousands of documents, and a seller who reprices an item
+would have to wait for that job to see it leave the Stale tab.
+
+`updatedAt` is written on every save as a **server timestamp** and is read
+back into `Item.updatedAt`. It is read-only everywhere: the item form does not
+offer it, and neither does anything else — a date a seller can type is not a
+record of anything. Null means the document has not come back from the server
+yet; in mock mode the in-memory repository stamps it, because a mode with no
+server would otherwise show "last updated" blank forever.
+
+`listedAt` survives the removal and carries more weight for it: it is the only
+record that an item ever reached a platform, so it is what staleness, the
+Stale tab and Home's getting-started progress all read.
+
+### `categories/{categoryId}`
+
+`name`, `parentId`, `description`, `deletedAt`, plus the fields every document
+carries. Every new workspace starts with Clothing, Shoes, and Accessories as
+normal editable records; they are defaults rather than a closed taxonomy.
 
 ### `listings/{listingId}`
 
@@ -132,11 +159,44 @@ One per item **per marketplace** — cross-listing (plan §13) means one item ha
 several. `externalListingId` and `externalUrl` are how the sync layer matches
 a remote listing back to ours, and both are null until a publish succeeds.
 
+### `marketplaces/{marketplaceId}`
+
+`name`, `feeRate`, `deletedAt`, plus the fields every document carries. These
+are seller-owned records rather than a closed platform list: a business can
+add, rename, change the estimated rate, and soft-delete any marketplace.
+
+`feeRate` is a fraction of the sale and is **a planning estimate, never
+accounting**. A fee an order actually reports is a fact and always wins.
+
+Every new workspace starts with eBay, Etsy, Depop, Poshmark, and Vinted as
+ordinary records. Their ids, names and initial rates come from one code-owned
+default list; after creation they behave exactly like a marketplace the seller
+added.
+
+### `carriers/{carrierId}`
+
+`name`, `deletedAt`, plus the fields every document carries. These are
+business-owned shipping choices: Settings may add, rename, and soft-delete
+them, while shipment forms offer the active records.
+
+Every new workspace starts with the carriers defined by
+`CarrierConstant.defaults`. They are ordinary editable records after seeding.
+
 ### `orders/{orderId}`
 
 `salePriceMinor`, `feesMinor`, `shippingCostMinor`, `refundMinor`,
-`payoutMinor`, `status`, `marketplaceId`, `externalOrderId`, `orderedAt`,
-`shipByDate`, plus an `items` array of `{itemId, quantity, unitPriceMinor}`.
+`payoutMinor`, `status`, `marketplaceId`, `marketplaceName`,
+`externalOrderId`, `orderedAt`, `shipByDate`, `shippedAt`, `deliveredAt`,
+`returnRequestedAt`, `returnedAt`, `refundedAt`, `settledAt`, plus a `lines`
+array of `{itemId, title, quantity, unitPriceMinor, unitCostMinor}`.
+
+`marketplaceId` points at the business-owned marketplace record while
+`marketplaceName` is the sale-time snapshot shown in history. Renaming or
+soft-deleting the marketplace must not rewrite an order that already happened.
+
+Lifecycle timestamps are facts, not values inferred from current `status`: a
+returned order can later be refunded, and both events must remain on its
+timeline.
 
 The line items are **embedded, not a subcollection**. An order has a handful
 of lines, they are always read with the order, and they never change after the
@@ -144,19 +204,46 @@ sale — which is exactly when embedding wins. Their `unitPriceMinor` is copied
 at sale time and must never be refreshed from the item: it is what the buyer
 paid, and repricing the item afterwards must not rewrite history.
 
+### `devices/{token}`
+
+`token`, `platform`, `updatedAt`. **The token is the document id**, which is
+what makes registration idempotent — the same phone re-registering on every
+launch rewrites one document instead of growing a collection — and what lets
+the send path delete exactly the entry FCM reported dead.
+
+Under the *user*, not the workspace: a device belongs to whoever is holding
+it, and a seller in three businesses does not have three phones. The token is
+never logged (hard rule 9) — it is a way to push arbitrary text onto somebody's
+phone.
+
+### `notifications/{notificationId}`
+
+`type`, `workspaceId`, `entityId`, `count`, `route`, `title`, `body`,
+`readAt`, `createdAt`. Written only by Cloud Functions; the client may update
+`readAt` and nothing else, which `firestore.rules` enforces field by field.
+
+**Under the user because a notification is addressed to a reader**, not to a
+business — two members of one workspace each get their own row and each marks
+their own read. A shared document with a `readBy` array would have every
+reader writing to a document every other reader is watching.
+
+**`title` and `body` are the English push text, and the app does not read
+them.** A Cloud Function cannot know the reader's locale, so the row is
+rendered in the app from `type` and `count` through ARB (hard rule 7). That is
+what lets the translation pass fix the inbox without rewriting history.
+
+`count` is null for a notification about one record and set for a digest —
+never 0, which would read as a digest of nothing (hard rule 5).
+
+**The id is the dedupe key**: an event id for a trigger, `<type>_<date>` for
+the daily digest. A retried trigger and a digest that runs twice both land on
+one row.
+
 ### `activity/{activityId}`
 
 `entityType`, `entityId`, `action`, `actorId`, `before`, `after`, `createdAt`.
 Written only by Cloud Functions triggers (see `firestore.rules`) so `actorId`
 cannot be forged. Actions are the list in plan §23.
-
-### `marketplaces/{marketplaceId}`
-
-Connection **status** only: which platform, connected or not, last sync time,
-last error. **The OAuth tokens are not in this document and not in Firestore
-at all** — they live in Secret Manager, reachable only by the functions that
-call the platform. A client can read this to render "eBay · connected", and
-can write nothing.
 
 ## Indexes
 

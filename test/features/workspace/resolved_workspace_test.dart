@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:seller_os/features/workspace/domain/entities/user_profile.dart';
+import 'package:reseller_studio/features/workspace/domain/entities/user_profile.dart';
 
 /// **Switching business is a write to `lastWorkspaceId` and nothing else** —
 /// there is no local "selected workspace" state anywhere in the app, because a
@@ -25,10 +25,7 @@ void main() {
     // Removed from 'b' by an owner while signed in elsewhere. Falling through
     // to the first they still belong to keeps the app readable; honouring the
     // stale pointer would open a workspace every rule denies them.
-    expect(
-      profileWith(last: 'b', ids: <String>['a']).resolvedWorkspaceId,
-      'a',
-    );
+    expect(profileWith(last: 'b', ids: <String>['a']).resolvedWorkspaceId, 'a');
   });
 
   test('no pointer yet opens the first business', () {

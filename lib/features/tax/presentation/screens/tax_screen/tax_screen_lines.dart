@@ -15,9 +15,9 @@ class _Lines extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      const SdSectionHeaderV3(
-        title: 'Expenses by line',
-        subtitle: 'Your categories, grouped the way the form asks',
+      SdSectionHeaderV3(
+        title: context.l10n.taxExpensesByLine,
+        subtitle: context.l10n.taxYourCategoriesGroupedTheWayThe,
         first: true,
       ),
       AppListCard(
@@ -50,31 +50,31 @@ class _MileageCard extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      const SdSectionHeaderV3(
-        title: 'Mileage',
-        subtitle: 'Deducted at the published rate, not at what you spent',
+      SdSectionHeaderV3(
+        title: context.l10n.taxMileage,
+        subtitle: context.l10n.taxDeductedAtThePublishedRateNot,
         first: true,
       ),
       AppListCard(
         children: <Widget>[
           AppListRow(
-            title: 'Distance',
+            title: context.l10n.taxDistance,
             subtitle: _unit(jurisdiction),
-            icon: Symbols.directions_car_rounded,
+            icon: AppIconConstant.directionsCar,
             trailingText: summary.mileageDistance <= 0
                 ? null
                 : summary.mileageDistance.toStringAsFixed(0),
             showChevron: false,
           ),
           AppListRow(
-            title: 'Deduction',
+            title: context.l10n.taxDeduction,
             // Null here means no published rate for that year, which is a
             // different problem from "no miles" — say which.
             subtitle:
                 summary.mileageDistance > 0 && summary.mileageDeduction == null
                 ? 'No published rate for this year yet'
                 : null,
-            icon: Symbols.calculate_rounded,
+            icon: AppIconConstant.calculate,
             trailingText: context.money(summary.mileageDeduction),
             showChevron: false,
           ),

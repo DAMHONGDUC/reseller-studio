@@ -2,10 +2,14 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // Turns android/app/google-services.json into the string resources
+    // FirebaseApp reads at startup. Without it Firebase.initializeApp
+    // throws [core/no-app] even though the file is on disk.
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.dd.seller.os"
+    namespace = "com.dd.reseller.studio"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -16,7 +20,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.dd.seller.os"
+        applicationId = "com.dd.reseller.studio"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

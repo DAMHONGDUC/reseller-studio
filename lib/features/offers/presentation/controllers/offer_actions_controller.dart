@@ -1,12 +1,13 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
-import '../../../../core/logging/app_logger.dart';
+import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
 import '../../../inventory/domain/repositories/item_repository.dart';
-import '../../../inventory/presentation/controllers/item_actions_controller.dart';
 import '../../../mock_data/providers.dart';
 import '../../../orders/domain/enums/order_status.dart';
+import '../../../orders/providers.dart';
 import '../../domain/entities/offer.dart';
 import '../../domain/repositories/offer_repository.dart';
 
@@ -33,7 +34,7 @@ class OfferActionsController extends Notifier<bool> {
     final ItemRepository items = ref.read(itemRepositoryProvider);
 
     state = true;
-    AppLogger.action('Accept offer', <String, Object>{
+    SdLogger.action(LogTagConstant.offer, 'Accept offer', <String, Object>{
       'offerId': offer.id,
       'amountMinor': offer.amount.minor,
       'marketplace': offer.marketplace.name,
@@ -46,7 +47,8 @@ class OfferActionsController extends Notifier<bool> {
         // The item was deleted while the offer sat there. Recording the
         // decision is still right; inventing an order for a thing that no
         // longer exists is not.
-        AppLogger.warning(
+        SdLogger.warning(
+          LogTagConstant.offer,
           'Accepted an offer whose item is gone',
           <String, Object>{'offerId': offer.id, 'itemId': offer.itemId},
         );
@@ -57,8 +59,8 @@ class OfferActionsController extends Notifier<bool> {
       }
 
       await ref
-          .read(itemActionsControllerProvider.notifier)
-          .markSold(
+          .read(recordSaleControllerProvider.notifier)
+          .record(
             item,
             salePrice: offer.amount,
             marketplace: offer.marketplace,
@@ -68,7 +70,8 @@ class OfferActionsController extends Notifier<bool> {
 
       await _save(offer, OfferStatus.accepted);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.offer,
         'Failed to accept offer',
         error: error,
         stackTrace: stackTrace,
@@ -83,12 +86,15 @@ class OfferActionsController extends Notifier<bool> {
 
   Future<void> decline(Offer offer) async {
     state = true;
-    AppLogger.action('Decline offer', <String, Object>{'offerId': offer.id});
+    SdLogger.action(LogTagConstant.offer, 'Decline offer', <String, Object>{
+      'offerId': offer.id,
+    });
 
     try {
       await _save(offer, OfferStatus.declined);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.offer,
         'Failed to decline offer',
         error: error,
         stackTrace: stackTrace,
@@ -108,7 +114,7 @@ class OfferActionsController extends Notifier<bool> {
   /// replied to the buyer.
   Future<void> counter(Offer offer, Money amount) async {
     state = true;
-    AppLogger.action('Counter offer', <String, Object>{
+    SdLogger.action(LogTagConstant.offer, 'Counter offer', <String, Object>{
       'offerId': offer.id,
       'counterMinor': amount.minor,
     });
@@ -116,7 +122,8 @@ class OfferActionsController extends Notifier<bool> {
     try {
       await _save(offer, OfferStatus.countered, counterAmount: amount);
     } catch (error, stackTrace) {
-      AppLogger.error(
+      SdLogger.error(
+        LogTagConstant.offer,
         'Failed to counter offer',
         error: error,
         stackTrace: stackTrace,

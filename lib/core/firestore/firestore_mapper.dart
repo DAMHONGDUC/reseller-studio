@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
-import '../logging/app_logger.dart';
+import '../constants/log_tag_constant.dart';
 import '../money/money.dart';
 
 /// Reading Firestore field values into Dart types, and back.
@@ -36,17 +37,21 @@ final class FirestoreMapper {
       final DateTime? parsed = DateTime.tryParse(value);
 
       if (parsed == null) {
-        AppLogger.warning('Unparseable date field', <String, String>{
-          'value': value,
-        });
+        SdLogger.warning(
+          LogTagConstant.firestore,
+          'Unparseable date field',
+          <String, String>{'value': value},
+        );
       }
 
       return parsed;
     }
 
-    AppLogger.warning('Unexpected date field type', <String, String>{
-      'type': value.runtimeType.toString(),
-    });
+    SdLogger.warning(
+      LogTagConstant.firestore,
+      'Unexpected date field type',
+      <String, String>{'type': value.runtimeType.toString()},
+    );
 
     return null;
   }
@@ -101,10 +106,11 @@ final class FirestoreMapper {
       if (value.name == name) return value;
     }
 
-    AppLogger.warning('Unknown enum value in document', <String, String>{
-      'value': name,
-      'type': T.toString(),
-    });
+    SdLogger.warning(
+      LogTagConstant.firestore,
+      'Unknown enum value in document',
+      <String, String>{'value': name, 'type': T.toString()},
+    );
 
     return null;
   }

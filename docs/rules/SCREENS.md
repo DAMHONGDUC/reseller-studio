@@ -24,25 +24,30 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   labelled `SdFabV3`, same button, same place, every screen. That is an
   always-apply rule and it lives in the root `CLAUDE.md`; the design-system
   half is in `DESIGN_SYSTEM.md`.
-- **A form screen pins its commit action to the bottom** — owner's rule,
-  stated about workspace setup. Only the fields scroll; the button holds the
-  bottom edge, so a seller never scrolls to find out how to finish. **This is
-  not the `SdFabV3` rule above and does not compete with it**: that one is for
-  a list screen creating a new row, this one is for a screen whose single
-  action commits the screen itself.
+- **Every add or edit screen pins its save action to the bottom** — owner's
+  rule, first stated about workspace setup and then restated for all of them,
+  because two screens had let the button scroll away with the last field. Only
+  the fields scroll; the button holds the bottom edge, so a seller never
+  scrolls to find out how to finish, and the way to finish is in the same place
+  on every screen. **This is not the `SdFabV3` rule above and does not compete
+  with it**: that one is for a list screen creating a new row, this one is for a
+  screen whose single action commits the screen itself.
+  - **`AppPinnedAction` (`core/widgets/`) is the one implementation.** Three
+    screens had written their own before it was extracted, which is three
+    chances for the gap above the button to be a different number.
   - The action sits **below** the scroll view, never floating over it, so
     content can never pass behind it. That is why it wears no surface and no
     blur — `SdContentPaddingV3.pinnedActionsGap` above it is the whole
     separation, and `SdContentPaddingV3.bottom(context)` below it clears the
     home indicator.
-  - It goes in its own widget in a `part` file, watching the controller
-    itself, so a keystroke rebuilds the button and not the fields above it.
-  - `WorkspaceSetupScreen` is the worked example; v2 recorded the same idea in
-    `SdActionViewV2`'s pinned mode.
+  - The screen passes the button's own state down; the widget holding it stays
+    small enough that a keystroke rebuilds it and not the fields above.
+  - A sheet is already this shape — its action is its last row and the sheet
+    is only as tall as its content — so it needs nothing extra.
 
 ## The device status bar — one source, and the two platforms disagree
 
-Seller OS ships light **and** dark, so this is not a set-and-forget line: the
+Reseller Studio ships light **and** dark, so this is not a set-and-forget line: the
 wrong value renders invisible icons on exactly one platform in exactly one
 theme, which is the hardest kind of bug to be told about.
 
@@ -78,7 +83,7 @@ theme, which is the hardest kind of bug to be told about.
   after a palette change.
 
 `AppTheme.statusBarStyle(Brightness)` is that one place; `AppTheme._build`
-hands it to `AppBarTheme.systemOverlayStyle`, and `SellerOsApp`'s builder wraps
+hands it to `AppBarTheme.systemOverlayStyle`, and `ResellerStudioApp`'s builder wraps
 the app in an `AnnotatedRegion` of the same value so a route with no app bar —
 splash, login — is covered too. `test/core/theme/app_theme_test.dart` asserts
 both platform fields in both themes. Android also needs
@@ -93,6 +98,9 @@ because they are about the shell, not the bar:
 
 - **The selection indicator slides, it does not fade.** Same duration as every
   other piece of chrome, from `SdMotionV3`. No flash, no strobe.
+- **The complete frame is `SdBottomNavigationV3`.** Owner's rule. It owns the
+  glass bar and adjacent-tab swipe; `AppShell` owns only GoRouter branch
+  selection, analytics and localized destination data.
 - **Tabs are branches of an `IndexedStack`, so no route is pushed and a
   navigator observer sees nothing.** Screen-view analytics for the five tabs
   therefore cannot come from the router, or tab analytics are silently empty
@@ -155,6 +163,45 @@ because they are about the shell, not the bar:
   matches that search" are different situations and get different copy, chosen
   off the trimmed query — otherwise a search with no hits reads as data loss.
   Both strings go through ARB keys (hard rule 7).
+- **A filtered list picks between the two with `AppListEmptyState`, and its
+  `hasAny` reads the unfiltered source.** Four screens had written the choice
+  by hand and three of them got it wrong the same way: Orders, Offers and
+  Listings told a seller who had never added anything that nothing matched a
+  filter they never set. The widget is what makes the filter half impossible
+  to write twice, and its `hasAny` is deliberately awkward to pass from a
+  filtered list, because a count taken after filtering is the bug.
+- **The "not started yet" half carries an action; the filter half does not.**
+  A filter has an obvious fix already on screen. A first empty list is where a
+  new seller stops, so it names the next step and opens it — including on the
+  lists with no create action of their own, where the step is upstream
+  (Listings sends the seller to Inventory).
+- **A list that has a create action offers that action, never a detour.**
+  Orders was the exception until it got one: it now opens the record-sale
+  screen from both its button and its empty state, and the two say the same
+  words. An empty state pointing somewhere other than the screen's own create
+  button teaches a route the seller then has to unlearn
+  (`lib/features/orders/CLAUDE.md`).
+
+## A form seeds through `FormSeed`, never straight from `build`
+
+A form that edits an existing record learns it has one in a `build` — the
+record arrives on a stream, so there is nowhere earlier. **Copying it into the
+form's controller from there throws**: `Tried to modify a provider while the
+widget tree was building`. It is not a debug-only assertion in practice — the
+form stayed empty, and the seller saw an edit screen that never filled in.
+
+- **Use the `FormSeed` mixin (`core/state/`) and call `seedOnce`.** It defers
+  the copy to the end of the frame, which is the fix Riverpod's own error
+  message names, and it owns the once-only flag.
+- **Once, not once per build.** The record rebuilds the screen whenever a
+  teammate edits it, and re-seeding then throws away every keystroke the
+  seller made in between. Never re-derive the guard per screen — two screens
+  had written it themselves and both had the bug beside it.
+- **One frame of empty fields is the cost, and it is invisible**: the screen
+  was already showing empty fields while the record loaded.
+- Held by `test/features/inventory/item_form_seed_test.dart` and
+  `test/features/workspace/workspace_detail_seed_test.dart`, both of which
+  fail on the direct call.
 
 ## Search
 
@@ -200,15 +247,51 @@ app holding a receipt, so Home lists **every** one of them.
 screen that owns the action; it never opens a form Home would then have to
 know how to save.
 
-**About is the one row here that does not create something, and it goes
-last** — owner's rule. It lives two levels deep under Settings, so this is
-what keeps it findable, and putting it at the end is what stops a seller
-scanning for "add" from stepping over it. Nothing else non-create joins it
-without the same decision.
+**Two rows here do not create anything, and they ride at the end** — owner's
+rule, About last and Analytics just above it. About lives two levels deep under
+Settings, so Home is what keeps it findable; putting both at the end is what
+stops a seller scanning for "add" from stepping over them. Nothing else
+non-create joins them without the same decision.
+
+**Scan is a Home shortcut; Flow overview is its own section directly below
+the shortcut row.** Owner's rule. Scan is an action a seller reaches for while
+holding an item, so it belongs in the one-glance row. Flow overview needs more
+context than a small launcher card can carry, so its dedicated section opens
+the existing sheet and appears in one place only.
+
+**Analytics opens with `go`, not `push`.** It is a branch root, and pushing one
+over Home leaves the seller on the wrong tab with a back button they should not
+have — which is why `QuickAction` carries how it opens rather than a route
+alone.
+
+- **`WorkflowConstant.steps` is the content, and stays the only copy of the
+  chain.** The sheet and About's diagram draw the same data — a second list
+  written for the sheet is how the app ends up teaching two workflows.
+- **A step carries `isOptional`, and optional means the app never blocks on
+  it** — not "unimportant". Listing, shipping and recording a source are all
+  things a seller can skip entirely and still get paid, and hard rule 2 is why:
+  requirements attach when a record *moves*, never when it is created. Saying
+  so out loud is the point of the badge, because a seller who thinks all nine
+  are mandatory goes back to the spreadsheet.
+- The badge is `SdBadgeV3` in the neutral tone. Optional is not a warning.
 
 The shortcut card at the top of Home is named after the section it lands on
 and scrolls to the end — a card that said something other than where it goes
 is a card that lies.
+
+## Dense destination screens expose their hierarchy
+
+**More is grouped into titled sections, never one undifferentiated list.**
+Owner's rule. Operations contains Sourcing, Listings, Categories and
+Locations; Finance contains Expenses, Payouts, Reports, Receipts and Tax;
+Business contains Marketplaces, Team and Activity; Account contains
+Subscription and Settings. Signed-out More renders only the Account section
+with Settings.
+
+**An item detail exposes its action sheet with a labelled app-bar button, not
+an ellipsis glyph.** Owner's rule. The sheet holds several important state
+transitions, so a subtle three-dot icon makes the main way to act on an item
+look decorative; the localized Actions label is the affordance.
 
 **Rows, and always last on the screen** — owner's rule. Home answers "what
 needs attention today" first, so a launcher sitting above the figures makes

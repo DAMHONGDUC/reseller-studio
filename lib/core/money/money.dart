@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 import 'currency_decimals.dart';
+import 'currency_input_utils.dart';
 
 /// An amount of money, stored as an integer number of **minor units** — cents
 /// for USD, đồng for VND.
@@ -70,13 +71,16 @@ final class Money implements Comparable<Money> {
   /// the arithmetic.
   double get major => minor / CurrencyDecimals.factorFor(currency);
 
-  /// What goes back into a text field the seller edits: `19.99`, or `450000`
-  /// for a currency with no minor unit.
+  /// What goes back into a text field the seller edits: `1,219.99`, or
+  /// `450,000` for a currency with no minor unit.
   ///
   /// Round-trips through [tryParse] unchanged, which is the whole contract —
   /// an edit form that reformatted the number it was given would change an
   /// amount nobody touched.
-  String toInputString() => major.toStringAsFixed(decimals);
+  String toInputString() => CurrencyInputUtils.format(
+    major.toStringAsFixed(decimals),
+    decimalPlaces: decimals,
+  );
 
   bool get isZero => minor == 0;
   bool get isNegative => minor < 0;
