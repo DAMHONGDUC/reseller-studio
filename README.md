@@ -62,8 +62,13 @@ Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 ## Release
 
 ```sh
+melos run prepare-env-dev
+cd ios && bundle exec fastlane beta flavor:dev bump:true notes:"dev" && cd ..
+```
+
+```sh
 melos run prepare-env-prod
-cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"release notes"
+cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"prod" && cd ..
 ```
 
 Do not archive from Xcode. The release lane supplies the build-time
