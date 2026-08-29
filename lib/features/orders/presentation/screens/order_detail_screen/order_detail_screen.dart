@@ -15,6 +15,7 @@ import '../../../../../core/utils/link_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
+import '../../../../../core/widgets/app_row_icon_button.dart';
 import '../../../../expenses/domain/entities/expense.dart';
 import '../../../../expenses/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';

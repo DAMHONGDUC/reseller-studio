@@ -14,6 +14,7 @@ import '../constants/app_icon_constant.dart';
 import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../router/app_routes.dart';
+import 'app_row_icon_button.dart';
 import 'app_selectable_row.dart';
 import 'app_sheet_option_list.dart';
 import 'option_picker_sheet.dart';
@@ -218,21 +219,11 @@ class _WorkspaceRow extends StatelessWidget {
           ),
           if (isCurrent) SdIconV3(AppIconConstant.check, color: accent),
           // Its own tap target beside the row's, so choosing a business and
-          // correcting one are never the same gesture. Square and sized to
-          // the design system's action slot, so it clears 44pt.
-          IconButton(
-            onPressed: onEdit,
+          // correcting one are never the same gesture.
+          AppRowIconButton(
+            icon: AppIconConstant.edit,
             tooltip: context.l10n.workspaceEdit,
-            padding: EdgeInsets.zero,
-            constraints: BoxConstraints.tightFor(
-              width: SdAppBarActionV3.slot,
-              height: SdAppBarActionV3.slot,
-            ),
-            icon: SdIconV3(
-              AppIconConstant.edit,
-              size: SdIconV3.smallSize,
-              color: context.sdTheme3.textSecondary,
-            ),
+            onPressed: onEdit,
           ),
         ],
       ),

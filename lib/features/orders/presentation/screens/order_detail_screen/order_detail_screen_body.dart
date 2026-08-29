@@ -264,15 +264,14 @@ class _TrackingRow extends StatelessWidget {
     return _OrderDetailRow(
       label: context.l10n.orderTracking,
       value: number,
-      trailing: IconButton(
-        icon: SdIconV3(
-          url == null ? AppIconConstant.contentCopy : AppIconConstant.openInNew,
-          size: SdIconV3.smallSize,
-          color: context.colorScheme3.primary,
-        ),
+      trailing: AppRowIconButton(
+        icon: url == null
+            ? AppIconConstant.contentCopy
+            : AppIconConstant.openInNew,
         tooltip: url == null
             ? context.l10n.orderCopyTracking
             : context.l10n.orderTrackParcel,
+        tint: context.colorScheme3.primary,
         onPressed: () => url == null ? _copy(context) : _open(context, url),
       ),
     );
