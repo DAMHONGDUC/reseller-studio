@@ -45,17 +45,38 @@ class PaywallScreen extends ConsumerWidget {
         // not, which is what holds the links against the bottom edge when the
         // content is shorter than the sheet.
         Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const _PaywallBenefits(),
-                SizedBox(height: SdSpacingConstant.h16),
-                const _PaywallOfferings(),
-                SizedBox(height: SdSpacingConstant.h12),
-                const _PaywallDisclosure(),
-              ],
-            ),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) =>
+                SingleChildScrollView(
+                  // - the column is at least the viewport, so the slack of a
+                  //   90% sheet is real space to hand out
+                  // - taller content overflows it and the view scrolls as usual
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      // Two groups, so the slack lands between them: what
+                      // Premium includes stays under the title, the prices and
+                      // the fine print sit against the footer.
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        const _PaywallBenefits(),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            SizedBox(height: SdSpacingConstant.h16),
+                            const _PaywallOfferings(),
+                            SizedBox(height: SdSpacingConstant.h12),
+                            const _PaywallDisclosure(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
           ),
         ),
         SizedBox(height: SdSpacingConstant.h8),

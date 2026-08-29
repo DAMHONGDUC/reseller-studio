@@ -95,6 +95,34 @@ void main() {
     expect(cardBehind(tester, 'Yearly').layer, SdCardLayerV3.elevated);
   });
 
+  testWidgets('the prices and the fine print sit against the footer', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const PaywallScreen());
+
+    final Rect benefits = tester.getRect(
+      find
+          .ancestor(
+            of: find.text('Unlimited items'),
+            matching: find.byType(SdCardV3),
+          )
+          .first,
+    );
+    final Rect options = tester.getRect(
+      find.ancestor(of: find.text('Yearly'), matching: find.byType(SdCardV3)).first,
+    );
+    final Rect terms = tester.getRect(
+      find.textContaining('Renews automatically'),
+    );
+    final Rect footer = tester.getRect(find.byType(PaywallFooterLinks));
+
+    expect(
+      footer.top - terms.bottom,
+      lessThan(options.top - benefits.bottom),
+      reason: 'the slack belongs between the two halves, not under the last line',
+    );
+  });
+
   testWidgets('the sheet keeps nine tenths of the screen, footer at its foot', (
     WidgetTester tester,
   ) async {
