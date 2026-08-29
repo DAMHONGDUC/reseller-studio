@@ -2,13 +2,15 @@ part of 'item_card.dart';
 
 /// What state the item is in, and where it stands on the marketplaces.
 ///
+/// **Two lines, and the split is by question** — owner's rule. The first says
+/// what the item *is*: its status, its Stale marker and its grade. The second
+/// says where it stands on the marketplaces. One `Wrap` for all of them let a
+/// long grade push the market count onto its own line at some widths and not
+/// others, so the row's shape depended on the words in it.
+///
 /// **The status badge and the stale badge are separate, and both can show**:
 /// an item can be listed *and* stale, and collapsing that into one marker
 /// would lose the fact that it is still live and still earning nothing.
-///
-/// **One `Wrap`, not a badge row with the market count on its own line below**
-/// — owner's rule that the card's tags be compact. Distribution is the same
-/// kind of fact as the rest, so it flows with them and costs no second line.
 class _StateBadges extends StatelessWidget {
   const _StateBadges({
     required this.item,
@@ -31,33 +33,41 @@ class _StateBadges extends StatelessWidget {
         .map((Listing listing) => listing.marketplace)
         .toSet()
         .length;
-    // An item that has left inventory is not late for anything, so silence is
-    // the right answer for it rather than a red tag.
+    // An item that has left inventory is not late for anything, so the second
+    // line goes with it rather than holding a gap.
     final bool showMarkets = marketCount > 0 || item.status.isListable;
 
-    return Wrap(
-      spacing: SdSpacingConstant.w6,
-      runSpacing: SdSpacingConstant.h4,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        _DisplayTag(
-          label: item.status.label(context),
-          color: item.status.color(context),
+        Wrap(
+          spacing: SdSpacingConstant.w6,
+          runSpacing: SdSpacingConstant.h4,
+          children: <Widget>[
+            _DisplayTag(
+              label: item.status.label(context),
+              color: item.status.color(context),
+            ),
+            if (isStale)
+              _DisplayTag(
+                label: context.l10n.itemStale,
+                color: context.sdTheme3.warning,
+                icon: AppIconConstant.hourglassBottom,
+              ),
+            // The grade a buyer reads first on every marketplace, and the
+            // thing that explains a price a seller would otherwise have to
+            // open the item to justify.
+            if (item.condition != null)
+              _DisplayTag(
+                label: item.condition!.label(context),
+                color: item.condition!.color(context),
+              ),
+          ],
         ),
-        if (isStale)
-          _DisplayTag(
-            label: context.l10n.itemStale,
-            color: context.sdTheme3.warning,
-            icon: AppIconConstant.hourglassBottom,
-          ),
-        // The grade a buyer reads first on every marketplace, and the thing
-        // that explains a price a seller would otherwise have to open the
-        // item to justify.
-        if (item.condition != null)
-          _DisplayTag(
-            label: item.condition!.label(context),
-            color: item.condition!.color(context),
-          ),
-        if (showMarkets) _Marketplaces(count: marketCount),
+        if (showMarkets) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h4),
+          _Marketplaces(count: marketCount),
+        ],
       ],
     );
   }

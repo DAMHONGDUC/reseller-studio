@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -81,6 +82,31 @@ void main() {
     // Expected profit is the detail screen's, not the row's.
     expect(find.text('Profit'), findsNothing);
     expect(find.text(r'$140.00'), findsNothing);
+  });
+
+  testWidgets('the band spaces its cells apart, edge to edge', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(
+          cost: const Money(4500, 'USD'),
+          asking: const Money(18500, 'USD'),
+        ),
+        now: testNow,
+      ),
+    );
+
+    // The divider spans the card's content width, so it is what the band's
+    // two outer cells have to reach.
+    final Rect band = tester.getRect(find.byType(SdDividerV3));
+
+    expect(tester.getRect(find.text('Qty')).left, moreOrLessEquals(band.left));
+    expect(
+      tester.getRect(find.text(r'$185.00')).right,
+      moreOrLessEquals(band.right),
+    );
   });
 
   testWidgets('a Quick Add row says the figures are missing, never zero', (

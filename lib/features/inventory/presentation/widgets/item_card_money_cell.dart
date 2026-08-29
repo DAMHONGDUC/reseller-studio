@@ -16,15 +16,20 @@ class _MoneyCell extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
+    this.alignment = CrossAxisAlignment.start,
   });
 
   final String label;
   final String value;
   final Color color;
 
+  /// Which edge of the cell the label and the figure sit on. The last cell in
+  /// a space-between band ends on the card's edge, so it aligns to it.
+  final CrossAxisAlignment alignment;
+
   @override
   Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
+    crossAxisAlignment: alignment,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       Text(

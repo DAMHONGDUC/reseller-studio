@@ -14,9 +14,11 @@ part of 'item_card.dart';
 /// inside the top row they were squeezed between a photo and a button. Across
 /// the foot, the labels share one baseline and the figures share the next.
 ///
-/// **The quantity leads and is narrower than the rest**, because a count is
-/// two characters where an amount is nine — equal quarters would spend the
-/// width where it is not needed and ellipsize a four-figure price.
+/// **Spaced apart, not divided into shares** — owner's rule. The cells
+/// measure themselves and `spaceBetween` puts the gaps where the content
+/// leaves them: the count holds the card's left edge and the asking price
+/// holds its right. Fixed flex shares spent width on a two-character count
+/// and then ellipsized a four-figure price.
 ///
 /// Every amount renders `—` when unknown, which is most of the point: an item
 /// added through Quick Add has none of them, and the row must say so rather
@@ -30,30 +32,25 @@ class _MoneyLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: <Widget>[
-      Expanded(
-        flex: 2,
-        child: _MoneyCell(
-          label: context.l10n.itemQuantityShort,
-          value: item.quantityOnHand.toString(),
-          color: context.sdTheme3.textPrimary,
-        ),
+      _MoneyCell(
+        label: context.l10n.itemQuantityShort,
+        value: item.quantityOnHand.toString(),
+        color: context.sdTheme3.textPrimary,
       ),
-      Expanded(
-        flex: 3,
-        child: _MoneyCell(
-          label: context.l10n.itemCost,
-          value: context.money(item.purchasePrice),
-          color: context.sdTheme3.textSecondary,
-        ),
+      _MoneyCell(
+        label: context.l10n.itemCost,
+        value: context.money(item.purchasePrice),
+        color: context.sdTheme3.textSecondary,
       ),
-      Expanded(
-        flex: 3,
-        child: _MoneyCell(
-          label: context.l10n.itemAsking,
-          value: context.money(item.askingPrice),
-          color: context.sdTheme3.textPrimary,
-        ),
+      _MoneyCell(
+        label: context.l10n.itemAsking,
+        value: context.money(item.askingPrice),
+        color: context.sdTheme3.textPrimary,
+        // Flush with the card's edge: a space-between row ending on a
+        // left-aligned amount reads as a column that did not reach.
+        alignment: CrossAxisAlignment.end,
       ),
     ],
   );

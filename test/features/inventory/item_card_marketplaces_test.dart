@@ -96,6 +96,32 @@ void main() {
     expect(find.text(r'$50.00'), findsNothing);
   });
 
+  testWidgets('the marketplace tag is a line of its own, under the state', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: item,
+        now: testNow,
+        listings: <Listing>[listingOn(Marketplace.ebay, 4500)],
+      ),
+    );
+
+    final Rect status = tester.getRect(
+      find.widgetWithText(SdBadgeV3, 'In stock'),
+    );
+    final Rect grade = tester.getRect(find.widgetWithText(SdBadgeV3, 'Good'));
+    final Rect market = tester.getRect(
+      find.widgetWithText(SdBadgeV3, '1 market'),
+    );
+
+    // Line one is what the item is; line two is where it is listed.
+    expect(grade.top, moreOrLessEquals(status.top));
+    expect(market.top, greaterThan(status.bottom));
+    expect(market.left, moreOrLessEquals(status.left));
+  });
+
   testWidgets('an item nobody has listed says so, in red', (
     WidgetTester tester,
   ) async {

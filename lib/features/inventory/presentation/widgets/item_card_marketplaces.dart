@@ -6,6 +6,11 @@ part of 'item_card.dart';
 /// **One count, no names or prices** — owner's rule. The detail screen owns
 /// the full list; the card stays compact while answering distribution.
 ///
+/// **It is the tag line's second row, on its own** — owner's rule. Where an
+/// item is listed is a different question from what it is, and sharing a
+/// `Wrap` with the grade made which line it landed on depend on how long the
+/// words were.
+///
 /// **An item nobody has listed says so, in red** — owner's rule. Nothing read
 /// as "no marketplaces worth naming" when the truth was stock earning
 /// nothing, which is the one thing on this card a seller can fix today.
