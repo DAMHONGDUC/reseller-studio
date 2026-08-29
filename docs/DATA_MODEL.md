@@ -136,6 +136,13 @@ older than the workspace's threshold). Storing it as a status would mean a
 nightly job flipping thousands of documents, and a seller who reprices an item
 would have to wait for that job to see it leave the Stale tab.
 
+`updatedAt` is written on every save as a **server timestamp** and is read
+back into `Item.updatedAt`. It is read-only everywhere: the item form does not
+offer it, and neither does anything else — a date a seller can type is not a
+record of anything. Null means the document has not come back from the server
+yet; in mock mode the in-memory repository stamps it, because a mode with no
+server would otherwise show "last updated" blank forever.
+
 `listedAt` survives the removal and carries more weight for it: it is the only
 record that an item ever reached a platform, so it is what staleness, the
 Stale tab and Home's getting-started progress all read.

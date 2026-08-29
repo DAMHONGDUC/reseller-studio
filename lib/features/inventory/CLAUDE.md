@@ -184,6 +184,23 @@ which is what lets the amounts be compared at a glance.
   marketplace takes them is not known until the item sells. `ProfitBreakdown`
   is the real number, on a completed order.
 
+## The row carries the grade, and the date it last changed
+
+Owner's rule.
+
+- **The condition sits with the state badges.** It is what a buyer reads first
+  on every marketplace, and on a list it explains a price a seller would
+  otherwise have to open the item to justify.
+- **`Updated <date>` is the card's last line, and its quietest.** It answers
+  "did my edit save?" and "which of these did I touch this morning?" — a
+  different question from every figure above it, and one that deserves none of
+  their weight. It is absent when nothing has ever updated the record, rather
+  than dressing the creation date up as an edit.
+- **Both dates are read-only, and the full pair lives in the detail screen** —
+  `Added` and `Last updated`, in the provenance block. No form offers either:
+  a date the seller can type is not a record of anything. See
+  `docs/DATA_MODEL.md` for how `updatedAt` is written.
+
 ## The row says how long, not only what
 
 Owner's rule, part of the same one above. A badge beside the status carries
@@ -282,58 +299,44 @@ item with one.
   is the figure the card, the Sold transition and every count in Analytics are
   built from.
 
-## The status is four radios, each wearing its tag's colour
+## Status and condition are tag groups, and switching is free
 
-Owner's rule, and it replaced a picker row that opened a sheet.
+Owner's rules, in the order they arrived, and they replaced two picker rows
+that each opened a sheet.
 
-- **Radios, not a sheet.** There are four states and they answer one question;
-  hiding them behind a row costs two taps to see what the choices even are.
-- **Each option carries `ItemStatusLabel.color`** — resolved from the badge
-  tone, so the chosen radio and the tag on the card are the same colour by
-  construction rather than by two switches agreeing. Colour is never the only
-  signal: the label is spelled out and the radio is filled.
-- **`sold` is offered like the rest** — owner's rule, after it was refused for
-  a while. Setting it records that the stock has gone and **empties the count
-  with it** (`ItemTransition.apply`), so the card cannot offer two left of
-  something gone. It writes **no order**: revenue and profit still come from
-  orders (hard rule 3), so a sale that has to show up in the figures is
-  recorded through Mark as sold.
-- **`sold` wears `info` rather than `neutral`.** With four states left, three
-  greys made the radio group a shape test instead of a colour one.
-- **Every pick still goes through `ItemTransition.check`**, against what is
-  typed in the boxes rather than the saved record — a price entered a second
-  ago is a price. A refusal says which requirement is missing.
-
-## Quantity is what decides whether a record is sold
-
-Owner's rule: **count 0 means sold, count above 0 means in stock.** Taken as
-"status = f(quantity)" that would delete the lifecycle — `listed`, `draft`,
-`reserved` and `archived` all have to survive, and `sold` is a claim that
-money changed hands, which only an order can back. So the rule is wired as
-quantity *driving* the transition, with the status still stored:
-
-- **A sale takes one unit, not the row.** `ItemTransition.sell` decrements the
-  count and moves the status to `sold` **only when the shelf empties**.
-  Selling one of ten used to mark the whole record sold and leave the count at
-  ten, so Inventory said gone while nine were still on the shelf.
-- **A row with stock behind it keeps its status and its clocks.** Nine left
-  after a sale is still `listed`, and `listedAt` is untouched — a sale is not
-  a relist, and staleness is measured from the first time it went live.
-- **`restocked` is the other half**, run by the item form on save: a `sold`
-  row given a count above zero goes back to `inStock` and loses its `soldAt`.
-  **An archived one does not move** — archiving is a deliberate withdrawal,
-  and a number in a box does not undo it.
-- **Both live in `ItemTransition`**, so the sheet, the bulk bar, the Orders
-  tab's Record sale and the offer-accept path all get the same behaviour
-  without any of them knowing the rule.
-- **The form carries `listedAt` and `soldAt` because `submit` builds a whole
-  `Item`.** Any timestamp the form does not hold is one that saving a typo fix
-  erased — it reset the staleness clock and dropped the row out of
-  days-to-sell. `test/features/inventory/item_form_quantity_test.dart` pins
-  that, and the restock beside it.
-- `test/features/inventory/item_transition_test.dart` holds the rest: one of
-  three, the last of one, an empty shelf refusing a sale, and the archive that
-  a count cannot undo.
+- **Tags, not sheets.** Four statuses and seven condition grades are the
+  answer to one question each; hiding them behind a row costs two taps to see
+  what the choices even are. Laid out, the seller reads the whole vocabulary
+  at once. Both groups are built from `SdTagV3` through one `_TagGroupField`,
+  extracted on its second use so the two cannot answer the same shape of
+  question two ways.
+- **Every tag has its own colour, and the colour lives on the enum** —
+  owner's rule: `ItemStatusColor` and `ItemConditionColor` are extensions on
+  `ItemStatus` and `ItemCondition`, so a value is *asked* what colour it is
+  and there is exactly one answer. They map onto `AppColors.tagSeries`, which
+  exists because the semantic tones run out at five and three of the four
+  statuses shared `neutral`: a row of radios in one grey is a shape test, not
+  a colour one. The general rule is in `docs/rules/DESIGN_SYSTEM.md`.
+- **Every place that draws one as a tag uses that colour** — the radio on the
+  form, the badge on the card, the badge on the detail screen. `SdBadgeV3`
+  takes the colour rather than a tone for these two.
+  - **The condition palette is ordered best-to-worst**, so the seven grades
+    read as a scale rather than seven equal options.
+  - **The status hues are chosen, not incidental**: grey for a draft that
+    claims nothing, green for stock, blue for a sale, amber for a withdrawal.
+- **Switching is free** — owner's rule, and it is the newest of them. The form
+  checks nothing and refuses nothing: this is the screen where a seller
+  corrects what the app got wrong, and a correction that argues back is the
+  thing they came to fix. `ItemTransition.setStatus` is that path.
+  - **The verbs are unchanged.** `ItemTransition.check` still gates Mark as
+    sold, cross-listing and the bulk paths, which is where a missing price
+    actually matters.
+  - **The side effects still ride along**, because they keep the record
+    consistent rather than legal: setting `sold` empties the count, and coming
+    back onto the shelf clears `soldAt`.
+  - It writes **no order**: revenue and profit are read from orders (hard rule
+    3), so a sale that has to show up in the figures is recorded through Mark
+    as sold.
 
 ## An item that has left inventory can come back, and the sale goes with it
 

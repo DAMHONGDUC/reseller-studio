@@ -733,6 +733,26 @@ quietly re-invent one.
   one short doc comment stating its UI meaning and one blank line before the
   next entry.** The name alone is not enough when one glyph serves several
   workflows, and the separation keeps future icon-source swaps reviewable.
+- **An enum's colour lives on that enum, as an extension** — owner's rule.
+  `extension ItemStatusColor on ItemStatus { Color color(BuildContext) }`, and
+  the same shape for `ItemCondition`. Not a static on a presenter class, not a
+  switch at a call site: the value is asked what colour it is, so there is
+  exactly one answer and adding a case to the enum breaks the switch that
+  hands it out.
+- **Every place that draws that value as a tag draws it in that colour** —
+  owner's rule, the other half of the one above. The tag on a form and the
+  badge on a card are the same value; two hues for it is the seller learning
+  the palette twice. `SdBadgeV3.color` exists for exactly this, and it
+  overrides the tone.
+- **Tags: `SdTagV3` for a group of choices, `SdBadgeV3` for a state the app is
+  reporting.** The badge is read-only and takes a *tone* from the five the
+  package knows; the tag is tapped and takes a **colour**, because a set that
+  must be told apart — four statuses, seven condition grades — runs past what
+  five tones can say. The app maps its enum to a hue (`AppColors.tagSeries`)
+  and hands it over, which is the same division as everywhere else: the
+  package never learns what a domain value means.
+- **A tag's colour is never its only signal.** The label is spelled out and
+  the chosen one draws a filled radio as well as a filled ground.
 - **Dividers: one thickness, one colour, and between items only**
   (`if (index > 0)`). A rule above the first row lands on the container's edge
   and reads as a border it does not have. Its height equals its thickness — see
