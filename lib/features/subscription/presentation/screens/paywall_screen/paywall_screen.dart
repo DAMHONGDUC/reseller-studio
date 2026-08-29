@@ -27,21 +27,24 @@ part 'paywall_screen_footer.dart';
 /// GoRouter owns this as a route, while [SdBottomSheetV3] gives the route its
 /// modal presentation. Dismissing it therefore preserves the screen beneath.
 ///
-/// **No height fraction.** What the sheet holds is a tagline, two columns of
-/// benefits, two option cards and a button; a sheet fixed at nine tenths of
-/// the screen spent the difference on dead space above the footer.
+/// **Nine tenths of the screen, always.** A sheet that resized itself around
+/// whatever the store returned read as a different screen on every open, and
+/// the strip of page left above it is what says this one can be dismissed.
 class PaywallScreen extends ConsumerWidget {
   const PaywallScreen({super.key});
+
+  static const double heightFactor = 0.9;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => SdBottomSheetV3(
     title: context.l10n.paywallTitle,
+    heightFactor: heightFactor,
     child: Column(
-      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        // Loose: the sheet is as tall as its content, and the content still
-        // scrolls when a large text scale makes it taller than the screen.
-        Flexible(
+        // Expanded, not Flexible: the content takes everything the footer does
+        // not, which is what holds the links against the bottom edge when the
+        // content is shorter than the sheet.
+        Expanded(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -86,6 +86,27 @@ void main() {
     expect(cardBehind(tester, 'Yearly').borderColor, isNull);
   });
 
+  testWidgets('the sheet keeps nine tenths of the screen, footer at its foot', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const PaywallScreen());
+
+    final SdBottomSheetV3 sheet = tester.widget<SdBottomSheetV3>(
+      find.byType(SdBottomSheetV3),
+    );
+    final Rect box = tester.getRect(find.byType(SdBottomSheetV3));
+    final Rect footer = tester.getRect(find.byType(PaywallFooterLinks));
+    final Rect content = tester.getRect(find.byType(SingleChildScrollView));
+
+    // The fraction itself only bites under the modal route's loose
+    // constraints; here the sheet is pumped as a screen, so what is checked is
+    // that it asks for one and that the content still gives the footer the
+    // bottom edge.
+    expect(sheet.heightFactor, PaywallScreen.heightFactor);
+    expect(footer.top, greaterThanOrEqualTo(content.bottom));
+    expect(box.bottom - footer.bottom, lessThan(footer.height));
+  });
+
   testWidgets('the footer is one row of links, below the scrolling content', (
     WidgetTester tester,
   ) async {
