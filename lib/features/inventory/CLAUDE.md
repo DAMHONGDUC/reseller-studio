@@ -139,9 +139,9 @@ Owner's rule — the row must be **good-looking, sensible and complete**, in
 that order of argument and none of them at the cost of the others. `ItemCard`
 answers it with a split, ruled off by a hairline:
 
-- **Above: what the item is.** Photo, title, then compact display badges
-  naming its state, stale state, condition and where it stands on the
-  marketplaces — all in one column beside the photo, sharing one left edge.
+- **Above: what the item is.** Photo, title, then two lines of compact display
+  badges — state and grade on the first, the marketplaces on the second — all
+  in one column beside the photo, sharing one left edge.
 - **Below: what it is worth.** A band across the card's full width — how many
   are left, then cost and asking price, each a label with its figure under
   it.
@@ -158,11 +158,18 @@ keeping written down:
 Across the foot the labels share one baseline and the figures share the next,
 which is what lets the amounts be compared at a glance.
 
-- **The quantity leads, and its cell is narrower** — owner's rule that the row
-  carry what is left. A count is two characters where an amount is nine, so
-  equal quarters would spend width where it is not needed and ellipsize a
-  four-figure price. It replaces the old `×3` badge: a figure with a permanent
-  cell is one a seller can find without reading the chips.
+- **The three cells are spaced apart, not divided into shares** — owner's
+  rule. `MainAxisAlignment.spaceBetween` on cells that measure themselves:
+  quantity holds the card's left edge, the asking price holds its right, and
+  the gaps fall where the content leaves them. Fixed flex shares spent width
+  on a two-character count and then ellipsized a four-figure price, which is
+  the failure this replaces.
+- **The last cell aligns its figure to the card's right edge**, because a
+  space-between row that ends on a left-aligned amount reads as a column that
+  did not reach.
+- **The quantity leads** — owner's rule that the row carry what is left. It
+  replaces the old `×3` badge: a figure with a permanent cell is one a seller
+  can find without reading the chips.
 - **`Item.quantityOnHand` is zero once the item is sold or archived**,
   whatever `quantity` says. The field records how many were taken in; a row
   answering "what is left" must not answer with that number after the last one
@@ -219,10 +226,18 @@ is live on** — no names and no amounts.
 - **One compact count replaces the wrapped badge list.** The list made a card
   grow with every marketplace and slowed scanning; the detail screen keeps the
   full names for the seller who needs them.
-- **The count flows in the same `Wrap` as the other tags** — owner's rule that
-  the row be compact. It replaces a line of its own under them: where an item
-  is live is a fact about the item like its grade, and a second line bought
-  nothing but height.
+- **The tags are two lines, and the split is by question** — owner's rule.
+  Line one is what the item *is*: its status, its Stale marker and its grade.
+  Line two is where it *stands on the marketplaces*: the count, or that
+  nothing carries it. One `Wrap` let a long grade push the market count onto a
+  line of its own at some widths and not others, so the row's shape depended
+  on the words in it.
+- **Stale rides on line one.** It is a fact about the item's state, not about
+  its distribution — the clock says it has not moved, which is not the same
+  claim as where it is listed.
+- **Line two is absent, not empty, when there is nothing to say.** A sold or
+  archived item shows no marketplace tag at all, so the card loses the line
+  rather than keeping a gap where one used to be.
 - **An item on no marketplace says so, in red** — owner's rule. Nothing at all
   read as "no platforms worth naming" when the truth was stock earning
   nothing, which is the one thing on this row a seller can fix today. Only an
