@@ -19,8 +19,9 @@ Read this file before changing anything in `lib/features/inventory/`.
   listing records for one platform still read as one market.
 - **The Price cell matches the Cost cell's complete UI.** Owner's rule. It has
   a label above its content; only the content differs, using the arrow instead
-  of an amount. The whole Price cell is the tap target that opens the
-  marketplace price list, rather than making the seller hit the arrow alone.
+  of an amount, and the label-to-content gap is the same in both cells. The
+  whole Price cell is one circular tap target that opens the marketplace price
+  list, rather than making the seller hit the arrow alone.
 
 ## Item action feedback
 
