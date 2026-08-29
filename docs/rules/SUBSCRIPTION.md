@@ -31,15 +31,17 @@ any action that can be blocked by an entitlement.
 - **Buying and managing Premium are separate destinations.** Owner's rule.
   `PaywallScreen` owns the monthly and yearly purchase actions; it has its own
   route and that route presents it as a bottom sheet. `SubscriptionScreen` is
-  a separate full screen for the current plan, restore, and store billing
+  a separate full screen for the current plan and store billing
   management, and never doubles as the purchase surface. Premium gates and
   upgrade banners open the paywall route, while More → Subscription opens the
   management screen.
-- **The paywall's legal destinations are text links in one row at its
-  bottom.** Owner's rule. Terms of Use and Privacy Policy do not render as a
-  card, list rows, or icon actions there; their compact placement keeps the
-  purchase choice primary while leaving both App Store-required links directly
-  reachable.
+- **The paywall has a fixed footer below its scrolling content.** Owner's
+  rule. Restore Purchases lives in that footer, and its last row is Terms of
+  Use and Privacy Policy as underlined text links. The legal links never scroll
+  away, and they do not render as a card, list rows, or icon actions; their
+  compact placement keeps the purchase choice primary while leaving both App
+  Store-required destinations directly reachable. `SubscriptionScreen` does
+  not repeat Restore Purchases.
 
 ## Enforcement
 
