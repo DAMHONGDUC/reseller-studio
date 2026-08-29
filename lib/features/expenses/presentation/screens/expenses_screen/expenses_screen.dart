@@ -10,6 +10,7 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/utils/mileage_unit_label.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_icon_button.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../../tax/providers.dart';
 import '../../../domain/entities/expense.dart';
@@ -162,12 +163,9 @@ class ExpensesScreen extends ConsumerWidget {
                             style: context.textTheme3.bodyMedium!.tabular3
                                 .copyWith(color: context.sdTheme3.textPrimary),
                           ),
-                          IconButton(
-                            icon: SdIconV3(
-                              AppIconConstant.delete,
-                              size: SdIconV3.smallSize,
-                              color: context.sdTheme3.textTertiary,
-                            ),
+                          SizedBox(width: SdSpacingConstant.w12),
+                          AppRowIconButton(
+                            icon: AppIconConstant.delete,
                             tooltip: context.l10n.actionDelete,
                             onPressed: () =>
                                 _confirmDelete(context, ref, expense),

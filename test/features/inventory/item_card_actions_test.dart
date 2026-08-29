@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reseller_studio/core/widgets/app_row_chevron.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
@@ -56,11 +57,14 @@ void main() {
   ) async {
     await pumpScreen(tester, const InventoryScreen());
 
+    // The target is what the `InkResponse` covers, which is no longer what the
+    // button occupies in the row: it lays out at the glyph's width so the dots
+    // hold the card's content edge, and overflows to the target around them.
     final Size size = tester.getSize(
       find
           .descendant(
             of: actionsButton().first,
-            matching: find.byType(SizedBox),
+            matching: find.byType(InkResponse),
           )
           .first,
     );
@@ -82,6 +86,32 @@ void main() {
           .customBorder,
       isA<CircleBorder>(),
     );
+  });
+
+  testWidgets('the glyph holds the card content edge, not the target box', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const InventoryScreen());
+
+    final Rect dots = tester.getRect(
+      find
+          .descendant(of: actionsButton().first, matching: find.byType(Icon))
+          .first,
+    );
+    final Rect arrow = tester.getRect(
+      find
+          .descendant(
+            of: find.byType(ItemCard).first,
+            matching: find.byType(AppRowChevron),
+          )
+          .first,
+    );
+
+    // Centring the glyph in a target that stopped at the content edge set it
+    // 12 points short of every chevron in the app, and a column of end glyphs
+    // out of line reads as a mistake to somebody who cannot say which card is
+    // wrong. The overhang is ink over the card's own inset instead.
+    expect(dots.right, moreOrLessEquals(arrow.right, epsilon: 0.5));
   });
 
   testWidgets('it disappears while a bulk selection is open', (

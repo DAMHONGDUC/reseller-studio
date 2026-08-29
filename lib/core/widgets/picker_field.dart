@@ -3,6 +3,7 @@ import 'package:system_design/index.dart';
 
 import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
+import 'app_row_chevron.dart';
 
 /// A form row whose value is chosen from a sheet rather than typed.
 ///
@@ -90,9 +91,12 @@ class PickerField extends StatelessWidget {
                             ),
                     ),
                   ),
+                  // The field's whole point is that it opens a picker, so
+                  // its glyph is the end-glyph size rather than the small one
+                  // the leading mark beside the text uses.
                   SdIconV3(
                     AppIconConstant.expandMore,
-                    size: SdIconV3.smallSize,
+                    size: AppRowChevron.size,
                     color: context.sdTheme3.textSecondary,
                   ),
                 ],

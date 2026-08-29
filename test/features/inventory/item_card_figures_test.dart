@@ -54,16 +54,19 @@ void main() {
 
     final Rect card = tester.getRect(find.byType(SdCardV3));
     final Rect thumbnail = tester.getRect(find.byType(AppPhoto));
-    final Rect actionsTarget = tester.getRect(
+    // The glyph keeps the padding, not the target: the 44pt `InkResponse`
+    // overhangs into the card's own inset so the dots hold the content edge
+    // rather than sitting 12 points inside every chevron in the app.
+    final Rect dots = tester.getRect(
       find.descendant(
         of: find.byTooltip('Actions'),
-        matching: find.byType(InkResponse),
+        matching: find.byType(Icon),
       ),
     );
 
     expect(
       thumbnail.left - card.left,
-      moreOrLessEquals(card.right - actionsTarget.right),
+      moreOrLessEquals(card.right - dots.right),
     );
   });
 
@@ -178,14 +181,20 @@ void main() {
 
     expect(ink.highlightShape, BoxShape.circle);
     expect(ink.customBorder, isA<CircleBorder>());
-    expect(tester.getSize(priceTarget), Size.square(SdSpacingConstant.r44));
+    // Tall enough for the target, and no wider than the label above the
+    // glyph: a square would centre the pair and pull the arrow off the card's
+    // right edge, out of the column every other end glyph sits in.
     expect(
-      tester.getCenter(find.text('Price')).dx,
-      moreOrLessEquals(tester.getCenter(priceTarget).dx),
+      tester.getSize(priceTarget).height,
+      greaterThanOrEqualTo(SdSpacingConstant.r44),
     );
     expect(
-      tester.getCenter(arrow).dx,
-      moreOrLessEquals(tester.getCenter(priceTarget).dx),
+      tester.getRect(find.text('Price')).right,
+      moreOrLessEquals(tester.getRect(priceTarget).right),
+    );
+    expect(
+      tester.getRect(arrow).right,
+      moreOrLessEquals(tester.getRect(priceTarget).right),
     );
     expect(
       tester.getRect(arrow).top - tester.getRect(find.text('Price')).bottom,

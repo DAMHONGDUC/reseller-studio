@@ -41,11 +41,7 @@ class _HomeFlowOverview extends StatelessWidget {
             ),
           ),
           SizedBox(width: SdSpacingConstant.w8),
-          SdIconV3(
-            AppIconConstant.chevronRight,
-            size: SdIconV3.smallSize,
-            color: context.sdTheme3.textTertiary,
-          ),
+          const AppRowChevron(),
         ],
       ),
     ),

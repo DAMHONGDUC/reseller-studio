@@ -39,12 +39,8 @@ class _LocationRow extends StatelessWidget {
       ].join(' · '),
       icon: iconFor(location.kind),
       showChevron: false,
-      trailing: IconButton(
-        icon: SdIconV3(
-          AppIconConstant.delete,
-          size: SdIconV3.smallSize,
-          color: context.sdTheme3.textTertiary,
-        ),
+      trailing: AppRowIconButton(
+        icon: AppIconConstant.delete,
         tooltip: context.l10n.actionDelete,
         onPressed: () => onDelete(itemCount),
       ),

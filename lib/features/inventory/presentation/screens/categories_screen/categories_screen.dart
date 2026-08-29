@@ -7,6 +7,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_icon_button.dart';
 import '../../../../../core/widgets/name_entry_sheet.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_category.dart';
@@ -166,12 +167,8 @@ class CategoriesScreen extends ConsumerWidget {
                   subtitle: context.l10n.categoryItemCount(count),
                   icon: AppIconConstant.category,
                   onTap: () => _rename(context, ref, category),
-                  trailing: IconButton(
-                    icon: SdIconV3(
-                      AppIconConstant.delete,
-                      size: SdIconV3.smallSize,
-                      color: context.sdTheme3.textTertiary,
-                    ),
+                  trailing: AppRowIconButton(
+                    icon: AppIconConstant.delete,
                     tooltip: context.l10n.actionDelete,
                     onPressed: () =>
                         _confirmDelete(context, ref, category, count),

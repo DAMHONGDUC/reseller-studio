@@ -20,6 +20,11 @@ part of 'item_card.dart';
 /// right. Fixed flex shares spent width on a two-character count and then
 /// ellipsized a four-figure price.
 ///
+/// **The arrow is the same glyph every other card ends with** — owner's
+/// rule. It is `AppRowChevron`, so it cannot come out a size or a grey of its
+/// own, and its cell aligns to the end so it holds the card's right edge in
+/// the same column as the chevrons on Orders and Offers.
+///
 /// **The asking price is not here, the arrow is** — owner's rule. What the
 /// item is asked for is a per-marketplace number, so one figure on the row is
 /// a price that may be true nowhere; the arrow opens the screen that lists
@@ -69,15 +74,12 @@ class _MoneyLine extends StatelessWidget {
       else if (!item.status.isListable)
         _MoneyCell(
           label: context.l10n.inventoryPrice,
-          content: SizedBox.square(dimension: SdIconV3.smallSize),
+          content: SizedBox.square(dimension: AppRowChevron.size),
         )
       else
         _MoneyCell(
           label: context.l10n.inventoryPrice,
-          content: SdIconV3(
-            AppIconConstant.chevronRight,
-            size: SdIconV3.smallSize,
-            color: context.sdTheme3.textTertiary,
+          content: AppRowChevron(
             semanticLabel: context.l10n.inventoryMarketPrices,
           ),
           tooltip: context.l10n.inventoryMarketPrices,

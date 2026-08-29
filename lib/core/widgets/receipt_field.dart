@@ -4,6 +4,7 @@ import 'package:system_design/index.dart';
 import '../constants/app_icon_constant.dart';
 import '../extensions/context_extensions.dart';
 import 'app_photo.dart';
+import 'app_row_icon_button.dart';
 
 /// The receipt slot on a purchase or expense form.
 ///
@@ -58,13 +59,10 @@ class ReceiptField extends StatelessWidget {
                   ),
                 ),
               ),
-              IconButton(
-                icon: SdIconV3(
-                  AppIconConstant.close,
-                  size: SdIconV3.smallSize,
-                  color: context.sdTheme3.danger,
-                ),
+              AppRowIconButton(
+                icon: AppIconConstant.close,
                 tooltip: context.l10n.receiptRemoveTooltip,
+                tint: context.sdTheme3.danger,
                 onPressed: onRemove,
               ),
             ],

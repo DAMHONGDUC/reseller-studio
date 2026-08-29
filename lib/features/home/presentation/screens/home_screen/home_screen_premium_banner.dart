@@ -59,10 +59,7 @@ class _HomePremiumBanner extends ConsumerWidget {
               ),
             ),
             SizedBox(width: SdSpacingConstant.w8),
-            Icon(
-              AppIconConstant.chevronRight,
-              color: context.sdTheme3.textSecondary,
-            ),
+            const AppRowChevron(),
           ],
         ),
       ),

@@ -5,12 +5,13 @@ import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/widgets/app_photo.dart';
+import '../../../../core/widgets/app_row_chevron.dart';
+import '../../../../core/widgets/app_row_icon_button.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 
-part 'item_card_icon_button.dart';
 part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
 part 'item_card_money_line.dart';
@@ -148,7 +149,7 @@ class ItemCard extends StatelessWidget {
               // A glyph is all the width allows next to a title and a price,
               // so it has to be one a seller already knows.
               if (onActions != null && !isSelecting)
-                _CardIconButton(
+                AppRowIconButton(
                   icon: AppIconConstant.moreVert,
                   tooltip: context.l10n.commonActions,
                   onPressed: onActions!,

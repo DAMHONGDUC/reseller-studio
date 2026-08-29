@@ -8,6 +8,10 @@ part of 'item_card.dart';
 /// stranded a card's width from the number it names. Stacked, the labels
 /// share one baseline and the amounts share the next.
 ///
+/// **A cell that opens something aligns to the end** — owner's rule. Its
+/// glyph holds the card's right edge, in the same column as the chevron every
+/// other card ends with; centred in a square target it sat 12 points short.
+///
 /// **The amount is a size louder than its label** — owner's rule. The figures
 /// are what the row exists to show, and a label at the same weight makes the
 /// seller hunt for the number among the words introducing it.
@@ -27,9 +31,12 @@ class _MoneyCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget cell = Column(
+      // A cell that opens something ends the row, so it aligns to the end and
+      // its glyph holds the card's right edge — the column every other card's
+      // chevron sits in.
       crossAxisAlignment: onTap == null
           ? CrossAxisAlignment.start
-          : CrossAxisAlignment.center,
+          : CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
@@ -50,13 +57,16 @@ class _MoneyCell extends StatelessWidget {
       message: tooltip!,
       child: InkResponse(
         onTap: handleTap,
-        radius: SdSpacingConstant.r22,
+        radius: AppRowIconButton.target / 2,
         containedInkWell: true,
         highlightShape: BoxShape.circle,
         customBorder: const CircleBorder(),
-        child: SizedBox.square(
-          dimension: _CardIconButton.slotSize,
-          child: Center(child: cell),
+        // Tall enough to reach the 44pt target, and only as wide as the label
+        // above the glyph — a square would centre the pair and pull the glyph
+        // off the card's edge.
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: AppRowIconButton.target),
+          child: cell,
         ),
       ),
     );
