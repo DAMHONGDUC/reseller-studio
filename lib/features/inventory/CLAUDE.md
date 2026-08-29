@@ -140,8 +140,8 @@ that order of argument and none of them at the cost of the others. `ItemCard`
 answers it with a split, ruled off by a hairline:
 
 - **Above: what the item is.** Photo, title, the badges naming its state and
-  its age, and the marketplaces it is live on — all in one column beside the
-  photo, sharing one left edge.
+  condition, then its state age directly above the marketplace count — all in
+  one column beside the photo, sharing one left edge.
 - **Below: what it is worth.** A band across the card's full width — how many
   are left, then cost, asking price and expected profit, each a label with its
   figure under it.
@@ -203,15 +203,16 @@ Owner's rule.
 
 ## The row says how long, not only what
 
-Owner's rule, part of the same one above. A badge beside the status carries
-the age of the state the item is in — `3w`, `2mo` — from `Item.stateSince`.
+Owner's rule, part of the same one above. A badge carries the age of the state
+the item is in — `3w`, `2mo` — from `Item.stateSince`.
 
 - **One timestamp per state**: sold reads `soldAt`, listed reads `listedAt`,
   everything else `createdAt`. A screen picking its own field is how two
   places end up disagreeing about what "how long has this sat" means.
-- **The duration alone, beside the badge that names the state.** "Listed 84d"
-  next to a badge already reading *Listed* says the word twice, and the row
-  has no width to spare.
+- **The duration is its own line directly above the marketplace count.** It
+  stays visually associated with distribution without crowding the status,
+  stale and condition badges. The compact duration alone avoids repeating the
+  status name.
 - **It is not the stale badge.** Stale says a threshold was crossed; the age
   says by how far, and an item three days over reads differently from one at
   six months.
@@ -228,9 +229,9 @@ is live on** — no names and no amounts.
 - **One compact count replaces the wrapped badge list.** The list made a card
   grow with every marketplace and slowed scanning; the detail screen keeps the
   full names for the seller who needs them.
-- **They sit with the state badges, above the money band.** Where an item is
-  live is a fact about the item, not a figure — grouping it with the badges
-  keeps the band to the three amounts it exists to line up.
+- **The count sits below the state-age line, above the money band.** Where an
+  item is live is a fact about the item, not a money figure; this order also
+  keeps the age immediately above the count as one quiet metadata block.
 - **The count is deduped by marketplace**, so two listing records on one
   platform still read as one market.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds both
