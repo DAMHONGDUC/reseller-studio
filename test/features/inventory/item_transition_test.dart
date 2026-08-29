@@ -72,15 +72,19 @@ void main() {
       );
     });
 
-    test('a hand-picked sold is refused whatever else is right', () {
-      // Hard rule 3: revenue and profit are read from the order, so the flag
-      // is set by recording the sale, never on its own.
-      final ItemTransitionCheck result = ItemTransition.manualCheck(
-        item(askingPrice: const Money(4500, 'USD')),
+    test('a hand-picked sold is allowed, and empties the shelf with it', () {
+      // Owner's rule: the status is editable, `sold` included. It writes no
+      // order, so revenue and profit still come from Mark as sold — what it
+      // records is that the stock has gone.
+      final Item sold = ItemTransition.apply(
+        item(askingPrice: const Money(4500, 'USD'), quantity: 3),
         ItemStatus.sold,
+        now: now,
       );
 
-      expect(result.blocks, contains(ItemTransitionBlock.needsSaleRecord));
+      expect(sold.status, ItemStatus.sold);
+      expect(sold.quantity, 0);
+      expect(sold.soldAt, now);
     });
   });
 

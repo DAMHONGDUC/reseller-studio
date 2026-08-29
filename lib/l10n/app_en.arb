@@ -120,10 +120,6 @@
   "@itemStatus": {
     "description": "Field label on the item form for the item's state."
   },
-  "itemBlockNeedsSaleRecord": "Use Actions → Mark as sold, so the order is recorded with it",
-  "@itemBlockNeedsSaleRecord": {
-    "description": "Why the status picker refuses Sold: a sale writes an order, and profit is derived from orders."
-  },
   "itemBlockNoQuantity": "Nothing left in stock to move",
   "@itemBlockNoQuantity": {
     "description": "Why a transition is refused because quantity is zero."
@@ -1137,14 +1133,13 @@
   "@restockHowMany": {
     "description": "Field label in the restock sheet — what is added to the count, not the new total."
   },
-  "restockHelp": "{count, plural, =0{Nothing on the shelf right now} =1{1 on the shelf right now} other{{count} on the shelf right now}}",
-  "@restockHelp": {
-    "description": "Helper under the restock field: what the count is today, so the seller can see what they are adding to.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
+  "restockOnShelfNow": "On the shelf now",
+  "@restockOnShelfNow": {
+    "description": "Restock sheet: how many the item has before anything is added."
+  },
+  "restockNewTotal": "New total",
+  "@restockNewTotal": {
+    "description": "Restock sheet: what the count becomes once the arrivals are added. An em dash until the box holds a usable number."
   },
   "restockCountRequired": "Enter how many arrived",
   "@restockCountRequired": {

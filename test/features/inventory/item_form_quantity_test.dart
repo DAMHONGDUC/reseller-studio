@@ -90,27 +90,35 @@ void main() {
     );
   });
 
-  test('sold is never set by hand — a sale writes an order', () async {
+  test('sold can be set by hand, and takes the count with it', () async {
     final ProviderContainer container = mockContainer();
 
     await warmUp(container);
 
-    final Item inStock = await saved(container, 'itm-11');
+    final Item onShelf = await saved(container, 'itm-11');
     final ItemFormController form = container.read(
       itemFormControllerProvider.notifier,
     );
 
-    form.seed(inStock);
+    form.seed(onShelf);
 
-    // Hard rule 3: revenue, fees and profit are read from the order, so a row
-    // Inventory calls sold that the ledger has never heard of is the dirty
-    // data this refusal exists to stop.
     expect(
       form
           .checkStatus(ItemStatus.sold, quantity: '2', askingPrice: '42.00')
-          .blocks,
-      contains(ItemTransitionBlock.needsSaleRecord),
+          .isAllowed,
+      isTrue,
     );
+
+    form.selectStatus(ItemStatus.sold);
+    await form.submit(title: onShelf.title, quantity: '2', askingPrice: '42');
+
+    final Item sold = await saved(container, 'itm-11');
+
+    // Sold means sold out however it was reached, so the count goes with the
+    // status — otherwise the card would offer two left of something gone.
+    expect(sold.status, ItemStatus.sold);
+    expect(sold.quantity, 0);
+    expect(sold.soldAt, isNotNull);
   });
 
   test('editing an item keeps the timestamps it was not asked about', () async {

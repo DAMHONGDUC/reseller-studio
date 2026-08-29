@@ -37,17 +37,25 @@ class _FormSection extends StatelessWidget {
   );
 }
 
-/// The item's state, editable — with the rules that keep the data honest.
+/// The item's state, editable — four radios, each wearing its own colour.
 ///
-/// **Every status is offered and the refusal explains itself** — owner's
-/// rule. A picker that hid what it would not accept teaches nothing; one that
-/// says "Add an asking price to list this" teaches the rule and points at the
-/// fix, the same way the actions sheet does.
+/// **Radios rather than a picker sheet** — owner's rule. There are four
+/// states and they are the answer to one question, so hiding them behind a
+/// row that opens a sheet costs two taps to see what the choices even are.
+/// Laid out, the seller reads the whole vocabulary at once.
 ///
-/// **Sold is the one it always refuses.** A sale writes an order, and revenue,
-/// fees and profit are read from that order (hard rule 3) — flipping the flag
-/// on its own would leave a row Inventory calls sold and the ledger has never
-/// heard of. `ItemTransition.manualCheck` holds that rule, not this widget.
+/// **Each option carries the colour of its badge** (`ItemStatusLabel.color`),
+/// so the chosen radio and the tag on the card are visibly the same thing.
+/// Colour is never the only signal: the label is spelled out and the radio is
+/// filled.
+///
+/// **Sold is offered too** — owner's rule. It records that the stock is gone
+/// and empties the count with it, and it writes no order: revenue and profit
+/// are still read from orders (hard rule 3), so a sale that should show up in
+/// the figures is recorded through Mark as sold instead.
+///
+/// A refused move says which requirement is missing rather than going quiet,
+/// the same way the actions sheet does.
 class _StatusField extends ConsumerWidget {
   const _StatusField({
     required this.state,
@@ -61,56 +69,122 @@ class _StatusField extends ConsumerWidget {
   final TextEditingController quantity;
   final TextEditingController askingPrice;
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => PickerField(
-    label: context.l10n.itemStatus,
-    icon: AppIconConstant.inventory,
-    value: ItemStatusLabel.of(context, state.status),
-    onTap: () async {
-      final ItemStatus? picked = await OptionPickerSheet.show<ItemStatus>(
+  void _pick(BuildContext context, WidgetRef ref, ItemStatus status) {
+    final ItemFormController form = ref.read(
+      itemFormControllerProvider.notifier,
+    );
+    final ItemTransitionCheck check = form.checkStatus(
+      status,
+      quantity: quantity.text,
+      askingPrice: askingPrice.text,
+    );
+
+    if (!check.isAllowed) {
+      SdSnackBarUtilsV3.error(
         context,
-        title: context.l10n.itemStatus,
-        selected: state.status,
-        // Sold is left out rather than offered and refused: it is not a
-        // correction, it is an order — `ItemTransition.manualCheck` says the
-        // same thing to anything that asks.
-        options: ItemStatus.values
-            .where((ItemStatus status) => status != ItemStatus.sold)
-            .map(
-              (ItemStatus status) => PickerOption<ItemStatus>(
-                value: status,
-                label: ItemStatusLabel.of(context, status),
+        ItemBlockPresenter.messages(context, check.blocks),
+      );
+
+      return;
+    }
+
+    form.selectStatus(status);
+  }
+
+  // Full width and left-aligned: `_FormSection` centres what it is given, so
+  // a group that sizes to its chips would sit indented while every typed row
+  // beside it starts at the card's edge.
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => SizedBox(
+    width: double.infinity,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        // The same label widget the typed and picked rows use, so one form
+        // cannot label its fields three ways.
+        SdFieldLabelV3(label: context.l10n.itemStatus),
+        SizedBox(height: SdSpacingConstant.h6),
+        Wrap(
+          spacing: SdSpacingConstant.w8,
+          runSpacing: SdSpacingConstant.h8,
+          children: <Widget>[
+            for (final ItemStatus status in ItemStatus.values)
+              _StatusOption(
+                status: status,
+                isSelected: state.status == status,
+                onTap: () => _pick(context, ref, status),
               ),
-            )
-            .toList(),
-      );
-
-      if (picked == null || !context.mounted) return;
-
-      final ItemFormController form = ref.read(
-        itemFormControllerProvider.notifier,
-      );
-      final ItemTransitionCheck check = form.checkStatus(
-        picked,
-        quantity: quantity.text,
-        askingPrice: askingPrice.text,
-      );
-
-      if (!check.isAllowed) {
-        SdSnackBarUtilsV3.error(
-          context,
-          ItemBlockPresenter.messages(context, check.blocks),
-        );
-
-        return;
-      }
-
-      form.selectStatus(picked);
-    },
+          ],
+        ),
+      ],
+    ),
   );
 }
 
-/// The condition grades resellers actually use in listings.
+/// One radio in that group.
+class _StatusOption extends StatelessWidget {
+  const _StatusOption({
+    required this.status,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final ItemStatus status;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  /// How much of the status colour the chosen option keeps behind it. The
+  /// same strength `SdBadgeV3` fills with, so the radio and the tag on the
+  /// card read as one colour rather than two versions of it.
+  static const double selectedFillOpacity = SdBadgeV3.fillOpacity;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color tint = ItemStatusLabel.color(context, status);
+    final Color foreground = isSelected ? tint : context.sdTheme3.textSecondary;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: SdRadiusV3.chipAll,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: SdSpacingConstant.w12,
+          vertical: SdSpacingConstant.h8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? tint.withValues(alpha: selectedFillOpacity)
+              : Colors.transparent,
+          borderRadius: SdRadiusV3.chipAll,
+          border: Border.all(
+            color: isSelected ? tint : context.sdTheme3.border,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SdIconV3(
+              isSelected
+                  ? AppIconConstant.radioButtonChecked
+                  : AppIconConstant.radioButtonUnchecked,
+              size: SdIconV3.smallSize,
+              color: foreground,
+            ),
+            SizedBox(width: SdSpacingConstant.w6),
+            Text(
+              ItemStatusLabel.of(context, status),
+              style: context.textTheme3.bodySmall!.semiBold3.copyWith(
+                color: foreground,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The condition grades resellers actually use in listings./// The condition grades resellers actually use in listings.
 class _ConditionField extends ConsumerWidget {
   const _ConditionField({required this.state});
 

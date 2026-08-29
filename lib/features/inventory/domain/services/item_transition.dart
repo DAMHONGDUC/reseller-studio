@@ -20,12 +20,6 @@ enum ItemTransitionBlock {
 
   /// Nothing on the shelf to move.
   noQuantity,
-
-  /// The seller picked `sold` by hand. A sale writes an order — that is where
-  /// revenue, fees and profit come from (hard rule 3) — so the status cannot
-  /// be set on its own without leaving a row Inventory calls sold and the
-  /// ledger has never heard of.
-  needsSaleRecord,
 }
 
 /// The result of asking whether an item may change status.
@@ -113,28 +107,6 @@ final class ItemTransition {
         : ItemTransitionCheck.blocked(blocks);
   }
 
-  /// Whether the seller may set [target] by hand, on the item form.
-  ///
-  /// **Everything [check] refuses, plus `sold`** — owner's rule that the
-  /// status be editable without letting dirty data in. Picking a state is a
-  /// correction: an item is a draft, it is in stock, it is live somewhere, it
-  /// is put aside, it is withdrawn. A *sale* is not a correction — it is an
-  /// order, with a price, a marketplace and a buyer, and the whole profit half
-  /// of the product reads that order rather than this flag. So `sold` is
-  /// reached through Mark as sold, which writes both.
-  ///
-  /// Coming *out* of sold is not blocked here: a sale that did not happen is
-  /// exactly the correction this exists for, and `restocked` does the same
-  /// from the count.
-  static ItemTransitionCheck manualCheck(Item item, ItemStatus target) {
-    if (target != ItemStatus.sold) return check(item, target);
-
-    return ItemTransitionCheck.blocked(<ItemTransitionBlock>[
-      ...check(item, target).blocks,
-      ItemTransitionBlock.needsSaleRecord,
-    ]);
-  }
-
   /// [item] marked as live on a marketplace.
   ///
   /// **Going live is not a status move any more** — owner's rule, since an
@@ -175,7 +147,7 @@ final class ItemTransition {
     // stays listed, and its staleness clock is not touched.
     if (left > 0) return item.copyWith(quantity: left);
 
-    return apply(item, ItemStatus.sold, now: now).copyWith(quantity: 0);
+    return apply(item, ItemStatus.sold, now: now);
   }
 
   /// [item] after its count was edited — back on the shelf if the seller put
@@ -228,6 +200,10 @@ final class ItemTransition {
 
     return item.copyWith(
       status: target,
+      // Sold means sold out, whichever way it was reached: the count goes to
+      // zero so the card, the restock box and Analytics all agree with the
+      // status rather than each other.
+      quantity: target == ItemStatus.sold ? 0 : null,
       soldAt: target == ItemStatus.sold ? now : null,
       // Coming back onto the shelf undoes the sale, and the date has to go
       // with it: an item on hand that still carries a sold date is one every

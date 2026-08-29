@@ -229,6 +229,10 @@ final class AppIconConstant {
   /// Scan a QR code.
   static const IconData qrCodeScanner = Symbols.qr_code_scanner_rounded;
 
+  /// Indicate the chosen single-choice option.
+  static const IconData radioButtonChecked =
+      Symbols.radio_button_checked_rounded;
+
   /// Indicate an unselected single-choice option.
   static const IconData radioButtonUnchecked =
       Symbols.radio_button_unchecked_rounded;

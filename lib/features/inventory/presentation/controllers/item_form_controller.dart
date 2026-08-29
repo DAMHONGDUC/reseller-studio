@@ -167,13 +167,18 @@ class ItemFormController extends Notifier<ItemFormState> {
   /// in the boxes right now.
   ///
   /// **Checked against the pending values, not the saved record.** A price
-  /// typed a second ago is a price: refusing "list this" over a field the
-  /// seller has already filled in is the form arguing with itself.
+  /// typed a second ago is a price: refusing a move over a field the seller
+  /// has already filled in is the form arguing with itself.
+  ///
+  /// **The same `ItemTransition.check` every other path uses** — owner's rule
+  /// that the picker may set any status, `sold` included. What it may not do
+  /// is skip a requirement: a sale still needs a price, and an empty shelf
+  /// still cannot move.
   ItemTransitionCheck checkStatus(
     ItemStatus target, {
     String quantity = '',
     String askingPrice = '',
-  }) => ItemTransition.manualCheck(_candidate(quantity, askingPrice), target);
+  }) => ItemTransition.check(_candidate(quantity, askingPrice), target);
 
   /// Take the pick. The move itself happens in [submit], where the record is
   /// written — a status changed on a form the seller then abandons is one

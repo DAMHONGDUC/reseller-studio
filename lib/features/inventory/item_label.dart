@@ -21,10 +21,28 @@ final class ItemStatusLabel {
     ItemStatus.archived => context.l10n.itemStatusArchived,
   };
 
+  /// The colour a status wears outside a badge — the radio group on the item
+  /// form, and anything else that has to match the tag without being one.
+  ///
+  /// **Resolved from [tone], not from a second opinion about the status.** A
+  /// switch on `ItemStatus` here would be the place where a status that
+  /// changed tone kept its old colour in one screen.
+  static Color color(BuildContext context, ItemStatus status) =>
+      switch (tone(status)) {
+        SdBadgeToneV3.success => context.sdTheme3.success,
+        SdBadgeToneV3.warning => context.sdTheme3.warning,
+        SdBadgeToneV3.danger => context.sdTheme3.danger,
+        SdBadgeToneV3.info => context.sdTheme3.info,
+        SdBadgeToneV3.neutral => context.sdTheme3.textSecondary,
+      };
+
   static SdBadgeToneV3 tone(ItemStatus status) => switch (status) {
     ItemStatus.draft => SdBadgeToneV3.neutral,
     ItemStatus.inStock => SdBadgeToneV3.success,
-    ItemStatus.sold => SdBadgeToneV3.neutral,
+    // Blue rather than grey: sold is a fact worth seeing on a row, and with
+    // four statuses left, three of them grey made the radios on the item form
+    // a shape test rather than a colour one.
+    ItemStatus.sold => SdBadgeToneV3.info,
     ItemStatus.archived => SdBadgeToneV3.neutral,
   };
 }
