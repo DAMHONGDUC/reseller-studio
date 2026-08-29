@@ -6,7 +6,7 @@ may list the names; it never gets a second explanation.
 
 ## The set
 
-Fourteen commands. Every one is `melos run <name>`, and every body is a file in
+Sixteen commands. Every one is `melos run <name>`, and every body is a file in
 `tool/`.
 
 | Command | Script | Promise |
@@ -25,6 +25,8 @@ Fourteen commands. Every one is `melos run <name>`, and every body is a file in
 | `build-ipa-prod` | `build-ipa.sh prod` | The IPA, prod config attached. |
 | `deploy-firebase-dev` | `deploy-firebase.sh dev` | Rules, indexes and functions to the dev alias. |
 | `deploy-firebase-prod` | `deploy-firebase.sh prod` | The same, prod alias. |
+| `release-dev` | `release.sh dev` | dev config, dev Firebase, then TestFlight. |
+| `release-prod` | `release.sh prod` | The same, prod. |
 
 Three shapes recur, and they are the pattern to copy:
 
@@ -35,6 +37,10 @@ Three shapes recur, and they are the pattern to copy:
   `melos.yaml` entry is the only thing that is duplicated.
 - **Underscore-prefixed files are not commands.** `_common.sh`, `_clean.sh`,
   `_url-scheme.sh` — sourced or called by others, never named in `melos.yaml`.
+- **A command that chains others calls their scripts, never their steps.**
+  `release.sh` runs `prepare-env.sh`, `deploy-firebase.sh` and the beta lane in
+  order; it re-implements none of them, so the confirm prompt and every check
+  are the same ones a step run on its own gets.
 
 ## What each one actually does
 
@@ -174,6 +180,25 @@ Its contract, in order:
 `firebase deploy` line into a document: `storage` once went missing from the
 script while `RELEASE_ACTIONS.md` still named it, and the bucket the app
 uploads to was the one nobody was deploying rules for.
+
+### `release-*` — the three commands that were always run together
+
+Config, Firebase, TestFlight — `prepare-env.sh`, `deploy-firebase.sh`, then the
+`beta` lane. What the command adds over typing them is the two things a person
+gets wrong at 2am:
+
+- **The order, which is a rule and not a preference.** Backend first: a build
+  that reaches a tester ahead of the rules it needs fails on a query nobody can
+  fix from the App Store.
+- **`set -e`, so it is a chain and not a list.** A failed deploy is never
+  followed by an upload — the `&&` that used to carry that lived in a shell
+  history nobody shared.
+
+It is **not** a shortcut past anything. `deploy-firebase.sh` still asks for the
+project id on `/dev/tty` and still refuses without a terminal, so an unattended
+run stops before it ships. The TestFlight note is everything after the flavour
+(`melos run release-prod -- what changed`), collected with `$*` because melos
+joins its extra args into one command line before a shell sees them.
 
 ## The conventions
 
