@@ -24,7 +24,7 @@ any action that can be blocked by an entitlement.
   not credentials, but one owner still prevents a renamed offering or
   entitlement from silently disagreeing with the app.
 - **Home shows Free sellers one compact Premium banner directly above the
-  shortcut row.** Owner's rule. The whole banner opens the subscription screen,
+  shortcut row.** Owner's rule. The whole banner opens the paywall,
   and it disappears for Premium sellers so a paid customer is never advertised
   the product they already own. It stays a banner rather than a fourth shortcut
   because Home's shortcut list is closed.
@@ -35,6 +35,11 @@ any action that can be blocked by an entitlement.
   management, and never doubles as the purchase surface. Premium gates and
   upgrade banners open the paywall route, while More → Subscription opens the
   management screen.
+- **The paywall's legal destinations are text links in one row at its
+  bottom.** Owner's rule. Terms of Use and Privacy Policy do not render as a
+  card, list rows, or icon actions there; their compact placement keeps the
+  purchase choice primary while leaving both App Store-required links directly
+  reachable.
 
 ## Enforcement
 
