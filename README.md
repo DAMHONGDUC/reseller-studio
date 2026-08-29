@@ -1,94 +1,70 @@
 # Reseller Studio
 
-A seller operating system for resellers — not an inventory tracker.
+Seller operations for the full resale lifecycle:
 
 ```text
-SOURCE → PURCHASE → INVENTORY → LIST → SELL → SHIP → PROFIT → ANALYZE → SOURCE BETTER
+SOURCE → PURCHASE → INVENTORY → LIST → SELL → SHIP → PROFIT → ANALYZE
 ```
 
-Flutter · Firebase · Riverpod · design system v3.
+| Area | Choice |
+|---|---|
+| App | Flutter 3.44.5 / Dart 3.12.2 |
+| State | Riverpod |
+| Backend | Firebase |
+| Navigation | `go_router`, five-tab shell |
+| Design system | `packages/system_design` v3 submodule |
+| Launch markets | United States and United Kingdom |
 
-## Getting started
+## Setup
 
-Requires [fvm](https://fvm.app) and Melos 6.3.3:
+Requirements: [FVM](https://fvm.app) and Melos 6.3.3.
 
 ```sh
 dart pub global activate melos 6.3.3
-fvm install                 # installs Flutter 3.44.5, per .fvmrc
-melos run set-up            # submodules, deps, l10n, functions, pods
+fvm install
+melos run set-up
 ```
 
-Then, before the app can reach a backend, run `flutterfire configure` — there
-is no Firebase project checked in and none can be. See **Pending setup** in
-`CLAUDE.md`.
+Firebase and store accounts are not included in the repository. See
+[`RELEASE_ACTIONS.md`](RELEASE_ACTIONS.md) before connecting a real backend.
 
-`melos run analyze` must pass with zero findings before any change is done.
+## Daily commands
+
+| Task | Command |
+|---|---|
+| Run | `melos run run` |
+| Generate localization | `melos run gen` |
+| Analyze | `melos run analyze` |
+| Test | `melos run test` |
+| Test Firestore rules | `melos run test-rules` |
+| Release checks | `melos run preflight` |
+
+Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 
 ## App identifiers
 
-What `flutterfire configure`, App Store Connect and the Play Console all ask
-for. **The two platforms differ — iOS is `app.`, Android is `com.`** — so
-register each store listing against its own row rather than assuming one id
-covers both. The right-hand column owns the value; change it there, never here.
+| Platform | Identifier | Source |
+|---|---|---|
+| iOS | `app.dd.reseller.studio` | `ios/Runner.xcodeproj/project.pbxproj` |
+| Android | `com.dd.reseller.studio` | `android/app/build.gradle.kts` |
 
-| | | |
-| --- | --- | --- |
-| iOS bundle id | `app.dd.reseller.studio` | `ios/Runner.xcodeproj/project.pbxproj` |
-| Android applicationId | `com.dd.reseller.studio` | `android/app/build.gradle.kts` |
+## Documentation
 
-The iOS test target is `app.dd.reseller.studio.RunnerTests`. The Kotlin package
-under `android/app/src/main/kotlin/` tracks the applicationId and moves with it.
+| Need | Read |
+|---|---|
+| Documentation index | [`docs/README.md`](docs/README.md) |
+| Product authority | [`SELLER_OS_FINAL_MASTER_PLAN.md`](SELLER_OS_FINAL_MASTER_PLAN.md) |
+| Engineering rules | [`AGENTS.md`](AGENTS.md) |
+| Stored data contract | [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) |
+| Built and pending work | [`docs/DONE_WORK.md`](docs/DONE_WORK.md), [`docs/REMAINING_WORK.md`](docs/REMAINING_WORK.md) |
+| Release checklist | [`RELEASE_ACTIONS.md`](RELEASE_ACTIONS.md) |
 
-## Commands
-
-Names only. **`docs/rules/COMMANDS.md` is the one place they are explained** —
-what each promises, and why the set is shaped this way.
-
-| | |
-| --- | --- |
-| Setting up | `set-up`, `deep-set-up` |
-| Config | `prepare-env-dev`, `prepare-env-prod` |
-| Developing | `run`, `gen` |
-| Gates | `analyze`, `test`, `test-rules`, `preflight` |
-| Shipping | `build-ipa-dev`, `build-ipa-prod`, `deploy-firebase-dev`, `deploy-firebase-prod` |
-
-## Shipping to TestFlight
-
-Two commands, and the first is not optional — what a build *carries* and what
-happens to the build afterwards are independent halves (`docs/rules/RELEASE.md`).
-
-### Dev
-
-```sh
-melos run prepare-env-dev
-```
-
-```sh
-cd ios && bundle exec fastlane beta flavor:dev bump:true notes:"dev"
-```
-
-### Prod
+## Release
 
 ```sh
 melos run prepare-env-prod
+cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"release notes"
 ```
 
-```sh
-cd ios && bundle exec fastlane beta flavor:prod bump:true notes:"prod"
-```
-
-## Where things are
-
-| | |
-| --- | --- |
-| Product spec, the authority | `SELLER_OS_FINAL_MASTER_PLAN.md` |
-| Engineering rules | `CLAUDE.md` |
-| Firestore collections and field contracts | `docs/DATA_MODEL.md` |
-| What may go in the design system | `packages/system_design/WIDGET_RULES.md` |
-
-## The design system is a submodule
-
-`packages/system_design` is [its own repo](https://github.com/DAMHONGDUC/system_design),
-shared with BaroEase. It carries two widget generations: `v2/` renders
-BaroEase, `v3/` renders Reseller Studio. **Never modify `v2/`, and never import it
-from `v3/`.**
+Do not archive from Xcode. The release lane supplies the build-time
+configuration required by Firebase.

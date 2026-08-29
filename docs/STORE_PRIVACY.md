@@ -1,171 +1,104 @@
-# Store privacy — what the app actually collects
+# Store privacy
 
-Audited from the code on 16 August 2026, so the two store questionnaires can
-be answered from evidence rather than from memory. Every claim below names the
-file it came from.
+Code-audited disclosure for App Store Connect, Google Play and the hosted
+privacy policy. This is a draft for legal review, not legal advice.
 
-`docs/rules/PRIVACY_AND_SECURITY.md` is the *engineering* rule file — what the
-code may log and upload. This one is the *disclosure*: what to tell Apple,
-Google and the seller. They are different jobs and both have to be right.
+## Data inventory
 
-**This is a draft for a lawyer to review, not legal advice.** The UK is a
-launch market, so UK GDPR applies: a controller has to be named, a lawful
-basis stated and a retention period committed to, and none of those can be
-read out of a codebase.
-
-## 1. What is collected
-
-### From the seller, because they typed it
-
-| Data | Where it goes | Source |
-|---|---|---|
-| Display name, email, avatar URL | `users/{uid}`, denormalised into `workspaces/{id}/members/{uid}` | `docs/DATA_MODEL.md` |
-| Business records — items, purchases, orders, listings, expenses, sources | `workspaces/{id}/…` | `docs/DATA_MODEL.md` |
-| Item photos, receipt images, workspace logo | Firebase Storage | `lib/core/storage/file_uploader.dart` |
-| Addresses of the seller's own storage locations and sourcing sources | `locations/`, `sources/` | `lib/features/inventory/domain/entities/storage_location.dart` |
-| `buyerName` — optional, about the seller's customer | `orders/{id}` | `lib/features/orders/domain/entities/order.dart` |
-
-`buyerName` is the only third-party personal data in the app, it is optional,
-and it is the buyer's **name only**.
-
-**No buyer address is stored anywhere.** Confirmed by grep across `lib/`: the
-only address fields belong to the seller's own locations and sources. Worth
-stating explicitly on both questionnaires, because a reseller app is exactly
-where a reviewer expects to find shipping addresses.
-
-### Automatically, by the SDKs
-
-| Data | Collector | Note |
-|---|---|---|
-| Crash traces, device model, OS version | Firebase Crashlytics | `SdCrashReporter.setUserId` sends the Firebase UID **and nothing else** (hard rule 9) |
-| Product-interaction events | Firebase Analytics | the full list is `lib/core/analytics/app_analytics.dart`, one typed method per event |
-| App instance id, device and OS, coarse region from IP | Firebase Analytics | the SDK's own baseline, not something the app sends |
-| Subscription and purchase state | RevenueCat | plan tier only |
-
-**No analytics event carries personal data.** Every parameter is a boolean, a
-count, or a fixed vocabulary word — `via_quick_add`, `marketplace`, `count`,
-`plan`. No item title, no buyer name, no email, no amount of money. That is
-enforced by the file being the single inventory of what is sent, and it is
-worth re-reading before each release.
-
-### What is NOT collected
-
-Each of these is a question on one of the forms, and the answer is no:
-
-- **No precise or coarse location.** There is no location plugin in
-  `pubspec.yaml`.
-- **No contacts, calendar, health, or browsing history.**
-- **No advertising SDK, no third-party tracker, no data broker.** The only
-  third parties are Google (Firebase) and RevenueCat, both processors.
-- **No marketplace OAuth tokens in the app.** They live in Secret Manager and
-  are read only by Cloud Functions (hard rule 10). Not deployed yet, so today
-  the app holds none at all.
-- **No password.** Sign-in is Apple and Google only (hard rule 1), so there is
-  no credential for this app to store or lose.
-
-## 2. App Store Connect — App Privacy answers
-
-For each type: what it is, whether it is linked to the user, and why.
-
-| Data type | Collected | Linked | Purpose |
+| Data | Source | Storage/processor | Purpose |
 |---|---|---|---|
-| Contact Info → Name, Email | yes | yes | App Functionality |
-| User Content → Photos | yes | yes | App Functionality |
-| User Content → Other | yes | yes | App Functionality |
-| Identifiers → User ID | yes | yes | App Functionality, Analytics |
-| Identifiers → Device ID | yes | yes | Analytics |
-| Usage Data → Product Interaction | yes | yes | Analytics |
-| Diagnostics → Crash Data | yes | yes | App Functionality |
-| Purchases → Purchase History | yes | yes | App Functionality |
+| Name, email, avatar | Apple or Google sign-in | Firebase Auth and Firestore | Account and team identity |
+| Inventory, purchases, listings, orders, expenses | Seller input | Firestore | App functionality |
+| Item, receipt and workspace images | Seller upload | Firebase Storage | App functionality |
+| Seller business locations and sources | Seller input | Firestore | Inventory and sourcing |
+| Optional buyer name | Seller input | Firestore order | Order history |
+| Crash and device diagnostics | Automatic | Firebase Crashlytics | Reliability |
+| Product interactions | Automatic | Firebase Analytics | Product analytics |
+| Subscription state | Store purchase | RevenueCat | Premium access |
 
-**"Used for tracking" is NO for every row.** Apple defines tracking as linking
-this data with third-party data for targeted advertising or sharing it with a
-data broker. The app does neither, which is why it needs **no App Tracking
-Transparency prompt**. Answering yes here would force one.
+The app does not store buyer addresses, passwords, contacts, health data,
+precise location, browsing history or advertising identifiers. It does not
+sell data or use data for cross-app tracking.
 
-**Account deletion is already built** (`docs/DONE_WORK.md`, auth flows), which
-is what guideline 5.1.1(v) requires — an app offering account creation must
-offer in-app deletion. Point the reviewer at Settings.
+## App Store Connect
 
-## 3. Google Play — Data Safety answers
-
-Same facts, Google's vocabulary. All of it is encrypted in transit (Firebase
-is HTTPS throughout) and the seller can request deletion in-app.
-
-| Category | Type | Collected | Purpose |
+| Data type | Collected | Linked to user | Purpose |
 |---|---|---|---|
-| Personal info | Name, Email address | yes | Account management, App functionality |
-| Photos and videos | Photos | yes | App functionality |
-| Financial info | Purchase history | yes | App functionality |
-| App activity | App interactions | yes | Analytics |
-| App info and performance | Crash logs, Diagnostics | yes | App functionality |
-| Device or other IDs | Device or other IDs | yes | Analytics |
+| Contact Info: Name, Email | Yes | Yes | App Functionality |
+| User Content: Photos, Other | Yes | Yes | App Functionality |
+| Identifiers: User ID | Yes | Yes | App Functionality, Analytics |
+| Identifiers: Device ID | Yes | Yes | Analytics |
+| Usage Data: Product Interaction | Yes | Yes | Analytics |
+| Diagnostics: Crash Data | Yes | Yes | App Functionality |
+| Purchases: Purchase History | Yes | Yes | App Functionality |
 
-Declare: **data is encrypted in transit — yes**; **users can request data
-deletion — yes**; **committed to Play Families policy — not applicable**, the
-app is not aimed at children.
+“Used for tracking” is **No** for every row. No ATT prompt is required unless
+the data flow changes.
 
-## 4. Privacy policy — a draft to host
+## Google Play
 
-Both stores need a **public URL** before the listing is accepted. Fill the
-bracketed parts and have it reviewed.
+| Category | Data | Purpose |
+|---|---|---|
+| Personal info | Name, email | Account management, app functionality |
+| Photos and videos | Photos | App functionality |
+| Financial info | Purchase history | App functionality |
+| App activity | App interactions | Analytics |
+| App performance | Crash logs, diagnostics | App functionality |
+| Device identifiers | Device or other IDs | Analytics |
 
----
+| Form question | Answer |
+|---|---|
+| Encrypted in transit | Yes |
+| User can request deletion | Yes, in Settings |
+| Designed for children | No |
+
+## Hosted privacy policy draft
+
+Fill every bracket, obtain legal review, and host this text at a stable public
+URL.
 
 ### Privacy Policy — Reseller Studio
 
 _Last updated: [date]_
 
-**Who we are.** [Legal entity name] ("we") provides the Reseller Studio app. For UK
-and EU data protection law we are the data controller. Contact:
+**Controller.** [Legal entity name] provides Reseller Studio and is the data
+controller under applicable UK and EU data-protection law. Contact:
 [support email].
 
-**What we collect.**
+**Data we collect.** We process the account identity supplied by Apple or
+Google; business records and images you enter; an optional buyer name attached
+to an order; subscription state; crash diagnostics; and feature-usage events.
+We do not request or store buyer addresses or account passwords.
 
-- *Your account*: the name, email address and avatar your Apple or Google
-  account gives us when you sign in. If you use Sign in with Apple's Hide My
-  Email, we only ever see the relay address.
-- *Your business records*: the inventory, purchases, orders, listings,
-  expenses and sourcing information you enter, including photographs of items
-  and receipts.
-- *Your customers*: if you choose to record a buyer's name against an order,
-  we store that name. We do not ask for or store buyers' addresses.
-- *Diagnostics and usage*: crash reports, and anonymous events describing
-  which features are used. These never include your business data.
+**Why we use it.** We use this data to provide and synchronize the service,
+support teams, manage Premium access, secure the app, and diagnose faults. Our
+lawful bases are performance of our contract and our legitimate interest in a
+working and secure product.
 
-**Why we use it.** To run the service you signed up for, to keep your data
-synchronised across your devices and team, to manage your subscription, and to
-find and fix faults. Our lawful basis is performance of our contract with you,
-and our legitimate interest in a working, secure product.
+**Sharing.** We do not sell data or use it for advertising. Google Firebase
+processes authentication, database, file, analytics, crash and notification
+data. RevenueCat processes subscription state. Data is stored in [region].
+International transfers use [safeguard].
 
-**We do not sell your data, and we do not use it for advertising.**
+**Retention.** We keep data while the account exists. Account deletion from
+Settings removes personal data and solely owned workspaces within [n] days,
+except records retained to meet a legal obligation.
 
-**Who processes it for us.** Google (Firebase — authentication, database,
-file storage, crash reporting, analytics, notifications) and RevenueCat
-(subscription management). Data is stored in [region]. Where data leaves the
-UK or EEA, it is transferred under [safeguard].
+**Rights.** You may access, correct, export or delete your data. Use the app's
+export and deletion tools or contact [support email]. UK users may complain to
+the Information Commissioner's Office.
 
-**How long we keep it.** For as long as your account exists. Delete your
-account in Settings and we remove your personal data and your workspace's
-records within [n] days, except anything we must keep by law.
-
-**Your rights.** You can access, correct, export or delete your data. The app
-exports your records as CSV, and Settings deletes your account. To exercise
-any other right, or to complain, write to [support email]. In the UK you may
-also complain to the Information Commissioner's Office.
-
-**Children.** Reseller Studio is for business use and is not directed at anyone
+**Children.** Reseller Studio is a business tool and is not directed to anyone
 under 18.
 
-**Changes.** We will post any change here and update the date above.
+**Changes.** We will publish policy changes at this URL and update the date.
 
----
+## Before submission
 
-## 5. What is still yours to do
-
-- Fill the brackets and have a lawyer read it — particularly the retention
-  period and the transfer safeguard.
-- Host it at a stable URL and put that URL in both listings.
-- Re-read `lib/core/analytics/app_analytics.dart` before each release. It is
-  the single inventory of what leaves the device, and this document is only
-  true for as long as that file is.
+| Task | Owner |
+|---|---|
+| Fill controller, contact, region, safeguards and retention | Business owner |
+| Obtain legal review | Business owner |
+| Host Privacy Policy and Terms of Use | Business owner |
+| Add both URLs to store listings and build configuration | Release owner |
+| Re-audit analytics and SDKs | Engineer |

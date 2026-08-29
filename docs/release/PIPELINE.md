@@ -1,58 +1,41 @@
-# The shape of a release
+# Release pipeline
 
-What runs, in what order, and where each thing can fail. The *rules* behind
-every step are in `docs/rules/RELEASE.md` and are not repeated here.
+## Flow
 
-## A run
-
-```text
-workflow_dispatch(flavor, bump, notes)
-        │
-        ├── checkout + submodule → design system's main
-        ├── git identity → github-actions[bot]
-        ├── Xcode, Flutter (from .fvmrc), Ruby 3.3 → bundle install
-        │
-        ├── env/<flavor>.json          ← ENV_<FLAVOR>_JSON secret, verbatim
-        ├── GoogleService-Info.plist   ← base64 secret, then plutil -lint
-        ├── Info.plist URL scheme      ← derived from the plist above
-        ├── pub get (app + design system), gen-l10n
-        │
-        └── fastlane beta
-              1. verify_flavor_config      ~5s    ← the last catch
-              2. build number              ~30s   ← TestFlight says what is taken
-              3. setup_ci → match → entitlements → manual signing → ExportOptions
-              4. tool/build-ipa.sh         ~20m   ← the only archive
-              5. upload_to_testflight      ~2m
-              6. dSYMs                     best effort
-              7. commit the build number
-        │
-        ├── git push          (only when bump)
-        └── upload the .ipa as an artifact
-```
-
-## Where a run dies, and what it means
-
-| Step | Failure | What it actually is |
+| Order | Stage | Output |
 |---|---|---|
-| 1 | `GoogleService-Info.plist is project X, but prod is Y` | The two config halves disagree — the whole reason this step exists. |
-| 1 | `no .firebaserc` | Nothing says which Firebase project a flavour is. See `RELEASE_ACTIONS.md`. |
-| 2 | `build … is already on TestFlight` | Re-run with `bump: true`. |
-| 3 | `Duplicate header: "Authorization"` | Both match auth secrets are set in Actions; one is empty and must leave `ENV`. |
-| 3 | `profile doesn't include the … entitlement` | A capability was enabled after the profile was minted. `bundle exec fastlane certificates force:true`, from a Mac. |
-| 4 | `No Firebase App '[DEFAULT]' has been created`, at runtime | Something archived without `--dart-define-from-file`. Nothing but `tool/build-ipa.sh` may build. |
-| 4 | `codesign` prompting during `exportArchive` | `setup_ci` ran on a laptop. It is gated on `GITHUB_ACTIONS`, not on `is_ci`. |
+| 1 | Checkout app and design-system submodule | Source tree |
+| 2 | Install pinned Flutter, Ruby and dependencies | Build tools |
+| 3 | Restore flavor configuration from Actions secrets | Env JSON and Firebase plist |
+| 4 | Generate the iOS URL scheme and localization | Prepared source |
+| 5 | Verify flavor/Firebase pairing | Safe release configuration |
+| 6 | Resolve TestFlight build number | Unique build |
+| 7 | Load signing through Match | Certificate and profile |
+| 8 | Build only through `tool/build-ipa.sh` | IPA and dSYMs |
+| 9 | Upload to TestFlight | Processing build |
+| 10 | Commit/push build number when requested | Traceable version |
+| 11 | Upload the IPA workflow artifact | Downloadable artifact |
 
-## Rehearsing without burning macOS minutes
+## Failure lookup
 
-```bash
+| Failure | Meaning | Fix |
+|---|---|---|
+| Firebase project mismatch | Flavor JSON and plist belong to different projects | Replace the incorrect flavor asset |
+| Missing `.firebaserc` | Flavor has no project alias | Add `dev`/`prod` aliases |
+| Build already exists | TestFlight has the same build number | Re-run with build bump enabled |
+| Duplicate Authorization header | Multiple Match auth methods are set | Keep one authorization secret |
+| Profile lacks entitlement | Capability changed after profile creation | Regenerate the profile |
+| Firebase default app missing at runtime | Archive skipped build-time configuration | Build only through the repository script |
+| Codesign prompts in CI | CI signing setup did not run | Check the GitHub Actions environment and Match values |
+
+## Rehearsal
+
+Run both from `ios/`:
+
+```sh
 bundle exec fastlane preflight
-```
-
-Then the half most likely to break, which is the CI half:
-
-```bash
 CI=true bundle exec fastlane preflight
 ```
 
-Both from `ios/`. Three minutes each, and between them they exercise every
-credential a real run needs except the build itself.
+The first checks the local path; the second checks CI-only behavior without
+uploading a build.
