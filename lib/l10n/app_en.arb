@@ -3017,6 +3017,23 @@
   "@workspaceReadOnlyNote": {
     "description": "Shown to a member or viewer instead of the editable rows."
   },
+  "homeOrdersOverdue": "{count, plural, =1{1 overdue} other{{count} overdue}}",
+  "@homeOrdersOverdue": {
+    "description": "Detail under Home's orders row when at least one order has passed its ship-by date.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeOrdersNoneOverdue": "none overdue",
+  "@homeOrdersNoneOverdue": {
+    "description": "Detail under Home's orders row when orders are pending but none is late."
+  },
+  "homeItemsToListDetail": "in stock, not listed anywhere",
+  "@homeItemsToListDetail": {
+    "description": "Detail under Home's items-to-list row."
+  },
   "homeStaleDetail": "listed over {count, plural, =1{1 day} other{{count} days}}",
   "@homeStaleDetail": {
     "description": "Detail under Home's stale row. The number is the workspace's own threshold.",

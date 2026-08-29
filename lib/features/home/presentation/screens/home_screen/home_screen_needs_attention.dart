@@ -55,7 +55,9 @@ class _NeedsAttention extends ConsumerWidget {
           // An overdue order is a different problem from a pending one: the
           // penalty has already started. Saying so on the row is the whole
           // value of the block.
-          detail: overdue > 0 ? '$overdue overdue' : 'none overdue',
+          detail: overdue > 0
+              ? context.l10n.homeOrdersOverdue(overdue)
+              : context.l10n.homeOrdersNoneOverdue,
           tint: overdue > 0
               ? context.sdTheme3.danger
               : context.sdTheme3.warning,
@@ -77,7 +79,7 @@ class _NeedsAttention extends ConsumerWidget {
           icon: AppIconConstant.sell,
           label: context.l10n.homeItemsToList,
           count: unlisted.length,
-          detail: 'in stock, not listed anywhere',
+          detail: context.l10n.homeItemsToListDetail,
           tint: context.sdTheme3.info,
           onTap: () => context.go(AppRoutes.inventory),
         ),
