@@ -21,6 +21,7 @@ import '../../orders/domain/repositories/order_repository.dart';
 import '../../sourcing/domain/entities/purchase.dart';
 import '../../sourcing/domain/entities/source.dart';
 import '../../sourcing/domain/repositories/sourcing_repository.dart';
+import '../../subscription/domain/entities/plan_intro_offer.dart';
 import '../../subscription/domain/entities/plan_offering.dart';
 import '../../subscription/domain/entities/subscription_status.dart';
 import '../../subscription/domain/enums/seller_plan.dart';
@@ -627,6 +628,14 @@ class InMemorySubscriptionRepository implements SubscriptionRepository {
       plan: SellerPlan.premium,
       period: BillingPeriod.yearly,
       formattedPrice: r'$89.99',
+      // Yearly alone, the way the store is configured, so the trial copy is
+      // walkable before RevenueCat.
+      introOffer: PlanIntroOffer(
+        unit: IntroPeriodUnit.week,
+        unitCount: MockPlanConstant.mockTrialWeeks,
+        formattedPrice: r'$0.00',
+        isFree: true,
+      ),
     ),
   ];
 
@@ -671,6 +680,10 @@ class InMemorySubscriptionRepository implements SubscriptionRepository {
 
 /// The one number the fake subscription needs.
 final class MockPlanConstant {
+  /// How long the fake trial runs, so the paywall's trial copy has something
+  /// to render in mock mode.
+  static const int mockTrialWeeks = 1;
+
   /// How far out a mock purchase renews. A month, so the Subscription screen
   /// has a plausible date to render rather than an empty row.
   static const Duration mockRenewal = Duration(days: 30);

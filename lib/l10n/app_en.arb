@@ -787,6 +787,33 @@
       }
     }
   },
+  "commonWeeks": "{count, plural, =1{1 week} other{{count} weeks}}",
+  "@commonWeeks": {
+    "description": "A number of weeks. Plural for the same reason as commonDays.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonMonths": "{count, plural, =1{1 month} other{{count} months}}",
+  "@commonMonths": {
+    "description": "A number of months. Plural for the same reason as commonDays.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonYears": "{count, plural, =1{1 year} other{{count} years}}",
+  "@commonYears": {
+    "description": "A number of years. Plural for the same reason as commonDays.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "commonName": "Name",
   "@commonName": {
     "description": "Field label for the name of a category, location or source."
@@ -2513,6 +2540,39 @@
   "paywallUnavailable": "Purchases are not available in this build yet.",
   "@paywallUnavailable": {
     "description": "Shown on the paywall when RevenueCat configuration is incomplete."
+  },
+  "paywallTrialTag": "{duration} free",
+  "@paywallTrialTag": {
+    "description": "Line on the plan option card carrying a free trial. Short: the card is half the sheet's width.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "paywallStartTrial": "Start your {duration} free trial",
+  "@paywallStartTrial": {
+    "description": "The purchase button when the selected plan carries a free trial. Names the duration, because a button reading Continue hides what the tap actually starts.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "paywallTrialTerms": "Free for {duration}, then {price} {period}. Cancel before it ends and you are not charged.",
+  "@paywallTrialTerms": {
+    "description": "Fine print for a trial. App Store guideline 3.1.2 wants the duration and the renewal price inside the binary, not only on the store listing.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
   },
   "paywallContinue": "Continue",
   "@paywallContinue": {
