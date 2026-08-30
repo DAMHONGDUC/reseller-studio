@@ -17,8 +17,8 @@ any action that can be blocked by an entitlement.
   create once usage is at or above the Free ceiling; inventory, order history,
   and businesses already stored remain readable.
 - **RevenueCat client configuration is build-time environment data.** Owner's
-  rule. `AppEnv` is the only reader of `REVENUECAT_IOS_KEY`,
-  `REVENUECAT_ANDROID_KEY`, `REVENUECAT_ENTITLEMENT`, and
+  rule. `AppEnv` is the only reader of `REVENUECAT_API_KEY_IOS`,
+  `REVENUECAT_API_KEY_ANDROID`, `REVENUECAT_ENTITLEMENT`, and
   `REVENUECAT_OFFERING`; billing code reads those fields and never repeats a
   RevenueCat dashboard identifier. The values are public client configuration,
   not credentials, but one owner still prevents a renamed offering or
