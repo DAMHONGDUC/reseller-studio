@@ -98,6 +98,7 @@ class _ShipOrderSheetState extends ConsumerState<ShipOrderSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.shipTitle,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

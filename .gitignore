@@ -133,6 +133,11 @@ ios/fastlane/ExportOptions.plist
 # Melos
 pubspec_overrides.yaml
 
+# GitNexus local index and generated editor skills.
+.gitnexus/
+.claude/skills/gitnexus-*/
+.agents/skills/gitnexus-*/
+
 # Scratch work that must never reach CI.
 #
 # `*_tmp_test.dart` — throwaway harnesses (screenshot shooters, geometry

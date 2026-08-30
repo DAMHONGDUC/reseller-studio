@@ -108,6 +108,7 @@ class _OptionPickerSheetState<T> extends State<OptionPickerSheet<T>> {
 
     return SdBottomSheetV3(
       title: widget.title,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

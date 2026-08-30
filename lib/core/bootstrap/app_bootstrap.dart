@@ -193,8 +193,8 @@ final class AppBootstrap {
   /// sign-in, not at startup where there is no user yet.
   static Future<void> _initializeBilling() async {
     final String key = defaultTargetPlatform == TargetPlatform.android
-        ? AppEnv.revenueCatAndroidKey
-        : AppEnv.revenueCatIosKey;
+        ? AppEnv.revenueCatApiKeyAndroid
+        : AppEnv.revenueCatApiKeyIos;
 
     if (key.isEmpty) {
       SdLogger.warning(
@@ -210,6 +210,17 @@ final class AppBootstrap {
       await Purchases.configure(PurchasesConfiguration(key));
 
       SdLogger.info(LogTagConstant.bootstrap, 'Billing initialized');
+
+      // A key alone is not enough to sell anything: the repository needs the
+      // entitlement and the offering too, and without them the paywall is
+      // empty while this step still reads as a success.
+      if (AppEnv.missingBillingKeys.isNotEmpty) {
+        SdLogger.warning(
+          LogTagConstant.bootstrap,
+          'Billing configuration incomplete — the paywall will list nothing',
+          <String, List<String>>{'missingKeys': AppEnv.missingBillingKeys},
+        );
+      }
     } catch (error, stackTrace) {
       // The app must still start: a seller who cannot reach RevenueCat keeps
       // the free tier, which is worse than what they paid for but is not a

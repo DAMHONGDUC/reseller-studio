@@ -141,6 +141,7 @@ class MemberActionsSheet extends ConsumerWidget {
 
     return SdBottomSheetV3(
       title: _name(context),
+      closeTooltip: context.l10n.commonClose,
       child: AppSheetOptionList(
         itemCount: actions.length,
         itemBuilder: (BuildContext context, int index) => actions[index],

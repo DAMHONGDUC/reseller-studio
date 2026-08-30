@@ -23,6 +23,7 @@ class _ReceiptPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SdBottomSheetV3(
     title: receipt.title,
+    closeTooltip: context.l10n.commonClose,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[

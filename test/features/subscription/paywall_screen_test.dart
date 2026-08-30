@@ -39,11 +39,12 @@ class _SilentStore implements SubscriptionRepository {
 }
 
 void main() {
-  SdCardV3 cardBehind(WidgetTester tester, String label) => tester.widget<SdCardV3>(
-    find
-        .ancestor(of: find.text(label), matching: find.byType(SdCardV3))
-        .first,
-  );
+  SdCardV3 cardBehind(WidgetTester tester, String label) =>
+      tester.widget<SdCardV3>(
+        find
+            .ancestor(of: find.text(label), matching: find.byType(SdCardV3))
+            .first,
+      );
 
   testWidgets('Paywall is a bottom sheet selling one plan on two periods', (
     WidgetTester tester,
@@ -56,12 +57,43 @@ void main() {
     expect(find.text('Monthly'), findsOneWidget);
     expect(find.text(r'$89.99'), findsOneWidget);
     expect(find.text(r'$9.99'), findsOneWidget);
-    expect(find.text('Continue'), findsOneWidget);
+    expect(find.text('Start your 1 week free trial'), findsOneWidget);
     expect(
       tester.getTopLeft(find.text('Yearly')).dx,
       lessThan(tester.getTopLeft(find.text('Monthly')).dx),
       reason: 'the recommended option leads, whatever order the store used',
     );
+  });
+
+  testWidgets('the yearly trial is named on the card, the button and the fine '
+      'print', (WidgetTester tester) async {
+    await pumpScreen(tester, const PaywallScreen());
+
+    // Guideline 3.1.2 wants the duration and the renewing price in the
+    // binary, so a badge on the card is not on its own enough.
+    expect(find.text('1 week free'), findsOneWidget);
+    expect(find.text('Start your 1 week free trial'), findsOneWidget);
+    expect(
+      find.text(
+        r'Free for 1 week, then $89.99 per year. Cancel before it ends and '
+        'you are not charged.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('monthly carries no trial, and picking it says so', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const PaywallScreen());
+    await tester.tap(find.text('Monthly'));
+    await tester.pumpAndSettle();
+
+    // The trial is configured on the yearly product alone, so promising one
+    // here would be a claim the receipt contradicts.
+    expect(find.text('Continue'), findsOneWidget);
+    expect(find.textContaining('free trial'), findsNothing);
+    expect(find.textContaining('Free for'), findsNothing);
   });
 
   testWidgets('the yearly option opens selected and is marked best value', (
@@ -109,7 +141,9 @@ void main() {
           .first,
     );
     final Rect options = tester.getRect(
-      find.ancestor(of: find.text('Yearly'), matching: find.byType(SdCardV3)).first,
+      find
+          .ancestor(of: find.text('Yearly'), matching: find.byType(SdCardV3))
+          .first,
     );
     final Rect terms = tester.getRect(
       find.textContaining('Renews automatically'),
@@ -119,7 +153,8 @@ void main() {
     expect(
       footer.top - terms.bottom,
       lessThan(options.top - benefits.bottom),
-      reason: 'the slack belongs between the two halves, not under the last line',
+      reason:
+          'the slack belongs between the two halves, not under the last line',
     );
   });
 

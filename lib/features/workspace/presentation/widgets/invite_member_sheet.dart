@@ -93,6 +93,7 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.teamInviteTitle,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

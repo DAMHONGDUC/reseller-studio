@@ -43,6 +43,7 @@ class _PaywallPlanOptions extends ConsumerWidget {
       offerings,
       period,
     );
+    final PlanIntroOffer? trial = selected?.introOffer;
 
     return Column(
       children: <Widget>[
@@ -52,7 +53,11 @@ class _PaywallPlanOptions extends ConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              for (int index = 0; index < offerings.length; index++) ...<Widget>[
+              for (
+                int index = 0;
+                index < offerings.length;
+                index++
+              ) ...<Widget>[
                 if (index > 0) SizedBox(width: SdSpacingConstant.w12),
                 Expanded(
                   child: _PaywallPlanOption(
@@ -74,7 +79,11 @@ class _PaywallPlanOptions extends ConsumerWidget {
         SizedBox(height: SdSpacingConstant.h16),
         SdButtonV3(
           variant: SdButtonVariantV3.primary,
-          label: context.l10n.paywallContinue,
+          // The button names what the tap starts: "Continue" hides a free
+          // week from the one place the seller is looking.
+          label: trial != null && trial.isFree
+              ? context.l10n.paywallStartTrial(trial.duration(context))
+              : context.l10n.paywallContinue,
           expand: true,
           busy: isBusy,
           onPressed: selected == null
@@ -105,60 +114,75 @@ class _PaywallPlanOption extends StatelessWidget {
   final VoidCallback onSelected;
 
   @override
-  Widget build(BuildContext context) => SdCardV3(
-    layer: SdCardLayerV3.elevated,
-    padding: EdgeInsets.all(SdSpacingConstant.w12),
-    borderColor: isSelected ? context.colorScheme3.primary : null,
-    onTap: onSelected,
-    semanticLabel:
-        '${SubscriptionLabels.periodName(offering.period)}, '
-        '${offering.formattedPrice} ${SubscriptionLabels.period(offering.period)}',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                SubscriptionLabels.periodName(offering.period),
-                style: context.textTheme3.labelLarge!.semiBold3.copyWith(
-                  color: context.sdTheme3.textPrimary,
+  Widget build(BuildContext context) {
+    final PlanIntroOffer? intro = offering.introOffer;
+    final String? trial = intro != null && intro.isFree
+        ? context.l10n.paywallTrialTag(intro.duration(context))
+        : null;
+
+    return SdCardV3(
+      layer: SdCardLayerV3.elevated,
+      padding: EdgeInsets.all(SdSpacingConstant.w12),
+      borderColor: isSelected ? context.colorScheme3.primary : null,
+      onTap: onSelected,
+      semanticLabel:
+          '${SubscriptionLabels.periodName(offering.period)}, '
+          '${offering.formattedPrice} ${SubscriptionLabels.period(offering.period)}'
+          '${trial == null ? '' : ', $trial'}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  SubscriptionLabels.periodName(offering.period),
+                  style: context.textTheme3.labelLarge!.semiBold3.copyWith(
+                    color: context.sdTheme3.textPrimary,
+                  ),
                 ),
               ),
+              SdIconV3(
+                isSelected
+                    ? AppIconConstant.checkCircle
+                    : AppIconConstant.radioButtonUnchecked,
+                size: SdIconV3.smallSize,
+                color: isSelected
+                    ? context.colorScheme3.primary
+                    : context.sdTheme3.textTertiary,
+              ),
+            ],
+          ),
+          SizedBox(height: SdSpacingConstant.h8),
+          Text(
+            offering.formattedPrice,
+            style: context.textTheme3.titleMedium!.semiBold3.copyWith(
+              color: context.sdTheme3.textPrimary,
             ),
-            SdIconV3(
-              isSelected
-                  ? AppIconConstant.checkCircle
-                  : AppIconConstant.radioButtonUnchecked,
-              size: SdIconV3.smallSize,
-              color: isSelected
-                  ? context.colorScheme3.primary
-                  : context.sdTheme3.textTertiary,
+          ),
+          Text(
+            SubscriptionLabels.period(offering.period),
+            style: context.textTheme3.bodySmall!.copyWith(
+              color: context.sdTheme3.textSecondary,
+            ),
+          ),
+          if (trial != null)
+            Text(
+              trial,
+              style: context.textTheme3.bodySmall!.semiBold3.copyWith(
+                color: context.colorScheme3.primary,
+              ),
+            ),
+          if (isBestValue) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h8),
+            const SdBadgeV3(
+              label: SubscriptionLabels.bestValue,
+              tone: SdBadgeToneV3.success,
+              size: SdBadgeSizeV3.compact,
             ),
           ],
-        ),
-        SizedBox(height: SdSpacingConstant.h8),
-        Text(
-          offering.formattedPrice,
-          style: context.textTheme3.titleMedium!.semiBold3.copyWith(
-            color: context.sdTheme3.textPrimary,
-          ),
-        ),
-        Text(
-          SubscriptionLabels.period(offering.period),
-          style: context.textTheme3.bodySmall!.copyWith(
-            color: context.sdTheme3.textSecondary,
-          ),
-        ),
-        if (isBestValue) ...<Widget>[
-          SizedBox(height: SdSpacingConstant.h8),
-          const SdBadgeV3(
-            label: SubscriptionLabels.bestValue,
-            tone: SdBadgeToneV3.success,
-            size: SdBadgeSizeV3.compact,
-          ),
         ],
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }

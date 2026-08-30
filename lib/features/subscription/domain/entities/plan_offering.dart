@@ -1,4 +1,5 @@
 import '../enums/seller_plan.dart';
+import 'plan_intro_offer.dart';
 
 /// How long one purchase lasts.
 enum BillingPeriod { monthly, yearly }
@@ -18,6 +19,7 @@ class PlanOffering {
     required this.plan,
     required this.period,
     required this.formattedPrice,
+    this.introOffer,
   });
 
   /// The store product identifier. Opaque here — only the billing SDK's
@@ -29,4 +31,17 @@ class PlanOffering {
 
   /// Ready to render, e.g. `$9.99` or `£7.99`.
   final String formattedPrice;
+
+  /// What the store offers before that price, when it offers anything and
+  /// this seller is still eligible for it. Null is the normal case.
+  final PlanIntroOffer? introOffer;
+
+  /// The same product with its introductory offer dropped — what a seller who
+  /// has already used one is actually buying.
+  PlanOffering withoutIntroOffer() => PlanOffering(
+    productId: productId,
+    plan: plan,
+    period: period,
+    formattedPrice: formattedPrice,
+  );
 }

@@ -98,11 +98,6 @@ jobs:
           esac
           plutil -lint ios/Runner/GoogleService-Info.plist
 
-      # Derived from the plist just written, not carried as a third secret.
-      # The same script `melos run prepare-env-*` uses.
-      - name: Sign-in URL scheme
-        run: sh tool/_url-scheme.sh
-
       - name: Dependencies
         run: |
           flutter pub get

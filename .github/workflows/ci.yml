@@ -63,13 +63,13 @@ jobs:
       - name: Localizations
         run: flutter gen-l10n
 
-      # The scripts, not their contents retyped here. `tool/analyze.sh` calls
+      # The scripts, not their contents retyped here. The shared analyze script calls
       # itself "exactly what CI runs" and this is what makes that true.
       - name: Analyze
-        run: sh tool/analyze.sh
+        run: sh packages/system_design/tool/analyze.sh
 
       - name: Test
-        run: sh tool/test.sh
+        run: sh packages/system_design/tool/test.sh
 
   functions:
     name: Cloud Functions
@@ -104,11 +104,3 @@ jobs:
       - name: Build
         working-directory: functions
         run: npm run build
-
-      # The rules are the real access boundary — the signed-out shell and every
-      # `WorkspaceGuard` are UI states, never permissions. Run from the repo
-      # root: `firebase.json` and `firestore.rules` both live there, and the
-      # script uses the CLI `npm ci` just installed. The runner already has
-      # the Java the emulator needs.
-      - name: Firestore rules
-        run: sh tool/test-rules.sh

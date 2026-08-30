@@ -45,28 +45,43 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
-  Future<List<PlanOffering>> offerings() => FailureMapper.guard(
-    'load subscription offerings',
-    () async {
-      final Offerings offerings = await Purchases.getOfferings();
-      final List<Package> packages =
-          offerings.getOffering(AppEnv.revenueCatOffering)?.availablePackages ??
-          const <Package>[];
+  Future<List<PlanOffering>> offerings() =>
+      FailureMapper.guard('load subscription offerings', () async {
+        final Offerings offerings = await Purchases.getOfferings();
+        final Offering? offering = _activeOffering(offerings);
+        final List<Package> packages =
+            offering?.availablePackages ?? const <Package>[];
+        final List<PlanOffering> rows = await _withEligibleOffers(
+          packages.map(RevenueCatProductMapper.offering).nonNulls.toList(),
+        );
 
-      final List<PlanOffering> rows = packages
-          .map(RevenueCatProductMapper.offering)
-          .nonNulls
-          .toList();
+        if (rows.isEmpty) {
+          // An empty paywall is otherwise silent: nothing threw, the store just
+          // had nothing this build can sell.
+          SdLogger.warning(
+            LogTagConstant.subscription,
+            'No sellable package in the offering',
+            _storeDiagnostics(offerings, offering, packages),
+          );
 
-      SdLogger.info(
-        LogTagConstant.subscription,
-        'Subscription offerings loaded',
-        <String, Object>{'packages': packages.length, 'mapped': rows.length},
-      );
+          return rows;
+        }
 
-      return rows;
-    },
-  );
+        SdLogger.info(
+          LogTagConstant.subscription,
+          'Subscription offerings loaded',
+          <String, Object>{
+            'offering': offering?.identifier ?? '',
+            'packages': packages.length,
+            'mapped': rows.length,
+            'withIntroOffer': rows
+                .where((PlanOffering row) => row.introOffer != null)
+                .length,
+          },
+        );
+
+        return rows;
+      });
 
   @override
   Future<SubscriptionStatus> purchase(PlanOffering offering) =>
@@ -181,15 +196,87 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
   Future<Package?> _packageFor(PlanOffering offering) async {
     final Offerings offerings = await Purchases.getOfferings();
 
-    return offerings
-        .getOffering(AppEnv.revenueCatOffering)
-        ?.availablePackages
+    return _activeOffering(offerings)?.availablePackages
         .where(
           (Package package) =>
               package.storeProduct.identifier == offering.productId,
         )
         .firstOrNull;
   }
+
+  /// Drops an introductory offer the store will not honour for this seller.
+  ///
+  /// Its own try/catch rather than a failure: a paywall that cannot answer
+  /// "eligible?" still has a price to sell. An unknown answer counts as
+  /// eligible because Android answers unknown for everyone, and the store
+  /// refuses a second trial itself.
+  Future<List<PlanOffering>> _withEligibleOffers(
+    List<PlanOffering> rows,
+  ) async {
+    final List<String> withOffer = rows
+        .where((PlanOffering row) => row.introOffer != null)
+        .map((PlanOffering row) => row.productId)
+        .toList();
+
+    if (withOffer.isEmpty) return rows;
+
+    try {
+      final Map<String, IntroEligibility> eligibility =
+          await Purchases.checkTrialOrIntroductoryPriceEligibility(withOffer);
+
+      return rows
+          .map(
+            (PlanOffering row) =>
+                _isEligible(eligibility, row) ? row : row.withoutIntroOffer(),
+          )
+          .toList();
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.subscription,
+        'Failed to check trial eligibility — quoting the store as it came',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, int>{'products': withOffer.length},
+      );
+
+      return rows;
+    }
+  }
+
+  static bool _isEligible(
+    Map<String, IntroEligibility> eligibility,
+    PlanOffering row,
+  ) =>
+      eligibility[row.productId]?.status !=
+      IntroEligibilityStatus.introEligibilityStatusIneligible;
+
+  /// The offering this build sells, falling back to whichever one
+  /// RevenueCat marks current.
+  ///
+  /// A renamed offering on the dashboard would otherwise empty the paywall
+  /// with nothing thrown and nothing logged, and `current` is the answer
+  /// every other RevenueCat client defaults to.
+  static Offering? _activeOffering(Offerings offerings) =>
+      offerings.getOffering(AppEnv.revenueCatOffering) ?? offerings.current;
+
+  /// What the next person would otherwise reproduce the run to find out:
+  /// which offering was asked for, and what the store actually returned.
+  static Map<String, Object> _storeDiagnostics(
+    Offerings offerings,
+    Offering? offering,
+    List<Package> packages,
+  ) => <String, Object>{
+    'asked': AppEnv.revenueCatOffering,
+    'used': offering?.identifier ?? 'none',
+    'available': offerings.all.keys.toList(),
+    'packages': packages.map(_describe).toList(),
+  };
+
+  /// Enough of a package to see why the mapper dropped it — a custom type
+  /// with a period this app does not sell is the usual answer.
+  static String _describe(Package package) =>
+      '${package.identifier}/${package.packageType.name}/'
+      '${package.storeProduct.subscriptionPeriod ?? "none"}';
 
   /// Reads the one entitlement configured for this build.
   static SubscriptionStatus _statusFrom(CustomerInfo info) {

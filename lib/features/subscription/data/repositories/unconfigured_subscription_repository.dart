@@ -1,5 +1,6 @@
 import 'package:system_design/common.dart';
 
+import '../../../../core/config/app_env.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/app_failure.dart';
 import '../../domain/entities/plan_offering.dart';
@@ -21,8 +22,18 @@ class UnconfiguredSubscriptionRepository implements SubscriptionRepository {
   Stream<SubscriptionStatus> watchStatus() =>
       Stream<SubscriptionStatus>.value(SubscriptionStatus.free);
 
+  /// Empty, and it says why: a build one key short looks exactly like a
+  /// build with nothing on sale, and only this line tells them apart.
   @override
-  Future<List<PlanOffering>> offerings() async => const <PlanOffering>[];
+  Future<List<PlanOffering>> offerings() async {
+    SdLogger.warning(
+      LogTagConstant.subscription,
+      'Offerings skipped — billing is not configured',
+      <String, List<String>>{'missingKeys': AppEnv.missingBillingKeys},
+    );
+
+    return const <PlanOffering>[];
+  }
 
   @override
   Future<SubscriptionStatus> purchase(PlanOffering offering) async {

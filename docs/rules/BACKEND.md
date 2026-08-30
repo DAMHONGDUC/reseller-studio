@@ -29,12 +29,11 @@ about how the backend is written.
   self-edit is a promotion to owner.
 - **The audit log is append-only and written only by Cloud Functions** — hard
   rule 12.
-- **Run the real rules against the emulator in CI.** A rules test that mocks
-  the evaluation proves nothing; the emulator runs the same engine production
-  does. Built: `melos run test-rules`, and CI's `functions` job runs it.
-  **The suite reads `firestore.rules` itself, never a copy** — a copy would let
+- **Rules tests read `firestore.rules` itself, never a copy.** A copy would let
   the two drift, which is the one way a rules test fails: passing while
-  production is open.
+  production is open. The standalone `test-rules` command and its CI step are
+  deliberately absent by owner's rule, and nothing gates a release on them —
+  the rules ship on the strength of the deploy.
 
 ## Queries
 

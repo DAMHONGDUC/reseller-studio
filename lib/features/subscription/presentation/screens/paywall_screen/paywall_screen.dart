@@ -6,6 +6,7 @@ import '../../../../../core/config/app_env.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../domain/entities/plan_intro_offer.dart';
 import '../../../domain/entities/plan_offering.dart';
 import '../../../domain/entities/subscription_status.dart';
 import '../../../domain/enums/seller_plan.dart';
@@ -38,6 +39,7 @@ class PaywallScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => SdBottomSheetV3(
     title: context.l10n.paywallTitle,
+    closeTooltip: context.l10n.commonClose,
     heightFactor: heightFactor,
     child: Column(
       children: <Widget>[

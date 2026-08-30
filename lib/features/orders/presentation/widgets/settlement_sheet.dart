@@ -94,6 +94,7 @@ class _SettleOrderSheetState extends ConsumerState<SettleOrderSheet> {
 
     return SdBottomSheetV3(
       title: context.l10n.settleTitle,
+      closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

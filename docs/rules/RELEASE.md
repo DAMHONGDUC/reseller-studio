@@ -1,7 +1,7 @@
 # Release
 
-Read this before touching `env_assets/`, `tool/prepare-env.sh`,
-`tool/build-ipa.sh`, anything under `ios/fastlane/`, or
+Read this before touching `env_assets/`, `packages/system_design/tool/prepare-env.sh`,
+`packages/system_design/tool/build-ipa.sh`, anything under `ios/fastlane/`, or
 `.github/workflows/release.yml`.
 
 Two halves, and they are independent: **env config is what a build carries,
@@ -18,7 +18,7 @@ second is useless without it.
 **Nothing ties the two together.** `env/prod.json` beside a dev
 `GoogleService-Info.plist` compiles, installs, launches, and writes into the
 wrong Firestore. Every guard below exists because of that one gap:
-`tool/prepare-env.sh` keeps the halves in step, and `verify_flavor_config` in
+`packages/system_design/tool/prepare-env.sh` keeps the halves in step, and `verify_flavor_config` in
 the beta lane is the last place a mismatch can be caught.
 
 `ios/Runner/Info.plist` is in that list because it carries the Google sign-in
@@ -59,29 +59,18 @@ The script's contract, and none of it is optional:
 - **Check every source first, copy after.** A run that dies on the third file
   leaves the tree half one environment and half the other, and nothing on disk
   says so.
-- **It copies bytes and never reads them** (hard rule 9). The one derived value
-  is the sign-in URL scheme, and that is `tool/_url-scheme.sh` — **one
-  implementation, shared with the release workflow**, because two copies of
-  derived data is what makes them drift.
+- **It copies bytes and never reads them** (hard rule 9). The installed
+  `Info.plist` is complete as supplied; the pipeline has no script that derives
+  or patches a URL scheme after the copy.
 - **`ios/Runner/Info.plist` comes from `env_assets/<flavour>-Info.plist`, like
   every other native file.** Owner's rule. The Runner target reads one path, so
   the flavour's plist is copied onto it rather than patched into the tracked
   one — a hand-edit that survives a flavour switch is the same hazard as a dev
   `GoogleService-Info.plist` beside `env/prod.json`, one file lower down.
-- **`_url-scheme.sh` runs after the copies, never before.** It writes into the
-  plist that was just installed; the other order derives the entry and then
-  overwrites it. It is **not** an exception to the replace rule: it keeps
-  nothing from the file the copy overwrote, and it deletes any existing
-  `google-sign-in` entry before adding this flavour's, so a re-run replaces
-  rather than appends.
-
-**What the flavour plists may differ in: nothing the pipeline derives.** CI has
-no `Info.plist` secret — `.github/workflows/release.yml` builds on the tracked
-file and calls the same `_url-scheme.sh`. So a local copy that differs from
-`ios/Runner/Info.plist` in anything except the derived `google-sign-in` entry
-is a difference that never reaches a TestFlight build. Real changes — a usage
-string, the `selleros` deep-link scheme, an orientation — go into the tracked
-file first and into `env_assets/` afterwards.
+**The flavour plists are complete build inputs.** Each one already carries its
+Google sign-in callback alongside the shared usage strings, deep-link scheme
+and orientations; the release workflow installs the selected file without a
+second derivation step.
 
 **`ios/Runner/Info.plist` is tracked, and `prepare-env` overwrites it.** That
 is deliberate and it leaves the working tree dirty: the installed file pins one
@@ -89,7 +78,7 @@ flavour, so **never commit it**.
 
 ## No one ever archives from Xcode
 
-`tool/build-ipa.sh` — `melos run build-ipa-dev` / `-prod` — is the only place an archive is made, and **the fastlane
+`packages/system_design/tool/build-ipa.sh` — `melos run build-ipa-dev` / `-prod` — is the only place an archive is made, and **the fastlane
 lane shells out to it rather than calling `gym`**. The reason is not taste:
 the app's whole configuration arrives through `--dart-define-from-file`, a flag
 `xcodebuild`, `gym` and Product > Archive all know nothing about. An archive
@@ -115,7 +104,7 @@ Every step that can fail cheaply runs before the twenty-five minute one.
    twenty-five minutes.
 3. CI only: `setup_ci` → `match(readonly: true)` → entitlement check → manual
    signing → write `ExportOptions.plist`.
-4. Build, through `tool/build-ipa.sh`.
+4. Build, through `packages/system_design/tool/build-ipa.sh`.
 5. Upload, not waiting for processing — nothing in the lane reads the result
    and macOS minutes bill at 10x. A changelog is the exception: it is the only
    thing on the build that says dev or prod, and attaching one costs the wait.
@@ -125,8 +114,11 @@ Every step that can fail cheaply runs before the twenty-five minute one.
    is a gap in the numbering; a build whose number is in no commit is the thing
    this ordering exists to prevent.
 
-`preflight` is everything a release depends on except the build — three minutes
+`pre-build` is everything a release depends on except the build — three minutes
 instead of twenty-eight, and every credential failure ever met surfaces in it.
+**It is a lane, not a shared script, and `release-*` does not run it**: the
+chain the design system ships names no app, so this is the step to run by hand
+before starting one.
 **`flavor:` is optional there and is skipped rather than defaulted**:
 defaulting to prod would fail a rehearsal on a dev machine over the one
 question it was not asked.
@@ -151,7 +143,7 @@ every "profile doesn't include the … entitlement".
   multi-target apps a TODO. With automatic signing this never shows; with
   manual signing an extension gets no profile and `exportArchive` fails after
   the full build. The lane writes the plist itself with every id in it, and
-  `tool/build-ipa.sh` drops its own `--export-method` when a caller passes one.
+  `packages/system_design/tool/build-ipa.sh` drops its own `--export-method` when a caller passes one.
   **One target today. Adding an extension means adding its id to the Matchfile
   and to that plist**, and nothing will remind you.
 - **Delete the empty auth variable.** Actions sets every `${{ secrets.X }}` a

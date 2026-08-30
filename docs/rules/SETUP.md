@@ -1,28 +1,20 @@
-# Pending setup — the owner does this by hand, don't assume it exists
+# Pending setup
 
-Read this when something Firebase-, signing- or asset-related appears missing,
-or before assuming a piece of infrastructure exists.
+Read this before treating missing Firebase, signing or store infrastructure as
+a code defect. The owner completes every row with external access.
 
-- **There is no Firebase project yet.** `lib/firebase_options.dart`,
-  `google-services.json` and `GoogleService-Info.plist` are all gitignored and
-  absent. Run `flutterfire configure` once the project exists. Until then
-  `bootstrap` catches the init failure and the app runs without a backend —
-  deliberately, so a missing config is a warning line rather than a white
-  screen. **There is no auth bypass any more** (hard rule 1): the app opens on
-  the signed-out shell — five empty tabs — and mock data in More → Settings is
-  how it is developed against until sign-in works.
-  The `FIREBASE_*` keys in `env/*.json` are empty until then; `bootstrap` logs
-  one clean warning rather than a Firebase stack trace when it sees that.
-- **`.firebaserc` does not exist**, so `melos run deploy-firebase-*` cannot run.
-- **The v3 design-system commit is local to this machine.** It is committed in
-  `packages/system_design` on `main` but **not pushed**. Push it before anyone
-  else clones this repo, or their `melos run set-up` will fast-forward the
-  submodule to an upstream `main` that has no `v3/` and nothing will compile.
-- **Sign in with Apple and Google Sign-In are not configured** — no Services
-  ID, no OAuth client, no entitlement. The login screen's buttons are inert
-  and carry placeholder glyphs; both platforms require their own brand mark
-  and forbid a substitute, so the real assets must land before release.
-- **`functions/` has no deployed function.** `npm ci` has not been run there.
-- **App icons and launch screens are Flutter's defaults.**
-- **No `firebase_options.dart` means no FCM, no Crashlytics data, no
-  Analytics.** Everything is wired; nothing is reporting.
+| Area | Repository state | Owner action |
+|---|---|---|
+| Firebase apps | Integration code exists; generated configs are gitignored | Create projects/apps and run `flutterfire configure` |
+| Firebase aliases | `.firebaserc` is not committed | Add `dev` and `prod` aliases |
+| Authentication | Apple and Google flows exist | Configure both providers and store-approved artwork |
+| Cloud Functions | Code builds and tests locally; nothing is deployed | Deploy, then configure APNs and Scheduler |
+| RevenueCat | Client, paywall, gates and webhook exist | Create one Premium entitlement/offering with monthly/yearly products |
+| Legal links | App reads build-time URLs | Host Privacy Policy and Terms of Use |
+| iOS release | Fastlane workflow exists | Add App Store Connect and Match credentials |
+| Android release | App configuration exists | Add Play listing and release signing |
+
+Without Firebase, the app resolves to signed out and remains usable only with
+debug mock data from More → Settings. There is no auth bypass (hard rule 1).
+
+The full owner checklist is [`../../RELEASE_ACTIONS.md`](../../RELEASE_ACTIONS.md).

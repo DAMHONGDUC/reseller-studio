@@ -17,12 +17,28 @@ any action that can be blocked by an entitlement.
   create once usage is at or above the Free ceiling; inventory, order history,
   and businesses already stored remain readable.
 - **RevenueCat client configuration is build-time environment data.** Owner's
-  rule. `AppEnv` is the only reader of `REVENUECAT_IOS_KEY`,
-  `REVENUECAT_ANDROID_KEY`, `REVENUECAT_ENTITLEMENT`, and
+  rule. `AppEnv` is the only reader of `REVENUECAT_API_KEY_IOS`,
+  `REVENUECAT_API_KEY_ANDROID`, `REVENUECAT_ENTITLEMENT`, and
   `REVENUECAT_OFFERING`; billing code reads those fields and never repeats a
   RevenueCat dashboard identifier. The values are public client configuration,
   not credentials, but one owner still prevents a renamed offering or
   entitlement from silently disagreeing with the app.
+- **The free trial is on the yearly plan only, and the paywall says so.**
+  Owner's rule. The store owns the offer; the app never decides who gets one,
+  it reads the product's introductory price and quotes what the store already
+  promised — the same way it quotes a price rather than formatting one. A
+  trial line on the monthly card would be a claim the receipt contradicts.
+  - **Shown only to a seller the store says is eligible**
+    (`checkTrialOrIntroductoryPriceEligibility`). An unknown answer counts as
+    eligible: Android reports unknown for everyone, and the store still
+    refuses a second trial — so the risk is a promise the store quietly
+    declines, never a double charge.
+  - **The card, the button and the fine print name the same duration and the
+    price it renews at.** App Store guideline 3.1.2 wants the terms inside
+    the binary, and a badge on its own is the half that gets rejected.
+  - **Yearly keeps its "Best value" mark.** The trial is added to that card,
+    never swapped in for the recommendation.
+
 - **Home shows Free sellers one compact Premium banner directly above the
   shortcut row.** Owner's rule. The whole banner opens the paywall,
   and it disappears for Premium sellers so a paid customer is never advertised

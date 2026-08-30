@@ -4,10 +4,30 @@ Read this when running, building, generating or deploying. **This file is the
 authority on the command set, and the only place it is explained.** The README
 may list the names; it never gets a second explanation.
 
+**Never create or edit a command script in `packages/system_design/tool/` from
+this app repository.** Owner's rule. Those files belong to the design-system
+submodule and must remain exactly as supplied by it; when the app's command
+configuration names a missing or incompatible script, fix the app-side
+configuration or update the submodule through its own repository instead of
+patching the script locally.
+
+**Command scripts live in `packages/system_design/tool/`, never in the app
+repo's `tool/`.** Owner's rule. The same setup, analysis, test and release
+pipeline serves every app that consumes the submodule; keeping another copy in
+the app lets fixes land in one pipeline while the other silently stays stale.
+
+**An app-specific check is not a shared script.** Owner's rule, stated when
+the design system deleted `tool/pre-build.sh`: a gate full of one app's bundle
+ids, entitlements and store rules cannot live in a directory every app
+embedding the submodule shares — it arrived as another app's checks and would
+drift again. It belongs to this app's fastlane lane, never to a second local
+script tree.
+
 ## The set
 
-Fourteen commands. Every one is `melos run <name>`, and every body is a file in
-`tool/`.
+Fourteen commands. Every one is `melos run <name>`, and every body is a file
+in `packages/system_design/tool/` — except `pre-build`, which is this app's own
+fastlane lane.
 
 | Command | Script | Promise |
 |---|---|---|
@@ -15,16 +35,16 @@ Fourteen commands. Every one is `melos run <name>`, and every body is a file in
 | `deep-set-up` | `deep-set-up.sh` | `set-up` plus Xcode's derived data. Costs a cold build. |
 | `prepare-env-dev` | `prepare-env.sh dev` | Install dev's config — env files + native files. |
 | `prepare-env-prod` | `prepare-env.sh prod` | The same, prod's native files. |
-| `run` | `run.sh` | The app, against a flavour's env config. |
 | `gen` | `gen.sh` | Localizations and codegen, nothing else. |
 | `analyze` | `analyze.sh` | Zero findings, or fail. What CI runs. |
 | `test` | `test.sh` | The test suite. |
-| `test-rules` | `test-rules.sh` | `firestore.rules` against the emulator. |
-| `preflight` | `preflight.sh` | Everything that must be true before a build is worth uploading. |
+| `pre-build` | `fastlane pre_build` | The app's own gate — config, signing, build number. |
 | `build-ipa-dev` | `build-ipa.sh dev` | The IPA, dev config attached. |
 | `build-ipa-prod` | `build-ipa.sh prod` | The IPA, prod config attached. |
 | `deploy-firebase-dev` | `deploy-firebase.sh dev` | Rules, indexes and functions to the dev alias. |
 | `deploy-firebase-prod` | `deploy-firebase.sh prod` | The same, prod alias. |
+| `release-dev` | `release.sh dev` | Set up, dev config, dev Firebase, then TestFlight. |
+| `release-prod` | `release.sh prod` | The same, prod. |
 
 Three shapes recur, and they are the pattern to copy:
 
@@ -33,8 +53,21 @@ Three shapes recur, and they are the pattern to copy:
   was last pointed at is the failure this prevents.
 - **One script serves both flavours, taking the flavour as `$1`.** The
   `melos.yaml` entry is the only thing that is duplicated.
-- **Underscore-prefixed files are not commands.** `_common.sh`, `_clean.sh`,
-  `_url-scheme.sh` — sourced or called by others, never named in `melos.yaml`.
+- **Underscore-prefixed files are not commands.** `_common.sh` and `_clean.sh`
+  are sourced or called by others, never named in `melos.yaml`.
+- **A command that chains others calls their scripts, never their steps.**
+  `release.sh` runs `set-up.sh`, `prepare-env.sh`, `deploy-firebase.sh` and the
+  beta lane in order; it re-implements none of them, so the confirm prompt and
+  every check are the same ones a step run on its own gets.
+
+**There is no `run`, `test-rules`, `_url-scheme` or `pre-build` script.** The
+first three were deleted. `pre-build` is the one command whose body is not a
+shared script: a gate naming this app's bundle ids, entitlements and store
+rules cannot live in a folder every app embedding the design system shares, so
+it is a lane in `ios/fastlane/Fastfile` instead.
+**`release-*` no longer runs it** — the shared `release.sh` names no app — so
+`pre-build` is a step to run before a release, not one the release runs for
+you.
 
 ## What each one actually does
 
@@ -113,24 +146,17 @@ thing to verify a change: scope to the file that changed. `*_tmp_test.dart` is
 gitignored because the scratch harnesses hang the runner by design and
 `flutter test` with no arguments picks them up.
 
-### `test-rules`
+### `pre-build`
 
-`firestore.rules` against the emulator, plus the pure function tests. Starts
-and stops the emulator itself and needs **Java**. Uses the `firebase` CLI from
-`functions/node_modules`, deliberately not whatever is on PATH: a globally
-installed CLI is a `pkg` bundle carrying its own node, and the child process it
-spawns resolves `node` to that bundle, which does not understand `--test`.
-**It builds `functions/` first** — the suite runs under plain node and imports
-the compiled `functions/lib/`, so a stale `lib/` would quietly test last week's
-code.
+Everything a release depends on except the build, and the app owns it: the
+installed config matches the flavour, the App Store Connect key is accepted,
+the build number settles against what TestFlight already has, and on CI the
+profiles resolve and carry the entitlements. It fails loudly, so it is the
+check `RELEASE_ACTIONS.md` cannot be.
 
-### `preflight`
-
-Everything that must be true before a build is worth uploading: the Firebase
-and sign-in files, no auth bypass in `lib/`, the icon not being Flutter's, the
-iOS usage strings, the legal URLs, the release credentials, and a clean
-analyze. Exits non-zero on an unmet blocker, so it is the check
-`RELEASE_ACTIONS.md` cannot be.
+**`flavor:` is optional and skipped rather than defaulted** — defaulting to
+prod would fail a rehearsal on a dev machine over the one question it was not
+asked.
 
 ### `prepare-env-*` and `build-ipa-*`
 
@@ -175,6 +201,25 @@ Its contract, in order:
 script while `RELEASE_ACTIONS.md` still named it, and the bucket the app
 uploads to was the one nobody was deploying rules for.
 
+### `release-*` — the four commands that are always run together
+
+Set up, config, Firebase, TestFlight — `set-up.sh`, `prepare-env.sh`,
+`deploy-firebase.sh`, then the `beta` lane. What the command adds over typing
+them is the two things a person gets wrong at 2am:
+
+- **The order, which is a rule and not a preference.** Backend first: a build
+  that reaches a tester ahead of the rules it needs fails on a query nobody can
+  fix from the App Store.
+- **`set -e`, so it is a chain and not a list.** A failed deploy is never
+  followed by an upload — the `&&` that used to carry that lived in a shell
+  history nobody shared.
+
+It is **not** a shortcut past anything. `deploy-firebase.sh` still asks for the
+project id on `/dev/tty` and still refuses without a terminal, so an unattended
+run stops before it ships. The TestFlight note is everything after the flavour
+(`melos run release-prod -- what changed`), collected with `$*` because melos
+joins its extra args into one command line before a shell sees them.
+
 ## The conventions
 
 ### Every body is a file; `melos.yaml` only names it
@@ -182,7 +227,7 @@ uploads to was the one nobody was deploying rules for.
 Melos echoes the whole `run:` block before **and** after every run, with no
 flag to turn it off, so a multi-line body buries the output it introduces. A
 file is also the only version that can be linted and run directly. Adding a
-command is a `tool/*.sh` plus one line in `melos.yaml` — **a `run:` longer than
+command is a `packages/system_design/tool/*.sh` plus one line in `melos.yaml` — **a `run:` longer than
 one line is the smell.** Every command also carries a real `description:`; that
 is what `melos run` prints.
 
@@ -193,7 +238,7 @@ Melos runs scripts through `/bin/sh`, which is dash on Linux: `set -o pipefail`,
 `/bin/sh` is bash under another name. Check before committing:
 
 ```bash
-dash -n tool/<name>.sh
+dash -n packages/system_design/tool/<name>.sh
 ```
 
 ### Every script opens the same way
@@ -204,7 +249,7 @@ set -eu
 . "$(dirname "$0")/_common.sh"
 ```
 
-`tool/_common.sh` holds what they share:
+`packages/system_design/tool/_common.sh` holds what they share:
 
 - `cd "${MELOS_ROOT_PATH:-.}"` — every path in every script is repo-relative.
 - **SDK resolution**, exported as `$FL` / `$DT`: `fvm flutter` when `.fvmrc`
@@ -217,9 +262,6 @@ set -eu
   every script a piped stdout and `TERM=dumb` even on a real terminal, so
   `[ -t 1 ]` and a `TERM` check both mean "never colour at all". Melos passes
   ANSI through and CI renders it.
-
-`preflight.sh` is the one script without `set -e`, and it says why: every check
-must run so the output is the whole list rather than the first failure.
 
 ### Pin the runner exactly, and know why you are on that major
 
@@ -246,8 +288,8 @@ the upload.
 
 **Never run the app bare.** With no `--dart-define-from-file` every `AppEnv`
 getter falls back to its default, which is a silently different app from the
-one CI builds. `melos run run` and the **"Reseller Studio (dev)"** VS Code launch
-configuration both pass it.
+one CI builds. The **"Reseller Studio (dev)"** VS Code launch configuration
+passes it.
 
 Running before Firebase exists: sign-in cannot succeed, and **there is no
 bypass** (hard rule 1). The app opens on the signed-out shell. **Mock data does
@@ -261,11 +303,11 @@ Three fastlane lanes, run from `ios/`. `docs/rules/RELEASE.md` is the authority
 on what each does and why the order matters.
 
 ```bash
-bundle exec fastlane preflight
+bundle exec fastlane pre_build
 ```
 
-- `preflight` — everything a release depends on except the build. Three minutes
-  instead of twenty-eight. Run `CI=true bundle exec fastlane preflight` after
+- `pre_build` — everything a release depends on except the build. Three minutes
+  instead of twenty-eight. Run `CI=true bundle exec fastlane pre_build` after
   it: the CI half is the one most likely to break.
 - `certificates` — **local only**, and refuses to run on a runner.
   `force:true` regenerates the profiles after enabling a capability.

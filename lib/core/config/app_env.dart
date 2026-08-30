@@ -162,12 +162,12 @@ final class AppEnv {
   // One key per store, because RevenueCat issues one per store and using the
   // wrong one fails at configure time rather than at purchase time.
 
-  static const String revenueCatIosKey = String.fromEnvironment(
-    'REVENUECAT_IOS_KEY',
+  static const String revenueCatApiKeyIos = String.fromEnvironment(
+    'REVENUECAT_API_KEY_IOS',
   );
 
-  static const String revenueCatAndroidKey = String.fromEnvironment(
-    'REVENUECAT_ANDROID_KEY',
+  static const String revenueCatApiKeyAndroid = String.fromEnvironment(
+    'REVENUECAT_API_KEY_ANDROID',
   );
 
   static const String revenueCatEntitlement = String.fromEnvironment(
@@ -183,10 +183,7 @@ final class AppEnv {
   /// What the Subscription screen reads to tell "not set up yet" apart from
   /// "set up and the seller is on Free" — two states that look identical from
   /// an empty offerings list and want very different screens.
-  static bool get hasBillingConfig =>
-      (revenueCatIosKey.isNotEmpty || revenueCatAndroidKey.isNotEmpty) &&
-      revenueCatEntitlement.isNotEmpty &&
-      revenueCatOffering.isNotEmpty;
+  static bool get hasBillingConfig => missingBillingKeys.isEmpty;
 
   // --- Workspace defaults ---
   //
@@ -212,27 +209,50 @@ final class AppEnv {
   /// What `bootstrap` checks to tell "no project configured yet" apart from
   /// "configured and the network is down" — two situations that look
   /// identical from an init failure and want different log lines.
-  static bool get hasFirebaseConfig => firebaseProjectId.isNotEmpty;
+  static bool get hasFirebaseConfig => _isFilled(firebaseProjectId);
+
+  /// Whether a key was actually filled in.
+  ///
+  /// `env.example.json` ships `<placeholder>` values and `melos run set-up`
+  /// copies them verbatim, so a half-filled flavour file otherwise reads as
+  /// configured and fails at the SDK instead of at the diagnostics.
+  static bool _isFilled(String value) =>
+      value.isNotEmpty && !(value.startsWith('<') && value.endsWith('>'));
 
   /// The keys that must be set for a **release** build to be shippable.
   ///
   /// Returned rather than asserted so `bootstrap` can log them all at once; a
   /// build that fails on the first missing key costs one round trip per key.
   static List<String> get missingReleaseKeys => <String>[
-    if (firebaseProjectId.isEmpty) 'FIREBASE_PROJECT_ID',
-    if (firebaseAppIdIos.isEmpty) 'FIREBASE_APP_ID_IOS',
+    if (!_isFilled(firebaseProjectId)) 'FIREBASE_PROJECT_ID',
+    if (!_isFilled(firebaseAppIdIos)) 'FIREBASE_APP_ID_IOS',
     // Not a backend key, and still a blocker: App Store review wants both
     // links reachable from inside the binary (guideline 3.1.2).
-    if (privacyPolicyUrl.isEmpty) 'PRIVACY_POLICY_URL',
-    if (termsOfServiceUrl.isEmpty) 'TERMS_OF_SERVICE_URL',
+    if (!_isFilled(privacyPolicyUrl)) 'PRIVACY_POLICY_URL',
+    if (!_isFilled(termsOfServiceUrl)) 'TERMS_OF_SERVICE_URL',
   ];
 
   /// One line for the log and the Settings diagnostics card.
   ///
   /// **Names keys, never values.** Printing the config would put every id in
   /// the console and, in release, into Crashlytics (hard rule 9).
+  /// The billing keys this build is missing.
+  ///
+  /// Named rather than counted: one blank field routes the app to
+  /// `UnconfiguredSubscriptionRepository`, and an empty paywall looks the
+  /// same whichever field it was.
+  static List<String> get missingBillingKeys => <String>[
+    // Either store key is enough — RevenueCat issues one per store and a
+    // build only ever runs on one of them.
+    if (!_isFilled(revenueCatApiKeyIos) && !_isFilled(revenueCatApiKeyAndroid))
+      'REVENUECAT_API_KEY_IOS|REVENUECAT_API_KEY_ANDROID',
+    if (!_isFilled(revenueCatEntitlement)) 'REVENUECAT_ENTITLEMENT',
+    if (!_isFilled(revenueCatOffering)) 'REVENUECAT_OFFERING',
+  ];
+
   static String get summary =>
       'flavor=${flavor.name} '
       'firebase=${hasFirebaseConfig ? firebaseProjectId : "not configured"} '
-      'region=$functionsRegion';
+      'region=$functionsRegion '
+      'billing=${hasBillingConfig ? "configured" : "not configured"}';
 }

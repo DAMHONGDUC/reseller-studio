@@ -80,6 +80,7 @@ class _NameEntrySheetState extends State<NameEntrySheet> {
   @override
   Widget build(BuildContext context) => SdBottomSheetV3(
     title: widget.title,
+    closeTooltip: context.l10n.commonClose,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
