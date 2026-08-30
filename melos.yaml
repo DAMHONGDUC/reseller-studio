@@ -25,14 +25,22 @@ ide:
 # was last pointed at is the failure this prevents. One script serves both and
 # takes the flavour as $1 — these entries are the only thing duplicated.
 #
-# **Underscore-prefixed files in packages/system_design/tool/ are not commands.** `_common.sh`,
-# `_clean.sh` is called by setup and is never named here.
+# **Underscore-prefixed files in the shared tool folder are not commands.**
+# `_common.sh` is sourced and `_clean.sh` is called by set-up; neither is ever
+# named here.
+#
+# **A check that names this app is not a shared script.** The design system is
+# embedded by more than one app, so bundle ids, entitlements and store rules
+# cannot live in its tool folder — they belong to the app, which is why
+# `pre-build` is a fastlane lane in `ios/fastlane/Fastfile` and the only entry
+# below that is not `sh <shared script>`.
 #
 # Each script is one line on purpose. Melos echoes the whole `run:` body
 # before AND after every run, with no flag to turn it off, so a multi-line
 # block buries the output it is meant to introduce. The bodies live in
-# `packages/system_design/tool/*.sh`, which also makes them lintable and runnable under dash — the
-# shell melos actually uses on Linux, and the one macOS hides from you.
+# `packages/system_design/tool/*.sh`, which also makes them lintable and
+# runnable under dash — the shell melos actually uses on Linux, and the one
+# macOS hides from you.
 scripts:
   set-up:
     description: Wipe, then everything a fresh clone needs. Idempotent.
@@ -63,8 +71,8 @@ scripts:
     run: sh packages/system_design/tool/test.sh
 
   pre-build:
-    description: Check iOS and Android before either platform is built.
-    run: sh packages/system_design/tool/pre-build.sh
+    description: The app's own gate — config, signing and the build number.
+    run: cd ios && bundle exec fastlane pre_build
 
   build-ipa-dev:
     description: The IPA, dev config attached. The only place an archive is made.
@@ -83,11 +91,11 @@ scripts:
     run: sh packages/system_design/tool/deploy-firebase.sh prod
 
   release-dev:
-    description: dev config, pre-build, dev Firebase, then TestFlight.
+    description: Set up, dev config, dev Firebase, then TestFlight.
     run: sh packages/system_design/tool/release.sh dev
 
   release-prod:
-    description: prod config, pre-build, prod Firebase, then TestFlight.
+    description: Set up, prod config, prod Firebase, then TestFlight.
     run: sh packages/system_design/tool/release.sh prod
 
 sdkPath: .fvm/flutter_sdk

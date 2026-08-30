@@ -10,7 +10,7 @@ void main() {
       multiLine: true,
     ).allMatches(melos);
 
-    expect(commands, hasLength(14));
+    expect(commands, hasLength(13));
 
     for (final RegExpMatch command in commands) {
       final String path = command.group(1)!;
@@ -30,39 +30,39 @@ void main() {
     expect(localScripts, isEmpty);
   });
 
-  test(
-    'release runs pre-build before deploy and removed scripts stay absent',
-    () {
-      final String release = File(
-        'packages/system_design/tool/release.sh',
-      ).readAsStringSync();
-      final int preBuild = release.indexOf('sh "\$SCRIPT_DIR/pre-build.sh"');
-      final int deploy = release.indexOf(
-        'sh "\$SCRIPT_DIR/deploy-firebase.sh"',
-      );
-
-      expect(preBuild, greaterThanOrEqualTo(0));
-      expect(deploy, greaterThan(preBuild));
-
-      for (final String name in <String>['run', 'test-rules', '_url-scheme']) {
-        expect(
-          File('packages/system_design/tool/$name.sh').existsSync(),
-          isFalse,
-        );
-      }
-    },
-  );
-
-  test('pre-build checks Android configuration and release signing', () {
-    final String preBuild = File(
-      'packages/system_design/tool/pre-build.sh',
+  test('release sets up and installs config before it deploys', () {
+    final String release = File(
+      'packages/system_design/tool/release.sh',
     ).readAsStringSync();
+    final int setUp = release.indexOf('sh "\$SCRIPT_DIR/set-up.sh"');
+    final int prepareEnv = release.indexOf('sh "\$SCRIPT_DIR/prepare-env.sh"');
+    final int deploy = release.indexOf('sh "\$SCRIPT_DIR/deploy-firebase.sh"');
 
-    expect(preBuild, contains('com.google.gms.google-services'));
-    expect(preBuild, contains('com.dd.reseller.studio'));
-    expect(preBuild, contains('android.permission.CAMERA'));
-    expect(preBuild, contains('android:scheme="selleros"'));
-    expect(preBuild, contains('flutter_deeplinking_enabled'));
-    expect(preBuild, contains('signingConfigs.getByName("debug")'));
+    expect(setUp, greaterThanOrEqualTo(0));
+    expect(prepareEnv, greaterThan(setUp));
+    expect(deploy, greaterThan(prepareEnv));
+
+    // `pre-build` is among them: a gate full of this app's bundle ids and
+    // entitlements cannot live in a folder every app embedding the design
+    // system shares.
+    for (final String name in <String>[
+      'run',
+      'test-rules',
+      '_url-scheme',
+      'pre-build',
+    ]) {
+      expect(
+        File('packages/system_design/tool/$name.sh').existsSync(),
+        isFalse,
+      );
+    }
+  });
+
+  test('pre-build is the app-owned fastlane lane', () {
+    final String melos = File('melos.yaml').readAsStringSync();
+    final String fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+
+    expect(melos, contains('run: cd ios && bundle exec fastlane pre_build'));
+    expect(fastfile, contains('lane :pre_build'));
   });
 }
