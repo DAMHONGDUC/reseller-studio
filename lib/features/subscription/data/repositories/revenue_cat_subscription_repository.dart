@@ -49,19 +49,34 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
     'load subscription offerings',
     () async {
       final Offerings offerings = await Purchases.getOfferings();
+      final Offering? offering = _activeOffering(offerings);
       final List<Package> packages =
-          offerings.getOffering(AppEnv.revenueCatOffering)?.availablePackages ??
-          const <Package>[];
-
+          offering?.availablePackages ?? const <Package>[];
       final List<PlanOffering> rows = packages
           .map(RevenueCatProductMapper.offering)
           .nonNulls
           .toList();
 
+      if (rows.isEmpty) {
+        // An empty paywall is otherwise silent: nothing threw, the store just
+        // had nothing this build can sell.
+        SdLogger.warning(
+          LogTagConstant.subscription,
+          'No sellable package in the offering',
+          _storeDiagnostics(offerings, offering, packages),
+        );
+
+        return rows;
+      }
+
       SdLogger.info(
         LogTagConstant.subscription,
         'Subscription offerings loaded',
-        <String, Object>{'packages': packages.length, 'mapped': rows.length},
+        <String, Object>{
+          'offering': offering?.identifier ?? '',
+          'packages': packages.length,
+          'mapped': rows.length,
+        },
       );
 
       return rows;
@@ -181,8 +196,7 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
   Future<Package?> _packageFor(PlanOffering offering) async {
     final Offerings offerings = await Purchases.getOfferings();
 
-    return offerings
-        .getOffering(AppEnv.revenueCatOffering)
+    return _activeOffering(offerings)
         ?.availablePackages
         .where(
           (Package package) =>
@@ -190,6 +204,34 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
         )
         .firstOrNull;
   }
+
+  /// The offering this build sells, falling back to whichever one
+  /// RevenueCat marks current.
+  ///
+  /// A renamed offering on the dashboard would otherwise empty the paywall
+  /// with nothing thrown and nothing logged, and `current` is the answer
+  /// every other RevenueCat client defaults to.
+  static Offering? _activeOffering(Offerings offerings) =>
+      offerings.getOffering(AppEnv.revenueCatOffering) ?? offerings.current;
+
+  /// What the next person would otherwise reproduce the run to find out:
+  /// which offering was asked for, and what the store actually returned.
+  static Map<String, Object> _storeDiagnostics(
+    Offerings offerings,
+    Offering? offering,
+    List<Package> packages,
+  ) => <String, Object>{
+    'asked': AppEnv.revenueCatOffering,
+    'used': offering?.identifier ?? 'none',
+    'available': offerings.all.keys.toList(),
+    'packages': packages.map(_describe).toList(),
+  };
+
+  /// Enough of a package to see why the mapper dropped it — a custom type
+  /// with a period this app does not sell is the usual answer.
+  static String _describe(Package package) =>
+      '${package.identifier}/${package.packageType.name}/'
+      '${package.storeProduct.subscriptionPeriod ?? "none"}';
 
   /// Reads the one entitlement configured for this build.
   static SubscriptionStatus _statusFrom(CustomerInfo info) {
