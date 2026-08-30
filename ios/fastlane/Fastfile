@@ -67,8 +67,13 @@ platform :ios do
     end
 
     # 4. The build. Always through the script — see the header.
-    export_flag = "--export-options-plist=#{export_options}".shellescape
-    sh("cd #{REPO_ROOT.shellescape} && sh packages/system_design/tool/build-ipa.sh #{flavor} #{export_flag}")
+    #    The flag is only added when step 3 wrote a plist. An empty
+    #    `--export-options-plist=` still counts as given, so the script skips
+    #    its own `--export-method` and xcodebuild dies on `"" property list`.
+    build_args = [flavor]
+    build_args << "--export-options-plist=#{export_options}".shellescape if export_options
+
+    sh("cd #{REPO_ROOT.shellescape} && sh packages/system_design/tool/build-ipa.sh #{build_args.join(" ")}")
 
     ipa = Dir[File.join(REPO_ROOT, "build/ios/ipa/*.ipa")].first
     UI.user_error!("no .ipa in build/ios/ipa") if ipa.nil?

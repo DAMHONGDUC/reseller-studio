@@ -65,4 +65,19 @@ void main() {
     expect(melos, contains('run: cd ios && bundle exec fastlane pre_build'));
     expect(fastfile, contains('lane :pre_build'));
   });
+
+  test('beta names an export plist only when it wrote one', () {
+    final String fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+
+    // An empty `--export-options-plist=` counts as given to build-ipa.sh, so
+    // it drops its own `--export-method` and the export dies on a path of "".
+    expect(
+      fastfile,
+      contains(
+        'build_args << "--export-options-plist=#{export_options}".shellescape '
+        'if export_options',
+      ),
+    );
+    expect(fastfile, isNot(contains('export_flag')));
+  });
 }
