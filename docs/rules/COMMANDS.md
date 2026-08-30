@@ -15,13 +15,19 @@ patching the script locally.
 repo's `tool/`.** Owner's rule. The same setup, analysis, test and release
 pipeline serves every app that consumes the submodule; keeping another copy in
 the app lets fixes land in one pipeline while the other silently stays stale.
-App-specific checks are still scripts in that shared command directory rather
-than a second local script tree.
+
+**An app-specific check is not a shared script.** Owner's rule, stated when
+the design system deleted `tool/pre-build.sh`: a gate full of one app's bundle
+ids, entitlements and store rules cannot live in a directory every app
+embedding the submodule shares — it arrived as another app's checks and would
+drift again. It belongs to this app's fastlane lane, never to a second local
+script tree.
 
 ## The set
 
-Fourteen commands. Every one is `melos run <name>`, and every body is a file in
-`packages/system_design/tool/`.
+Fourteen commands. Every one is `melos run <name>`, and every body is a file
+in `packages/system_design/tool/` — except `pre-build`, which is this app's own
+fastlane lane.
 
 | Command | Script | Promise |
 |---|---|---|
@@ -32,12 +38,12 @@ Fourteen commands. Every one is `melos run <name>`, and every body is a file in
 | `gen` | `gen.sh` | Localizations and codegen, nothing else. |
 | `analyze` | `analyze.sh` | Zero findings, or fail. What CI runs. |
 | `test` | `test.sh` | The test suite. |
-| `pre-build` | `pre-build.sh` | iOS and Android checks that must pass before a build. |
+| `pre-build` | `fastlane pre_build` | The app's own gate — config, signing, build number. |
 | `build-ipa-dev` | `build-ipa.sh dev` | The IPA, dev config attached. |
 | `build-ipa-prod` | `build-ipa.sh prod` | The IPA, prod config attached. |
 | `deploy-firebase-dev` | `deploy-firebase.sh dev` | Rules, indexes and functions to the dev alias. |
 | `deploy-firebase-prod` | `deploy-firebase.sh prod` | The same, prod alias. |
-| `release-dev` | `release.sh dev` | dev config, pre-build, dev Firebase, then TestFlight. |
+| `release-dev` | `release.sh dev` | Set up, dev config, dev Firebase, then TestFlight. |
 | `release-prod` | `release.sh prod` | The same, prod. |
 
 Three shapes recur, and they are the pattern to copy:
@@ -50,14 +56,18 @@ Three shapes recur, and they are the pattern to copy:
 - **Underscore-prefixed files are not commands.** `_common.sh` and `_clean.sh`
   are sourced or called by others, never named in `melos.yaml`.
 - **A command that chains others calls their scripts, never their steps.**
-  `release.sh` runs `prepare-env.sh`, `pre-build.sh`, `deploy-firebase.sh` and
-  the beta lane in order; it re-implements none of them, so the confirm prompt
-  and every check are the same ones a step run on its own gets.
+  `release.sh` runs `set-up.sh`, `prepare-env.sh`, `deploy-firebase.sh` and the
+  beta lane in order; it re-implements none of them, so the confirm prompt and
+  every check are the same ones a step run on its own gets.
 
-**There is no `run`, `test-rules` or `_url-scheme` script. `pre-build` is the
-cross-platform gate and every `release-*` command must run it.** Owner's rule.
-It checks both iOS and Android before either flavour deploys or uploads, so a
-platform-specific missing config cannot survive until the build itself.
+**There is no `run`, `test-rules`, `_url-scheme` or `pre-build` script.** The
+first three were deleted. `pre-build` is the one command whose body is not a
+shared script: a gate naming this app's bundle ids, entitlements and store
+rules cannot live in a folder every app embedding the design system shares, so
+it is a lane in `ios/fastlane/Fastfile` instead.
+**`release-*` no longer runs it** — the shared `release.sh` names no app — so
+`pre-build` is a step to run before a release, not one the release runs for
+you.
 
 ## What each one actually does
 
@@ -138,11 +148,15 @@ gitignored because the scratch harnesses hang the runner by design and
 
 ### `pre-build`
 
-Everything that must be true before a build is worth uploading: shared
-Firebase and auth checks, iOS configuration and signing, Android application,
-Firebase, permissions, deep links and signing, legal URLs, release credentials
-and a clean analyze. Exits non-zero on an unmet blocker, so it is the check
-`RELEASE_ACTIONS.md` cannot be.
+Everything a release depends on except the build, and the app owns it: the
+installed config matches the flavour, the App Store Connect key is accepted,
+the build number settles against what TestFlight already has, and on CI the
+profiles resolve and carry the entitlements. It fails loudly, so it is the
+check `RELEASE_ACTIONS.md` cannot be.
+
+**`flavor:` is optional and skipped rather than defaulted** — defaulting to
+prod would fail a rehearsal on a dev machine over the one question it was not
+asked.
 
 ### `prepare-env-*` and `build-ipa-*`
 
@@ -189,7 +203,7 @@ uploads to was the one nobody was deploying rules for.
 
 ### `release-*` — the four commands that are always run together
 
-Config, pre-build, Firebase, TestFlight — `prepare-env.sh`, `pre-build.sh`,
+Set up, config, Firebase, TestFlight — `set-up.sh`, `prepare-env.sh`,
 `deploy-firebase.sh`, then the `beta` lane. What the command adds over typing
 them is the two things a person gets wrong at 2am:
 
@@ -248,9 +262,6 @@ set -eu
   every script a piped stdout and `TERM=dumb` even on a real terminal, so
   `[ -t 1 ]` and a `TERM` check both mean "never colour at all". Melos passes
   ANSI through and CI renders it.
-
-`pre-build.sh` is the one script without `set -e`, and it says why: every check
-must run so the output is the whole list rather than the first failure.
 
 ### Pin the runner exactly, and know why you are on that major
 

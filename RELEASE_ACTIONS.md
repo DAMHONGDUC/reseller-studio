@@ -1,7 +1,8 @@
 # Release checklist
 
 These tasks require an external account, credential, private key or production
-decision. Complete them in order. Run `melos run pre-build` before release.
+decision. Complete them in order. Run `melos run pre-build` before a
+release — `release-dev` and `release-prod` do not run it for you.
 
 ## Blocking setup
 

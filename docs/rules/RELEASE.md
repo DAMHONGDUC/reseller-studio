@@ -116,8 +116,9 @@ Every step that can fail cheaply runs before the twenty-five minute one.
 
 `pre-build` is everything a release depends on except the build — three minutes
 instead of twenty-eight, and every credential failure ever met surfaces in it.
-Both `release-dev` and `release-prod` run it after installing the selected
-configuration and before any deploy or upload; a failure stops the chain.
+**It is a lane, not a shared script, and `release-*` does not run it**: the
+chain the design system ships names no app, so this is the step to run by hand
+before starting one.
 **`flavor:` is optional there and is skipped rather than defaulted**:
 defaulting to prod would fail a rehearsal on a dev machine over the one
 question it was not asked.
