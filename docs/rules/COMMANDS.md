@@ -4,6 +4,13 @@ Read this when running, building, generating or deploying. **This file is the
 authority on the command set, and the only place it is explained.** The README
 may list the names; it never gets a second explanation.
 
+**Never create or edit a command script in `packages/system_design/tool/` from
+this app repository.** Owner's rule. Those files belong to the design-system
+submodule and must remain exactly as supplied by it; when the app's command
+configuration names a missing or incompatible script, fix the app-side
+configuration or update the submodule through its own repository instead of
+patching the script locally.
+
 **Command scripts live in `packages/system_design/tool/`, never in the app
 repo's `tool/`.** Owner's rule. The same setup, analysis, test and release
 pipeline serves every app that consumes the submodule; keeping another copy in
