@@ -193,8 +193,8 @@ final class AppBootstrap {
   /// sign-in, not at startup where there is no user yet.
   static Future<void> _initializeBilling() async {
     final String key = defaultTargetPlatform == TargetPlatform.android
-        ? AppEnv.revenueCatAndroidKey
-        : AppEnv.revenueCatIosKey;
+        ? AppEnv.revenueCatApiKeyAndroid
+        : AppEnv.revenueCatApiKeyIos;
 
     if (key.isEmpty) {
       SdLogger.warning(

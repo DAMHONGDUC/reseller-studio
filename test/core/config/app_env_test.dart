@@ -36,8 +36,8 @@ void main() {
         'FUNCTIONS_REGION',
         'GOOGLE_SIGN_IN_CLIENT_ID_IOS',
         'GOOGLE_SIGN_IN_SERVER_CLIENT_ID',
-        'REVENUECAT_IOS_KEY',
-        'REVENUECAT_ANDROID_KEY',
+        'REVENUECAT_API_KEY_IOS',
+        'REVENUECAT_API_KEY_ANDROID',
         'REVENUECAT_ENTITLEMENT',
         'REVENUECAT_OFFERING',
         'PRIVACY_POLICY_URL',
@@ -83,8 +83,8 @@ void main() {
       expect(AppEnv.appDisplayName, isNotEmpty);
       expect(AppEnv.functionsRegion, isNotEmpty);
       expect(AppEnv.defaultCurrency, 'USD');
-      expect(AppEnv.revenueCatIosKey, isEmpty);
-      expect(AppEnv.revenueCatAndroidKey, isEmpty);
+      expect(AppEnv.revenueCatApiKeyIos, isEmpty);
+      expect(AppEnv.revenueCatApiKeyAndroid, isEmpty);
       expect(AppEnv.revenueCatEntitlement, isEmpty);
       expect(AppEnv.revenueCatOffering, isEmpty);
     });

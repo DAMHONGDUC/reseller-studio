@@ -162,12 +162,12 @@ final class AppEnv {
   // One key per store, because RevenueCat issues one per store and using the
   // wrong one fails at configure time rather than at purchase time.
 
-  static const String revenueCatIosKey = String.fromEnvironment(
-    'REVENUECAT_IOS_KEY',
+  static const String revenueCatApiKeyIos = String.fromEnvironment(
+    'REVENUECAT_API_KEY_IOS',
   );
 
-  static const String revenueCatAndroidKey = String.fromEnvironment(
-    'REVENUECAT_ANDROID_KEY',
+  static const String revenueCatApiKeyAndroid = String.fromEnvironment(
+    'REVENUECAT_API_KEY_ANDROID',
   );
 
   static const String revenueCatEntitlement = String.fromEnvironment(
@@ -244,8 +244,8 @@ final class AppEnv {
   static List<String> get missingBillingKeys => <String>[
     // Either store key is enough — RevenueCat issues one per store and a
     // build only ever runs on one of them.
-    if (!_isFilled(revenueCatIosKey) && !_isFilled(revenueCatAndroidKey))
-      'REVENUECAT_IOS_KEY|REVENUECAT_ANDROID_KEY',
+    if (!_isFilled(revenueCatApiKeyIos) && !_isFilled(revenueCatApiKeyAndroid))
+      'REVENUECAT_API_KEY_IOS|REVENUECAT_API_KEY_ANDROID',
     if (!_isFilled(revenueCatEntitlement)) 'REVENUECAT_ENTITLEMENT',
     if (!_isFilled(revenueCatOffering)) 'REVENUECAT_OFFERING',
   ];
