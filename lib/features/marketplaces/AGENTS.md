@@ -46,3 +46,33 @@ workflow that creates a workspace.
   that batch succeeds keeps an incomplete business out of the app.
 - **Default names, ids, and rates have one owner in code.** Workspace creation
   consumes that definition; no controller or screen repeats the values.
+
+## A marketplace carries a colour, and every row that names one wears it
+
+Owner's rule. A seller scanning orders reads the platform before they read
+anything else on the card, and eight identical grey badges make that a reading
+task instead of a glance.
+
+- **The hue is `AppTagHue`, stored by name.** The app already owns a named set
+  of hues that are only required to differ from each other, and a second
+  palette for marketplaces would be the same list twice. It is never indexed by
+  number (root `CLAUDE.md`), and an unknown or missing stored name falls back
+  to `AppTagHue.grey` — a marketplace written by a later build must still
+  render.
+- **Grey is the default, not an absence.** A marketplace the seller adds has no
+  colour opinion yet; the five seeded ones each start on a different hue so the
+  feature is visible without anybody configuring it.
+- **`AppMarketplaceTag` and `AppMarketplaceDot` are the only two presenters.**
+  In `core/widgets/`, because orders, home, payouts and analytics all name a
+  marketplace and none of them may map an id to a colour itself. Both read
+  `marketplaceHuesProvider`, so a renamed hue reaches every screen at once.
+- **Colour is never the only signal.** The name is always spelled out beside
+  the tag or the dot; the hue is a second way to find a row, never the only
+  one. A seller may give two marketplaces the same colour and nothing breaks.
+- **The marketplace breakdown on Analytics uses these hues, not the chart
+  series.** A platform that is amber on an order card and blue on a bar chart
+  is two colours for one thing.
+- **Listings, offers and cross-list are deliberately left plain.** They run off
+  the legacy closed `Marketplace` enum rather than the seller's records, so
+  most of their ids resolve to no record and every row would come out grey.
+  They join this rule when they move onto the records.
