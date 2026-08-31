@@ -44,6 +44,16 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
     home indicator.
   - The screen passes the button's own state down; the widget holding it stays
     small enough that a keystroke rebuilds it and not the fields above.
+  - **Two actions stack, they never sit side by side, and the primary is
+    lowest.** Business details pins Save with Delete this business above it.
+    A `Row` shrinks both labels to fit and puts a destructive verb a thumb's
+    width from the safe one; stacked, the button under the resting thumb is
+    always the one the screen is for. `AppPinnedAction.secondary` is the slot,
+    and both share the one bottom inset — a second padded widget would clear
+    the home indicator twice.
+  - **A conditional second action carries its own gap.** `_DangerZone` renders
+    nothing for a seller who cannot delete, and a gap owned by the slot would
+    leave a hole above Save on every screen that does not draw one.
   - **The button disappears rather than moves when it does not apply.** A
     screen whose action is conditional — Subscription only sells to a seller
     who is not paying, the paywall only buys once the store has answered —
@@ -55,9 +65,12 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   would be unfollowable without the line, and these sit on the wrong side of
   it:
   - **A button inside a row or a card acts on that record and stays there** —
-    the recurring expense's Record, an offer card's Accept, the danger zone's
-    Delete. Pinning those would tear an action away from the thing it names,
-    and a screen listing twelve of them has no single bottom edge to pin to.
+    the recurring expense's Record, an offer card's Accept. Pinning those
+    would tear an action away from the thing it names, and a screen listing
+    twelve of them has no single bottom edge to pin to. **A destructive action
+    on the record the whole screen is about is not one of these** — Business
+    details' Delete this business was read that way once and was wrong: the
+    screen is the record, so the verb is the screen's.
   - **An empty state's action stays in the empty state.** There is no content
     for the button to be pinned away from — the empty state *is* the screen —
     and `AppListEmptyState` already owns where it sits.
@@ -70,8 +83,11 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   - A sheet only as tall as its content is already this shape — its action is
     its last row — so it needs nothing extra. **A sheet that scrolls is a
     screen for this rule**: `PaywallScreen` is a route presented as a sheet,
-    takes nine tenths of the height whatever the store returns, and pins its
-    purchase button like any other screen.
+    takes nine tenths of the height whatever the store returns, and holds its
+    purchase button out of the scroll like any other screen. It is the one
+    place that does not use `AppPinnedAction` — `SdBottomSheetV3` already pays
+    the horizontal gutter and the home-indicator inset, so the shared widget
+    would draw both twice. Only `pinnedActionsGap` is taken from it.
 
 ## The device status bar — one source, and the two platforms disagree
 
