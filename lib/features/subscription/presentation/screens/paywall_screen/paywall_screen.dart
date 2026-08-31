@@ -6,6 +6,7 @@ import '../../../../../core/config/app_env.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/utils/text_measure_utils.dart';
 import '../../../domain/entities/plan_intro_offer.dart';
 import '../../../domain/entities/plan_offering.dart';
 import '../../../domain/entities/subscription_status.dart';

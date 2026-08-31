@@ -118,6 +118,28 @@ void main() {
     expect(cardBehind(tester, 'Yearly').borderColor, isNull);
   });
 
+  testWidgets('switching period leaves the prices where they were', (
+    WidgetTester tester,
+  ) async {
+    Rect yearlyCard() => tester.getRect(
+      find
+          .ancestor(of: find.text('Yearly'), matching: find.byType(SdCardV3))
+          .first,
+    );
+
+    await pumpScreen(tester, const PaywallScreen());
+
+    final Rect before = yearlyCard();
+
+    await tester.tap(find.text('Monthly'));
+    await tester.pumpAndSettle();
+
+    // Only the yearly product carries a trial, and its terms sit in the
+    // bottom-anchored fine print — a line that came and went with the tap
+    // dragged the cards up and down the sheet.
+    expect(yearlyCard(), before);
+  });
+
   testWidgets('what Premium includes is framed as a well', (
     WidgetTester tester,
   ) async {
