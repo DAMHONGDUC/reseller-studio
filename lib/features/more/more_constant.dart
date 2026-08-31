@@ -28,6 +28,7 @@ class MoreDestination {
 
 /// What a More row points at.
 enum MoreDestinationKind {
+  business,
   sourcing,
   listings,
   expenses,
@@ -49,6 +50,7 @@ enum MoreDestinationKind {
 final class MoreLabel {
   static String of(BuildContext context, MoreDestinationKind kind) =>
       switch (kind) {
+        MoreDestinationKind.business => context.l10n.workspaceDetailTitle,
         MoreDestinationKind.sourcing => context.l10n.moreSourcing,
         MoreDestinationKind.listings => context.l10n.moreListings,
         MoreDestinationKind.expenses => context.l10n.moreExpenses,
@@ -217,19 +219,50 @@ final class MoreConstant {
       .expand((MoreSection section) => section.destinations)
       .toList(growable: false);
 
-  static List<MoreSection> sectionsFor({required bool signedIn}) {
-    if (signedIn) return sections;
+  /// What More lists for this seller.
+  ///
+  /// **The business row is built here, not declared above**, because it is the
+  /// one destination that names a record: it opens the business the seller is
+  /// standing in, so it needs [workspaceId] and cannot be a `const` route. No
+  /// workspace, no row — the screen behind it takes an explicit id and has
+  /// nothing to open (`lib/features/workspace/CLAUDE.md`).
+  static List<MoreSection> sectionsFor({
+    required bool signedIn,
+    String? workspaceId,
+  }) {
+    if (!signedIn) {
+      final MoreDestination settings = destinations.firstWhere(
+        (MoreDestination destination) =>
+            destination.kind == MoreDestinationKind.settings,
+      );
 
-    final MoreDestination settings = destinations.firstWhere(
-      (MoreDestination destination) =>
-          destination.kind == MoreDestinationKind.settings,
-    );
+      return <MoreSection>[
+        MoreSection(
+          kind: MoreSectionKind.account,
+          destinations: <MoreDestination>[settings],
+        ),
+      ];
+    }
+
+    if (workspaceId == null) return sections;
 
     return <MoreSection>[
-      MoreSection(
-        kind: MoreSectionKind.account,
-        destinations: <MoreDestination>[settings],
-      ),
+      for (final MoreSection section in sections)
+        if (section.kind == MoreSectionKind.business)
+          MoreSection(
+            kind: section.kind,
+            destinations: <MoreDestination>[
+              MoreDestination(
+                kind: MoreDestinationKind.business,
+                icon: AppIconConstant.business,
+                route: AppRoutes.workspaceDetail(workspaceId),
+                isBuilt: true,
+              ),
+              ...section.destinations,
+            ],
+          )
+        else
+          section,
     ];
   }
 }
