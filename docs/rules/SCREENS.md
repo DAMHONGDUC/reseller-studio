@@ -24,17 +24,19 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   labelled `SdFabV3`, same button, same place, every screen. That is an
   always-apply rule and it lives in the root `CLAUDE.md`; the design-system
   half is in `DESIGN_SYSTEM.md`.
-- **Every add or edit screen pins its save action to the bottom** — owner's
-  rule, first stated about workspace setup and then restated for all of them,
-  because two screens had let the button scroll away with the last field. Only
-  the fields scroll; the button holds the bottom edge, so a seller never
-  scrolls to find out how to finish, and the way to finish is in the same place
-  on every screen. **This is not the `SdFabV3` rule above and does not compete
-  with it**: that one is for a list screen creating a new row, this one is for a
-  screen whose single action commits the screen itself.
+- **A screen with content and an action button pins that button to the bottom**
+  — owner's rule. It was first stated about workspace setup, then about every
+  add and edit screen, and now about all of them: wherever content scrolls and
+  the screen has an action, the content scrolls and the action holds the bottom
+  edge. A seller never scrolls to find out how to finish, and the way to finish
+  is in the same place on every screen. **This is not the `SdFabV3` rule above
+  and does not compete with it**: that one is for a list screen creating a new
+  row, this one is for a screen acting on what it is already showing.
   - **`AppPinnedAction` (`core/widgets/`) is the one implementation.** Three
     screens had written their own before it was extracted, which is three
-    chances for the gap above the button to be a different number.
+    chances for the gap above the button to be a different number. Its
+    `variant` is the only thing a screen chooses; the geometry is not
+    negotiable.
   - The action sits **below** the scroll view, never floating over it, so
     content can never pass behind it. That is why it wears no surface and no
     blur — `SdContentPaddingV3.pinnedActionsGap` above it is the whole
@@ -42,8 +44,34 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
     home indicator.
   - The screen passes the button's own state down; the widget holding it stays
     small enough that a keystroke rebuilds it and not the fields above.
-  - A sheet is already this shape — its action is its last row and the sheet
-    is only as tall as its content — so it needs nothing extra.
+  - **The button disappears rather than moves when it does not apply.** A
+    screen whose action is conditional — Subscription only sells to a seller
+    who is not paying, the paywall only buys once the store has answered —
+    renders nothing in the slot, and the scroll view takes the space back.
+    Never leave a disabled button pinned to explain a state; the content above
+    already does.
+
+- **"Action button" means the screen's action, not a row's.** The rule above
+  would be unfollowable without the line, and these sit on the wrong side of
+  it:
+  - **A button inside a row or a card acts on that record and stays there** —
+    the recurring expense's Record, an offer card's Accept, the danger zone's
+    Delete. Pinning those would tear an action away from the thing it names,
+    and a screen listing twelve of them has no single bottom edge to pin to.
+  - **An empty state's action stays in the empty state.** There is no content
+    for the button to be pinned away from — the empty state *is* the screen —
+    and `AppListEmptyState` already owns where it sits.
+  - **A detail screen's Actions button stays in the app bar**, because it
+    opens a sheet of several verbs rather than committing one. That is its own
+    owner's rule, further down this file.
+  - **A selection bar is already pinned** and stays a `bottomNavigationBar`:
+    it appears with the selection and replaces the FAB, which a pinned action
+    below the list cannot do.
+  - A sheet only as tall as its content is already this shape — its action is
+    its last row — so it needs nothing extra. **A sheet that scrolls is a
+    screen for this rule**: `PaywallScreen` is a route presented as a sheet,
+    takes nine tenths of the height whatever the store returns, and pins its
+    purchase button like any other screen.
 
 ## The device status bar — one source, and the two platforms disagree
 
