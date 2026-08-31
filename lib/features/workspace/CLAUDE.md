@@ -115,3 +115,8 @@ change them.
 - **Deleting stays here too**, owner-only, behind the same confirmation — it
   is a change to the same record and splitting it across two screens is how a
   destructive action ends up somewhere nobody looks for it.
+- **Both verbs are pinned, Delete above Save.** The record this screen
+  destroys is the record it edits, so Delete is the screen's action and not a
+  card's — it scrolled off the end of the form until the pinned-action rule in
+  `docs/rules/SCREENS.md` was widened. Save stays lowest, so the button under
+  a resting thumb is never the destructive one.
