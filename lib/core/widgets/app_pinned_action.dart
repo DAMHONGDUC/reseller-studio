@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:system_design/index.dart';
 
-/// The commit button on an add or edit screen, holding the bottom edge.
+/// A screen's own action, holding the bottom edge.
 ///
-/// **Owner's rule: every add or edit screen pins its save action.** Only the
-/// fields scroll, so a seller never scrolls to find out how to finish and the
-/// way to finish is in the same place on every screen. Three screens had
-/// written their own before this was extracted, which is three chances for the
-/// gap above the button to be a different number.
+/// **Owner's rule: a screen with content and an action button pins that
+/// button.** Only the content scrolls, so a seller never scrolls to find out
+/// how to finish and the way to finish is in the same place on every screen.
+/// Three screens had written their own before this was extracted, which is
+/// three chances for the gap above the button to be a different number.
+///
+/// The line between a screen's action and a row's is drawn in
+/// `docs/rules/SCREENS.md`; a button that acts on one record stays on it.
 ///
 /// It sits **below** the scroll view, never over it, so content can never pass
 /// behind it — which is why it wears no surface and no blur:
@@ -21,11 +24,19 @@ class AppPinnedAction extends StatelessWidget {
   const AppPinnedAction({
     required this.label,
     required this.onPressed,
+    this.variant = SdButtonVariantV3.primary,
+    this.icon,
     this.isBusy = false,
     super.key,
   });
 
   final String label;
+
+  /// The only thing a screen chooses here. The geometry is not negotiable —
+  /// that is the whole reason this widget exists.
+  final SdButtonVariantV3 variant;
+
+  final IconData? icon;
 
   /// Null disables the button — what a form with an unmet requirement passes.
   final VoidCallback? onPressed;
@@ -41,8 +52,9 @@ class AppPinnedAction extends StatelessWidget {
       SdContentPaddingV3.bottom(context),
     ),
     child: SdButtonV3(
-      variant: SdButtonVariantV3.primary,
+      variant: variant,
       label: label,
+      icon: icon,
       expand: true,
       busy: isBusy,
       onPressed: onPressed,

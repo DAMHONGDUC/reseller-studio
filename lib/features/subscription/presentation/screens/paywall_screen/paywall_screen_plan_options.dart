@@ -1,96 +1,44 @@
 part of 'paywall_screen.dart';
 
-/// The billing periods side by side, and the one button that buys the
-/// selected one.
+/// The billing periods side by side. The button that buys the selected one is
+/// pinned below the scroll — `_PaywallPurchaseAction`.
 class _PaywallPlanOptions extends ConsumerWidget {
   const _PaywallPlanOptions({required this.offerings});
 
   final List<PlanOffering> offerings;
 
-  Future<void> _buy(
-    BuildContext context,
-    WidgetRef ref,
-    PlanOffering offering,
-  ) async {
-    try {
-      final SubscriptionStatus status = await ref
-          .read(subscriptionControllerProvider.notifier)
-          .purchase(offering);
-
-      if (!context.mounted || !status.plan.isAtLeast(offering.plan)) return;
-
-      SdSnackBarUtilsV3.success(
-        context,
-        '${SubscriptionLabels.name(status.plan)} is active',
-      );
-      Navigator.of(context).pop();
-    } catch (error) {
-      // Already logged by SubscriptionController.
-      if (!context.mounted) return;
-
-      SdSnackBarUtilsV3.error(
-        context,
-        FailurePresenter.message(context, error),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isBusy = ref.watch(subscriptionControllerProvider);
     final BillingPeriod period = ref.watch(paywallSelectionProvider);
     final PlanOffering? selected = PlanOfferingCatalogue.selected(
       offerings,
       period,
     );
-    final PlanIntroOffer? trial = selected?.introOffer;
 
-    return Column(
-      children: <Widget>[
-        // The cards carry different content — one of them wears the badge —
-        // and two option cards of different heights read as a layout bug.
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              for (
-                int index = 0;
-                index < offerings.length;
-                index++
-              ) ...<Widget>[
-                if (index > 0) SizedBox(width: SdSpacingConstant.w12),
-                Expanded(
-                  child: _PaywallPlanOption(
-                    offering: offerings[index],
-                    isSelected: offerings[index].period == selected?.period,
-                    isBestValue: PlanOfferingCatalogue.isBestValue(
-                      offerings[index],
-                      offerings,
-                    ),
-                    onSelected: () => ref
-                        .read(paywallSelectionProvider.notifier)
-                        .select(offerings[index].period),
-                  ),
+    // The cards carry different content — one of them wears the badge — and
+    // two option cards of different heights read as a layout bug.
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          for (int index = 0; index < offerings.length; index++) ...<Widget>[
+            if (index > 0) SizedBox(width: SdSpacingConstant.w12),
+            Expanded(
+              child: _PaywallPlanOption(
+                offering: offerings[index],
+                isSelected: offerings[index].period == selected?.period,
+                isBestValue: PlanOfferingCatalogue.isBestValue(
+                  offerings[index],
+                  offerings,
                 ),
-              ],
-            ],
-          ),
-        ),
-        SizedBox(height: SdSpacingConstant.h16),
-        SdButtonV3(
-          variant: SdButtonVariantV3.primary,
-          // The button names what the tap starts: "Continue" hides a free
-          // week from the one place the seller is looking.
-          label: trial != null && trial.isFree
-              ? context.l10n.paywallStartTrial(trial.duration(context))
-              : context.l10n.paywallContinue,
-          expand: true,
-          busy: isBusy,
-          onPressed: selected == null
-              ? null
-              : () => _buy(context, ref, selected),
-        ),
-      ],
+                onSelected: () => ref
+                    .read(paywallSelectionProvider.notifier)
+                    .select(offerings[index].period),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
@@ -17,6 +18,21 @@ void main() {
     expect(find.textContaining('per month'), findsNothing);
     expect(find.textContaining('per year'), findsNothing);
     expect(find.text('Restore purchases'), findsNothing);
+  });
+
+  testWidgets('the plans button is pinned below the scroll, not in it', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const SubscriptionScreen());
+
+    expect(
+      find.ancestor(
+        of: find.text('View Premium plans'),
+        matching: find.byType(Scrollable),
+      ),
+      findsNothing,
+      reason: 'the screen acts on what it shows, so the action holds the foot',
+    );
   });
 
   testWidgets('the seller is told which plan is theirs', (

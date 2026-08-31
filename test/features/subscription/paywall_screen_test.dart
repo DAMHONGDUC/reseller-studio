@@ -170,13 +170,38 @@ void main() {
     final Rect terms = tester.getRect(
       find.textContaining('Renews automatically'),
     );
-    final Rect footer = tester.getRect(find.byType(PaywallFooterLinks));
+    // The pinned action, not the footer: the button left the scroll, so the
+    // slack this test is about now ends at its top edge.
+    final Rect action = tester.getRect(
+      find.widgetWithText(SdButtonV3, 'Start your 1 week free trial'),
+    );
 
     expect(
-      footer.top - terms.bottom,
+      action.top - terms.bottom,
       lessThan(options.top - benefits.bottom),
       reason:
           'the slack belongs between the two halves, not under the last line',
+    );
+  });
+
+  testWidgets('the buy button is pinned below the scroll, above the links', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const PaywallScreen());
+
+    final Finder buy = find.widgetWithText(
+      SdButtonV3,
+      'Start your 1 week free trial',
+    );
+
+    expect(
+      find.ancestor(of: buy, matching: find.byType(Scrollable)),
+      findsNothing,
+      reason: 'the one thing the seller came to tap never scrolls away',
+    );
+    expect(
+      tester.getRect(buy).bottom,
+      lessThanOrEqualTo(tester.getRect(find.byType(PaywallFooterLinks)).top),
     );
   });
 
