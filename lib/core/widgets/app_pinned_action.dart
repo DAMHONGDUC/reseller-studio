@@ -27,6 +27,7 @@ class AppPinnedAction extends StatelessWidget {
     this.variant = SdButtonVariantV3.primary,
     this.icon,
     this.isBusy = false,
+    this.secondary,
     super.key,
   });
 
@@ -43,6 +44,17 @@ class AppPinnedAction extends StatelessWidget {
 
   final bool isBusy;
 
+  /// A second action stacked **above** the main one, sharing this slot's one
+  /// bottom inset — a destructive verb on the record the screen is about, the
+  /// shape Business details wears.
+  ///
+  /// - lowest is the primary, so the button under the resting thumb is always
+  ///   the one the screen is for
+  /// - a widget rather than a second set of label and variant props: there is
+  ///   one of these in the app, and a config surface would outnumber its users
+  /// - it carries its own gap below itself, because it is usually conditional
+  final Widget? secondary;
+
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.fromLTRB(
@@ -51,13 +63,19 @@ class AppPinnedAction extends StatelessWidget {
       SdContentPaddingV3.horizontal,
       SdContentPaddingV3.bottom(context),
     ),
-    child: SdButtonV3(
-      variant: variant,
-      label: label,
-      icon: icon,
-      expand: true,
-      busy: isBusy,
-      onPressed: onPressed,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ?secondary,
+        SdButtonV3(
+          variant: variant,
+          label: label,
+          icon: icon,
+          expand: true,
+          busy: isBusy,
+          onPressed: onPressed,
+        ),
+      ],
     ),
   );
 }
