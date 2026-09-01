@@ -47,7 +47,15 @@ about how the backend is written.
   the two drift, which is the one way a rules test fails: passing while
   production is open. The standalone `test-rules` command and its CI step are
   deliberately absent by owner's rule, and nothing gates a release on them —
-  the rules ship on the strength of the deploy.
+  the rules ship on the strength of the deploy. `npm --prefix functions run
+  test:rules` is how they are run by hand; it is deliberately **not** the
+  `test` script, because it needs the Firestore emulator and `test` is what a
+  deploy runs.
+- **`npm test` in `functions/` gates every deploy of the functions**, and it
+  holds only what runs on plain node against the compiled `lib/`. That is where
+  a check belongs when its failure mode is invisible until a seller taps a
+  button — a callable with no region, a name the app calls that nothing
+  exports. Both were real, and both shipped once.
 
 ## Queries
 
