@@ -39,6 +39,36 @@ controller in the feature that owns the record, reached through
 **`MarkSoldSheet` is in `core/widgets/`** for the same reason: two features
 open it, and that is where a widget goes the moment the second one does.
 
+## The sale flow shows what decides the pick, not a price it will re-ask for
+
+Owner's rule, in two halves, both about `RecordSaleScreen` and the sheet it
+opens.
+
+- **A row carries where the item is listed and what it is expected to fetch —
+  never a listing price.** The row used to print the *top* of the item's live
+  prices: one of several numbers, belonging to whichever platform happened to
+  carry it, and the very figure the sheet was about to ask the seller to
+  confirm. What actually decides which row to tap is whether the thing is out
+  there and what they wanted for it — so the subtitle counts the marketplaces
+  (`Not listed` when there are none) and the trailing figure is
+  `Item.expectedPrice` (`lib/features/inventory/CLAUDE.md`).
+- **The marketplace picker offers only the platforms that item is on.** A list
+  of every marketplace the business sells on makes the seller find the one
+  this jacket was live at, and a mis-pick writes an order against a platform
+  that never carried it — which then lands in that platform's fees, payouts
+  and analytics.
+  - **An item on no marketplace gets the full list.** Cash in hand is a sale,
+    `RecordSaleScreen` offers unlisted stock on purpose, and an empty picker
+    is a flow with no way out.
+  - The fallback lives in `marketplacesForItemProvider`, not at the call site,
+    so the sheet and anything that opens it next cannot disagree about what an
+    unlisted item may be sold on.
+  - The join is `MarketplaceMatching`: a listing names a `Marketplace` *enum*
+    and an order names a marketplace *record*, and nothing stores a key
+    between them.
+- `test/features/orders/record_sale_test.dart` pins the row and both halves of
+  the picker.
+
 ## An order always names an item
 
 `OrderLine.itemId` is non-null, so there is no walk-in sale — nothing sells

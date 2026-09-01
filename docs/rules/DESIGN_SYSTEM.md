@@ -280,11 +280,14 @@ Owner's rules, all of them read from one place so no screen types them:
   - **`onPressed` is nullable**, because a disabled action is a real state: a
     delete is refused while a save is in flight, and hiding the row instead
     would move everything beside it.
-- **A labelled action in a detail screen's app bar uses the medium button
-  proportions.** Owner's rule. The small button keeps `labelLarge` text while
-  scaling down its glyph and gap, so the word outweighs the icon and the pair
-  reads as two unrelated sizes. `AppDetailActionButton` is the shared app-side
-  wrapper; detail screens do not rebuild its padding or button size.
+- **A detail screen's app bar opens its actions from a `more_vert` glyph, not
+  a labelled button.** Owner's rule, reversing "a labelled action uses the
+  medium button proportions". The word spent the title's width to say only
+  that there *were* actions — which is what three dots say in a quarter of the
+  space, in the shape the inventory row already uses. `AppDetailActionButton`
+  is still the shared app-side wrapper and now draws `SdAppBarActionButtonV3`;
+  its `label` survives as the tooltip and the semantics name, so the control
+  is not anonymous to a screen reader. Detail screens do not rebuild it.
 - **A screen whose search box is the point uses `SdSearchHeaderV3`, not an
   app bar with a field under it.** The field docks into the title's row as
   the list scrolls and the filter strip pins under it, so scrolled chrome

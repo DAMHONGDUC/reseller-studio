@@ -144,10 +144,37 @@ the thing they usually came for.
 - `test/features/inventory/item_detail_sections_test.dart` pins where Edit
   goes and that the section opens no field of its own.
 
-## An item has no price of its own; every price belongs to a marketplace
+## The item carries what it is expected to fetch, and nothing a buyer is asked
 
-Owner's rule, and it **deletes `Item.askingPrice`** — the field, not just its
-place on a screen. It departs from the plan's item field list on purpose: the
+Owner's rule, in two moves, and the second one narrows the first rather than
+undoing it.
+
+**`Item.expectedPrice` is the one price the item owns.** Not required (hard
+rule 2), never a listing's price, and never shown as one: it is what the
+seller thought the thing was worth when they bought it.
+
+- **It is the number that is true when nothing else is.** An item on no
+  marketplace has no ask at all, and an item on four has four; the expected
+  price is one figure, present either way, which is why the inventory row, the
+  record-sale row and the mark-sold seed can all read it.
+- **It answers no question `Listing.price` answers.** A buyer is never shown
+  it, no fee is computed from it, and nothing reconciles it against a
+  platform. A screen that needs to know what someone is actually being asked
+  reads the listings, exactly as before.
+- **It seeds Mark sold** — replacing the top live listing price, which was the
+  highest of several numbers and belonged to whichever platform happened to
+  carry it.
+- **Stored as `expectedPriceMinor`**, and it joins `_currencyOf`: an item
+  whose only amount is an expected price still records the currency it was
+  entered in.
+- Boxes on both forms and on the detail screen's Pricing block; an emptied box
+  clears it (`clearExpectedPrice`), because a removed figure is not the same
+  as one left alone.
+- `test/features/inventory/item_detail_sections_test.dart` and
+  `item_card_figures_test.dart` pin the field and the cell.
+
+**And it still deletes `Item.askingPrice`** — the field, not just its place on
+a screen. It departs from the plan's item field list on purpose: the
 plan wrote the field before cross-listing existed, and once the same jacket is
 live at three numbers, "the price" is a question only a marketplace can
 answer.
@@ -156,9 +183,11 @@ answer.
   the item was the number a seller typed once and then never reconciled with
   what eBay, Depop and Poshmark were actually showing. Every screen that read
   it was reporting a guess with the confidence of a fact.
-- **`Listing.price` is the only price of a thing for sale.** `purchasePrice`
-  is what the seller paid and stays; `minimumPrice` is the floor for offers
-  and stays; there is nothing in between.
+- **`Listing.price` is the only price a buyer is shown.** `purchasePrice` is
+  what the seller paid and stays; `expectedPrice` is what they hope to get;
+  `minimumPrice` is the floor for offers. None of the three is what any
+  platform is currently asking, and that is the only number `askingPrice`
+  claimed to be.
 - **What died with the field, and none of it is coming back behind another
   name:**
   - `Item.expectedProfit` — a derivation with no numerator left.
@@ -172,10 +201,10 @@ answer.
     marketplace, so the number it should be compared against is that
     marketplace's listing — read at the screen, where the listings are.
   - The asking column in the Reports export.
-- **Where a screen still needs a price to seed a field, it reads the
-  listings.** Mark as sold and Record sale seed from the item's live listings
-  rather than from a field on the item, because that is where the number a
-  buyer was shown actually lives.
+- **Where a screen needs a price to seed a field, it reads the expected
+  price.** Mark as sold seeds from it; the cross-list screen still seeds a
+  newly ticked marketplace from what the item is already live at, because
+  there the question really is what a buyer is being shown.
 - **`ItemDto` stops reading and writing `askingPriceMinor`.** A document
   written before this keeps the key; nothing rewrites it and no migration
   runs, exactly as with the retired statuses.
@@ -222,10 +251,17 @@ which is what lets the amounts be compared at a glance.
     rather than its middle. `test/features/inventory/item_card_figures_test.dart`
     pins both, and pins that Cost does not move between two cards whose
     amounts differ.
-- **No price is on the row but the cost** — owner's rule. What the item is
-  asked for is a per-marketplace number, so one figure on the card is a price
-  that may be true nowhere; the row points at the screen that lists them all.
-  It is the same argument the item's own asking price lost (see below).
+- **The row carries the cost and the expected price, and no marketplace's
+  ask** — owner's rule, and the second half of it arrived with
+  `Item.expectedPrice` (see below). What the item is *asked* for is a
+  per-marketplace number, so one such figure on the card would be a price that
+  may be true nowhere; what the seller *expects* for it is a single number the
+  item carries itself. The arrow still points at the screen that lists what
+  each platform asks.
+  - **Three figure cells, and they split the row.** Qty, Cost and Expected
+    take equal shares and the chevron takes only its glyph — the ellipsizing
+    the old three-money layout suffered came from cells that measured
+    themselves, not from the count.
 - **The band ends in an arrow into `AppRoutes.crossList`** — owner's rule, and
   it is what replaced that figure. That screen is where every marketplace's
   price is, so the row answers "what is it going for?" by opening the place
