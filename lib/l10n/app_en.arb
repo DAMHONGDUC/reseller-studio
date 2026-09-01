@@ -3325,10 +3325,6 @@
   "@crossListPrice": {
     "description": "The one price every new listing is created at."
   },
-  "crossListPriceHelper": "What a marketplace starts at when you tick it. Each one keeps its own price below.",
-  "@crossListPriceHelper": {
-    "description": "Explains that the price is shared across the new listings."
-  },
   "crossListPriceOwn": "Own price",
   "@crossListPriceOwn": {
     "description": "Badge on a review row priced differently from the shared price."

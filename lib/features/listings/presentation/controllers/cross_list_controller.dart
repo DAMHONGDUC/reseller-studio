@@ -19,11 +19,10 @@ class CrossListState {
   /// Marketplaces ticked to be listed on for the first time.
   final Set<Marketplace> selected;
 
-  /// **The seed, not the answer.** It inherits from the item (§28) and is what
-  /// a marketplace's own field starts at the moment it is ticked. Changing it
-  /// afterwards does not reach back into rows the seller has already been
-  /// shown — a number moving in a field nobody is looking at is worse than
-  /// retyping one.
+  /// **The seed, and nothing the seller types.** It inherits from what the
+  /// item is already live at (§28) and is what a marketplace's own field
+  /// starts at the moment it is ticked. There is no field for it: every price
+  /// on the screen belongs to the marketplace it sits under.
   final Money? price;
 
   /// The number currently in every visible price field, new rows and live
@@ -69,8 +68,8 @@ class CrossListState {
     Map<Marketplace, Listing>? existing,
   }) => CrossListState(
     selected: selected ?? this.selected,
-    // Explicitly nullable: clearing the field has to be able to put the
-    // price back to unknown, which `price ?? this.price` could not.
+    // Explicitly nullable rather than `price ?? this.price`: every caller
+    // passes the seed through on purpose, so a copy cannot resurrect one.
     price: price,
     prices: prices ?? this.prices,
     existing: existing ?? this.existing,
@@ -91,8 +90,11 @@ class CrossListController extends Notifier<CrossListState> {
   @override
   CrossListState build() => const CrossListState();
 
-  /// Seed the price from the item's asking price (§28: "can inherit from
-  /// item"). Called once, when the screen has its item.
+  /// Seed the price a newly ticked row starts at, from the top price the item
+  /// is already live at (§28: "can inherit from item").
+  ///
+  /// Called on every emission of the listings stream and takes the first
+  /// answer only: a later one would move a number under a seller mid-edit.
   void inheritPrice(Money? price) {
     if (state.price != null) return;
 
@@ -126,7 +128,7 @@ class CrossListController extends Notifier<CrossListState> {
 
   /// Tick or untick a marketplace.
   ///
-  /// **Ticking seeds that row's price from the shared one**, so the common
+  /// **Ticking seeds that row's price from the inherited one**, so the common
   /// case — one number everywhere — is still no typing at all. Unticking
   /// drops the price with it: a hidden number that came back on the next tick
   /// is one nobody chose this time.
@@ -152,8 +154,6 @@ class CrossListController extends Notifier<CrossListState> {
       prices: prices,
     );
   }
-
-  void setPrice(Money? price) => state = state.copyWith(price: price);
 
   /// Price one marketplace. Null is an emptied field, which holds publish
   /// closed rather than falling back to the seed.

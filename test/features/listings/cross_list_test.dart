@@ -207,13 +207,25 @@ void main() {
       expect(find.text('Already on'), findsNWidgets(2));
     });
 
+    testWidgets('no asking price box sits above the marketplaces', (
+      WidgetTester tester,
+    ) async {
+      // Owner's rule: every price here belongs to the marketplace it sits
+      // under. `itm-11` is on none and nothing is ticked, so any field on
+      // screen could only be the screen-level box that used to head it.
+      await pumpScreen(tester, const CrossListScreen(itemId: 'itm-11'));
+
+      expect(find.byType(MoneyField), findsNothing);
+    });
+
     testWidgets('the live listings arrive priced, and change nothing yet', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
 
-      // The shared seed plus a field on each of the two live rows.
-      expect(find.byType(MoneyField), findsNWidgets(3));
+      // One field on each of the two live rows, and no screen-level box
+      // above them.
+      expect(find.byType(MoneyField), findsNWidgets(2));
 
       // Nothing has been added and no price has moved, so there is nothing to
       // save and the button says so by being dead.
@@ -231,12 +243,12 @@ void main() {
       await tester.tap(find.text('Etsy'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(MoneyField), findsNWidgets(4));
+      expect(find.byType(MoneyField), findsNWidgets(3));
       expect(find.text('Save 1 marketplace'), findsOneWidget);
       expect(
         tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
         isNotNull,
-        reason: 'the row was seeded from the shared price, so it can save',
+        reason: 'the row inherited the item’s top live price, so it can save',
       );
     });
 
@@ -335,7 +347,7 @@ void main() {
       Map<Marketplace, Money> prices = const <Marketplace, Money>{},
     }) => CrossListState(selected: selected, price: price, prices: prices);
 
-    test('a row not ticked yet reads the shared seed', () {
+    test('a row not ticked yet reads the inherited seed', () {
       final CrossListState current = state(
         price: const Money(4500, 'USD'),
         selected: <Marketplace>{Marketplace.depop},
@@ -370,13 +382,13 @@ void main() {
       );
     });
 
-    test('ticking seeds the row from the shared price', () {
+    test('ticking seeds the row from the inherited price', () {
       final ProviderContainer container = mockContainer();
       final CrossListController controller = container.read(
         crossListControllerProvider.notifier,
       );
 
-      controller.setPrice(const Money(4500, 'USD'));
+      controller.inheritPrice(const Money(4500, 'USD'));
       controller.toggle(Marketplace.etsy);
 
       // The common case — one number everywhere — must still be no typing.
@@ -392,13 +404,13 @@ void main() {
         crossListControllerProvider.notifier,
       );
 
-      controller.setPrice(const Money(4500, 'USD'));
+      controller.inheritPrice(const Money(4500, 'USD'));
       controller.toggle(Marketplace.etsy);
       controller.setPriceFor(Marketplace.etsy, const Money(2500, 'USD'));
       controller.toggle(Marketplace.etsy);
       controller.toggle(Marketplace.etsy);
 
-      // Back on the shared seed, not on the 2500 nobody chose this time.
+      // Back on the inherited seed, not on the 2500 nobody chose this time.
       expect(
         container.read(crossListControllerProvider).prices[Marketplace.etsy],
         const Money(4500, 'USD'),
