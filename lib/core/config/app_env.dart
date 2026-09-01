@@ -131,7 +131,7 @@ final class AppEnv {
   /// function was deployed to or every call 404s.
   static const String functionsRegion = String.fromEnvironment(
     'FUNCTIONS_REGION',
-    defaultValue: 'asia-southeast1',
+    defaultValue: 'us-central1',
   );
 
   // --- Sign-in ---
