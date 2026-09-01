@@ -3,7 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/inventory/domain/entities/item.dart';
+import '../../features/listings/domain/entities/listing.dart';
+import '../../features/listings/domain/services/listing_pricing.dart';
+import '../../features/listings/providers.dart';
 import '../../features/marketplaces/domain/entities/marketplace.dart';
+import '../../features/marketplaces/domain/services/marketplace_matching.dart';
 import '../../features/marketplaces/providers.dart';
 import '../../features/orders/providers.dart';
 import '../../features/workspace/providers.dart';
@@ -55,17 +59,52 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
 }
 
 class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
-  /// Seeded from what the seller expects for the item. A seed rather than an
-  /// answer: they confirm or correct it, and a sale under the expected price
-  /// is the normal case.
+  /// Seeded from the marketplace the sheet opens on, and refilled every time
+  /// the seller picks another one.
   late final TextEditingController _price = TextEditingController(
-    text: widget.item.expectedPrice?.toInputString() ?? '',
+    text: _priceFor(ref.read(_options).firstOrNull),
   );
 
   final TextEditingController _buyer = TextEditingController();
 
   Marketplace? _marketplace;
   DateTime _soldAt = DateTime.now();
+
+  /// The platforms this sale may name — this item's, or all of them when it
+  /// is on none.
+  Provider<List<Marketplace>> get _options =>
+      marketplacesForItemProvider(widget.item.id);
+
+  /// What the box should read for [marketplace].
+  ///
+  /// **That platform's own listing price, falling back to what the seller
+  /// expects for the item** — owner's rule. An item live at £45 on eBay and
+  /// £40 on Depop has two right answers and the picker is what chooses
+  /// between them; a marketplace it is not listed on has none, and the
+  /// expected price is the one number that is true either way
+  /// (`lib/features/inventory/CLAUDE.md`).
+  String _priceFor(Marketplace? marketplace) {
+    final Map<String, Money> prices = ListingPricing.byMarketplace(
+      ref.read(listingsForItemProvider(widget.item.id)).value ??
+          const <Listing>[],
+    );
+    final Money? listed = marketplace == null
+        ? null
+        : MarketplaceMatching.valueFor(marketplace, prices);
+
+    return (listed ?? widget.item.expectedPrice)?.toInputString() ?? '';
+  }
+
+  /// Picking a platform moves the price with it — including over a number the
+  /// seller had typed, which is the point: the box says what that marketplace
+  /// is asking, and a figure left behind from the platform before it would be
+  /// the wrong one presented as confirmed.
+  void _selectMarketplace(Marketplace picked) {
+    setState(() {
+      _marketplace = picked;
+      _price.text = _priceFor(picked);
+    });
+  }
 
   @override
   void dispose() {
@@ -121,9 +160,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final DateTime now = DateTime.now();
     // Only the platforms this item is on — the whole list only when it is on
     // none (`marketplacesForItemProvider`).
-    final List<Marketplace> marketplaces = ref.watch(
-      marketplacesForItemProvider(widget.item.id),
-    );
+    final List<Marketplace> marketplaces = ref.watch(_options);
     final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
 
     return SdBottomSheetV3(
@@ -162,7 +199,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
               if (picked == null) return;
 
-              setState(() => _marketplace = picked);
+              _selectMarketplace(picked);
             },
           ),
           SizedBox(height: SdSpacingConstant.h16),

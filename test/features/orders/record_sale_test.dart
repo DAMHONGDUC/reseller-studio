@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/core/widgets/app_list_row.dart';
+import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/core/widgets/option_picker_sheet.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
@@ -252,6 +253,72 @@ void main() {
         );
       }
     });
+  });
+
+  testWidgets('picking a marketplace fills the sale price with what that '
+      'platform is asking', (WidgetTester tester) async {
+    // Owner's rule: itm-4 is live at 185 on eBay and 175 on Depop, so the box
+    // follows the picker rather than holding one of the two.
+    await pumpScreen(tester, const RecordSaleScreen());
+    await tester.tap(find.text('Vintage Levi 501 — 34x32, redline selvedge'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Sold on'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OptionPickerSheet<record.Marketplace>),
+        matching: find.text('Depop'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<TextField>(
+            find.descendant(
+              of: find.byType(MoneyField),
+              matching: find.byType(TextField),
+            ),
+          )
+          .controller!
+          .text,
+      '175.00',
+    );
+  });
+
+  testWidgets('a marketplace the item is not on falls back to the expected '
+      'price', (WidgetTester tester) async {
+    // itm-11 is listed nowhere, so every platform is offered and none of them
+    // has a price of its own.
+    await pumpScreen(tester, const RecordSaleScreen());
+    await tester.tap(find.text('Nike windbreaker — XL'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Sold on'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OptionPickerSheet<record.Marketplace>),
+        matching: find.text('Etsy'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Nobody entered an expected price for it either, so the box is empty
+    // rather than showing a number belonging to another platform.
+    expect(
+      tester
+          .widget<TextField>(
+            find.descendant(
+              of: find.byType(MoneyField),
+              matching: find.byType(TextField),
+            ),
+          )
+          .controller!
+          .text,
+      isEmpty,
+    );
   });
 
   testWidgets('an empty shelf sends the seller to inventory, not to a form', (

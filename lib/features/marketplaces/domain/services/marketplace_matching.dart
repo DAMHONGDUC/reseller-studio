@@ -13,6 +13,21 @@ import '../entities/marketplace.dart';
 /// (`ebay`, `depop`), which is exact; the name is the fallback for a record
 /// the seller created themselves and happened to call "eBay".
 final class MarketplaceMatching {
+  /// What [byKey] holds for [marketplace], under the same id-then-name rule
+  /// [matching] uses.
+  ///
+  /// Null means this platform is not in the map — a marketplace the item is
+  /// not listed on, which is a real answer and not a missing price.
+  static T? valueFor<T>(Marketplace marketplace, Map<String, T> byKey) {
+    final Map<String, T> lowered = <String, T>{
+      for (final MapEntry<String, T> entry in byKey.entries)
+        entry.key.toLowerCase(): entry.value,
+    };
+
+    return lowered[marketplace.id.toLowerCase()] ??
+        lowered[marketplace.name.toLowerCase()];
+  }
+
   /// The records named by [keys], in [marketplaces]' own order.
   ///
   /// An empty result is a real answer: none of the platforms the item is on
