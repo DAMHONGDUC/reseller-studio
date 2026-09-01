@@ -21,16 +21,13 @@ final class ItemCardMetricConstant {
   /// Title to the tags under it.
   static double get titleGap => SdSpacingConstant.h2;
 
-  /// Between the two tag lines: what the item is, and where it is listed.
-  static double get tagLineGap => SdSpacingConstant.h2;
-
-  /// Between two badges on the same tag line.
+  /// Between two badges on the tag line.
   static double get tagGap => SdSpacingConstant.w6;
 
-  /// Between two runs of the first tag line, when the words are long enough
-  /// that it wraps. It is the same air as [tagLineGap] on purpose: a wrapped
-  /// run is still the same question, so it must not open a wider gap than the
-  /// one that separates the two questions.
+  /// Between two runs of the tag line, when the words are long enough that it
+  /// wraps. The tightest gap on the card on purpose: a wrapped run is still
+  /// the same line of tags, so it must not open a gap that reads as a break
+  /// between two of them.
   static double get tagRunGap => SdSpacingConstant.h2;
 
   /// Around the hairline over the money band.
