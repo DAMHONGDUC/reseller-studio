@@ -126,6 +126,10 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               SdAppBarActionV3(
                 icon: AppIconConstant.filterAlt,
                 tooltip: context.l10n.filterTitle,
+                // Lit while the sheet behind it is holding something — the
+                // tab is not counted, because the strip is already showing
+                // which one is picked.
+                isActive: ref.watch(inventoryCriteriaProvider).isActive,
                 onPressed: () => InventoryFilterSheet.show(context),
               ),
               SdAppBarActionV3(

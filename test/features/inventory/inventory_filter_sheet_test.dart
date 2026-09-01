@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/widgets/app_active_filter_bar.dart';
@@ -81,6 +82,44 @@ void main() {
     await closeSheet(tester);
 
     expect(find.byType(AppActiveFilterBar), findsNothing);
+  });
+
+  testWidgets('the app bar\u2019s filter glyph fills once something is on', (
+    WidgetTester tester,
+  ) async {
+    // A list showing fewer rows than it holds says so twice: the bar under
+    // the strip, and the action that opens the sheet holding the reason.
+    await pumpScreen(tester, const InventoryScreen());
+
+    expect(
+      tester.widget<Icon>(find.byIcon(AppIconConstant.filterAlt)).fill,
+      isNull,
+    );
+
+    await openSheet(tester);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(InventoryFilterSheet),
+        matching: find.text('Archived'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Icon>(find.byIcon(AppIconConstant.filterAlt)).fill, 1);
+
+    // The tab is not what the glyph is about: the strip already shows which
+    // one is picked, and the sheet behind the glyph would open empty.
+    await tester.tap(find.text('Reset'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(SdFilterChipV3, 'Draft'));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Icon>(find.byIcon(AppIconConstant.filterAlt)).fill,
+      isNull,
+    );
   });
 
   testWidgets('Apply writes the draft to the list, and Reset undoes it', (

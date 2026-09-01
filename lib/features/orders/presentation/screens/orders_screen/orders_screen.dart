@@ -79,6 +79,9 @@ class OrdersScreen extends ConsumerWidget {
           SdAppBarActionButtonV3(
             icon: AppIconConstant.filterAlt,
             tooltip: context.l10n.filterTitle,
+            // Lit while the sheet behind it is holding something — see
+            // Inventory's, and the tab is not counted there either.
+            isActive: ref.watch(orderCriteriaProvider).isActive,
             onPressed: () => OrderFilterSheet.show(context),
           ),
           SdAppBarActionButtonV3(

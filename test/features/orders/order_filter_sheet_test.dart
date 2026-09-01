@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/widgets/app_active_filter_bar.dart';
@@ -25,6 +26,30 @@ void main() {
     expect(find.text('Payout'), findsOneWidget);
     // The two statuses no tab offers on its own.
     expect(find.text('Cancelled'), findsOneWidget);
+  });
+
+  testWidgets('the app bar\u2019s filter glyph fills once something is on', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const OrdersScreen());
+
+    expect(
+      tester.widget<Icon>(find.byIcon(AppIconConstant.filterAlt)).fill,
+      isNull,
+    );
+
+    await openSheet(tester);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OrderFilterSheet),
+        matching: find.text('Cancelled'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Icon>(find.byIcon(AppIconConstant.filterAlt)).fill, 1);
   });
 
   testWidgets('a ticked chip is pending until Apply, and Reset undoes it', (
