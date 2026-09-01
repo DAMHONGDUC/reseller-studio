@@ -110,7 +110,7 @@ void main() {
     expect(find.text(r'$140.00'), findsNothing);
   });
 
-  testWidgets('the band spaces its cells apart, edge to edge', (
+  testWidgets('the hairline crosses the card and the band sits inside it', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -122,14 +122,24 @@ void main() {
       ),
     );
 
-    // The divider spans the card's content width, so it is what the band's
-    // two ends have to reach.
-    final Rect band = tester.getRect(find.byType(SdDividerV3));
+    final Rect rule = tester.getRect(find.byType(SdDividerV3));
+    final Rect card = tester.getRect(find.byType(ItemCard));
 
-    expect(tester.getRect(find.text('Qty')).left, moreOrLessEquals(band.left));
+    // Edge to edge, inside the card's border and nothing else: a hairline
+    // that stopped at the content read as a line drawn under one zone rather
+    // than as the seam between two.
+    expect(rule.left - card.left, lessThanOrEqualTo(SdDividerV3.thickness));
+    expect(card.right - rule.right, lessThanOrEqualTo(SdDividerV3.thickness));
+
+    // The band itself still runs from one content edge to the other, so its
+    // two ends are the card's inset and not wherever the figures landed.
     expect(
-      tester.getRect(find.text('Price')).right,
-      moreOrLessEquals(band.right, epsilon: 0.5),
+      tester.getRect(find.text('Qty')).left - rule.left,
+      moreOrLessEquals(SdSpacingConstant.w16, epsilon: 0.5),
+    );
+    expect(
+      rule.right - tester.getRect(find.text('Price')).right,
+      moreOrLessEquals(SdSpacingConstant.w16, epsilon: 0.5),
     );
   });
 
@@ -185,7 +195,7 @@ void main() {
     expect(taps, 1);
   });
 
-  testWidgets('the Price target is circular and uses the Cost content gap', (
+  testWidgets('the Price target is circular and costs the band no height', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -209,13 +219,17 @@ void main() {
 
     expect(ink.highlightShape, BoxShape.circle);
     expect(ink.customBorder, isA<CircleBorder>());
-    // Tall enough for the target, and no wider than the label above the
-    // glyph: a square would centre the pair and pull the arrow off the card's
-    // right edge, out of the column every other end glyph sits in.
+    // The ink reaches the 44pt target the layout does not reserve: a box that
+    // tall made the band taller than the two lines it holds and left dead
+    // space under the arrow, while the cells beside it stopped at their text.
+    expect(ink.radius, moreOrLessEquals(SdSpacingConstant.r44 / 2));
     expect(
-      tester.getSize(priceTarget).height,
-      greaterThanOrEqualTo(SdSpacingConstant.r44),
+      tester.getRect(priceTarget).bottom,
+      moreOrLessEquals(tester.getRect(arrow).bottom, epsilon: 0.5),
     );
+    // No wider than the label above the glyph: a square would centre the pair
+    // and pull the arrow off the card's right edge, out of the column every
+    // other end glyph sits in.
     expect(
       tester.getRect(find.text('Price')).right,
       moreOrLessEquals(tester.getRect(priceTarget).right),

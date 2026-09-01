@@ -105,65 +105,81 @@ class ItemCard extends StatelessWidget {
       // Outlined as well as ticked: colour is never the only signal, and
       // the tick is never the only one either.
       borderColor: isSelected ? context.colorScheme3.primary : null,
+      // The card holds no inset of its own: the hairline between its two
+      // zones runs edge to edge, so the padding belongs to the zones it
+      // separates rather than to the card around both of them.
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // The money band runs to the card's own left edge — owner's rule —
           // so the Row above holds only what sits beside the photo.
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              if (isSelecting) ...<Widget>[
-                SdIconV3(
-                  isSelected
-                      ? AppIconConstant.checkCircle
-                      : AppIconConstant.radioButtonUnchecked,
-                  color: isSelected
-                      ? context.colorScheme3.primary
-                      : context.sdTheme3.textTertiary,
-                  semanticLabel: isSelected
-                      ? context.l10n.inventorySelected
-                      : context.l10n.inventoryNotSelected,
-                ),
+          Padding(
+            padding: SdContentPaddingV3.card.copyWith(
+              bottom: ItemCardMetricConstant.bandGap,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                if (isSelecting) ...<Widget>[
+                  SdIconV3(
+                    isSelected
+                        ? AppIconConstant.checkCircle
+                        : AppIconConstant.radioButtonUnchecked,
+                    color: isSelected
+                        ? context.colorScheme3.primary
+                        : context.sdTheme3.textTertiary,
+                    semanticLabel: isSelected
+                        ? context.l10n.inventorySelected
+                        : context.l10n.inventoryNotSelected,
+                  ),
+                  SizedBox(width: SdSpacingConstant.w12),
+                ],
+                _Thumbnail(item: item),
                 SizedBox(width: SdSpacingConstant.w12),
-              ],
-              _Thumbnail(item: item),
-              SizedBox(width: SdSpacingConstant.w12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      item.title,
-                      style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
-                        color: context.sdTheme3.textPrimary,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        item.title,
+                        style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
+                          color: context.sdTheme3.textPrimary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: ItemCardMetricConstant.titleGap),
-                    _StateBadges(item: item, now: now, listings: listings),
-                    _UpdatedLine(item: item),
-                  ],
+                      SizedBox(height: ItemCardMetricConstant.titleGap),
+                      _StateBadges(item: item, now: now, listings: listings),
+                      _UpdatedLine(item: item),
+                    ],
+                  ),
                 ),
-              ),
-              // `more_vert`, not the detail screen's `tune` — owner's rule.
-              // A glyph is all the width allows next to a title and a price,
-              // so it has to be one a seller already knows.
-              if (onActions != null && !isSelecting)
-                AppRowIconButton(
-                  icon: AppIconConstant.moreVert,
-                  tooltip: context.l10n.commonActions,
-                  onPressed: onActions!,
-                ),
-            ],
+                // `more_vert`, not the detail screen's `tune` — owner's rule.
+                // A glyph is all the width allows next to a title and a price,
+                // so it has to be one a seller already knows.
+                if (onActions != null && !isSelecting)
+                  AppRowIconButton(
+                    icon: AppIconConstant.moreVert,
+                    tooltip: context.l10n.commonActions,
+                    onPressed: onActions!,
+                  ),
+              ],
+            ),
           ),
-          // The rule makes the band deliberate rather than a block that
-          // happens to start further left than everything above it.
-          SdDividerV3(gap: ItemCardMetricConstant.bandGap),
-          _MoneyLine(
-            item: item,
-            onMarketPrices: isSelecting ? null : onMarketPrices,
+          // Edge to edge, with no gap of its own — owner's rule. A hairline
+          // that stops short of the card reads as a line drawn on the
+          // content; one that crosses it is the card's two zones. The air
+          // around it is the zones' padding, the way `AppListCard` does it.
+          const SdDividerV3(),
+          Padding(
+            padding: SdContentPaddingV3.card.copyWith(
+              top: ItemCardMetricConstant.bandGap,
+            ),
+            child: _MoneyLine(
+              item: item,
+              onMarketPrices: isSelecting ? null : onMarketPrices,
+            ),
           ),
         ],
       ),
