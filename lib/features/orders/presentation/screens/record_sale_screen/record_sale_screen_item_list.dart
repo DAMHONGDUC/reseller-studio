@@ -26,10 +26,9 @@ class _SaleItemList extends ConsumerWidget {
               .map(
                 (Item item) => _SaleItemRow(
                   item: item,
-                  price: ListingPricing.topPrice(
-                    listings
-                        .where((Listing row) => row.itemId == item.id)
-                        .toList(growable: false),
+                  marketplaceCount: ListingMarketplaces.countFor(
+                    listings,
+                    item.id,
                   ),
                 ),
               )
@@ -40,19 +39,33 @@ class _SaleItemList extends ConsumerWidget {
   }
 }
 
+/// One item to sell.
+///
+/// **No price on the row, a marketplace count and the expected price
+/// instead** — owner's rule. What it is live at is a different number on every
+/// platform, and the one this row used to print was the highest of them: a
+/// figure the seller was about to be asked to confirm and would rarely see
+/// again. What decides which row to tap is where the thing is listed and what
+/// the seller wanted for it.
 class _SaleItemRow extends StatelessWidget {
-  const _SaleItemRow({required this.item, this.price});
+  const _SaleItemRow({required this.item, required this.marketplaceCount});
 
   final Item item;
 
-  /// The top price it is live at, or null when it is on no marketplace — the
-  /// item itself carries no price.
-  final Money? price;
+  /// Distinct marketplaces carrying it — zero for an item on none, which is
+  /// a fact rather than a missing figure.
+  final int marketplaceCount;
 
-  /// Where it is, and what it is called on the shelf. The SKU earns its place
-  /// because two items can carry the same title and only one of them sold.
-  String _subtitle(BuildContext context) =>
-      <String>[item.status.label(context), ?item.sku].join(' · ');
+  /// Where it is, what it is called on the shelf, and how many platforms
+  /// carry it. The SKU earns its place because two items can carry the same
+  /// title and only one of them sold.
+  String _subtitle(BuildContext context) => <String>[
+    item.status.label(context),
+    ?item.sku,
+    marketplaceCount == 0
+        ? context.l10n.inventoryNotListed
+        : context.l10n.inventoryMarketCount(marketplaceCount),
+  ].join(' · ');
 
   /// Picking an item opens the sheet; a recorded sale closes this screen so
   /// the seller lands back on Orders with the new order under them.
@@ -69,9 +82,9 @@ class _SaleItemRow extends StatelessWidget {
     title: item.title,
     subtitle: _subtitle(context),
     icon: AppIconConstant.inventory,
-    // The top price it is live at, which is also what the sheet pre-fills —
-    // `—` when it is on no marketplace (hard rule 5).
-    trailingText: context.money(price),
+    // What the seller expects for it — `—` when nobody entered one, never a
+    // zero (hard rule 5).
+    trailingText: context.money(item.expectedPrice),
     onTap: () => _pick(context),
   );
 }

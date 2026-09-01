@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_photo.dart';
 import '../../../../core/widgets/app_row_chevron.dart';
 import '../../../../core/widgets/app_row_icon_button.dart';
 import '../../../listings/domain/entities/listing.dart';
+import '../../../listings/domain/services/listing_marketplaces.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';

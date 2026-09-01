@@ -3,9 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/inventory/domain/entities/item.dart';
-import '../../features/listings/domain/entities/listing.dart';
-import '../../features/listings/domain/services/listing_pricing.dart';
-import '../../features/listings/providers.dart';
 import '../../features/marketplaces/domain/entities/marketplace.dart';
 import '../../features/marketplaces/providers.dart';
 import '../../features/orders/providers.dart';
@@ -30,6 +27,13 @@ import 'picker_field.dart';
 /// sheet, and the Orders tab's record-sale screen once it has an item. Those
 /// are the two ways an order is created, and they are one sheet on purpose
 /// (`lib/features/orders/CLAUDE.md`).
+///
+/// **It offers only the marketplaces the item is actually on** — owner's
+/// rule. A picker listing every platform the business sells on makes the
+/// seller find the one of them this jacket was live at, and picking a wrong
+/// one writes an order against a platform that never carried it. An item on
+/// no marketplace still has to be sellable — cash in hand is a sale — so that
+/// case falls back to the full list rather than to an empty picker.
 class MarkSoldSheet extends ConsumerStatefulWidget {
   const MarkSoldSheet({required this.item, super.key});
 
@@ -51,16 +55,11 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
 }
 
 class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
-  /// Seeded from the top price the item is live at — it carries no price of
-  /// its own. A seed rather than an answer: the seller confirms or corrects
-  /// it, and a sale below the ask is the normal case.
+  /// Seeded from what the seller expects for the item. A seed rather than an
+  /// answer: they confirm or correct it, and a sale under the expected price
+  /// is the normal case.
   late final TextEditingController _price = TextEditingController(
-    text:
-        ListingPricing.topPrice(
-          ref.read(listingsForItemProvider(widget.item.id)).value ??
-              const <Listing>[],
-        )?.toInputString() ??
-        '',
+    text: widget.item.expectedPrice?.toInputString() ?? '',
   );
 
   final TextEditingController _buyer = TextEditingController();
@@ -120,8 +119,10 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final bool isBusy = ref.watch(recordSaleControllerProvider);
     final String currency = ref.watch(workspaceCurrencyProvider);
     final DateTime now = DateTime.now();
+    // Only the platforms this item is on — the whole list only when it is on
+    // none (`marketplacesForItemProvider`).
     final List<Marketplace> marketplaces = ref.watch(
-      activeMarketplacesProvider,
+      marketplacesForItemProvider(widget.item.id),
     );
     final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
 

@@ -21,6 +21,7 @@ class Item {
     required this.createdAt,
     this.updatedAt,
     this.purchasePrice,
+    this.expectedPrice,
     this.minimumPrice,
     this.purchaseId,
     this.sourceId,
@@ -58,6 +59,17 @@ class Item {
   /// profit figure derived from this item is then `—` rather than wrong. See
   /// `Money`'s class doc and hard rule 5.
   final Money? purchasePrice;
+
+  /// What the seller expects to get for it — owner's rule, and the one price
+  /// the item carries itself.
+  ///
+  /// **Never required** (hard rule 2), and never a listing's price: a
+  /// marketplace's price is what a buyer is actually being asked, while this
+  /// is the number the seller had in mind when they bought the thing. An item
+  /// on four platforms still has one of these, and an item on none has it
+  /// too — which is why it is the figure the row and the sale flow can show
+  /// when there is nothing live to read.
+  final Money? expectedPrice;
 
   /// The floor for offers and bulk repricing. A seller who sets this can
   /// accept offers automatically without watching them.
@@ -141,6 +153,7 @@ class Item {
     int? quantity,
     ItemStatus? status,
     Money? purchasePrice,
+    Money? expectedPrice,
     Money? minimumPrice,
     String? sourceId,
     String? categoryId,
@@ -158,6 +171,7 @@ class Item {
     DateTime? updatedAt,
     bool clearSoldAt = false,
     bool clearPurchasePrice = false,
+    bool clearExpectedPrice = false,
     bool clearMinimumPrice = false,
     bool clearBarcode = false,
     bool clearDescription = false,
@@ -172,6 +186,9 @@ class Item {
     purchasePrice: clearPurchasePrice
         ? null
         : purchasePrice ?? this.purchasePrice,
+    expectedPrice: clearExpectedPrice
+        ? null
+        : expectedPrice ?? this.expectedPrice,
     minimumPrice: clearMinimumPrice ? null : minimumPrice ?? this.minimumPrice,
     purchaseId: purchaseId,
     sourceId: sourceId ?? this.sourceId,

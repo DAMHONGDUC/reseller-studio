@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -53,6 +54,31 @@ void main() {
     // Listings offers its Edit even on no marketplace: it is the only way
     // onto a first one, so an item listed nowhere still has a way out.
     expect(find.text('Listings'), findsOneWidget);
+  });
+
+  testWidgets('Pricing edits the expected price alongside cost and floor', (
+    WidgetTester tester,
+  ) async {
+    // Owner's rule: the item carries one price of its own, and it is never
+    // required (hard rule 2).
+    final ProviderContainer container = await pumpDetail(tester);
+
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(SdSectionHeaderV3, 'Pricing'),
+        matching: find.text('Edit'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(MoneyField, 'Expected price'),
+      '90.00',
+    );
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect((await read(container)).expectedPrice, const Money(9000, 'USD'));
   });
 
   testWidgets('Listings sits directly under Price', (
@@ -157,7 +183,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await pumpDetail(tester);
-    await tester.tap(find.text('Actions'));
+    await tester.tap(find.byTooltip('Actions'));
     await tester.pumpAndSettle();
 
     expect(find.byType(ItemActionsSheet), findsOneWidget);

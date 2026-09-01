@@ -22,6 +22,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
   final TextEditingController _title = TextEditingController();
   final TextEditingController _quantity = TextEditingController();
   final TextEditingController _cost = TextEditingController();
+  final TextEditingController _expected = TextEditingController();
   final TextEditingController _minimum = TextEditingController();
   final TextEditingController _barcode = TextEditingController();
   final TextEditingController _description = TextEditingController();
@@ -32,6 +33,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
     _title.dispose();
     _quantity.dispose();
     _cost.dispose();
+    _expected.dispose();
     _minimum.dispose();
     _barcode.dispose();
     _description.dispose();
@@ -53,6 +55,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         _quantity.text = item.quantity.toString();
       case ItemDetailSection.pricing:
         _cost.text = item.purchasePrice?.toInputString() ?? '';
+        _expected.text = item.expectedPrice?.toInputString() ?? '';
         _minimum.text = item.minimumPrice?.toInputString() ?? '';
       case ItemDetailSection.provenance:
         _barcode.text = item.barcode ?? '';
@@ -150,6 +153,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
             () => controller.savePricing(
               itemId: item.id,
               purchasePrice: _cost.text,
+              expectedPrice: _expected.text,
               minimumPrice: _minimum.text,
             ),
           ),
@@ -161,6 +165,14 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
                 controller: _cost,
                 currency: currency,
                 helperText: context.l10n.itemCostHelp,
+                textInputAction: TextInputAction.next,
+              ),
+              SizedBox(height: SdSpacingConstant.h16),
+              MoneyField(
+                label: context.l10n.itemExpectedPrice,
+                controller: _expected,
+                currency: currency,
+                helperText: context.l10n.itemExpectedPriceHelp,
                 textInputAction: TextInputAction.next,
               ),
               SizedBox(height: SdSpacingConstant.h16),
@@ -363,6 +375,10 @@ class _PricingFacts extends StatelessWidget {
       _DetailRow(
         label: context.l10n.itemCost,
         value: context.money(item.purchasePrice),
+      ),
+      _DetailRow(
+        label: context.l10n.itemExpectedPrice,
+        value: context.money(item.expectedPrice),
       ),
       _DetailRow(
         label: context.l10n.itemMinimumPrice,

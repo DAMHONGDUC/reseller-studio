@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/analytics/domain/entities/analytics_summary.dart';
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
@@ -214,15 +213,17 @@ void main() {
       expect(find.text('In stock'), findsWidgets);
     });
 
-    testWidgets('Item detail exposes a labelled Actions button', (
+    testWidgets('Item detail opens its actions from the more_vert glyph', (
       WidgetTester tester,
     ) async {
+      // Owner's rule: the bar carries the glyph, not the word — the label
+      // stays as the tooltip so the button still has a name.
       await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-1'));
 
-      final Finder action = find.widgetWithText(SdButtonV3, 'Actions');
+      final Finder action = find.byTooltip('Actions');
 
       expect(action, findsOneWidget);
-      expect(find.byIcon(Symbols.more_vert_rounded), findsNothing);
+      expect(find.text('Actions'), findsNothing);
 
       await tester.tap(action);
       await tester.pumpAndSettle();
