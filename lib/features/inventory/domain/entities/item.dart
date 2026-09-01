@@ -150,10 +150,12 @@ class Item {
   }
 
   /// **A null argument means "leave it alone", never "clear it"** — which is
-  /// why undoing a sale needs [clearSoldAt]. It is the one field the app ever
-  /// has to unset: an item back on the shelf still carrying a sold date reads
-  /// as sold in an export, and there is no other way to say so through a
-  /// copy.
+  /// why unsetting a field needs its own flag.
+  ///
+  /// [clearSoldAt] was the first: an item back on the shelf still carrying a
+  /// sold date reads as sold in an export. The rest arrived with the detail
+  /// screen's editable sections, where emptying a box *is* the seller
+  /// removing the value — a meaning a bare null cannot carry.
   Item copyWith({
     String? title,
     int? quantity,
@@ -161,6 +163,7 @@ class Item {
     Money? purchasePrice,
     Money? askingPrice,
     Money? minimumPrice,
+    String? sourceId,
     String? categoryId,
     String? locationId,
     String? sku,
@@ -169,11 +172,18 @@ class Item {
     String? description,
     String? notes,
     List<String>? photoUrls,
+    DateTime? purchaseDate,
     DateTime? listedAt,
     DateTime? soldAt,
     DateTime? deletedAt,
     DateTime? updatedAt,
     bool clearSoldAt = false,
+    bool clearPurchasePrice = false,
+    bool clearAskingPrice = false,
+    bool clearMinimumPrice = false,
+    bool clearBarcode = false,
+    bool clearDescription = false,
+    bool clearNotes = false,
   }) => Item(
     id: id,
     title: title ?? this.title,
@@ -181,20 +191,22 @@ class Item {
     status: status ?? this.status,
     createdAt: createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
-    purchasePrice: purchasePrice ?? this.purchasePrice,
-    askingPrice: askingPrice ?? this.askingPrice,
-    minimumPrice: minimumPrice ?? this.minimumPrice,
+    purchasePrice: clearPurchasePrice
+        ? null
+        : purchasePrice ?? this.purchasePrice,
+    askingPrice: clearAskingPrice ? null : askingPrice ?? this.askingPrice,
+    minimumPrice: clearMinimumPrice ? null : minimumPrice ?? this.minimumPrice,
     purchaseId: purchaseId,
-    sourceId: sourceId,
+    sourceId: sourceId ?? this.sourceId,
     categoryId: categoryId ?? this.categoryId,
     locationId: locationId ?? this.locationId,
     sku: sku ?? this.sku,
-    barcode: barcode ?? this.barcode,
+    barcode: clearBarcode ? null : barcode ?? this.barcode,
     condition: condition ?? this.condition,
-    description: description ?? this.description,
-    notes: notes ?? this.notes,
+    description: clearDescription ? null : description ?? this.description,
+    notes: clearNotes ? null : notes ?? this.notes,
     photoUrls: photoUrls ?? this.photoUrls,
-    purchaseDate: purchaseDate,
+    purchaseDate: purchaseDate ?? this.purchaseDate,
     listedAt: listedAt ?? this.listedAt,
     soldAt: clearSoldAt ? null : soldAt ?? this.soldAt,
     deletedAt: deletedAt ?? this.deletedAt,

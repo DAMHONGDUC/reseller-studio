@@ -316,7 +316,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('List on marketplaces'), findsOneWidget);
+      expect(find.text('Marketplaces management'), findsOneWidget);
       expect(find.text('Cross-list'), findsNothing);
     });
 

@@ -8,6 +8,7 @@ import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/photo_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/file_uploader.dart';
+import '../../../../core/utils/text_input_utils.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
@@ -335,11 +336,11 @@ class ItemFormController extends Notifier<ItemFormState> {
         sourceId: state.sourceId,
         categoryId: state.categoryId,
         locationId: state.locationId,
-        sku: _orNull(sku),
-        barcode: _orNull(barcode),
+        sku: TextInputUtils.orNull(sku),
+        barcode: TextInputUtils.orNull(barcode),
         condition: state.condition,
-        description: _orNull(description),
-        notes: _orNull(notes),
+        description: TextInputUtils.orNull(description),
+        notes: TextInputUtils.orNull(notes),
         photoUrls: state.photoUrls,
         purchaseDate: state.purchaseDate,
         listedAt: state.listedAt,
@@ -388,15 +389,6 @@ class ItemFormController extends Notifier<ItemFormState> {
     } finally {
       state = state.copyWith(isSaving: false);
     }
-  }
-
-  /// An empty box means "not entered", which is a null field rather than an
-  /// empty string — the two look identical on screen and completely different
-  /// in a query.
-  static String? _orNull(String value) {
-    final String trimmed = value.trim();
-
-    return trimmed.isEmpty ? null : trimmed;
   }
 }
 

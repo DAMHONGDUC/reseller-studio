@@ -179,8 +179,16 @@ class Order {
   /// state. A correction to any of them is a different order, and letting a
   /// shipping update rewrite them is how a report run next year stops
   /// reproducing this year's number.
+  /// A copy with some fields replaced.
+  ///
+  /// **A null argument means "leave it alone"**, so unsetting a field needs
+  /// its own flag. The detail screen's sections can empty a box, and an
+  /// emptied box is the seller removing the value — a meaning a bare null
+  /// cannot carry.
   Order copyWith({
     OrderStatus? status,
+    Money? salePrice,
+    DateTime? orderedAt,
     Money? fees,
     Money? shippingCost,
     Money? refund,
@@ -189,6 +197,12 @@ class Order {
     String? trackingNumber,
     String? carrier,
     DateTime? shipByDate,
+    bool clearFees = false,
+    bool clearShippingCost = false,
+    bool clearBuyerName = false,
+    bool clearTrackingNumber = false,
+    bool clearCarrier = false,
+    bool clearShipByDate = false,
     DateTime? shippedAt,
     DateTime? deliveredAt,
     DateTime? returnRequestedAt,
@@ -202,17 +216,19 @@ class Order {
     marketplaceRecordId: marketplaceId,
     marketplaceNameSnapshot: marketplaceName,
     lines: lines,
-    salePrice: salePrice,
-    orderedAt: orderedAt,
-    fees: fees ?? this.fees,
-    shippingCost: shippingCost ?? this.shippingCost,
+    salePrice: salePrice ?? this.salePrice,
+    orderedAt: orderedAt ?? this.orderedAt,
+    fees: clearFees ? null : fees ?? this.fees,
+    shippingCost: clearShippingCost ? null : shippingCost ?? this.shippingCost,
     refund: refund ?? this.refund,
     payout: payout ?? this.payout,
     externalOrderId: externalOrderId,
-    buyerName: buyerName ?? this.buyerName,
-    trackingNumber: trackingNumber ?? this.trackingNumber,
-    carrier: carrier ?? this.carrier,
-    shipByDate: shipByDate ?? this.shipByDate,
+    buyerName: clearBuyerName ? null : buyerName ?? this.buyerName,
+    trackingNumber: clearTrackingNumber
+        ? null
+        : trackingNumber ?? this.trackingNumber,
+    carrier: clearCarrier ? null : carrier ?? this.carrier,
+    shipByDate: clearShipByDate ? null : shipByDate ?? this.shipByDate,
     shippedAt: shippedAt ?? this.shippedAt,
     deliveredAt: deliveredAt ?? this.deliveredAt,
     returnRequestedAt: returnRequestedAt ?? this.returnRequestedAt,

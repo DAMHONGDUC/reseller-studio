@@ -60,7 +60,6 @@ final class AppRoutes {
 
   static const String inventory = '/inventory';
   static const String itemDetail = '/inventory/item/:itemId';
-  static const String editItemPath = '/inventory/item/:itemId/edit';
 
   /// Cross-listing (§13), nested under the item it publishes. Reached from
   /// the item's action sheet, never from a list — the flow starts with one
@@ -157,7 +156,6 @@ final class AppRoutes {
   static String carrier(String carrierId) => '/more/carriers/$carrierId';
 
   static String item(String itemId) => '/inventory/item/$itemId';
-  static String editItem(String itemId) => '/inventory/item/$itemId/edit';
   static String crossList(String itemId) =>
       '/inventory/item/$itemId/cross-list';
   static String order(String orderId) => '/orders/$orderId';

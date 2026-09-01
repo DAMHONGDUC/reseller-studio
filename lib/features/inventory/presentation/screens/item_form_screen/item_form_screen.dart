@@ -3,32 +3,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
-import '../../../../../core/constants/date_picker_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/state/form_seed.dart';
-import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_photo.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/money_field.dart';
-import '../../../../../core/widgets/option_picker_sheet.dart';
-import '../../../../../core/widgets/picker_field.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/providers.dart';
-import '../../../../sourcing/domain/entities/source.dart';
-import '../../../../sourcing/providers.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
-import '../../../domain/entities/item_category.dart';
-import '../../../domain/entities/storage_location.dart';
 import '../../../domain/enums/item_status.dart';
-import '../../../item_label.dart';
 import '../../../providers.dart';
 import '../../controllers/item_form_controller.dart';
+import '../../widgets/item_field.dart';
 
 part 'item_form_screen_marketplace_prices.dart';
 part 'item_form_screen_photo_strip.dart';
@@ -221,8 +213,18 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                       textInputAction: TextInputAction.next,
                     ),
                     _StatusField(state: state),
-                    _ConditionField(state: state),
-                    _CategoryField(state: state),
+                    ItemConditionField(
+                      selected: state.condition,
+                      onSelected: ref
+                          .read(itemFormControllerProvider.notifier)
+                          .selectCondition,
+                    ),
+                    ItemCategoryField(
+                      selected: state.categoryId,
+                      onSelected: ref
+                          .read(itemFormControllerProvider.notifier)
+                          .selectCategory,
+                    ),
                   ],
                 ),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
@@ -259,14 +261,31 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                 _FormSection(
                   title: context.l10n.itemFormWhereFrom,
                   children: <Widget>[
-                    _SourceField(state: state),
-                    _PurchaseDateField(state: state),
+                    ItemSourceField(
+                      selected: state.sourceId,
+                      onSelected: ref
+                          .read(itemFormControllerProvider.notifier)
+                          .selectSource,
+                    ),
+                    ItemPurchaseDateField(
+                      selected: state.purchaseDate,
+                      onSelected: ref
+                          .read(itemFormControllerProvider.notifier)
+                          .selectPurchaseDate,
+                    ),
                   ],
                 ),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
                 _FormSection(
                   title: context.l10n.itemFormWhereIs,
-                  children: <Widget>[_LocationField(state: state)],
+                  children: <Widget>[
+                    ItemLocationField(
+                      selected: state.locationId,
+                      onSelected: ref
+                          .read(itemFormControllerProvider.notifier)
+                          .selectLocation,
+                    ),
+                  ],
                 ),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
                 _FormSection(

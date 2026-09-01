@@ -5664,5 +5664,13 @@
   "marketplaceColorHelper": "Tags this marketplace everywhere it is named.",
   "@marketplaceColorHelper": {
     "description": "Helper under the marketplace colour picker."
+  },
+  "itemOverview": "Overview",
+  "@itemOverview": {
+    "description": "Item detail section: the title, state and grade."
+  },
+  "orderSectionOrder": "Order",
+  "@orderSectionOrder": {
+    "description": "Order detail section: the sale itself \u2014 price, buyer, date."
   }
 }
