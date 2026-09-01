@@ -5624,5 +5624,45 @@
   "orderFilterNoDeadline": "No deadline",
   "@orderFilterNoDeadline": {
     "description": "Orders the platform gave no ship-by date for."
+  },
+  "hueGreen": "Green",
+  "@hueGreen": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueBlue": "Blue",
+  "@hueBlue": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueViolet": "Violet",
+  "@hueViolet": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueIndigo": "Indigo",
+  "@hueIndigo": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueTeal": "Teal",
+  "@hueTeal": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueAmber": "Amber",
+  "@hueAmber": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueRed": "Red",
+  "@hueRed": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueGrey": "Grey",
+  "@hueGrey": {
+    "description": "A colour a seller can give a marketplace. The default."
+  },
+  "marketplaceColorLabel": "Color",
+  "@marketplaceColorLabel": {
+    "description": "Field label for the colour a marketplace is tagged with."
+  },
+  "marketplaceColorHelper": "Tags this marketplace everywhere it is named.",
+  "@marketplaceColorHelper": {
+    "description": "Helper under the marketplace colour picker."
   }
 }

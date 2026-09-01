@@ -46,6 +46,18 @@ final class DateTimeUtils {
   static DateTime startOfDay(DateTime value) =>
       DateTime(value.year, value.month, value.day);
 
+  /// Whether [value] falls inside the last [days] days counted back from
+  /// [now], today included.
+  ///
+  /// Counted in whole days through [daysBetween] rather than by subtracting a
+  /// `Duration`: a duration of 7 days crosses a daylight-saving boundary an
+  /// hour short, which drops the oldest row out of "last 7 days" twice a year.
+  static bool isWithinLastDays(
+    DateTime value, {
+    required DateTime now,
+    required int days,
+  }) => daysBetween(value, now) < days;
+
   static DateTime startOfMonth(DateTime value) =>
       DateTime(value.year, value.month);
 

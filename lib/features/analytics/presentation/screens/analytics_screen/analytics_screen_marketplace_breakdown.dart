@@ -39,8 +39,13 @@ class _MarketplaceBreakdown extends ConsumerWidget {
                 child: _MarketplaceRow(
                   row: rows[i],
                   maxRevenue: maxRevenue,
-                  color:
-                      AppColors.chartSeries[i % AppColors.chartSeries.length],
+                  // The marketplace's own hue, not a chart series colour: a
+                  // platform that is amber on an order card and blue on a bar
+                  // is two colours for one thing.
+                  color: AppMarketplaceDot.hueOf(
+                    ref,
+                    rows[i].marketplaceId,
+                  ).of(context),
                 ),
               ),
           ],

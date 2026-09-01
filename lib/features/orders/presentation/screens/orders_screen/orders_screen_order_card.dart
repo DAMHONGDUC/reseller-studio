@@ -63,8 +63,9 @@ class _OrderCard extends StatelessWidget {
                       tone: _statusTone(order.status),
                       size: SdBadgeSizeV3.compact,
                     ),
-                    SdBadgeV3(
-                      label: order.marketplaceName,
+                    AppMarketplaceTag(
+                      marketplaceId: order.marketplaceId,
+                      name: order.marketplaceName,
                       size: SdBadgeSizeV3.compact,
                     ),
                     if (isOverdue)

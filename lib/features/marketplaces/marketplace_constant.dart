@@ -1,9 +1,12 @@
+import '../../core/theme/app_tag_hue.dart';
+
 /// One of the marketplaces a new business starts with.
 class MarketplaceSeed {
   const MarketplaceSeed({
     required this.id,
     required this.name,
     required this.feeRate,
+    required this.hue,
   });
 
   /// A stable, readable id — so a seeded row is recognisable in Firestore and
@@ -13,6 +16,11 @@ class MarketplaceSeed {
 
   final String name;
   final double feeRate;
+
+  /// A different hue each, so the colour tags mean something on the first
+  /// screen a new seller opens rather than after they have configured five
+  /// records.
+  final AppTagHue hue;
 }
 
 /// **The five marketplaces a new business is created with** — owner's rule.
@@ -27,11 +35,36 @@ class MarketplaceSeed {
 /// tier corrects it in the marketplace's own screen.
 final class MarketplaceConstant {
   static const List<MarketplaceSeed> defaults = <MarketplaceSeed>[
-    MarketplaceSeed(id: 'ebay', name: 'eBay', feeRate: 0.1325),
-    MarketplaceSeed(id: 'etsy', name: 'Etsy', feeRate: 0.095),
-    MarketplaceSeed(id: 'depop', name: 'Depop', feeRate: 0.10),
-    MarketplaceSeed(id: 'poshmark', name: 'Poshmark', feeRate: 0.20),
-    MarketplaceSeed(id: 'vinted', name: 'Vinted', feeRate: 0),
+    MarketplaceSeed(
+      id: 'ebay',
+      name: 'eBay',
+      feeRate: 0.1325,
+      hue: AppTagHue.blue,
+    ),
+    MarketplaceSeed(
+      id: 'etsy',
+      name: 'Etsy',
+      feeRate: 0.095,
+      hue: AppTagHue.amber,
+    ),
+    MarketplaceSeed(
+      id: 'depop',
+      name: 'Depop',
+      feeRate: 0.10,
+      hue: AppTagHue.red,
+    ),
+    MarketplaceSeed(
+      id: 'poshmark',
+      name: 'Poshmark',
+      feeRate: 0.20,
+      hue: AppTagHue.violet,
+    ),
+    MarketplaceSeed(
+      id: 'vinted',
+      name: 'Vinted',
+      feeRate: 0,
+      hue: AppTagHue.teal,
+    ),
   ];
 
   /// A rate is a fraction of the sale price, so anything outside this is a

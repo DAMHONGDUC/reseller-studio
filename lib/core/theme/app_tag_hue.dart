@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../extensions/context_extensions.dart';
 import 'app_colors.dart';
 
 /// The hues a tag can wear, named rather than numbered.
@@ -16,6 +17,11 @@ import 'app_colors.dart';
 ///
 /// Ordered light-to-serious, so a set that runs best-to-worst reads correctly
 /// by following the list.
+///
+/// **A seller picks one of these too** — a marketplace carries a hue
+/// (`lib/features/marketplaces/AGENTS.md`), which is why the enum grew a
+/// [label] and a [fromName]. One named palette for both, rather than a second
+/// list that has to be kept looking like this one.
 enum AppTagHue {
   green,
   blue,
@@ -25,6 +31,27 @@ enum AppTagHue {
   amber,
   red,
   grey;
+
+  /// The hue a stored name refers to.
+  ///
+  /// **An unknown or missing name is [grey], never a throw.** A record written
+  /// by a later build with a hue this one has never heard of still has to
+  /// render — the same reason `CountryLabel` falls back to the code.
+  static AppTagHue fromName(String? name) =>
+      AppTagHue.values.where((AppTagHue hue) => hue.name == name).firstOrNull ??
+      AppTagHue.grey;
+
+  /// What this hue is called, for the picker and for a screen reader.
+  String label(BuildContext context) => switch (this) {
+    AppTagHue.green => context.l10n.hueGreen,
+    AppTagHue.blue => context.l10n.hueBlue,
+    AppTagHue.violet => context.l10n.hueViolet,
+    AppTagHue.indigo => context.l10n.hueIndigo,
+    AppTagHue.teal => context.l10n.hueTeal,
+    AppTagHue.amber => context.l10n.hueAmber,
+    AppTagHue.red => context.l10n.hueRed,
+    AppTagHue.grey => context.l10n.hueGrey,
+  };
 
   /// The hue in the palette currently on screen.
   Color of(BuildContext context) {

@@ -3,17 +3,26 @@ import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
+import '../../../../core/theme/app_tag_hue.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/marketplace.dart';
 import '../../marketplace_constant.dart';
 
 /// What the add/edit marketplace form has collected.
 class MarketplaceFormState {
-  const MarketplaceFormState({this.feeRate, this.isSaving = false});
+  const MarketplaceFormState({
+    this.feeRate,
+    this.hue = AppTagHue.grey,
+    this.isSaving = false,
+  });
 
   /// A fraction of the sale, not a percentage — the field converts, so the
   /// stored number and the typed one never disagree about the factor of 100.
   final double? feeRate;
+
+  /// The colour every row naming this marketplace will wear. Never null — a
+  /// new record starts on grey rather than on "not chosen".
+  final AppTagHue hue;
 
   final bool isSaving;
 
@@ -22,11 +31,15 @@ class MarketplaceFormState {
 
   bool get canSubmit => !isSaving && isFeeRateValid;
 
-  MarketplaceFormState copyWith({double? feeRate, bool? isSaving}) =>
-      MarketplaceFormState(
-        feeRate: feeRate ?? this.feeRate,
-        isSaving: isSaving ?? this.isSaving,
-      );
+  MarketplaceFormState copyWith({
+    double? feeRate,
+    AppTagHue? hue,
+    bool? isSaving,
+  }) => MarketplaceFormState(
+    feeRate: feeRate ?? this.feeRate,
+    hue: hue ?? this.hue,
+    isSaving: isSaving ?? this.isSaving,
+  );
 }
 
 /// Add, rename, reprice and delete a marketplace.
@@ -42,14 +55,21 @@ class MarketplaceFormController extends Notifier<MarketplaceFormState> {
 
   /// Loads an existing marketplace into the form. Called once — see
   /// `FormSeed`.
-  void seed(Marketplace marketplace) =>
-      state = MarketplaceFormState(feeRate: marketplace.feeRate);
+  void seed(Marketplace marketplace) => state = MarketplaceFormState(
+    feeRate: marketplace.feeRate,
+    hue: marketplace.hue,
+  );
 
   /// Resets for a create, because the provider outlives one visit to the form.
   void startCreate() => state = const MarketplaceFormState();
 
-  void updateFeeRate(double? rate) =>
-      state = MarketplaceFormState(feeRate: rate, isSaving: state.isSaving);
+  void updateFeeRate(double? rate) => state = MarketplaceFormState(
+    feeRate: rate,
+    hue: state.hue,
+    isSaving: state.isSaving,
+  );
+
+  void selectHue(AppTagHue hue) => state = state.copyWith(hue: hue);
 
   /// Returns the id written, or null when the name was empty.
   Future<String?> submit({required String name, String? marketplaceId}) async {
@@ -57,6 +77,7 @@ class MarketplaceFormController extends Notifier<MarketplaceFormState> {
     final String id = marketplaceId ?? _uuid.v4();
 
     final double? feeRate = state.feeRate;
+    final AppTagHue hue = state.hue;
 
     if (trimmed.isEmpty ||
         state.isSaving ||
@@ -73,11 +94,12 @@ class MarketplaceFormController extends Notifier<MarketplaceFormState> {
         'marketplaceId': id,
         'isEditing': marketplaceId != null,
         'feePercent': feeRate * 100,
+        'hue': hue.name,
       },
     );
 
     try {
-      // Read fresh rather than held from when the screen opened: only the two
+      // Read fresh rather than held from when the screen opened: only the
       // fields this form owns are applied, so a teammate's edit survives.
       final List<Marketplace> existing = await ref
           .read(marketplaceRepositoryProvider)
@@ -96,8 +118,9 @@ class MarketplaceFormController extends Notifier<MarketplaceFormState> {
                     name: trimmed,
                     feeRate: feeRate,
                     createdAt: DateTime.now(),
+                    hue: hue,
                   )
-                : current.copyWith(name: trimmed, feeRate: feeRate),
+                : current.copyWith(name: trimmed, feeRate: feeRate, hue: hue),
           );
 
       return id;

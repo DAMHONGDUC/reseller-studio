@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/theme/app_tag_hue.dart';
 import '../../domain/entities/marketplace.dart';
 
 /// How a [Marketplace] is stored.
@@ -16,6 +17,9 @@ final class MarketplaceDto {
       // missing one is visibly zero and gets corrected.
       feeRate: (data['feeRate'] as num?)?.toDouble() ?? 0,
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
+      // Stored by name, never by index: a reordered enum would otherwise
+      // repaint every marketplace in the business.
+      hue: AppTagHue.fromName(FirestoreMapper.stringOrNull(data['hue'])),
       deletedAt: FirestoreMapper.dateOrNull(data['deletedAt']),
     );
   }
@@ -26,6 +30,7 @@ final class MarketplaceDto {
   }) => FirestoreMapper.pruned(<String, Object?>{
     'name': marketplace.name,
     'feeRate': marketplace.feeRate,
+    'hue': marketplace.hue.name,
     'deletedAt': marketplace.deletedAt == null
         ? null
         : Timestamp.fromDate(marketplace.deletedAt!),

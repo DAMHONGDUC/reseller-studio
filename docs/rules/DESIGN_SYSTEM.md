@@ -217,8 +217,12 @@ Owner's rules, all of them read from one place so no screen types them:
     `Expanded` list, so it was never inside the scrollable.
   - Inventory's list *is* the scrollable — the search header has to live in it
     to dock — so its strip is a `SliverPersistentHeader(pinned: true)` whose
-    extent is `topGap * 2 + AppFilterStrip.height`. That band carries both
-    gaps, so the screen places neither.
+    extent is `topGap * 2 + AppFilterStrip.height`, plus
+    `AppActiveFilterBar.height` and the gap above it while something is
+    filtered. That band carries both outer gaps, so the screen places neither.
+    **The delegate rebuilds when that row appears**: a pinned sliver states its
+    extent before it lays anything out, so a row coming and going inside a
+    fixed extent would be clipped.
   - **This reverses the earlier "a filter row is content, and content
     scrolls".** Chips a seller cannot reach 300 rows down are chips they
     scroll back up for, which is the cost the docking header exists to avoid.

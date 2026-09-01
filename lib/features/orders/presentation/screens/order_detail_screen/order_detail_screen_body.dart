@@ -92,16 +92,26 @@ class _StatusCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: SdSpacingConstant.h4),
-          Text(
-            <String>[
-              order.marketplaceName,
-              DateTimeUtils.mediumDate(
-                order.orderedAt,
-                locale: context.localeTag,
+          Row(
+            children: <Widget>[
+              // The marketplace stays first in the line; the dot only colours
+              // the name that is already there.
+              AppMarketplaceDot(marketplaceId: order.marketplaceId),
+              SizedBox(width: SdSpacingConstant.w6),
+              Expanded(
+                child: Text(
+                  <String>[
+                    order.marketplaceName,
+                    DateTimeUtils.mediumDate(
+                      order.orderedAt,
+                      locale: context.localeTag,
+                    ),
+                    if (order.buyerName != null) order.buyerName!,
+                  ].join(' · '),
+                  style: context.textTheme3.bodySmall!.faint3(context),
+                ),
               ),
-              if (order.buyerName != null) order.buyerName!,
-            ].join(' · '),
-            style: context.textTheme3.bodySmall!.faint3(context),
+            ],
           ),
         ],
       ),

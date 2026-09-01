@@ -195,6 +195,40 @@ because they are about the shell, not the bar:
   a search header, so the spinner drops in below the chips rather than over
   them.
 
+## A filtered list says how many filters are on, and offers Reset
+
+Owner's rule. Inventory and Orders both keep their vocabulary of filters in a
+sheet, so without a line on the screen a row missing because of a filter and a
+row missing because of a bug look identical — and the seller's only way to
+check is to reopen the sheet and read every group.
+
+- **`AppActiveFilterBar` (`core/widgets/`) is the one implementation**, and it
+  renders in two places at once: under the strip on the screen, and at the top
+  of that screen's filter sheet. One widget, so the count the seller reads
+  before opening the sheet and the count they read inside it cannot disagree.
+- **It renders nothing at zero.** A row saying "0 filters" is chrome describing
+  the absence of chrome.
+- **The count is by group, never by chip.** Three categories ticked is one
+  filter; a seller who made one choice cannot reconcile "3 filters" with the
+  sheet in front of them.
+- **The selected tab counts as one whenever it is not `All`**, and Reset
+  returns it there. A seller looking at three rows of eleven is filtered by the
+  tab exactly as much as by the sheet, and a bar reading "no filters" over a
+  narrowed list would be describing a different screen.
+- **The search box is not counted and Reset leaves it alone.** It is visible on
+  the screen with its own clear button, so it is not the filter that went
+  missing.
+- **The sheet applies as it is tapped; there is no Apply button.** Its primary
+  button carries the result count and closes — a seller who ticks a chip and
+  watches the number move learns immediately whether it was the filter they
+  meant.
+- **The entry point is an app-bar action, never a chip on the strip.** Five
+  tabs are already wider than a phone, so a sixth chip pushes a real tab off
+  the edge to reach a sheet that is not a tab.
+- `test/features/inventory/inventory_filter_sheet_test.dart` and
+  `test/features/orders/order_filter_sheet_test.dart` hold the count, the two
+  places it renders, and Reset.
+
 ## Empty states
 
 - **An empty state still scrolls**, or the one screen a seller most wants to

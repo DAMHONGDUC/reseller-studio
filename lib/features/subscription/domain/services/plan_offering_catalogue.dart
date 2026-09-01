@@ -65,6 +65,8 @@ final class PlanOfferingCatalogue {
   /// Whether this option is the one the paywall recommends. Only ever true
   /// alongside another option — a lone product is not a better deal than
   /// anything.
-  static bool isBestValue(PlanOffering offering, List<PlanOffering> offerings) =>
-      offerings.length > 1 && offering.period == recommended;
+  static bool isBestValue(
+    PlanOffering offering,
+    List<PlanOffering> offerings,
+  ) => offerings.length > 1 && offering.period == recommended;
 }

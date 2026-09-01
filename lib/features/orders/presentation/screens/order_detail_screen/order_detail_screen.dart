@@ -14,6 +14,7 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/utils/link_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/app_row_icon_button.dart';
 import '../../../../expenses/domain/entities/expense.dart';

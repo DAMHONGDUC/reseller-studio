@@ -3,14 +3,21 @@
 library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
+import '../../core/constants/log_tag_constant.dart';
+import '../../core/filters/date_range_filter.dart';
+import '../../core/filters/presence_filter.dart';
+import '../../core/money/money.dart';
 import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
+import '../../core/utils/set_utils.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/item.dart';
 import 'domain/entities/item_category.dart';
+import 'domain/entities/item_filter_criteria.dart';
 import 'domain/entities/storage_location.dart';
 import 'domain/enums/item_status.dart';
 import 'domain/services/item_search.dart';
@@ -119,24 +126,127 @@ inventorySearchProvider = NotifierProvider<InventorySearchController, String>(
   InventorySearchController.new,
 );
 
+/// The extra filters behind Inventory's filter sheet.
+///
+/// **Separate from `inventoryFilterProvider`, and reset together with it.**
+/// The tab is one preset a seller taps constantly; these are the vocabulary
+/// they open a sheet for. Keeping them apart is what lets the strip stay a
+/// single choice with counts while the sheet stays a set of independent
+/// groups — and [reset] is the one place that knows both halves exist.
+class InventoryCriteriaController extends Notifier<ItemFilterCriteria> {
+  @override
+  ItemFilterCriteria build() => ItemFilterCriteria.none;
+
+  void toggleStatus(ItemStatus value) =>
+      state = state.copyWith(statuses: SetUtils.toggled(state.statuses, value));
+
+  void toggleCondition(ItemCondition value) => state = state.copyWith(
+    conditions: SetUtils.toggled(state.conditions, value),
+  );
+
+  void toggleCategory(String id) => state = state.copyWith(
+    categoryIds: SetUtils.toggled(state.categoryIds, id),
+  );
+
+  void toggleLocation(String id) => state = state.copyWith(
+    locationIds: SetUtils.toggled(state.locationIds, id),
+  );
+
+  void toggleSource(String id) =>
+      state = state.copyWith(sourceIds: SetUtils.toggled(state.sourceIds, id));
+
+  void setPhotos(PresenceFilter value) => state = state.copyWith(photos: value);
+
+  void setCost(PresenceFilter value) => state = state.copyWith(cost: value);
+
+  void setAsking(PresenceFilter value) => state = state.copyWith(asking: value);
+
+  void setListed(PresenceFilter value) => state = state.copyWith(listed: value);
+
+  void setAdded(DateRangeFilter value) => state = state.copyWith(added: value);
+
+  /// **Null clears the end of the window** — an empty price box means the
+  /// seller stopped bounding that side, not that they bounded it at zero.
+  void setMinAsking(Money? value) => state = value == null
+      ? state.copyWith(clearMinAsking: true)
+      : state.copyWith(minAsking: value);
+
+  void setMaxAsking(Money? value) => state = value == null
+      ? state.copyWith(clearMaxAsking: true)
+      : state.copyWith(maxAsking: value);
+
+  /// Drops every filter, the tab included.
+  ///
+  /// The search box is deliberately left alone: it is visible on the screen
+  /// with its own clear button, and it is not counted as a filter either.
+  void reset() {
+    // Its own state and the tab, never `inventoryActiveFilterCountProvider`:
+    // that provider watches this one, so reading it from here is a circular
+    // dependency the framework refuses at the tap.
+    SdLogger.action(
+      LogTagConstant.item,
+      'Reset inventory filters',
+      <String, Object?>{
+        'groups': state.activeCount,
+        'tab': ref.read(inventoryFilterProvider).name,
+      },
+    );
+
+    ref.read(inventoryFilterProvider.notifier).select(InventoryFilter.all);
+    state = ItemFilterCriteria.none;
+  }
+}
+
+final NotifierProvider<InventoryCriteriaController, ItemFilterCriteria>
+inventoryCriteriaProvider =
+    NotifierProvider<InventoryCriteriaController, ItemFilterCriteria>(
+      InventoryCriteriaController.new,
+    );
+
+/// How many filters are narrowing the list right now — what the seller is
+/// told above it, and what the Filters chip carries.
+///
+/// **The tab counts as one when it is not `all`.** A seller looking at three
+/// rows of eleven is filtered by the tab exactly as much as by the sheet, and
+/// a bar that said "no filters" while Sold was selected would be describing a
+/// different screen. Reset clears both, so the number and the button agree.
+final Provider<int> inventoryActiveFilterCountProvider = Provider<int>((
+  Ref ref,
+) {
+  final int extras = ref.watch(inventoryCriteriaProvider).activeCount;
+  final InventoryFilter tab = ref.watch(inventoryFilterProvider);
+
+  return tab == InventoryFilter.all ? extras : extras + 1;
+});
+
 /// How many items sit under each tab.
 ///
 /// **Computed from the one item stream rather than five queries.** Inventory
 /// shows all five counts at once, so per-tab queries would mean five live
 /// listeners for one screen; folding over the list already in memory costs
 /// nothing and cannot disagree with the list being displayed.
-final Provider<Map<InventoryFilter, int>> inventoryCountsProvider =
-    Provider<Map<InventoryFilter, int>>((Ref ref) {
-      final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
-      final DateTime now = ref.watch(clockProvider).now();
+final Provider<Map<InventoryFilter, int>>
+inventoryCountsProvider = Provider<Map<InventoryFilter, int>>((Ref ref) {
+  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
+  final DateTime now = ref.watch(clockProvider).now();
+  final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
+  final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
 
-      return <InventoryFilter, int>{
-        for (final InventoryFilter filter in InventoryFilter.values)
-          filter: items
-              .where((Item item) => filter.matches(item, now: now))
-              .length,
-      };
-    });
+  // Narrowed by everything except the tab itself, so a chip's number is
+  // exactly how many rows tapping it would show. A count taken before the
+  // sheet was applied says 40 over a list of three.
+  final List<Item> pool = items
+      .where(
+        (Item item) =>
+            criteria.matches(item, now: now) && ItemSearch.matches(item, query),
+      )
+      .toList();
+
+  return <InventoryFilter, int>{
+    for (final InventoryFilter filter in InventoryFilter.values)
+      filter: pool.where((Item item) => filter.matches(item, now: now)).length,
+  };
+});
 
 /// Which items are ticked for a bulk action.
 ///
@@ -256,19 +366,23 @@ final class LocationPathBuilder {
   }
 }
 
-/// The rows actually shown: the selected tab, narrowed by the search box.
+/// The rows actually shown: the selected tab, narrowed by the search box and
+/// by the filter sheet.
 final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   Ref ref,
 ) {
   final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
   final InventoryFilter filter = ref.watch(inventoryFilterProvider);
+  final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
   final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
   final DateTime now = ref.watch(clockProvider).now();
 
   return items
       .where(
         (Item item) =>
-            filter.matches(item, now: now) && ItemSearch.matches(item, query),
+            filter.matches(item, now: now) &&
+            criteria.matches(item, now: now) &&
+            ItemSearch.matches(item, query),
       )
       .toList();
 });

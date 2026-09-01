@@ -86,6 +86,7 @@ class MockDataset {
           name: seed.name,
           feeRate: seed.feeRate,
           createdAt: now,
+          hue: seed.hue,
         ),
     ];
     final List<Carrier> carriers = <Carrier>[

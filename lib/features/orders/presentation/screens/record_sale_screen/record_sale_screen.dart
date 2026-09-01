@@ -72,7 +72,7 @@ class _RecordSaleScreenState extends ConsumerState<RecordSaleScreen> {
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
-            ),
+            ).copyWith(bottom: SdContentPaddingV3.listItemGap),
             child: SdSearchFieldV3(
               controller: _controller,
               hint: context.l10n.recordSaleSearchHint,

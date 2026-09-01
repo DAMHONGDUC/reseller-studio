@@ -10,6 +10,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
@@ -23,6 +24,7 @@ import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
+import '../../widgets/inventory_filter_sheet.dart';
 import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_card.dart';
 import '../../widgets/reprice_sheet.dart';
@@ -118,6 +120,14 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             onChanged: (String value) =>
                 ref.read(inventorySearchProvider.notifier).update(value),
             actions: <SdAppBarActionV3>[
+              // In the chrome rather than on the strip: the five tabs already
+              // scroll on a narrow phone, and a sixth chip pushes Returns off
+              // the edge to reach a sheet that is not a tab.
+              SdAppBarActionV3(
+                icon: AppIconConstant.filterAlt,
+                tooltip: context.l10n.filterTitle,
+                onPressed: () => InventoryFilterSheet.show(context),
+              ),
               SdAppBarActionV3(
                 icon: AppIconConstant.addBox,
                 tooltip: context.l10n.inventoryAddItem,
@@ -133,9 +143,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
           // Pinned, so the chips stay reachable 300 rows down — and still
           // not part of the app bar (owner's rules, both). The band carries
           // its own topGap above and below, so the screen places neither.
-          const SliverPersistentHeader(
+          SliverPersistentHeader(
             pinned: true,
-            delegate: _PinnedFilterStrip(),
+            delegate: _PinnedFilterStrip(
+              showActiveFilters:
+                  ref.watch(inventoryActiveFilterCountProvider) > 0,
+            ),
           ),
           switch (source) {
             // A screen that has not loaded is not empty — saying "No items"

@@ -4,6 +4,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../domain/entities/analytics_summary.dart';
 import '../../../providers.dart';
 import '../../widgets/metric_card.dart';
@@ -42,6 +43,9 @@ class AnalyticsMarketplaceScreen extends ConsumerWidget {
                 for (final MarketplacePerformance row in rows) ...<Widget>[
                   MetricCard(
                     title: row.marketplaceName,
+                    leading: AppMarketplaceDot(
+                      marketplaceId: row.marketplaceId,
+                    ),
                     rows: <Widget>[
                       MetricRow(
                         label: context.l10n.commonRevenue,
