@@ -39,6 +39,48 @@ controller in the feature that owns the record, reached through
 **`MarkSoldSheet` is in `core/widgets/`** for the same reason: two features
 open it, and that is where a widget goes the moment the second one does.
 
+## The sale flow shows what decides the pick, not a price it will re-ask for
+
+Owner's rule, in two halves, both about `RecordSaleScreen` and the sheet it
+opens.
+
+- **A row carries where the item is listed and what it is expected to fetch —
+  never a listing price.** The row used to print the *top* of the item's live
+  prices: one of several numbers, belonging to whichever platform happened to
+  carry it, and the very figure the sheet was about to ask the seller to
+  confirm. What actually decides which row to tap is whether the thing is out
+  there and what they wanted for it — so the subtitle counts the marketplaces
+  (`Not listed` when there are none) and the trailing figure is
+  `Item.expectedPrice` (`lib/features/inventory/CLAUDE.md`).
+- **The marketplace picker offers only the platforms that item is on.** A list
+  of every marketplace the business sells on makes the seller find the one
+  this jacket was live at, and a mis-pick writes an order against a platform
+  that never carried it — which then lands in that platform's fees, payouts
+  and analytics.
+  - **An item on no marketplace gets the full list.** Cash in hand is a sale,
+    `RecordSaleScreen` offers unlisted stock on purpose, and an empty picker
+    is a flow with no way out.
+  - The fallback lives in `marketplacesForItemProvider`, not at the call site,
+    so the sheet and anything that opens it next cannot disagree about what an
+    unlisted item may be sold on.
+  - The join is `MarketplaceMatching`: a listing names a `Marketplace` *enum*
+    and an order names a marketplace *record*, and nothing stores a key
+    between them.
+- **Picking a platform fills the sale price with what that platform is
+  asking** — owner's rule, and it overwrites a figure the seller had already
+  typed. That is the point: the box is what *this* marketplace is asking, and
+  a number left behind from the platform before it would be the wrong one
+  shown as confirmed. An item live at 185 on eBay and 175 on Depop has two
+  right answers, and the picker is what chooses between them.
+  - **A platform the item is not on falls back to `Item.expectedPrice`** —
+    the one number that is true either way. The sheet opens on the same rule,
+    seeded from the marketplace it opens on.
+  - The price map is `ListingPricing.byMarketplace` and the lookup is
+    `MarketplaceMatching.valueFor`, so the enum-to-record key rule is written
+    once and the sheet does not know it.
+- `test/features/orders/record_sale_test.dart` pins the row, both halves of
+  the picker, and the price following it.
+
 ## An order always names an item
 
 `OrderLine.itemId` is non-null, so there is no walk-in sale — nothing sells

@@ -1,9 +1,13 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/theme/app_tag_hue.dart';
+import '../listings/domain/entities/listing.dart';
+import '../listings/domain/services/listing_marketplaces.dart';
+import '../listings/providers.dart';
 import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/marketplace.dart';
+import 'domain/services/marketplace_matching.dart';
 import 'marketplace_constant.dart';
 
 /// The normal marketplace records created for every new business.
@@ -52,6 +56,26 @@ final Provider<List<Marketplace>> activeMarketplacesProvider =
             in ref.watch(marketplacesProvider).value ?? const <Marketplace>[])
           if (!marketplace.isDeleted) marketplace,
       ];
+    });
+
+/// The ones an item is actually on, for a picker that is about that item.
+///
+/// **Falls back to every active marketplace when the item is on none** —
+/// owner's rule as it applies to the sheet that reads this: cash in hand is a
+/// sale, so an unlisted item must still be sellable, and an empty picker is a
+/// flow with no way out. The fallback is here rather than at the call site so
+/// two screens cannot disagree about what an unlisted item may be sold on.
+final marketplacesForItemProvider =
+    Provider.family<List<Marketplace>, String>((Ref ref, String itemId) {
+      final List<Marketplace> active = ref.watch(activeMarketplacesProvider);
+      final List<Marketplace> listed = MarketplaceMatching.matching(
+        active,
+        ListingMarketplaces.keys(
+          ref.watch(listingsForItemProvider(itemId)).value ?? const <Listing>[],
+        ),
+      );
+
+      return listed.isEmpty ? active : listed;
     });
 
 /// Id → the name the seller gave it. What every row renders through

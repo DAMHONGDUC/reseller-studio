@@ -1,27 +1,26 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/widgets/app_detail_action_button.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
 void main() {
-  testWidgets('uses medium proportions for a balanced label and icon', (
+  testWidgets('draws the more_vert glyph and keeps the label as its name', (
     WidgetTester tester,
   ) async {
+    // Owner's rule: the same control the inventory row carries, and a label
+    // that survives for the screen reader rather than for the bar.
     await pumpScreen(
       tester,
       AppDetailActionButton(label: 'Actions', onPressed: () {}),
     );
 
-    final SdButtonV3 button = tester.widget<SdButtonV3>(
-      find.byType(SdButtonV3),
-    );
+    final SdAppBarActionButtonV3 button = tester
+        .widget<SdAppBarActionButtonV3>(find.byType(SdAppBarActionButtonV3));
 
-    expect(button.size, SdButtonSizeV3.medium);
-    expect(button.icon, isNotNull);
-    expect(
-      tester.widget<SdIconV3>(find.byType(SdIconV3)).size,
-      SdIconV3.defaultSize,
-    );
+    expect(button.icon, AppIconConstant.moreVert);
+    expect(button.tooltip, 'Actions');
+    expect(find.text('Actions'), findsNothing);
   });
 }

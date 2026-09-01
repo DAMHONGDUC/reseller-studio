@@ -14,23 +14,24 @@ part of 'item_card.dart';
 /// inside the top row they were squeezed between a photo and a button. Across
 /// the foot, the labels share one baseline and the figures share the next.
 ///
-/// **Qty and Cost take equal shares; the arrow measures itself** — owner's
+/// **The figures take equal shares; the arrow measures itself** — owner's
 /// rule, reversing "spaced apart, not divided into shares". Cells that all
 /// measured themselves put the gaps where the content left them, so the
 /// middle one sat at a different place on every card and `Cost` shuffled
-/// sideways down the list. Shares were rejected when three cells held money
-/// and a four-figure price ellipsized; the third now holds a chevron, so the
-/// two carrying figures split everything else and neither is close.
+/// sideways down the list. Qty, Cost and Expected split the row between them
+/// and the chevron takes only its glyph.
 ///
 /// **The arrow is the same glyph every other card ends with** — owner's
 /// rule. It is `AppRowChevron`, so it cannot come out a size or a grey of its
 /// own, and its cell aligns to the end so it holds the card's right edge in
 /// the same column as the chevrons on Orders and Offers.
 ///
-/// **The asking price is not here, the arrow is** — owner's rule. What the
-/// item is asked for is a per-marketplace number, so one figure on the row is
-/// a price that may be true nowhere; the arrow opens the screen that lists
-/// every marketplace's own.
+/// **The expected price is here; a marketplace's asking price is not** —
+/// owner's rule. What the item is *asked* for is a per-marketplace number, so
+/// one figure on the row would be a price that may be true nowhere; what the
+/// seller *expects* for it is one number the item carries itself, true whether
+/// it is live on four platforms or none. The arrow beside it still opens the
+/// screen that lists every marketplace's own.
 ///
 /// Every amount renders `—` when unknown, which is most of the point: an item
 /// added through Quick Add has none of them, and the row must say so rather
@@ -65,6 +66,17 @@ class _MoneyLine extends StatelessWidget {
           label: context.l10n.itemCost,
           content: Text(
             context.money(item.purchasePrice),
+            style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
+              color: context.sdTheme3.textSecondary,
+            ),
+          ),
+        ),
+      ),
+      Expanded(
+        child: _MoneyCell(
+          label: context.l10n.itemExpectedShort,
+          content: Text(
+            context.money(item.expectedPrice),
             style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
               color: context.sdTheme3.textSecondary,
             ),

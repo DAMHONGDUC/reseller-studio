@@ -32,10 +32,7 @@ class _StateBadges extends StatelessWidget {
     final bool isStale =
         item.status.isOnHand &&
         StaleInventoryPolicy.isStale(item.listedAt, now: now);
-    final int marketCount = listings
-        .map((Listing listing) => listing.marketplace)
-        .toSet()
-        .length;
+    final int marketCount = ListingMarketplaces.of(listings).length;
     // An item that has left inventory is not late for anything, so the second
     // line goes with it rather than holding a gap.
     final bool showMarkets = marketCount > 0 || item.status.isListable;

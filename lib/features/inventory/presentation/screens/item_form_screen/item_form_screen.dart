@@ -54,6 +54,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
   final TextEditingController _sku = TextEditingController();
   final TextEditingController _barcode = TextEditingController();
   final TextEditingController _cost = TextEditingController();
+  final TextEditingController _expected = TextEditingController();
   final TextEditingController _minimum = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _notes = TextEditingController();
@@ -78,6 +79,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
     _sku.dispose();
     _barcode.dispose();
     _cost.dispose();
+    _expected.dispose();
     _minimum.dispose();
     _description.dispose();
     _notes.dispose();
@@ -92,6 +94,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
     _sku.text = item.sku ?? '';
     _barcode.text = item.barcode ?? '';
     _cost.text = item.purchasePrice?.toInputString() ?? '';
+    _expected.text = item.expectedPrice?.toInputString() ?? '';
     _minimum.text = item.minimumPrice?.toInputString() ?? '';
     _description.text = item.description ?? '';
     _notes.text = item.notes ?? '';
@@ -139,6 +142,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
             sku: _sku.text,
             barcode: _barcode.text,
             purchasePrice: _cost.text,
+            expectedPrice: _expected.text,
             minimumPrice: _minimum.text,
             description: _description.text,
             notes: _notes.text,
@@ -232,6 +236,13 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                       controller: _cost,
                       currency: currency,
                       helperText: context.l10n.itemCostHelp,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    MoneyField(
+                      label: context.l10n.itemExpectedPrice,
+                      controller: _expected,
+                      currency: currency,
+                      helperText: context.l10n.itemExpectedPriceHelp,
                       textInputAction: TextInputAction.next,
                     ),
                     MoneyField(

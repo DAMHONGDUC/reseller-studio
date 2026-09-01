@@ -14,11 +14,23 @@ class _MarketplaceBreakdown extends ConsumerWidget {
       marketplacePerformanceProvider,
     );
 
+    // The same card the rows would have filled, so the block keeps its place
+    // in the screen's rhythm — and the words sit centred in it, on the card's
+    // own air rather than on a page band this slot does not own.
     if (rows.isEmpty) {
-      return SdEmptyStateV3(
-        icon: AppIconConstant.barChart,
-        title: context.l10n.analyticsNoSalesYet,
-        message: context.l10n.analyticsMarketplacePerformanceAppearsOnceYouHave,
+      return Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: SdContentPaddingV3.horizontal,
+        ),
+        child: SdCardV3(
+          child: SdEmptyStateV3(
+            variant: SdEmptyStateVariantV3.inline,
+            icon: AppIconConstant.barChart,
+            title: context.l10n.analyticsNoSalesYet,
+            message:
+                context.l10n.analyticsMarketplacePerformanceAppearsOnceYouHave,
+          ),
+        ),
       );
     }
 

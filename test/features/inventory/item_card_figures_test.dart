@@ -16,7 +16,7 @@ import '../../support/pump_app.dart';
 void main() {
   Item itemWith({
     Money? cost,
-    Money? asking,
+    Money? expected,
     ItemStatus status = ItemStatus.inStock,
   }) => Item(
     id: 'itm-1',
@@ -26,6 +26,7 @@ void main() {
     createdAt: testNow.subtract(const Duration(days: 40)),
     listedAt: testNow.subtract(const Duration(days: 21)),
     purchasePrice: cost,
+    expectedPrice: expected,
   );
 
   testWidgets('the band leads with how many are left', (
@@ -85,7 +86,7 @@ void main() {
     expect(find.text('0'), findsOneWidget);
   });
 
-  testWidgets('the band states cost, and neither asking price nor profit', (
+  testWidgets('the band states neither a marketplace ask nor profit', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -93,7 +94,7 @@ void main() {
       ItemCard(
         item: itemWith(
           cost: const Money(4500, 'USD'),
-          asking: const Money(18500, 'USD'),
+          expected: const Money(18500, 'USD'),
         ),
         now: testNow,
       ),
@@ -101,11 +102,9 @@ void main() {
 
     expect(find.text('Cost'), findsOneWidget);
     expect(find.text(r'$45.00'), findsOneWidget);
-    expect(find.text('Price'), findsNothing);
-    // What the item is asked for is a per-marketplace number, and the arrow
+    // What the item is *asked* for is a per-marketplace number, and the arrow
     // is what leads to them. Expected profit is the detail screen's.
     expect(find.text('Asking'), findsNothing);
-    expect(find.text(r'$185.00'), findsNothing);
     expect(find.text('Profit'), findsNothing);
     expect(find.text(r'$140.00'), findsNothing);
   });
@@ -273,9 +272,33 @@ void main() {
       ),
     );
 
-    // Hard rule 5: the cost renders an em dash rather than a zero, which
-    // would tell the seller the item was free.
-    expect(find.text('—'), findsOneWidget);
+    // Hard rule 5: cost and expected price each render an em dash rather
+    // than a zero, which would tell the seller the item was free and that
+    // they wanted nothing for it.
+    expect(find.text('—'), findsNWidgets(2));
+  });
+
+  testWidgets('the band carries the expected price beside the cost', (
+    WidgetTester tester,
+  ) async {
+    // Owner's rule: the one price the item carries itself, true whether it is
+    // live on four marketplaces or none. What each of them *asks* stays
+    // behind the arrow.
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(
+          cost: const Money(2200, 'USD'),
+          expected: const Money(9000, 'USD'),
+        ),
+        now: testNow,
+      ),
+    );
+
+    expect(find.text('Cost'), findsOneWidget);
+    expect(find.text(r'$22.00'), findsOneWidget);
+    expect(find.text('Expected'), findsOneWidget);
+    expect(find.text(r'$90.00'), findsOneWidget);
   });
 
   testWidgets('the row does not show state age', (WidgetTester tester) async {

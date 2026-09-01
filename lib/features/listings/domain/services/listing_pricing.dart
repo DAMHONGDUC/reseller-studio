@@ -24,6 +24,28 @@ final class ListingPricing {
         : null;
   }
 
+  /// Each platform's own price, keyed by the marketplace enum's `name` —
+  /// which is also the id a seeded workspace marketplace record carries.
+  ///
+  /// **The first listing on a platform wins.** Nothing in the app writes a
+  /// second listing on the same marketplace (the cross-list screen ticks a
+  /// platform the item is already on rather than offering it again), so a
+  /// duplicate is a repair case, and the older record is the one every other
+  /// screen is already showing.
+  ///
+  /// Strings rather than the enum so a caller holding the marketplace
+  /// *records* can read this without importing a second type called
+  /// `Marketplace` — `MarketplaceMatching.valueFor` is what looks one up.
+  static Map<String, Money> byMarketplace(List<Listing> listings) {
+    final Map<String, Money> prices = <String, Money>{};
+
+    for (final Listing listing in listings) {
+      prices.putIfAbsent(listing.marketplace.name, () => listing.price);
+    }
+
+    return prices;
+  }
+
   /// The highest price any of them carries, or null when there are none.
   ///
   /// **For seeding a box the seller will confirm**, never for a write applied

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/app_sheet_action_row.dart';
 import '../../../../core/widgets/app_sheet_option_list.dart';
 import '../../../../core/widgets/mark_sold_sheet.dart';
@@ -27,9 +25,13 @@ import 'restock_sheet.dart';
 /// Everything a seller can do to one item, in one sheet (plan §7).
 ///
 /// **The actions that would be refused are shown, not hidden**, and tapping
-/// one says which requirement is missing. Hiding "List" from an item with no
-/// price teaches nothing; "Add an asking price to list this" teaches the rule
-/// and points at the fix.
+/// one says which requirement is missing. Hiding "Mark sold" from an item
+/// nobody has counted teaches nothing; "Add a quantity" teaches the rule and
+/// points at the fix.
+///
+/// **Marketplaces are not in here** — owner's rule. That question is answered
+/// on the detail screen, under Price, where the prices the seller came to
+/// change already are.
 class ItemActionsSheet extends ConsumerWidget {
   const ItemActionsSheet({required this.item, super.key});
 
@@ -171,32 +173,6 @@ class ItemActionsSheet extends ConsumerWidget {
     final bool isOnHand = item.status.isOnHand;
 
     final List<Widget> actions = <Widget>[
-      // **One List row, not List and Cross-list** — owner's rule. The two
-      // read as the same verb to anybody who has not learned the difference,
-      // and the narrower one stopped working after the first listing: a
-      // seller who had listed on eBay tapped List, got a block message, and
-      // the thing they actually wanted was the row underneath.
-      AppSheetActionRow(
-        icon: AppIconConstant.sell,
-        label: context.l10n.itemActionList,
-        onTap: () {
-          final ItemTransitionCheck check = ref
-              .read(itemActionsControllerProvider.notifier)
-              .crossListCheck(item);
-
-          if (!check.isAllowed) {
-            SdSnackBarUtilsV3.error(
-              context,
-              ItemBlockPresenter.messages(context, check.blocks),
-            );
-
-            return;
-          }
-
-          Navigator.of(context).pop();
-          context.push(AppRoutes.crossList(item.id));
-        },
-      ),
       AppSheetActionRow(
         icon: AppIconConstant.priceChange,
         label: context.l10n.itemActionReprice,

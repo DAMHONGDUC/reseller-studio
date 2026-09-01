@@ -280,11 +280,14 @@ Owner's rules, all of them read from one place so no screen types them:
   - **`onPressed` is nullable**, because a disabled action is a real state: a
     delete is refused while a save is in flight, and hiding the row instead
     would move everything beside it.
-- **A labelled action in a detail screen's app bar uses the medium button
-  proportions.** Owner's rule. The small button keeps `labelLarge` text while
-  scaling down its glyph and gap, so the word outweighs the icon and the pair
-  reads as two unrelated sizes. `AppDetailActionButton` is the shared app-side
-  wrapper; detail screens do not rebuild its padding or button size.
+- **A detail screen's app bar opens its actions from a `more_vert` glyph, not
+  a labelled button.** Owner's rule, reversing "a labelled action uses the
+  medium button proportions". The word spent the title's width to say only
+  that there *were* actions — which is what three dots say in a quarter of the
+  space, in the shape the inventory row already uses. `AppDetailActionButton`
+  is still the shared app-side wrapper and now draws `SdAppBarActionButtonV3`;
+  its `label` survives as the tooltip and the semantics name, so the control
+  is not anonymous to a screen reader. Detail screens do not rebuild it.
 - **A screen whose search box is the point uses `SdSearchHeaderV3`, not an
   app bar with a field under it.** The field docks into the title's row as
   the list scrolls and the filter strip pins under it, so scrolled chrome
@@ -490,11 +493,29 @@ below for why they are not repeated here.
 |---|---|
 | `listItemGap` | between two items of the same list — **one number for every list in the app**, and the gap from a filter row down to its list is also this, because a filter sits above the list like one more item above the first |
 | `sectionGap` | between two whole cards or sections stacked on a screen — a distinct section, not a repeated row, so it gets the roomier number |
-| `sectionHeader({first})` | a heading's own insets; `first` drops the top gap because `topGap` already placed it. Its gutter is the *list's*, so the heading lines up with the left edge of the rows under it |
+| `sectionHeader({first, gutter})` | a heading's own insets; `first` drops the top gap because `topGap` already placed it. Its gutter is the *list's*, so the heading lines up with the left edge of the rows under it — `gutter: false` for a heading inside something that already carries it |
 | `button` | the one padding every button variant wears, so filled, outlined and text buttons never come out different sizes next to each other |
 | `card`, `row` | the inside of a card, and of a list row that is not one |
+| `rowNoGutter` | a row inside something that already carries the gutter — the vertical rhythm only, derived from `row` so the two cannot drift |
 | `filterStrip`, `filterStripGap` | the chip strip's height and its internal air |
 | `pinnedActionsGap` | above a pinned bottom action. Its own field, not `bottomGap`: that one is the air *below* the last item, and pinning created a second edge on the side the content arrives from |
+
+**A heading or a row inside a padded container drops the gutter, never the
+rhythm.** Owner's rule. A block already sitting in the screen's 16 that pays
+it again sets its own heading 16 further in than the card beneath it, which
+reads as a stray indent rather than as a nested group — `AppEditableSection`,
+Item detail's Listings heading and its listing rows all had it.
+
+- **It is a flag, never a padding passed in.** `SdSectionHeaderV3` took a
+  `customPadding` for one call site and immediately had two call sites
+  computing the recipe two different ways — one of them dropping the vertical
+  gap as well, which is the half that must survive. `gutter: false` and
+  `SdContentPaddingV3.rowNoGutter` say what the thing *is*; the numbers stay
+  in the token (`WIDGET_RULES.md` §6: a widget owns only its own intrinsic
+  size).
+- `test/core/widgets/section_heading_is_flush_test.dart` pins both halves —
+  the heading lands on its card's left edge, and the gap above it does not
+  change.
 
 **Chrome the content has to clear**
 

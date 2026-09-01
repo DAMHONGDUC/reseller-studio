@@ -281,6 +281,24 @@ check is to reopen the sheet and read every group.
   button teaches a route the seller then has to unlearn
   (`lib/features/orders/CLAUDE.md`).
 
+- **An empty *block* is not an empty screen, and says so with
+  `SdEmptyStateVariantV3.inline`.** Owner's rule. The page variant carries the
+  screen's own band — 32 above, 32 plus the floating bar's footprint below —
+  which is right when the empty state *is* the screen and wrong the moment it
+  is one item in a list: Analytics' marketplace breakdown sits between two
+  headings, and that band put a hundred points of dead air under three lines
+  and left the words reading as if they were set too high.
+  - **The inline block keeps the container the rows would have filled.** The
+    breakdown renders the same `SdCardV3` either way, so the screen's rhythm
+    does not change with the data, and the words centre on the card's own
+    padding.
+  - **Filling the height is not centring.** `Column(mainAxisSize: max)` makes
+    the column *be* the available space and lands its children at the top of
+    it — the opposite of what it looks like it does. The centring is the
+    `Center` above it, and it only works while the column stays `min`.
+  - `test/features/analytics/marketplace_breakdown_empty_test.dart` pins the
+    card and the equal air.
+
 ## A form seeds through `FormSeed`, never straight from `build`
 
 A form that edits an existing record learns it has one in a `build` — the
@@ -320,8 +338,8 @@ past nine fields they were not changing, and popped back — for one number.
   that reflows on Edit makes the seller re-find the field they came for.
 - **Only stored fields open.** A derived figure has no field to edit
   (hard rule 3), and a recorded timestamp is not a thing a seller types.
-- **A state transition stays in the actions sheet, never in a section.** List,
-  Mark sold, Archive, Ship, Mark delivered and Record refund carry side
+- **A state transition stays in the actions sheet, never in a section.** Mark
+  sold, Archive, Ship, Mark delivered and Record refund carry side
   effects — an inventory write, an audit entry, a timeline fact — and a status
   field that wrote the value alone would skip all of them (hard rule 2).
 - **A section whose rows belong to another screen sends Edit there instead of

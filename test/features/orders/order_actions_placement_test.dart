@@ -39,7 +39,7 @@ void main() {
   ) async {
     await pumpScreen(tester, const OrderDetailScreen(orderId: 'ord-1'));
 
-    await tester.tap(find.widgetWithText(SdButtonV3, 'Actions'));
+    await tester.tap(find.byTooltip('Actions'));
     await tester.pumpAndSettle();
 
     expect(find.byType(OrderActionsSheet), findsOneWidget);
@@ -52,7 +52,7 @@ void main() {
   ) async {
     await pumpScreen(tester, const OrderDetailScreen(orderId: 'ord-4'));
 
-    await tester.tap(find.widgetWithText(SdButtonV3, 'Actions'));
+    await tester.tap(find.byTooltip('Actions'));
     await tester.pumpAndSettle();
 
     // The pinned button is the fast path; the sheet is the complete list, so

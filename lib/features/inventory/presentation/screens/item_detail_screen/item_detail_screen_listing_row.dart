@@ -7,7 +7,7 @@ class _ListingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: SdContentPaddingV3.row,
+    padding: SdContentPaddingV3.rowNoGutter,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[

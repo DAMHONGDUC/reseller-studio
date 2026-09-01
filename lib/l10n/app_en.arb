@@ -1037,6 +1037,18 @@
   "@inventoryNotListed": {
     "description": "Red Inventory card badge on an item that is on no marketplace yet."
   },
+  "itemExpectedPrice": "Expected price",
+  "@itemExpectedPrice": {
+    "description": "What the seller expects the item to sell for."
+  },
+  "itemExpectedPriceHelp": "What you expect to get for it. Optional.",
+  "@itemExpectedPriceHelp": {
+    "description": "Helper under the expected price box."
+  },
+  "itemExpectedShort": "Expected",
+  "@itemExpectedShort": {
+    "description": "Column label for the expected price on the inventory row."
+  },
   "itemMinimumPrice": "Minimum price",
   "@itemMinimumPrice": {
     "description": "The floor for offers and bulk repricing."
@@ -1164,10 +1176,6 @@
   "itemAddSourceFirst": "Add a source first: More → Sourcing",
   "@itemAddSourceFirst": {
     "description": "Says where to go when the source picker is empty."
-  },
-  "itemActionList": "Marketplaces management",
-  "@itemActionList": {
-    "description": "Opens the sheet that puts an item on a marketplace."
   },
   "itemActionReprice": "Reprice",
   "@itemActionReprice": {

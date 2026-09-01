@@ -7,6 +7,7 @@ import '../../features/listings/domain/entities/listing.dart';
 import '../../features/listings/domain/services/listing_pricing.dart';
 import '../../features/listings/providers.dart';
 import '../../features/marketplaces/domain/entities/marketplace.dart';
+import '../../features/marketplaces/domain/services/marketplace_matching.dart';
 import '../../features/marketplaces/providers.dart';
 import '../../features/orders/providers.dart';
 import '../../features/workspace/providers.dart';
@@ -30,6 +31,13 @@ import 'picker_field.dart';
 /// sheet, and the Orders tab's record-sale screen once it has an item. Those
 /// are the two ways an order is created, and they are one sheet on purpose
 /// (`lib/features/orders/CLAUDE.md`).
+///
+/// **It offers only the marketplaces the item is actually on** — owner's
+/// rule. A picker listing every platform the business sells on makes the
+/// seller find the one of them this jacket was live at, and picking a wrong
+/// one writes an order against a platform that never carried it. An item on
+/// no marketplace still has to be sellable — cash in hand is a sale — so that
+/// case falls back to the full list rather than to an empty picker.
 class MarkSoldSheet extends ConsumerStatefulWidget {
   const MarkSoldSheet({required this.item, super.key});
 
@@ -51,22 +59,52 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
 }
 
 class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
-  /// Seeded from the top price the item is live at — it carries no price of
-  /// its own. A seed rather than an answer: the seller confirms or corrects
-  /// it, and a sale below the ask is the normal case.
+  /// Seeded from the marketplace the sheet opens on, and refilled every time
+  /// the seller picks another one.
   late final TextEditingController _price = TextEditingController(
-    text:
-        ListingPricing.topPrice(
-          ref.read(listingsForItemProvider(widget.item.id)).value ??
-              const <Listing>[],
-        )?.toInputString() ??
-        '',
+    text: _priceFor(ref.read(_options).firstOrNull),
   );
 
   final TextEditingController _buyer = TextEditingController();
 
   Marketplace? _marketplace;
   DateTime _soldAt = DateTime.now();
+
+  /// The platforms this sale may name — this item's, or all of them when it
+  /// is on none.
+  Provider<List<Marketplace>> get _options =>
+      marketplacesForItemProvider(widget.item.id);
+
+  /// What the box should read for [marketplace].
+  ///
+  /// **That platform's own listing price, falling back to what the seller
+  /// expects for the item** — owner's rule. An item live at £45 on eBay and
+  /// £40 on Depop has two right answers and the picker is what chooses
+  /// between them; a marketplace it is not listed on has none, and the
+  /// expected price is the one number that is true either way
+  /// (`lib/features/inventory/CLAUDE.md`).
+  String _priceFor(Marketplace? marketplace) {
+    final Map<String, Money> prices = ListingPricing.byMarketplace(
+      ref.read(listingsForItemProvider(widget.item.id)).value ??
+          const <Listing>[],
+    );
+    final Money? listed = marketplace == null
+        ? null
+        : MarketplaceMatching.valueFor(marketplace, prices);
+
+    return (listed ?? widget.item.expectedPrice)?.toInputString() ?? '';
+  }
+
+  /// Picking a platform moves the price with it — including over a number the
+  /// seller had typed, which is the point: the box says what that marketplace
+  /// is asking, and a figure left behind from the platform before it would be
+  /// the wrong one presented as confirmed.
+  void _selectMarketplace(Marketplace picked) {
+    setState(() {
+      _marketplace = picked;
+      _price.text = _priceFor(picked);
+    });
+  }
 
   @override
   void dispose() {
@@ -120,9 +158,9 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final bool isBusy = ref.watch(recordSaleControllerProvider);
     final String currency = ref.watch(workspaceCurrencyProvider);
     final DateTime now = DateTime.now();
-    final List<Marketplace> marketplaces = ref.watch(
-      activeMarketplacesProvider,
-    );
+    // Only the platforms this item is on — the whole list only when it is on
+    // none (`marketplacesForItemProvider`).
+    final List<Marketplace> marketplaces = ref.watch(_options);
     final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
 
     return SdBottomSheetV3(
@@ -161,7 +199,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
               if (picked == null) return;
 
-              setState(() => _marketplace = picked);
+              _selectMarketplace(picked);
             },
           ),
           SizedBox(height: SdSpacingConstant.h16),

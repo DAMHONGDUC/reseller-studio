@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -39,9 +40,9 @@ void main() {
   ) async {
     await pumpDetail(tester);
 
-    // Overview, Pricing and Provenance are above the fold; Description and
-    // Notes are built as the list reaches them.
-    expect(find.text('Edit'), findsNWidgets(3));
+    // Overview, Pricing, Listings and Provenance are above the fold;
+    // Description and Notes are built as the list reaches them.
+    expect(find.text('Edit'), findsNWidgets(4));
 
     await tester.scrollUntilVisible(
       find.text('Notes'),
@@ -50,13 +51,51 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Listings offers an Edit only when there is a price to move; itm-11 is
-    // on no marketplace, so it shows the empty line and no Edit.
+    // Listings offers its Edit even on no marketplace: it is the only way
+    // onto a first one, so an item listed nowhere still has a way out.
     expect(find.text('Listings'), findsOneWidget);
-    expect(find.text('Edit'), findsNWidgets(3));
   });
 
-  testWidgets('a listed item sends Edit to Marketplaces management', (
+  testWidgets('Pricing edits the expected price alongside cost and floor', (
+    WidgetTester tester,
+  ) async {
+    // Owner's rule: the item carries one price of its own, and it is never
+    // required (hard rule 2).
+    final ProviderContainer container = await pumpDetail(tester);
+
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(SdSectionHeaderV3, 'Pricing'),
+        matching: find.text('Edit'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(MoneyField, 'Expected price'),
+      '90.00',
+    );
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect((await read(container)).expectedPrice, const Money(9000, 'USD'));
+  });
+
+  testWidgets('Listings sits directly under Price', (
+    WidgetTester tester,
+  ) async {
+    // Owner's rule: the money on this screen reads in one run.
+    await pumpDetail(tester);
+
+    final double pricing = tester.getTopLeft(find.text('Pricing')).dy;
+    final double listings = tester.getTopLeft(find.text('Listings')).dy;
+    final double provenance = tester.getTopLeft(find.text('Provenance')).dy;
+
+    expect(pricing, lessThan(listings));
+    expect(listings, lessThan(provenance));
+  });
+
+  testWidgets('Listings sends Edit to Marketplaces management', (
     WidgetTester tester,
   ) async {
     // Owner's rule: the prices live on the screen that can also add a
@@ -144,7 +183,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await pumpDetail(tester);
-    await tester.tap(find.text('Actions'));
+    await tester.tap(find.byTooltip('Actions'));
     await tester.pumpAndSettle();
 
     expect(find.byType(ItemActionsSheet), findsOneWidget);

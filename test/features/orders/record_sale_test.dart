@@ -5,9 +5,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/widgets/app_list_row.dart';
+import 'package:reseller_studio/core/widgets/money_field.dart';
+import 'package:reseller_studio/core/widgets/option_picker_sheet.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart'
+    as record;
 import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
@@ -143,6 +148,176 @@ void main() {
     expect(
       find.text('Vintage Levi 501 — 34x32, redline selvedge'),
       findsNothing,
+    );
+  });
+
+  testWidgets('a row carries where it is listed and what it is expected to '
+      'fetch, never a listing price', (WidgetTester tester) async {
+    // Owner's rule: the price on this row was the highest of several and the
+    // seller was about to be asked to confirm it anyway. What decides which
+    // row to tap is where the thing is live and what they wanted for it.
+    await pumpScreen(tester, const RecordSaleScreen());
+
+    final Finder row = find.ancestor(
+      of: find.text('Vintage Levi 501 — 34x32, redline selvedge'),
+      matching: find.byType(AppListRow),
+    );
+
+    // itm-4 is on eBay and Depop, and is expected to fetch 180.
+    expect(
+      find.descendant(of: row, matching: find.textContaining('2 markets')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: row, matching: find.text(r'$180.00')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('an item on no marketplace says so on its row', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const RecordSaleScreen());
+
+    final Finder row = find.ancestor(
+      of: find.text('Nike windbreaker — XL'),
+      matching: find.byType(AppListRow),
+    );
+
+    expect(
+      find.descendant(of: row, matching: find.textContaining('Not listed')),
+      findsOneWidget,
+    );
+    // Nobody entered an expected price for it — a dash, never a zero
+    // (hard rule 5).
+    expect(find.descendant(of: row, matching: find.text('—')), findsOneWidget);
+  });
+
+  group('the sale offers only the marketplaces the item is on', () {
+    Future<void> openMarketplacePicker(
+      WidgetTester tester,
+      String title,
+    ) async {
+      await pumpScreen(tester, const RecordSaleScreen());
+      await tester.tap(find.text(title));
+      await tester.pumpAndSettle();
+
+      // The sheet's marketplace box, opened onto the picker beneath it.
+      await tester.tap(find.text('Sold on'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a listed item offers those platforms and no others', (
+      WidgetTester tester,
+    ) async {
+      // Owner's rule: picking a platform the item was never on writes an
+      // order against a marketplace that never carried it.
+      await openMarketplacePicker(
+        tester,
+        'Vintage Levi 501 — 34x32, redline selvedge',
+      );
+
+      final Finder picker = find.byType(OptionPickerSheet<record.Marketplace>);
+
+      expect(
+        find.descendant(of: picker, matching: find.text('eBay')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: picker, matching: find.text('Depop')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: picker, matching: find.text('Etsy')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: picker, matching: find.text('Vinted')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('an item on nothing still offers every marketplace', (
+      WidgetTester tester,
+    ) async {
+      // Cash in hand is a sale: an empty picker would be a flow with no way
+      // out for stock that was never listed.
+      await openMarketplacePicker(tester, 'Nike windbreaker — XL');
+
+      final Finder picker = find.byType(OptionPickerSheet<record.Marketplace>);
+
+      for (final String name in <String>['eBay', 'Etsy', 'Vinted']) {
+        expect(
+          find.descendant(of: picker, matching: find.text(name)),
+          findsOneWidget,
+        );
+      }
+    });
+  });
+
+  testWidgets('picking a marketplace fills the sale price with what that '
+      'platform is asking', (WidgetTester tester) async {
+    // Owner's rule: itm-4 is live at 185 on eBay and 175 on Depop, so the box
+    // follows the picker rather than holding one of the two.
+    await pumpScreen(tester, const RecordSaleScreen());
+    await tester.tap(find.text('Vintage Levi 501 — 34x32, redline selvedge'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Sold on'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OptionPickerSheet<record.Marketplace>),
+        matching: find.text('Depop'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<TextField>(
+            find.descendant(
+              of: find.byType(MoneyField),
+              matching: find.byType(TextField),
+            ),
+          )
+          .controller!
+          .text,
+      '175.00',
+    );
+  });
+
+  testWidgets('a marketplace the item is not on falls back to the expected '
+      'price', (WidgetTester tester) async {
+    // itm-11 is listed nowhere, so every platform is offered and none of them
+    // has a price of its own.
+    await pumpScreen(tester, const RecordSaleScreen());
+    await tester.tap(find.text('Nike windbreaker — XL'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Sold on'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OptionPickerSheet<record.Marketplace>),
+        matching: find.text('Etsy'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Nobody entered an expected price for it either, so the box is empty
+    // rather than showing a number belonging to another platform.
+    expect(
+      tester
+          .widget<TextField>(
+            find.descendant(
+              of: find.byType(MoneyField),
+              matching: find.byType(TextField),
+            ),
+          )
+          .controller!
+          .text,
+      isEmpty,
     );
   });
 
