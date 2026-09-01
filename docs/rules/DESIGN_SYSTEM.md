@@ -262,6 +262,17 @@ Owner's rules, all of them read from one place so no screen types them:
     glyph below: a control at the top of every screen that a seller has to
     look for is one they stop reaching for. It is the size the two delete
     actions had already drifted to on their own.
+  - **An action whose state is on wears `isActive`, and it fills as well as
+    tints.** Owner's rule, given for the filter glyph over a filtered list.
+    The `FILL` axis of the variable font is how the nav bar already marks the
+    current destination, so the state survives a palette a colour-blind seller
+    cannot separate — colour is never the only signal. An explicit `tint`
+    still wins the colour; the fill is the half that cannot be argued with.
+  - **A header compares the actions it was handed, never how many.**
+    `SdAppBarActionV3` carries value equality over what it draws — `onPressed`
+    is left out, because a closure is new on every build and an action would
+    never equal itself. A delegate comparing `actions.length` is why a lit
+    glyph stayed unlit until something else rebuilt the header.
   - **An unread mark is `dotColor`, not a `Stack` at the call site.** The dot
     sits on the glyph's corner, and only the button knows where the glyph is —
     `NotificationBell` used to pin one to a raw `Icon` whose size it did not

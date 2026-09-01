@@ -239,6 +239,13 @@ check is to reopen the sheet and read every group.
 - **The entry point is an app-bar action, never a chip on the strip.** Five
   tabs are already wider than a phone, so a sixth chip pushes a real tab off
   the edge to reach a sheet that is not a tab.
+- **That action is lit while the sheet holds something** — owner's rule.
+  `SdAppBarActionButtonV3.isActive` fills the glyph and paints it primary, so
+  a seller who scrolled past the bar under the strip can still see, from the
+  chrome that never moves, that the list is narrower than the shelf. It
+  follows the sheet's own groups and not the tab, for the reason the sheet's
+  bar does: the strip already shows which tab is picked, and a lit glyph over
+  a sheet that opens empty is a lie about where the rows went.
 - `test/features/inventory/inventory_filter_sheet_test.dart` and
   `test/features/orders/order_filter_sheet_test.dart` hold the count, the two
   places it renders, and Reset.
