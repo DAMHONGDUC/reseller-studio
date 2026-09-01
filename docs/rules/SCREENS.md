@@ -281,6 +281,39 @@ form stayed empty, and the seller saw an edit screen that never filled in.
   `test/features/workspace/workspace_detail_seed_test.dart`, both of which
   fail on the direct call.
 
+## A detail screen edits in place, one section at a time
+
+Owner's rule, and it replaces the edit screen for every record that has a
+detail screen. **There is no separate screen for changing an existing record.**
+A seller who spots a wrong cost was pushed onto a full form, made to scroll
+past nine fields they were not changing, and popped back — for one number.
+
+- **Each section that holds fields carries its own Edit, and Edit becomes
+  Cancel and Save.** The section is the unit because the section is already
+  how the screen groups fields: correcting a price and correcting an address
+  are separate intents and must be separate saves.
+- **One section edits at a time.** Opening a second closes the first — two
+  open drafts is two sets of unsaved keystrokes and no way to tell which Save
+  belongs to which.
+- **Read mode and edit mode are the same rows in the same order.** A section
+  that reflows on Edit makes the seller re-find the field they came for.
+- **Only stored fields open.** A derived figure has no field to edit
+  (hard rule 3), and a recorded timestamp is not a thing a seller types.
+- **A state transition stays in the actions sheet, never in a section.** List,
+  Mark sold, Archive, Ship, Mark delivered and Record refund carry side
+  effects — an inventory write, an audit entry, a timeline fact — and a status
+  field that wrote the value alone would skip all of them (hard rule 2).
+- **Which section is open, and the save, live in a controller**; the text
+  controllers stay on the screen, the way every other form here does it. A
+  widget deciding what to write is the rule this repo does not bend.
+- **Cancel restores from the record, not from a copy taken on Edit.** The
+  record is a stream and a teammate may have changed it while the draft was
+  open; re-seeding from what is current is the only answer that is not stale.
+- **Saving writes only the fields that section owns**, re-read at the moment
+  of the write — the same rule the workspace detail screen already follows.
+- **The create form stays a screen.** Creating has no record to show sections
+  of, and hard rule 2 keeps that form's requirements to a title.
+
 ## Search
 
 - **Search is a mode of the header, not a widget parked above the list.**

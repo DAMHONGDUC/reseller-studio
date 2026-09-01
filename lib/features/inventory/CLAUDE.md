@@ -428,3 +428,36 @@ rule and points at the fix.
 The record arrives on a stream, so the form learns it exists inside a `build` —
 and writing the form's controller from there throws. See
 `docs/rules/SCREENS.md`, which carries the rule and the reason.
+
+## The row carries enough; what it must do now is get smaller
+
+Owner's rule. The information on the inventory card is settled — every figure
+above has a rule of its own and none of them leaves. What was wrong is the
+height: a card that answers four questions in the space of a phone screen and
+a half means a seller scrolls to compare two items that should have been
+visible together.
+
+- **Nothing is removed to make room.** Compaction is spacing, glyph and
+  thumbnail size — never a fact. A denser card that dropped the cost would be
+  a different card, not a smaller one.
+- **`ItemCardMetricConstant` owns the sizes the card tightens**, so the next
+  pass changes numbers in one class instead of hunting `SizedBox`es through
+  six part files.
+- **The two zones and the money band stay exactly as they are.** Every rule
+  above about what sits where survives this; only the gaps between them close.
+
+## The item form creates; the detail screen edits
+
+Owner's rule, and it retires `AppRoutes.editItem`. `ItemFormScreen` is now
+reached only to add an item, and changing an existing one happens in the
+detail screen's own sections — see the in-place editing rule in
+`docs/rules/SCREENS.md`, which is where the shape of that lives.
+
+- **Overview, Pricing, Provenance, Description and Notes each open on their
+  own.** Description and Notes are drawn even when empty now, because a
+  section that is hidden until it has content is one a seller cannot use to
+  add content.
+- **Status is not one of them.** Listing, selling and archiving move quantity
+  between the four statuses and write an order or a listing with it — the
+  actions sheet owns every one of those, and a status field writing the value
+  by itself would skip the write that makes it true.
