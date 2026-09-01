@@ -19,7 +19,6 @@ void main() {
     status: ItemStatus.inStock,
     createdAt: testNow.subtract(const Duration(days: 100)),
     listedAt: testNow.subtract(const Duration(days: 100)),
-    askingPrice: const Money(4500, 'USD'),
     condition: ItemCondition.good,
   );
 

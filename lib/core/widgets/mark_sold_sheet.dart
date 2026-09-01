@@ -3,6 +3,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/inventory/domain/entities/item.dart';
+import '../../features/listings/domain/entities/listing.dart';
+import '../../features/listings/domain/services/listing_pricing.dart';
+import '../../features/listings/providers.dart';
 import '../../features/marketplaces/domain/entities/marketplace.dart';
 import '../../features/marketplaces/providers.dart';
 import '../../features/orders/providers.dart';
@@ -48,8 +51,16 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
 }
 
 class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
+  /// Seeded from the top price the item is live at — it carries no price of
+  /// its own. A seed rather than an answer: the seller confirms or corrects
+  /// it, and a sale below the ask is the normal case.
   late final TextEditingController _price = TextEditingController(
-    text: widget.item.askingPrice?.toInputString() ?? '',
+    text:
+        ListingPricing.topPrice(
+          ref.read(listingsForItemProvider(widget.item.id)).value ??
+              const <Listing>[],
+        )?.toInputString() ??
+        '',
   );
 
   final TextEditingController _buyer = TextEditingController();

@@ -8,12 +8,6 @@ import '../enums/item_status.dart';
 /// is not. The string a user reads is chosen in the presentation layer from
 /// this value; `domain/` holds no strings (hard rule 7).
 enum ItemTransitionBlock {
-  /// Listing needs something to list at.
-  missingPrice,
-
-  /// Selling needs to know what it sold for.
-  missingSalePrice,
-
   /// The item is somewhere this move does not start from — listing something
   /// already sold, selling something archived.
   wrongStatus,
@@ -63,9 +57,6 @@ final class ItemTransition {
         if (item.status == ItemStatus.sold ||
             item.status == ItemStatus.archived) {
           blocks.add(ItemTransitionBlock.wrongStatus);
-        }
-        if (item.askingPrice == null) {
-          blocks.add(ItemTransitionBlock.missingSalePrice);
         }
       case ItemStatus.draft:
       case ItemStatus.inStock:

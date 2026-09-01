@@ -125,12 +125,10 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
   Future<void> savePricing({
     required String itemId,
     required String purchasePrice,
-    required String askingPrice,
     required String minimumPrice,
   }) {
     final String currency = ref.read(workspaceCurrencyProvider);
     final Money? cost = Money.tryParse(purchasePrice, currency);
-    final Money? asking = Money.tryParse(askingPrice, currency);
     final Money? minimum = Money.tryParse(minimumPrice, currency);
 
     return _write(itemId, ItemDetailSection.pricing, (Item current) {
@@ -138,10 +136,8 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
       // same as leaving it alone — hence the clear flags (hard rule 5).
       return current.copyWith(
         purchasePrice: cost,
-        askingPrice: asking,
         minimumPrice: minimum,
         clearPurchasePrice: cost == null,
-        clearAskingPrice: asking == null,
         clearMinimumPrice: minimum == null,
       );
     });

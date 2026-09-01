@@ -245,7 +245,6 @@ class InMemoryOrderRepository implements OrderRepository {
     final Item current = _store.items[index];
     final int left = current.quantity - 1;
     _store.items[index] = current.copyWith(
-      askingPrice: current.askingPrice ?? order.salePrice,
       quantity: left,
       status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
       soldAt: left == 0 ? order.orderedAt : null,

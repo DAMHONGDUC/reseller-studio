@@ -40,7 +40,6 @@ void main() {
     quantity: quantity,
     status: status,
     createdAt: testNow,
-    askingPrice: asking,
     listedAt: listedAt,
   );
 
@@ -104,7 +103,6 @@ void main() {
               Marketplace.ebay: Money(4500, 'USD'),
               Marketplace.depop: Money(4500, 'USD'),
             },
-            askingPrice: const Money(4500, 'USD'),
           );
 
       final List<Listing> listings = await listingsFor(container, 'x-1');
@@ -138,7 +136,6 @@ void main() {
             prices: const <Marketplace, Money>{
               Marketplace.etsy: Money(3000, 'USD'),
             },
-            askingPrice: const Money(3000, 'USD'),
           );
 
       final Item? saved = await container
@@ -149,7 +146,6 @@ void main() {
       // Going live is not a status any more: what it changes is the clock,
       // and a draft becoming stock the seller is selling.
       expect(saved!.status, ItemStatus.inStock);
-      expect(saved.askingPrice, const Money(3000, 'USD'));
       expect(saved.listedAt, isNotNull);
     });
 
@@ -173,7 +169,6 @@ void main() {
               prices: const <Marketplace, Money>{
                 Marketplace.poshmark: Money(4000, 'USD'),
               },
-              askingPrice: const Money(4000, 'USD'),
             );
 
         final Item? saved = await container
@@ -185,7 +180,6 @@ void main() {
         // adding a marketplace must not reset the clock.
         expect(saved!.listedAt, firstListed);
         expect(saved.status, ItemStatus.inStock);
-        expect(saved.askingPrice, const Money(4000, 'USD'));
       },
     );
 
@@ -199,7 +193,6 @@ void main() {
           .crossList(
             coat,
             prices: const <Marketplace, Money>{},
-            askingPrice: const Money(1000, 'USD'),
           );
 
       expect(await listingsFor(container, 'x-4'), isEmpty);
@@ -428,7 +421,6 @@ void main() {
               Marketplace.ebay: Money(4500, 'USD'),
               Marketplace.depop: Money(4000, 'USD'),
             },
-            askingPrice: const Money(4500, 'USD'),
           );
 
       final Map<Marketplace, Money> written = <Marketplace, Money>{
@@ -442,7 +434,7 @@ void main() {
       });
     });
 
-    test('the item keeps the shared price, not one platform’s', () async {
+    test('cross-listing writes listings and no price onto the item', () async {
       final ProviderContainer container = mockContainer();
       final Item coat = item(id: 'x-6');
 
@@ -455,16 +447,24 @@ void main() {
               Marketplace.ebay: Money(4500, 'USD'),
               Marketplace.depop: Money(4000, 'USD'),
             },
-            askingPrice: const Money(4500, 'USD'),
           );
 
-      final Item? saved = await container
-          .read(itemRepositoryProvider)
-          .watchItem('x-6')
+      final List<Listing> saved = await container
+          .read(listingRepositoryProvider)
+          .watchListingsForItem('x-6')
           .first;
 
-      // What the item is worth is not whichever platform was cheapest.
-      expect(saved!.askingPrice, const Money(4500, 'USD'));
+      // Every price is a marketplace's own — the item carries none, so the
+      // two numbers survive as two rather than being averaged into one.
+      expect(
+        <Marketplace, Money>{
+          for (final Listing listing in saved) listing.marketplace: listing.price,
+        },
+        const <Marketplace, Money>{
+          Marketplace.ebay: Money(4500, 'USD'),
+          Marketplace.depop: Money(4000, 'USD'),
+        },
+      );
     });
   });
 }

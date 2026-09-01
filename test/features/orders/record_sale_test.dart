@@ -82,7 +82,7 @@ void main() {
   );
 
   test(
-    'an item with no asking price still sells, at what it sold for',
+    'an item with no price anywhere still sells',
     () async {
       final ProviderContainer container = mockContainer();
 
@@ -91,7 +91,7 @@ void main() {
       // A draft from Quick Add: a title and nothing else (hard rule 2).
       final Item draft = itemById(container, 'itm-9');
 
-      expect(draft.askingPrice, isNull, reason: 'the seed item drifted');
+      expect(draft.purchasePrice, isNull, reason: 'the seed item drifted');
 
       await container
           .read(recordSaleControllerProvider.notifier)
@@ -104,8 +104,9 @@ void main() {
 
       final Item sold = itemById(container, 'itm-9');
 
+      // The sale price rides on the order, never back onto the item: the
+      // item has no price of its own to write it to.
       expect(sold.status, ItemStatus.sold);
-      expect(sold.askingPrice, Money(4000, 'USD'));
     },
   );
 

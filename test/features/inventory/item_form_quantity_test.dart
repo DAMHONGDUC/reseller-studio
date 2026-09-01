@@ -98,7 +98,7 @@ void main() {
 
     form.seed(onShelf);
     form.selectStatus(ItemStatus.sold);
-    await form.submit(title: onShelf.title, quantity: '2', askingPrice: '42');
+    await form.submit(title: onShelf.title, quantity: '2');
 
     final Item sold = await saved(container, 'itm-11');
 

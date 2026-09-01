@@ -6,28 +6,48 @@ part of 'record_sale_screen.dart';
 /// the Search screen does with the same widget — the card belongs to the
 /// screens that own the records, and reaching into Inventory's presentation
 /// layer for it is what the dependency rule forbids.
-class _SaleItemList extends StatelessWidget {
+class _SaleItemList extends ConsumerWidget {
   const _SaleItemList({required this.items});
 
   final List<Item> items;
 
   @override
-  Widget build(BuildContext context) => ListView(
-    padding: SdContentPaddingV3.screen(context),
-    children: <Widget>[
-      AppListCard(
-        children: items
-            .map((Item item) => _SaleItemRow(item: item))
-            .toList(growable: false),
-      ),
-    ],
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Read once for the whole list, never per row: a family watch on every
+    // row is one subscription each and a rebuild storm on any listing write.
+    final List<Listing> listings =
+        ref.watch(listingsProvider).value ?? const <Listing>[];
+
+    return ListView(
+      padding: SdContentPaddingV3.screen(context),
+      children: <Widget>[
+        AppListCard(
+          children: items
+              .map(
+                (Item item) => _SaleItemRow(
+                  item: item,
+                  price: ListingPricing.topPrice(
+                    listings
+                        .where((Listing row) => row.itemId == item.id)
+                        .toList(growable: false),
+                  ),
+                ),
+              )
+              .toList(growable: false),
+        ),
+      ],
+    );
+  }
 }
 
 class _SaleItemRow extends StatelessWidget {
-  const _SaleItemRow({required this.item});
+  const _SaleItemRow({required this.item, this.price});
 
   final Item item;
+
+  /// The top price it is live at, or null when it is on no marketplace — the
+  /// item itself carries no price.
+  final Money? price;
 
   /// Where it is, and what it is called on the shelf. The SKU earns its place
   /// because two items can carry the same title and only one of them sold.
@@ -49,9 +69,9 @@ class _SaleItemRow extends StatelessWidget {
     title: item.title,
     subtitle: _subtitle(context),
     icon: AppIconConstant.inventory,
-    // The asking price, which is also what the sheet pre-fills — `—` when
-    // nobody has entered one (hard rule 5).
-    trailingText: context.money(item.askingPrice),
+    // The top price it is live at, which is also what the sheet pre-fills —
+    // `—` when it is on no marketplace (hard rule 5).
+    trailingText: context.money(price),
     onTap: () => _pick(context),
   );
 }

@@ -15,6 +15,7 @@ import '../../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/listing.dart';
+import '../../../domain/services/listing_pricing.dart';
 import '../../../providers.dart';
 import '../../controllers/cross_list_controller.dart';
 
@@ -86,23 +87,28 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
     });
   }
 
-  void _inheritOnce(Item item) {
-    if (_inherited) return;
+  /// Seeds the shared price from what the item is already live at.
+  ///
+  /// The item carries no price of its own, so the number a seller most likely
+  /// wants for a new marketplace is the top one they are already asking. It
+  /// is only a seed — every row is editable before anything is published.
+  void _inheritOnce(List<Listing> listings) {
+    if (_inherited || listings.isEmpty) return;
 
     _inherited = true;
 
-    final Money? asking = item.askingPrice;
+    final Money? live = ListingPricing.topPrice(listings);
 
-    if (asking == null) return;
+    if (live == null) return;
 
-    _price.text = asking.toInputString();
+    _price.text = live.toInputString();
     // After the frame: the controller is being read by the widget that is
     // building right now, and writing to it during build is what Riverpod
     // refuses outright.
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       if (!mounted) return;
 
-      ref.read(crossListControllerProvider.notifier).inheritPrice(asking);
+      ref.read(crossListControllerProvider.notifier).inheritPrice(live);
     });
   }
 
@@ -143,11 +149,12 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
       );
     }
 
-    _inheritOnce(item);
-    _seedExisting(
-      ref.watch(listingsForItemProvider(widget.itemId)).value ??
-          const <Listing>[],
-    );
+    final List<Listing> live =
+        ref.watch(listingsForItemProvider(widget.itemId)).value ??
+        const <Listing>[];
+
+    _inheritOnce(live);
+    _seedExisting(live);
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(

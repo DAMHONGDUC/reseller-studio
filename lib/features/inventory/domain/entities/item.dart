@@ -21,7 +21,6 @@ class Item {
     required this.createdAt,
     this.updatedAt,
     this.purchasePrice,
-    this.askingPrice,
     this.minimumPrice,
     this.purchaseId,
     this.sourceId,
@@ -60,9 +59,6 @@ class Item {
   /// `Money`'s class doc and hard rule 5.
   final Money? purchasePrice;
 
-  /// What it is listed at, or what the seller intends to list at.
-  final Money? askingPrice;
-
   /// The floor for offers and bulk repricing. A seller who sets this can
   /// accept offers automatically without watching them.
   final Money? minimumPrice;
@@ -94,22 +90,6 @@ class Item {
   final DateTime? deletedAt;
 
   bool get isDeleted => deletedAt != null;
-
-  /// Expected profit if it sells at [askingPrice], or null when either the
-  /// cost or the asking price is unknown.
-  ///
-  /// **Ignores fees and shipping on purpose** — those depend on which
-  /// marketplace it sells on, which is not known until it sells. This is the
-  /// rough number for an inventory row; `ProfitBreakdown` is the real one for
-  /// a completed order.
-  Money? get expectedProfit {
-    final Money? cost = purchasePrice;
-    final Money? asking = askingPrice;
-
-    if (cost == null || asking == null) return null;
-
-    return asking - cost;
-  }
 
   /// How many are still on the shelf.
   ///
@@ -161,7 +141,6 @@ class Item {
     int? quantity,
     ItemStatus? status,
     Money? purchasePrice,
-    Money? askingPrice,
     Money? minimumPrice,
     String? sourceId,
     String? categoryId,
@@ -179,7 +158,6 @@ class Item {
     DateTime? updatedAt,
     bool clearSoldAt = false,
     bool clearPurchasePrice = false,
-    bool clearAskingPrice = false,
     bool clearMinimumPrice = false,
     bool clearBarcode = false,
     bool clearDescription = false,
@@ -194,7 +172,6 @@ class Item {
     purchasePrice: clearPurchasePrice
         ? null
         : purchasePrice ?? this.purchasePrice,
-    askingPrice: clearAskingPrice ? null : askingPrice ?? this.askingPrice,
     minimumPrice: clearMinimumPrice ? null : minimumPrice ?? this.minimumPrice,
     purchaseId: purchaseId,
     sourceId: sourceId ?? this.sourceId,

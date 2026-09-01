@@ -5,12 +5,9 @@ import 'package:system_design/index.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
-import '../../../../core/money/money.dart';
 import '../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../core/widgets/app_filter_chip_group.dart';
-import '../../../../core/widgets/money_field.dart';
 import '../../../sourcing/providers.dart';
-import '../../../workspace/providers.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/item_filter_criteria.dart';
 import '../../domain/enums/item_status.dart';
@@ -28,7 +25,7 @@ import '../../providers.dart';
 /// tap away above the list; what is here is the vocabulary that has nowhere
 /// else to be asked — including a status group, because `archived` and the
 /// seller's own condition grades are not tabs.
-class InventoryFilterSheet extends ConsumerStatefulWidget {
+class InventoryFilterSheet extends ConsumerWidget {
   const InventoryFilterSheet({super.key});
 
   /// How much of the screen the sheet takes. Fixed rather than sized to its
@@ -41,45 +38,13 @@ class InventoryFilterSheet extends ConsumerStatefulWidget {
     builder: (BuildContext context) => const InventoryFilterSheet(),
   );
 
-  @override
-  ConsumerState<InventoryFilterSheet> createState() =>
-      _InventoryFilterSheetState();
-}
-
-class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
-  final TextEditingController _min = TextEditingController();
-  final TextEditingController _max = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    final ItemFilterCriteria criteria = ref.read(inventoryCriteriaProvider);
-
-    // Seeded once, never on rebuild: the criteria change on every keystroke,
-    // and writing the field back from them would fight the seller's cursor.
-    _min.text = criteria.minAsking?.toInputString() ?? '';
-    _max.text = criteria.maxAsking?.toInputString() ?? '';
-  }
-
-  @override
-  void dispose() {
-    _min.dispose();
-    _max.dispose();
-    super.dispose();
-  }
-
-  /// Reset is the one action that has to reach the boxes as well as the
-  /// state — a cleared filter with `20` still sitting in the field reads as a
-  /// filter that refused to clear.
-  void _reset() {
-    ref.read(inventoryCriteriaProvider.notifier).reset();
-    _min.clear();
-    _max.clear();
-  }
-
   /// The three states of "does it have one", worded for what is being asked.
+  ///
+  /// Every group the sheet offers is now a set of chips, so the sheet holds
+  /// no text fields and therefore no controllers — which is why it is a plain
+  /// `ConsumerWidget` again.
   List<AppFilterOption<PresenceFilter>> _presence(
+    BuildContext context,
     String yes,
     String no,
   ) => <AppFilterOption<PresenceFilter>>[
@@ -92,7 +57,10 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
   ];
 
   /// A group of records plus the chip for the items that name none of them.
-  List<AppFilterOption<String>> _byId(Map<String, String> namesById) =>
+  List<AppFilterOption<String>> _byId(
+    BuildContext context,
+    Map<String, String> namesById,
+  ) =>
       <AppFilterOption<String>>[
         for (final MapEntry<String, String> entry in namesById.entries)
           AppFilterOption<String>(value: entry.key, label: entry.value),
@@ -103,12 +71,11 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
       ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
     final InventoryCriteriaController controller = ref.read(
       inventoryCriteriaProvider.notifier,
     );
-    final String currency = ref.watch(workspaceCurrencyProvider);
     final int shown = ref.watch(visibleItemsProvider).length;
     final Map<String, String> categories = <String, String>{
       for (final ItemCategory category
@@ -126,7 +93,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
         children: <Widget>[
           AppActiveFilterBar(
             count: ref.watch(inventoryActiveFilterCountProvider),
-            onReset: _reset,
+            onReset: ref.read(inventoryCriteriaProvider.notifier).reset,
             gutter: false,
           ),
           Expanded(
@@ -163,21 +130,21 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterCategory,
-                    options: _byId(categories),
+                    options: _byId(context, categories),
                     selected: criteria.categoryIds,
                     onSelected: controller.toggleCategory,
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterLocation,
-                    options: _byId(ref.watch(locationPathsProvider)),
+                    options: _byId(context, ref.watch(locationPathsProvider)),
                     selected: criteria.locationIds,
                     onSelected: controller.toggleLocation,
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterSource,
-                    options: _byId(ref.watch(sourceNamesProvider)),
+                    options: _byId(context, ref.watch(sourceNamesProvider)),
                     selected: criteria.sourceIds,
                     onSelected: controller.toggleSource,
                   ),
@@ -185,6 +152,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                   AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterPhotos,
                     options: _presence(
+                      context,
                       context.l10n.filterWithPhotos,
                       context.l10n.filterWithoutPhotos,
                     ),
@@ -195,6 +163,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                   AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterCost,
                     options: _presence(
+                      context,
                       context.l10n.filterCostRecorded,
                       context.l10n.filterCostMissing,
                     ),
@@ -203,18 +172,9 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<PresenceFilter>(
-                    title: context.l10n.filterAskingPrice,
-                    options: _presence(
-                      context.l10n.filterPriced,
-                      context.l10n.filterNotPriced,
-                    ),
-                    selected: <PresenceFilter>{criteria.asking},
-                    onSelected: controller.setAsking,
-                  ),
-                  SizedBox(height: groupGap),
-                  AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterListed,
                     options: _presence(
+                      context,
                       context.l10n.filterEverListed,
                       context.l10n.filterNeverListed,
                     ),
@@ -234,40 +194,6 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     ],
                     selected: <DateRangeFilter>{criteria.added},
                     onSelected: controller.setAdded,
-                  ),
-                  SizedBox(height: groupGap),
-                  Text(
-                    context.l10n.filterAskingRange,
-                    style: context.textTheme3.labelMedium!.semiBold3.copyWith(
-                      color: context.sdTheme3.textSecondary,
-                    ),
-                  ),
-                  SizedBox(height: SdSpacingConstant.h8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Expanded(
-                        child: MoneyField(
-                          label: context.l10n.filterRangeMin,
-                          controller: _min,
-                          currency: currency,
-                          onChanged: (String value) => controller.setMinAsking(
-                            Money.tryParse(value, currency),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: SdSpacingConstant.w12),
-                      Expanded(
-                        child: MoneyField(
-                          label: context.l10n.filterRangeMax,
-                          controller: _max,
-                          currency: currency,
-                          onChanged: (String value) => controller.setMaxAsking(
-                            Money.tryParse(value, currency),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),

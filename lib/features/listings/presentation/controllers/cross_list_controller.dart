@@ -187,7 +187,6 @@ class CrossListController extends Notifier<CrossListState> {
         .crossList(
           item,
           prices: created,
-          askingPrice: current.price,
           reprice: <Listing>[
             for (final MapEntry<Marketplace, Money> entry in repriced.entries)
               current.existing[entry.key]!.copyWith(price: entry.value),

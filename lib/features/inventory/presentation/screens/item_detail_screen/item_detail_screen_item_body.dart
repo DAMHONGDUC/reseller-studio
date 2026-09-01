@@ -22,7 +22,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
   final TextEditingController _title = TextEditingController();
   final TextEditingController _quantity = TextEditingController();
   final TextEditingController _cost = TextEditingController();
-  final TextEditingController _asking = TextEditingController();
   final TextEditingController _minimum = TextEditingController();
   final TextEditingController _barcode = TextEditingController();
   final TextEditingController _description = TextEditingController();
@@ -33,7 +32,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
     _title.dispose();
     _quantity.dispose();
     _cost.dispose();
-    _asking.dispose();
     _minimum.dispose();
     _barcode.dispose();
     _description.dispose();
@@ -55,8 +53,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         _quantity.text = item.quantity.toString();
       case ItemDetailSection.pricing:
         _cost.text = item.purchasePrice?.toInputString() ?? '';
-        _asking.text = item.askingPrice?.toInputString() ?? '';
-        _minimum.text = item.minimumPrice?.toInputString() ?? '';
+            _minimum.text = item.minimumPrice?.toInputString() ?? '';
       case ItemDetailSection.provenance:
         _barcode.text = item.barcode ?? '';
       case ItemDetailSection.description:
@@ -153,7 +150,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
             () => controller.savePricing(
               itemId: item.id,
               purchasePrice: _cost.text,
-              askingPrice: _asking.text,
               minimumPrice: _minimum.text,
             ),
           ),
@@ -165,13 +161,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
                 controller: _cost,
                 currency: currency,
                 helperText: context.l10n.itemCostHelp,
-                textInputAction: TextInputAction.next,
-              ),
-              SizedBox(height: SdSpacingConstant.h16),
-              MoneyField(
-                label: context.l10n.itemAskingPrice,
-                controller: _asking,
-                currency: currency,
                 textInputAction: TextInputAction.next,
               ),
               SizedBox(height: SdSpacingConstant.h16),
@@ -363,7 +352,7 @@ class _OverviewFacts extends StatelessWidget {
   );
 }
 
-/// What it cost, what it is asked for, and what that would leave.
+/// What it cost, and the floor the seller will not go under.
 class _PricingFacts extends StatelessWidget {
   const _PricingFacts({required this.item});
 
@@ -377,23 +366,8 @@ class _PricingFacts extends StatelessWidget {
         value: context.money(item.purchasePrice),
       ),
       _DetailRow(
-        label: context.l10n.itemAskingPrice,
-        value: context.money(item.askingPrice),
-      ),
-      _DetailRow(
         label: context.l10n.itemMinimumPrice,
         value: context.money(item.minimumPrice),
-      ),
-      _DetailRow(
-        label: context.l10n.itemExpectedProfit,
-        value: context.money(item.expectedProfit),
-        // Hard rule 5: an em dash is not a figure, so it must not be tinted
-        // as though it were good or bad news.
-        valueColor: item.expectedProfit == null
-            ? null
-            : item.expectedProfit!.isNegative
-            ? context.sdTheme3.loss
-            : context.sdTheme3.profit,
       ),
     ],
   );

@@ -35,7 +35,6 @@ void main() {
     sourceId: sourceId,
     photoUrls: photoUrls,
     purchasePrice: purchasePrice,
-    askingPrice: askingPrice,
     listedAt: listedAt,
   );
 
@@ -141,45 +140,6 @@ void main() {
     });
   });
 
-  group('asking price window', () {
-    const ItemFilterCriteria under20 = ItemFilterCriteria(
-      maxAsking: Money(2000, 'USD'),
-    );
-
-    test('an item with no asking price is out of any window', () {
-      expect(under20.matches(itemWith(), now: now), isFalse);
-    });
-
-    test('bounds are inclusive', () {
-      expect(
-        under20.matches(
-          itemWith(askingPrice: const Money(2000, 'USD')),
-          now: now,
-        ),
-        isTrue,
-      );
-      expect(
-        under20.matches(
-          itemWith(askingPrice: const Money(2001, 'USD')),
-          now: now,
-        ),
-        isFalse,
-      );
-    });
-
-    test('another currency is excluded rather than compared', () {
-      // Comparing two currencies throws (hard rule 4), and there is no rate
-      // here to convert with — so the row simply is not in the window.
-      expect(
-        under20.matches(
-          itemWith(askingPrice: const Money(1000, 'VND')),
-          now: now,
-        ),
-        isFalse,
-      );
-    });
-  });
-
   group('activeCount', () {
     test('counts groups, not chips', () {
       const ItemFilterCriteria criteria = ItemFilterCriteria(
@@ -188,30 +148,6 @@ void main() {
       );
 
       expect(criteria.activeCount, 2);
-    });
-
-    test('a price window is one filter whichever end is set', () {
-      const ItemFilterCriteria min = ItemFilterCriteria(
-        minAsking: Money(500, 'USD'),
-      );
-      const ItemFilterCriteria both = ItemFilterCriteria(
-        minAsking: Money(500, 'USD'),
-        maxAsking: Money(2000, 'USD'),
-      );
-
-      expect(min.activeCount, 1);
-      expect(both.activeCount, 1);
-    });
-  });
-
-  group('copyWith', () {
-    test('clears a bound only when told to', () {
-      const ItemFilterCriteria criteria = ItemFilterCriteria(
-        minAsking: Money(500, 'USD'),
-      );
-
-      expect(criteria.copyWith().minAsking, const Money(500, 'USD'));
-      expect(criteria.copyWith(clearMinAsking: true).minAsking, isNull);
     });
   });
 }

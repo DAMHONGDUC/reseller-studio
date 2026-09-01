@@ -81,10 +81,7 @@ class RecordSaleController extends Notifier<bool> {
         buyerName: buyerName,
       );
 
-      await orders.recordSale(
-        order,
-        item.copyWith(askingPrice: item.askingPrice ?? salePrice),
-      );
+      await orders.recordSale(order, item);
 
       SdLogger.info(LogTagConstant.order, 'Sale recorded', <String, Object>{
         'itemId': item.id,

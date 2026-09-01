@@ -8,7 +8,6 @@ import 'package:system_design/common.dart';
 import '../../core/constants/log_tag_constant.dart';
 import '../../core/filters/date_range_filter.dart';
 import '../../core/filters/presence_filter.dart';
-import '../../core/money/money.dart';
 import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
 import '../../core/utils/set_utils.dart';
@@ -159,21 +158,9 @@ class InventoryCriteriaController extends Notifier<ItemFilterCriteria> {
 
   void setCost(PresenceFilter value) => state = state.copyWith(cost: value);
 
-  void setAsking(PresenceFilter value) => state = state.copyWith(asking: value);
-
   void setListed(PresenceFilter value) => state = state.copyWith(listed: value);
 
   void setAdded(DateRangeFilter value) => state = state.copyWith(added: value);
-
-  /// **Null clears the end of the window** — an empty price box means the
-  /// seller stopped bounding that side, not that they bounded it at zero.
-  void setMinAsking(Money? value) => state = value == null
-      ? state.copyWith(clearMinAsking: true)
-      : state.copyWith(minAsking: value);
-
-  void setMaxAsking(Money? value) => state = value == null
-      ? state.copyWith(clearMaxAsking: true)
-      : state.copyWith(maxAsking: value);
 
   /// Drops every filter, the tab included.
   ///

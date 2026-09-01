@@ -36,7 +36,11 @@ void main() {
     // be asked.
     expect(find.text('Category'), findsOneWidget);
     expect(find.text('Location'), findsOneWidget);
-    expect(find.text('Asking price range'), findsOneWidget);
+    expect(find.text('Source'), findsOneWidget);
+    // Every group is chips now: the item carries no price of its own, so the
+    // asking-price presence group and its range boxes went with the field.
+    expect(find.text('Asking price'), findsNothing);
+    expect(find.text('Asking price range'), findsNothing);
   });
 
   testWidgets('a ticked chip is counted, and Reset drops it', (

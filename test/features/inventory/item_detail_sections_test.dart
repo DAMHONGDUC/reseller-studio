@@ -97,7 +97,7 @@ void main() {
     expect(after.title, 'Corrected title');
     // The overview owns the title, the count and the grade — and nothing else.
     expect(after.purchasePrice, before.purchasePrice);
-    expect(after.askingPrice, before.askingPrice);
+    expect(after.minimumPrice, before.minimumPrice);
     expect(after.status, before.status);
     expect(after.sourceId, before.sourceId);
     // Saving closes the section, which is what puts every other Edit back.

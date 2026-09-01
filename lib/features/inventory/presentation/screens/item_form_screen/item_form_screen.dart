@@ -54,7 +54,6 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
   final TextEditingController _sku = TextEditingController();
   final TextEditingController _barcode = TextEditingController();
   final TextEditingController _cost = TextEditingController();
-  final TextEditingController _asking = TextEditingController();
   final TextEditingController _minimum = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _notes = TextEditingController();
@@ -79,7 +78,6 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
     _sku.dispose();
     _barcode.dispose();
     _cost.dispose();
-    _asking.dispose();
     _minimum.dispose();
     _description.dispose();
     _notes.dispose();
@@ -94,7 +92,6 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
     _sku.text = item.sku ?? '';
     _barcode.text = item.barcode ?? '';
     _cost.text = item.purchasePrice?.toInputString() ?? '';
-    _asking.text = item.askingPrice?.toInputString() ?? '';
     _minimum.text = item.minimumPrice?.toInputString() ?? '';
     _description.text = item.description ?? '';
     _notes.text = item.notes ?? '';
@@ -142,7 +139,6 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
             sku: _sku.text,
             barcode: _barcode.text,
             purchasePrice: _cost.text,
-            askingPrice: _asking.text,
             minimumPrice: _minimum.text,
             description: _description.text,
             notes: _notes.text,
@@ -236,12 +232,6 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                       controller: _cost,
                       currency: currency,
                       helperText: context.l10n.itemCostHelp,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    MoneyField(
-                      label: context.l10n.itemAskingPrice,
-                      controller: _asking,
-                      currency: currency,
                       textInputAction: TextInputAction.next,
                     ),
                     MoneyField(

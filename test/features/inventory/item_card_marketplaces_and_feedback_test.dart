@@ -21,7 +21,6 @@ void main() {
       quantity: 1,
       status: ItemStatus.inStock,
       createdAt: testNow,
-      askingPrice: const Money(10000, 'USD'),
       listedAt: testNow,
     );
     final List<Listing> listings = <Listing>[

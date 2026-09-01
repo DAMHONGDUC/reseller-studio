@@ -26,7 +26,6 @@ void main() {
     createdAt: testNow.subtract(const Duration(days: 40)),
     listedAt: testNow.subtract(const Duration(days: 21)),
     purchasePrice: cost,
-    askingPrice: asking,
   );
 
   testWidgets('the band leads with how many are left', (

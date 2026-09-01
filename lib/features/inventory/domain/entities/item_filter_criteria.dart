@@ -1,6 +1,5 @@
 import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
-import '../../../../core/money/money.dart';
 import '../../item_filter_constant.dart';
 import '../enums/item_status.dart';
 import 'item.dart';
@@ -25,11 +24,8 @@ class ItemFilterCriteria {
     this.sourceIds = const <String>{},
     this.photos = PresenceFilter.any,
     this.cost = PresenceFilter.any,
-    this.asking = PresenceFilter.any,
     this.listed = PresenceFilter.any,
     this.added = DateRangeFilter.any,
-    this.minAsking,
-    this.maxAsking,
   });
 
   /// Nothing narrowed — what Inventory opens on and what Reset restores.
@@ -51,19 +47,11 @@ class ItemFilterCriteria {
   /// every profit figure in the app read `—`.
   final PresenceFilter cost;
 
-  /// Whether an asking price was ever entered.
-  final PresenceFilter asking;
-
   /// Whether it has ever been live on a marketplace (`listedAt`).
   final PresenceFilter listed;
 
   /// How recently the item was created.
   final DateRangeFilter added;
-
-  /// The asking-price window. Either end may stand alone — "under £20" is a
-  /// question a seller asks far more often than "between £5 and £20".
-  final Money? minAsking;
-  final Money? maxAsking;
 
   /// How many groups are narrowing the list — what the seller is told.
   ///
@@ -80,10 +68,8 @@ class ItemFilterCriteria {
     if (sourceIds.isNotEmpty) count++;
     if (photos.isActive) count++;
     if (cost.isActive) count++;
-    if (asking.isActive) count++;
     if (listed.isActive) count++;
     if (added.isActive) count++;
-    if (minAsking != null || maxAsking != null) count++;
 
     return count;
   }
@@ -101,11 +87,10 @@ class ItemFilterCriteria {
     if (!_matchesId(sourceIds, item.sourceId)) return false;
     if (!photos.matches(item.photoUrls.isNotEmpty)) return false;
     if (!cost.matches(item.purchasePrice != null)) return false;
-    if (!asking.matches(item.askingPrice != null)) return false;
     if (!listed.matches(item.listedAt != null)) return false;
     if (!added.matches(item.createdAt, now: now)) return false;
 
-    return _matchesAskingRange(item.askingPrice);
+    return true;
   }
 
   ItemFilterCriteria copyWith({
@@ -116,13 +101,8 @@ class ItemFilterCriteria {
     Set<String>? sourceIds,
     PresenceFilter? photos,
     PresenceFilter? cost,
-    PresenceFilter? asking,
     PresenceFilter? listed,
     DateRangeFilter? added,
-    Money? minAsking,
-    Money? maxAsking,
-    bool clearMinAsking = false,
-    bool clearMaxAsking = false,
   }) => ItemFilterCriteria(
     statuses: statuses ?? this.statuses,
     conditions: conditions ?? this.conditions,
@@ -131,13 +111,8 @@ class ItemFilterCriteria {
     sourceIds: sourceIds ?? this.sourceIds,
     photos: photos ?? this.photos,
     cost: cost ?? this.cost,
-    asking: asking ?? this.asking,
     listed: listed ?? this.listed,
     added: added ?? this.added,
-    // A null argument means "leave it alone" here too, so emptying the price
-    // box needs the flag — the same shape `Item.clearSoldAt` has.
-    minAsking: clearMinAsking ? null : minAsking ?? this.minAsking,
-    maxAsking: clearMaxAsking ? null : maxAsking ?? this.maxAsking,
   );
 
   /// A group of ids, where a record naming none of them matches only when the
@@ -149,26 +124,5 @@ class ItemFilterCriteria {
     }
 
     return selected.contains(value);
-  }
-
-  /// **An item with no asking price is out of any price window**, and an
-  /// amount in another currency is too: comparing two currencies throws
-  /// (hard rule 4), and there is no rate here to convert with.
-  bool _matchesAskingRange(Money? price) {
-    final Money? min = minAsking;
-    final Money? max = maxAsking;
-
-    if (min == null && max == null) return true;
-    if (price == null) return false;
-    if (min != null &&
-        (price.currency != min.currency || price.minor < min.minor)) {
-      return false;
-    }
-    if (max != null &&
-        (price.currency != max.currency || price.minor > max.minor)) {
-      return false;
-    }
-
-    return true;
   }
 }
