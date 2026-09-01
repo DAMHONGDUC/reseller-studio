@@ -228,11 +228,19 @@ Owner's rule.
 - **The condition sits with the state badges.** It is what a buyer reads first
   on every marketplace, and on a list it explains a price a seller would
   otherwise have to open the item to justify.
-- **`Updated <date>` is the card's last line, and its quietest.** It answers
-  "did my edit save?" and "which of these did I touch this morning?" — a
-  different question from every figure above it, and one that deserves none of
-  their weight. It is absent when nothing has ever updated the record, rather
-  than dressing the creation date up as an edit.
+- **`Updated <date>` sits with the title and the tags, never in the money
+  band** — owner's rule, and it **replaces "the card's last line"**. It
+  answers "did my edit save?" and "which of these did I touch this morning?",
+  which is a fact about the *record* rather than about what the item is worth;
+  hung under Qty and Cost with no separation it read as a fourth row of that
+  grid, so a date sat in a block of figures.
+  - It closes the identity column, under the tag lines, in the same left edge
+    as the title — the quietest thing in the zone that says what this row is.
+  - **The money band is Qty, Cost and the arrow, and nothing else.** Three
+    cells sharing one baseline is what that grid was designed as, and anything
+    appended to it is a fourth cell the layout never accounted for.
+  - It is absent when nothing has ever updated the record, rather than
+    dressing the creation date up as an edit.
 - **Both dates are read-only, and the full pair lives in the detail screen** —
   `Added` and `Last updated`, in the provenance block. No form offers either:
   a date the seller can type is not a record of anything. See
