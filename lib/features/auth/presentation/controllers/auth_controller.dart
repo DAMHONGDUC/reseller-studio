@@ -82,9 +82,12 @@ class AuthController extends Notifier<AuthFormState> {
   /// that would buzz the next person to hold this phone with the last
   /// person's orders.
   Future<void> signOut() async {
+    // Neither cleanup step is allowed to fail the sign-out — a seller who
+    // tapped it must end up signed out whatever a plugin does.
+    await _unregisterDevice();
+    await _forgetBillingIdentity();
+
     try {
-      await ref.read(pushControllerProvider.notifier).unregister();
-      await ref.read(subscriptionRepositoryProvider).forget();
       await ref.read(authRepositoryProvider).signOut();
       SdCrashReporter.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
@@ -113,6 +116,42 @@ class AuthController extends Notifier<AuthFormState> {
       );
 
       rethrow;
+    }
+  }
+
+  /// Drop this device's push token, and never fail the sign-out over it.
+  ///
+  /// It has to happen before the session ends — `users/{uid}/devices` is
+  /// writable only by that uid — but a token that outlives the session is a
+  /// smaller harm than a seller who cannot get out of the app.
+  Future<void> _unregisterDevice() async {
+    try {
+      await ref.read(pushControllerProvider.notifier).unregister();
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.logout,
+        'Device not unregistered — its token stays until it expires',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Clear the billing identity, and never fail the sign-out over it.
+  ///
+  /// This is the one that was actually stopping people: RevenueCat throws on
+  /// a log-out it never logged in for, which is the state after any launch
+  /// where `identify` did not run — and that threw away the sign-out with it.
+  Future<void> _forgetBillingIdentity() async {
+    try {
+      await ref.read(subscriptionRepositoryProvider).forget();
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.logout,
+        'Billing identity not cleared — the next sign-in overwrites it',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

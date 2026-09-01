@@ -154,9 +154,22 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
         );
       });
 
+  /// **An anonymous id is already forgotten.** RevenueCat throws
+  /// `LOGOUT_CALLED_WITH_ANONYMOUS_USER` rather than answering "nothing to
+  /// do", and that throw used to travel all the way out and abandon the
+  /// sign-out that asked for it.
   @override
   Future<void> forget() =>
       FailureMapper.guard('forget billing identity', () async {
+        if (await Purchases.isAnonymous) {
+          SdLogger.info(
+            LogTagConstant.subscription,
+            'Billing identity already anonymous — nothing to clear',
+          );
+
+          return;
+        }
+
         await Purchases.logOut();
 
         SdLogger.info(LogTagConstant.subscription, 'Billing identity cleared');
