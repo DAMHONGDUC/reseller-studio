@@ -252,6 +252,18 @@ which is what lets the amounts be compared at a glance.
 - **`SdDividerV3` between the zones**, not a gap alone: it makes the band
   deliberate rather than a block that happens to start further left than
   everything above it.
+- **The hairline runs edge to edge, and carries no gap of its own** — owner's
+  rule. A rule that stops at the content inset reads as a line drawn under one
+  zone; one that crosses the card is the seam between two. So the card holds
+  `EdgeInsets.zero` and each zone carries `SdContentPaddingV3.card`, the way
+  `AppListCard` already does it — the air around the hairline is the two
+  zones' padding (`ItemCardMetricConstant.bandGap`), never the divider's.
+- **A cell that opens something lays out at its own height** — owner's rule.
+  Reserving the 44pt target in the layout made the band taller than the two
+  lines it holds and left dead space under the arrow while the cells beside it
+  stopped at their text; the ink overhangs the card's inset instead, which is
+  what every other end glyph in the app already does
+  (`docs/rules/DESIGN_SYSTEM.md`).
 - **The cost renders `—` when unknown** (hard rule 5), never `0`: an item
   added through Quick Add has none, and a zero would tell the seller it was
   free.

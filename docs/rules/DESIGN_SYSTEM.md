@@ -840,6 +840,11 @@ quietly re-invent one.
   (`if (index > 0)`). A rule above the first row lands on the container's edge
   and reads as a border it does not have. Its height equals its thickness — see
   the divider trap under Spacing.
+- **A hairline inside a card runs edge to edge.** Owner's rule. A rule that
+  stops at the content inset reads as a line drawn under one block; one that
+  crosses the card is the seam between two. The card takes
+  `EdgeInsets.zero` and the blocks it separates carry the padding —
+  `AppListCard` and the inventory row's money band are both built that way.
 - **Modal colour is one slot and sheets and dialogs both wear it**
   (`SdThemeV3`). A dialog opening over a sheet must never be a second shade. It
   sits a step *below* the card, not above: a modal already separates itself with
