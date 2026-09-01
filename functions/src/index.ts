@@ -75,5 +75,13 @@ export { dailyDigest } from './notifications/dailyDigest';
 // ask an SDK a question.
 export { revenueCatWebhook } from './subscription/revenueCatWebhook';
 
+// The Free ceilings, made real. A rule can read one document but cannot count
+// a collection, so these keep `workspaces/{id}/usage/current` in step and the
+// rules refuse a create against it.
+export {
+  onItemUsageWritten,
+  onOrderUsageWritten,
+} from './subscription/onUsageWritten';
+
 // Marketplace OAuth and sync are dropped, not pending — see CLAUDE.md
 // hard rule 10 and docs/REMAINING_WORK.md.

@@ -81,33 +81,31 @@ void main() {
     },
   );
 
-  test(
-    'an item with no asking price still sells, at what it sold for',
-    () async {
-      final ProviderContainer container = mockContainer();
+  test('an item with no price anywhere still sells', () async {
+    final ProviderContainer container = mockContainer();
 
-      await warmUp(container);
+    await warmUp(container);
 
-      // A draft from Quick Add: a title and nothing else (hard rule 2).
-      final Item draft = itemById(container, 'itm-9');
+    // A draft from Quick Add: a title and nothing else (hard rule 2).
+    final Item draft = itemById(container, 'itm-9');
 
-      expect(draft.askingPrice, isNull, reason: 'the seed item drifted');
+    expect(draft.purchasePrice, isNull, reason: 'the seed item drifted');
 
-      await container
-          .read(recordSaleControllerProvider.notifier)
-          .record(
-            draft,
-            salePrice: Money(4000, 'USD'),
-            marketplace: Marketplace.ebay,
-            soldAt: testNow,
-          );
+    await container
+        .read(recordSaleControllerProvider.notifier)
+        .record(
+          draft,
+          salePrice: Money(4000, 'USD'),
+          marketplace: Marketplace.ebay,
+          soldAt: testNow,
+        );
 
-      final Item sold = itemById(container, 'itm-9');
+    final Item sold = itemById(container, 'itm-9');
 
-      expect(sold.status, ItemStatus.sold);
-      expect(sold.askingPrice, Money(4000, 'USD'));
-    },
-  );
+    // The sale price rides on the order, never back onto the item: the
+    // item has no price of its own to write it to.
+    expect(sold.status, ItemStatus.sold);
+  });
 
   testWidgets('Orders offers the sale as its create action', (
     WidgetTester tester,

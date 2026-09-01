@@ -6,8 +6,8 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
-import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../domain/entities/analytics_summary.dart';
 import '../../../providers.dart';
 

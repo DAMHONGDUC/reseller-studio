@@ -77,6 +77,25 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
+    // Whether the workspace has run past what its plan allows.
+    //
+    // **A rule cannot count a collection**, only read one document — so the
+    // counting happens in `onItemUsageWritten` / `onOrderUsageWritten`, which
+    // write the verdict here. No ceiling is written in this file on purpose:
+    // the numbers have one owner in `PlanLimits.byPlan`, mirrored once in
+    // `functions/src/lib/firestore.ts`, and a third copy in rules is a copy
+    // nobody would remember to change.
+    //
+    // **Fails open at every step**: no usage document, no such field, or a
+    // value that is not the boolean the function writes, and the create goes
+    // through. The failure mode of failing closed is a seller who cannot add
+    // stock and no way to ship the fix (`docs/rules/BACKEND.md`).
+    function withinCeiling(workspaceId, flag) {
+      let usage = /databases/$(database)/documents/workspaces/$(workspaceId)/usage/current;
+
+      return !exists(usage) || get(usage).data.get(flag, false) != true;
+    }
+
     // --- Users -----------------------------------------------------------
 
     // A user's own profile. Nobody reads anyone else's: a team member's name
@@ -170,9 +189,22 @@ service cloud.firestore {
       // Same shape for all of them, so a new collection is one line rather
       // than a new policy to reason about.
 
-      match /items/{itemId}                { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
+      // Items and orders are the two the Free plan puts a ceiling on (plan
+      // §27), so their creates carry one more condition than the rest. Only
+      // creates: a downgrade never deletes or freezes what a seller already
+      // has, which is the same promise `PlanGate` makes in the app.
+      match /items/{itemId} {
+        allow read: if canRead(workspaceId);
+        allow create: if canWrite(workspaceId) && withinCeiling(workspaceId, 'itemsAtCeiling');
+        allow update, delete: if canWrite(workspaceId);
+      }
+      match /orders/{orderId} {
+        allow read: if canRead(workspaceId);
+        allow create: if canWrite(workspaceId) && withinCeiling(workspaceId, 'ordersAtCeiling');
+        allow update, delete: if canWrite(workspaceId);
+      }
+
       match /listings/{listingId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /orders/{orderId}              { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /offers/{offerId}              { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /purchases/{purchaseId}        { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
       match /sources/{sourceId}            { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
@@ -198,6 +230,14 @@ service cloud.firestore {
       // Plan state comes from the store via a webhook. A client that could
       // write this could grant itself Business tier.
       match /subscription/{docId} {
+        allow read: if canRead(workspaceId);
+        allow write: if false;
+      }
+
+      // What the workspace holds, recounted by a trigger. A client that could
+      // write this could clear its own ceiling flag, which is the whole thing
+      // this document exists to stop.
+      match /usage/{docId} {
         allow read: if canRead(workspaceId);
         allow write: if false;
       }

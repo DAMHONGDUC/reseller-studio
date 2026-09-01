@@ -44,6 +44,33 @@ void main() {
     });
   });
 
+  test(
+    'the business row heads the Business section when a workspace is set',
+    () {
+      final List<MoreSection> sections = MoreConstant.sectionsFor(
+        signedIn: true,
+        workspaceId: 'ws-1',
+      );
+      final MoreSection business = sections.firstWhere(
+        (MoreSection section) => section.kind == MoreSectionKind.business,
+      );
+
+      expect(business.destinations.first.kind, MoreDestinationKind.business);
+      expect(business.destinations.first.route, '/workspace/ws-1');
+    },
+  );
+
+  test('no workspace, no business row — the screen behind it needs an id', () {
+    final List<MoreSection> sections = MoreConstant.sectionsFor(signedIn: true);
+
+    expect(
+      sections
+          .expand((MoreSection section) => section.destinations)
+          .map((MoreDestination destination) => destination.kind),
+      isNot(contains(MoreDestinationKind.business)),
+    );
+  });
+
   testWidgets('signed-in More renders every section title', (
     WidgetTester tester,
   ) async {

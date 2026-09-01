@@ -4,7 +4,9 @@ import { defineSecret } from 'firebase-functions/params';
 import { onRequest } from 'firebase-functions/v2/https';
 
 import { db, paths } from '../lib/firestore';
+import { clientFacing } from '../lib/runtime';
 import { planFromEvent, willRenew } from './entitlement';
+import { refreshUsage } from './usage';
 
 /**
  * The shared token RevenueCat sends in `Authorization`.
@@ -41,7 +43,7 @@ const webhookToken = defineSecret('REVENUECAT_WEBHOOK_TOKEN');
  * that hides a real failure.
  */
 export const revenueCatWebhook = onRequest(
-  { secrets: [webhookToken] },
+  { ...clientFacing, secrets: [webhookToken] },
   async (request, response) => {
     if (request.get('Authorization') !== webhookToken.value()) {
       // Never logs what was sent — a wrong token is still a credential.
@@ -147,6 +149,12 @@ async function writePlan(
     },
     { merge: true },
   );
+
+  // **Immediately, not on the workspace's next write.** The ceiling flags were
+  // computed against the plan that has just changed, so an upgrade would leave
+  // a paying seller refused by the rules until they happened to touch a record
+  // — a lock-out, and the one failure mode this boundary must not have.
+  await refreshUsage(workspaceId);
 
   return true;
 }

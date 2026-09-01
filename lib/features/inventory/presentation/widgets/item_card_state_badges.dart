@@ -2,11 +2,14 @@ part of 'item_card.dart';
 
 /// What state the item is in, and where it stands on the marketplaces.
 ///
-/// **Two lines, and the split is by question** — owner's rule. The first says
-/// what the item *is*: its status, its Stale marker and its grade. The second
-/// says where it stands on the marketplaces. One `Wrap` for all of them let a
-/// long grade push the market count onto its own line at some widths and not
-/// others, so the row's shape depended on the words in it.
+/// **One wrapping line, and the marketplace count is the last badge on it** —
+/// owner's rule. Splitting the two questions onto their own lines charged a
+/// whole badge line on every card so that a sometimes-wrapping first line
+/// could not happen; the row's job is to get smaller, and that line held no
+/// fact of its own.
+///
+/// The reading order carries the split the layout no longer does: what the
+/// item *is* first, where it *stands* last.
 ///
 /// **The status badge and the stale badge are separate, and both can show**:
 /// an item can be listed *and* stale, and collapsing that into one marker
@@ -37,37 +40,31 @@ class _StateBadges extends StatelessWidget {
     // line goes with it rather than holding a gap.
     final bool showMarkets = marketCount > 0 || item.status.isListable;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
+      spacing: ItemCardMetricConstant.tagGap,
+      runSpacing: ItemCardMetricConstant.tagRunGap,
       children: <Widget>[
-        Wrap(
-          spacing: SdSpacingConstant.w6,
-          runSpacing: SdSpacingConstant.h4,
-          children: <Widget>[
-            _DisplayTag(
-              label: item.status.label(context),
-              color: item.status.color(context),
-            ),
-            if (isStale)
-              _DisplayTag(
-                label: context.l10n.itemStale,
-                color: context.sdTheme3.warning,
-                icon: AppIconConstant.hourglassBottom,
-              ),
-            // The grade a buyer reads first on every marketplace, and the
-            // thing that explains a price a seller would otherwise have to
-            // open the item to justify.
-            if (item.condition != null)
-              _DisplayTag(
-                label: item.condition!.label(context),
-                color: item.condition!.color(context),
-              ),
-          ],
+        _DisplayTag(
+          label: item.status.label(context),
+          color: item.status.color(context),
         ),
-        if (showMarkets) ...<Widget>[
-          SizedBox(height: SdSpacingConstant.h4),
-          _Marketplaces(count: marketCount),
-        ],
+        if (isStale)
+          _DisplayTag(
+            label: context.l10n.itemStale,
+            color: context.sdTheme3.warning,
+            icon: AppIconConstant.hourglassBottom,
+          ),
+        // The grade a buyer reads first on every marketplace, and the thing
+        // that explains a price a seller would otherwise have to open the item
+        // to justify.
+        if (item.condition != null)
+          _DisplayTag(
+            label: item.condition!.label(context),
+            color: item.condition!.color(context),
+          ),
+        // Last, so the reading order still runs from what the item is to where
+        // it stands, now that the layout no longer says so.
+        if (showMarkets) _Marketplaces(count: marketCount),
       ],
     );
   }

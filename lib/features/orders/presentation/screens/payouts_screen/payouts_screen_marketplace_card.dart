@@ -21,6 +21,7 @@ class _MarketplaceCard extends StatelessWidget {
     children: <Widget>[
       SdSectionHeaderV3(
         title: row.marketplaceName,
+        leading: AppMarketplaceDot(marketplaceId: row.marketplaceId),
         subtitle: row.awaitingIsEstimated
             ? context.l10n.payoutsEstimatedNote
             : null,

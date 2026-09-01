@@ -2,13 +2,17 @@
 library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
+import '../../core/constants/log_tag_constant.dart';
+import '../../core/time/app_clock.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/services/item_search.dart';
 import '../inventory/providers.dart';
 import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
+import 'domain/entities/order_filter_criteria.dart';
 import 'domain/enums/order_status.dart';
 import 'domain/services/payout_reconciliation.dart';
 import 'presentation/controllers/record_sale_controller.dart';
@@ -71,14 +75,92 @@ final NotifierProvider<OrderFilterController, OrderFilter> orderFilterProvider =
       OrderFilterController.new,
     );
 
+/// The extra filters behind Orders' filter sheet — the same split Inventory
+/// has, for the same reason: the strip stays one preset with counts, and the
+/// sheet holds the groups a seller opens deliberately.
+class OrderCriteriaController extends Notifier<OrderFilterCriteria> {
+  @override
+  OrderFilterCriteria build() => OrderFilterCriteria.none;
+
+  /// Writes what the filter sheet was holding, once Apply is pressed — see
+  /// `InventoryCriteriaController.apply` for why the sheet holds it.
+  void apply(OrderFilterCriteria pending) {
+    SdLogger.action(
+      LogTagConstant.order,
+      'Apply order filters',
+      <String, Object?>{'groups': pending.activeCount},
+    );
+
+    state = pending;
+  }
+
+  /// Drops every filter, the tab included.
+  void reset() {
+    // Not `orderActiveFilterCountProvider` — it watches this notifier, so
+    // reading it here is a circular dependency. See Inventory's reset.
+    SdLogger.action(
+      LogTagConstant.order,
+      'Reset order filters',
+      <String, Object?>{
+        'groups': state.activeCount,
+        'tab': ref.read(orderFilterProvider).name,
+      },
+    );
+
+    ref.read(orderFilterProvider.notifier).select(OrderFilter.all);
+    state = OrderFilterCriteria.none;
+  }
+}
+
+final NotifierProvider<OrderCriteriaController, OrderFilterCriteria>
+orderCriteriaProvider =
+    NotifierProvider<OrderCriteriaController, OrderFilterCriteria>(
+      OrderCriteriaController.new,
+    );
+
+/// How many filters are narrowing the list — the tab counted as one whenever
+/// it is not `all`. See `inventoryActiveFilterCountProvider`.
+final Provider<int> orderActiveFilterCountProvider = Provider<int>((Ref ref) {
+  final int extras = ref.watch(orderCriteriaProvider).activeCount;
+  final OrderFilter tab = ref.watch(orderFilterProvider);
+
+  return tab == OrderFilter.all ? extras : extras + 1;
+});
+
 final Provider<Map<OrderFilter, int>> orderCountsProvider =
     Provider<Map<OrderFilter, int>>((Ref ref) {
       final List<Order> orders =
           ref.watch(ordersProvider).value ?? const <Order>[];
+      final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
+      final DateTime now = ref.watch(clockProvider).now();
+
+      // Narrowed by the sheet but not by the tab, so a chip's number is
+      // exactly how many rows tapping it would show.
+      final List<Order> pool = orders
+          .where((Order order) => criteria.matches(order, now: now))
+          .toList();
 
       return <OrderFilter, int>{
         for (final OrderFilter filter in OrderFilter.values)
-          filter: orders.where(filter.matches).length,
+          filter: pool.where(filter.matches).length,
+      };
+    });
+
+/// Marketplace id → the name to put on a chip, taken from the orders
+/// themselves.
+///
+/// **Read off the orders rather than the marketplace records**, so a filter
+/// chip exists for every platform the list actually contains — including one
+/// the seller has since deleted, and one an old order names by the platform's
+/// own enum rather than by a record id.
+final Provider<Map<String, String>> orderMarketplaceNamesProvider =
+    Provider<Map<String, String>>((Ref ref) {
+      final List<Order> orders =
+          ref.watch(ordersProvider).value ?? const <Order>[];
+
+      return <String, String>{
+        for (final Order order in orders)
+          order.marketplaceId: order.marketplaceName,
       };
     });
 
@@ -86,8 +168,16 @@ final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
   Ref ref,
 ) {
   final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
+  final OrderFilter filter = ref.watch(orderFilterProvider);
+  final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
+  final DateTime now = ref.watch(clockProvider).now();
 
-  return orders.where(ref.watch(orderFilterProvider).matches).toList();
+  return orders
+      .where(
+        (Order order) =>
+            filter.matches(order) && criteria.matches(order, now: now),
+      )
+      .toList();
 });
 
 /// Orders still waiting on the seller, most urgent first.

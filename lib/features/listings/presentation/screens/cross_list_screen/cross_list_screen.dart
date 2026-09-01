@@ -15,6 +15,7 @@ import '../../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/listing.dart';
+import '../../../domain/services/listing_pricing.dart';
 import '../../../providers.dart';
 import '../../controllers/cross_list_controller.dart';
 
@@ -47,6 +48,13 @@ part 'cross_list_screen_marketplaces.dart';
 /// photos — diverges later, when a seller optimises one; asking for four
 /// titles here would make the fast path the slow one (hard rule 2).
 ///
+/// **There is no asking price field above the list** — owner's rule. Every
+/// price on this screen belongs to the marketplace it sits under, so a second
+/// box that priced nothing was one number too many: a seller filled it in and
+/// still had to look down the rows to find out what it had done. The seed it
+/// used to hold survives without it — a newly ticked row starts at the top
+/// price the item is already live at.
+///
 /// **Publish writes drafts, not live listings.** Nothing is integrated yet,
 /// and a row claiming to be live on eBay is a claim the app cannot back up.
 class CrossListScreen extends ConsumerStatefulWidget {
@@ -59,50 +67,23 @@ class CrossListScreen extends ConsumerStatefulWidget {
 }
 
 class _CrossListScreenState extends ConsumerState<CrossListScreen> {
-  final TextEditingController _price = TextEditingController();
-
-  /// The inherited price is written into the box once, when the item first
-  /// arrives. Doing it on every build would overwrite what the seller typed.
-  bool _inherited = false;
-
-  @override
-  void dispose() {
-    _price.dispose();
-    super.dispose();
-  }
-
-  /// Hands the item's live listings to the controller, so their prices are
-  /// editable on their own rows.
+  /// Hands the item's live listings to the controller: each one's price fills
+  /// its own row, and the top of them becomes the seed a newly ticked
+  /// marketplace starts at (§28 — the price inherits).
   ///
-  /// Deferred like the price below, and for the same reason: this runs inside
-  /// a build, and writing a provider there throws.
-  void _seedExisting(List<Listing> listings) {
+  /// Deferred to after the frame: this runs inside a build, and writing to a
+  /// provider there is what Riverpod refuses outright. Both calls ignore a
+  /// value the seller has already typed, so re-running on every emission of
+  /// the stream cannot retype a field for them.
+  void _seed(List<Listing> listings) {
     if (listings.isEmpty) return;
 
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       if (!mounted) return;
 
-      ref.read(crossListControllerProvider.notifier).seedExisting(listings);
-    });
-  }
-
-  void _inheritOnce(Item item) {
-    if (_inherited) return;
-
-    _inherited = true;
-
-    final Money? asking = item.askingPrice;
-
-    if (asking == null) return;
-
-    _price.text = asking.toInputString();
-    // After the frame: the controller is being read by the widget that is
-    // building right now, and writing to it during build is what Riverpod
-    // refuses outright.
-    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      if (!mounted) return;
-
-      ref.read(crossListControllerProvider.notifier).inheritPrice(asking);
+      ref.read(crossListControllerProvider.notifier)
+        ..inheritPrice(ListingPricing.topPrice(listings))
+        ..seedExisting(listings);
     });
   }
 
@@ -143,11 +124,11 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
       );
     }
 
-    _inheritOnce(item);
-    _seedExisting(
-      ref.watch(listingsForItemProvider(widget.itemId)).value ??
-          const <Listing>[],
-    );
+    final List<Listing> live =
+        ref.watch(listingsForItemProvider(widget.itemId)).value ??
+        const <Listing>[];
+
+    _seed(live);
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(
@@ -164,17 +145,6 @@ class _CrossListScreenState extends ConsumerState<CrossListScreen> {
               ),
               children: <Widget>[
                 SizedBox(height: SdContentPaddingV3.topGap),
-                MoneyField(
-                  label: context.l10n.crossListPrice,
-                  controller: _price,
-                  currency: currency,
-                  isRequired: true,
-                  helperText: context.l10n.crossListPriceHelper,
-                  onChanged: (String value) => ref
-                      .read(crossListControllerProvider.notifier)
-                      .setPrice(Money.tryParse(value, currency)),
-                ),
-                SizedBox(height: SdSpacingConstant.h24),
                 _Marketplaces(itemId: item.id, currency: currency),
               ],
             ),

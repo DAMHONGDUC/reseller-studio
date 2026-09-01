@@ -33,6 +33,11 @@ class FirebaseAuthRepository implements AuthRepository {
   /// one thing here a client is not allowed to do for itself.
   final FirebaseFunctions _functions;
 
+  /// What the function answers on a sign-in it considers too old. It picks
+  /// `unauthenticated` over `permission-denied` on purpose — see
+  /// `functions/src/lib/caller.ts`.
+  static const String _staleSessionCode = 'unauthenticated';
+
   @override
   Future<SignInResult> signInWithApple() =>
       FailureMapper.guard('sign in with Apple', () async {
@@ -116,6 +121,11 @@ class FirebaseAuthRepository implements AuthRepository {
   /// `user.delete()`. Doing both would race: the second call arrives with a
   /// uid that no longer exists and fails on a delete that actually worked.
   ///
+  /// **A stale sign-in is re-authenticated rather than reported.** The
+  /// function reads `auth_time` and refuses anything older than a few
+  /// minutes, which is nearly every session — so the provider sheet is
+  /// raised and the call is made once more.
+  ///
   /// The local sign-out afterwards is not decoration. Deleting the user
   /// server-side does not invalidate the token this device is holding, and
   /// `userChanges` has no event to fire — without it the app sits on a
@@ -130,6 +140,7 @@ class FirebaseAuthRepository implements AuthRepository {
         }
 
         final String uid = user.uid;
+        Object? deleted;
 
         SdLogger.action(
           LogTagConstant.deleteAccount,
@@ -137,18 +148,126 @@ class FirebaseAuthRepository implements AuthRepository {
           <String, Object>{'uid': uid},
         );
 
-        final HttpsCallableResult<Object?> result = await _functions
-            .httpsCallable(CallableConstant.deleteAccount)
-            .call<Object?>();
+        try {
+          deleted = await _callDelete();
+        } on FirebaseFunctionsException catch (error) {
+          if (error.code != _staleSessionCode) rethrow;
+
+          if (!await _reauthenticate(user)) return;
+
+          deleted = await _callDelete();
+        }
 
         await _auth.signOut();
 
         SdLogger.action(
           LogTagConstant.deleteAccount,
           'Account deleted',
-          <String, Object?>{'uid': uid, 'result': result.data},
+          <String, Object?>{'uid': uid, 'result': deleted},
         );
       });
+
+  Future<Object?> _callDelete() async {
+    final HttpsCallableResult<Object?> result = await _functions
+        .httpsCallable(CallableConstant.deleteAccount)
+        .call<Object?>();
+
+    return result.data;
+  }
+
+  /// Ask the provider to confirm the seller is still holding the phone.
+  ///
+  /// **The function refuses a sign-in older than a few minutes**, and almost
+  /// every session is: without this the only way to delete an account was to
+  /// sign out, sign back in, and get to Settings inside the window. The sheet
+  /// that appears is the same one they signed in with.
+  ///
+  /// Returns false when they close it — a cancellation is not a failure
+  /// (owner's rule), so the account simply stays.
+  Future<bool> _reauthenticate(User user) async {
+    final AuthProviderKind? provider = _providerOf(user);
+
+    if (provider == null) {
+      // Nothing this app offers signed this session in, so there is no sheet
+      // to raise — the seller signs in again instead.
+      throw const AppFailure(
+        AppFailureKind.unauthenticated,
+        technicalMessage: 'No Apple or Google provider on the current user',
+      );
+    }
+
+    try {
+      switch (provider) {
+        case AuthProviderKind.apple:
+          await user.reauthenticateWithProvider(AppleAuthProvider());
+        case AuthProviderKind.google:
+          await _reauthenticateWithGoogle(user);
+      }
+    } on FirebaseAuthException catch (error) {
+      if (_isCancellation(error.code)) return _reauthCancelled(provider);
+
+      rethrow;
+    } on GoogleSignInException catch (error) {
+      if (error.code == GoogleSignInExceptionCode.canceled) {
+        return _reauthCancelled(provider);
+      }
+
+      rethrow;
+    }
+
+    // The callable is authorized by the token this device holds, so it is
+    // refreshed here rather than left carrying the old `auth_time`.
+    await user.getIdToken(true);
+
+    SdLogger.info(
+      LogTagConstant.deleteAccount,
+      'Re-authenticated before delete',
+      <String, String>{'provider': provider.name},
+    );
+
+    return true;
+  }
+
+  Future<void> _reauthenticateWithGoogle(User user) async {
+    final GoogleSignInAccount account = await GoogleSignIn.instance
+        .authenticate();
+
+    final String? idToken = account.authentication.idToken;
+
+    if (idToken == null) {
+      throw const AppFailure(
+        AppFailureKind.unknown,
+        technicalMessage: 'Google returned no id token',
+      );
+    }
+
+    await user.reauthenticateWithCredential(
+      GoogleAuthProvider.credential(idToken: idToken),
+    );
+  }
+
+  static bool _reauthCancelled(AuthProviderKind provider) {
+    SdLogger.info(
+      LogTagConstant.deleteAccount,
+      'Re-authentication cancelled — account kept',
+      <String, String>{'provider': provider.name},
+    );
+
+    return false;
+  }
+
+  /// Which of the two providers signed this session in, if either.
+  static AuthProviderKind? _providerOf(User user) {
+    final Set<String> ids = user.providerData
+        .map((UserInfo info) => info.providerId)
+        .toSet();
+
+    for (final AuthProviderKind provider in AuthProviderKind.values) {
+      if (ids.contains(provider.firebaseProviderId)) return provider;
+    }
+
+    return null;
+  }
 
   /// Firebase types the user on a credential as nullable even on success.
   static SignInResult _signedIn(

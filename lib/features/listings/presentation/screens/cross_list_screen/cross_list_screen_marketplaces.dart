@@ -12,7 +12,8 @@ part of 'cross_list_screen.dart';
 /// it replaced a separate Review section whose rows opened a sheet to edit one
 /// number. Choosing a platform and pricing it is one decision; splitting it
 /// across two sections meant scrolling to find out what the tick had just
-/// done.
+/// done. The screen's own asking price box went the same way, for the same
+/// reason.
 class _Marketplaces extends ConsumerWidget {
   const _Marketplaces({required this.itemId, required this.currency});
 
@@ -78,8 +79,8 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
     super.dispose();
   }
 
-  /// Ticking seeds the field from the shared price; the controller writes the
-  /// state, so the text is filled in from what the toggle just produced
+  /// Ticking seeds the field from the inherited price; the controller writes
+  /// the state, so the text is filled in from what the toggle just produced
   /// rather than from a second copy of the seeding rule.
   void _toggle() {
     ref.read(crossListControllerProvider.notifier).toggle(widget.marketplace);

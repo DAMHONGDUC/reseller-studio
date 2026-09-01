@@ -305,10 +305,6 @@
   "@workspaceStaleAfter": {
     "description": "Settings row: how long a listing sits before this workspace calls it stale."
   },
-  "workspaceNoneLoaded": "No workspace loaded.",
-  "@workspaceNoneLoaded": {
-    "description": "Shown in Settings when there is no workspace to describe."
-  },
   "businessTypeSoleTrader": "Sole trader",
   "@businessTypeSoleTrader": {
     "description": "Business type option."
@@ -588,10 +584,6 @@
   },
   "settingsAccount": "Account",
   "@settingsAccount": {
-    "description": "Settings section header."
-  },
-  "settingsWorkspace": "Workspace",
-  "@settingsWorkspace": {
     "description": "Settings section header."
   },
   "settingsDeveloper": "Developer",
@@ -1173,7 +1165,7 @@
   "@itemAddSourceFirst": {
     "description": "Says where to go when the source picker is empty."
   },
-  "itemActionList": "List on marketplaces",
+  "itemActionList": "Marketplaces management",
   "@itemActionList": {
     "description": "Opens the sheet that puts an item on a marketplace."
   },
@@ -3052,10 +3044,6 @@
   "@workspaceEditBusiness": {
     "description": "Section header over the editable workspace settings."
   },
-  "workspaceEditNote": "Changing the country changes which tax rules this business files under.",
-  "@workspaceEditNote": {
-    "description": "Warns that the country drives the tax jurisdiction."
-  },
   "workspaceRenameTitle": "Rename this business",
   "@workspaceRenameTitle": {
     "description": "Title of the sheet that renames a workspace."
@@ -3076,10 +3064,6 @@
   "workspaceSaved": "Saved",
   "@workspaceSaved": {
     "description": "Confirmation after changing a workspace setting."
-  },
-  "workspaceReadOnlyNote": "Only an owner or admin can change these.",
-  "@workspaceReadOnlyNote": {
-    "description": "Shown to a member or viewer instead of the editable rows."
   },
   "homeOrdersOverdue": "{count, plural, =1{1 overdue} other{{count} overdue}}",
   "@homeOrdersOverdue": {
@@ -3333,17 +3317,13 @@
   "@notificationSomethingHappened": {
     "description": "Fallback row for a notification type this build does not know."
   },
-  "crossListTitle": "List on marketplaces",
+  "crossListTitle": "Marketplaces management",
   "@crossListTitle": {
     "description": "Title of the cross-listing screen."
   },
   "crossListPrice": "Asking price",
   "@crossListPrice": {
     "description": "The one price every new listing is created at."
-  },
-  "crossListPriceHelper": "What a marketplace starts at when you tick it. Each one keeps its own price below.",
-  "@crossListPriceHelper": {
-    "description": "Explains that the price is shared across the new listings."
   },
   "crossListPriceOwn": "Own price",
   "@crossListPriceOwn": {
@@ -5449,5 +5429,230 @@
   "carrierDeleteBody": "It will be removed from future shipments. Existing orders keep their carrier.",
   "@carrierDeleteBody": {
     "description": "Confirmation message before soft-deleting a carrier."
+  },
+  "filterTitle": "Filters",
+  "@filterTitle": {
+    "description": "Title of the filter sheet, and the label on the chip that opens it. Also the word above the applied-filter count."
+  },
+  "filterAppliedCount": "{count, plural, =1{1 filter applied} other{{count} filters applied}}",
+  "@filterAppliedCount": {
+    "description": "Tells the seller how narrowed the list is. A list missing rows because of a filter looks identical to a list missing rows because of a bug, and this line is the difference.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filterReset": "Reset",
+  "@filterReset": {
+    "description": "Clears every filter at once, the selected tab included."
+  },
+  "filterAny": "Any",
+  "@filterAny": {
+    "description": "The unfiltered option of a three-state group \u2014 with photos, without photos, or any."
+  },
+  "filterAnyTime": "Any time",
+  "@filterAnyTime": {
+    "description": "Date range: not narrowed."
+  },
+  "filterLast7Days": "Last 7 days",
+  "@filterLast7Days": {
+    "description": "Date range preset."
+  },
+  "filterLast30Days": "Last 30 days",
+  "@filterLast30Days": {
+    "description": "Date range preset."
+  },
+  "filterLast90Days": "Last 90 days",
+  "@filterLast90Days": {
+    "description": "Date range preset."
+  },
+  "filterThisYear": "This year",
+  "@filterThisYear": {
+    "description": "Date range preset: the current calendar year."
+  },
+  "filterUnassigned": "Unassigned",
+  "@filterUnassigned": {
+    "description": "Chip for the records that name no category, location or source."
+  },
+  "filterStatus": "Status",
+  "@filterStatus": {
+    "description": "Filter group over the record's status."
+  },
+  "filterCategory": "Category",
+  "@filterCategory": {
+    "description": "Filter group over item categories."
+  },
+  "filterLocation": "Location",
+  "@filterLocation": {
+    "description": "Filter group over storage locations."
+  },
+  "filterSource": "Source",
+  "@filterSource": {
+    "description": "Filter group over where the stock was bought."
+  },
+  "filterPhotos": "Photos",
+  "@filterPhotos": {
+    "description": "Filter group: whether the item carries a photo."
+  },
+  "filterWithPhotos": "With photos",
+  "@filterWithPhotos": {
+    "description": "Items that have at least one photo."
+  },
+  "filterWithoutPhotos": "No photos",
+  "@filterWithoutPhotos": {
+    "description": "Items with no photo at all."
+  },
+  "filterCost": "Cost",
+  "@filterCost": {
+    "description": "Filter group: whether a purchase price was ever entered."
+  },
+  "filterCostRecorded": "Cost recorded",
+  "@filterCostRecorded": {
+    "description": "Items whose purchase price is known."
+  },
+  "filterCostMissing": "No cost",
+  "@filterCostMissing": {
+    "description": "Items with no purchase price \u2014 the rows that make every profit figure read as unknown."
+  },
+  "filterAskingPrice": "Asking price",
+  "@filterAskingPrice": {
+    "description": "Filter group: whether an asking price was ever entered."
+  },
+  "filterPriced": "Priced",
+  "@filterPriced": {
+    "description": "Items that carry an asking price."
+  },
+  "filterNotPriced": "Not priced",
+  "@filterNotPriced": {
+    "description": "Items with no asking price."
+  },
+  "filterListed": "Listed",
+  "@filterListed": {
+    "description": "Filter group: whether the item has ever been live on a marketplace."
+  },
+  "filterEverListed": "Has been listed",
+  "@filterEverListed": {
+    "description": "Items that have gone live somewhere at least once."
+  },
+  "filterNeverListed": "Never listed",
+  "@filterNeverListed": {
+    "description": "Items that have never been put on a marketplace."
+  },
+  "filterAdded": "Added",
+  "@filterAdded": {
+    "description": "Filter group over when the item was created."
+  },
+  "filterAskingRange": "Asking price range",
+  "@filterAskingRange": {
+    "description": "Heading over the two boxes that bound an item's asking price."
+  },
+  "filterSaleRange": "Sale price range",
+  "@filterSaleRange": {
+    "description": "Heading over the two boxes that bound an order's sale price."
+  },
+  "filterRangeMin": "Min",
+  "@filterRangeMin": {
+    "description": "Lower bound of a price range. Empty means unbounded, never zero."
+  },
+  "filterRangeMax": "Max",
+  "@filterRangeMax": {
+    "description": "Upper bound of a price range. Empty means unbounded."
+  },
+  "filterApply": "Apply",
+  "@filterApply": {
+    "description": "Primary button of a filter sheet. It writes what the seller ticked and closes the sheet; nothing is filtered until it is pressed."
+  },
+  "filterMarketplace": "Marketplace",
+  "@filterMarketplace": {
+    "description": "Filter group over which platform the sale happened on."
+  },
+  "filterOrdered": "Ordered",
+  "@filterOrdered": {
+    "description": "Filter group over when the order was placed."
+  },
+  "filterDeadline": "Ship by",
+  "@filterDeadline": {
+    "description": "Filter group over the platform's shipping deadline."
+  },
+  "filterPayout": "Payout",
+  "@filterPayout": {
+    "description": "Filter group: whether the marketplace has paid out."
+  },
+  "filterPayoutReceived": "Paid out",
+  "@filterPayoutReceived": {
+    "description": "Orders whose payout the platform has reported."
+  },
+  "filterPayoutAwaiting": "Awaiting payout",
+  "@filterPayoutAwaiting": {
+    "description": "Orders with no payout recorded yet."
+  },
+  "filterTracking": "Tracking",
+  "@filterTracking": {
+    "description": "Filter group: whether the order carries a tracking number."
+  },
+  "filterWithTracking": "With tracking",
+  "@filterWithTracking": {
+    "description": "Orders that have a tracking number."
+  },
+  "filterWithoutTracking": "No tracking",
+  "@filterWithoutTracking": {
+    "description": "Orders with no tracking number."
+  },
+  "orderFilterOverdue": "Overdue",
+  "@orderFilterOverdue": {
+    "description": "Orders still to ship whose deadline has passed."
+  },
+  "orderFilterNoDeadline": "No deadline",
+  "@orderFilterNoDeadline": {
+    "description": "Orders the platform gave no ship-by date for."
+  },
+  "hueGreen": "Green",
+  "@hueGreen": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueBlue": "Blue",
+  "@hueBlue": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueViolet": "Violet",
+  "@hueViolet": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueIndigo": "Indigo",
+  "@hueIndigo": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueTeal": "Teal",
+  "@hueTeal": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueAmber": "Amber",
+  "@hueAmber": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueRed": "Red",
+  "@hueRed": {
+    "description": "A colour a seller can give a marketplace."
+  },
+  "hueGrey": "Grey",
+  "@hueGrey": {
+    "description": "A colour a seller can give a marketplace. The default."
+  },
+  "marketplaceColorLabel": "Color",
+  "@marketplaceColorLabel": {
+    "description": "Field label for the colour a marketplace is tagged with."
+  },
+  "marketplaceColorHelper": "Tags this marketplace everywhere it is named.",
+  "@marketplaceColorHelper": {
+    "description": "Helper under the marketplace colour picker."
+  },
+  "itemOverview": "Overview",
+  "@itemOverview": {
+    "description": "Item detail section: the title, state and grade."
+  },
+  "orderSectionOrder": "Order",
+  "@orderSectionOrder": {
+    "description": "Order detail section: the sale itself \u2014 price, buyer, date."
   }
 }

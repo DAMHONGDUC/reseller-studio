@@ -30,16 +30,18 @@ void main() {
     expect(localScripts, isEmpty);
   });
 
-  test('release sets up and installs config before it deploys', () {
+  test('release installs config before it deploys, and never sets up', () {
     final String release = File(
       'packages/system_design/tool/release.sh',
     ).readAsStringSync();
-    final int setUp = release.indexOf('sh "\$SCRIPT_DIR/set-up.sh"');
     final int prepareEnv = release.indexOf('sh "\$SCRIPT_DIR/prepare-env.sh"');
     final int deploy = release.indexOf('sh "\$SCRIPT_DIR/deploy-firebase.sh"');
 
-    expect(setUp, greaterThanOrEqualTo(0));
-    expect(prepareEnv, greaterThan(setUp));
+    // A release builds the tree as it stands — owner's rule. A tree that needs
+    // restoring is restored by `melos run set-up` first, on purpose, rather
+    // than paying a cold wipe-and-regenerate on every release.
+    expect(release, isNot(contains('sh "\$SCRIPT_DIR/set-up.sh"')));
+    expect(prepareEnv, greaterThanOrEqualTo(0));
     expect(deploy, greaterThan(prepareEnv));
 
     // `pre-build` is among them: a gate full of this app's bundle ids and

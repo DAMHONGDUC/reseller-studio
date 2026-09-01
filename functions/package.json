@@ -1,6 +1,6 @@
 {
   "name": "seller-os-functions",
-  "description": "Cloud Functions for Reseller Studio — the trusted half of the app.",
+  "description": "Cloud Functions for Reseller Studio \u2014 the trusted half of the app.",
   "main": "lib/index.js",
   "private": true,
   "engines": {
@@ -10,6 +10,8 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "lint": "eslint --ext .ts src",
+    "test": "node --test test/entitlement.test.mjs test/usage.test.mjs test/server_surface.test.mjs",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-rules \"node --test test/firestore_rules.test.mjs\"",
     "serve": "npm run build && firebase emulators:start --only functions,firestore,auth,storage",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"

@@ -17,4 +17,9 @@ final class DatePickerConstant {
   /// current and previous tax year; anything older is a data-entry mistake
   /// rather than a workflow.
   static const int recentEntryYearsBack = 2;
+
+  /// How far ahead a deadline may be set. A ship-by date is the one date in
+  /// the app that belongs in the future, and no marketplace gives a seller
+  /// longer than this to post something.
+  static const int deadlineDaysAhead = 90;
 }

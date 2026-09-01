@@ -5,6 +5,7 @@ import { onCall } from 'firebase-functions/v2/https';
 import { requireFreshUid } from '../lib/caller';
 import { db, paths } from '../lib/firestore';
 import { deleteWorkspaceData } from '../workspace/teardown';
+import { clientFacing } from '../lib/runtime';
 
 /**
  * Delete the caller's account and everything it owns.
@@ -28,7 +29,7 @@ import { deleteWorkspaceData } from '../workspace/teardown';
  * failure halfway through leaves an account that can sign in and retry rather
  * than an orphaned login with no data.
  */
-export const deleteAccount = onCall(async (request) => {
+export const deleteAccount = onCall(clientFacing, async (request) => {
   const uid = requireFreshUid(request);
   const userRef = db().doc(paths.user(uid));
   const userSnap = await userRef.get();

@@ -1,6 +1,12 @@
 part of 'workspace_detail_screen.dart';
 
-/// Ending the business, on the screen that owns every other change to it.
+/// Ending the business, pinned above Save on the screen that owns every other
+/// change to it.
+///
+/// **It is the screen's action, not a row's.** The record this destroys is
+/// what the whole screen edits, so it holds the bottom edge like Save does
+/// (`docs/rules/SCREENS.md`) — it scrolled off the end of the form until the
+/// rule was widened.
 ///
 /// **Only for the business the seller is standing in.** `firestore.rules`
 /// scopes member reads to one workspace at a time (hard rule 11b), so the app
@@ -64,12 +70,17 @@ class _DangerZone extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return SdButtonV3(
-      variant: SdButtonVariantV3.destructive,
-      label: context.l10n.workspaceDelete,
-      icon: AppIconConstant.deleteForever,
-      expand: true,
-      onPressed: () => _confirm(context, ref),
+    // Its own gap: this button is conditional, and a gap owned by the pinned
+    // slot would leave a hole above Save for everyone who cannot delete.
+    return Padding(
+      padding: EdgeInsets.only(bottom: SdSpacingConstant.h12),
+      child: SdButtonV3(
+        variant: SdButtonVariantV3.destructive,
+        label: context.l10n.workspaceDelete,
+        icon: AppIconConstant.deleteForever,
+        expand: true,
+        onPressed: () => _confirm(context, ref),
+      ),
     );
   }
 }

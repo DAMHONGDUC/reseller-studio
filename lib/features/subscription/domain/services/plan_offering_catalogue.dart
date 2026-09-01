@@ -54,9 +54,19 @@ final class PlanOfferingCatalogue {
     return offerings.isEmpty ? null : offerings.first;
   }
 
+  /// The offerings that open with a free trial, in the order given. Every
+  /// one of them has a non-null [PlanOffering.introOffer].
+  static List<PlanOffering> freeTrials(List<PlanOffering> offerings) =>
+      <PlanOffering>[
+        for (final PlanOffering offering in offerings)
+          if (offering.introOffer?.isFree ?? false) offering,
+      ];
+
   /// Whether this option is the one the paywall recommends. Only ever true
   /// alongside another option — a lone product is not a better deal than
   /// anything.
-  static bool isBestValue(PlanOffering offering, List<PlanOffering> offerings) =>
-      offerings.length > 1 && offering.period == recommended;
+  static bool isBestValue(
+    PlanOffering offering,
+    List<PlanOffering> offerings,
+  ) => offerings.length > 1 && offering.period == recommended;
 }

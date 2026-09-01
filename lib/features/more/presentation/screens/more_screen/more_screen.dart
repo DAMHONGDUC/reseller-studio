@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../auth/providers.dart';
+import '../../../../workspace/providers.dart';
 import '../../../more_constant.dart';
 
 part 'more_screen_more_row.dart';
@@ -35,6 +36,7 @@ class MoreScreen extends ConsumerWidget {
     // rows that all bounce back here (owner's rule).
     final List<MoreSection> sections = MoreConstant.sectionsFor(
       signedIn: signedIn,
+      workspaceId: ref.watch(currentWorkspaceIdProvider),
     );
 
     return SdScaffoldV3(

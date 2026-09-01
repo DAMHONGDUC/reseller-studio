@@ -6,6 +6,7 @@ import '../../../../../core/config/app_env.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/utils/text_measure_utils.dart';
 import '../../../domain/entities/plan_intro_offer.dart';
 import '../../../domain/entities/plan_offering.dart';
 import '../../../domain/entities/subscription_status.dart';
@@ -21,6 +22,7 @@ part 'paywall_screen_benefits.dart';
 part 'paywall_screen_offerings.dart';
 part 'paywall_screen_plan_options.dart';
 part 'paywall_screen_disclosure.dart';
+part 'paywall_screen_purchase_action.dart';
 part 'paywall_screen_footer.dart';
 
 /// The only surface that sells Premium.
@@ -80,6 +82,9 @@ class PaywallScreen extends ConsumerWidget {
                 ),
           ),
         ),
+        // Out of the scroll, so the one thing the seller came to tap is where
+        // it was when they arrived — however long the benefits list runs.
+        const _PaywallPurchaseAction(),
         SizedBox(height: SdSpacingConstant.h8),
         const _PaywallFooter(),
       ],

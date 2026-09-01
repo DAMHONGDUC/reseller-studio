@@ -262,14 +262,6 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     routes: <RouteBase>[
                       GoRoute(
                         parentNavigatorKey: AppNavigatorKey.root,
-                        path: 'edit',
-                        builder: (BuildContext context, GoRouterState state) =>
-                            ItemFormScreen(
-                              itemId: state.pathParameters['itemId'],
-                            ),
-                      ),
-                      GoRoute(
-                        parentNavigatorKey: AppNavigatorKey.root,
                         path: 'cross-list',
                         builder: (BuildContext context, GoRouterState state) =>
                             CrossListScreen(

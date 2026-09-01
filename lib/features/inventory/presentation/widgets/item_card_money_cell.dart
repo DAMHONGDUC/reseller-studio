@@ -12,6 +12,13 @@ part of 'item_card.dart';
 /// glyph holds the card's right edge, in the same column as the chevron every
 /// other card ends with; centred in a square target it sat 12 points short.
 ///
+/// **It lays out at its own height and overhangs for its target** — owner's
+/// rule, the same one `AppRowIconButton` follows
+/// (`docs/rules/DESIGN_SYSTEM.md`). A 44pt box in the layout made the band
+/// taller than the two lines it holds and left the dead space under the
+/// arrow, while the two cells beside it stopped at their text; the ink
+/// spreads over the card's own inset instead, which nothing else is using.
+///
 /// **The amount is a size louder than its label** — owner's rule. The figures
 /// are what the row exists to show, and a label at the same weight makes the
 /// seller hunt for the number among the words introducing it.
@@ -57,17 +64,14 @@ class _MoneyCell extends StatelessWidget {
       message: tooltip!,
       child: InkResponse(
         onTap: handleTap,
+        // The ink reaches the 44pt target the layout no longer reserves, and
+        // only the label's width — a square would centre the pair and pull
+        // the glyph off the card's edge.
         radius: AppRowIconButton.target / 2,
         containedInkWell: true,
         highlightShape: BoxShape.circle,
         customBorder: const CircleBorder(),
-        // Tall enough to reach the 44pt target, and only as wide as the label
-        // above the glyph — a square would centre the pair and pull the glyph
-        // off the card's edge.
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: AppRowIconButton.target),
-          child: cell,
-        ),
+        child: cell,
       ),
     );
   }

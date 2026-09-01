@@ -21,7 +21,6 @@ class Item {
     required this.createdAt,
     this.updatedAt,
     this.purchasePrice,
-    this.askingPrice,
     this.minimumPrice,
     this.purchaseId,
     this.sourceId,
@@ -60,9 +59,6 @@ class Item {
   /// `Money`'s class doc and hard rule 5.
   final Money? purchasePrice;
 
-  /// What it is listed at, or what the seller intends to list at.
-  final Money? askingPrice;
-
   /// The floor for offers and bulk repricing. A seller who sets this can
   /// accept offers automatically without watching them.
   final Money? minimumPrice;
@@ -94,22 +90,6 @@ class Item {
   final DateTime? deletedAt;
 
   bool get isDeleted => deletedAt != null;
-
-  /// Expected profit if it sells at [askingPrice], or null when either the
-  /// cost or the asking price is unknown.
-  ///
-  /// **Ignores fees and shipping on purpose** — those depend on which
-  /// marketplace it sells on, which is not known until it sells. This is the
-  /// rough number for an inventory row; `ProfitBreakdown` is the real one for
-  /// a completed order.
-  Money? get expectedProfit {
-    final Money? cost = purchasePrice;
-    final Money? asking = askingPrice;
-
-    if (cost == null || asking == null) return null;
-
-    return asking - cost;
-  }
 
   /// How many are still on the shelf.
   ///
@@ -150,17 +130,19 @@ class Item {
   }
 
   /// **A null argument means "leave it alone", never "clear it"** — which is
-  /// why undoing a sale needs [clearSoldAt]. It is the one field the app ever
-  /// has to unset: an item back on the shelf still carrying a sold date reads
-  /// as sold in an export, and there is no other way to say so through a
-  /// copy.
+  /// why unsetting a field needs its own flag.
+  ///
+  /// [clearSoldAt] was the first: an item back on the shelf still carrying a
+  /// sold date reads as sold in an export. The rest arrived with the detail
+  /// screen's editable sections, where emptying a box *is* the seller
+  /// removing the value — a meaning a bare null cannot carry.
   Item copyWith({
     String? title,
     int? quantity,
     ItemStatus? status,
     Money? purchasePrice,
-    Money? askingPrice,
     Money? minimumPrice,
+    String? sourceId,
     String? categoryId,
     String? locationId,
     String? sku,
@@ -169,11 +151,17 @@ class Item {
     String? description,
     String? notes,
     List<String>? photoUrls,
+    DateTime? purchaseDate,
     DateTime? listedAt,
     DateTime? soldAt,
     DateTime? deletedAt,
     DateTime? updatedAt,
     bool clearSoldAt = false,
+    bool clearPurchasePrice = false,
+    bool clearMinimumPrice = false,
+    bool clearBarcode = false,
+    bool clearDescription = false,
+    bool clearNotes = false,
   }) => Item(
     id: id,
     title: title ?? this.title,
@@ -181,20 +169,21 @@ class Item {
     status: status ?? this.status,
     createdAt: createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
-    purchasePrice: purchasePrice ?? this.purchasePrice,
-    askingPrice: askingPrice ?? this.askingPrice,
-    minimumPrice: minimumPrice ?? this.minimumPrice,
+    purchasePrice: clearPurchasePrice
+        ? null
+        : purchasePrice ?? this.purchasePrice,
+    minimumPrice: clearMinimumPrice ? null : minimumPrice ?? this.minimumPrice,
     purchaseId: purchaseId,
-    sourceId: sourceId,
+    sourceId: sourceId ?? this.sourceId,
     categoryId: categoryId ?? this.categoryId,
     locationId: locationId ?? this.locationId,
     sku: sku ?? this.sku,
-    barcode: barcode ?? this.barcode,
+    barcode: clearBarcode ? null : barcode ?? this.barcode,
     condition: condition ?? this.condition,
-    description: description ?? this.description,
-    notes: notes ?? this.notes,
+    description: clearDescription ? null : description ?? this.description,
+    notes: clearNotes ? null : notes ?? this.notes,
     photoUrls: photoUrls ?? this.photoUrls,
-    purchaseDate: purchaseDate,
+    purchaseDate: purchaseDate ?? this.purchaseDate,
     listedAt: listedAt ?? this.listedAt,
     soldAt: clearSoldAt ? null : soldAt ?? this.soldAt,
     deletedAt: deletedAt ?? this.deletedAt,

@@ -79,19 +79,23 @@ several. They are now one row, `itemActionList`, opening `CrossListScreen`.
 ## Every marketplace may carry its own price
 
 Owner's rule. `Listing.price` was always per-listing; what was missing was a
-way to set it. The cross-list screen now collects **a shared price plus the
-exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
+way to set it. The cross-list screen collects **one price per marketplace**,
+and `crossList` takes a `Map<Marketplace, Money>`.
 
 - **The price field sits under the marketplace it belongs to** — owner's rule.
   Choosing a platform and pricing it is one decision, and it replaced a
   separate Review section whose rows opened a sheet to edit one number: the
   seller ticked something and had to scroll to find out what that had done.
   The fee and what is left ride under the field as its helper.
-- **Ticking seeds that row from the shared price**, so the common case — one
-  number everywhere — is still no typing at all. The shared field is the seed,
-  not the answer: changing it afterwards does not reach back into rows already
-  on screen, because a number moving in a field nobody is watching is worse
-  than retyping one.
+- **There is no asking price box above the list** — owner's rule. Every price
+  on the screen belongs to the marketplace it sits under, so a box that priced
+  nothing was one number too many: a seller filled it in and still had to read
+  down the rows to find out what it had done.
+- **Ticking seeds that row from what the item is already live at**, so the
+  common case — one number everywhere — is still no typing at all. The seed is
+  taken once, from the top live price (`ListingPricing.topPrice`), and never
+  reaches back into a row already on screen: a number moving in a field nobody
+  is watching is worse than retyping one.
 - **A marketplace the item is already on is ticked, and its price is
   editable** — owner's rule. An empty circle beside a platform the item is
   live on is simply wrong; the circle cannot be unticked, because a second
@@ -105,33 +109,69 @@ exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
   at a number the seller had just deleted.
 - **Unticking a platform drops its price.** A hidden number that came back on
   the next tick is one nobody chose that time.
-- **The item's `askingPrice` takes the shared price, never a platform's.**
-  What the item is worth is not whichever marketplace happened to be cheapest,
-  so `crossList` takes it as a separate argument and leaves the item alone
-  when it is null.
-- `test/features/listings/cross_list_test.dart` holds all six.
+- **The seed seeds the rows and is written nowhere else.** It used to also
+  become the item's own `askingPrice`; the item has no price of its own any
+  more (see below), so `crossList` writes listings and nothing but.
+- `test/features/listings/cross_list_test.dart` holds them.
 
-## Two places price a marketplace, and they answer different questions
+## One screen prices a marketplace, and the detail screen links to it
 
-Owner's rule, and it is deliberate rather than a duplication left standing.
+Owner's rule, and it **reverses the inline reprice** the detail screen used to
+do. Marketplaces management prices every platform an item is on and is the only
+screen that can add another; a second set of boxes on the detail screen was the
+same number written two ways, and the half a seller reached first could not do
+the thing they usually came for.
 
-- **The item form edits the prices of listings that already exist**, inline —
-  cost, asking price and minimum are on that screen already, and the number a
-  buyer actually sees is the one a seller most often came to change. It never
-  creates a listing, and renders nothing when the item is on no marketplace.
-  The edits ride on `ItemFormState.listingPrices`, keyed by listing id, and
-  are written by the form's own Save — so changing a title and a price is one
-  button.
-- **The List screen adds marketplaces**, and prices both the new ones and the
-  live ones. It is where "put this somewhere new" is answered.
-- **Neither writes through the other.** The form's `_saveListingPrices` reads
-  the listings fresh and moves only the price; `crossList` batches new
-  listings and repriced ones together. A shared write path would have to know
-  which screen called it, which is the coupling the split avoids.
-- **`askingPrice` is the item's own number and stays that** — what the seller
-  wants for the thing, shown on its card. A marketplace price never writes
-  back to it, and a reprice on its own does not re-stamp `listedAt`, which
-  would reset the staleness clock.
+- **Item detail's Listings section reports and links.** It lists what each
+  marketplace asks, and its Edit pushes `AppRoutes.crossList` — the section
+  keeps its header and its Edit, and hands the whole question over
+  (`docs/rules/SCREENS.md`).
+- **An item on no marketplace gets no Edit**, only the line saying so: there is
+  no price to move, and the way onto a first platform is the actions sheet,
+  which names it.
+- **`ItemDetailSection` has no `listings` value, and the controller has no
+  listing write.** The link is the whole feature; a save path left standing
+  beside it is the second writer this rule exists to remove.
+- **A reprice does not re-stamp `listedAt`**, which would reset the staleness
+  clock: moving a price is not putting the item on sale again.
+- `test/features/inventory/item_detail_sections_test.dart` pins where Edit
+  goes and that the section opens no field of its own.
+
+## An item has no price of its own; every price belongs to a marketplace
+
+Owner's rule, and it **deletes `Item.askingPrice`** — the field, not just its
+place on a screen. It departs from the plan's item field list on purpose: the
+plan wrote the field before cross-listing existed, and once the same jacket is
+live at three numbers, "the price" is a question only a marketplace can
+answer.
+
+- **A price that may be true nowhere is worse than no price.** One figure on
+  the item was the number a seller typed once and then never reconciled with
+  what eBay, Depop and Poshmark were actually showing. Every screen that read
+  it was reporting a guess with the confidence of a fact.
+- **`Listing.price` is the only price of a thing for sale.** `purchasePrice`
+  is what the seller paid and stays; `minimumPrice` is the floor for offers
+  and stays; there is nothing in between.
+- **What died with the field, and none of it is coming back behind another
+  name:**
+  - `Item.expectedProfit` — a derivation with no numerator left.
+  - `ItemFilterCriteria`'s asking-price presence and range filters. An item
+    does not carry its listings, so the filter cannot be repointed at them
+    without loading every listing to answer one predicate.
+  - `ItemTransition`'s `missingPrice` block. Nothing about an item is missing
+    a price any more; the cross-list screen is where a price is entered and it
+    refuses to publish a row without one.
+  - The Offers screen's "% off the asking price". An offer is made on a
+    marketplace, so the number it should be compared against is that
+    marketplace's listing — read at the screen, where the listings are.
+  - The asking column in the Reports export.
+- **Where a screen still needs a price to seed a field, it reads the
+  listings.** Mark as sold and Record sale seed from the item's live listings
+  rather than from a field on the item, because that is where the number a
+  buyer was shown actually lives.
+- **`ItemDto` stops reading and writing `askingPriceMinor`.** A document
+  written before this keeps the key; nothing rewrites it and no migration
+  runs, exactly as with the retired statuses.
 
 ## The inventory row is two zones, and every figure has a place
 
@@ -139,9 +179,9 @@ Owner's rule — the row must be **good-looking, sensible and complete**, in
 that order of argument and none of them at the cost of the others. `ItemCard`
 answers it with a split, ruled off by a hairline:
 
-- **Above: what the item is.** Photo, title, then two lines of compact display
-  badges — state and grade on the first, the marketplaces on the second — all
-  in one column beside the photo, sharing one left edge.
+- **Above: what the item is.** Photo, title, then one line of compact display
+  badges — state, grade and the marketplaces together, wrapping when the words
+  are long — all in one column beside the photo, sharing one left edge.
 - **Below: what it is worth.** A band across the card's full width — how many
   are left and what they cost, each a label with its figure under it, then an
   arrow into the marketplace prices.
@@ -175,10 +215,10 @@ which is what lets the amounts be compared at a glance.
     rather than its middle. `test/features/inventory/item_card_figures_test.dart`
     pins both, and pins that Cost does not move between two cards whose
     amounts differ.
-- **The asking price is not on the row** — owner's rule. What the item is
+- **No price is on the row but the cost** — owner's rule. What the item is
   asked for is a per-marketplace number, so one figure on the card is a price
-  that may be true nowhere; the row points at the screen that lists them all
-  instead of printing the item's own.
+  that may be true nowhere; the row points at the screen that lists them all.
+  It is the same argument the item's own asking price lost (see below).
 - **The band ends in an arrow into `AppRoutes.crossList`** — owner's rule, and
   it is what replaced that figure. That screen is where every marketplace's
   price is, so the row answers "what is it going for?" by opening the place
@@ -212,14 +252,26 @@ which is what lets the amounts be compared at a glance.
 - **`SdDividerV3` between the zones**, not a gap alone: it makes the band
   deliberate rather than a block that happens to start further left than
   everything above it.
+- **The hairline runs edge to edge, and carries no gap of its own** — owner's
+  rule. A rule that stops at the content inset reads as a line drawn under one
+  zone; one that crosses the card is the seam between two. So the card holds
+  `EdgeInsets.zero` and each zone carries `SdContentPaddingV3.card`, the way
+  `AppListCard` already does it — the air around the hairline is the two
+  zones' padding (`ItemCardMetricConstant.bandGap`), never the divider's.
+- **A cell that opens something lays out at its own height** — owner's rule.
+  Reserving the 44pt target in the layout made the band taller than the two
+  lines it holds and left dead space under the arrow while the cells beside it
+  stopped at their text; the ink overhangs the card's inset instead, which is
+  what every other end glyph in the app already does
+  (`docs/rules/DESIGN_SYSTEM.md`).
 - **The cost renders `—` when unknown** (hard rule 5), never `0`: an item
   added through Quick Add has none, and a zero would tell the seller it was
   free.
-- **Expected profit is not on the row** — owner's rule. `Item.expectedProfit`
-  is derived from an asking price nobody has been offered yet and ignores fees
-  and shipping, so on a list it took a cell the width of a real figure to say
-  something rougher than either number beside it. The detail screen still
-  shows it, and `ProfitBreakdown` on a completed order is the real one.
+- **Expected profit is nowhere at all.** It was derived from the item's asking
+  price, and that price is gone — a figure built on a number nobody has been
+  offered, ignoring fees and shipping, computed from a field that no longer
+  exists. `ProfitBreakdown` on a completed order is the real one and always
+  was.
 
 ## The row carries the grade, and the date it last changed
 
@@ -228,11 +280,19 @@ Owner's rule.
 - **The condition sits with the state badges.** It is what a buyer reads first
   on every marketplace, and on a list it explains a price a seller would
   otherwise have to open the item to justify.
-- **`Updated <date>` is the card's last line, and its quietest.** It answers
-  "did my edit save?" and "which of these did I touch this morning?" — a
-  different question from every figure above it, and one that deserves none of
-  their weight. It is absent when nothing has ever updated the record, rather
-  than dressing the creation date up as an edit.
+- **`Updated <date>` sits with the title and the tags, never in the money
+  band** — owner's rule, and it **replaces "the card's last line"**. It
+  answers "did my edit save?" and "which of these did I touch this morning?",
+  which is a fact about the *record* rather than about what the item is worth;
+  hung under Qty and Cost with no separation it read as a fourth row of that
+  grid, so a date sat in a block of figures.
+  - It closes the identity column, under the tag lines, in the same left edge
+    as the title — the quietest thing in the zone that says what this row is.
+  - **The money band is Qty, Cost and the arrow, and nothing else.** Three
+    cells sharing one baseline is what that grid was designed as, and anything
+    appended to it is a fourth cell the layout never accounted for.
+  - It is absent when nothing has ever updated the record, rather than
+    dressing the creation date up as an edit.
 - **Both dates are read-only, and the full pair lives in the detail screen** —
   `Added` and `Last updated`, in the provenance block. No form offers either:
   a date the seller can type is not a record of anything. See
@@ -256,18 +316,30 @@ is live on** — no names and no amounts.
 - **One compact count replaces the wrapped badge list.** The list made a card
   grow with every marketplace and slowed scanning; the detail screen keeps the
   full names for the seller who needs them.
-- **The tags are two lines, and the split is by question** — owner's rule.
-  Line one is what the item *is*: its status, its Stale marker and its grade.
-  Line two is where it *stands on the marketplaces*: the count, or that
-  nothing carries it. One `Wrap` let a long grade push the market count onto a
-  line of its own at some widths and not others, so the row's shape depended
-  on the words in it.
-- **Stale rides on line one.** It is a fact about the item's state, not about
-  its distribution — the clock says it has not moved, which is not the same
-  claim as where it is listed.
-- **Line two is absent, not empty, when there is nothing to say.** A sold or
-  archived item shows no marketplace tag at all, so the card loses the line
-  rather than keeping a gap where one used to be.
+- **The tags are one wrapping line, and the marketplace count is the last of
+  them** — owner's rule, and it **reverses "the tags are two lines, and the
+  split is by question"**. Status, Stale, grade and the marketplace count sit
+  in one `Wrap`, in that reading order.
+  - **The old rule's cost was measured and the old rule lost.** Splitting by
+    question bought a guaranteed shape and charged a whole badge line for it —
+    a fixed cost on every card in the list, paid so that a *sometimes*
+    two-line first line could not happen. The row's job now is to get smaller,
+    and a line reserved for one badge is the largest thing on the card that
+    holds no fact of its own.
+  - **What the old rule bought is genuinely lost**: a long grade can push the
+    count onto a run of its own at some widths and not others, so the card's
+    height again depends on the words in it. That is accepted, not overlooked
+    — the wrap costs a run only when the words are long, where the split cost
+    a line always.
+  - **The reading order carries the split the layout no longer does.** What
+    the item *is* comes first and where it *stands* comes last, so the eye
+    still meets them in that order whether or not they share a run.
+- **The run gap is the tightest on the card** (`tagRunGap`). A wrapped run is
+  still the same line of tags, so it must not open a gap that reads as the
+  separation the two lines used to be.
+- **The marketplace tag is absent, not empty, when there is nothing to say.**
+  A sold or archived item shows no marketplace tag at all, so the wrap simply
+  holds one badge fewer.
 - **An item on no marketplace says so, in red** — owner's rule. Nothing at all
   read as "no platforms worth naming" when the truth was stock earning
   nothing, which is the one thing on this row a seller can fix today. Only an
@@ -290,6 +362,7 @@ is live on** — no names and no amounts.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds all three:
   the distinct count is on the row, no marketplace name or listing price is,
   and an unlisted item on the shelf shows the red tag.
+  It also holds that the four badges share one `Wrap` rather than two.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
 
@@ -419,12 +492,51 @@ Owner's rule, after a sold item was given a quantity of 10 and stayed sold.
 ## The actions that would be refused are shown, not hidden
 
 A move the item cannot make yet still appears in the sheet, and tapping it
-says which field is missing (`ItemBlockPresenter`). Hiding "List" from an item
-with no price teaches nothing; "Add an asking price to list this" teaches the
-rule and points at the fix.
+says which field is missing (`ItemBlockPresenter`). Hiding "Mark as sold" from
+an item with nothing on the shelf teaches nothing; "There is none left to
+sell" teaches the rule and points at the fix.
 
 ## The item form seeds through `FormSeed`
 
 The record arrives on a stream, so the form learns it exists inside a `build` —
 and writing the form's controller from there throws. See
 `docs/rules/SCREENS.md`, which carries the rule and the reason.
+
+## The row carries enough; what it must do is stay short without crowding
+
+Owner's rule. The information on the inventory card is settled — every figure
+above has a rule of its own and none of them leaves. What was wrong was the
+height: a card that answers four questions in the space of a phone screen and
+a half means a seller scrolls to compare two items that should have been
+visible together.
+
+- **Nothing is removed to make room.** Compaction is spacing, glyph and
+  thumbnail size — never a fact. A denser card that dropped the cost would be
+  a different card, not a smaller one.
+- **`ItemCardMetricConstant` owns every gap and size the card is tuned by**,
+  so a pass changes numbers in one class instead of hunting `SizedBox`es
+  through six part files.
+- **The compaction pass went one step too far, and the gaps came back** —
+  owner's rule. Title to tags, badge to badge and the column's own steps were
+  tight enough that the row read as one block of text; they are the three that
+  reopened. **Height is bought from the gaps that carry nothing, never from
+  the ones that separate two different things.**
+- **The two zones and the money band stay exactly as they are.** Every rule
+  above about what sits where survives both passes; only the air between them
+  moves.
+
+## The item form creates; the detail screen edits
+
+Owner's rule, and it retires `AppRoutes.editItem`. `ItemFormScreen` is now
+reached only to add an item, and changing an existing one happens in the
+detail screen's own sections — see the in-place editing rule in
+`docs/rules/SCREENS.md`, which is where the shape of that lives.
+
+- **Overview, Pricing, Provenance, Description and Notes each open on their
+  own.** Description and Notes are drawn even when empty now, because a
+  section that is hidden until it has content is one a seller cannot use to
+  add content.
+- **Status is not one of them.** Listing, selling and archiving move quantity
+  between the four statuses and write an order or a listing with it — the
+  actions sheet owns every one of those, and a status field writing the value
+  by itself would skip the write that makes it true.

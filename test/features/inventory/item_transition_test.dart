@@ -19,7 +19,6 @@ void main() {
     quantity: quantity,
     status: status,
     createdAt: now,
-    askingPrice: askingPrice,
     listedAt: listedAt,
     soldAt: soldAt,
   );
@@ -30,21 +29,23 @@ void main() {
 
       // Hard rule 2: no price, no photo, no category, no source.
       expect(created.purchasePrice, isNull);
-      expect(created.askingPrice, isNull);
+      expect(created.minimumPrice, isNull);
       expect(created.photoUrls, isEmpty);
       expect(created.status, ItemStatus.draft);
     });
   });
 
-  group('selling needs a sale price', () {
-    test('is blocked when no asking price was entered', () {
+  group('selling checks the shelf, not a price', () {
+    test('an item on the shelf may be sold — the item carries no price', () {
+      // Owner's rule: the item has no price of its own any more, so there is
+      // nothing about it that can be missing one. What is asked for a sale is
+      // typed into the sheet that records it.
       final ItemTransitionCheck result = ItemTransition.check(
         item(),
         ItemStatus.sold,
       );
 
-      expect(result.isAllowed, isFalse);
-      expect(result.blocks, contains(ItemTransitionBlock.missingSalePrice));
+      expect(result.isAllowed, isTrue);
     });
 
     test('is allowed once a price is set', () {
@@ -67,7 +68,6 @@ void main() {
         containsAll(<ItemTransitionBlock>[
           ItemTransitionBlock.noQuantity,
           ItemTransitionBlock.wrongStatus,
-          ItemTransitionBlock.missingSalePrice,
         ]),
       );
     });
@@ -93,11 +93,7 @@ void main() {
         'from the original listing', () {
       final DateTime firstListing = DateTime(2026, 1, 1);
       final Item relisted = ItemTransition.apply(
-        item(
-          status: ItemStatus.inStock,
-          askingPrice: const Money(4500, 'USD'),
-          listedAt: firstListing,
-        ),
+        item(status: ItemStatus.inStock, listedAt: firstListing),
         ItemStatus.inStock,
         now: now,
       );
@@ -119,7 +115,6 @@ void main() {
     test('selling one of several leaves the rest where they were', () {
       final Item listed = item(
         status: ItemStatus.inStock,
-        askingPrice: const Money(4500, 'USD'),
         quantity: 3,
         listedAt: now,
       );
@@ -135,11 +130,7 @@ void main() {
     });
 
     test('the sale that empties the shelf is the one that sells the row', () {
-      final Item listed = item(
-        status: ItemStatus.inStock,
-        askingPrice: const Money(4500, 'USD'),
-        listedAt: now,
-      );
+      final Item listed = item(status: ItemStatus.inStock, listedAt: now);
 
       final Item afterSale = ItemTransition.sell(listed, now: now);
 
@@ -150,11 +141,7 @@ void main() {
     });
 
     test('an empty shelf cannot be sold from', () {
-      final Item soldOut = item(
-        status: ItemStatus.sold,
-        askingPrice: const Money(4500, 'USD'),
-        quantity: 0,
-      );
+      final Item soldOut = item(status: ItemStatus.sold, quantity: 0);
 
       expect(() => ItemTransition.sell(soldOut, now: now), throwsStateError);
     });

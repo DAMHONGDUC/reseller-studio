@@ -29,11 +29,33 @@ about how the backend is written.
   self-edit is a promotion to owner.
 - **The audit log is append-only and written only by Cloud Functions** — hard
   rule 12.
+- **A rule can read one document; it cannot count a collection.** Anything
+  enforced against a total — the Free item and order ceilings, the seat limit —
+  is decided by a Cloud Function and written into a document the rule reads.
+  `workspaces/{id}/usage/current` is that document for the ceilings, and it is
+  `allow write: if false` for exactly the reason the subscription document is.
+  - **No ceiling is written in `firestore.rules`.** The numbers have one owner
+    in `PlanLimits.byPlan` and one deliberate mirror in
+    `functions/src/lib/firestore.ts`; the function writes a *verdict* and the
+    rule reads a boolean, so a third copy never exists to go stale.
+  - **The rules ceiling is not the product ceiling.** `ceilingGrace` puts the
+    rule above the client gate on purpose: the count is recounted by a trigger
+    and lags a write, so enforcing to the exact number would refuse a seller an
+    action their own app had just allowed. The gate is the ceiling on use; the
+    rule is the ceiling on abuse.
 - **Rules tests read `firestore.rules` itself, never a copy.** A copy would let
   the two drift, which is the one way a rules test fails: passing while
   production is open. The standalone `test-rules` command and its CI step are
   deliberately absent by owner's rule, and nothing gates a release on them —
-  the rules ship on the strength of the deploy.
+  the rules ship on the strength of the deploy. `npm --prefix functions run
+  test:rules` is how they are run by hand; it is deliberately **not** the
+  `test` script, because it needs the Firestore emulator and `test` is what a
+  deploy runs.
+- **`npm test` in `functions/` gates every deploy of the functions**, and it
+  holds only what runs on plain node against the compiled `lib/`. That is where
+  a check belongs when its failure mode is invisible until a seller taps a
+  button — a callable with no region, a name the app calls that nothing
+  exports. Both were real, and both shipped once.
 
 ## Queries
 
@@ -78,6 +100,28 @@ about how the backend is written.
 
 ## Cloud Functions
 
+- **Every function a client dials by name pins its region**, and it is
+  **the region the Firestore database is in** — owner's rule. `onCall` and
+  `onRequest` take `clientFacing` from `functions/src/lib/runtime.ts`.
+  - **Pinned rather than left to the default**, even while the two agree: a
+    default is not an agreement between two sides of a wire. When they
+    disagreed the failure was a `not-found` at the moment a seller tapped the
+    button — nothing failed at build, at deploy, or at startup, and account
+    deletion is a store requirement.
+  - **The database's region, not the seller's or the developer's.** The
+    triggers and the scheduler already sit where the database is, so a
+    callable anywhere else buys every read and write inside one a round trip
+    between continents.
+  - **Moving it deletes and recreates every function**, because region is part
+    of a function's identity — the deploy stops and names them rather than
+    doing it, which is right. Changing it means changing `FUNCTIONS_REGION` in
+    every flavour file under `env_assets/` as well.
+  - `test/server_surface.test.mjs` fails if a new callable forgets the pin, if
+    the region stops matching `FUNCTIONS_REGION` in `env/env.example.json`, or
+    if a name in `CallableConstant` has no function behind it.
+  - **Triggers and the scheduler deliberately do not take it.** A Firestore
+    trigger has to sit in a region its database allows — Firebase's to pick,
+    not ours to guess — and nobody addresses one by region anyway.
 - **Functions are idempotent.** They are retried — by the platform, by a client
   that lost its answer, by a redeploy. A function that is only correct the
   first time is a function that double-charges.

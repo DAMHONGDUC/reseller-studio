@@ -75,20 +75,39 @@ class MetricRow extends StatelessWidget {
 
 /// A titled card of [MetricRow]s.
 class MetricCard extends StatelessWidget {
-  const MetricCard({required this.title, required this.rows, super.key});
+  const MetricCard({
+    required this.title,
+    required this.rows,
+    this.leading,
+    super.key,
+  });
 
   final String title;
   final List<Widget> rows;
+
+  /// A mark in front of the title — the colour of the marketplace this card
+  /// is about. A widget, so this class never learns what the mark means.
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      Text(
-        title,
-        style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-          color: context.sdTheme3.textPrimary,
-        ),
+      Row(
+        children: <Widget>[
+          if (leading != null) ...<Widget>[
+            leading!,
+            SizedBox(width: SdSpacingConstant.w8),
+          ],
+          Expanded(
+            child: Text(
+              title,
+              style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+                color: context.sdTheme3.textPrimary,
+              ),
+            ),
+          ),
+        ],
       ),
       SizedBox(height: SdSpacingConstant.h8),
       SdCardV3(child: Column(children: rows)),

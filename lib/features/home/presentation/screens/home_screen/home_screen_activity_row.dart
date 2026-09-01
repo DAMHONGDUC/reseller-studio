@@ -33,9 +33,19 @@ class _ActivityRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  order.marketplaceName,
-                  style: context.textTheme3.bodySmall!.muted3(context),
+                Row(
+                  children: <Widget>[
+                    AppMarketplaceDot(marketplaceId: order.marketplaceId),
+                    SizedBox(width: SdSpacingConstant.w6),
+                    Expanded(
+                      child: Text(
+                        order.marketplaceName,
+                        style: context.textTheme3.bodySmall!.muted3(context),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

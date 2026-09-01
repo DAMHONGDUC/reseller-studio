@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
+import '../../../../../core/widgets/app_editable_section.dart';
 import '../../../../../core/widgets/app_photo.dart';
+import '../../../../../core/widgets/money_field.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../../listings/providers.dart';
 import '../../../../sourcing/providers.dart';
+import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/enums/item_status.dart';
 import '../../../providers.dart';
+import '../../controllers/item_detail_edit_controller.dart';
 import '../../widgets/item_actions_sheet.dart';
+import '../../widgets/item_field.dart';
 
 part 'item_detail_screen_detail_row.dart';
 part 'item_detail_screen_item_body.dart';

@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../domain/entities/subscription_status.dart';
 import '../../../domain/enums/seller_plan.dart';
 import '../../../providers.dart';
@@ -36,33 +37,42 @@ class SubscriptionScreen extends ConsumerWidget {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.moreSubscription),
-      body: ListView(
-        padding: SdContentPaddingV3.screen(context),
+      body: Column(
         children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          _CurrentPlanCard(plan: plan, status: status),
-          if (!plan.isPaid) ...<Widget>[
-            SizedBox(height: SdContentPaddingV3.sectionGap),
-            SdButtonV3(
-              variant: SdButtonVariantV3.primary,
-              label: context.l10n.subscriptionViewPremiumPlans,
-              expand: true,
-              onPressed: () => context.push(AppRoutes.paywall),
-            ),
-          ],
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          if (status != null && status.source != SubscriptionSource.none)
-            AppListCard(
+          Expanded(
+            child: ListView(
+              // No bottom inset when the action is pinned: it owns that edge.
+              padding: plan.isPaid
+                  ? SdContentPaddingV3.screen(context)
+                  : EdgeInsets.symmetric(
+                      horizontal: SdContentPaddingV3.horizontal,
+                    ),
               children: <Widget>[
-                AppListRow(
-                  title: context.l10n.subscriptionManageBilling,
-                  subtitle: _billingHome(status.source),
-                  icon: AppIconConstant.creditCard,
-                  showChevron: false,
-                ),
+                SizedBox(height: SdContentPaddingV3.topGap),
+                _CurrentPlanCard(plan: plan, status: status),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                if (status != null && status.source != SubscriptionSource.none)
+                  AppListCard(
+                    children: <Widget>[
+                      AppListRow(
+                        title: context.l10n.subscriptionManageBilling,
+                        subtitle: _billingHome(status.source),
+                        icon: AppIconConstant.creditCard,
+                        showChevron: false,
+                      ),
+                    ],
+                  ),
+                SizedBox(height: SdContentPaddingV3.bottomGap),
               ],
             ),
-          SizedBox(height: SdContentPaddingV3.bottomGap),
+          ),
+          // Gone rather than disabled for a paying seller: there is nothing
+          // left to buy, and the card above already says which plan is theirs.
+          if (!plan.isPaid)
+            AppPinnedAction(
+              label: context.l10n.subscriptionViewPremiumPlans,
+              onPressed: () => context.push(AppRoutes.paywall),
+            ),
         ],
       ),
     );

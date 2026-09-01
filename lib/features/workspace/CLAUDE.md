@@ -93,14 +93,22 @@ both places a seller sees a business:
 - **the switcher sheet**, where every row carries an edit affordance beside
   it — so the business you want to correct is editable from the list you were
   already looking at, without switching to it first;
-- **Settings**, where the business card shows the facts and an Edit row opens
-  the same screen.
+- **More → Business**, its own row above Marketplaces, which opens the
+  business the seller is currently standing in.
 
-**Settings no longer edits a field in place.** It used to open a picker per
-row, and adding a second way in would have made two screens that both write
-the same document — the state where one of them quietly stops matching. The
-card is now what it always was for a member: the facts, plus the one way to
-change them.
+**Settings does not show the business at all any more.** Owner's rule, and it
+replaces the rule that used to stand here — that Settings held the facts and
+an Edit row. Settings is now what its name says: the device's theme, the
+account, and the developer block. A business is a record, records are managed
+from More, and a seller looking for their business had to know it was filed
+under a screen about preferences.
+
+- **The row is built from the resolved workspace id, not from a const route.**
+  `MoreConstant.sectionsFor` takes the id and drops the row when there is
+  none — the screen still takes an explicit id, which is the point below.
+- **Settings no longer edits a field in place** either. It used to open a
+  picker per row and write on the tap; two screens writing the same document
+  is the state where one of them quietly stops matching.
 
 - **It is a form with a pinned save, not a row that writes on tap** — the
   screens rule in `docs/rules/SCREENS.md`. Nothing is written until the seller
@@ -115,3 +123,8 @@ change them.
 - **Deleting stays here too**, owner-only, behind the same confirmation — it
   is a change to the same record and splitting it across two screens is how a
   destructive action ends up somewhere nobody looks for it.
+- **Both verbs are pinned, Delete above Save.** The record this screen
+  destroys is the record it edits, so Delete is the screen's action and not a
+  card's — it scrolled off the end of the form until the pinned-action rule in
+  `docs/rules/SCREENS.md` was widened. Save stays lowest, so the button under
+  a resting thumb is never the destructive one.

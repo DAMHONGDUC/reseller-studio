@@ -57,7 +57,7 @@ void main() {
       expect(created.status, ItemStatus.draft);
       expect(created.quantity, 1);
       expect(created.purchasePrice, isNull);
-      expect(created.askingPrice, isNull);
+      expect(created.minimumPrice, isNull);
       expect(created.photoUrls, isEmpty);
     });
 

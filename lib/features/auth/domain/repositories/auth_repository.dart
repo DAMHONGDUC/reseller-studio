@@ -12,6 +12,13 @@ enum AuthProviderKind {
     AuthProviderKind.apple => 'Apple',
     AuthProviderKind.google => 'Google',
   };
+
+  /// The id Firebase records on a signed-in user, which is how the app asks
+  /// "who signed this session in?" before re-authenticating for a delete.
+  String get firebaseProviderId => switch (this) {
+    AuthProviderKind.apple => 'apple.com',
+    AuthProviderKind.google => 'google.com',
+  };
 }
 
 /// The result of a sign-in attempt.
@@ -58,10 +65,15 @@ abstract interface class AuthRepository {
   /// solely owns go with the login; the ones they merely belong to lose only
   /// their membership.
   ///
-  /// Refused on an old session, which arrives as
-  /// `AppFailureKind.unauthenticated` — the screen asks the user to sign in
-  /// again rather than showing a failure they cannot act on. The check moved
-  /// server-side with the delete: the Admin SDK does not enforce Firebase's
-  /// own `requires-recent-login`, so the function reads `auth_time` itself.
+  /// Refused on an old session — the check moved server-side with the
+  /// delete, because the Admin SDK does not enforce Firebase's own
+  /// `requires-recent-login`, so the function reads `auth_time` itself. When
+  /// that happens the seller is asked to prove it is them, on the provider
+  /// they signed in with, and the delete is tried once more; a session older
+  /// than a few minutes is the normal case, so telling them to sign out and
+  /// back in was telling almost everyone.
+  ///
+  /// Backing out of that sheet is a cancellation, not a failure: nothing is
+  /// deleted and nothing is shown.
   Future<void> deleteAccount();
 }

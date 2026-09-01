@@ -10,19 +10,29 @@ import '../../../workspace/providers.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../providers.dart';
 
-/// What the login screen is doing right now.
+/// The two ways a session ends, both started from Settings.
+///
+/// Named rather than a bool because they run from the same card and take
+/// visibly different amounts of time — the delete walks every subcollection
+/// server-side — so the seller must be able to see *which* one is running.
+enum AccountAction { signOut, deleteAccount }
+
+/// What the auth controller is doing right now.
 ///
 /// [busyProvider] rather than a plain bool, so only the button that was tapped
 /// shows a spinner — two buttons both spinning would suggest two sign-ins are
-/// in flight.
+/// in flight. [busyAction] is the same idea for the Settings card.
 class AuthFormState {
-  const AuthFormState({this.busyProvider});
+  const AuthFormState({this.busyProvider, this.busyAction});
 
   final AuthProviderKind? busyProvider;
+  final AccountAction? busyAction;
 
-  bool get isBusy => busyProvider != null;
+  bool get isBusy => busyProvider != null || busyAction != null;
 
   bool isBusyWith(AuthProviderKind provider) => busyProvider == provider;
+
+  bool isRunning(AccountAction action) => busyAction == action;
 }
 
 /// Sign in with Apple or Google, sign out, delete.
@@ -82,9 +92,14 @@ class AuthController extends Notifier<AuthFormState> {
   /// that would buzz the next person to hold this phone with the last
   /// person's orders.
   Future<void> signOut() async {
+    state = const AuthFormState(busyAction: AccountAction.signOut);
+
+    // Neither cleanup step is allowed to fail the sign-out — a seller who
+    // tapped it must end up signed out whatever a plugin does.
+    await _unregisterDevice();
+    await _forgetBillingIdentity();
+
     try {
-      await ref.read(pushControllerProvider.notifier).unregister();
-      await ref.read(subscriptionRepositoryProvider).forget();
       await ref.read(authRepositoryProvider).signOut();
       SdCrashReporter.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
@@ -97,10 +112,18 @@ class AuthController extends Notifier<AuthFormState> {
       );
 
       rethrow;
+    } finally {
+      _clearBusy();
     }
   }
 
+  /// **The slowest thing in the app, and the one that must look busy.** The
+  /// function walks every subcollection the account owns and may raise the
+  /// provider sheet on the way, so a card that sat there unchanged was one a
+  /// seller tapped again.
   Future<void> deleteAccount() async {
+    state = const AuthFormState(busyAction: AccountAction.deleteAccount);
+
     try {
       await ref.read(authRepositoryProvider).deleteAccount();
       SdCrashReporter.instance.setUserId(null);
@@ -113,6 +136,52 @@ class AuthController extends Notifier<AuthFormState> {
       );
 
       rethrow;
+    } finally {
+      _clearBusy();
+    }
+  }
+
+  /// Both actions end the session, and the router tears the stack down the
+  /// moment it does — so this can land after the provider is gone.
+  void _clearBusy() {
+    if (!ref.mounted) return;
+
+    state = const AuthFormState();
+  }
+
+  /// Drop this device's push token, and never fail the sign-out over it.
+  ///
+  /// It has to happen before the session ends — `users/{uid}/devices` is
+  /// writable only by that uid — but a token that outlives the session is a
+  /// smaller harm than a seller who cannot get out of the app.
+  Future<void> _unregisterDevice() async {
+    try {
+      await ref.read(pushControllerProvider.notifier).unregister();
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.logout,
+        'Device not unregistered — its token stays until it expires',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Clear the billing identity, and never fail the sign-out over it.
+  ///
+  /// This is the one that was actually stopping people: RevenueCat throws on
+  /// a log-out it never logged in for, which is the state after any launch
+  /// where `identify` did not run — and that threw away the sign-out with it.
+  Future<void> _forgetBillingIdentity() async {
+    try {
+      await ref.read(subscriptionRepositoryProvider).forget();
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.logout,
+        'Billing identity not cleared — the next sign-in overwrites it',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

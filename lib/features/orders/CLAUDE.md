@@ -143,3 +143,22 @@ buyer", "Item is back with you", "Refund the buyer".
 - Each lifecycle event stores its own timestamp. The timeline includes order,
   shipment, delivery, return request, returned item, refund, and settlement;
   current status is not a substitute for when a past event happened.
+
+## The order's sections edit in place; its transitions do not
+
+Owner's rule, and the general shape is in `docs/rules/SCREENS.md`. Three of
+the order detail screen's sections carry their own Edit and Save:
+
+- **Order** — the buyer's name, what it sold for, and when it was ordered.
+- **Profit** — the platform fee alone. Every other line on that statement is
+  derived (hard rule 3) or belongs to another record, and a figure with no
+  stored field behind it has nothing to edit.
+- **Shipping** — carrier, tracking number, ship-by date and shipping cost.
+
+**Status is not editable, and neither are the lines or the timeline.** Ship,
+Mark delivered, Record refund and Cancel each write more than the status —
+inventory moves back, a timeline fact is recorded, a refund amount is stored —
+and they stay in the pinned next move and the actions sheet where the domain
+rules can run (`Order transitions are domain rules, never button rules`,
+above). A dropdown that set `status` alone would produce an order that says
+delivered with nothing to show for it.

@@ -8,9 +8,11 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
+import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -20,6 +22,7 @@ import '../../../domain/enums/order_status.dart';
 import '../../../providers.dart';
 import '../../order_filter_label.dart';
 import '../../order_status_label.dart';
+import '../../widgets/order_filter_sheet.dart';
 
 part 'orders_screen_order_card.dart';
 part 'orders_screen_order_filter_strip.dart';
@@ -71,6 +74,16 @@ class OrdersScreen extends ConsumerWidget {
       appBar: SdAppBarV3(
         title: context.l10n.navOrders,
         actions: <Widget>[
+          // The screen's own control leads, ahead of the two that navigate
+          // somewhere else.
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.filterAlt,
+            tooltip: context.l10n.filterTitle,
+            // Lit while the sheet behind it is holding something — see
+            // Inventory's, and the tab is not counted there either.
+            isActive: ref.watch(orderCriteriaProvider).isActive,
+            onPressed: () => OrderFilterSheet.show(context),
+          ),
           SdAppBarActionButtonV3(
             icon: AppIconConstant.localOffer,
             tooltip: context.l10n.offersTitle,
@@ -87,6 +100,7 @@ class OrdersScreen extends ConsumerWidget {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           const _OrderFilterStrip(),
+          const _ActiveFilters(),
           SizedBox(height: SdContentPaddingV3.topGap),
           Expanded(
             child: switch (source) {

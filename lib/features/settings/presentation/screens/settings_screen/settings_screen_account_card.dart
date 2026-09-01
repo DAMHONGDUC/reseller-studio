@@ -3,11 +3,11 @@ part of 'settings_screen.dart';
 /// Who is signed in, and the two ways out.
 ///
 /// **Deleting the account is destructive and irreversible, so it asks twice**
-/// — once in a dialog that says what goes, and once by refusing to proceed on
-/// a stale session. Firebase rejects a delete on an old sign-in with
-/// `requires-recent-login`, which arrives as `unauthenticated`; the message
-/// tells the seller to sign in again rather than showing a failure they
-/// cannot act on.
+/// — once in a dialog that says what goes, and once on the provider itself.
+/// The backend refuses a delete on a sign-in more than a few minutes old, and
+/// the repository answers that by raising the Apple or Google sheet and
+/// trying again, so the seller confirms with the account rather than being
+/// told to sign out and come back.
 class _AccountCard extends ConsumerWidget {
   const _AccountCard();
 
@@ -54,6 +54,12 @@ class _AccountCard extends ConsumerWidget {
     );
   }
 
+  /// The spinner sits on the row that is working, and only that row: the
+  /// delete takes seconds the seller cannot otherwise see, and both rows go
+  /// inert while either runs so a second tap cannot start a second delete.
+  static Widget? _spinnerFor(AuthFormState auth, AccountAction action) =>
+      auth.isRunning(action) ? const SdLoadingV3() : null;
+
   /// No success message: both actions end the session, and the router replaces
   /// the whole stack with the login screen before a snackbar could be read.
   Future<void> _run(
@@ -78,6 +84,7 @@ class _AccountCard extends ConsumerWidget {
     final String? email = ref.watch(authUserProvider).value?.email;
     final String? name = ref.watch(authUserProvider).value?.displayName;
     final bool signedIn = ref.watch(isSignedInProvider) ?? false;
+    final AuthFormState auth = ref.watch(authControllerProvider);
 
     // Settings is reachable without an account (owner's rule), so this card
     // has to have something to say in that state — and "Sign out" is not it.
@@ -111,14 +118,16 @@ class _AccountCard extends ConsumerWidget {
           title: context.l10n.settingsSignOut,
           icon: AppIconConstant.logout,
           iconTint: context.sdTheme3.textSecondary,
-          onTap: () => _confirmSignOut(context, ref),
+          trailing: _spinnerFor(auth, AccountAction.signOut),
+          onTap: auth.isBusy ? null : () => _confirmSignOut(context, ref),
         ),
         AppListRow(
           title: context.l10n.settingsDeleteAccount,
           subtitle: context.l10n.settingsDeleteAccountPermanent,
           icon: AppIconConstant.deleteForever,
           iconTint: context.sdTheme3.danger,
-          onTap: () => _confirmDelete(context, ref),
+          trailing: _spinnerFor(auth, AccountAction.deleteAccount),
+          onTap: auth.isBusy ? null : () => _confirmDelete(context, ref),
         ),
       ],
     );

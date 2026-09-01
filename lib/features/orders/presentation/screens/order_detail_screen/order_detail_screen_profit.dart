@@ -20,70 +20,77 @@ part of 'order_detail_screen.dart';
 /// zero (hard rule 5). Treating the missing cost as zero would report the
 /// whole sale price as profit — the single most misleading thing this app
 /// could tell a seller.
+/// The read half of an editable section, so it draws no card of its own.
 class _ProfitStatement extends StatelessWidget {
-  const _ProfitStatement({required this.profit});
+  const _ProfitStatement({required this.profit, this.feesField});
 
   final ProfitBreakdown profit;
+
+  /// Replaces the platform-fee row while the section is being edited. **The
+  /// one stored figure here** — everything else is derived (hard rule 3), so
+  /// the statement keeps its shape and only that row becomes a box.
+  final Widget? feesField;
 
   @override
   Widget build(BuildContext context) {
     final Money? net = profit.netProfit;
 
-    return SdCardV3(
-      child: Column(
-        children: <Widget>[
-          _OrderDetailRow(
-            label: context.l10n.commonRevenue,
-            value: context.money(profit.revenue),
-          ),
-          _OrderDetailRow(
-            label: context.l10n.commonCostOfGoods,
-            value: context.money(profit.cogs),
-          ),
+    return Column(
+      children: <Widget>[
+        _OrderDetailRow(
+          label: context.l10n.commonRevenue,
+          value: context.money(profit.revenue),
+        ),
+        _OrderDetailRow(
+          label: context.l10n.commonCostOfGoods,
+          value: context.money(profit.cogs),
+        ),
+        if (feesField != null)
+          feesField!
+        else
           _OrderDetailRow(
             label: context.l10n.orderPlatformFees,
             value: context.money(profit.fees),
           ),
-          _OrderDetailRow(
-            label: context.l10n.commonShipping,
-            value: context.money(profit.shipping),
-          ),
-          _OrderDetailRow(
-            label: context.l10n.orderOtherExpenses,
-            value: context.money(profit.otherExpenses),
-          ),
-          SdDividerV3(gap: SdSpacingConstant.h8),
-          _OrderDetailRow(
-            label: context.l10n.commonNetProfit,
-            value: context.money(net),
-            isEmphasis: true,
-            // An em dash is not a figure, so it must not be tinted as though
-            // it were good or bad news.
-            valueColor: net == null
-                ? null
-                : net.isNegative
-                ? context.sdTheme3.loss
-                : context.sdTheme3.profit,
-          ),
-          _OrderDetailRow(
-            label: context.l10n.commonMargin,
-            value: context.percent(profit.margin),
-          ),
-          _OrderDetailRow(
-            label: context.l10n.commonRoi,
-            value: context.percent(profit.roi),
-          ),
-          if (!profit.isComplete) ...<Widget>[
-            SizedBox(height: SdSpacingConstant.h8),
-            Text(
-              context.l10n.orderProfitIncomplete,
-              style: context.textTheme3.bodySmall!.copyWith(
-                color: context.sdTheme3.warning,
-              ),
+        _OrderDetailRow(
+          label: context.l10n.commonShipping,
+          value: context.money(profit.shipping),
+        ),
+        _OrderDetailRow(
+          label: context.l10n.orderOtherExpenses,
+          value: context.money(profit.otherExpenses),
+        ),
+        SdDividerV3(gap: SdSpacingConstant.h8),
+        _OrderDetailRow(
+          label: context.l10n.commonNetProfit,
+          value: context.money(net),
+          isEmphasis: true,
+          // An em dash is not a figure, so it must not be tinted as though
+          // it were good or bad news.
+          valueColor: net == null
+              ? null
+              : net.isNegative
+              ? context.sdTheme3.loss
+              : context.sdTheme3.profit,
+        ),
+        _OrderDetailRow(
+          label: context.l10n.commonMargin,
+          value: context.percent(profit.margin),
+        ),
+        _OrderDetailRow(
+          label: context.l10n.commonRoi,
+          value: context.percent(profit.roi),
+        ),
+        if (!profit.isComplete) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h8),
+          Text(
+            context.l10n.orderProfitIncomplete,
+            style: context.textTheme3.bodySmall!.copyWith(
+              color: context.sdTheme3.warning,
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 }

@@ -43,10 +43,6 @@ final class ItemDto {
         data['purchasePriceMinor'],
         currency,
       ),
-      askingPrice: FirestoreMapper.moneyOrNull(
-        data['askingPriceMinor'],
-        currency,
-      ),
       minimumPrice: FirestoreMapper.moneyOrNull(
         data['minimumPriceMinor'],
         currency,
@@ -94,7 +90,6 @@ final class ItemDto {
         'status': item.status.name,
         currencyField: _currencyOf(item),
         'purchasePriceMinor': FirestoreMapper.minorOrNull(item.purchasePrice),
-        'askingPriceMinor': FirestoreMapper.minorOrNull(item.askingPrice),
         'minimumPriceMinor': FirestoreMapper.minorOrNull(item.minimumPrice),
         'purchaseId': item.purchaseId,
         'sourceId': item.sourceId,
@@ -118,7 +113,7 @@ final class ItemDto {
   /// Whatever currency the item's own amounts are in, or null when none were
   /// entered — in which case the workspace's applies on the way back.
   static String? _currencyOf(Item item) =>
-      (item.purchasePrice ?? item.askingPrice ?? item.minimumPrice)?.currency;
+      (item.purchasePrice ?? item.minimumPrice)?.currency;
 
   static Timestamp? _timestampOrNull(DateTime? value) =>
       value == null ? null : Timestamp.fromDate(value);

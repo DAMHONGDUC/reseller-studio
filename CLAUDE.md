@@ -422,6 +422,14 @@ behind it.
      more by hand.
    - `vi` translations written before this rule are unreviewed machine work.
      They are on the release checklist in `RELEASE_ACTIONS.md`, not trusted.
+   - **A build offers `ResellerStudioApp.shippingLocales`, never
+     `AppLocalizations.supportedLocales`.** The generator fills a missing key
+     from the template, so a partial `app_vi.arb` does not fail to build — it
+     ships a device set to Vietnamese an app that is two thirds English, out
+     of the very translations the line above says are not trusted. The
+     shipping list is English alone and grows again in the one translation
+     pass at release. `test/core/shipping_locales_test.dart` pins both halves:
+     what ships, and that the vi keys are still there.
 
 8. **Every `catch` logs — handling an error is not the same as knowing it
    happened.** Call

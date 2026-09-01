@@ -171,14 +171,6 @@ class ItemActionsSheet extends ConsumerWidget {
     final bool isOnHand = item.status.isOnHand;
 
     final List<Widget> actions = <Widget>[
-      AppSheetActionRow(
-        icon: AppIconConstant.edit,
-        label: context.l10n.actionEdit,
-        onTap: () {
-          Navigator.of(context).pop();
-          context.push(AppRoutes.editItem(item.id));
-        },
-      ),
       // **One List row, not List and Cross-list** — owner's rule. The two
       // read as the same verb to anybody who has not learned the difference,
       // and the narrower one stopped working after the first listing: a

@@ -192,7 +192,6 @@ class ReportController extends Notifier<bool> {
               categories[item.categoryId] ?? '',
               locations[item.locationId] ?? '',
               _major(item.purchasePrice),
-              _major(item.askingPrice),
               _date(item.purchaseDate),
               _date(item.listedAt),
               _date(item.soldAt),

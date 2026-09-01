@@ -1,5 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/theme/app_tag_hue.dart';
 import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/marketplace.dart';
@@ -14,12 +15,18 @@ final Provider<List<Marketplace>> defaultMarketplacesProvider =
       final DateTime createdAt = DateTime.now();
 
       return <Marketplace>[
-        for (final MarketplaceSeed seed in MarketplaceConstant.defaults)
+        for (final (int index, MarketplaceSeed seed)
+            in MarketplaceConstant.defaults.indexed)
           Marketplace(
             id: seed.id,
             name: seed.name,
             feeRate: seed.feeRate,
-            createdAt: createdAt,
+            // A millisecond apart, never one instant: the list is read back
+            // ordered by `createdAt`, and five identical stamps leave the tie
+            // to the document id — the seeded order in mock data and
+            // alphabetical order in Firestore, for the same five rows.
+            createdAt: createdAt.add(Duration(milliseconds: index)),
+            hue: seed.hue,
           ),
       ];
     });
@@ -55,6 +62,23 @@ final Provider<Map<String, String>> marketplaceNamesProvider =
         for (final Marketplace marketplace
             in ref.watch(marketplacesProvider).value ?? const <Marketplace>[])
           marketplace.id: marketplace.name,
+      };
+    });
+
+/// Id → the colour every row that names it wears.
+///
+/// **The only map from a marketplace to a colour.** `AppMarketplaceTag` and
+/// `AppMarketplaceDot` read it; no screen looks a hue up itself, so a seller
+/// changing one repaints orders, home, payouts and analytics together.
+///
+/// A deleted marketplace stays in here for the reason it stays in
+/// [marketplacesProvider]: a past order still names it.
+final Provider<Map<String, AppTagHue>> marketplaceHuesProvider =
+    Provider<Map<String, AppTagHue>>((Ref ref) {
+      return <String, AppTagHue>{
+        for (final Marketplace marketplace
+            in ref.watch(marketplacesProvider).value ?? const <Marketplace>[])
+          marketplace.id: marketplace.hue,
       };
     });
 

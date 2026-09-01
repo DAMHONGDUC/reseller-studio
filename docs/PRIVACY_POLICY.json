@@ -1,0 +1,325 @@
+{
+  "name": "Reseller Studio",
+  "tagline": "The operating system for resellers: source, list, sell, ship, profit. Your business records are yours; an account is required and nothing is sold or used for advertising.",
+  "icon": "📦",
+  "accent": "#3D50DF",
+  "platforms": [
+    "iOS"
+  ],
+  "effectiveDate": "2026-08-31",
+  "lastUpdated": "2026-08-31",
+  "contactEmail": "ducdam.dev@gmail.com",
+  "controller": "Dam Hong Duc, Ho Chi Minh City, Viet Nam",
+  "url": "https://damhongduc.github.io/personal_work_space",
+  "storeLinks": {},
+  "overview": [
+    "This Privacy Policy describes how {{app}} handles information when you use the app. It applies to every version of {{app}} distributed by {{publisher}} on the app stores listed above.",
+    "{{app}} is a business tool for resellers. It keeps the record of what you bought, what you listed, what you sold and what it cost you, and it works out the profit from those facts. Because that record follows you across devices and is shared with the team you invite, {{app}} is a synced product: an account is required, and your business records are stored on our backend rather than only on your phone.",
+    "The data controller for {{app}} is Dam Hong Duc, Ho Chi Minh City, Viet Nam, reachable at {{email}}.",
+    "If anything here is unclear, email {{email}} before you continue using the app."
+  ],
+  "summary": [
+    "An account is required. There is no guest mode, and the only ways in are Sign in with Apple and Google Sign-In — we never see or store a password.",
+    "Your inventory, purchases, orders, expenses and photos are stored in our Firebase backend so they sync across your devices and reach the team you invite. They are encrypted in transit and at rest, but this is not end-to-end encryption.",
+    "Everything inside a business is visible to the people you invite to that business. That is what a shared workspace is for, and removing someone removes their access.",
+    "We never connect to your marketplace accounts. There is no eBay, Depop or Vinted login in this app, so no marketplace password or token ever reaches us.",
+    "We do not track you. No ad network, no attribution SDK, no advertising identifier, nothing shared with a data broker. We ask for no location, no contacts and no health data.",
+    "You can export your records as CSV at any time, and delete a business or your whole account from inside the app."
+  ],
+  "collects": [
+    {
+      "category": "Account information",
+      "items": [
+        "Account identifier",
+        "Email address",
+        "Display name",
+        "Profile photo URL",
+        "Your language preference and which business you last had open"
+      ],
+      "purpose": "Authenticate you, show you which account you are signed in to, and name you to your teammates. It comes from the Apple or Google account you sign in with. We never receive a password.",
+      "linked": true
+    },
+    {
+      "category": "Your business records",
+      "items": [
+        "Items — title, quantity, condition, status, cost, asking price, category, storage location",
+        "Sources and purchases — where you bought, when, and what it cost",
+        "Listings and offers — marketplace, price, status, and the amount a buyer offered",
+        "Orders — sale price, fees, shipping cost, refunds, payout, tracking number, carrier and lifecycle dates",
+        "Expenses, receipts and the tax figures derived from them",
+        "Your own categories, storage locations, marketplaces and their fee rates, and carriers",
+        "Any free-text note you type on a record"
+      ],
+      "purpose": "This is what the app is for. Records are stored in our backend under the business they belong to, so they survive a lost phone, sync to your other devices and reach the team you invite. Profit, margin and ROI are never stored — they are worked out from these facts each time you look at them.",
+      "linked": true
+    },
+    {
+      "category": "Photos and files you add",
+      "items": [
+        "Item photos",
+        "Purchase and expense receipt images",
+        "A business logo, if you add one"
+      ],
+      "purpose": "Show you what an item is and keep the proof of what you paid. Files are stored in our backend under the business they belong to and are readable only by that business's members.",
+      "linked": true
+    },
+    {
+      "category": "Buyer details you choose to enter",
+      "items": [
+        "A buyer name on an order or an offer — always optional",
+        "A tracking number and carrier for a shipment",
+        "Anything you type into an order's notes"
+      ],
+      "purpose": "Keep your sale history readable. The app never asks for a buyer's address, never imports one, and never puts any of this into a log line, an analytics event or a crash report. What ends up in these fields is what you choose to type.",
+      "linked": true
+    },
+    {
+      "category": "Team and business data",
+      "items": [
+        "Business name, country, currency, time zone and business type",
+        "Each member's role, display name and email address, visible to the other members of that business",
+        "The email address of anyone you invite, until the invitation is accepted or withdrawn",
+        "An activity log of who changed which record, and what it looked like before and after"
+      ],
+      "purpose": "Run a shared business: decide who may do what, show a team who did what, and let you invite someone by email. The activity log is written only by our backend so an entry cannot name the wrong person.",
+      "linked": true
+    },
+    {
+      "category": "Notification settings and history",
+      "items": [
+        "Push notification token and device platform",
+        "Your in-app notification history — type, the record it points at, a count, and whether you have read it"
+      ],
+      "purpose": "Deliver the alerts the app sends — an order that needs shipping, a returns deadline, a teammate's invitation — and let you see them again in the app. Deny the notification permission and none of this is collected.",
+      "linked": true
+    },
+    {
+      "category": "Subscription state",
+      "items": [
+        "Which plan and entitlement you hold, and when it renews or lapses",
+        "Your account identifier, used as the subscription identifier"
+      ],
+      "purpose": "Unlock Premium and enforce the Free tier's limits. Payment is taken by the App Store — card details are handled by Apple and never reach us.",
+      "linked": true
+    },
+    {
+      "category": "Diagnostics",
+      "items": [
+        "Crash logs",
+        "Non-fatal errors",
+        "Device model",
+        "OS version"
+      ],
+      "purpose": "Identify and fix crashes and performance problems. Tagged with your opaque account identifier so a repeated fault can be recognised as one person's, never with your name or email. Always on — there is no in-app switch yet; write to us and we will stop and erase yours.",
+      "linked": true
+    },
+    {
+      "category": "Usage analytics",
+      "items": [
+        "Actions taken in the app — for example that an item was created, that a bulk action ran on a number of rows, that a report was exported, that the paywall was opened"
+      ],
+      "purpose": "Understand which features are used so the app can be improved. Records that something happened, never its content: every analytics parameter is a count, an identifier, a plan name or a yes/no flag. No item title, no price, no buyer name, no note and no photo ever becomes one. Always on — there is no in-app switch yet; write to us and we will stop and erase yours.",
+      "linked": true
+    }
+  ],
+  "notCollected": [
+    "Location of any kind — precise or coarse. The app asks for no location permission.",
+    "Marketplace passwords or OAuth tokens — {{app}} does not connect to marketplace accounts at all",
+    "Buyer shipping addresses — no field in the app stores one",
+    "Contacts",
+    "Health or fitness data",
+    "Microphone or audio",
+    "Payment card details — the App Store handles payment and we never see a card",
+    "Advertising identifiers",
+    "Your passwords — sign-in is handled entirely by Apple or Google"
+  ],
+  "permissions": [
+    {
+      "name": "Camera",
+      "required": false,
+      "reason": "Scan a barcode on an item and photograph what you are listing. Deny it and the app still works; you add photos from your library instead and type identifiers by hand."
+    },
+    {
+      "name": "Photo Library",
+      "required": false,
+      "reason": "Attach an existing photo to an item, a purchase receipt or an expense. {{app}} reads only the photos you pick — it never browses your library."
+    },
+    {
+      "name": "Notifications",
+      "required": false,
+      "reason": "Deliver alerts about orders that need shipping, returns deadlines and team invitations. Deny it and nothing else changes."
+    }
+  ],
+  "thirdParties": [
+    {
+      "name": "Google Firebase",
+      "purpose": "Authentication, the database holding your business records, file storage for your photos and receipts, push delivery, and the backend functions that run team invitations, account deletion and the audit log. Hosted on Google Cloud infrastructure.",
+      "url": "https://firebase.google.com/support/privacy"
+    },
+    {
+      "name": "Firebase Crashlytics",
+      "purpose": "Crash reporting and stability diagnostics.",
+      "url": "https://firebase.google.com/support/privacy"
+    },
+    {
+      "name": "Firebase Analytics",
+      "purpose": "Usage analytics — which features are used, never what you recorded.",
+      "url": "https://firebase.google.com/support/privacy"
+    },
+    {
+      "name": "RevenueCat",
+      "purpose": "Subscription and entitlement state, keyed to your account identifier. Card details are handled by Apple and never reach us.",
+      "url": "https://www.revenuecat.com/privacy"
+    },
+    {
+      "name": "Apple (Sign in with Apple, App Store)",
+      "purpose": "Sign-in and purchase processing. If you use Apple's private relay address, that relayed address is the only email we ever hold for you.",
+      "url": "https://www.apple.com/legal/privacy/"
+    },
+    {
+      "name": "Google Sign-In",
+      "purpose": "Sign-in.",
+      "url": "https://policies.google.com/privacy"
+    }
+  ],
+  "sections": [
+    {
+      "id": "account-required",
+      "title": "An account is required",
+      "body": [
+        "Unlike a notes app, {{app}} cannot be used anonymously. A reseller's records are a business record shared across devices and with a team, so every record belongs to an account and a business from the moment it is created.",
+        "There are exactly two ways in: **Sign in with Apple** and **Google Sign-In**. There is no email-and-password form, no sign-up form and no password reset, which means this app stores no password and there is none for anyone to steal from us.",
+        "Before you sign in, the app shows an introduction and a sign-in prompt and nothing else. No business data is readable — not because a screen is hiding it, but because our security rules refuse to serve it."
+      ]
+    },
+    {
+      "id": "where-data-lives",
+      "title": "Where your records live",
+      "body": [
+        "Your business records are stored in **Cloud Firestore** and your photos and receipts in **Firebase Storage**, both operated by Google on our behalf. They are encrypted in transit and encrypted at rest by Google.",
+        "This is **not end-to-end encryption**, and we will not tell you it is. Records are stored as ordinary documents, which is what makes search, reports, tax summaries and team access possible. Our backend — and therefore Google's infrastructure, which hosts it — is technically able to read them. We do not read your records, and nothing in the product is built to.",
+        "Every record lives under the business it belongs to, and our security rules decide access from your membership of that business alone. Nobody can promote themselves; membership is written by our backend, never by the app.",
+        "A copy of the records you have recently opened is cached on your device so the app keeps working with no signal. That cache is removed when you sign out or delete the app.",
+        "Data may be processed in a country other than yours, including Google data centre regions outside the UK and EU. Where that happens we rely on Google's standard contractual clauses as the transfer safeguard."
+      ]
+    },
+    {
+      "id": "teams",
+      "title": "Working with a team",
+      "body": [
+        "A business in {{app}} can have more than one member. **Everything inside a business is visible to every member of it** — items, costs, orders, profit, expenses, receipts and photos. That is what a shared business is, and it is worth being clear about before you invite anybody.",
+        "So that a team can be read, each member's display name and email address are stored inside the business and shown to the other members. You can belong to several businesses; a member of one sees nothing of another.",
+        "You invite someone by email address, and that address is held until the invitation is accepted or withdrawn. Removing a member ends their access immediately; the records they created stay with the business, because they are the business's history and not that person's property.",
+        "Every change to an item, an order or a listing is written to an append-only activity log that records who made it and what the record looked like before and after. Only our backend can write it, and only members of that business can read it."
+      ]
+    },
+    {
+      "id": "buyer-data",
+      "title": "Information about your buyers",
+      "body": [
+        "One kind of data in this app is not about you: a buyer's name, if you type one on an order or an offer. It is always optional and the app never asks for an address.",
+        "It is stored with the order and it is shown to your team. **It never appears in a log line, an analytics event, a crash report or a filename** — the app is built so that no free text you type can become an analytics parameter.",
+        "Because you decide what to type, you are responsible for what those fields contain. If you record information about your customers, the data-protection obligations of a seller in your country apply to you, and we act as your processor for it. Keep it to what you need."
+      ]
+    },
+    {
+      "id": "no-marketplace-connection",
+      "title": "We do not connect to your marketplace accounts",
+      "body": [
+        "{{app}} has no eBay, Depop, Vinted, Poshmark or Etsy login, no OAuth flow and no sync. What the app knows about a marketplace is what **you** tell it: its name, and the fee rate you use for planning.",
+        "This is a deliberate limit rather than a missing feature. It means no marketplace password, token or API key ever reaches this app or our backend, and a compromise of {{app}} could not touch your selling accounts."
+      ]
+    },
+    {
+      "id": "analytics-and-crash",
+      "title": "Analytics and crash reporting",
+      "body": [
+        "The app reports **that** something happened, never what it was. Every analytics event is a fixed name with parameters that are counts, identifiers, plan names or yes/no flags — for example that an item was created and whether it had a photo, or that a bulk action ran on a number of rows. The complete list of events lives in one file in our source so it stays reviewable.",
+        "An item title, a price, a buyer name, a note and a photo can never be an analytics parameter. Crash reports carry the fault, the device model and the OS version, tagged with your opaque account identifier and nothing else about you.",
+        "Both are on by default and there is no in-app switch yet. If you want yours stopped and erased, email {{email}} and we will do it."
+      ]
+    },
+    {
+      "id": "app-store-labels",
+      "title": "What our App Store privacy labels say",
+      "body": [
+        "Apple asks every developer to declare, on the App Store product page, what an app collects, whether it is linked to your identity, and whether it is used to track you. Below is exactly what {{app}} declares, so you can hold the labels and this policy against each other and see that they agree.",
+        "“Tracking” has a specific meaning in Apple's rules: linking data from this app with third-party data for advertising or advertising measurement, or sharing it with a data broker. {{app}} does none of that — there is no ad network, no attribution SDK, no advertising identifier is read, and nothing is sold or handed to a data broker. **Every item below is declared as not used for tracking**, and the app contains no App Tracking Transparency prompt because there is nothing to ask permission for.",
+        "Location is not declared at all, because the app never asks for it. Health and fitness are not declared, because the app has no use for them."
+      ],
+      "list": [
+        "Name — App Functionality, linked to you. From the account you sign in with, and shown to your teammates.",
+        "Email address — App Functionality, linked to you. From the account you sign in with, and used to invite teammates.",
+        "Photos or videos — App Functionality, linked to you. Item photos, receipts and a business logo.",
+        "Other user content — App Functionality, linked to you. Your inventory, purchases, listings, orders, expenses and notes.",
+        "User ID — App Functionality and Analytics, linked to you. The opaque account identifier.",
+        "Device ID — App Functionality, linked to you. The push token that delivers alerts.",
+        "Purchase history — App Functionality, linked to you. Which subscription you hold.",
+        "Product interaction — Analytics, linked to you. Which screens and features get used.",
+        "Crash data and performance data — App Functionality, linked to you. Crashes and non-fatal errors."
+      ]
+    },
+    {
+      "id": "export",
+      "title": "Exporting your data",
+      "body": [
+        "From Reports you can export your sales, inventory, expenses or a year's tax summary as **CSV** — rows an accountant or a spreadsheet can sum, not a picture of your numbers.",
+        "The file is written to the app's temporary storage and handed straight to the iOS share sheet, so it goes only where you send it. It is never uploaded to us, and we never see it.",
+        "If you would rather have a full copy of everything we hold, email {{email}} and we will send it."
+      ]
+    },
+    {
+      "id": "deleting",
+      "title": "Deleting a business, or your account",
+      "body": [
+        "Two destructive actions, deliberately kept separate."
+      ],
+      "list": [
+        "Delete a business — from that business's detail screen. Removes the business, every record under it, its photos and receipts, and every member's access to it. Your account and your other businesses are untouched.",
+        "Delete your account — Settings → Account. Removes your profile, your devices and notifications, and any invitation waiting for you. Every business you are the **sole owner** of is deleted with all its records and files. A business somebody else owns loses only your membership, because deleting a shared business over one person leaving would destroy other people's records.",
+        "Your sign-in is deleted last, so a failure part way through leaves an account you can sign back into and retry rather than records nobody can reach.",
+        "Neither action cancels your subscription. That lives in the App Store and only you can cancel it there — do that first if you are leaving.",
+        "Backups held by our infrastructure provider may retain deleted content for a short period before they expire."
+      ]
+    },
+    {
+      "id": "retention",
+      "title": "How long we keep things",
+      "body": [
+        "Your records are kept for as long as your account exists, because that is what a business history is for — a seller looks back at what a source returned two years ago.",
+        "Deleting a record inside the app removes it from view immediately. Records that other records point at — an item, a source, a purchase, a category, a location — are marked deleted rather than erased outright, so that deleting a source cannot silently destroy the purchase history that depends on it. They go for good when the business or the account is deleted.",
+        "Diagnostics and analytics are retained on our providers' standard schedules, which are measured in months rather than years."
+      ]
+    },
+    {
+      "id": "rights",
+      "title": "Your rights",
+      "body": [
+        "You can access, correct, export or delete your data. The app's own export and deletion tools cover all four, and {{email}} reaches a person if they do not.",
+        "Where UK or EU data-protection law applies, our lawful bases are performance of our contract with you — running the service you signed up for — and our legitimate interest in a working, secure and improving product for diagnostics and analytics. If you are in the UK you may complain to the Information Commissioner's Office; in the EU, to your national supervisory authority.",
+        "We do not sell personal information and we do not share it for cross-context behavioural advertising."
+      ]
+    },
+    {
+      "id": "children",
+      "title": "Children's privacy",
+      "body": [
+        "{{app}} is a business tool. It is not directed at anyone under 18 and we do not knowingly collect personal information from children. If you believe a child has provided us with personal information, contact {{email}} and we will delete it."
+      ]
+    },
+    {
+      "id": "financial-disclaimer",
+      "title": "Not financial or tax advice",
+      "body": [
+        "{{app}} calculates profit, margin, ROI and a year-end summary from the figures you enter, for the United States and the United Kingdom. Those figures are a bookkeeping aid, not tax advice, and they are only ever as right as what was typed in. Check your return with a qualified accountant before you file it."
+      ]
+    },
+    {
+      "id": "changes",
+      "title": "Changes to this policy",
+      "body": [
+        "We will publish any change at this URL and update the date at the top. If a change materially affects what we collect or who we share it with, we will say so in the app before it takes effect."
+      ]
+    }
+  ]
+}

@@ -19,7 +19,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Search | Items, orders, listings and sources | None |
 | Workspace and team | Create, switch, delete, invite, role and member management | Team actions require deployed Functions |
 | Notifications | Inbox, unread state, FCM registration, event pushes, daily digest | Functions, APNs and Scheduler |
-| Subscription | Free/Premium gates, monthly/yearly paywall, restore, management screen | RevenueCat and webhook setup |
+| Subscription | Free/Premium gates, monthly/yearly paywall, restore, management screen, server-enforced item and order ceilings | RevenueCat and webhook setup |
 | Settings | Account, workspace, theme, debug mock-data switch | None |
 
 ## Platform foundations

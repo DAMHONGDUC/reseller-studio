@@ -8,6 +8,7 @@ import '../../../../core/money/money.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../listings/domain/repositories/listing_repository.dart';
+import '../../../listings/providers.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../mock_data/providers.dart';
 import '../../domain/entities/item.dart';
@@ -68,11 +69,6 @@ class ItemActionsController extends Notifier<bool> {
   /// its shared default and its overrides into that map; nothing here has to
   /// know which was which.
   ///
-  /// [askingPrice] is what the *item* is worth — the form's shared price, not
-  /// any one platform's. Null leaves the item's own asking price alone, which
-  /// is right when every platform was priced individually and none of them is
-  /// the item's number.
-  ///
   /// **[reprice] carries live listings whose price changed** — owner's rule:
   /// one screen answers "what does this cost on each platform", whether the
   /// listing exists yet or not. They ride in the same `saveAll` as the new
@@ -85,7 +81,6 @@ class ItemActionsController extends Notifier<bool> {
   Future<void> crossList(
     Item item, {
     required Map<Marketplace, Money> prices,
-    Money? askingPrice,
     List<Listing> reprice = const <Listing>[],
   }) async {
     final ListingRepository listings = ref.read(listingRepositoryProvider);
@@ -109,9 +104,6 @@ class ItemActionsController extends Notifier<bool> {
     state = true;
 
     try {
-      final Item priced = askingPrice == null
-          ? item
-          : item.copyWith(askingPrice: askingPrice);
       // Nothing new to list means nothing to move the item for: a reprice on
       // its own must not re-stamp `listedAt` and reset the staleness clock.
       final bool isNew = prices.isNotEmpty;
@@ -142,8 +134,8 @@ class ItemActionsController extends Notifier<bool> {
       // not a status of its own any more.
       await items.save(
         isNew && item.status.isListable
-            ? ItemTransition.markListed(priced, now: now)
-            : priced,
+            ? ItemTransition.markListed(item, now: now)
+            : item,
       );
 
       SdLogger.info(
@@ -176,13 +168,59 @@ class ItemActionsController extends Notifier<bool> {
     }
   }
 
-  /// Change the asking price on one item or forty (plan §7, hard rule 16).
-  Future<void> reprice(List<Item> items, Money price) => _bulk(
-    'Reprice items',
-    items,
-    <String, Object>{'priceMinor': price.minor},
-    (Item item) => item.copyWith(askingPrice: price),
-  );
+  /// Move every marketplace price on one item or forty (plan §7, hard rule
+  /// 16).
+  ///
+  /// **It writes listings, not items.** The item carries no price of its own
+  /// (`lib/features/inventory/CLAUDE.md`), so repricing from Inventory means
+  /// moving what each marketplace is asking — one `saveAll`, whether that is
+  /// two listings or two hundred.
+  ///
+  /// **An item on no marketplace is silently skipped**, not an error: a bulk
+  /// selection of forty rows where six are drafts is a normal selection, and
+  /// refusing the whole write over them would be the bug.
+  ///
+  /// It deliberately does not re-stamp `listedAt`: moving a price is not
+  /// putting the item on sale again, and the staleness clock must not reset.
+  Future<void> reprice(List<Item> items, Money price) async {
+    final Set<String> itemIds = items.map((Item item) => item.id).toSet();
+    final List<Listing> repriced =
+        (ref.read(listingsProvider).value ?? const <Listing>[])
+            .where((Listing listing) => itemIds.contains(listing.itemId))
+            .map((Listing listing) => listing.copyWith(price: price))
+            .toList(growable: false);
+    final Map<String, Object> data = <String, Object>{
+      'items': items.length,
+      'listings': repriced.length,
+      'priceMinor': price.minor,
+    };
+
+    if (repriced.isEmpty) return;
+
+    SdLogger.action(LogTagConstant.listing, 'Reprice listings', data);
+    AppAnalytics.instance.bulkAction(
+      action: 'Reprice listings',
+      count: repriced.length,
+    );
+
+    state = true;
+
+    try {
+      await ref.read(listingRepositoryProvider).saveAll(repriced);
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.listing,
+        'Failed to reprice listings',
+        error: error,
+        stackTrace: stackTrace,
+        data: data,
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
 
   /// Put items on a shelf.
   Future<void> move(List<Item> items, String locationId) => _bulk(

@@ -11,9 +11,6 @@ import 'domain/services/item_transition.dart';
 final class ItemBlockPresenter {
   static String message(BuildContext context, ItemTransitionBlock block) =>
       switch (block) {
-        ItemTransitionBlock.missingPrice => context.l10n.itemBlockMissingPrice,
-        ItemTransitionBlock.missingSalePrice =>
-          context.l10n.itemBlockMissingSalePrice,
         ItemTransitionBlock.wrongStatus => context.l10n.itemBlockWrongStatus,
         ItemTransitionBlock.noQuantity => context.l10n.itemBlockNoQuantity,
       };

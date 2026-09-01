@@ -6,11 +6,13 @@ import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/state/form_seed.dart';
+import '../../../../../core/theme/app_tag_hue.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../domain/entities/marketplace.dart';
 import '../../../domain/services/marketplace_rate_input_utils.dart';
 import '../../../providers.dart';
 import '../../controllers/marketplace_form_controller.dart';
+import '../../widgets/marketplace_hue_field.dart';
 
 /// Adds a marketplace or edits one seller-owned marketplace record.
 ///
@@ -207,6 +209,15 @@ class _MarketplaceDetailScreenState
                   textInputAction: TextInputAction.done,
                   onChanged: _updateRate,
                   onSubmitted: (_) => _submit(),
+                ),
+                SizedBox(height: SdSpacingConstant.h16),
+                MarketplaceHueField(
+                  label: context.l10n.marketplaceColorLabel,
+                  helperText: context.l10n.marketplaceColorHelper,
+                  selected: state.hue,
+                  onSelected: (AppTagHue hue) => ref
+                      .read(marketplaceFormControllerProvider.notifier)
+                      .selectHue(hue),
                 ),
               ],
             ),

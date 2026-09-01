@@ -6,6 +6,7 @@ import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/barcode_scanner_page.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
@@ -129,90 +130,101 @@ class _PurchaseEvaluatorScreenState
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.sourcingShouldIBuyThis),
-      body: ListView(
-        padding: SdContentPaddingV3.screen(context),
+      body: Column(
         children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          _Verdict(evaluation: evaluation, marketplace: _marketplace),
-          SizedBox(height: SdContentPaddingV3.sectionGap),
-          _SoldBeforeCard(found: _soldBefore),
-          SdButtonV3(
-            variant: SdButtonVariantV3.outlined,
-            label: context.l10n.sourcingScanAction,
-            icon: AppIconConstant.qrCodeScanner,
-            expand: true,
-            onPressed: _scan,
-          ),
-          SizedBox(height: SdSpacingConstant.h16),
-          SdCardV3(
-            child: Column(
+          Expanded(
+            child: ListView(
+              // No bottom inset: the pinned action owns the bottom edge.
+              padding: EdgeInsets.symmetric(
+                horizontal: SdContentPaddingV3.horizontal,
+              ),
               children: <Widget>[
-                MoneyField(
-                  label: context.l10n.sourcingBuyPrice,
-                  controller: _buy,
-                  currency: currency,
-                  textInputAction: TextInputAction.next,
-                  onChanged: (_) => setState(() {}),
-                ),
-                SizedBox(height: SdSpacingConstant.h16),
-                MoneyField(
-                  label: context.l10n.sourcingWhatYouThinkItSellsFor,
-                  controller: _sale,
-                  currency: currency,
-                  helperText: _saleFromHistory
-                      ? context.l10n.sourcingSalePriceFilled
-                      : null,
-                  textInputAction: TextInputAction.next,
-                  onChanged: (_) => setState(() => _saleFromHistory = false),
-                ),
-                SizedBox(height: SdSpacingConstant.h16),
-                PickerField(
-                  label: context.l10n.commonMarketplace,
-                  icon: AppIconConstant.storefront,
-                  value:
-                      '${_marketplace.displayName} · '
-                      '${(MarketplaceFeePolicy.rateFor(_marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
-                  onTap: () async {
-                    final Marketplace?
-                    picked = await OptionPickerSheet.show<Marketplace>(
-                      context,
-                      title: context.l10n.commonMarketplace,
-                      selected: _marketplace,
-                      options: Marketplace.values
-                          .map(
-                            (
-                              Marketplace marketplace,
-                            ) => PickerOption<Marketplace>(
-                              value: marketplace,
-                              label: marketplace.displayName,
-                              caption:
-                                  '${(MarketplaceFeePolicy.rateFor(marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
-                            ),
-                          )
-                          .toList(),
-                    );
+                SizedBox(height: SdContentPaddingV3.topGap),
+                _Verdict(evaluation: evaluation, marketplace: _marketplace),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _SoldBeforeCard(found: _soldBefore),
+                SdCardV3(
+                  child: Column(
+                    children: <Widget>[
+                      MoneyField(
+                        label: context.l10n.sourcingBuyPrice,
+                        controller: _buy,
+                        currency: currency,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (_) => setState(() {}),
+                      ),
+                      SizedBox(height: SdSpacingConstant.h16),
+                      MoneyField(
+                        label: context.l10n.sourcingWhatYouThinkItSellsFor,
+                        controller: _sale,
+                        currency: currency,
+                        helperText: _saleFromHistory
+                            ? context.l10n.sourcingSalePriceFilled
+                            : null,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (_) =>
+                            setState(() => _saleFromHistory = false),
+                      ),
+                      SizedBox(height: SdSpacingConstant.h16),
+                      PickerField(
+                        label: context.l10n.commonMarketplace,
+                        icon: AppIconConstant.storefront,
+                        value:
+                            '${_marketplace.displayName} · '
+                            '${(MarketplaceFeePolicy.rateFor(_marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
+                        onTap: () async {
+                          final Marketplace?
+                          picked = await OptionPickerSheet.show<Marketplace>(
+                            context,
+                            title: context.l10n.commonMarketplace,
+                            selected: _marketplace,
+                            options: Marketplace.values
+                                .map(
+                                  (
+                                    Marketplace marketplace,
+                                  ) => PickerOption<Marketplace>(
+                                    value: marketplace,
+                                    label: marketplace.displayName,
+                                    caption:
+                                        '${(MarketplaceFeePolicy.rateFor(marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
+                                  ),
+                                )
+                                .toList(),
+                          );
 
-                    if (picked == null) return;
+                          if (picked == null) return;
 
-                    setState(() => _marketplace = picked);
-                  },
+                          setState(() => _marketplace = picked);
+                        },
+                      ),
+                      SizedBox(height: SdSpacingConstant.h16),
+                      MoneyField(
+                        label: context.l10n.sourcingPostageYouWillPay,
+                        controller: _shipping,
+                        currency: currency,
+                        textInputAction: TextInputAction.done,
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
-                MoneyField(
-                  label: context.l10n.sourcingPostageYouWillPay,
-                  controller: _shipping,
-                  currency: currency,
-                  textInputAction: TextInputAction.done,
-                  onChanged: (_) => setState(() {}),
+                Text(
+                  'Fees are the platform\'s published rate, not a quote. The '
+                  'real fee arrives with the order.',
+                  style: context.textTheme3.bodySmall!.faint3(context),
                 ),
               ],
             ),
           ),
-          SizedBox(height: SdSpacingConstant.h16),
-          Text(
-            'Fees are the platform\'s published rate, not a quote. The real '
-            'fee arrives with the order.',
-            style: context.textTheme3.bodySmall!.faint3(context),
+          // The screen's one action, and it is what a seller reaches for
+          // holding the item — a thumb's width from where the phone is held,
+          // not three fields up the scroll.
+          AppPinnedAction(
+            variant: SdButtonVariantV3.outlined,
+            label: context.l10n.sourcingScanAction,
+            icon: AppIconConstant.qrCodeScanner,
+            onPressed: _scan,
           ),
         ],
       ),

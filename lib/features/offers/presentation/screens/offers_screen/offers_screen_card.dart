@@ -90,11 +90,20 @@ class _OfferCard extends ConsumerWidget {
     final bool canAct = offer.needsAction && !offer.hasExpired(now);
     final String? deadline = _deadline(context, offer, now);
 
-    final Item? item = (ref.watch(itemsProvider).value ?? const <Item>[])
-        .where((Item row) => row.id == offer.itemId)
-        .firstOrNull;
+    // What the offer is measured against is that marketplace's own listing:
+    // the item carries no price of its own, and an offer made on Depop says
+    // nothing about what eBay is asking.
+    final Money? listed =
+        (ref.watch(listingsProvider).value ?? const <Listing>[])
+            .where(
+              (Listing row) =>
+                  row.itemId == offer.itemId &&
+                  row.marketplace == offer.marketplace,
+            )
+            .firstOrNull
+            ?.price;
 
-    final double? discount = offer.discountFrom(item?.askingPrice);
+    final double? discount = offer.discountFrom(listed);
 
     return SdCardV3(
       onTap: () => context.push(AppRoutes.item(offer.itemId)),
@@ -136,10 +145,8 @@ class _OfferCard extends ConsumerWidget {
                 Text(
                   <String>[
                     offer.marketplace.displayName,
-                    if (item?.askingPrice != null)
-                      context.l10n.offerAsking(
-                        context.money(item!.askingPrice),
-                      ),
+                    if (listed != null)
+                      context.l10n.offerAsking(context.money(listed)),
                     if (discount != null)
                       context.l10n.offerBelowAsking(context.percent(discount)),
                     if (offer.buyerName != null) offer.buyerName!,

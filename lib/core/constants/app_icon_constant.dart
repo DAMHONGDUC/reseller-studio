@@ -52,6 +52,12 @@ final class AppIconConstant {
   /// Highlight a quick or automated action.
   static const IconData bolt = Symbols.bolt_rounded;
 
+  /// The business the seller is standing in.
+  static const IconData business = Symbols.business_center_rounded;
+
+  /// Choose a colour for a record.
+  static const IconData palette = Symbols.palette_rounded;
+
   /// Calculate a financial value.
   static const IconData calculate = Symbols.calculate_rounded;
 
@@ -111,6 +117,9 @@ final class AppIconConstant {
 
   /// Expand a collapsed control.
   static const IconData expandMore = Symbols.expand_more_rounded;
+
+  /// Open the filter sheet.
+  static const IconData filterAlt = Symbols.filter_alt_rounded;
 
   /// Clear an active filter.
   static const IconData filterAltOff = Symbols.filter_alt_off_rounded;

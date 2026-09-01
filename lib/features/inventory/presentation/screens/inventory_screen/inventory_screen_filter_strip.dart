@@ -23,6 +23,20 @@ class _FilterStrip extends ConsumerWidget {
   }
 }
 
+/// The count-and-reset line under the strip.
+///
+/// Its own consumer so a chip tap rebuilds this row and not the pinned band
+/// around it.
+class _ActiveFilters extends ConsumerWidget {
+  const _ActiveFilters();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => AppActiveFilterBar(
+    count: ref.watch(inventoryActiveFilterCountProvider),
+    onReset: ref.read(inventoryCriteriaProvider.notifier).reset,
+  );
+}
+
 /// Pins the filter strip under the docked search header.
 ///
 /// **Owner's rule: Inventory's chips stay put while the list scrolls, the way
@@ -35,13 +49,24 @@ class _FilterStrip extends ConsumerWidget {
 /// its own sliver in the body with the body's own background, below the
 /// chrome rather than inside it.
 class _PinnedFilterStrip extends SliverPersistentHeaderDelegate {
-  const _PinnedFilterStrip();
+  const _PinnedFilterStrip({required this.showActiveFilters});
+
+  /// Whether the band carries the count-and-reset row — it is only there when
+  /// something is filtered, so the extent has to move with it.
+  final bool showActiveFilters;
+
+  /// The gap between the chips and the row under them. Not `topGap`: that gap
+  /// belongs to the boundary between the band and the screen, and this one is
+  /// inside the band.
+  static double get _rowGap => SdSpacingConstant.h8;
 
   /// The strip and the gap either side of it — the band the screen owns.
   /// Fixed, because a pinned sliver states its extent before it lays anything
   /// out.
-  static double get _extent =>
-      SdContentPaddingV3.topGap * 2 + AppFilterStrip.height;
+  double get _extent =>
+      SdContentPaddingV3.topGap * 2 +
+      AppFilterStrip.height +
+      (showActiveFilters ? _rowGap + AppActiveFilterBar.height : 0);
 
   @override
   double get minExtent => _extent;
@@ -61,11 +86,16 @@ class _PinnedFilterStrip extends SliverPersistentHeaderDelegate {
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
         const _FilterStrip(),
+        if (showActiveFilters) ...<Widget>[
+          SizedBox(height: _rowGap),
+          const _ActiveFilters(),
+        ],
         SizedBox(height: SdContentPaddingV3.topGap),
       ],
     ),
   );
 
   @override
-  bool shouldRebuild(covariant _PinnedFilterStrip oldDelegate) => false;
+  bool shouldRebuild(covariant _PinnedFilterStrip oldDelegate) =>
+      oldDelegate.showActiveFilters != showActiveFilters;
 }

@@ -217,8 +217,12 @@ Owner's rules, all of them read from one place so no screen types them:
     `Expanded` list, so it was never inside the scrollable.
   - Inventory's list *is* the scrollable — the search header has to live in it
     to dock — so its strip is a `SliverPersistentHeader(pinned: true)` whose
-    extent is `topGap * 2 + AppFilterStrip.height`. That band carries both
-    gaps, so the screen places neither.
+    extent is `topGap * 2 + AppFilterStrip.height`, plus
+    `AppActiveFilterBar.height` and the gap above it while something is
+    filtered. That band carries both outer gaps, so the screen places neither.
+    **The delegate rebuilds when that row appears**: a pinned sliver states its
+    extent before it lays anything out, so a row coming and going inside a
+    fixed extent would be clipped.
   - **This reverses the earlier "a filter row is content, and content
     scrolls".** Chips a seller cannot reach 300 rows down are chips they
     scroll back up for, which is the cost the docking header exists to avoid.
@@ -258,6 +262,17 @@ Owner's rules, all of them read from one place so no screen types them:
     glyph below: a control at the top of every screen that a seller has to
     look for is one they stop reaching for. It is the size the two delete
     actions had already drifted to on their own.
+  - **An action whose state is on wears `isActive`, and it fills as well as
+    tints.** Owner's rule, given for the filter glyph over a filtered list.
+    The `FILL` axis of the variable font is how the nav bar already marks the
+    current destination, so the state survives a palette a colour-blind seller
+    cannot separate — colour is never the only signal. An explicit `tint`
+    still wins the colour; the fill is the half that cannot be argued with.
+  - **A header compares the actions it was handed, never how many.**
+    `SdAppBarActionV3` carries value equality over what it draws — `onPressed`
+    is left out, because a closure is new on every build and an action would
+    never equal itself. A delegate comparing `actions.length` is why a lit
+    glyph stayed unlit until something else rebuilt the header.
   - **An unread mark is `dotColor`, not a `Stack` at the call site.** The dot
     sits on the glyph's corner, and only the button knows where the glyph is —
     `NotificationBell` used to pin one to a raw `Icon` whose size it did not
@@ -836,6 +851,11 @@ quietly re-invent one.
   (`if (index > 0)`). A rule above the first row lands on the container's edge
   and reads as a border it does not have. Its height equals its thickness — see
   the divider trap under Spacing.
+- **A hairline inside a card runs edge to edge.** Owner's rule. A rule that
+  stops at the content inset reads as a line drawn under one block; one that
+  crosses the card is the seam between two. The card takes
+  `EdgeInsets.zero` and the blocks it separates carry the padding —
+  `AppListCard` and the inventory row's money band are both built that way.
 - **Modal colour is one slot and sheets and dialogs both wear it**
   (`SdThemeV3`). A dialog opening over a sheet must never be a second shade. It
   sits a step *below* the card, not above: a modal already separates itself with

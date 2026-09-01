@@ -35,6 +35,19 @@ class ResellerStudioApp extends ConsumerWidget {
   const ResellerStudioApp({super.key});
 
   /// iPhone 14 / 15 logical size — the device the layouts were drawn for.
+  /// The locales a build offers, and it is deliberately **not**
+  /// [AppLocalizations.supportedLocales].
+  ///
+  /// `app_vi.arb` holds a few hundred of the app's keys and the generator
+  /// fills the rest from English, so a device set to Vietnamese would render
+  /// a mixed-language app out of translations hard rule 7 calls unreviewed.
+  /// Offering only English is what the Settings row already claims, and the
+  /// launch markets are the United States and the United Kingdom.
+  ///
+  /// The vi keys stay in the ARB (hard rule 7). This list grows again in the
+  /// one translation pass at release.
+  static const List<Locale> shippingLocales = <Locale>[Locale('en')];
+
   static const Size designSize = Size(390, 844);
 
   @override
@@ -66,7 +79,7 @@ class ResellerStudioApp extends ConsumerWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: shippingLocales,
         builder: (BuildContext context, Widget? child) =>
             AnnotatedRegion<SystemUiOverlayStyle>(
               // Covers the routes with no app bar — splash, login, a

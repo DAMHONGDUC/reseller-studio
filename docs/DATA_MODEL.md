@@ -28,6 +28,7 @@ workspaces/{workspaceId}
   carriers/{carrierId}
   activity/{activityId}
   subscription/{docId}
+  usage/{docId}
 ```
 
 Business records are nested under a workspace. This makes workspace membership
@@ -83,6 +84,7 @@ the relationship chain supports workflows and analytics, not item validity.
 | `receipts/{id}` | File metadata and parent reference | Metadata in Firestore; file in Storage |
 | `activity/{id}` | `entityType`, `entityId`, `action`, `actorId`, `before`, `after`, `createdAt` | Append-only and Functions-written |
 | `subscription/{id}` | Plan/entitlement state and timestamps | Webhook-written; backend source for Premium enforcement |
+| `usage/current` | `items`, `orders`, `itemsAtCeiling`, `ordersAtCeiling` | Trigger-written; the only thing `firestore.rules` can read to enforce a Free ceiling, because a rule cannot count a collection |
 
 ## Important snapshots and denormalization
 

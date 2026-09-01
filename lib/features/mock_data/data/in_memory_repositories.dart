@@ -245,7 +245,6 @@ class InMemoryOrderRepository implements OrderRepository {
     final Item current = _store.items[index];
     final int left = current.quantity - 1;
     _store.items[index] = current.copyWith(
-      askingPrice: current.askingPrice ?? order.salePrice,
       quantity: left,
       status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
       soldAt: left == 0 ? order.orderedAt : null,
@@ -280,9 +279,15 @@ class InMemoryMarketplaceRepository implements MarketplaceRepository {
 
   final MockStore _store;
 
+  // Oldest first, the way the real query reads them back: the seeded five
+  // must come out in the order the business was given them here too.
   @override
-  Stream<List<Marketplace>> watchMarketplaces() =>
-      _store.watch(() => List<Marketplace>.of(_store.marketplaces));
+  Stream<List<Marketplace>> watchMarketplaces() => _store.watch(
+    () => List<Marketplace>.of(_store.marketplaces)
+      ..sort(
+        (Marketplace a, Marketplace b) => a.createdAt.compareTo(b.createdAt),
+      ),
+  );
 
   @override
   Future<void> save(Marketplace marketplace) async => _store.upsert(
@@ -364,9 +369,12 @@ class InMemoryListingRepository implements ListingRepository {
 
   final MockStore _store;
 
+  // Newest first, the way the real query reads them back.
   @override
-  Stream<List<Listing>> watchListings() =>
-      _store.watch(() => List<Listing>.of(_store.listings));
+  Stream<List<Listing>> watchListings() => _store.watch(
+    () => List<Listing>.of(_store.listings)
+      ..sort((Listing a, Listing b) => b.createdAt.compareTo(a.createdAt)),
+  );
 
   @override
   Stream<List<Listing>> watchListingsForItem(String itemId) => _store.watch(

@@ -10,7 +10,7 @@ class _Thumbnail extends StatelessWidget {
 
   final Item item;
 
-  static double get size => SdSpacingConstant.r64;
+  static double get size => ItemCardMetricConstant.thumbnail;
 
   @override
   Widget build(BuildContext context) => AppPhoto(

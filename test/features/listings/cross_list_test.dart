@@ -40,7 +40,6 @@ void main() {
     quantity: quantity,
     status: status,
     createdAt: testNow,
-    askingPrice: asking,
     listedAt: listedAt,
   );
 
@@ -104,7 +103,6 @@ void main() {
               Marketplace.ebay: Money(4500, 'USD'),
               Marketplace.depop: Money(4500, 'USD'),
             },
-            askingPrice: const Money(4500, 'USD'),
           );
 
       final List<Listing> listings = await listingsFor(container, 'x-1');
@@ -138,7 +136,6 @@ void main() {
             prices: const <Marketplace, Money>{
               Marketplace.etsy: Money(3000, 'USD'),
             },
-            askingPrice: const Money(3000, 'USD'),
           );
 
       final Item? saved = await container
@@ -149,7 +146,6 @@ void main() {
       // Going live is not a status any more: what it changes is the clock,
       // and a draft becoming stock the seller is selling.
       expect(saved!.status, ItemStatus.inStock);
-      expect(saved.askingPrice, const Money(3000, 'USD'));
       expect(saved.listedAt, isNotNull);
     });
 
@@ -173,7 +169,6 @@ void main() {
               prices: const <Marketplace, Money>{
                 Marketplace.poshmark: Money(4000, 'USD'),
               },
-              askingPrice: const Money(4000, 'USD'),
             );
 
         final Item? saved = await container
@@ -185,7 +180,6 @@ void main() {
         // adding a marketplace must not reset the clock.
         expect(saved!.listedAt, firstListed);
         expect(saved.status, ItemStatus.inStock);
-        expect(saved.askingPrice, const Money(4000, 'USD'));
       },
     );
 
@@ -196,11 +190,7 @@ void main() {
       await container.read(itemRepositoryProvider).save(coat);
       await container
           .read(itemActionsControllerProvider.notifier)
-          .crossList(
-            coat,
-            prices: const <Marketplace, Money>{},
-            askingPrice: const Money(1000, 'USD'),
-          );
+          .crossList(coat, prices: const <Marketplace, Money>{});
 
       expect(await listingsFor(container, 'x-4'), isEmpty);
     });
@@ -217,13 +207,25 @@ void main() {
       expect(find.text('Already on'), findsNWidgets(2));
     });
 
+    testWidgets('no asking price box sits above the marketplaces', (
+      WidgetTester tester,
+    ) async {
+      // Owner's rule: every price here belongs to the marketplace it sits
+      // under. `itm-11` is on none and nothing is ticked, so any field on
+      // screen could only be the screen-level box that used to head it.
+      await pumpScreen(tester, const CrossListScreen(itemId: 'itm-11'));
+
+      expect(find.byType(MoneyField), findsNothing);
+    });
+
     testWidgets('the live listings arrive priced, and change nothing yet', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
 
-      // The shared seed plus a field on each of the two live rows.
-      expect(find.byType(MoneyField), findsNWidgets(3));
+      // One field on each of the two live rows, and no screen-level box
+      // above them.
+      expect(find.byType(MoneyField), findsNWidgets(2));
 
       // Nothing has been added and no price has moved, so there is nothing to
       // save and the button says so by being dead.
@@ -241,12 +243,12 @@ void main() {
       await tester.tap(find.text('Etsy'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(MoneyField), findsNWidgets(4));
+      expect(find.byType(MoneyField), findsNWidgets(3));
       expect(find.text('Save 1 marketplace'), findsOneWidget);
       expect(
         tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
         isNotNull,
-        reason: 'the row was seeded from the shared price, so it can save',
+        reason: 'the row inherited the item’s top live price, so it can save',
       );
     });
 
@@ -316,7 +318,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('List on marketplaces'), findsOneWidget);
+      expect(find.text('Marketplaces management'), findsOneWidget);
       expect(find.text('Cross-list'), findsNothing);
     });
 
@@ -345,7 +347,7 @@ void main() {
       Map<Marketplace, Money> prices = const <Marketplace, Money>{},
     }) => CrossListState(selected: selected, price: price, prices: prices);
 
-    test('a row not ticked yet reads the shared seed', () {
+    test('a row not ticked yet reads the inherited seed', () {
       final CrossListState current = state(
         price: const Money(4500, 'USD'),
         selected: <Marketplace>{Marketplace.depop},
@@ -380,13 +382,13 @@ void main() {
       );
     });
 
-    test('ticking seeds the row from the shared price', () {
+    test('ticking seeds the row from the inherited price', () {
       final ProviderContainer container = mockContainer();
       final CrossListController controller = container.read(
         crossListControllerProvider.notifier,
       );
 
-      controller.setPrice(const Money(4500, 'USD'));
+      controller.inheritPrice(const Money(4500, 'USD'));
       controller.toggle(Marketplace.etsy);
 
       // The common case — one number everywhere — must still be no typing.
@@ -402,13 +404,13 @@ void main() {
         crossListControllerProvider.notifier,
       );
 
-      controller.setPrice(const Money(4500, 'USD'));
+      controller.inheritPrice(const Money(4500, 'USD'));
       controller.toggle(Marketplace.etsy);
       controller.setPriceFor(Marketplace.etsy, const Money(2500, 'USD'));
       controller.toggle(Marketplace.etsy);
       controller.toggle(Marketplace.etsy);
 
-      // Back on the shared seed, not on the 2500 nobody chose this time.
+      // Back on the inherited seed, not on the 2500 nobody chose this time.
       expect(
         container.read(crossListControllerProvider).prices[Marketplace.etsy],
         const Money(4500, 'USD'),
@@ -428,7 +430,6 @@ void main() {
               Marketplace.ebay: Money(4500, 'USD'),
               Marketplace.depop: Money(4000, 'USD'),
             },
-            askingPrice: const Money(4500, 'USD'),
           );
 
       final Map<Marketplace, Money> written = <Marketplace, Money>{
@@ -442,7 +443,7 @@ void main() {
       });
     });
 
-    test('the item keeps the shared price, not one platform’s', () async {
+    test('cross-listing writes listings and no price onto the item', () async {
       final ProviderContainer container = mockContainer();
       final Item coat = item(id: 'x-6');
 
@@ -455,16 +456,25 @@ void main() {
               Marketplace.ebay: Money(4500, 'USD'),
               Marketplace.depop: Money(4000, 'USD'),
             },
-            askingPrice: const Money(4500, 'USD'),
           );
 
-      final Item? saved = await container
-          .read(itemRepositoryProvider)
-          .watchItem('x-6')
+      final List<Listing> saved = await container
+          .read(listingRepositoryProvider)
+          .watchListingsForItem('x-6')
           .first;
 
-      // What the item is worth is not whichever platform was cheapest.
-      expect(saved!.askingPrice, const Money(4500, 'USD'));
+      // Every price is a marketplace's own — the item carries none, so the
+      // two numbers survive as two rather than being averaged into one.
+      expect(
+        <Marketplace, Money>{
+          for (final Listing listing in saved)
+            listing.marketplace: listing.price,
+        },
+        const <Marketplace, Money>{
+          Marketplace.ebay: Money(4500, 'USD'),
+          Marketplace.depop: Money(4000, 'USD'),
+        },
+      );
     });
   });
 }

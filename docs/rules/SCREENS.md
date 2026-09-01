@@ -24,17 +24,19 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   labelled `SdFabV3`, same button, same place, every screen. That is an
   always-apply rule and it lives in the root `CLAUDE.md`; the design-system
   half is in `DESIGN_SYSTEM.md`.
-- **Every add or edit screen pins its save action to the bottom** — owner's
-  rule, first stated about workspace setup and then restated for all of them,
-  because two screens had let the button scroll away with the last field. Only
-  the fields scroll; the button holds the bottom edge, so a seller never
-  scrolls to find out how to finish, and the way to finish is in the same place
-  on every screen. **This is not the `SdFabV3` rule above and does not compete
-  with it**: that one is for a list screen creating a new row, this one is for a
-  screen whose single action commits the screen itself.
+- **A screen with content and an action button pins that button to the bottom**
+  — owner's rule. It was first stated about workspace setup, then about every
+  add and edit screen, and now about all of them: wherever content scrolls and
+  the screen has an action, the content scrolls and the action holds the bottom
+  edge. A seller never scrolls to find out how to finish, and the way to finish
+  is in the same place on every screen. **This is not the `SdFabV3` rule above
+  and does not compete with it**: that one is for a list screen creating a new
+  row, this one is for a screen acting on what it is already showing.
   - **`AppPinnedAction` (`core/widgets/`) is the one implementation.** Three
     screens had written their own before it was extracted, which is three
-    chances for the gap above the button to be a different number.
+    chances for the gap above the button to be a different number. Its
+    `variant` is the only thing a screen chooses; the geometry is not
+    negotiable.
   - The action sits **below** the scroll view, never floating over it, so
     content can never pass behind it. That is why it wears no surface and no
     blur — `SdContentPaddingV3.pinnedActionsGap` above it is the whole
@@ -42,8 +44,50 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
     home indicator.
   - The screen passes the button's own state down; the widget holding it stays
     small enough that a keystroke rebuilds it and not the fields above.
-  - A sheet is already this shape — its action is its last row and the sheet
-    is only as tall as its content — so it needs nothing extra.
+  - **Two actions stack, they never sit side by side, and the primary is
+    lowest.** Business details pins Save with Delete this business above it.
+    A `Row` shrinks both labels to fit and puts a destructive verb a thumb's
+    width from the safe one; stacked, the button under the resting thumb is
+    always the one the screen is for. `AppPinnedAction.secondary` is the slot,
+    and both share the one bottom inset — a second padded widget would clear
+    the home indicator twice.
+  - **A conditional second action carries its own gap.** `_DangerZone` renders
+    nothing for a seller who cannot delete, and a gap owned by the slot would
+    leave a hole above Save on every screen that does not draw one.
+  - **The button disappears rather than moves when it does not apply.** A
+    screen whose action is conditional — Subscription only sells to a seller
+    who is not paying, the paywall only buys once the store has answered —
+    renders nothing in the slot, and the scroll view takes the space back.
+    Never leave a disabled button pinned to explain a state; the content above
+    already does.
+
+- **"Action button" means the screen's action, not a row's.** The rule above
+  would be unfollowable without the line, and these sit on the wrong side of
+  it:
+  - **A button inside a row or a card acts on that record and stays there** —
+    the recurring expense's Record, an offer card's Accept. Pinning those
+    would tear an action away from the thing it names, and a screen listing
+    twelve of them has no single bottom edge to pin to. **A destructive action
+    on the record the whole screen is about is not one of these** — Business
+    details' Delete this business was read that way once and was wrong: the
+    screen is the record, so the verb is the screen's.
+  - **An empty state's action stays in the empty state.** There is no content
+    for the button to be pinned away from — the empty state *is* the screen —
+    and `AppListEmptyState` already owns where it sits.
+  - **A detail screen's Actions button stays in the app bar**, because it
+    opens a sheet of several verbs rather than committing one. That is its own
+    owner's rule, further down this file.
+  - **A selection bar is already pinned** and stays a `bottomNavigationBar`:
+    it appears with the selection and replaces the FAB, which a pinned action
+    below the list cannot do.
+  - A sheet only as tall as its content is already this shape — its action is
+    its last row — so it needs nothing extra. **A sheet that scrolls is a
+    screen for this rule**: `PaywallScreen` is a route presented as a sheet,
+    takes nine tenths of the height whatever the store returns, and holds its
+    purchase button out of the scroll like any other screen. It is the one
+    place that does not use `AppPinnedAction` — `SdBottomSheetV3` already pays
+    the horizontal gutter and the home-indicator inset, so the shared widget
+    would draw both twice. Only `pinnedActionsGap` is taken from it.
 
 ## The device status bar — one source, and the two platforms disagree
 
@@ -151,6 +195,61 @@ because they are about the shell, not the bar:
   a search header, so the spinner drops in below the chips rather than over
   them.
 
+## A filtered list says how many filters are on, and offers Reset
+
+Owner's rule. Inventory and Orders both keep their vocabulary of filters in a
+sheet, so without a line on the screen a row missing because of a filter and a
+row missing because of a bug look identical — and the seller's only way to
+check is to reopen the sheet and read every group.
+
+- **`AppActiveFilterBar` (`core/widgets/`) is the one implementation**, and it
+  renders in two places at once: under the strip on the screen, and at the top
+  of that screen's filter sheet. One widget, so the two counts are one line of
+  code — what each one counts is not the same, and the sheet's is below.
+- **It renders nothing at zero.** A row saying "0 filters" is chrome describing
+  the absence of chrome.
+- **The count is by group, never by chip.** Three categories ticked is one
+  filter; a seller who made one choice cannot reconcile "3 filters" with the
+  sheet in front of them.
+- **The selected tab counts as one whenever it is not `All`**, and Reset
+  returns it there. A seller looking at three rows of eleven is filtered by the
+  tab exactly as much as by the sheet, and a bar reading "no filters" over a
+  narrowed list would be describing a different screen.
+- **The search box is not counted and Reset leaves it alone.** It is visible on
+  the screen with its own clear button, so it is not the filter that went
+  missing.
+- **Nothing is applied until Apply is pressed.** Owner's rule, and it
+  **reverses "the sheet applies as it is tapped"**. The chips edit a draft the
+  sheet holds; the list behind it does not move while the seller is still
+  deciding, and closing the sheet any other way — the X, a drag, the back
+  gesture — leaves the list exactly as they found it. A seller trying two
+  combinations had already changed the screen twice under the old rule.
+  - **The primary button says "Apply", not a count.** How many rows are left
+    is a fact about a filter that has been applied, and this button is what
+    applies one.
+  - **The sheet's own bar counts the draft, and never the tab.** The tab is
+    not in the sheet, so a number counting it could not be made true by the
+    Reset beside it — inside the sheet, Reset empties what is pending and
+    nothing else. The strip's bar still counts the tab and its Reset still
+    clears it.
+  - **Ticking a chip is a method on the criteria, not on the notifier**
+    (`ItemFilterCriteria.withStatusToggled`). Two places tick a chip now — the
+    draft and the applied value — so what a tick means lives in one place, and
+    `apply(pending)` is all the controller keeps.
+- **The entry point is an app-bar action, never a chip on the strip.** Five
+  tabs are already wider than a phone, so a sixth chip pushes a real tab off
+  the edge to reach a sheet that is not a tab.
+- **That action is lit while the sheet holds something** — owner's rule.
+  `SdAppBarActionButtonV3.isActive` fills the glyph and paints it primary, so
+  a seller who scrolled past the bar under the strip can still see, from the
+  chrome that never moves, that the list is narrower than the shelf. It
+  follows the sheet's own groups and not the tab, for the reason the sheet's
+  bar does: the strip already shows which tab is picked, and a lit glyph over
+  a sheet that opens empty is a lie about where the rows went.
+- `test/features/inventory/inventory_filter_sheet_test.dart` and
+  `test/features/orders/order_filter_sheet_test.dart` hold the count, the two
+  places it renders, and Reset.
+
 ## Empty states
 
 - **An empty state still scrolls**, or the one screen a seller most wants to
@@ -202,6 +301,46 @@ form stayed empty, and the seller saw an edit screen that never filled in.
 - Held by `test/features/inventory/item_form_seed_test.dart` and
   `test/features/workspace/workspace_detail_seed_test.dart`, both of which
   fail on the direct call.
+
+## A detail screen edits in place, one section at a time
+
+Owner's rule, and it replaces the edit screen for every record that has a
+detail screen. **There is no separate screen for changing an existing record.**
+A seller who spots a wrong cost was pushed onto a full form, made to scroll
+past nine fields they were not changing, and popped back — for one number.
+
+- **Each section that holds fields carries its own Edit, and Edit becomes
+  Cancel and Save.** The section is the unit because the section is already
+  how the screen groups fields: correcting a price and correcting an address
+  are separate intents and must be separate saves.
+- **One section edits at a time.** Opening a second closes the first — two
+  open drafts is two sets of unsaved keystrokes and no way to tell which Save
+  belongs to which.
+- **Read mode and edit mode are the same rows in the same order.** A section
+  that reflows on Edit makes the seller re-find the field they came for.
+- **Only stored fields open.** A derived figure has no field to edit
+  (hard rule 3), and a recorded timestamp is not a thing a seller types.
+- **A state transition stays in the actions sheet, never in a section.** List,
+  Mark sold, Archive, Ship, Mark delivered and Record refund carry side
+  effects — an inventory write, an audit entry, a timeline fact — and a status
+  field that wrote the value alone would skip all of them (hard rule 2).
+- **A section whose rows belong to another screen sends Edit there instead of
+  opening fields.** Owner's rule, stated for Item detail's Listings block: what
+  a marketplace asks is edited on Marketplaces management, which is also the
+  only screen that can put the item on a new one. Editing the same number in
+  two places is two ways to write it, and the half the seller reaches first is
+  the one that cannot do the rest of the job. The section still reads as a
+  section — same header, same Edit — it just hands the whole question over.
+- **Which section is open, and the save, live in a controller**; the text
+  controllers stay on the screen, the way every other form here does it. A
+  widget deciding what to write is the rule this repo does not bend.
+- **Cancel restores from the record, not from a copy taken on Edit.** The
+  record is a stream and a teammate may have changed it while the draft was
+  open; re-seeding from what is current is the only answer that is not stale.
+- **Saving writes only the fields that section owns**, re-read at the moment
+  of the write — the same rule the workspace detail screen already follows.
+- **The create form stays a screen.** Creating has no record to show sections
+  of, and hard rule 2 keeps that form's requirements to a title.
 
 ## Search
 

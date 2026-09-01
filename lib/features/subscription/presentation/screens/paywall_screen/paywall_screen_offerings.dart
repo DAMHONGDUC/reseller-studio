@@ -9,17 +9,16 @@ class _PaywallOfferings extends ConsumerWidget {
   const _PaywallOfferings();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ref
-          .watch(planOfferingsProvider)
-          .when(
-            loading: () => const _PaywallOfferingsLoading(),
-            error: (Object error, StackTrace stackTrace) =>
-                const _PaywallOfferingsError(),
-            data: (List<PlanOffering> offerings) => offerings.isEmpty
-                ? const _PaywallOfferingsUnavailable()
-                : _PaywallPlanOptions(offerings: offerings),
-          );
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(planOfferingsProvider)
+      .when(
+        loading: () => const _PaywallOfferingsLoading(),
+        error: (Object error, StackTrace stackTrace) =>
+            const _PaywallOfferingsError(),
+        data: (List<PlanOffering> offerings) => offerings.isEmpty
+            ? const _PaywallOfferingsUnavailable()
+            : _PaywallPlanOptions(offerings: offerings),
+      );
 }
 
 class _PaywallOfferingsLoading extends StatelessWidget {

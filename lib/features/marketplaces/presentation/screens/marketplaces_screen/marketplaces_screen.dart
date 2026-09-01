@@ -60,6 +60,9 @@ class MarketplacesScreen extends ConsumerWidget {
                         context.l10n.marketplacesEstimatedFee,
                       ),
                       icon: AppIconConstant.storefront,
+                      // The colour is picked on the detail screen; this is
+                      // where the seller sees what they picked.
+                      iconTint: marketplace.hue.of(context),
                       onTap: () =>
                           context.push(AppRoutes.marketplace(marketplace.id)),
                     ),

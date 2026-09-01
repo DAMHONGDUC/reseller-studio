@@ -19,7 +19,6 @@ void main() {
     status: ItemStatus.inStock,
     createdAt: testNow.subtract(const Duration(days: 100)),
     listedAt: testNow.subtract(const Duration(days: 100)),
-    askingPrice: const Money(4500, 'USD'),
     condition: ItemCondition.good,
   );
 
@@ -36,6 +35,8 @@ void main() {
     status: ListingStatus.active,
     createdAt: testNow,
   );
+
+  final Finder badges = find.byType(SdBadgeV3);
 
   testWidgets('the card counts distinct marketplaces and prices none of them', (
     WidgetTester tester,
@@ -81,10 +82,7 @@ void main() {
     );
     // The card reports; it never offers the form's picker.
     expect(find.byType(SdTagV3), findsNothing);
-    expect(
-      tester.widget<SdBadgeV3>(marketTag).size,
-      SdBadgeSizeV3.compact,
-    );
+    expect(tester.widget<SdBadgeV3>(marketTag).size, SdBadgeSizeV3.compact);
     expect(find.text('<1d'), findsNothing);
     expect(find.text('eBay'), findsNothing);
     expect(find.text('Depop'), findsNothing);
@@ -96,7 +94,7 @@ void main() {
     expect(find.text(r'$50.00'), findsNothing);
   });
 
-  testWidgets('the marketplace tag is a line of its own, under the state', (
+  testWidgets('every tag shares one wrap, the market count last', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -108,18 +106,23 @@ void main() {
       ),
     );
 
-    final Rect status = tester.getRect(
-      find.widgetWithText(SdBadgeV3, 'In stock'),
-    );
-    final Rect grade = tester.getRect(find.widgetWithText(SdBadgeV3, 'Good'));
-    final Rect market = tester.getRect(
-      find.widgetWithText(SdBadgeV3, '1 market'),
+    final Finder wrap = find.descendant(
+      of: find.byType(ItemCard),
+      matching: find.byType(Wrap),
     );
 
-    // Line one is what the item is; line two is where it is listed.
-    expect(grade.top, moreOrLessEquals(status.top));
-    expect(market.top, greaterThan(status.bottom));
-    expect(market.left, moreOrLessEquals(status.left));
+    // One wrap, not a column of two: the line reserved for the count was the
+    // largest thing on the card holding no fact of its own.
+    expect(wrap, findsOneWidget);
+
+    final List<String> labels = tester
+        .widgetList<SdBadgeV3>(find.descendant(of: wrap, matching: badges))
+        .map((SdBadgeV3 badge) => badge.label)
+        .toList();
+
+    // The reading order carries the split the layout no longer does: what the
+    // item is first, where it stands last.
+    expect(labels, <String>['In stock', 'Stale', 'Good', '1 market']);
   });
 
   testWidgets('an item nobody has listed says so, in red', (
@@ -144,7 +147,10 @@ void main() {
     // listing would be pointing at work nobody has to do.
     await pumpScreen(
       tester,
-      ItemCard(item: item.copyWith(status: ItemStatus.sold), now: testNow),
+      ItemCard(
+        item: item.copyWith(status: ItemStatus.sold),
+        now: testNow,
+      ),
     );
 
     expect(find.text('Not listed'), findsNothing);
