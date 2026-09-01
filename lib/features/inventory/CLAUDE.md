@@ -490,10 +490,10 @@ The record arrives on a stream, so the form learns it exists inside a `build` �
 and writing the form's controller from there throws. See
 `docs/rules/SCREENS.md`, which carries the rule and the reason.
 
-## The row carries enough; what it must do now is get smaller
+## The row carries enough; what it must do is stay short without crowding
 
 Owner's rule. The information on the inventory card is settled — every figure
-above has a rule of its own and none of them leaves. What was wrong is the
+above has a rule of its own and none of them leaves. What was wrong was the
 height: a card that answers four questions in the space of a phone screen and
 a half means a seller scrolls to compare two items that should have been
 visible together.
@@ -501,11 +501,17 @@ visible together.
 - **Nothing is removed to make room.** Compaction is spacing, glyph and
   thumbnail size — never a fact. A denser card that dropped the cost would be
   a different card, not a smaller one.
-- **`ItemCardMetricConstant` owns the sizes the card tightens**, so the next
-  pass changes numbers in one class instead of hunting `SizedBox`es through
-  six part files.
+- **`ItemCardMetricConstant` owns every gap and size the card is tuned by**,
+  so a pass changes numbers in one class instead of hunting `SizedBox`es
+  through six part files.
+- **The compaction pass went one step too far, and the gaps came back** —
+  owner's rule. Title to tags, badge to badge and the column's own steps were
+  tight enough that the row read as one block of text; they are the three that
+  reopened. **Height is bought from the gaps that carry nothing, never from
+  the ones that separate two different things.**
 - **The two zones and the money band stay exactly as they are.** Every rule
-  above about what sits where survives this; only the gaps between them close.
+  above about what sits where survives both passes; only the air between them
+  moves.
 
 ## The item form creates; the detail screen edits
 
