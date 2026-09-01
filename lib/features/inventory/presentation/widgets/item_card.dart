@@ -11,6 +11,7 @@ import '../../../listings/domain/entities/listing.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
+import '../../item_card_metric_constant.dart';
 
 part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
@@ -140,7 +141,7 @@ class ItemCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: SdSpacingConstant.h6),
+                    SizedBox(height: ItemCardMetricConstant.titleGap),
                     _StateBadges(item: item, now: now, listings: listings),
                   ],
                 ),
@@ -158,7 +159,7 @@ class ItemCard extends StatelessWidget {
           ),
           // The rule makes the band deliberate rather than a block that
           // happens to start further left than everything above it.
-          SdDividerV3(gap: SdSpacingConstant.h12),
+          SdDividerV3(gap: ItemCardMetricConstant.bandGap),
           _MoneyLine(
             item: item,
             onMarketPrices: isSelecting ? null : onMarketPrices,

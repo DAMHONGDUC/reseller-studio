@@ -21,7 +21,7 @@ class _UpdatedLine extends StatelessWidget {
     if (updated == null) return const SizedBox.shrink();
 
     return Padding(
-      padding: EdgeInsets.only(top: SdSpacingConstant.h8),
+      padding: EdgeInsets.only(top: ItemCardMetricConstant.updatedGap),
       child: Text(
         context.l10n.itemUpdatedAt(
           DateTimeUtils.shortDate(updated, locale: context.localeTag),

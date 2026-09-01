@@ -1165,7 +1165,7 @@
   "@itemAddSourceFirst": {
     "description": "Says where to go when the source picker is empty."
   },
-  "itemActionList": "List on marketplaces",
+  "itemActionList": "Marketplaces management",
   "@itemActionList": {
     "description": "Opens the sheet that puts an item on a marketplace."
   },
@@ -3317,7 +3317,7 @@
   "@notificationSomethingHappened": {
     "description": "Fallback row for a notification type this build does not know."
   },
-  "crossListTitle": "List on marketplaces",
+  "crossListTitle": "Marketplaces management",
   "@crossListTitle": {
     "description": "Title of the cross-listing screen."
   },

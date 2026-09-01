@@ -65,7 +65,7 @@ class _StateBadges extends StatelessWidget {
           ],
         ),
         if (showMarkets) ...<Widget>[
-          SizedBox(height: SdSpacingConstant.h4),
+          SizedBox(height: ItemCardMetricConstant.tagLineGap),
           _Marketplaces(count: marketCount),
         ],
       ],
