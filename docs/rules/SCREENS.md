@@ -204,8 +204,8 @@ check is to reopen the sheet and read every group.
 
 - **`AppActiveFilterBar` (`core/widgets/`) is the one implementation**, and it
   renders in two places at once: under the strip on the screen, and at the top
-  of that screen's filter sheet. One widget, so the count the seller reads
-  before opening the sheet and the count they read inside it cannot disagree.
+  of that screen's filter sheet. One widget, so the two counts are one line of
+  code — what each one counts is not the same, and the sheet's is below.
 - **It renders nothing at zero.** A row saying "0 filters" is chrome describing
   the absence of chrome.
 - **The count is by group, never by chip.** Three categories ticked is one
@@ -218,10 +218,24 @@ check is to reopen the sheet and read every group.
 - **The search box is not counted and Reset leaves it alone.** It is visible on
   the screen with its own clear button, so it is not the filter that went
   missing.
-- **The sheet applies as it is tapped; there is no Apply button.** Its primary
-  button carries the result count and closes — a seller who ticks a chip and
-  watches the number move learns immediately whether it was the filter they
-  meant.
+- **Nothing is applied until Apply is pressed.** Owner's rule, and it
+  **reverses "the sheet applies as it is tapped"**. The chips edit a draft the
+  sheet holds; the list behind it does not move while the seller is still
+  deciding, and closing the sheet any other way — the X, a drag, the back
+  gesture — leaves the list exactly as they found it. A seller trying two
+  combinations had already changed the screen twice under the old rule.
+  - **The primary button says "Apply", not a count.** How many rows are left
+    is a fact about a filter that has been applied, and this button is what
+    applies one.
+  - **The sheet's own bar counts the draft, and never the tab.** The tab is
+    not in the sheet, so a number counting it could not be made true by the
+    Reset beside it — inside the sheet, Reset empties what is pending and
+    nothing else. The strip's bar still counts the tab and its Reset still
+    clears it.
+  - **Ticking a chip is a method on the criteria, not on the notifier**
+    (`ItemFilterCriteria.withStatusToggled`). Two places tick a chip now — the
+    draft and the applied value — so what a tick means lives in one place, and
+    `apply(pending)` is all the controller keeps.
 - **The entry point is an app-bar action, never a chip on the strip.** Five
   tabs are already wider than a phone, so a sixth chip pushes a real tab off
   the edge to reach a sheet that is not a tab.
