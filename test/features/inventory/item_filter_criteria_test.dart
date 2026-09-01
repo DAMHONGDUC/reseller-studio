@@ -52,10 +52,7 @@ void main() {
         categoryIds: <String>{'cat-1'},
       );
 
-      expect(
-        criteria.matches(itemWith(categoryId: 'cat-1'), now: now),
-        isTrue,
-      );
+      expect(criteria.matches(itemWith(categoryId: 'cat-1'), now: now), isTrue);
       expect(
         criteria.matches(itemWith(categoryId: 'cat-2'), now: now),
         isFalse,

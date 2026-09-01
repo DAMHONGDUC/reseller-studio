@@ -93,14 +93,15 @@ class _OfferCard extends ConsumerWidget {
     // What the offer is measured against is that marketplace's own listing:
     // the item carries no price of its own, and an offer made on Depop says
     // nothing about what eBay is asking.
-    final Money? listed = (ref.watch(listingsProvider).value ?? const <Listing>[])
-        .where(
-          (Listing row) =>
-              row.itemId == offer.itemId &&
-              row.marketplace == offer.marketplace,
-        )
-        .firstOrNull
-        ?.price;
+    final Money? listed =
+        (ref.watch(listingsProvider).value ?? const <Listing>[])
+            .where(
+              (Listing row) =>
+                  row.itemId == offer.itemId &&
+                  row.marketplace == offer.marketplace,
+            )
+            .firstOrNull
+            ?.price;
 
     final double? discount = offer.discountFrom(listed);
 
@@ -144,9 +145,8 @@ class _OfferCard extends ConsumerWidget {
                 Text(
                   <String>[
                     offer.marketplace.displayName,
-                    if (listed != null) context.l10n.offerAsking(
-                      context.money(listed),
-                    ),
+                    if (listed != null)
+                      context.l10n.offerAsking(context.money(listed)),
                     if (discount != null)
                       context.l10n.offerBelowAsking(context.percent(discount)),
                     if (offer.buyerName != null) offer.buyerName!,

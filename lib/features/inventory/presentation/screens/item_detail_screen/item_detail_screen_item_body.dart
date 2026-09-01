@@ -53,7 +53,11 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         _quantity.text = item.quantity.toString();
       case ItemDetailSection.pricing:
         _cost.text = item.purchasePrice?.toInputString() ?? '';
-            _minimum.text = item.minimumPrice?.toInputString() ?? '';
+        _minimum.text = item.minimumPrice?.toInputString() ?? '';
+      // Its boxes are one per listing and belong to the section that draws
+      // them, so it seeds itself.
+      case ItemDetailSection.listings:
+        break;
       case ItemDetailSection.provenance:
         _barcode.text = item.barcode ?? '';
       case ItemDetailSection.description:
@@ -219,8 +223,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
           ),
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        _SectionTitle(title: context.l10n.itemListings),
-        _Listings(itemId: item.id),
+        _ListingsSection(item: item),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.description,

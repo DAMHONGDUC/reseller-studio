@@ -76,10 +76,7 @@ void main() {
       );
       final DateTime passed = DateTime(2026, 8, 20);
 
-      expect(
-        overdue.matches(orderWith(shipByDate: passed), now: now),
-        isTrue,
-      );
+      expect(overdue.matches(orderWith(shipByDate: passed), now: now), isTrue);
       // Already shipped: nothing is late about it any more.
       expect(
         overdue.matches(
@@ -113,10 +110,7 @@ void main() {
 
       expect(awaiting.matches(orderWith(), now: now), isTrue);
       expect(
-        awaiting.matches(
-          orderWith(payout: const Money(3600, 'USD')),
-          now: now,
-        ),
+        awaiting.matches(orderWith(payout: const Money(3600, 'USD')), now: now),
         isFalse,
       );
     });
@@ -127,10 +121,7 @@ void main() {
       );
 
       expect(
-        tracked.matches(
-          orderWith(status: OrderStatus.shipped),
-          now: now,
-        ),
+        tracked.matches(orderWith(status: OrderStatus.shipped), now: now),
         isFalse,
       );
       expect(
@@ -161,11 +152,17 @@ void main() {
       );
 
       expect(
-        over30.matches(orderWith(salePrice: const Money(3000, 'USD')), now: now),
+        over30.matches(
+          orderWith(salePrice: const Money(3000, 'USD')),
+          now: now,
+        ),
         isTrue,
       );
       expect(
-        over30.matches(orderWith(salePrice: const Money(2999, 'USD')), now: now),
+        over30.matches(
+          orderWith(salePrice: const Money(2999, 'USD')),
+          now: now,
+        ),
         isFalse,
       );
       expect(

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/widgets/app_editable_section.dart';
+import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/repositories/item_repository.dart';
 import 'package:reseller_studio/features/inventory/presentation/controllers/item_detail_edit_controller.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/mock_data/providers.dart';
 
 import '../../support/pump_app.dart';
@@ -46,10 +50,69 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Listings is a list of records rather than a set of fields, so it is the
-    // one section with nothing to open.
+    // Listings offers an Edit only when there is a price to move; itm-11 is
+    // on no marketplace, so it shows the empty line and no Edit.
     expect(find.text('Listings'), findsOneWidget);
     expect(find.text('Edit'), findsNWidgets(3));
+  });
+
+  testWidgets('a listed item reprices its marketplaces in place', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-4'));
+
+    final ProviderContainer container = ProviderScope.containerOf(
+      tester.element(find.byType(ItemDetailScreen)),
+    );
+    final List<Listing> before = await container
+        .read(listingRepositoryProvider)
+        .watchListingsForItem('itm-4')
+        .first;
+
+    expect(before, isNotEmpty);
+
+    await tester.scrollUntilVisible(
+      find.text('Listings'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    // Found through its own section rather than by counting Edits: what is
+    // built depends on how far the list has scrolled.
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(AppEditableSection, 'Listings'),
+        matching: find.text('Edit'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(MoneyField).first,
+        matching: find.byType(EditableText),
+      ),
+      '99.00',
+    );
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final List<Listing> after = await container
+        .read(listingRepositoryProvider)
+        .watchListingsForItem('itm-4')
+        .first;
+
+    // One price moved and the rest are untouched; nothing about the listing
+    // but its price is written.
+    expect(
+      after.firstWhere((Listing row) => row.id == before.first.id).price,
+      const Money(9900, 'USD'),
+    );
+    expect(
+      after.firstWhere((Listing row) => row.id == before.first.id).status,
+      before.first.status,
+    );
   });
 
   testWidgets('opening one section closes the door on the others', (

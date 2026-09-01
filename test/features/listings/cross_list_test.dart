@@ -190,10 +190,7 @@ void main() {
       await container.read(itemRepositoryProvider).save(coat);
       await container
           .read(itemActionsControllerProvider.notifier)
-          .crossList(
-            coat,
-            prices: const <Marketplace, Money>{},
-          );
+          .crossList(coat, prices: const <Marketplace, Money>{});
 
       expect(await listingsFor(container, 'x-4'), isEmpty);
     });
@@ -458,7 +455,8 @@ void main() {
       // two numbers survive as two rather than being averaged into one.
       expect(
         <Marketplace, Money>{
-          for (final Listing listing in saved) listing.marketplace: listing.price,
+          for (final Listing listing in saved)
+            listing.marketplace: listing.price,
         },
         const <Marketplace, Money>{
           Marketplace.ebay: Money(4500, 'USD'),

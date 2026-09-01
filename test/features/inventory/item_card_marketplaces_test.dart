@@ -82,10 +82,7 @@ void main() {
     );
     // The card reports; it never offers the form's picker.
     expect(find.byType(SdTagV3), findsNothing);
-    expect(
-      tester.widget<SdBadgeV3>(marketTag).size,
-      SdBadgeSizeV3.compact,
-    );
+    expect(tester.widget<SdBadgeV3>(marketTag).size, SdBadgeSizeV3.compact);
     expect(find.text('<1d'), findsNothing);
     expect(find.text('eBay'), findsNothing);
     expect(find.text('Depop'), findsNothing);
@@ -150,7 +147,10 @@ void main() {
     // listing would be pointing at work nobody has to do.
     await pumpScreen(
       tester,
-      ItemCard(item: item.copyWith(status: ItemStatus.sold), now: testNow),
+      ItemCard(
+        item: item.copyWith(status: ItemStatus.sold),
+        now: testNow,
+      ),
     );
 
     expect(find.text('Not listed'), findsNothing);

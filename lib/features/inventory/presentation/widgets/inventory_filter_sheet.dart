@@ -60,15 +60,14 @@ class InventoryFilterSheet extends ConsumerWidget {
   List<AppFilterOption<String>> _byId(
     BuildContext context,
     Map<String, String> namesById,
-  ) =>
-      <AppFilterOption<String>>[
-        for (final MapEntry<String, String> entry in namesById.entries)
-          AppFilterOption<String>(value: entry.key, label: entry.value),
-        AppFilterOption<String>(
-          value: ItemFilterConstant.unassignedId,
-          label: context.l10n.filterUnassigned,
-        ),
-      ];
+  ) => <AppFilterOption<String>>[
+    for (final MapEntry<String, String> entry in namesById.entries)
+      AppFilterOption<String>(value: entry.key, label: entry.value),
+    AppFilterOption<String>(
+      value: ItemFilterConstant.unassignedId,
+      label: context.l10n.filterUnassigned,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

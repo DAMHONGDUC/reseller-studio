@@ -143,14 +143,20 @@ void main() {
     // different place on every row.
     await pumpScreen(
       tester,
-      ItemCard(item: itemWith(cost: const Money(4500, 'USD')), now: testNow),
+      ItemCard(
+        item: itemWith(cost: const Money(4500, 'USD')),
+        now: testNow,
+      ),
     );
 
     final double narrow = tester.getRect(find.text('Cost')).left;
 
     await pumpScreen(
       tester,
-      ItemCard(item: itemWith(cost: const Money(123456, 'USD')), now: testNow),
+      ItemCard(
+        item: itemWith(cost: const Money(123456, 'USD')),
+        now: testNow,
+      ),
     );
 
     expect(tester.getRect(find.text('Cost')).left, moreOrLessEquals(narrow));

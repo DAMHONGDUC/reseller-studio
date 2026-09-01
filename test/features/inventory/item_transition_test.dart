@@ -93,10 +93,7 @@ void main() {
         'from the original listing', () {
       final DateTime firstListing = DateTime(2026, 1, 1);
       final Item relisted = ItemTransition.apply(
-        item(
-          status: ItemStatus.inStock,
-          listedAt: firstListing,
-        ),
+        item(status: ItemStatus.inStock, listedAt: firstListing),
         ItemStatus.inStock,
         now: now,
       );
@@ -133,10 +130,7 @@ void main() {
     });
 
     test('the sale that empties the shelf is the one that sells the row', () {
-      final Item listed = item(
-        status: ItemStatus.inStock,
-        listedAt: now,
-      );
+      final Item listed = item(status: ItemStatus.inStock, listedAt: now);
 
       final Item afterSale = ItemTransition.sell(listed, now: now);
 
@@ -147,10 +141,7 @@ void main() {
     });
 
     test('an empty shelf cannot be sold from', () {
-      final Item soldOut = item(
-        status: ItemStatus.sold,
-        quantity: 0,
-      );
+      final Item soldOut = item(status: ItemStatus.sold, quantity: 0);
 
       expect(() => ItemTransition.sell(soldOut, now: now), throwsStateError);
     });

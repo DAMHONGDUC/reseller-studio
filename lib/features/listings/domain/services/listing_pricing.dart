@@ -43,8 +43,6 @@ final class ListingPricing {
         .map((Listing listing) => listing.price)
         .where((Money price) => price.currency == currency);
 
-    return comparable.reduce(
-      (Money a, Money b) => b.minor > a.minor ? b : a,
-    );
+    return comparable.reduce((Money a, Money b) => b.minor > a.minor ? b : a);
   }
 }
