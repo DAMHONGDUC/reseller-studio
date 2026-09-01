@@ -79,19 +79,23 @@ several. They are now one row, `itemActionList`, opening `CrossListScreen`.
 ## Every marketplace may carry its own price
 
 Owner's rule. `Listing.price` was always per-listing; what was missing was a
-way to set it. The cross-list screen now collects **a shared price plus the
-exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
+way to set it. The cross-list screen collects **one price per marketplace**,
+and `crossList` takes a `Map<Marketplace, Money>`.
 
 - **The price field sits under the marketplace it belongs to** — owner's rule.
   Choosing a platform and pricing it is one decision, and it replaced a
   separate Review section whose rows opened a sheet to edit one number: the
   seller ticked something and had to scroll to find out what that had done.
   The fee and what is left ride under the field as its helper.
-- **Ticking seeds that row from the shared price**, so the common case — one
-  number everywhere — is still no typing at all. The shared field is the seed,
-  not the answer: changing it afterwards does not reach back into rows already
-  on screen, because a number moving in a field nobody is watching is worse
-  than retyping one.
+- **There is no asking price box above the list** — owner's rule. Every price
+  on the screen belongs to the marketplace it sits under, so a box that priced
+  nothing was one number too many: a seller filled it in and still had to read
+  down the rows to find out what it had done.
+- **Ticking seeds that row from what the item is already live at**, so the
+  common case — one number everywhere — is still no typing at all. The seed is
+  taken once, from the top live price (`ListingPricing.topPrice`), and never
+  reaches back into a row already on screen: a number moving in a field nobody
+  is watching is worse than retyping one.
 - **A marketplace the item is already on is ticked, and its price is
   editable** — owner's rule. An empty circle beside a platform the item is
   live on is simply wrong; the circle cannot be unticked, because a second
@@ -105,39 +109,33 @@ exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
   at a number the seller had just deleted.
 - **Unticking a platform drops its price.** A hidden number that came back on
   the next tick is one nobody chose that time.
-- **The shared price seeds the rows and is written nowhere else.** It used to
-  also become the item's own `askingPrice`; the item has no price of its own
-  any more (see below), so `crossList` writes listings and nothing but.
-- `test/features/listings/cross_list_test.dart` holds all six.
+- **The seed seeds the rows and is written nowhere else.** It used to also
+  become the item's own `askingPrice`; the item has no price of its own any
+  more (see below), so `crossList` writes listings and nothing but.
+- `test/features/listings/cross_list_test.dart` holds them.
 
-## Two places price a marketplace, and they answer different questions
+## One screen prices a marketplace, and the detail screen links to it
 
-Owner's rule, and it is deliberate rather than a duplication left standing.
+Owner's rule, and it **reverses the inline reprice** the detail screen used to
+do. Marketplaces management prices every platform an item is on and is the only
+screen that can add another; a second set of boxes on the detail screen was the
+same number written two ways, and the half a seller reached first could not do
+the thing they usually came for.
 
-- **The detail screen edits the prices of listings that already exist**,
-  inline in its Listings section — the number a buyer actually sees is the one
-  a seller most often came to change, and detail is where an existing item is
-  edited. It is an editable section like Overview and Pricing: one box per
-  marketplace, seeded on open so Cancel is a restore.
-  - **It never creates a listing.** Putting the item somewhere new is the List
-    screen's question, and a section that both repriced and created would be a
-    second way to write one.
-  - **An item on no marketplace gets no Edit**, only the line saying so: there
-    is no price to move, and the way on is the actions sheet.
-  - **A box that does not parse leaves its listing alone.** A listing must
-    have a price, so an emptied field is a typo rather than the seller
-    removing the figure — the opposite of the item's own money fields, where
-    empty means "not known" (hard rule 5).
-  - `test/features/inventory/item_detail_sections_test.dart` pins the reprice
-    and that nothing but the price moves.
-- **The List screen adds marketplaces**, and prices both the new ones and the
-  live ones. It is where "put this somewhere new" is answered.
-- **Neither writes through the other.** The detail section reads the listings
-  fresh and moves only the price; `crossList` batches new listings and
-  repriced ones together. A shared write path would have to know which screen
-  called it, which is the coupling the split avoids.
+- **Item detail's Listings section reports and links.** It lists what each
+  marketplace asks, and its Edit pushes `AppRoutes.crossList` — the section
+  keeps its header and its Edit, and hands the whole question over
+  (`docs/rules/SCREENS.md`).
+- **An item on no marketplace gets no Edit**, only the line saying so: there is
+  no price to move, and the way onto a first platform is the actions sheet,
+  which names it.
+- **`ItemDetailSection` has no `listings` value, and the controller has no
+  listing write.** The link is the whole feature; a save path left standing
+  beside it is the second writer this rule exists to remove.
 - **A reprice does not re-stamp `listedAt`**, which would reset the staleness
   clock: moving a price is not putting the item on sale again.
+- `test/features/inventory/item_detail_sections_test.dart` pins where Edit
+  goes and that the section opens no field of its own.
 
 ## An item has no price of its own; every price belongs to a marketplace
 

@@ -303,6 +303,13 @@ past nine fields they were not changing, and popped back — for one number.
   Mark sold, Archive, Ship, Mark delivered and Record refund carry side
   effects — an inventory write, an audit entry, a timeline fact — and a status
   field that wrote the value alone would skip all of them (hard rule 2).
+- **A section whose rows belong to another screen sends Edit there instead of
+  opening fields.** Owner's rule, stated for Item detail's Listings block: what
+  a marketplace asks is edited on Marketplaces management, which is also the
+  only screen that can put the item on a new one. Editing the same number in
+  two places is two ways to write it, and the half the seller reaches first is
+  the one that cannot do the rest of the job. The section still reads as a
+  section — same header, same Edit — it just hands the whole question over.
 - **Which section is open, and the save, live in a controller**; the text
   controllers stay on the screen, the way every other form here does it. A
   widget deciding what to write is the rule this repo does not bend.
