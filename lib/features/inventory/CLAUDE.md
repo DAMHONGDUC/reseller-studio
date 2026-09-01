@@ -139,9 +139,9 @@ Owner's rule — the row must be **good-looking, sensible and complete**, in
 that order of argument and none of them at the cost of the others. `ItemCard`
 answers it with a split, ruled off by a hairline:
 
-- **Above: what the item is.** Photo, title, then two lines of compact display
-  badges — state and grade on the first, the marketplaces on the second — all
-  in one column beside the photo, sharing one left edge.
+- **Above: what the item is.** Photo, title, then one line of compact display
+  badges — state, grade and the marketplaces together, wrapping when the words
+  are long — all in one column beside the photo, sharing one left edge.
 - **Below: what it is worth.** A band across the card's full width — how many
   are left and what they cost, each a label with its figure under it, then an
   arrow into the marketplace prices.
@@ -264,18 +264,30 @@ is live on** — no names and no amounts.
 - **One compact count replaces the wrapped badge list.** The list made a card
   grow with every marketplace and slowed scanning; the detail screen keeps the
   full names for the seller who needs them.
-- **The tags are two lines, and the split is by question** — owner's rule.
-  Line one is what the item *is*: its status, its Stale marker and its grade.
-  Line two is where it *stands on the marketplaces*: the count, or that
-  nothing carries it. One `Wrap` let a long grade push the market count onto a
-  line of its own at some widths and not others, so the row's shape depended
-  on the words in it.
-- **Stale rides on line one.** It is a fact about the item's state, not about
-  its distribution — the clock says it has not moved, which is not the same
-  claim as where it is listed.
-- **Line two is absent, not empty, when there is nothing to say.** A sold or
-  archived item shows no marketplace tag at all, so the card loses the line
-  rather than keeping a gap where one used to be.
+- **The tags are one wrapping line, and the marketplace count is the last of
+  them** — owner's rule, and it **reverses "the tags are two lines, and the
+  split is by question"**. Status, Stale, grade and the marketplace count sit
+  in one `Wrap`, in that reading order.
+  - **The old rule's cost was measured and the old rule lost.** Splitting by
+    question bought a guaranteed shape and charged a whole badge line for it —
+    a fixed cost on every card in the list, paid so that a *sometimes*
+    two-line first line could not happen. The row's job now is to get smaller,
+    and a line reserved for one badge is the largest thing on the card that
+    holds no fact of its own.
+  - **What the old rule bought is genuinely lost**: a long grade can push the
+    count onto a run of its own at some widths and not others, so the card's
+    height again depends on the words in it. That is accepted, not overlooked
+    — the wrap costs a run only when the words are long, where the split cost
+    a line always.
+  - **The reading order carries the split the layout no longer does.** What
+    the item *is* comes first and where it *stands* comes last, so the eye
+    still meets them in that order whether or not they share a run.
+- **The run gap is the tightest on the card** (`tagRunGap`). A wrapped run is
+  still the same line of tags, so it must not open a gap that reads as the
+  separation the two lines used to be.
+- **The marketplace tag is absent, not empty, when there is nothing to say.**
+  A sold or archived item shows no marketplace tag at all, so the wrap simply
+  holds one badge fewer.
 - **An item on no marketplace says so, in red** — owner's rule. Nothing at all
   read as "no platforms worth naming" when the truth was stock earning
   nothing, which is the one thing on this row a seller can fix today. Only an
@@ -298,6 +310,7 @@ is live on** — no names and no amounts.
 - `test/features/inventory/item_card_marketplaces_test.dart` holds all three:
   the distinct count is on the row, no marketplace name or listing price is,
   and an unlisted item on the shelf shows the red tag.
+  It also holds that the four badges share one `Wrap` rather than two.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
 
