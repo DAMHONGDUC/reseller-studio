@@ -5,11 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
 import '../../core/constants/log_tag_constant.dart';
-import '../../core/filters/date_range_filter.dart';
-import '../../core/filters/presence_filter.dart';
-import '../../core/money/money.dart';
 import '../../core/time/app_clock.dart';
-import '../../core/utils/set_utils.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/services/item_search.dart';
 import '../inventory/providers.dart';
@@ -17,7 +13,6 @@ import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
 import 'domain/entities/order_filter_criteria.dart';
-import 'domain/enums/order_deadline_filter.dart';
 import 'domain/enums/order_status.dart';
 import 'domain/services/payout_reconciliation.dart';
 import 'presentation/controllers/record_sale_controller.dart';
@@ -87,33 +82,17 @@ class OrderCriteriaController extends Notifier<OrderFilterCriteria> {
   @override
   OrderFilterCriteria build() => OrderFilterCriteria.none;
 
-  void toggleStatus(OrderStatus value) =>
-      state = state.copyWith(statuses: SetUtils.toggled(state.statuses, value));
+  /// Writes what the filter sheet was holding, once Apply is pressed — see
+  /// `InventoryCriteriaController.apply` for why the sheet holds it.
+  void apply(OrderFilterCriteria pending) {
+    SdLogger.action(
+      LogTagConstant.order,
+      'Apply order filters',
+      <String, Object?>{'groups': pending.activeCount},
+    );
 
-  void toggleMarketplace(String id) => state = state.copyWith(
-    marketplaceIds: SetUtils.toggled(state.marketplaceIds, id),
-  );
-
-  void setOrdered(DateRangeFilter value) =>
-      state = state.copyWith(ordered: value);
-
-  void setPayout(PresenceFilter value) => state = state.copyWith(payout: value);
-
-  void setTracking(PresenceFilter value) =>
-      state = state.copyWith(tracking: value);
-
-  void setDeadline(OrderDeadlineFilter value) =>
-      state = state.copyWith(deadline: value);
-
-  /// **Null clears that end of the window** — an empty box means unbounded,
-  /// never zero.
-  void setMinSale(Money? value) => state = value == null
-      ? state.copyWith(clearMinSale: true)
-      : state.copyWith(minSale: value);
-
-  void setMaxSale(Money? value) => state = value == null
-      ? state.copyWith(clearMaxSale: true)
-      : state.copyWith(maxSale: value);
+    state = pending;
+  }
 
   /// Drops every filter, the tab included.
   void reset() {

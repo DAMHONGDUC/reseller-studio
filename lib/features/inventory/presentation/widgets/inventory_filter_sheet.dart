@@ -16,16 +16,22 @@ import '../../providers.dart';
 
 /// Everything Inventory can be narrowed by, in one sheet.
 ///
-/// **It applies as it is tapped; there is no Apply button.** The list behind
-/// the sheet is the answer, and the primary button says how many rows are left
-/// rather than committing anything — a seller who ticks a category and sees
-/// the count move knows immediately whether the filter was the one they meant.
+/// **Nothing is applied until Apply is pressed** — owner's rule, and it
+/// **reverses "it applies as it is tapped"**. The chips edit a draft this
+/// sheet holds; the list behind it does not move while the seller is still
+/// deciding, and closing the sheet any other way leaves the list exactly as
+/// they found it.
+///
+/// **Reset clears the draft, not the screen.** It is the same button, but it
+/// now empties what is pending — the strip behind the sheet has its own Reset
+/// for the filters that are actually on, and that one still clears the tab
+/// with them.
 ///
 /// **The strip's five tabs are deliberately not repeated here.** They are one
 /// tap away above the list; what is here is the vocabulary that has nowhere
 /// else to be asked — including a status group, because `archived` and the
 /// seller's own condition grades are not tabs.
-class InventoryFilterSheet extends ConsumerWidget {
+class InventoryFilterSheet extends ConsumerStatefulWidget {
   const InventoryFilterSheet({super.key});
 
   /// How much of the screen the sheet takes. Fixed rather than sized to its
@@ -38,11 +44,25 @@ class InventoryFilterSheet extends ConsumerWidget {
     builder: (BuildContext context) => const InventoryFilterSheet(),
   );
 
+  @override
+  ConsumerState<InventoryFilterSheet> createState() =>
+      _InventoryFilterSheetState();
+}
+
+class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
+  /// What the seller has ticked so far. Seeded from what is applied, once:
+  /// the sheet opens on the filters the list is already under, and every tap
+  /// after that moves this and nothing else.
+  late ItemFilterCriteria _draft = ref.read(inventoryCriteriaProvider);
+
+  void _edit(ItemFilterCriteria next) => setState(() => _draft = next);
+
+  void _apply() {
+    ref.read(inventoryCriteriaProvider.notifier).apply(_draft);
+    Navigator.of(context).pop();
+  }
+
   /// The three states of "does it have one", worded for what is being asked.
-  ///
-  /// Every group the sheet offers is now a set of chips, so the sheet holds
-  /// no text fields and therefore no controllers — which is why it is a plain
-  /// `ConsumerWidget` again.
   List<AppFilterOption<PresenceFilter>> _presence(
     BuildContext context,
     String yes,
@@ -70,12 +90,8 @@ class InventoryFilterSheet extends ConsumerWidget {
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
-    final InventoryCriteriaController controller = ref.read(
-      inventoryCriteriaProvider.notifier,
-    );
-    final int shown = ref.watch(visibleItemsProvider).length;
+  Widget build(BuildContext context) {
+    final ItemFilterCriteria criteria = _draft;
     final Map<String, String> categories = <String, String>{
       for (final ItemCategory category
           in ref.watch(categoriesProvider).value ?? const <ItemCategory>[])
@@ -91,8 +107,11 @@ class InventoryFilterSheet extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           AppActiveFilterBar(
-            count: ref.watch(inventoryActiveFilterCountProvider),
-            onReset: ref.read(inventoryCriteriaProvider.notifier).reset,
+            // The draft's own groups, and not the tab: the sheet does not
+            // offer the tab, so a number counting it could not be made true
+            // by the Reset beside it.
+            count: criteria.activeCount,
+            onReset: () => _edit(ItemFilterCriteria.none),
             gutter: false,
           ),
           Expanded(
@@ -110,7 +129,8 @@ class InventoryFilterSheet extends ConsumerWidget {
                         ),
                     ],
                     selected: criteria.statuses,
-                    onSelected: controller.toggleStatus,
+                    onSelected: (ItemStatus value) =>
+                        _edit(criteria.withStatusToggled(value)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<ItemCondition>(
@@ -124,28 +144,32 @@ class InventoryFilterSheet extends ConsumerWidget {
                         ),
                     ],
                     selected: criteria.conditions,
-                    onSelected: controller.toggleCondition,
+                    onSelected: (ItemCondition value) =>
+                        _edit(criteria.withConditionToggled(value)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterCategory,
                     options: _byId(context, categories),
                     selected: criteria.categoryIds,
-                    onSelected: controller.toggleCategory,
+                    onSelected: (String id) =>
+                        _edit(criteria.withCategoryToggled(id)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterLocation,
                     options: _byId(context, ref.watch(locationPathsProvider)),
                     selected: criteria.locationIds,
-                    onSelected: controller.toggleLocation,
+                    onSelected: (String id) =>
+                        _edit(criteria.withLocationToggled(id)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterSource,
                     options: _byId(context, ref.watch(sourceNamesProvider)),
                     selected: criteria.sourceIds,
-                    onSelected: controller.toggleSource,
+                    onSelected: (String id) =>
+                        _edit(criteria.withSourceToggled(id)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<PresenceFilter>(
@@ -156,7 +180,8 @@ class InventoryFilterSheet extends ConsumerWidget {
                       context.l10n.filterWithoutPhotos,
                     ),
                     selected: <PresenceFilter>{criteria.photos},
-                    onSelected: controller.setPhotos,
+                    onSelected: (PresenceFilter value) =>
+                        _edit(criteria.withPhotos(value)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<PresenceFilter>(
@@ -167,7 +192,8 @@ class InventoryFilterSheet extends ConsumerWidget {
                       context.l10n.filterCostMissing,
                     ),
                     selected: <PresenceFilter>{criteria.cost},
-                    onSelected: controller.setCost,
+                    onSelected: (PresenceFilter value) =>
+                        _edit(criteria.withCost(value)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<PresenceFilter>(
@@ -178,7 +204,8 @@ class InventoryFilterSheet extends ConsumerWidget {
                       context.l10n.filterNeverListed,
                     ),
                     selected: <PresenceFilter>{criteria.listed},
-                    onSelected: controller.setListed,
+                    onSelected: (PresenceFilter value) =>
+                        _edit(criteria.withListed(value)),
                   ),
                   SizedBox(height: groupGap),
                   AppFilterChipGroup<DateRangeFilter>(
@@ -192,7 +219,8 @@ class InventoryFilterSheet extends ConsumerWidget {
                         ),
                     ],
                     selected: <DateRangeFilter>{criteria.added},
-                    onSelected: controller.setAdded,
+                    onSelected: (DateRangeFilter value) =>
+                        _edit(criteria.withAdded(value)),
                   ),
                 ],
               ),
@@ -202,10 +230,11 @@ class InventoryFilterSheet extends ConsumerWidget {
           SdButtonV3(
             variant: SdButtonVariantV3.primary,
             expand: true,
-            // The count, not "Apply": nothing is pending, and a seller who can
-            // see there are no rows left knows to loosen a chip before closing.
-            label: context.l10n.filterShowItems(shown),
-            onPressed: () => Navigator.of(context).pop(),
+            // "Apply", not a count: the number of rows left is a fact about a
+            // filter that has been applied, and this button is what applies
+            // one.
+            label: context.l10n.filterApply,
+            onPressed: _apply,
           ),
         ],
       ),

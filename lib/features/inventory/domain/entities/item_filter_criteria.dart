@@ -1,5 +1,6 @@
 import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
+import '../../../../core/utils/set_utils.dart';
 import '../../item_filter_constant.dart';
 import '../enums/item_status.dart';
 import 'item.dart';
@@ -92,6 +93,38 @@ class ItemFilterCriteria {
 
     return true;
   }
+
+  /// Ticking a chip, as a value rather than as a write.
+  ///
+  /// **The vocabulary lives here, not on the controller** — the filter sheet
+  /// edits a draft it holds until Apply is pressed, and the applied criteria
+  /// live in a provider. Two places tick a chip, so what a tick *means* is one
+  /// thing in one place; a second copy on the notifier is how the pending
+  /// filter and the applied one would come to disagree about a second tap.
+  ItemFilterCriteria withStatusToggled(ItemStatus value) =>
+      copyWith(statuses: SetUtils.toggled(statuses, value));
+
+  ItemFilterCriteria withConditionToggled(ItemCondition value) =>
+      copyWith(conditions: SetUtils.toggled(conditions, value));
+
+  ItemFilterCriteria withCategoryToggled(String id) =>
+      copyWith(categoryIds: SetUtils.toggled(categoryIds, id));
+
+  ItemFilterCriteria withLocationToggled(String id) =>
+      copyWith(locationIds: SetUtils.toggled(locationIds, id));
+
+  ItemFilterCriteria withSourceToggled(String id) =>
+      copyWith(sourceIds: SetUtils.toggled(sourceIds, id));
+
+  ItemFilterCriteria withPhotos(PresenceFilter value) =>
+      copyWith(photos: value);
+
+  ItemFilterCriteria withCost(PresenceFilter value) => copyWith(cost: value);
+
+  ItemFilterCriteria withListed(PresenceFilter value) =>
+      copyWith(listed: value);
+
+  ItemFilterCriteria withAdded(DateRangeFilter value) => copyWith(added: value);
 
   ItemFilterCriteria copyWith({
     Set<ItemStatus>? statuses,

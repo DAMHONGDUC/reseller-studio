@@ -5559,23 +5559,9 @@
   "@filterRangeMax": {
     "description": "Upper bound of a price range. Empty means unbounded."
   },
-  "filterShowItems": "{count, plural, =0{No items match} =1{Show 1 item} other{Show {count} items}}",
-  "@filterShowItems": {
-    "description": "Primary button of the Inventory filter sheet. It closes the sheet \u2014 filters are applied as they are tapped, so it reports the result rather than committing it.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "filterShowOrders": "{count, plural, =0{No orders match} =1{Show 1 order} other{Show {count} orders}}",
-  "@filterShowOrders": {
-    "description": "Primary button of the Orders filter sheet. See filterShowItems.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
+  "filterApply": "Apply",
+  "@filterApply": {
+    "description": "Primary button of a filter sheet. It writes what the seller ticked and closes the sheet; nothing is filtered until it is pressed."
   },
   "filterMarketplace": "Marketplace",
   "@filterMarketplace": {

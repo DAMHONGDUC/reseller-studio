@@ -27,7 +27,7 @@ void main() {
     expect(find.text('Cancelled'), findsOneWidget);
   });
 
-  testWidgets('a ticked chip is counted, and Reset drops it', (
+  testWidgets('a ticked chip is pending until Apply, and Reset undoes it', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
@@ -40,12 +40,27 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // The sheet's row and the screen's behind it are one widget in two places.
-    expect(find.text('1 filter applied'), findsNWidgets(2));
+    // Once: the sheet counts what is ticked, the list behind it has not moved.
+    expect(find.text('1 filter applied'), findsOneWidget);
 
+    // Closing without applying leaves the list as the seller found it.
     await tester.tap(find.byIcon(AppIconConstant.close));
     await tester.pumpAndSettle();
 
+    expect(find.byType(AppActiveFilterBar), findsNothing);
+
+    await openSheet(tester);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OrderFilterSheet),
+        matching: find.text('Cancelled'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(OrderFilterSheet), findsNothing);
     expect(find.text('1 filter applied'), findsOneWidget);
 
     await tester.tap(find.text('Reset'));

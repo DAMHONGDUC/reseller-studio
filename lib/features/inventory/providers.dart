@@ -6,11 +6,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
 import '../../core/constants/log_tag_constant.dart';
-import '../../core/filters/date_range_filter.dart';
-import '../../core/filters/presence_filter.dart';
 import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
-import '../../core/utils/set_utils.dart';
 import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
@@ -136,31 +133,21 @@ class InventoryCriteriaController extends Notifier<ItemFilterCriteria> {
   @override
   ItemFilterCriteria build() => ItemFilterCriteria.none;
 
-  void toggleStatus(ItemStatus value) =>
-      state = state.copyWith(statuses: SetUtils.toggled(state.statuses, value));
+  /// Writes what the filter sheet was holding, once the seller presses Apply.
+  ///
+  /// **The sheet is the only writer, and it writes once** — owner's rule. It
+  /// used to tick straight into this notifier, so the list moved under the
+  /// sheet on every chip and a seller trying two combinations had already
+  /// changed the screen twice.
+  void apply(ItemFilterCriteria pending) {
+    SdLogger.action(
+      LogTagConstant.item,
+      'Apply inventory filters',
+      <String, Object?>{'groups': pending.activeCount},
+    );
 
-  void toggleCondition(ItemCondition value) => state = state.copyWith(
-    conditions: SetUtils.toggled(state.conditions, value),
-  );
-
-  void toggleCategory(String id) => state = state.copyWith(
-    categoryIds: SetUtils.toggled(state.categoryIds, id),
-  );
-
-  void toggleLocation(String id) => state = state.copyWith(
-    locationIds: SetUtils.toggled(state.locationIds, id),
-  );
-
-  void toggleSource(String id) =>
-      state = state.copyWith(sourceIds: SetUtils.toggled(state.sourceIds, id));
-
-  void setPhotos(PresenceFilter value) => state = state.copyWith(photos: value);
-
-  void setCost(PresenceFilter value) => state = state.copyWith(cost: value);
-
-  void setListed(PresenceFilter value) => state = state.copyWith(listed: value);
-
-  void setAdded(DateRangeFilter value) => state = state.copyWith(added: value);
+    state = pending;
+  }
 
   /// Drops every filter, the tab included.
   ///

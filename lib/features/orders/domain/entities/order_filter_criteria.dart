@@ -1,6 +1,7 @@
 import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/utils/set_utils.dart';
 import '../enums/order_deadline_filter.dart';
 import '../enums/order_status.dart';
 import 'order.dart';
@@ -81,6 +82,36 @@ class OrderFilterCriteria {
 
     return _matchesSaleRange(order.salePrice);
   }
+
+  /// Ticking a chip, as a value rather than as a write — the reason the
+  /// vocabulary lives on the criteria is in `ItemFilterCriteria`.
+  OrderFilterCriteria withStatusToggled(OrderStatus value) =>
+      copyWith(statuses: SetUtils.toggled(statuses, value));
+
+  OrderFilterCriteria withMarketplaceToggled(String id) =>
+      copyWith(marketplaceIds: SetUtils.toggled(marketplaceIds, id));
+
+  OrderFilterCriteria withOrdered(DateRangeFilter value) =>
+      copyWith(ordered: value);
+
+  OrderFilterCriteria withPayout(PresenceFilter value) =>
+      copyWith(payout: value);
+
+  OrderFilterCriteria withTracking(PresenceFilter value) =>
+      copyWith(tracking: value);
+
+  OrderFilterCriteria withDeadline(OrderDeadlineFilter value) =>
+      copyWith(deadline: value);
+
+  /// **Null clears that end of the window** — an empty box means unbounded,
+  /// never zero.
+  OrderFilterCriteria withMinSale(Money? value) => value == null
+      ? copyWith(clearMinSale: true)
+      : copyWith(minSale: value);
+
+  OrderFilterCriteria withMaxSale(Money? value) => value == null
+      ? copyWith(clearMaxSale: true)
+      : copyWith(maxSale: value);
 
   OrderFilterCriteria copyWith({
     Set<OrderStatus>? statuses,

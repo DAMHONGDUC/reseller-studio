@@ -8,12 +8,14 @@ import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
-/// A filtered list has to say it is filtered.
+/// A filtered list has to say it is filtered — and it is only filtered once
+/// the seller says so.
 ///
 /// The sheet's chips are behind a button, so an item missing from the list and
 /// an item filtered out of it look identical without the count — and the
 /// seller's only fix would be to reopen the sheet and hunt for what they
-/// ticked.
+/// ticked. What the chips tick is a draft: the list moves on Apply, and on
+/// nothing else.
 void main() {
   Future<void> openSheet(WidgetTester tester) async {
     await tester.tap(find.byIcon(AppIconConstant.filterAlt));
@@ -43,7 +45,7 @@ void main() {
     expect(find.text('Asking price range'), findsNothing);
   });
 
-  testWidgets('a ticked chip is counted, and Reset drops it', (
+  testWidgets('a ticked chip is pending, and closing applies nothing', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const InventoryScreen());
@@ -58,15 +60,48 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Twice: the sheet's own row, and the screen's behind it — they are one
-    // widget rendered in both places, which is what keeps the two counts from
-    // ever disagreeing.
-    expect(find.text('1 filter applied'), findsNWidgets(2));
+    // Once, not twice: the sheet counts what the seller has ticked, and the
+    // list behind it has not moved — nothing is applied until Apply.
+    expect(find.text('1 filter applied'), findsOneWidget);
 
+    await tester.tap(find.text('Reset'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 filter applied'), findsNothing);
+
+    // Ticked again and abandoned: closing the sheet leaves the list exactly
+    // as the seller found it.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(InventoryFilterSheet),
+        matching: find.text('Archived'),
+      ),
+    );
+    await tester.pumpAndSettle();
     await closeSheet(tester);
 
-    // The count follows the seller back to the list rather than living in the
-    // sheet they just closed.
+    expect(find.byType(AppActiveFilterBar), findsNothing);
+  });
+
+  testWidgets('Apply writes the draft to the list, and Reset undoes it', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const InventoryScreen());
+    await openSheet(tester);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(InventoryFilterSheet),
+        matching: find.text('Archived'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+
+    // Applying closes the sheet, and the count follows the seller back to the
+    // list rather than living in the sheet they just left.
+    expect(find.byType(InventoryFilterSheet), findsNothing);
     expect(find.text('1 filter applied'), findsOneWidget);
 
     await tester.tap(find.text('Reset'));
