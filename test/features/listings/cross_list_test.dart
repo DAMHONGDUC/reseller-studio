@@ -303,10 +303,12 @@ void main() {
     });
   });
 
-  group('one List row, not two verbs meaning the same thing', () {
-    testWidgets('the actions sheet offers List and no Cross-list', (
+  group('marketplaces are answered on the detail screen, not in the sheet', () {
+    testWidgets('the actions sheet names no marketplace row at all', (
       WidgetTester tester,
     ) async {
+      // Owner's rule: the way onto a marketplace is Item detail → Listings →
+      // Edit, under Price, where the prices already are.
       await pumpScreen(tester, const InventoryScreen());
       await tester.tap(
         find
@@ -318,11 +320,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Marketplaces management'), findsOneWidget);
+      expect(find.text('Marketplaces management'), findsNothing);
       expect(find.text('Cross-list'), findsNothing);
     });
 
-    test('the row is gated by crossListCheck, so a sold row is the only one '
+    test('the Edit is gated by crossListCheck, so a sold row is the only one '
         'it refuses', () {
       final Item onShelf = item(id: 'i-listed', status: ItemStatus.inStock);
       final Item sold = item(

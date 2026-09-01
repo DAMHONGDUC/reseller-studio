@@ -39,9 +39,9 @@ void main() {
   ) async {
     await pumpDetail(tester);
 
-    // Overview, Pricing and Provenance are above the fold; Description and
-    // Notes are built as the list reaches them.
-    expect(find.text('Edit'), findsNWidgets(3));
+    // Overview, Pricing, Listings and Provenance are above the fold;
+    // Description and Notes are built as the list reaches them.
+    expect(find.text('Edit'), findsNWidgets(4));
 
     await tester.scrollUntilVisible(
       find.text('Notes'),
@@ -50,13 +50,26 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Listings offers an Edit only when there is a price to move; itm-11 is
-    // on no marketplace, so it shows the empty line and no Edit.
+    // Listings offers its Edit even on no marketplace: it is the only way
+    // onto a first one, so an item listed nowhere still has a way out.
     expect(find.text('Listings'), findsOneWidget);
-    expect(find.text('Edit'), findsNWidgets(3));
   });
 
-  testWidgets('a listed item sends Edit to Marketplaces management', (
+  testWidgets('Listings sits directly under Price', (
+    WidgetTester tester,
+  ) async {
+    // Owner's rule: the money on this screen reads in one run.
+    await pumpDetail(tester);
+
+    final double pricing = tester.getTopLeft(find.text('Pricing')).dy;
+    final double listings = tester.getTopLeft(find.text('Listings')).dy;
+    final double provenance = tester.getTopLeft(find.text('Provenance')).dy;
+
+    expect(pricing, lessThan(listings));
+    expect(listings, lessThan(provenance));
+  });
+
+  testWidgets('Listings sends Edit to Marketplaces management', (
     WidgetTester tester,
   ) async {
     // Owner's rule: the prices live on the screen that can also add a
