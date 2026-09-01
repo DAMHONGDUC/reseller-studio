@@ -3,11 +3,11 @@ part of 'settings_screen.dart';
 /// Who is signed in, and the two ways out.
 ///
 /// **Deleting the account is destructive and irreversible, so it asks twice**
-/// — once in a dialog that says what goes, and once by refusing to proceed on
-/// a stale session. Firebase rejects a delete on an old sign-in with
-/// `requires-recent-login`, which arrives as `unauthenticated`; the message
-/// tells the seller to sign in again rather than showing a failure they
-/// cannot act on.
+/// — once in a dialog that says what goes, and once on the provider itself.
+/// The backend refuses a delete on a sign-in more than a few minutes old, and
+/// the repository answers that by raising the Apple or Google sheet and
+/// trying again, so the seller confirms with the account rather than being
+/// told to sign out and come back.
 class _AccountCard extends ConsumerWidget {
   const _AccountCard();
 
