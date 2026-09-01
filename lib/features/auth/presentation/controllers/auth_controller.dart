@@ -10,19 +10,29 @@ import '../../../workspace/providers.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../providers.dart';
 
-/// What the login screen is doing right now.
+/// The two ways a session ends, both started from Settings.
+///
+/// Named rather than a bool because they run from the same card and take
+/// visibly different amounts of time — the delete walks every subcollection
+/// server-side — so the seller must be able to see *which* one is running.
+enum AccountAction { signOut, deleteAccount }
+
+/// What the auth controller is doing right now.
 ///
 /// [busyProvider] rather than a plain bool, so only the button that was tapped
 /// shows a spinner — two buttons both spinning would suggest two sign-ins are
-/// in flight.
+/// in flight. [busyAction] is the same idea for the Settings card.
 class AuthFormState {
-  const AuthFormState({this.busyProvider});
+  const AuthFormState({this.busyProvider, this.busyAction});
 
   final AuthProviderKind? busyProvider;
+  final AccountAction? busyAction;
 
-  bool get isBusy => busyProvider != null;
+  bool get isBusy => busyProvider != null || busyAction != null;
 
   bool isBusyWith(AuthProviderKind provider) => busyProvider == provider;
+
+  bool isRunning(AccountAction action) => busyAction == action;
 }
 
 /// Sign in with Apple or Google, sign out, delete.
@@ -82,6 +92,8 @@ class AuthController extends Notifier<AuthFormState> {
   /// that would buzz the next person to hold this phone with the last
   /// person's orders.
   Future<void> signOut() async {
+    state = const AuthFormState(busyAction: AccountAction.signOut);
+
     // Neither cleanup step is allowed to fail the sign-out — a seller who
     // tapped it must end up signed out whatever a plugin does.
     await _unregisterDevice();
@@ -100,10 +112,18 @@ class AuthController extends Notifier<AuthFormState> {
       );
 
       rethrow;
+    } finally {
+      _clearBusy();
     }
   }
 
+  /// **The slowest thing in the app, and the one that must look busy.** The
+  /// function walks every subcollection the account owns and may raise the
+  /// provider sheet on the way, so a card that sat there unchanged was one a
+  /// seller tapped again.
   Future<void> deleteAccount() async {
+    state = const AuthFormState(busyAction: AccountAction.deleteAccount);
+
     try {
       await ref.read(authRepositoryProvider).deleteAccount();
       SdCrashReporter.instance.setUserId(null);
@@ -116,7 +136,17 @@ class AuthController extends Notifier<AuthFormState> {
       );
 
       rethrow;
+    } finally {
+      _clearBusy();
     }
+  }
+
+  /// Both actions end the session, and the router tears the stack down the
+  /// moment it does — so this can land after the provider is gone.
+  void _clearBusy() {
+    if (!ref.mounted) return;
+
+    state = const AuthFormState();
   }
 
   /// Drop this device's push token, and never fail the sign-out over it.
