@@ -22,11 +22,11 @@ part 'item_card_thumbnail.dart';
 
 /// One row of Inventory.
 ///
-/// **Two zones.** Beside the photo, what the item *is*: its title and the
-/// compact tags naming its state, grade and marketplace count. Below, running
-/// to the card's own left edge, what it is *worth*: how many are left, what
-/// they cost and what they are being asked for — then when the record last
-/// changed. Everything else is on the detail screen.
+/// **Two zones.** Beside the photo, what the item *is*: its title, the compact
+/// tags naming its state, grade and marketplace count, and the date the record
+/// last changed. Below, running to the card's own left edge, what it is
+/// *worth*: how many are left and what they cost, then the way into what each
+/// marketplace is asking. Everything else is on the detail screen.
 ///
 /// The figures start at the edge rather than after the photo — owner's rule.
 /// It gives them the card's full width, and it separates the two questions
@@ -143,6 +143,7 @@ class ItemCard extends StatelessWidget {
                     ),
                     SizedBox(height: ItemCardMetricConstant.titleGap),
                     _StateBadges(item: item, now: now, listings: listings),
+                    _UpdatedLine(item: item),
                   ],
                 ),
               ),
@@ -164,7 +165,6 @@ class ItemCard extends StatelessWidget {
             item: item,
             onMarketPrices: isSelecting ? null : onMarketPrices,
           ),
-          _UpdatedLine(item: item),
         ],
       ),
     ),
