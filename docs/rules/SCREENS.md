@@ -320,8 +320,8 @@ past nine fields they were not changing, and popped back — for one number.
   that reflows on Edit makes the seller re-find the field they came for.
 - **Only stored fields open.** A derived figure has no field to edit
   (hard rule 3), and a recorded timestamp is not a thing a seller types.
-- **A state transition stays in the actions sheet, never in a section.** List,
-  Mark sold, Archive, Ship, Mark delivered and Record refund carry side
+- **A state transition stays in the actions sheet, never in a section.** Mark
+  sold, Archive, Ship, Mark delivered and Record refund carry side
   effects — an inventory write, an audit entry, a timeline fact — and a status
   field that wrote the value alone would skip all of them (hard rule 2).
 - **A section whose rows belong to another screen sends Edit there instead of

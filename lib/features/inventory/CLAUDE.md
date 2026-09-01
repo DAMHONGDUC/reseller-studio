@@ -52,29 +52,30 @@ list: the detail screen's Actions button, and **the `more_vert` button on
   pass it.
 - `test/features/inventory/item_card_actions_test.dart` holds all of it.
 
-## One List row, and it opens the cross-list screen
+## The actions sheet names no marketplace, and never did more than one thing
 
-Owner's rule. The actions sheet used to carry **two** verbs for putting an
-item on a marketplace — a `List` sheet for exactly one, and `Cross-list` for
-several. They are now one row, `itemActionList`, opening `CrossListScreen`.
+Owner's rule, in two moves. The sheet first collapsed **two** verbs into one —
+a `List` sheet for exactly one marketplace beside a `Cross-list` row for
+several — and then lost that row as well: marketplaces are answered on Item
+detail, under Price.
 
-- **They read as the same verb.** Nothing on either row said which to use, and
-  a seller meeting the sheet for the first time has no way to tell.
-- **The narrower one stopped working after the first listing.** `List` was
-  gated on `ItemTransition.check(item, listed)`, which refuses an item that is
-  already listed — the exact item cross-listing exists for. So the first thing
-  it did once a seller had listed anything was refuse and point at nothing,
-  while the row they wanted sat underneath.
-- **The row is gated on `crossListCheck`**, which refuses only a sold or
-  archived item and an empty shelf — and asks for no price, because the screen
-  it opens is where the price is entered (hard rule 2).
-- **Nothing was lost.** Picking one marketplace on that screen writes the same
-  listing and makes the same status move the sheet did.
-  `ListItemSheet` and `ItemActionsController.listItem` are deleted rather than
-  left as a second way to write a listing.
+- **The two verbs read as the same one.** Nothing on either row said which to
+  use, and the narrower one was gated on `ItemTransition.check(item, listed)`,
+  which refuses an item that is already listed — the exact item cross-listing
+  exists for. `ListItemSheet` and `ItemActionsController.listItem` are deleted
+  rather than left as a second way to write a listing.
+- **The surviving row left too.** A sheet row and a section header were two
+  doors onto `CrossListScreen`, and the one a seller met first was the one
+  furthest from the prices they came to read. `itemActionList` is deleted with
+  it.
+- **The gate moved with the row, not away.** Item detail's Listings Edit calls
+  `crossListCheck`, which refuses only a sold or archived item and an empty
+  shelf — and asks for no price, because the screen it opens is where the
+  price is entered (hard rule 2).
+- **What is left in the sheet is what the sheet is for**: state transitions
+  and writes that carry side effects. Marketplaces are neither.
 - `test/features/listings/cross_list_test.dart` holds both halves: the sheet
-  offers List and no Cross-list, and the old gate would still refuse the item
-  the new one allows.
+  names no marketplace row, and the gate still refuses a sold item.
 
 ## Every marketplace may carry its own price
 
@@ -126,9 +127,15 @@ the thing they usually came for.
   marketplace asks, and its Edit pushes `AppRoutes.crossList` — the section
   keeps its header and its Edit, and hands the whole question over
   (`docs/rules/SCREENS.md`).
-- **An item on no marketplace gets no Edit**, only the line saying so: there is
-  no price to move, and the way onto a first platform is the actions sheet,
-  which names it.
+- **The section sits directly under Price** — owner's rule. What the item cost
+  and what each platform asks are one question with two halves, and the seller
+  reading the money on this screen now reads it in one run instead of
+  scrolling past where the item came from.
+- **An item on no marketplace gets the same Edit**, above the line saying it
+  is listed nowhere — owner's rule, and it replaced a header with nothing in
+  it. The actions sheet no longer names a marketplace row, so this is the only
+  way onto a first platform; a section that reported a state and offered no
+  way to leave it was a dead end.
 - **`ItemDetailSection` has no `listings` value, and the controller has no
   listing write.** The link is the whole feature; a save path left standing
   beside it is the second writer this rule exists to remove.
