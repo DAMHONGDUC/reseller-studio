@@ -47,6 +47,34 @@ workflow that creates a workspace.
 - **Default names, ids, and rates have one owner in code.** Workspace creation
   consumes that definition; no controller or screen repeats the values.
 
+## One order, wherever marketplaces are drawn
+
+Owner's rule, stated after the same two marketplaces came out in one order on
+an item's detail screen and another on the screen that prices them. A query
+answers "which marketplaces", never "in what order", and a list left in
+document order is a different list on the next screen.
+
+- **`MarketplaceOrder.sort` owns the order of anything keyed by the legacy
+  `Marketplace` enum**, and the enum's declaration order is that order — it is
+  what the cross-list screen already drew, so nothing changed shape.
+- **It is applied at the provider, not at the screens.** `listingsForItemProvider`
+  hands its listings back ordered, so the detail screen, the cross-list screen
+  and anything added later cannot each answer this differently.
+- **The records the business owns are ordered by `createdAt`** — the order the
+  seller was given them in, then added to. The defaults are stamped a
+  millisecond apart for that reason: five identical stamps leave the tie to the
+  document id, which is the seeded order in mock data and alphabetical order in
+  Firestore, for the same five rows.
+- **A mock repository sorts the way the real query does.** Listings newest
+  first, marketplaces oldest first — an order that only holds against Firestore
+  is one nobody developing against mock data can see break.
+- **Ranking is not ordering.** Analytics' marketplace breakdown is sorted by
+  what each platform earned; that is an answer, not a list, and stays.
+- **Two lists still exist** — the seller's records and the legacy enum (see the
+  last bullet of the section below). This rule gives each one an order; it does
+  not merge them.
+- `test/features/marketplaces/marketplace_order_test.dart` pins both halves.
+
 ## A marketplace carries a colour, and every row that names one wears it
 
 Owner's rule. A seller scanning orders reads the platform before they read
