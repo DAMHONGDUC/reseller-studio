@@ -92,6 +92,18 @@ about how the backend is written.
 
 ## Cloud Functions
 
+- **Every function a client dials by name pins its region.** `onCall` and
+  `onRequest` take `clientFacing` from `functions/src/lib/runtime.ts`;
+  firebase-functions v2 otherwise deploys them to `us-central1` while
+  `AppEnv.functionsRegion` asks for somewhere else, and the failure is a
+  `not-found` at the moment a seller taps the button — nothing fails at build,
+  at deploy, or at startup. `test/server_surface.test.mjs` fails if a new
+  callable forgets it, if the region stops matching `FUNCTIONS_REGION` in
+  `env/env.example.json`, or if a name in `CallableConstant` has no function
+  behind it.
+  - **Triggers and the scheduler deliberately do not take it.** A Firestore
+    trigger has to sit in a region its database allows — Firebase's to pick,
+    not ours to guess — and nobody addresses one by region anyway.
 - **Functions are idempotent.** They are retried — by the platform, by a client
   that lost its answer, by a redeploy. A function that is only correct the
   first time is a function that double-charges.
