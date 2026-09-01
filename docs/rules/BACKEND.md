@@ -29,6 +29,20 @@ about how the backend is written.
   self-edit is a promotion to owner.
 - **The audit log is append-only and written only by Cloud Functions** — hard
   rule 12.
+- **A rule can read one document; it cannot count a collection.** Anything
+  enforced against a total — the Free item and order ceilings, the seat limit —
+  is decided by a Cloud Function and written into a document the rule reads.
+  `workspaces/{id}/usage/current` is that document for the ceilings, and it is
+  `allow write: if false` for exactly the reason the subscription document is.
+  - **No ceiling is written in `firestore.rules`.** The numbers have one owner
+    in `PlanLimits.byPlan` and one deliberate mirror in
+    `functions/src/lib/firestore.ts`; the function writes a *verdict* and the
+    rule reads a boolean, so a third copy never exists to go stale.
+  - **The rules ceiling is not the product ceiling.** `ceilingGrace` puts the
+    rule above the client gate on purpose: the count is recounted by a trigger
+    and lags a write, so enforcing to the exact number would refuse a seller an
+    action their own app had just allowed. The gate is the ceiling on use; the
+    rule is the ceiling on abuse.
 - **Rules tests read `firestore.rules` itself, never a copy.** A copy would let
   the two drift, which is the one way a rules test fails: passing while
   production is open. The standalone `test-rules` command and its CI step are

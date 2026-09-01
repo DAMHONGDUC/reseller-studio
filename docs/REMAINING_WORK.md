@@ -9,9 +9,8 @@ engineering work only.
 | Priority | Work | Why |
 |---|---|---|
 | 1 | Deploy and verify Cloud Functions | Team, notifications, deletion and server-side entitlement depend on them |
-| 2 | Add trusted server enforcement for Free limits | Client gates are UX, not a security boundary |
-| 3 | Complete the Vietnamese ARB pass | Language switching stays hidden until the locale is complete |
-| 4 | Add listing templates | Last unbuilt listing workflow from plan §12 |
+| 2 | Complete the Vietnamese ARB pass | Only English ships until the locale is complete |
+| 3 | Add listing templates | Last unbuilt listing workflow from plan §12 |
 
 ## Open verification
 
@@ -22,6 +21,7 @@ engineering work only.
 | Push notifications | Code exists | APNs registration, delivery and tap pass on hardware |
 | Deep links | Registered on both platforms | Real notification opens the expected workspace and record |
 | Mock data in release | Guarded by dev flags | Confirm tree-shaking before submission |
+| Free ceilings in production | Rules and triggers written and tested against the emulator | `onItemUsageWritten` and `onOrderUsageWritten` are deployed and `usage/current` appears |
 | Design-system CI source | CI follows remote `main` | Decide whether CI should test the pinned gitlink |
 
 ## Deliberately deferred or dropped
