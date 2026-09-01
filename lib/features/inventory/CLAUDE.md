@@ -115,10 +115,21 @@ exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
 Owner's rule, and it is deliberate rather than a duplication left standing.
 
 - **The detail screen edits the prices of listings that already exist**,
-  inline in its Marketplaces section — the number a buyer actually sees is the
-  one a seller most often came to change, and detail is where an existing item
-  is edited. It never creates a listing, and renders an empty state when the
-  item is on no marketplace.
+  inline in its Listings section — the number a buyer actually sees is the one
+  a seller most often came to change, and detail is where an existing item is
+  edited. It is an editable section like Overview and Pricing: one box per
+  marketplace, seeded on open so Cancel is a restore.
+  - **It never creates a listing.** Putting the item somewhere new is the List
+    screen's question, and a section that both repriced and created would be a
+    second way to write one.
+  - **An item on no marketplace gets no Edit**, only the line saying so: there
+    is no price to move, and the way on is the actions sheet.
+  - **A box that does not parse leaves its listing alone.** A listing must
+    have a price, so an emptied field is a typo rather than the seller
+    removing the figure — the opposite of the item's own money fields, where
+    empty means "not known" (hard rule 5).
+  - `test/features/inventory/item_detail_sections_test.dart` pins the reprice
+    and that nothing but the price moves.
 - **The List screen adds marketplaces**, and prices both the new ones and the
   live ones. It is where "put this somewhere new" is answered.
 - **Neither writes through the other.** The detail section reads the listings
