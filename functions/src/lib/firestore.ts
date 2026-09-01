@@ -28,6 +28,12 @@ export const paths = {
   notifications: (uid: string) => `users/${uid}/notifications`,
   subscription: (workspaceId: string) =>
     `workspaces/${workspaceId}/subscription/current`,
+
+  // What the workspace is holding, recounted here and read by
+  // `firestore.rules`. Its own document rather than a field on the
+  // subscription one: that is the webhook's, and two writers on one document
+  // is how a late RevenueCat event erases a count.
+  usage: (workspaceId: string) => `workspaces/${workspaceId}/usage/current`,
   invites: 'invites',
   invite: (inviteId: string) => `invites/${inviteId}`,
 };
@@ -44,6 +50,34 @@ export const seatsByPlan: Record<string, number | null> = {
   free: 1,
   premium: 10,
 };
+
+/**
+ * Items on hand and orders per plan — the ceilings `PlanLimits.byPlan` states
+ * for the app.
+ *
+ * A deliberate duplicate for the same reason `seatsByPlan` is one: the app
+ * needs the numbers to render the paywall, and the backend needs them where a
+ * modified client cannot reach. **Changing one means changing the other.**
+ *
+ * `null` means unlimited.
+ */
+export const ceilingsByPlan: Record<string, { items: number | null; orders: number | null }> = {
+  free: { items: 50, orders: 30 },
+  premium: { items: null, orders: null },
+};
+
+/**
+ * How far past a ceiling the *rules* let a client go before refusing.
+ *
+ * **The client gate is the ceiling on use; the rule is the ceiling on abuse.**
+ * The count a rule reads is recounted by a trigger, so it lags a write by a
+ * second or two — without slack, a seller at the ceiling who deletes a row and
+ * immediately adds one would be refused by the backend for an action their own
+ * app had just allowed. That is a lock-out (`docs/rules/BACKEND.md`), and the
+ * whole point of this boundary is the client that ignores its gate entirely,
+ * which slack does nothing for.
+ */
+export const ceilingGrace = 10;
 
 /**
  * Which plan a workspace is on.

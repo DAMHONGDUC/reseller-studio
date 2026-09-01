@@ -199,6 +199,77 @@ describe('what only a Cloud Function may write', () => {
   });
 });
 
+describe('the Free ceilings are a boundary, not a UI decision', () => {
+  // Plan §27. The client gate is what a seller sees; this is what a modified
+  // client meets. A rule cannot count a collection, so the counting happens in
+  // a trigger and the rule reads the verdict it wrote.
+  //
+  // Written as OWNER rather than MEMBER: an earlier suite demotes MEMBER to
+  // viewer, and a viewer is refused every write for a reason that has nothing
+  // to do with a ceiling.
+
+  it('lets a create through while the workspace is under its ceiling', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context
+        .firestore()
+        .doc(`workspaces/${WORKSPACE}/usage/current`)
+        .set({ items: 3, orders: 1, itemsAtCeiling: false, ordersAtCeiling: false });
+    });
+
+    await assertSucceeds(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-under`).set({ title: 'Jacket' }),
+    );
+  });
+
+  it('refuses a create once the trigger says the ceiling is reached', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context
+        .firestore()
+        .doc(`workspaces/${WORKSPACE}/usage/current`)
+        .set({ items: 60, orders: 40, itemsAtCeiling: true, ordersAtCeiling: true });
+    });
+
+    await assertFails(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-over`).set({ title: 'Jacket' }),
+    );
+    await assertFails(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/orders/order-over`).set({ total: 1 }),
+    );
+  });
+
+  it('still lets the seller edit and delete what they already have', async () => {
+    // A downgrade never freezes existing rows — the same promise `PlanGate`
+    // makes in the app. Deleting is how a seller gets back under the ceiling,
+    // so refusing it would be a trap with no way out.
+    await assertSucceeds(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-1`).update({ title: 'Edited' }),
+    );
+    await assertSucceeds(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-3`).delete(),
+    );
+  });
+
+  it('fails open when the flag is missing, malformed or the document is gone', async () => {
+    for (const usage of [{ items: 60 }, { itemsAtCeiling: 'yes' }, null]) {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const reference = context.firestore().doc(`workspaces/${WORKSPACE}/usage/current`);
+
+        await (usage === null ? reference.delete() : reference.set(usage));
+      });
+
+      await assertSucceeds(
+        as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-open`).set({ title: 'Jacket' }),
+      );
+    }
+  });
+
+  it('refuses a client clearing its own ceiling flag', async () => {
+    await assertFails(
+      as(OWNER).doc(`workspaces/${WORKSPACE}/usage/current`).set({ itemsAtCeiling: false }),
+    );
+  });
+});
+
 describe('user profiles', () => {
   it('lets somebody read and write only their own', async () => {
     await assertSucceeds(as(MEMBER).doc(`users/${MEMBER}`).set({ displayName: 'Me' }));
