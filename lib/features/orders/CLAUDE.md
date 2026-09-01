@@ -66,8 +66,20 @@ opens.
   - The join is `MarketplaceMatching`: a listing names a `Marketplace` *enum*
     and an order names a marketplace *record*, and nothing stores a key
     between them.
-- `test/features/orders/record_sale_test.dart` pins the row and both halves of
-  the picker.
+- **Picking a platform fills the sale price with what that platform is
+  asking** — owner's rule, and it overwrites a figure the seller had already
+  typed. That is the point: the box is what *this* marketplace is asking, and
+  a number left behind from the platform before it would be the wrong one
+  shown as confirmed. An item live at 185 on eBay and 175 on Depop has two
+  right answers, and the picker is what chooses between them.
+  - **A platform the item is not on falls back to `Item.expectedPrice`** —
+    the one number that is true either way. The sheet opens on the same rule,
+    seeded from the marketplace it opens on.
+  - The price map is `ListingPricing.byMarketplace` and the lookup is
+    `MarketplaceMatching.valueFor`, so the enum-to-record key rule is written
+    once and the sheet does not know it.
+- `test/features/orders/record_sale_test.dart` pins the row, both halves of
+  the picker, and the price following it.
 
 ## An order always names an item
 
