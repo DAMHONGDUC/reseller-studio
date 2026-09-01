@@ -100,15 +100,25 @@ about how the backend is written.
 
 ## Cloud Functions
 
-- **Every function a client dials by name pins its region.** `onCall` and
-  `onRequest` take `clientFacing` from `functions/src/lib/runtime.ts`;
-  firebase-functions v2 otherwise deploys them to `us-central1` while
-  `AppEnv.functionsRegion` asks for somewhere else, and the failure is a
-  `not-found` at the moment a seller taps the button — nothing fails at build,
-  at deploy, or at startup. `test/server_surface.test.mjs` fails if a new
-  callable forgets it, if the region stops matching `FUNCTIONS_REGION` in
-  `env/env.example.json`, or if a name in `CallableConstant` has no function
-  behind it.
+- **Every function a client dials by name pins its region**, and it is
+  **the region the Firestore database is in** — owner's rule. `onCall` and
+  `onRequest` take `clientFacing` from `functions/src/lib/runtime.ts`.
+  - **Pinned rather than left to the default**, even while the two agree: a
+    default is not an agreement between two sides of a wire. When they
+    disagreed the failure was a `not-found` at the moment a seller tapped the
+    button — nothing failed at build, at deploy, or at startup, and account
+    deletion is a store requirement.
+  - **The database's region, not the seller's or the developer's.** The
+    triggers and the scheduler already sit where the database is, so a
+    callable anywhere else buys every read and write inside one a round trip
+    between continents.
+  - **Moving it deletes and recreates every function**, because region is part
+    of a function's identity — the deploy stops and names them rather than
+    doing it, which is right. Changing it means changing `FUNCTIONS_REGION` in
+    every flavour file under `env_assets/` as well.
+  - `test/server_surface.test.mjs` fails if a new callable forgets the pin, if
+    the region stops matching `FUNCTIONS_REGION` in `env/env.example.json`, or
+    if a name in `CallableConstant` has no function behind it.
   - **Triggers and the scheduler deliberately do not take it.** A Firestore
     trigger has to sit in a region its database allows — Firebase's to pick,
     not ours to guess — and nobody addresses one by region anyway.
