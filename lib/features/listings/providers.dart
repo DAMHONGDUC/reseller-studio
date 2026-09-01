@@ -4,6 +4,7 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/state/selection_controller.dart';
+import '../marketplaces/domain/services/marketplace_order.dart';
 import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/listing.dart';
@@ -18,6 +19,10 @@ final StreamProvider<List<Listing>> listingsProvider =
 
 /// Every marketplace one item is live on — the item detail's Listings block
 /// and the cross-listing screen.
+///
+/// **Ordered here, so no screen has to think about it.** The query answers
+/// "which listings", not "in what order", and two screens reading the same
+/// item were drawing its marketplaces in two orders (`MarketplaceOrder`).
 // See `itemProvider` for why the type is inferred rather than written.
 // ignore: type_annotate_public_apis
 final listingsForItemProvider = StreamProvider.family<List<Listing>, String>((
@@ -26,7 +31,15 @@ final listingsForItemProvider = StreamProvider.family<List<Listing>, String>((
 ) {
   return WorkspaceGuard.listOrEmpty<Listing>(
     ref,
-    () => ref.watch(listingRepositoryProvider).watchListingsForItem(itemId),
+    () => ref
+        .watch(listingRepositoryProvider)
+        .watchListingsForItem(itemId)
+        .map(
+          (List<Listing> listings) => MarketplaceOrder.sort(
+            listings,
+            (Listing listing) => listing.marketplace,
+          ),
+        ),
   );
 });
 

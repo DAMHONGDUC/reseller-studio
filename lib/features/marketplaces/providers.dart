@@ -15,12 +15,17 @@ final Provider<List<Marketplace>> defaultMarketplacesProvider =
       final DateTime createdAt = DateTime.now();
 
       return <Marketplace>[
-        for (final MarketplaceSeed seed in MarketplaceConstant.defaults)
+        for (final (int index, MarketplaceSeed seed)
+            in MarketplaceConstant.defaults.indexed)
           Marketplace(
             id: seed.id,
             name: seed.name,
             feeRate: seed.feeRate,
-            createdAt: createdAt,
+            // A millisecond apart, never one instant: the list is read back
+            // ordered by `createdAt`, and five identical stamps leave the tie
+            // to the document id — the seeded order in mock data and
+            // alphabetical order in Firestore, for the same five rows.
+            createdAt: createdAt.add(Duration(milliseconds: index)),
             hue: seed.hue,
           ),
       ];
