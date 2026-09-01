@@ -3,6 +3,7 @@ import { logger } from 'firebase-functions';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { db, paths } from '../lib/firestore';
+import { clientFacing } from '../lib/runtime';
 
 /**
  * Turn a pending invite into a membership.
@@ -19,7 +20,7 @@ import { db, paths } from '../lib/firestore';
  * invite `accepted` either way. `onMemberWritten` then adds the workspace to
  * the user's own list.
  */
-export const acceptInvite = onCall(async (request) => {
+export const acceptInvite = onCall(clientFacing, async (request) => {
   const uid = request.auth?.uid;
   const tokenEmail = request.auth?.token.email?.toLowerCase();
 

@@ -3,6 +3,7 @@ import { logger } from 'firebase-functions';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { db, paths, planFor, seatsByPlan } from '../lib/firestore';
+import { clientFacing } from '../lib/runtime';
 
 /** Roles an invite may grant. `owner` is never handed out by invitation. */
 const invitableRoles = ['admin', 'member', 'viewer'];
@@ -26,7 +27,7 @@ const invitableRoles = ['admin', 'member', 'viewer'];
  * and the email, so inviting the same person twice rewrites one document
  * rather than making a second.
  */
-export const inviteMember = onCall(async (request) => {
+export const inviteMember = onCall(clientFacing, async (request) => {
   const uid = request.auth?.uid;
 
   if (!uid) {

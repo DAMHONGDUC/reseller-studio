@@ -4,6 +4,7 @@ import { defineSecret } from 'firebase-functions/params';
 import { onRequest } from 'firebase-functions/v2/https';
 
 import { db, paths } from '../lib/firestore';
+import { clientFacing } from '../lib/runtime';
 import { planFromEvent, willRenew } from './entitlement';
 import { refreshUsage } from './usage';
 
@@ -42,7 +43,7 @@ const webhookToken = defineSecret('REVENUECAT_WEBHOOK_TOKEN');
  * that hides a real failure.
  */
 export const revenueCatWebhook = onRequest(
-  { secrets: [webhookToken] },
+  { ...clientFacing, secrets: [webhookToken] },
   async (request, response) => {
     if (request.get('Authorization') !== webhookToken.value()) {
       // Never logs what was sent — a wrong token is still a credential.

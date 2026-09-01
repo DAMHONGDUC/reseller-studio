@@ -4,6 +4,7 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { requireFreshUid } from '../lib/caller';
 import { db, paths } from '../lib/firestore';
 import { deleteWorkspaceData } from './teardown';
+import { clientFacing } from '../lib/runtime';
 
 /**
  * Delete one business without deleting the account with it.
@@ -26,7 +27,7 @@ import { deleteWorkspaceData } from './teardown';
  * `permission-denied`. A client that lost the answer to its first call would
  * otherwise be shown a failure for the delete that actually worked.
  */
-export const deleteWorkspace = onCall(async (request) => {
+export const deleteWorkspace = onCall(clientFacing, async (request) => {
   const uid = requireFreshUid(request);
   const workspaceId = String(request.data?.workspaceId ?? '');
 

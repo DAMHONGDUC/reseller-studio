@@ -2,6 +2,7 @@ import { logger } from 'firebase-functions';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { db, paths } from '../lib/firestore';
+import { clientFacing } from '../lib/runtime';
 
 /**
  * Remove somebody from a workspace, or change their role.
@@ -15,7 +16,7 @@ import { db, paths } from '../lib/firestore';
  * Removing is a delete of the membership document; `onMemberWritten` then
  * takes the workspace out of that person's own list.
  */
-export const removeMember = onCall(async (request) => {
+export const removeMember = onCall(clientFacing, async (request) => {
   const uid = request.auth?.uid;
 
   if (!uid) {
