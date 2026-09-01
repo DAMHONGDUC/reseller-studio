@@ -105,33 +105,64 @@ exceptions**, and `crossList` takes a `Map<Marketplace, Money>`.
   at a number the seller had just deleted.
 - **Unticking a platform drops its price.** A hidden number that came back on
   the next tick is one nobody chose that time.
-- **The item's `askingPrice` takes the shared price, never a platform's.**
-  What the item is worth is not whichever marketplace happened to be cheapest,
-  so `crossList` takes it as a separate argument and leaves the item alone
-  when it is null.
+- **The shared price seeds the rows and is written nowhere else.** It used to
+  also become the item's own `askingPrice`; the item has no price of its own
+  any more (see below), so `crossList` writes listings and nothing but.
 - `test/features/listings/cross_list_test.dart` holds all six.
 
 ## Two places price a marketplace, and they answer different questions
 
 Owner's rule, and it is deliberate rather than a duplication left standing.
 
-- **The item form edits the prices of listings that already exist**, inline —
-  cost, asking price and minimum are on that screen already, and the number a
-  buyer actually sees is the one a seller most often came to change. It never
-  creates a listing, and renders nothing when the item is on no marketplace.
-  The edits ride on `ItemFormState.listingPrices`, keyed by listing id, and
-  are written by the form's own Save — so changing a title and a price is one
-  button.
+- **The detail screen edits the prices of listings that already exist**,
+  inline in its Marketplaces section — the number a buyer actually sees is the
+  one a seller most often came to change, and detail is where an existing item
+  is edited. It never creates a listing, and renders an empty state when the
+  item is on no marketplace.
 - **The List screen adds marketplaces**, and prices both the new ones and the
   live ones. It is where "put this somewhere new" is answered.
-- **Neither writes through the other.** The form's `_saveListingPrices` reads
-  the listings fresh and moves only the price; `crossList` batches new
-  listings and repriced ones together. A shared write path would have to know
-  which screen called it, which is the coupling the split avoids.
-- **`askingPrice` is the item's own number and stays that** — what the seller
-  wants for the thing, shown on its card. A marketplace price never writes
-  back to it, and a reprice on its own does not re-stamp `listedAt`, which
-  would reset the staleness clock.
+- **Neither writes through the other.** The detail section reads the listings
+  fresh and moves only the price; `crossList` batches new listings and
+  repriced ones together. A shared write path would have to know which screen
+  called it, which is the coupling the split avoids.
+- **A reprice does not re-stamp `listedAt`**, which would reset the staleness
+  clock: moving a price is not putting the item on sale again.
+
+## An item has no price of its own; every price belongs to a marketplace
+
+Owner's rule, and it **deletes `Item.askingPrice`** — the field, not just its
+place on a screen. It departs from the plan's item field list on purpose: the
+plan wrote the field before cross-listing existed, and once the same jacket is
+live at three numbers, "the price" is a question only a marketplace can
+answer.
+
+- **A price that may be true nowhere is worse than no price.** One figure on
+  the item was the number a seller typed once and then never reconciled with
+  what eBay, Depop and Poshmark were actually showing. Every screen that read
+  it was reporting a guess with the confidence of a fact.
+- **`Listing.price` is the only price of a thing for sale.** `purchasePrice`
+  is what the seller paid and stays; `minimumPrice` is the floor for offers
+  and stays; there is nothing in between.
+- **What died with the field, and none of it is coming back behind another
+  name:**
+  - `Item.expectedProfit` — a derivation with no numerator left.
+  - `ItemFilterCriteria`'s asking-price presence and range filters. An item
+    does not carry its listings, so the filter cannot be repointed at them
+    without loading every listing to answer one predicate.
+  - `ItemTransition`'s `missingPrice` block. Nothing about an item is missing
+    a price any more; the cross-list screen is where a price is entered and it
+    refuses to publish a row without one.
+  - The Offers screen's "% off the asking price". An offer is made on a
+    marketplace, so the number it should be compared against is that
+    marketplace's listing — read at the screen, where the listings are.
+  - The asking column in the Reports export.
+- **Where a screen still needs a price to seed a field, it reads the
+  listings.** Mark as sold and Record sale seed from the item's live listings
+  rather than from a field on the item, because that is where the number a
+  buyer was shown actually lives.
+- **`ItemDto` stops reading and writing `askingPriceMinor`.** A document
+  written before this keeps the key; nothing rewrites it and no migration
+  runs, exactly as with the retired statuses.
 
 ## The inventory row is two zones, and every figure has a place
 
@@ -175,10 +206,10 @@ which is what lets the amounts be compared at a glance.
     rather than its middle. `test/features/inventory/item_card_figures_test.dart`
     pins both, and pins that Cost does not move between two cards whose
     amounts differ.
-- **The asking price is not on the row** — owner's rule. What the item is
+- **No price is on the row but the cost** — owner's rule. What the item is
   asked for is a per-marketplace number, so one figure on the card is a price
-  that may be true nowhere; the row points at the screen that lists them all
-  instead of printing the item's own.
+  that may be true nowhere; the row points at the screen that lists them all.
+  It is the same argument the item's own asking price lost (see below).
 - **The band ends in an arrow into `AppRoutes.crossList`** — owner's rule, and
   it is what replaced that figure. That screen is where every marketplace's
   price is, so the row answers "what is it going for?" by opening the place
@@ -215,11 +246,11 @@ which is what lets the amounts be compared at a glance.
 - **The cost renders `—` when unknown** (hard rule 5), never `0`: an item
   added through Quick Add has none, and a zero would tell the seller it was
   free.
-- **Expected profit is not on the row** — owner's rule. `Item.expectedProfit`
-  is derived from an asking price nobody has been offered yet and ignores fees
-  and shipping, so on a list it took a cell the width of a real figure to say
-  something rougher than either number beside it. The detail screen still
-  shows it, and `ProfitBreakdown` on a completed order is the real one.
+- **Expected profit is nowhere at all.** It was derived from the item's asking
+  price, and that price is gone — a figure built on a number nobody has been
+  offered, ignoring fees and shipping, computed from a field that no longer
+  exists. `ProfitBreakdown` on a completed order is the real one and always
+  was.
 
 ## The row carries the grade, and the date it last changed
 
@@ -440,9 +471,9 @@ Owner's rule, after a sold item was given a quantity of 10 and stayed sold.
 ## The actions that would be refused are shown, not hidden
 
 A move the item cannot make yet still appears in the sheet, and tapping it
-says which field is missing (`ItemBlockPresenter`). Hiding "List" from an item
-with no price teaches nothing; "Add an asking price to list this" teaches the
-rule and points at the fix.
+says which field is missing (`ItemBlockPresenter`). Hiding "Mark as sold" from
+an item with nothing on the shelf teaches nothing; "There is none left to
+sell" teaches the rule and points at the fix.
 
 ## The item form seeds through `FormSeed`
 
