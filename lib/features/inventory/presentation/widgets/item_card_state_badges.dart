@@ -41,8 +41,8 @@ class _StateBadges extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Wrap(
-          spacing: SdSpacingConstant.w6,
-          runSpacing: SdSpacingConstant.h4,
+          spacing: ItemCardMetricConstant.tagGap,
+          runSpacing: ItemCardMetricConstant.tagRunGap,
           children: <Widget>[
             _DisplayTag(
               label: item.status.label(context),
