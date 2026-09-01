@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/auth/presentation/screens/login_screen/login_screen.dart';
+import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
@@ -21,5 +22,26 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Continue with Apple'), findsOneWidget);
     expect(find.text('Continue with Google'), findsOneWidget);
+  });
+
+  testWidgets('the two are drawn the same size and the same variant', (
+    WidgetTester tester,
+  ) async {
+    // The pair reads as one control with two options, so a difference in
+    // height between them reads as a bug rather than as emphasis.
+    await pumpScreen(tester, const LoginScreen());
+
+    final SdButtonV3 apple = tester.widget<SdButtonV3>(
+      find.widgetWithText(SdButtonV3, 'Continue with Apple'),
+    );
+    final SdButtonV3 google = tester.widget<SdButtonV3>(
+      find.widgetWithText(SdButtonV3, 'Continue with Google'),
+    );
+
+    expect(apple.size, google.size);
+    // Never the app's indigo: Apple allows its button in black or white only
+    // (hard rule 1).
+    expect(apple.variant, SdButtonVariantV3.vendor);
+    expect(google.variant, SdButtonVariantV3.vendor);
   });
 }

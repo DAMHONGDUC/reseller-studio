@@ -17,6 +17,10 @@ part of 'login_screen.dart';
 /// old `primary` styling was a rejection waiting at review rather than a
 /// style preference. Google's neutral button is the same shape.
 ///
+/// **Both are the same size, and it is `small`** — the pair is read as one
+/// control with two options, so a difference in height between them reads as
+/// a bug rather than as emphasis. Whatever they wear, they wear together.
+///
 /// **Both marks are `SimpleIcons` glyphs** (owner's rule, hard rule 1) — a
 /// font, not the vendors' own artwork, so nothing here can fail to load and
 /// take the only way into the app down with it. Google's real file exists and
@@ -46,6 +50,7 @@ class _LoginActions extends ConsumerWidget {
             variant: SdButtonVariantV3.vendor,
             label: context.l10n.authContinueWithApple,
             icon: SimpleIcons.apple,
+            size: SdButtonSizeV3.small,
             expand: true,
             busy: state.isBusyWith(AuthProviderKind.apple),
             onPressed: state.isBusy
@@ -57,6 +62,7 @@ class _LoginActions extends ConsumerWidget {
             variant: SdButtonVariantV3.vendor,
             label: context.l10n.authContinueWithGoogle,
             icon: SimpleIcons.google,
+            size: SdButtonSizeV3.small,
             expand: true,
             busy: state.isBusyWith(AuthProviderKind.google),
             onPressed: state.isBusy
