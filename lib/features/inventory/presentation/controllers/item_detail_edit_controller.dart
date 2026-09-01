@@ -4,7 +4,6 @@ import 'package:system_design/common.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/utils/text_input_utils.dart';
-import '../../../listings/domain/entities/listing.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
@@ -14,10 +13,13 @@ import '../../domain/enums/item_status.dart';
 ///
 /// **Status is not here.** Listing, selling and archiving carry writes beyond
 /// the field — see `lib/features/inventory/CLAUDE.md`.
+///
+/// **Nor are listings.** What a marketplace asks is edited on Marketplaces
+/// management, which the Listings section links to rather than opening boxes
+/// of its own.
 enum ItemDetailSection {
   overview,
   pricing,
-  listings,
   provenance,
   description,
   notes,
@@ -189,73 +191,6 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
     return _write(itemId, ItemDetailSection.notes, (Item current) {
       return current.copyWith(notes: value, clearNotes: value == null);
     });
-  }
-
-  /// Moves the price of the item's listings, and nothing else about them.
-  ///
-  /// **It reads the listings fresh**, for the same reason [_write] re-reads
-  /// the item: a teammate may have changed a title or ended one while the
-  /// draft was open, and writing back a copy taken when Edit was tapped would
-  /// undo them.
-  ///
-  /// **A box that does not parse leaves its listing alone.** A listing must
-  /// have a price, so an emptied field is a typo rather than the seller
-  /// removing the figure — the opposite of the item's own money fields, where
-  /// empty means "not known" (hard rule 5).
-  ///
-  /// It deliberately does not touch `listedAt`: moving a price is not putting
-  /// the item on sale again, and the staleness clock must not reset.
-  Future<void> saveListingPrices({
-    required String itemId,
-    required Map<String, String> prices,
-  }) async {
-    final String currency = ref.read(workspaceCurrencyProvider);
-
-    if (state.isSaving) return;
-
-    state = state.copyWith(isSaving: true);
-    SdLogger.action(
-      LogTagConstant.listing,
-      'Save listing prices',
-      <String, Object>{'itemId': itemId, 'count': prices.length},
-    );
-
-    try {
-      final List<Listing> current = await ref
-          .read(listingRepositoryProvider)
-          .watchListingsForItem(itemId)
-          .first;
-      final List<Listing> moved = <Listing>[
-        for (final Listing listing in current)
-          if (Money.tryParse(prices[listing.id] ?? '', currency)
-              case final Money price when price != listing.price)
-            listing.copyWith(price: price),
-      ];
-
-      if (moved.isNotEmpty) {
-        await ref.read(listingRepositoryProvider).saveAll(moved);
-      }
-
-      SdLogger.info(
-        LogTagConstant.listing,
-        'Listing prices saved',
-        <String, Object>{'itemId': itemId, 'moved': moved.length},
-      );
-
-      state = const ItemDetailEditState();
-    } catch (error, stackTrace) {
-      SdLogger.error(
-        LogTagConstant.listing,
-        'Listing prices failed to save',
-        error: error,
-        stackTrace: stackTrace,
-        data: <String, Object>{'itemId': itemId, 'count': prices.length},
-      );
-
-      state = state.copyWith(isSaving: false);
-
-      rethrow;
-    }
   }
 
   /// Reads the item fresh, applies [apply], writes it and closes the section.

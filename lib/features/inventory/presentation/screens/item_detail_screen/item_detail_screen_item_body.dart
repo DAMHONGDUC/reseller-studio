@@ -54,10 +54,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
       case ItemDetailSection.pricing:
         _cost.text = item.purchasePrice?.toInputString() ?? '';
         _minimum.text = item.minimumPrice?.toInputString() ?? '';
-      // Its boxes are one per listing and belong to the section that draws
-      // them, so it seeds itself.
-      case ItemDetailSection.listings:
-        break;
       case ItemDetailSection.provenance:
         _barcode.text = item.barcode ?? '';
       case ItemDetailSection.description:
@@ -392,27 +388,6 @@ class _LongText extends StatelessWidget {
     child: Text(
       value ?? context.l10n.emptyValuePlaceholder,
       style: context.textTheme3.bodyMedium!.muted3(context),
-    ),
-  );
-}
-
-/// The heading above a block that cannot be edited.
-///
-/// Extracted the moment the body had six of them: six copies of a `Text` plus
-/// a `SizedBox` is six chances for one of the gaps to drift.
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: SdSpacingConstant.h8),
-    child: Text(
-      title,
-      style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-        color: context.sdTheme3.textPrimary,
-      ),
     ),
   );
 }

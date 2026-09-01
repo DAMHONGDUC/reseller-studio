@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // `Override` is not in the main entrypoint's `show` list; `misc.dart` is
 // where hooks_riverpod exports it.
@@ -71,6 +72,47 @@ Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
   List<Override> overrides = const <Override>[],
+}) => _pumpApp(tester, overrides: overrides, home: screen);
+
+/// Pump [screen] as a route, so a widget that calls `context.push` has a
+/// router to push into. The returned router is how a test reads where it went.
+///
+/// Every other destination is a placeholder: what these tests assert is which
+/// screen a button names, and building the real one would drag its providers
+/// into a test about a tap.
+Future<GoRouter> pumpRoutedScreen(
+  WidgetTester tester,
+  Widget screen, {
+  List<Override> overrides = const <Override>[],
+}) async {
+  final GoRouter router = GoRouter(
+    routes: <RouteBase>[
+      GoRoute(
+        path: '/',
+        builder: (BuildContext context, GoRouterState state) => screen,
+      ),
+      GoRoute(
+        // `(.*)` so one placeholder stands in for every path the screen under
+        // test could push, however many segments it has.
+        path: '/:destination(.*)',
+        builder: (BuildContext context, GoRouterState state) =>
+            const Scaffold(body: SizedBox.shrink()),
+      ),
+    ],
+  );
+
+  await _pumpApp(tester, overrides: overrides, router: router);
+
+  return router;
+}
+
+/// The wiring both pumps share: the device surface, the mock backend, the
+/// theme and the localizations.
+Future<void> _pumpApp(
+  WidgetTester tester, {
+  required List<Override> overrides,
+  Widget? home,
+  GoRouter? router,
 }) async {
   // The default test surface is 800×600 — wider and much shorter than any
   // phone, which makes rows that are fine on device overflow here and hides
@@ -87,6 +129,14 @@ Future<void> pumpScreen(
   tester.view.padding = const FakeViewPadding(top: 177, bottom: 102);
   addTearDown(tester.view.reset);
 
+  const List<LocalizationsDelegate<Object>> delegates =
+      <LocalizationsDelegate<Object>>[
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ];
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -99,16 +149,17 @@ Future<void> pumpScreen(
       ],
       child: ScreenUtilInit(
         designSize: ResellerStudioApp.designSize,
-        builder: (BuildContext context, Widget? _) => MaterialApp(
-          theme: AppTheme.light,
-          localizationsDelegates: const <LocalizationsDelegate<Object>>[
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          home: screen,
-        ),
+        builder: (BuildContext context, Widget? _) => router == null
+            ? MaterialApp(
+                theme: AppTheme.light,
+                localizationsDelegates: delegates,
+                home: home,
+              )
+            : MaterialApp.router(
+                theme: AppTheme.light,
+                localizationsDelegates: delegates,
+                routerConfig: router,
+              ),
       ),
     ),
   );
