@@ -33,14 +33,16 @@ engineering work only.
 | Marketplace OAuth and publishing | Dropped; listings remain seller-maintained records |
 | v2 collapsing chrome | Not ported; v3 owns a different screen model |
 
-## Waiting on an owner decision
+## Decided, built, and worth watching
 
-Neither is blocked on engineering. Both change something the owner has already
-decided, so neither was built.
+Both were owner decisions taken after the fact rather than defaults, so the
+reasoning lives where the next session will look: bundles in
+`lib/features/orders/CLAUDE.md`, the plan change in
+`docs/rules/SUBSCRIPTION.md`.
 
-| Question | What it would change |
+| Decision | What to watch |
 |---|---|
-| Should an order be allowed more than one line? | Bundles are everyday on Poshmark and Depop, and splitting one into several orders destroys the per-item ROI Sourcing exists to measure. `lib/features/orders/CLAUDE.md` says raise it first: it changes the entity, every screen that taps through to an item, and what profit means for an order. The narrow version keeps `OrderLine.itemId` non-null and apportions the sale price by `expectedPrice`. |
-| Should the Free ceiling stay a count of records? | `PlanLimits.byPlan` allows 50 items and 30 orders. The app's value only appears once the data is dense — sell-through, ROI by source, payout reconciliation and the tax pack are all meaningless at 40 items — so the ceiling blocks the process that creates the reason to pay. The alternative is to gate on outcomes instead: the tax pack, payout reconciliation, advanced analytics and team. `PlanFeature.requiredPlan` is already the single place that decides. |
+| An order may name several items | Lines that belong to no item are still unbuilt and still need raising. A bundle's split is a judgement `BundleAllocation` makes, so watch whether sellers disagree with it often enough to want to edit a line. |
+| Free counts no records; Premium sells capabilities | Reverting is one line in `PlanLimits.byPlan` plus its mirror in `functions/src/lib/firestore.ts`. Watch conversion: the argument is that a seller now reaches the tax and payout moments at all, and those are what the paywall is now sold on. |
 
 Keep this file synchronized with [`DONE_WORK.md`](DONE_WORK.md).

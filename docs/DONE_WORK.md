@@ -8,7 +8,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Onboarding and auth | One-time intro, Apple/Google sign-in, signed-out shell, sign-out, account deletion | Firebase and provider setup |
 | Home | Attention queue, overview, recent activity, Quick Access, Premium banner | Functions for live notifications |
 | Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, categories, locations, bulk actions including bulk listing | Firebase Storage for uploads |
-| Orders | Record sale with an optional platform fee, detail, shipping queue, settlement, returns, refunds, overdue payout chasing | None for manual records |
+| Orders | Record sale with an optional platform fee, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing | None for manual records |
 | Sourcing | Sources, purchases, ROI ranking, buy calculator | None |
 | Listings | Marketplace prices, cross-listing records, bulk reprice/pause/end | No marketplace publishing by decision |
 | Marketplaces | Seller-owned records, fee estimate, defaults, soft delete | None |
@@ -19,7 +19,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Search | Items, orders, listings and sources | None |
 | Workspace and team | Create, switch, delete, invite, role and member management | Team actions require deployed Functions |
 | Notifications | Inbox, unread state, FCM registration, event pushes, per-workspace-timezone digest, twelve types with a switch each | Functions, APNs and Scheduler |
-| Subscription | Free/Premium gates, monthly/yearly paywall, restore, management screen, server-enforced item and order ceilings | RevenueCat and webhook setup |
+| Subscription | Free/Premium gates on capabilities rather than record counts, monthly/yearly paywall, restore, management screen | RevenueCat and webhook setup |
 | Settings | Account, workspace, theme, debug mock-data switch | None |
 
 ## Platform foundations
