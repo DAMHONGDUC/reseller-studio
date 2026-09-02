@@ -37,6 +37,10 @@ final class LogTagConstant {
   static const String workspace = 'Workspace';
   static const String team = 'Team';
   static const String quickAdd = 'Quick Add';
+
+  /// Taking a whole buying trip in — its own flow, not Quick Add's and not
+  /// Sourcing's, so a session can be read back on its own.
+  static const String intake = 'Intake';
   static const String item = 'Item';
   static const String catalog = 'Catalog';
   static const String scanner = 'Scanner';

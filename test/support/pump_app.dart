@@ -22,6 +22,8 @@ import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/offers/providers.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart';
+import 'package:reseller_studio/features/sourcing/providers.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:reseller_studio/reseller_studio_app.dart';
 
@@ -225,6 +227,11 @@ Future<void> warmUp(ProviderContainer container) async {
   container.listen<AsyncValue<List<Offer>>>(
     offersProvider,
     (AsyncValue<List<Offer>>? previous, AsyncValue<List<Offer>> next) {},
+    fireImmediately: true,
+  );
+  container.listen<AsyncValue<List<Purchase>>>(
+    purchasesProvider,
+    (AsyncValue<List<Purchase>>? previous, AsyncValue<List<Purchase>> next) {},
     fireImmediately: true,
   );
 

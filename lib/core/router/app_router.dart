@@ -18,6 +18,7 @@ import '../../features/carriers/presentation/screens/carriers_screen/carriers_sc
 import '../../features/expenses/presentation/screens/expenses_screen/expenses_screen.dart';
 import '../../features/home/presentation/screens/home_screen/home_screen.dart';
 import '../../features/inventory/presentation/screens/categories_screen/categories_screen.dart';
+import '../../features/inventory/presentation/screens/intake_session_screen/intake_session_screen.dart';
 import '../../features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import '../../features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import '../../features/inventory/presentation/screens/item_form_screen/item_form_screen.dart';
@@ -232,6 +233,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'quick-add',
                     builder: (BuildContext context, GoRouterState state) =>
                         const QuickAddScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'intake',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const IntakeSessionScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

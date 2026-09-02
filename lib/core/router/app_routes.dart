@@ -67,6 +67,11 @@ final class AppRoutes {
   static const String crossListPath = '/inventory/item/:itemId/cross-list';
   static const String addItem = '/inventory/add';
   static const String quickAdd = '/inventory/quick-add';
+
+  /// A whole buying trip, taken in one line at a time. The batch sibling of
+  /// [quickAdd] — same one required field, but the source and the date are
+  /// asked once for the trip rather than once per item.
+  static const String intake = '/inventory/intake';
   static const String scanner = '/inventory/scanner';
   static const String locations = '/inventory/locations';
 

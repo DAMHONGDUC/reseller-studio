@@ -4,6 +4,46 @@ Rules specific to the item list, the item forms and what a seller can do to an
 item. The root `CLAUDE.md` still applies in full; this file only holds what
 would be wrong to generalise.
 
+## Two ways in: Quick Add for one thing, the intake session for a trip
+
+Both create items and **both require only a title** (hard rule 2). What
+separates them is how many things the seller is holding.
+
+- **Quick Add** (`/inventory/quick-add`) is the single item found on a shelf.
+  One field, save, gone.
+- **The intake session** (`/inventory/intake`) is the car boot, the estate
+  sale, the auction lot — thirty things from one source on one day. It asks
+  for the source and the date **once for the trip**, then loops on title and
+  cost with the keyboard up.
+
+**The cost box is why it exists.** What a seller paid is the only figure that
+lives solely in the moment they are standing in the shop; a week later nobody
+remembers whether the jumper was $3 or $5. A missing cost makes every profit
+figure downstream `—` (hard rule 5), so this is the flow the whole insight
+half of the product is fed by. Asking for a source and a date per item is two
+extra taps thirty times over, which is why in practice neither was ever filled
+in.
+
+**It adds no required field.** The cost stays optional exactly as it is
+everywhere else. What changed is where it sits.
+
+**Items are written as they are typed; the purchase is written at the end.**
+That order is the whole durability story and it is deliberate:
+
+- an abandoned session still leaves every item entered, with its cost, source
+  and date — nothing typed is lost;
+- and it leaves **no purchase**, because there was no completed trip. A
+  purchase created up front would be a record of a visit that did not happen,
+  and a `purchaseId` stamped on items before it existed would dangle.
+
+**`Purchase.totalCost` is the receipt, not the sum of the lines.** The screen
+offers a separate optional box for it, because that field is the one place in
+the app allowed to disagree with its items — a $40 box lot apportioned across
+eleven things is exactly the case it exists for. Never fill it in from the
+running total.
+
+`test/features/inventory/intake_session_test.dart` pins all four.
+
 ## New-business category defaults
 
 Every new business starts with three normal category records: Clothing,

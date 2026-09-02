@@ -112,6 +112,7 @@ enum QuickActionOpen {
 /// Every create action in the app.
 enum QuickActionKind {
   quickAddItem,
+  intakeSession,
   addItem,
   scan,
   recordSale,
@@ -174,6 +175,11 @@ final class QuickActionConstant {
           kind: QuickActionKind.quickAddItem,
           icon: AppIconConstant.bolt,
           route: AppRoutes.quickAdd,
+        ),
+        QuickAction(
+          kind: QuickActionKind.intakeSession,
+          icon: AppIconConstant.storefront,
+          route: AppRoutes.intake,
         ),
         QuickAction(
           kind: QuickActionKind.scan,
@@ -270,6 +276,7 @@ final class QuickActionLabel {
   static String of(BuildContext context, QuickActionKind kind) =>
       switch (kind) {
         QuickActionKind.quickAddItem => context.l10n.quickAddTitle,
+        QuickActionKind.intakeSession => context.l10n.quickActionIntakeSession,
         QuickActionKind.addItem => context.l10n.inventoryAddItem,
         QuickActionKind.scan => context.l10n.inventoryScan,
         QuickActionKind.recordSale => context.l10n.recordSaleTitle,

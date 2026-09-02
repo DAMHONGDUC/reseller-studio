@@ -1827,6 +1827,63 @@
       }
     }
   },
+  "intakeTitle": "Intake session",
+  "@intakeTitle": {
+    "description": "Title of the batch intake screen — one buying trip, many items."
+  },
+  "intakeItemTitle": "What is it?",
+  "@intakeItemTitle": {
+    "description": "The one required field on an intake line, same rule as Quick Add."
+  },
+  "intakeItemCost": "What you paid (optional)",
+  "@intakeItemCost": {
+    "description": "The per-item cost on an intake line. Optional, like everywhere else."
+  },
+  "intakeCostHelper": "The one number nobody remembers a week later. Leave it blank and profit stays unknown.",
+  "@intakeCostHelper": {
+    "description": "Says why the cost box is worth filling in at this exact moment."
+  },
+  "intakeAdd": "Add and keep going",
+  "@intakeAdd": {
+    "description": "Writes the line and returns the cursor to the title box."
+  },
+  "intakeReceiptTotal": "Receipt total (optional)",
+  "@intakeReceiptTotal": {
+    "description": "What actually left the pocket. May differ from the item costs — a box lot apportioned across eleven things is the case."
+  },
+  "intakeReceiptTotalHelper": "What the receipt says, if it differs from the costs above.",
+  "@intakeReceiptTotalHelper": {
+    "description": "Explains that the receipt total and the item costs are allowed to disagree."
+  },
+  "intakeFinished": "Trip saved.",
+  "@intakeFinished": {
+    "description": "Confirmation after the purchase and its items are written."
+  },
+  "intakeTakenIn": "{count, plural, =1{1 item taken in} other{{count} items taken in}}",
+  "@intakeTakenIn": {
+    "description": "Header over the list of what has gone in during this session.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "intakeFinish": "{count, plural, =1{Finish — 1 item, {total}} other{Finish — {count} items, {total}}}",
+  "@intakeFinish": {
+    "description": "The pinned button: how many went in and what they cost.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "quickActionIntakeSession": "Intake session",
+  "@quickActionIntakeSession": {
+    "description": "Quick Action row opening the batch intake screen."
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."
