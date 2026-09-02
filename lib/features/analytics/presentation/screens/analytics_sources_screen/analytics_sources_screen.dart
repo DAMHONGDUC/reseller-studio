@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../sourcing/providers.dart';
 import '../../widgets/metric_card.dart';
 
@@ -54,6 +56,10 @@ class AnalyticsSourcesScreen extends ConsumerWidget {
                 for (final SourcePerformance row in rows) ...<Widget>[
                   MetricCard(
                     title: names[row.sourceId] ?? row.sourceId,
+                    // The last step of the lifecycle, made a step rather than
+                    // a report: this screen says where to go next Saturday,
+                    // and now it opens the place it named.
+                    onTap: () => context.push(AppRoutes.source(row.sourceId)),
                     rows: <Widget>[
                       MetricRow(
                         label: context.l10n.commonRoi,
@@ -80,7 +86,7 @@ class AnalyticsSourcesScreen extends ConsumerWidget {
                       MetricRow(
                         label: context.l10n.commonItems,
                         value: '${row.itemsSold} / ${row.itemsBought}',
-                        caption: 'Sold of bought',
+                        caption: context.l10n.analyticsSoldOfBought,
                       ),
                     ],
                   ),

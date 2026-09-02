@@ -2046,6 +2046,10 @@
       }
     }
   },
+  "analyticsSoldOfBought": "Sold of bought",
+  "@analyticsSoldOfBought": {
+    "description": "Caption under the item count on a source breakdown, saying what the two numbers are."
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."

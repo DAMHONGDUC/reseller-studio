@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
-import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
 import 'package:reseller_studio/features/offers/domain/services/offer_evaluation.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
 
 /// The question a seller with a clock running actually has.
 ///
