@@ -122,6 +122,10 @@ final class AppRoutes {
   /// rather than inside Orders: it is a weekly reconciliation against a bank
   /// statement, not part of draining today's queue.
   static const String payouts = '/more/payouts';
+  /// Everywhere the figures are still guessing. Under More next to Reports,
+  /// because it is the screen a seller opens before handing anything over.
+  static const String books = '/more/books';
+
   static const String reports = '/more/reports';
   static const String receipts = '/more/receipts';
   static const String tax = '/more/tax';

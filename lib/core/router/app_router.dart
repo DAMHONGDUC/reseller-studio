@@ -42,6 +42,7 @@ import '../../features/orders/presentation/screens/payouts_screen/payouts_screen
 import '../../features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
 import '../../features/receipts/presentation/screens/receipts_screen/receipts_screen.dart';
+import '../../features/reports/presentation/screens/books_screen/books_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen/reports_screen.dart';
 import '../../features/search/presentation/screens/search_screen/search_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen/settings_screen.dart';
@@ -386,6 +387,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 // a seller three screens deep in More can check an order and
                 // come back to where they were.
                 routes: <RouteBase>[
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'books',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const BooksScreen(),
+                  ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
                     path: 'settings',

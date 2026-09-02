@@ -1888,6 +1888,77 @@
   "@scannerEvaluate": {
     "description": "Third action when a scanned code matches nothing: the seller does not own it yet and is deciding whether to."
   },
+  "booksTitle": "Close the books",
+  "@booksTitle": {
+    "description": "Title of the screen listing everywhere the figures are still guessing."
+  },
+  "booksClearTitle": "Nothing is guessing",
+  "@booksClearTitle": {
+    "description": "Empty state when every figure is entered."
+  },
+  "booksClearBody": "Every sale has its real fee and its cost, every payout has landed, and every buying trip has a receipt.",
+  "@booksClearBody": {
+    "description": "Says what a clear result actually means, so the seller knows what was checked."
+  },
+  "booksIntro": "{count, plural, =1{1 record still needs a figure before your books are exact.} other{{count} records still need a figure before your books are exact.}}",
+  "@booksIntro": {
+    "description": "Count of outstanding bookkeeping work at the top of the screen.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksEstimatedFees": "Fee is still an estimate",
+  "@booksEstimatedFees": {
+    "description": "Group header for sales with no reported platform fee."
+  },
+  "booksEstimatedFeesBody": "Profit uses the platform\u2019s published rate until you enter what it actually took.",
+  "@booksEstimatedFeesBody": {
+    "description": "What an estimated fee costs the seller in accuracy."
+  },
+  "booksUnknownCost": "Cost was never entered",
+  "@booksUnknownCost": {
+    "description": "Group header for sales whose item cost is missing."
+  },
+  "booksUnknownCostBody": "Profit for these cannot be worked out at all, so it shows as a dash.",
+  "@booksUnknownCostBody": {
+    "description": "Why a missing cost is worse than an estimated fee."
+  },
+  "booksUnpaidPayouts": "Payout has not arrived",
+  "@booksUnpaidPayouts": {
+    "description": "Group header for sales a marketplace has not settled."
+  },
+  "booksUnpaidPayoutsBody": "The marketplace should have paid for these by now.",
+  "@booksUnpaidPayoutsBody": {
+    "description": "Why an unpaid payout belongs on this screen."
+  },
+  "booksNoReceipt": "Buying trip with no receipt",
+  "@booksNoReceipt": {
+    "description": "Group header for purchases with no document attached."
+  },
+  "booksNoReceiptBody": "An expense with nothing filed against it is the one an accountant disallows.",
+  "@booksNoReceiptBody": {
+    "description": "Why a missing receipt matters."
+  },
+  "booksAndMore": "{count, plural, =1{1 more} other{{count} more}}",
+  "@booksAndMore": {
+    "description": "Last row of a group, counting what is not listed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksPurchaseItems": "{count, plural, =1{1 item} other{{count} items}}",
+  "@booksPurchaseItems": {
+    "description": "How many items a buying trip brought in, on its row.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."

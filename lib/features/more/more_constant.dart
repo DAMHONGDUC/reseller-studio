@@ -29,6 +29,7 @@ class MoreDestination {
 /// What a More row points at.
 enum MoreDestinationKind {
   business,
+  books,
   sourcing,
   listings,
   expenses,
@@ -51,6 +52,7 @@ final class MoreLabel {
   static String of(BuildContext context, MoreDestinationKind kind) =>
       switch (kind) {
         MoreDestinationKind.business => context.l10n.workspaceDetailTitle,
+        MoreDestinationKind.books => context.l10n.booksTitle,
         MoreDestinationKind.sourcing => context.l10n.moreSourcing,
         MoreDestinationKind.listings => context.l10n.moreListings,
         MoreDestinationKind.expenses => context.l10n.moreExpenses,
@@ -173,6 +175,12 @@ final class MoreConstant {
           kind: MoreDestinationKind.payouts,
           icon: AppIconConstant.accountBalance,
           route: AppRoutes.payouts,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.books,
+          icon: AppIconConstant.checkCircle,
+          route: AppRoutes.books,
           isBuilt: true,
         ),
         MoreDestination(

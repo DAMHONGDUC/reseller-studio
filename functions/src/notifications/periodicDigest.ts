@@ -102,7 +102,7 @@ async function bookkeeping(workspaceId: string, day: string): Promise<number> {
       type: 'profitIncomplete',
       workspaceId,
       count,
-      route: '/analytics/profit',
+      route: '/more/books',
       title: 'Fees still estimated',
       body:
         count === 1

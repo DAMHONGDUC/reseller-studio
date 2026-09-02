@@ -27,6 +27,9 @@ void main() {
       MoreSectionKind.finance: <MoreDestinationKind>[
         MoreDestinationKind.expenses,
         MoreDestinationKind.payouts,
+        // Close the books sits directly before the two screens that export:
+        // fix the figures, then hand them over.
+        MoreDestinationKind.books,
         MoreDestinationKind.reports,
         MoreDestinationKind.receipts,
         MoreDestinationKind.tax,
