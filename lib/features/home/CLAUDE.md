@@ -33,6 +33,20 @@ decide it, and they are listed in the order they outrank each other.
 3. **Needs Attention follows it, still above the numbers.** The plan's own
    core principle: a seller opening the app at 8am needs the orders waiting to
    ship, not last night's revenue.
+   - **It carries the plan's four rows and one more: an overdue payout.**
+     Orders to ship, offers waiting, items to list and stale inventory are
+     §6's; "not paid out yet" is the only row on Home that hands the seller
+     money back rather than work, and a payout that never arrives is invisible
+     until somebody goes looking for it.
+   - **Overdue, never merely outstanding.** A payout three days old is a
+     platform working normally, so the row uses
+     `PayoutReconciliation.overdueAfterDays` and is absent almost every day.
+     A row that is always there is one the eye learns to skip, which is what
+     the rest of this section exists to prevent.
+   - **It shows the amount, not the count.** The count is what the More row's
+     badge already says; the amount is what makes this worth opening.
+   - Adding a sixth row is a product decision — ask. The block works because
+     it is short enough that every row still reads as urgent.
 4. **Performance follows both.** It briefly sat directly under the shortcuts;
    that is no longer the order, and nothing should restore it from the record
    of the intermediate state.
@@ -49,6 +63,14 @@ decide it, and they are listed in the order they outrank each other.
    scannable like Settings, while one outer card keeps it reading as one Quick
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
+
+**Home is taller than a phone, so a section-order test cannot read pixels.**
+A lazy `ListView` estimates the extent of every child it has not built, which
+makes `position.pixels` a moving target rather than an absolute coordinate —
+two scrolled measurements compared against each other reported the wrong
+order outright. `home_section_order_test.dart` scrolls from the top and
+compares the order sections *come into view* in, sorting anything that arrives
+in the same frame by its y within that frame.
 
 **The shortcut card and Quick Action being last are one mechanism.** The card
 scrolls to the end of the list rather than to a key, because a lazy

@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
 import '../../core/constants/log_tag_constant.dart';
+import '../../core/money/money.dart';
 import '../../core/time/app_clock.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/services/item_search.dart';
@@ -220,6 +221,29 @@ final Provider<List<MarketplacePayout>> marketplacePayoutsProvider =
         feeRates: ref.watch(marketplaceFeeRatesProvider),
       );
     });
+
+/// Sales a marketplace should have paid for by now.
+///
+/// **Overdue rather than merely outstanding.** A payout three days old is a
+/// platform working normally; a row of them two weeks old is money nobody is
+/// looking for, and only the second is worth a place on Home.
+final Provider<List<Order>> overduePayoutsProvider = Provider<List<Order>>((
+  Ref ref,
+) {
+  return PayoutReconciliation.overdue(
+    ref.watch(ordersProvider).value ?? const <Order>[],
+    ref.watch(clockProvider).now(),
+  );
+});
+
+/// What those sales should have paid, summed. Null when there are none.
+final Provider<Money?> overduePayoutTotalProvider = Provider<Money?>((Ref ref) {
+  return PayoutReconciliation.overdueTotal(
+    ref.watch(ordersProvider).value ?? const <Order>[],
+    ref.watch(clockProvider).now(),
+    feeRates: ref.watch(marketplaceFeeRatesProvider),
+  );
+});
 
 /// How many orders across every marketplace are still missing a payout.
 ///

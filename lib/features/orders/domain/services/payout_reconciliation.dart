@@ -57,6 +57,46 @@ class MarketplacePayout {
 /// are an order with no reported fee and a refund landing after settlement,
 /// and a service that fetched its own data could not be tested at either.
 final class PayoutReconciliation {
+  /// How long after posting a platform has to pay before it is worth chasing.
+  ///
+  /// Two weeks: past every platform's normal settlement window, so a run of
+  /// these is a real gap and not the seller being impatient. **Mirrored
+  /// deliberately in `functions/src/notifications/dailyDigest.ts`**, which
+  /// sends the reminder — changing one means changing the other, the same
+  /// arrangement `PlanLimits` and `ceilingsByPlan` have.
+  static const int overdueAfterDays = 14;
+
+  /// Sales a marketplace has still not paid for, long enough to chase.
+  ///
+  /// **Only orders that have actually shipped.** A platform owes nothing on a
+  /// parcel still on the seller's table, and counting those would make the
+  /// figure a complaint about the seller's own queue.
+  static List<Order> overdue(List<Order> orders, DateTime now) {
+    final DateTime cutoff = now.subtract(
+      const Duration(days: overdueAfterDays),
+    );
+
+    return orders.where((Order order) {
+      final DateTime? shipped = order.shippedAt;
+
+      if (order.payout != null || shipped == null) return false;
+
+      return order.status.countsAsRevenue && shipped.isBefore(cutoff);
+    }).toList();
+  }
+
+  /// What those sales should have paid, summed.
+  ///
+  /// Null when there are none — hard rule 5: no outstanding payout is not
+  /// the same claim as zero money owed.
+  static Money? overdueTotal(
+    List<Order> orders,
+    DateTime now, {
+    Map<String, double> feeRates = const <String, double>{},
+  }) => overdue(orders, now)
+      .map((Order order) => expected(order, feeRates: feeRates))
+      .totalOrNull();
+
   /// One entry per marketplace that has an order worth money, busiest first.
   static List<MarketplacePayout> byMarketplace(
     List<Order> orders, {

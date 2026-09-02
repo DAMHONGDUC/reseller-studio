@@ -1811,6 +1811,22 @@
       }
     }
   },
+  "homePayoutOverdue": "Not paid out yet",
+  "@homePayoutOverdue": {
+    "description": "Home attention row for sales a marketplace should have settled by now."
+  },
+  "homePayoutOverdueDetail": "{amount} owed, {days} days or more since you posted",
+  "@homePayoutOverdueDetail": {
+    "description": "How much is outstanding and how long it has been. The amount is what makes this worth opening.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."
