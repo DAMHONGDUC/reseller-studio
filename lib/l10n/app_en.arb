@@ -1884,6 +1884,10 @@
   "@quickActionIntakeSession": {
     "description": "Quick Action row opening the batch intake screen."
   },
+  "scannerEvaluate": "Should I buy it?",
+  "@scannerEvaluate": {
+    "description": "Third action when a scanned code matches nothing: the seller does not own it yet and is deciding whether to."
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."

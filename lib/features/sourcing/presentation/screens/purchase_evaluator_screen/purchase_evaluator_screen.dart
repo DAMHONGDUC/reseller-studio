@@ -35,7 +35,13 @@ import '../../../domain/services/sold_before_lookup.dart';
 /// shown rather than clamped: a negative maximum means the fees and postage
 /// already exceed the sale price, so the item is not worth taking for free.
 class PurchaseEvaluatorScreen extends ConsumerStatefulWidget {
-  const PurchaseEvaluatorScreen({super.key});
+  const PurchaseEvaluatorScreen({this.initialCode, super.key});
+
+  /// A code the seller already scanned somewhere else, usually on the
+  /// Inventory scanner finding nothing — which is exactly the moment this
+  /// screen is for: something in their hand that the business does not own
+  /// yet. Null when the screen was opened from Sourcing.
+  final String? initialCode;
 
   @override
   ConsumerState<PurchaseEvaluatorScreen> createState() =>
@@ -73,6 +79,18 @@ class _PurchaseEvaluatorScreenState
 
     if (code == null || !mounted) return;
 
+    _applyCode(code, announceMiss: true);
+  }
+
+  /// Answer [code] out of the seller's own records and fill the sale price in.
+  ///
+  /// **Shared with the code this screen was opened on**, so arriving from the
+  /// scanner and scanning again here cannot answer the same code differently.
+  ///
+  /// [announceMiss] is false on arrival: a snackbar firing as a screen opens
+  /// reads as an error, and "no history" is an ordinary answer for something
+  /// the seller has never bought before.
+  void _applyCode(String code, {required bool announceMiss}) {
     final SoldBefore? found = SoldBeforeLookup.find(
       code: code,
       items: ref.read(itemsProvider).value ?? const <Item>[],
@@ -81,7 +99,10 @@ class _PurchaseEvaluatorScreenState
 
     if (found == null) {
       setState(() => _soldBefore = null);
-      SdSnackBarUtilsV3.info(context, context.l10n.sourcingScanNoHistory);
+
+      if (announceMiss) {
+        SdSnackBarUtilsV3.info(context, context.l10n.sourcingScanNoHistory);
+      }
 
       return;
     }
@@ -91,6 +112,21 @@ class _PurchaseEvaluatorScreenState
       _sale.text = found.salePrice.toInputString();
       _saleFromHistory = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final String? code = widget.initialCode;
+
+    if (code == null || code.isEmpty) return;
+
+    // After the first frame: the lookup reads providers and calls `setState`,
+    // and neither is legal while the widget is still being built.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _applyCode(code, announceMiss: false),
+    );
   }
 
   @override

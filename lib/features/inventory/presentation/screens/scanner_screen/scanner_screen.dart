@@ -94,6 +94,16 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
             isPrimary: true,
             onPressed: () => context.pushReplacement(AppRoutes.addItem),
           ),
+          // The other reason a code matches nothing: the seller does not own
+          // it yet and is deciding whether to. That decision is made standing
+          // in the shop, so it belongs here rather than three levels down
+          // under More — and the code goes with it, so the buy calculator
+          // opens on what this business got for one last time.
+          SdDialogActionV3(
+            label: context.l10n.scannerEvaluate,
+            onPressed: () =>
+                context.pushReplacement(AppRoutes.evaluate(code: code)),
+          ),
           SdDialogActionV3(
             label: context.l10n.scannerScanAgain,
             onPressed: () => _camera.currentState?.resume(),

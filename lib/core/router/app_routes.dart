@@ -171,6 +171,15 @@ final class AppRoutes {
   static String order(String orderId) => '/orders/$orderId';
   static String workspaceDetail(String workspaceId) =>
       '/workspace/$workspaceId';
+  /// The buy calculator, optionally opened on a code the seller just scanned.
+  ///
+  /// A query parameter rather than a path segment: the screen is perfectly
+  /// usable with no code — that is how it is reached from Sourcing — and a
+  /// segment would make the codeless case a second route.
+  static String evaluate({String? code}) => code == null || code.isEmpty
+      ? purchaseEvaluator
+      : '$purchaseEvaluator?code=${Uri.encodeComponent(code)}';
+
   static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';

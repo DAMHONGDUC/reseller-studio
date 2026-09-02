@@ -410,7 +410,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         parentNavigatorKey: AppNavigatorKey.root,
                         path: 'evaluate',
                         builder: (BuildContext context, GoRouterState state) =>
-                            const PurchaseEvaluatorScreen(),
+                            PurchaseEvaluatorScreen(
+                              initialCode:
+                                  state.uri.queryParameters['code'],
+                            ),
                       ),
                       GoRoute(
                         parentNavigatorKey: AppNavigatorKey.root,
