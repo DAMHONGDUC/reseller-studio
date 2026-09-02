@@ -24,6 +24,7 @@ import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
+import '../../widgets/bulk_list_sheet.dart';
 import '../../widgets/inventory_filter_sheet.dart';
 import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_card.dart';

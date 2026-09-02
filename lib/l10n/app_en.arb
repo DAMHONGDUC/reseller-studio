@@ -1959,6 +1959,75 @@
       }
     }
   },
+  "itemActionList": "List on…",
+  "@itemActionList": {
+    "description": "Bulk bar action opening the sheet that puts a whole selection up."
+  },
+  "bulkListTitle": "List {count} items",
+  "@bulkListTitle": {
+    "description": "Title of the bulk listing sheet.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkListMarketplaces": "Where to list them",
+  "@bulkListMarketplaces": {
+    "description": "Label above the marketplace chips."
+  },
+  "bulkListPrice": "At what price",
+  "@bulkListPrice": {
+    "description": "Label above the uplift chips."
+  },
+  "bulkListAtExpected": "Expected price",
+  "@bulkListAtExpected": {
+    "description": "The uplift chip meaning no change: each item goes up at its own expected price."
+  },
+  "bulkListUplift": "Expected {percent}",
+  "@bulkListUplift": {
+    "description": "An uplift chip, for example Expected +10 percent.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "bulkListPickOne": "Pick at least one marketplace.",
+  "@bulkListPickOne": {
+    "description": "Shown until a platform is chosen."
+  },
+  "bulkListSummary": "{listings} listings across {items} items. {skipped} skipped.",
+  "@bulkListSummary": {
+    "description": "Says what will be written and what will not, before the seller commits.",
+    "placeholders": {
+      "listings": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkListPublish": "List them",
+  "@bulkListPublish": {
+    "description": "The sheet's confirm button."
+  },
+  "bulkListDone": "{listings} listings created across {items} items.",
+  "@bulkListDone": {
+    "description": "Confirmation after a bulk listing run.",
+    "placeholders": {
+      "listings": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."

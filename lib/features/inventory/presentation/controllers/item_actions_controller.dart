@@ -8,6 +8,7 @@ import '../../../../core/money/money.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../listings/domain/repositories/listing_repository.dart';
+import '../../../listings/domain/services/bulk_listing_plan.dart';
 import '../../../listings/providers.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../mock_data/providers.dart';
@@ -159,6 +160,81 @@ class ItemActionsController extends Notifier<bool> {
         data: <String, Object>{
           'itemId': item.id,
           'marketplaces': prices.keys.map((Marketplace m) => m.name).toList(),
+        },
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Put a whole selection up at once (hard rule 16).
+  ///
+  /// **The plan decides; this only writes it.** Which items are listable, at
+  /// what price and on which platforms is `BulkListingPlan`, computed before
+  /// the seller confirms so the sheet can say what will be skipped. Working
+  /// that out here would put the answer somewhere the sheet could not show it.
+  ///
+  /// **One `saveAll` for every listing, then one for the items.** Listing day
+  /// is a single intent over thirty rows, and a loop of per-item writes is a
+  /// state where eleven are up, the screen showed an error, and nobody can
+  /// tell which eleven.
+  Future<void> crossListAll(BulkListingPlan plan) async {
+    final ListingRepository listings = ref.read(listingRepositoryProvider);
+    final ItemRepository items = ref.read(itemRepositoryProvider);
+    final DateTime now = DateTime.now();
+
+    if (plan.isEmpty) return;
+
+    SdLogger.action(LogTagConstant.listing, 'Bulk cross-list', <String, Object>{
+      'items': plan.itemCount,
+      'listings': plan.listingCount,
+      'skipped': plan.skippedCount,
+    });
+
+    state = true;
+
+    try {
+      await listings.saveAll(<Listing>[
+        for (final BulkListingLine line in plan.lines)
+          for (final MapEntry<Marketplace, Money> entry in line.prices.entries)
+            Listing(
+              id: _uuid.v4(),
+              itemId: line.item.id,
+              marketplace: entry.key,
+              title: line.item.title,
+              price: entry.value,
+              // Draft, like every other listing this app writes: nothing is
+              // integrated, so claiming it is live on eBay would be a lie.
+              status: ListingStatus.draft,
+              createdAt: now,
+            ),
+      ]);
+
+      await items.saveAll(<Item>[
+        for (final BulkListingLine line in plan.lines)
+          if (line.item.status.isListable)
+            ItemTransition.markListed(line.item, now: now),
+      ]);
+
+      SdLogger.info(LogTagConstant.listing, 'Bulk cross-listed', <String, Object>{
+        'items': plan.itemCount,
+        'listings': plan.listingCount,
+      });
+      AppAnalytics.instance.bulkAction(
+        action: 'Bulk cross-list',
+        count: plan.listingCount,
+      );
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.listing,
+        'Failed to bulk cross-list',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{
+          'items': plan.itemCount,
+          'listings': plan.listingCount,
         },
       );
 
