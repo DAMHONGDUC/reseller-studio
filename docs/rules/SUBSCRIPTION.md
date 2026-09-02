@@ -8,14 +8,39 @@ any action that can be blocked by an entitlement.
 - **The paid product is Premium, offered monthly and yearly.** Owner's rule.
   Monthly and yearly are billing periods for the same entitlement, not two
   feature tiers; choosing either unlocks the same product capabilities.
-- **Free is limited by Inventory usage, Order usage, and business count.**
-  Owner's rule. The ceilings live only in `PlanLimits.free`; documents and UI
-  copy read those fields and never repeat their values. Premium gates sit
-  before the blocked create action, so the seller never fills a form and then
-  learns that it cannot be saved.
-- **A downgrade never deletes existing records.** The gate blocks the next
-  create once usage is at or above the Free ceiling; inventory, order history,
-  and businesses already stored remain readable.
+- **Free counts no records. Premium sells the answers.** Owner's rule, and it
+  replaced a ceiling of 50 items and 30 orders.
+  - The ceiling blocked the wrong thing. Every figure this app is bought for —
+    sell-through, ROI by source, payout reconciliation, the tax pack — is
+    meaningless at forty items, so the seller was stopped at exactly the point
+    their data was about to start being worth something. They left before
+    seeing the reason to pay.
+  - **What Premium buys is a capability, never permission to keep typing.**
+    `PlanFeature.taxExport`, `payoutReconciliation`, `advancedAnalytics`,
+    `reports`, `team`, `multipleWorkspaces`, `advancedPermissions`. Adding one
+    means adding it to that enum, which fails to compile until
+    `requiredPlan` answers for it.
+  - **Businesses stay a count**, and it is the one Free ceiling left: a second
+    business is a second business, not a bigger one.
+  - The numbers still live only in `PlanLimits.byPlan`, with the one
+    deliberate mirror in `functions/src/lib/firestore.ts`. Documents and UI
+    copy read those fields and never repeat a value — the paywall's allowance
+    list reads them, which is why it already says "Unlimited items".
+- **A locked capability shows the figure and gates the tool.** Owner's rule,
+  and Payouts is the shape to copy: a Free seller sees *how much* is late,
+  because that number is the whole argument for paying, and Premium is what
+  breaks it down by marketplace and by order so they know which sale to quote
+  when they chase it. A locked screen that says only "upgrade to see this" is
+  one nobody opens twice.
+  - Same on Tax: the summary is free to read, the one-action pack is Premium.
+- **A downgrade never deletes existing records**, and now it never blocks a
+  create either. What a lapsed seller loses is the export and the breakdown,
+  not their inventory or their history.
+- **Feature gates are the UI's, not the backend's, and that is deliberate
+  here.** Both paid capabilities are derived from records the seller can
+  already read, so a server boundary would add nothing a modified client could
+  not do anyway by reading its own data. The gates that *do* grant something —
+  the team seat limit — stay enforced in the callable (`seatsByPlan`).
 - **RevenueCat client configuration is build-time environment data.** Owner's
   rule. `AppEnv` is the only reader of `REVENUECAT_API_KEY_IOS`,
   `REVENUECAT_API_KEY_ANDROID`, `REVENUECAT_ENTITLEMENT`, and
