@@ -65,6 +65,12 @@ class SettingsScreen extends ConsumerWidget {
           child: AppListCard(
             children: <Widget>[
               AppListRow(
+                title: context.l10n.notificationSettingsTitle,
+                subtitle: context.l10n.notificationSettingsIntro,
+                icon: AppIconConstant.notifications,
+                onTap: () => context.push(AppRoutes.notificationSettings),
+              ),
+              AppListRow(
                 title: context.l10n.moreAbout,
                 subtitle: context.l10n.aboutTagline,
                 icon: AppIconConstant.info,

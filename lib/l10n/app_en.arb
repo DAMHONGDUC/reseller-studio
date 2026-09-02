@@ -3340,6 +3340,158 @@
   "@notificationOfferReceived": {
     "description": "Inbox row for an offer received."
   },
+  "notificationShipByToday": "{count, plural, =1{1 order has to go out today} other{{count} orders have to go out today}}",
+  "@notificationShipByToday": {
+    "description": "Inbox row for the reminder that comes before the deadline, not after it.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationOfferExpiring": "{count, plural, =1{1 offer expires within hours} other{{count} offers expire within hours}}",
+  "@notificationOfferExpiring": {
+    "description": "Inbox row for offers about to run out.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationPayoutMissing": "{count, plural, =1{1 sale has still not been paid out} other{{count} sales have still not been paid out}}",
+  "@notificationPayoutMissing": {
+    "description": "Inbox row for the payout reconciliation reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationProfitIncomplete": "{count, plural, =1{1 sale is missing a figure, so its profit is a guess} other{{count} sales are missing a figure, so their profit is a guess}}",
+  "@notificationProfitIncomplete": {
+    "description": "Inbox row for the weekly bookkeeping reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationTaxSeason": "Your tax year is closing. Your figures are ready to export.",
+  "@notificationTaxSeason": {
+    "description": "Inbox row for the seasonal tax reminder."
+  },
+  "notificationRestockWinner": "One of your sources sold better than the rest last month.",
+  "@notificationRestockWinner": {
+    "description": "Inbox row for the monthly sourcing note."
+  },
+  "notificationTypeOrderCreated": "New order",
+  "@notificationTypeOrderCreated": {
+    "description": "Notification settings: the name of the new order reminder."
+  },
+  "notificationTypeOrderCreatedBody": "The moment something sells. The one most sellers keep on.",
+  "@notificationTypeOrderCreatedBody": {
+    "description": "Notification settings: what turning the new order reminder off costs."
+  },
+  "notificationTypeOfferReceived": "New offer",
+  "@notificationTypeOfferReceived": {
+    "description": "Notification settings: the name of the new offer reminder."
+  },
+  "notificationTypeOfferReceivedBody": "A buyer asked to pay less. Offers expire, so this one is worth a buzz.",
+  "@notificationTypeOfferReceivedBody": {
+    "description": "Notification settings: what turning the new offer reminder off costs."
+  },
+  "notificationTypeShipByToday": "Going out today",
+  "@notificationTypeShipByToday": {
+    "description": "Notification settings: the name of the going out today reminder."
+  },
+  "notificationTypeShipByTodayBody": "Orders whose deadline is today, while there is still time to post them.",
+  "@notificationTypeShipByTodayBody": {
+    "description": "Notification settings: what turning the going out today reminder off costs."
+  },
+  "notificationTypeShipmentsDue": "Overdue shipments",
+  "@notificationTypeShipmentsDue": {
+    "description": "Notification settings: the name of the overdue shipments reminder."
+  },
+  "notificationTypeShipmentsDueBody": "Orders already past their ship-by date.",
+  "@notificationTypeShipmentsDueBody": {
+    "description": "Notification settings: what turning the overdue shipments reminder off costs."
+  },
+  "notificationTypeOfferExpiring": "Offer about to expire",
+  "@notificationTypeOfferExpiring": {
+    "description": "Notification settings: the name of the offer about to expire reminder."
+  },
+  "notificationTypeOfferExpiringBody": "A few hours left to answer before the platform closes it.",
+  "@notificationTypeOfferExpiringBody": {
+    "description": "Notification settings: what turning the offer about to expire reminder off costs."
+  },
+  "notificationTypePayoutMissing": "Payout not arrived",
+  "@notificationTypePayoutMissing": {
+    "description": "Notification settings: the name of the payout not arrived reminder."
+  },
+  "notificationTypePayoutMissingBody": "Sales a marketplace has still not paid you for.",
+  "@notificationTypePayoutMissingBody": {
+    "description": "Notification settings: what turning the payout not arrived reminder off costs."
+  },
+  "notificationTypeProfitIncomplete": "Books need a number",
+  "@notificationTypeProfitIncomplete": {
+    "description": "Notification settings: the name of the books need a number reminder."
+  },
+  "notificationTypeProfitIncompleteBody": "A weekly note about sales whose fee or cost is still missing.",
+  "@notificationTypeProfitIncompleteBody": {
+    "description": "Notification settings: what turning the books need a number reminder off costs."
+  },
+  "notificationTypeTaxSeason": "Tax deadline",
+  "@notificationTypeTaxSeason": {
+    "description": "Notification settings: the name of the tax deadline reminder."
+  },
+  "notificationTypeTaxSeasonBody": "Twice a year, when your figures are due and ready to export.",
+  "@notificationTypeTaxSeasonBody": {
+    "description": "Notification settings: what turning the tax deadline reminder off costs."
+  },
+  "notificationTypeRestockWinner": "Worth buying again",
+  "@notificationTypeRestockWinner": {
+    "description": "Notification settings: the name of the worth buying again reminder."
+  },
+  "notificationTypeRestockWinnerBody": "A monthly note on the source or category that actually sold.",
+  "@notificationTypeRestockWinnerBody": {
+    "description": "Notification settings: what turning the worth buying again reminder off costs."
+  },
+  "notificationTypeStaleInventory": "Listings going stale",
+  "@notificationTypeStaleInventory": {
+    "description": "Notification settings: the name of the listings going stale reminder."
+  },
+  "notificationTypeStaleInventoryBody": "Stock that has been up longer than your own threshold.",
+  "@notificationTypeStaleInventoryBody": {
+    "description": "Notification settings: what turning the listings going stale reminder off costs."
+  },
+  "notificationTypeLowInventory": "Running low",
+  "@notificationTypeLowInventory": {
+    "description": "Notification settings: the name of the running low reminder."
+  },
+  "notificationTypeLowInventoryBody": "Too little left on the shelf to keep selling.",
+  "@notificationTypeLowInventoryBody": {
+    "description": "Notification settings: what turning the running low reminder off costs."
+  },
+  "notificationTypeMemberJoined": "Someone joined",
+  "@notificationTypeMemberJoined": {
+    "description": "Notification settings: the name of the someone joined reminder."
+  },
+  "notificationTypeMemberJoinedBody": "A new person was added to this business.",
+  "@notificationTypeMemberJoinedBody": {
+    "description": "Notification settings: what turning the someone joined reminder off costs."
+  },
+  "notificationSettingsTitle": "Notifications",
+  "@notificationSettingsTitle": {
+    "description": "Title of the screen where each kind of reminder is turned on or off."
+  },
+  "notificationSettingsIntro": "Choose what is worth interrupting you for. Everything you turn off still lands in your inbox.",
+  "@notificationSettingsIntro": {
+    "description": "Explains that muting a type does not lose the notification, only the buzz."
+  },
+  "notificationSettingsFailed": "Could not save that. Try again.",
+  "@notificationSettingsFailed": {
+    "description": "Shown when writing a notification preference failed."
+  },
   "notificationShipmentsDue": "{count, plural, =1{1 order is past its ship-by date} other{{count} orders are past their ship-by date}}",
   "@notificationShipmentsDue": {
     "description": "Inbox row for the daily shipping reminder.",

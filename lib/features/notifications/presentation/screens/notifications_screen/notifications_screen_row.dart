@@ -17,9 +17,21 @@ class _NotificationRow extends ConsumerWidget {
         NotificationType.orderCreated => context.l10n.notificationOrderCreated,
         NotificationType.offerReceived =>
           context.l10n.notificationOfferReceived,
+        NotificationType.shipByToday => context.l10n.notificationShipByToday(
+          notification.count ?? 0,
+        ),
         NotificationType.shipmentsDue => context.l10n.notificationShipmentsDue(
           notification.count ?? 0,
         ),
+        NotificationType.offerExpiring =>
+          context.l10n.notificationOfferExpiring(notification.count ?? 0),
+        NotificationType.payoutMissing =>
+          context.l10n.notificationPayoutMissing(notification.count ?? 0),
+        NotificationType.profitIncomplete =>
+          context.l10n.notificationProfitIncomplete(notification.count ?? 0),
+        NotificationType.taxSeason => context.l10n.notificationTaxSeason,
+        NotificationType.restockWinner =>
+          context.l10n.notificationRestockWinner,
         NotificationType.staleInventory =>
           context.l10n.notificationStaleInventory(notification.count ?? 0),
         NotificationType.lowInventory => context.l10n.notificationLowInventory(
@@ -30,16 +42,6 @@ class _NotificationRow extends ConsumerWidget {
         // line beats guessing which of the known types it meant.
         NotificationType.unknown => context.l10n.notificationSomethingHappened,
       };
-
-  static IconData _icon(NotificationType type) => switch (type) {
-    NotificationType.orderCreated => AppIconConstant.receiptLong,
-    NotificationType.offerReceived => AppIconConstant.localOffer,
-    NotificationType.shipmentsDue => AppIconConstant.localShipping,
-    NotificationType.staleInventory => AppIconConstant.hourglassBottom,
-    NotificationType.lowInventory => AppIconConstant.inventory,
-    NotificationType.memberJoined => AppIconConstant.groupAdd,
-    NotificationType.unknown => AppIconConstant.notifications,
-  };
 
   /// Tapping reads it and goes where it points.
   ///
@@ -79,7 +81,7 @@ class _NotificationRow extends ConsumerWidget {
         child: Row(
           children: <Widget>[
             SdIconTileV3(
-              icon: _icon(notification.type),
+              icon: notification.type.icon,
               // Unread is the loud state, and it is marked twice — the tile
               // takes the accent and the title takes the weight. Colour alone
               // is never the only signal.

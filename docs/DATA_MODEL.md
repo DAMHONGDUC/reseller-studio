@@ -64,7 +64,7 @@ the relationship chain supports workflows and analytics, not item validity.
 
 | Path | Main fields | Contract |
 |---|---|---|
-| `users/{uid}` | `displayName`, `email`, `avatarUrl`, `locale`, `lastWorkspaceId`, `workspaceIds` | Person and workspace pointers only; no business records |
+| `users/{uid}` | `displayName`, `email`, `avatarUrl`, `locale`, `lastWorkspaceId`, `workspaceIds`, `notificationPrefs` | Person and workspace pointers only; no business records |
 | `users/{uid}/devices/{token}` | `token`, `platform`, `updatedAt` | Token is also the document ID; never log it |
 | `users/{uid}/notifications/{id}` | `type`, `workspaceId`, `entityId`, `count`, `route`, `title`, `body`, `readAt`, `createdAt` | Functions create; client may update only `readAt`; ID is the dedupe key |
 | `invites/{id}` | Invitee email, workspace, role, status and timestamps | Functions own writes; invitee access is rule-scoped |
@@ -95,6 +95,18 @@ the relationship chain supports workflows and analytics, not item validity.
 | Order `marketplaceName` | Marketplace rename/delete must not rewrite sale history |
 | Order line title, price and cost | Repricing an item must not rewrite an existing sale |
 | Notification `title`, `body` | Push delivery needs text; the app renders inbox copy from `type` and `count` |
+
+## Notification preferences
+
+`users/{uid}.notificationPrefs` maps a `NotificationType` name to whether that
+reminder is wanted. **Only the mutes are stored**: an absent key is on, so a
+type added in a later build arrives switched on rather than silently off for
+everyone who upgraded into it.
+
+It hangs off the person rather than the workspace because two people sharing a
+business do not want the same reminders. **A mute silences the push only** —
+`notifyWorkspace` still writes the inbox row, because the row is the
+notification and the push is a copy of it.
 
 ## Order contract
 

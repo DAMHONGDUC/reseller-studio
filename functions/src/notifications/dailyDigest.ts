@@ -3,11 +3,20 @@ import { logger } from 'firebase-functions';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import { db, paths } from '../lib/firestore';
+import { localClock } from '../lib/timezone';
 import { notifyWorkspace } from './notify';
 
-/** When it runs. Early enough to be the first thing read, in one timezone. */
-const schedule = 'every day 08:00';
+/**
+ * Hourly, so every workspace can be served at 08:00 in **its own** timezone.
+ *
+ * A cron expression rather than `every 60 minutes`, which anchors to whenever
+ * the deploy happened and would drift the whole fleet off the hour.
+ */
+const schedule = '0 * * * *';
 const timeZone = 'Etc/UTC';
+
+/** The local hour a workspace is digested at. Early enough to be read first. */
+const sendAtLocalHour = 8;
 
 /** The default when a workspace has not set its own (`StaleInventoryPolicy`). */
 const defaultStaleThresholdDays = 60;
@@ -33,23 +42,35 @@ const onHandStatuses = ['draft', 'inStock', 'listed', 'reserved'];
  * notifications turns notifications off, and the app's whole promise is to
  * tell them what needs attention *today* rather than to enumerate it.
  *
- * **One send per workspace per day, keyed by the date**, so a retry, a manual
- * re-run and a redeploy on the same day all write the same document id and
- * nobody is told twice.
+ * **One send per workspace per local day, keyed by that date**, so a retry, a
+ * manual re-run and a redeploy within the same local day all write the same
+ * document id and nobody is told twice.
  *
- * The trade to name: this reads every workspace on every run. That is right
- * while there are thousands and wrong at a million, and the fix then is a
- * per-workspace queue rather than a wider query here.
+ * **08:00 is the workspace's own 08:00.** The function wakes every hour and
+ * digests only the businesses whose wall clock has just reached it, so a
+ * seller in California is not woken at 1am by a reminder written for London.
+ *
+ * The trade to name: this reads every workspace on every run, and there are
+ * now twenty-four runs a day rather than one. That is right while there are
+ * thousands and wrong at a million, and the fix then is a per-workspace queue
+ * rather than a wider query here.
  */
 export const dailyDigest = onSchedule({ schedule, timeZone }, async () => {
   const workspaces = await db().collection('workspaces').get();
-  const day = new Date().toISOString().slice(0, 10);
 
+  let due = 0;
   let sent = 0;
 
   for (const workspace of workspaces.docs) {
+    const settings = workspace.data() ?? {};
+    const local = localClock(settings.timezone as string | undefined);
+
+    if (local.hour !== sendAtLocalHour) continue;
+
+    due += 1;
+
     try {
-      sent += await digestFor(workspace.id, workspace.data() ?? {}, day);
+      sent += await digestFor(workspace.id, settings, local.day);
     } catch (error) {
       // One workspace failing must not cost every workspace after it its
       // reminders — the loop continues and the log names the one that broke.
@@ -57,7 +78,11 @@ export const dailyDigest = onSchedule({ schedule, timeZone }, async () => {
     }
   }
 
-  logger.info('daily digest complete', { workspaces: workspaces.size, sent });
+  logger.info('daily digest complete', {
+    workspaces: workspaces.size,
+    due,
+    sent,
+  });
 });
 
 /** Every count for one business, and at most one notification each. */

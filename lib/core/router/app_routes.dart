@@ -131,6 +131,11 @@ final class AppRoutes {
   static const String team = '/more/team';
   static const String settings = '/more/settings';
 
+  /// Which reminders this person wants. **Under Settings and not in
+  /// `_previewRoutes`**: it reads and writes the signed-in person's own
+  /// document, so unlike theme and language it is not a device preference.
+  static const String notificationSettings = '/more/settings/notifications';
+
   /// The audit log (§23). Under More rather than under Home: it is something
   /// you go and check, not something you are told.
   static const String activity = '/more/activity';

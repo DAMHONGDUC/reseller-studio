@@ -9,11 +9,15 @@ import '../auth/providers.dart';
 import '../workspace/providers.dart';
 import 'data/datasources/push_messaging.dart';
 import 'data/repositories/firestore_device_repository.dart';
+import 'data/repositories/firestore_notification_preferences_repository.dart';
 import 'data/repositories/firestore_notification_repository.dart';
 import 'domain/entities/app_notification.dart';
+import 'domain/entities/notification_preferences.dart';
 import 'domain/repositories/device_repository.dart';
+import 'domain/repositories/notification_preferences_repository.dart';
 import 'domain/repositories/notification_repository.dart';
 import 'presentation/controllers/notification_controller.dart';
+import 'presentation/controllers/notification_preferences_controller.dart';
 import 'presentation/controllers/push_controller.dart';
 
 /// The paths under the signed-in person's own user document, or null when
@@ -97,3 +101,41 @@ notificationControllerProvider = NotifierProvider<NotificationController, bool>(
 /// would never register.
 final NotifierProvider<PushController, void> pushControllerProvider =
     NotifierProvider<PushController, void>(PushController.new);
+
+final Provider<NotificationPreferencesRepository?>
+notificationPreferencesRepositoryProvider =
+    Provider<NotificationPreferencesRepository?>((Ref ref) {
+      final UserCollections? collections = ref.watch(userCollectionsProvider);
+
+      if (collections == null) return null;
+
+      return FirestoreNotificationPreferencesRepository(collections);
+    });
+
+/// Which reminders this person still wants.
+///
+/// **Signed out resolves to everything on, not to nothing.** The value is
+/// read to decide what a switch shows; an empty answer would render every
+/// reminder as muted, which is the opposite of the truth.
+final StreamProvider<NotificationPreferences>
+notificationPreferencesProvider = StreamProvider<NotificationPreferences>((
+  Ref ref,
+) {
+  final NotificationPreferencesRepository? repository = ref.watch(
+    notificationPreferencesRepositoryProvider,
+  );
+
+  if (repository == null) {
+    return Stream<NotificationPreferences>.value(
+      const NotificationPreferences.everything(),
+    );
+  }
+
+  return repository.watch();
+});
+
+final NotifierProvider<NotificationPreferencesController, bool>
+notificationPreferencesControllerProvider =
+    NotifierProvider<NotificationPreferencesController, bool>(
+      NotificationPreferencesController.new,
+    );
