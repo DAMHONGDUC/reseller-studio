@@ -2050,6 +2050,51 @@
   "@analyticsSoldOfBought": {
     "description": "Caption under the item count on a source breakdown, saying what the two numbers are."
   },
+  "taxAuthorityUs": "Schedule C lines, calendar year",
+  "@taxAuthorityUs": {
+    "description": "Subtitle of the Tax screen for a US business."
+  },
+  "taxAuthorityUk": "SA103 lines, 6 April to 5 April",
+  "@taxAuthorityUk": {
+    "description": "Subtitle of the Tax screen for a UK business."
+  },
+  "taxPackTitle": "Hand it over",
+  "@taxPackTitle": {
+    "description": "Section on the Tax screen that exports the whole year in one action."
+  },
+  "taxPackChecked": "{count, plural, =0{No sales in this year yet} =1{1 sale checked} other{{count} sales checked}}",
+  "@taxPackChecked": {
+    "description": "How many sales the pack covers. The half of the assurance line that gives the other half meaning.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taxPackExact": "Every fee and cost is a figure you entered.",
+  "@taxPackExact": {
+    "description": "Shown when nothing in the year is still an estimate."
+  },
+  "taxPackApproximate": "{fees} still use the platform's published fee rate; {costs} have no cost recorded.",
+  "@taxPackApproximate": {
+    "description": "Says exactly how the pack is approximate, so the accountant does not have to ask.",
+    "placeholders": {
+      "fees": {
+        "type": "int"
+      },
+      "costs": {
+        "type": "int"
+      }
+    }
+  },
+  "taxPackFixFirst": "Fix these first",
+  "@taxPackFixFirst": {
+    "description": "Opens Close the books from the Tax screen."
+  },
+  "taxPackExport": "Export the pack",
+  "@taxPackExport": {
+    "description": "Shares the summary, the sales, the expenses and the note as one set of files."
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."

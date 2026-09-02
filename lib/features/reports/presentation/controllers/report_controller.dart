@@ -16,8 +16,12 @@ import '../../../inventory/providers.dart';
 import '../../../orders/domain/entities/order.dart';
 import '../../../orders/providers.dart';
 import '../../../tax/domain/entities/tax_summary.dart';
+import '../../../tax/domain/entities/tax_year.dart';
 import '../../../tax/providers.dart';
+import '../../../workspace/providers.dart';
+import '../../domain/services/bookkeeping_gaps.dart';
 import '../../domain/services/csv_builder.dart';
+import '../../providers.dart';
 
 /// Which report is being exported.
 enum ReportKind {
@@ -111,14 +115,159 @@ class ReportController extends Notifier<bool> {
     }
   }
 
+  /// Everything an accountant needs for one year, in one share.
+  ///
+  /// **Four separate exports was the feature nobody finished.** A seller at
+  /// year end had to remember to run sales, then expenses, then the summary,
+  /// each spanning every year they had ever traded, and then explain to
+  /// somebody else which file was which. This is one action.
+  ///
+  /// **The manifest is what makes it worth handing over.** A summary is only
+  /// as exact as the rows under it, so the pack states how many sales it
+  /// checked and how many of them are still estimates — see
+  /// `taxYearGapsProvider`. Without that line the accountant has no way to
+  /// know whether the fees are the platform's real ones or this app's guess,
+  /// and with it they do not have to ask.
+  ///
+  /// It is a summary of the seller's own records and not a tax computation,
+  /// which the manifest says in the same words the screen does.
+  Future<void> exportTaxPack() async {
+    final TaxYear year = ref.read(selectedTaxYearProvider);
+    final TaxSummary summary = ref.read(taxSummaryProvider);
+    final BookkeepingGaps gaps = ref.read(taxYearGapsProvider);
+    final String workspace = ref.read(currentWorkspaceProvider)?.name ?? '';
+
+    state = true;
+    SdLogger.action(LogTagConstant.report, 'Export tax pack', <String, Object>{
+      'year': year.label,
+      'jurisdiction': year.jurisdiction.name,
+      'checkedOrders': gaps.checkedOrders,
+      'estimatedFees': gaps.estimatedFees.length,
+    });
+    AppAnalytics.instance.reportExported(kind: 'tax-pack');
+
+    try {
+      final Directory directory = Directory.systemTemp;
+      final String stem = 'seller-os-tax-${year.label.replaceAll('/', '-')}';
+      final Map<String, String> pack = <String, String>{
+        '$stem-summary.csv': _taxCsv(),
+        '$stem-sales.csv': _salesCsv(year: year),
+        '$stem-expenses.csv': _expensesCsv(year: year),
+        '$stem-README.txt': _manifest(
+          year: year,
+          summary: summary,
+          gaps: gaps,
+          workspace: workspace,
+          stem: stem,
+        ),
+      };
+
+      final List<XFile> files = <XFile>[];
+
+      for (final MapEntry<String, String> entry in pack.entries) {
+        final File file = File('${directory.path}/${entry.key}');
+
+        await file.writeAsString(entry.value);
+        files.add(XFile(file.path));
+      }
+
+      await SharePlus.instance.share(
+        ShareParams(
+          files: files,
+          subject: 'Reseller Studio — tax pack ${year.label}',
+        ),
+      );
+
+      SdLogger.info(LogTagConstant.report, 'Tax pack exported', <String, Object>{
+        'year': year.label,
+        'files': files.length,
+      });
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.report,
+        'Failed to export tax pack',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'year': year.label},
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// The plain-text note that opens the pack.
+  ///
+  /// **Plain text, not a fifth CSV.** It is read by a person, once, and a
+  /// spreadsheet is the wrong shape for prose.
+  ///
+  /// **It never states a tax owed.** The app applies no allowances, rates or
+  /// reliefs, and a figure that looked like one would be advice this app is
+  /// not in a position to give — the same line `TaxSummary` carries.
+  String _manifest({
+    required TaxYear year,
+    required TaxSummary summary,
+    required BookkeepingGaps gaps,
+    required String workspace,
+    required String stem,
+  }) {
+    final StringBuffer note = StringBuffer()
+      ..writeln('Reseller Studio — tax pack')
+      ..writeln('Business: $workspace')
+      ..writeln('Tax year: ${year.label} (${year.jurisdiction.name.toUpperCase()})')
+      ..writeln(
+        'Period: ${DateTimeUtils.isoDate(year.start)} to '
+        '${DateTimeUtils.isoDate(year.endExclusive)} (end exclusive)',
+      )
+      ..writeln('Prepared: ${DateTimeUtils.isoDate(DateTime.now())}')
+      ..writeln()
+      ..writeln('Files')
+      ..writeln('  $stem-summary.csv   one row per line of the return')
+      ..writeln('  $stem-sales.csv     one row per item sold in the period')
+      ..writeln('  $stem-expenses.csv  one row per expense in the period')
+      ..writeln()
+      ..writeln('How complete this is')
+      ..writeln('  Sales checked: ${gaps.checkedOrders}')
+      ..writeln(
+        '  Platform fee estimated rather than reported: '
+        '${gaps.estimatedFees.length}',
+      )
+      ..writeln('  Item cost never entered: ${gaps.unknownCost.length}')
+      ..writeln(
+        '  Purchases with no receipt attached: '
+        '${gaps.receiptlessPurchases.length}',
+      );
+
+    if (gaps.estimatedFees.isNotEmpty) {
+      note
+        ..writeln()
+        ..writeln(
+          'An estimated fee is the platform\'s published rate, not what it '
+          'actually charged.',
+        );
+    }
+
+    note
+      ..writeln()
+      ..writeln(
+        'This is a summary of the seller\'s own records. It applies no '
+        'allowances,',
+      )
+      ..writeln('thresholds, rates or reliefs, and it is not tax advice.');
+
+    return note.toString();
+  }
+
   /// One row per order line, not per order.
   ///
   /// A line is what an accountant reconciles: the item, what it cost, what it
   /// sold for. An order-level row would hide a two-item sale's economics
   /// behind one total.
-  String _salesCsv() {
-    final List<Order> orders =
-        ref.read(ordersProvider).value ?? const <Order>[];
+  String _salesCsv({TaxYear? year}) {
+    final List<Order> orders = (ref.read(ordersProvider).value ?? const <Order>[])
+        .where((Order order) => year == null || year.contains(order.orderedAt))
+        .toList();
     final List<List<String>> rows = <List<String>>[];
 
     for (final Order order in orders) {
@@ -201,9 +350,14 @@ class ReportController extends Notifier<bool> {
     );
   }
 
-  String _expensesCsv() {
+  String _expensesCsv({TaxYear? year}) {
     final List<Expense> expenses =
-        ref.read(expensesProvider).value ?? const <Expense>[];
+        (ref.read(expensesProvider).value ?? const <Expense>[])
+            .where(
+              (Expense expense) =>
+                  year == null || year.contains(expense.date),
+            )
+            .toList();
 
     return CsvBuilder.build(
       headers: const <String>[

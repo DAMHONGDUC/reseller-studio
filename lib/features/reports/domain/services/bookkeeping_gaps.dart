@@ -24,6 +24,7 @@ class BookkeepingGaps {
     required this.unknownCost,
     required this.unpaidPayouts,
     required this.receiptlessPurchases,
+    required this.checkedOrders,
   });
 
   /// Sales where nobody entered what the platform actually charged, so the
@@ -42,32 +43,59 @@ class BookkeepingGaps {
   /// disallows.
   final List<Purchase> receiptlessPurchases;
 
+  /// How many sales were looked at.
+  ///
+  /// The other half of the assurance line the tax export is worth handing
+  /// over for: "0 estimated" means nothing without "out of 128".
+  final int checkedOrders;
+
   /// Fold the rows.
   ///
   /// **Only orders whose money counts.** A cancelled sale has no fee worth
   /// chasing and a refunded one gave the money back, so listing either would
   /// send the seller to fix a record that is already correct.
+  /// [from] and [toExclusive] narrow it to one filing period.
+  ///
+  /// **Both null is the whole business**, which is what the Close the books
+  /// screen wants. The tax export wants the year it is about to hand over and
+  /// nothing else: a gap in a year already filed is not work this return is
+  /// waiting on.
   factory BookkeepingGaps.from({
     required List<Order> orders,
     required List<Purchase> purchases,
     required DateTime now,
+    DateTime? from,
+    DateTime? toExclusive,
   }) {
+    bool within(DateTime when) =>
+        (from == null || !when.isBefore(from)) &&
+        (toExclusive == null || when.isBefore(toExclusive));
+
     final List<Order> counted = orders
-        .where((Order order) => order.status.countsAsRevenue)
+        .where(
+          (Order order) =>
+              order.status.countsAsRevenue && within(order.orderedAt),
+        )
         .toList();
 
     return BookkeepingGaps(
+      checkedOrders: counted.length,
       estimatedFees: counted
           .where((Order order) => order.feesAreEstimated)
           .toList(),
       unknownCost: counted
           .where((Order order) => order.costOfGoods == null)
           .toList(),
-      unpaidPayouts: PayoutReconciliation.overdue(orders, now),
+      unpaidPayouts: PayoutReconciliation.overdue(
+        orders.where((Order order) => within(order.orderedAt)).toList(),
+        now,
+      ),
       receiptlessPurchases: purchases
           .where(
             (Purchase purchase) =>
-                !purchase.isDeleted && purchase.receiptUrl == null,
+                !purchase.isDeleted &&
+                purchase.receiptUrl == null &&
+                within(purchase.purchaseDate),
           )
           .toList(),
     );

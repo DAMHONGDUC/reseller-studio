@@ -136,4 +136,62 @@ void main() {
     expect(gaps.total, 0);
     expect(gaps.isClear, isTrue);
   });
+
+  group('narrowed to one filing period', () {
+    test('a sale from another year is not this return\'s problem', () {
+      final Order lastYear = Order(
+        id: 'old',
+        status: OrderStatus.delivered,
+        marketplace: Marketplace.ebay,
+        lines: <OrderLine>[
+          OrderLine(
+            itemId: 'itm-old',
+            title: 'Jacket',
+            quantity: 1,
+            unitPrice: usdOf(10000),
+          ),
+        ],
+        salePrice: usdOf(10000),
+        orderedAt: DateTime(2024, 3, 1),
+      );
+
+      final BookkeepingGaps whole = BookkeepingGaps.from(
+        orders: <Order>[lastYear],
+        purchases: const <Purchase>[],
+        now: now,
+      );
+      final BookkeepingGaps thisYear = BookkeepingGaps.from(
+        orders: <Order>[lastYear],
+        purchases: const <Purchase>[],
+        now: now,
+        from: DateTime(2026),
+        toExclusive: DateTime(2027),
+      );
+
+      expect(whole.isClear, isFalse);
+      expect(thisYear.isClear, isTrue);
+      expect(thisYear.checkedOrders, 0);
+    });
+
+    test('the checked count is what gives the estimate count meaning', () {
+      // "0 estimated" says nothing without "out of 128".
+      final BookkeepingGaps gaps = gapsFor(<Order>[
+        orderOf(
+          id: 'a',
+          fees: usdOf(1325),
+          unitCost: usdOf(3000),
+          payout: usdOf(8000),
+        ),
+        orderOf(
+          id: 'b',
+          fees: usdOf(1325),
+          unitCost: usdOf(3000),
+          payout: usdOf(8000),
+        ),
+      ]);
+
+      expect(gaps.checkedOrders, 2);
+      expect(gaps.estimatedFees, isEmpty);
+    });
+  });
 }
