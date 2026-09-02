@@ -2028,6 +2028,24 @@
       }
     }
   },
+  "offerLeaves": "Leaves {amount} after fees, before postage",
+  "@offerLeaves": {
+    "description": "What accepting an offer would actually leave the seller. Renders an em dash when the item cost was never entered.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerBelowFloor": "Below your floor of {amount}",
+  "@offerBelowFloor": {
+    "description": "Shown instead of the profit line when the offer is under the minimum price the seller set on the item.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."
