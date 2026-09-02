@@ -9,29 +9,24 @@ import 'package:reseller_studio/features/subscription/domain/services/plan_gate.
 void main() {
   final PlanLimits free = PlanLimits.of(SellerPlan.free);
 
-  test('Free allows the last item and blocks the next one', () {
+  test('Free no longer counts items or orders', () {
+    // The ceiling used to stop a seller at 50 items — which is exactly where
+    // sell-through, ROI by source and the tax pack start being worth
+    // something, so it blocked the reason to pay. Premium sells the answers
+    // instead; see `PlanLimits.byPlan`.
+    expect(free.items, isNull);
+    expect(free.orders, isNull);
     expect(
-      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items! - 1),
+      PlanGate.canAddItem(SellerPlan.free, currentItems: 100000),
       PlanBlock.none,
     );
     expect(
-      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items!),
-      PlanBlock.itemLimit,
-    );
-  });
-
-  test('Free allows the last order and blocks the next one', () {
-    expect(
-      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders! - 1),
+      PlanGate.canAddOrder(SellerPlan.free, currentOrders: 100000),
       PlanBlock.none,
     );
-    expect(
-      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders!),
-      PlanBlock.orderLimit,
-    );
   });
 
-  test('Free allows its first business and blocks another one', () {
+  test('a second business is still the one Free ceiling', () {
     expect(
       PlanGate.canAddWorkspace(
         SellerPlan.free,
@@ -81,6 +76,20 @@ void main() {
         PlanGate.upgradeFor(block, from: SellerPlan.free),
         block == PlanBlock.none ? isNull : SellerPlan.premium,
       );
+    }
+  });
+
+  test('Premium is what buys the answers, not permission to type', () {
+    // The paid line is a capability now. Every one of these is what a seller
+    // opens the app at year end or on payout day to do.
+    for (final PlanFeature capability in <PlanFeature>[
+      PlanFeature.taxExport,
+      PlanFeature.payoutReconciliation,
+      PlanFeature.advancedAnalytics,
+      PlanFeature.team,
+    ]) {
+      expect(PlanGate.has(SellerPlan.free, capability), isFalse);
+      expect(PlanGate.has(SellerPlan.premium, capability), isTrue);
     }
   });
 }

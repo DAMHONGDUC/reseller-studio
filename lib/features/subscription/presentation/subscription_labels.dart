@@ -20,8 +20,8 @@ final class SubscriptionLabels {
   };
 
   static String tagline(SellerPlan plan) => switch (plan) {
-    SellerPlan.free => 'Enough to run a small shelf',
-    SellerPlan.premium => 'Unlimited selling, without usage ceilings',
+    SellerPlan.free => 'Run the whole shelf, however big it gets',
+    SellerPlan.premium => 'The answers: tax, payouts, and what to buy next',
   };
 
   /// **Two or three words each.** The paywall lists these in two columns, and
@@ -35,6 +35,8 @@ final class SubscriptionLabels {
     PlanFeature.team => 'Team members',
     PlanFeature.multipleWorkspaces => 'Multiple businesses',
     PlanFeature.advancedPermissions => 'Roles & permissions',
+    PlanFeature.taxExport => 'Tax pack export',
+    PlanFeature.payoutReconciliation => 'Payout chasing',
   };
 
   static String period(BillingPeriod period) => switch (period) {

@@ -62,7 +62,14 @@ export const seatsByPlan: Record<string, number | null> = {
  * `null` means unlimited.
  */
 export const ceilingsByPlan: Record<string, { items: number | null; orders: number | null }> = {
-  free: { items: 50, orders: 30 },
+  // **Free no longer counts records.** The ceiling stopped a seller at the
+  // point their data was about to start being worth something, so they left
+  // before seeing the reason to pay; Premium sells the answers instead —
+  // `PlanFeature.taxExport`, `payoutReconciliation`, `advancedAnalytics`,
+  // `team`. Kept as a table rather than deleted because the seat limit and a
+  // future tier both need somewhere to state a ceiling, and because the rules
+  // read a verdict this file computes.
+  free: { items: null, orders: null },
   premium: { items: null, orders: null },
 };
 

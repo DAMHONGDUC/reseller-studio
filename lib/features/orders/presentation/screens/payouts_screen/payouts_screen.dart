@@ -4,14 +4,20 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/money/money.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
+import '../../../../subscription/domain/enums/plan_feature.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/services/payout_reconciliation.dart';
 import '../../../providers.dart';
 import '../../widgets/settlement_sheet.dart';
 
+part 'payouts_screen_locked.dart';
 part 'payouts_screen_marketplace_card.dart';
 
 /// Payouts — what each marketplace owes, against what it has paid (plan §8).
@@ -32,6 +38,14 @@ class PayoutsScreen extends ConsumerWidget {
     final bool settledUp = rows.every(
       (MarketplacePayout row) => row.awaiting.isEmpty,
     );
+
+    // **The figure is free; chasing it is not.** Hiding the number would make
+    // this a screen nobody opens twice, and a locked screen that says nothing
+    // sells nothing. What Premium buys is the per-order breakdown that turns
+    // "you are owed something" into a platform, a date and an order id.
+    if (!ref.watch(hasFeatureProvider(PlanFeature.payoutReconciliation))) {
+      return const _LockedPayouts();
+    }
 
     if (rows.isEmpty) {
       return SdScaffoldV3(

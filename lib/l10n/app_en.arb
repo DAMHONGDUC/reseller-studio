@@ -2121,6 +2121,30 @@
   "@markSoldSplitEvenly": {
     "description": "Says how a bundle price was divided when an item has no expected price to weight by."
   },
+  "payoutsLockedOwed": "{count, plural, =1{{amount} is late from 1 sale} other{{amount} is late across {count} sales}}",
+  "@payoutsLockedOwed": {
+    "description": "The figure a Free seller still sees on the payouts screen. The amount is the whole argument for paying.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "payoutsLockedNothingOwed": "Every marketplace has paid up",
+  "@payoutsLockedNothingOwed": {
+    "description": "Shown to a Free seller when no payout is late, so the locked screen still answers the question."
+  },
+  "payoutsLockedBody": "Premium breaks this down by marketplace and by order, so you know which sale to quote when you chase it.",
+  "@payoutsLockedBody": {
+    "description": "Says exactly what Premium adds here rather than that the screen is locked."
+  },
+  "payoutsLockedUnlock": "See which sales",
+  "@payoutsLockedUnlock": {
+    "description": "Opens the paywall from the payouts screen."
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."

@@ -17,6 +17,18 @@ class _ExportPack extends ConsumerWidget {
   const _ExportPack();
 
   Future<void> _export(BuildContext context, WidgetRef ref) async {
+    // The Tax screen itself stays free: a seller may always read their own
+    // figures. What Premium buys is handing them over in one action.
+    if (!ref.read(hasFeatureProvider(PlanFeature.taxExport))) {
+      await PlanBlockSheet.show(
+        context,
+        block: PlanBlock.featureLocked,
+        plan: ref.read(currentPlanProvider),
+      );
+
+      return;
+    }
+
     try {
       await ref.read(reportControllerProvider.notifier).exportTaxPack();
     } catch (error) {
