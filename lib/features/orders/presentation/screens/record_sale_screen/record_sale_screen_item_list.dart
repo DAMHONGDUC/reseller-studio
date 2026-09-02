@@ -17,6 +17,7 @@ class _SaleItemList extends ConsumerWidget {
     // row is one subscription each and a rebuild storm on any listing write.
     final List<Listing> listings =
         ref.watch(listingsProvider).value ?? const <Listing>[];
+    final Set<String> selected = ref.watch(recordSaleSelectionProvider);
 
     return ListView(
       padding: SdContentPaddingV3.screen(context),
@@ -26,6 +27,8 @@ class _SaleItemList extends ConsumerWidget {
               .map(
                 (Item item) => _SaleItemRow(
                   item: item,
+                  isSelected: selected.contains(item.id),
+                  isSelecting: selected.isNotEmpty,
                   marketplaceCount: ListingMarketplaces.countFor(
                     listings,
                     item.id,
@@ -47,10 +50,23 @@ class _SaleItemList extends ConsumerWidget {
 /// figure the seller was about to be asked to confirm and would rarely see
 /// again. What decides which row to tap is where the thing is listed and what
 /// the seller wanted for it.
-class _SaleItemRow extends StatelessWidget {
-  const _SaleItemRow({required this.item, required this.marketplaceCount});
+class _SaleItemRow extends ConsumerWidget {
+  const _SaleItemRow({
+    required this.item,
+    required this.marketplaceCount,
+    required this.isSelected,
+    required this.isSelecting,
+  });
 
   final Item item;
+
+  /// Whether this row is part of the bundle being built.
+  final bool isSelected;
+
+  /// Whether a bundle is being built at all. Once it is, a tap adds and
+  /// removes rather than opening the sheet — otherwise the seller's second
+  /// tap would sell one item instead of joining it to the others.
+  final bool isSelecting;
 
   /// Distinct marketplaces carrying it — zero for an item on none, which is
   /// a fact rather than a missing figure.
@@ -70,7 +86,7 @@ class _SaleItemRow extends StatelessWidget {
   /// Picking an item opens the sheet; a recorded sale closes this screen so
   /// the seller lands back on Orders with the new order under them.
   Future<void> _pick(BuildContext context) async {
-    final bool? recorded = await MarkSoldSheet.show(context, item);
+    final bool? recorded = await MarkSoldSheet.show(context, <Item>[item]);
 
     if (!context.mounted || !(recorded ?? false)) return;
 
@@ -78,14 +94,25 @@ class _SaleItemRow extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => AppListRow(
+  Widget build(BuildContext context, WidgetRef ref) => AppListRow(
     title: item.title,
     subtitle: _subtitle(context),
-    icon: AppIconConstant.inventory,
+    // A ticked row reads as ticked without reading the words — and the row
+    // still carries its own title, so colour is never the only signal.
+    icon: isSelected ? AppIconConstant.checkCircle : AppIconConstant.inventory,
+    iconTint: isSelected ? context.colorScheme3.primary : null,
     // What the seller expects for it — `—` when nobody entered one, never a
     // zero (hard rule 5).
     trailingText: context.money(item.expectedPrice),
-    onTap: () => _pick(context),
+    showChevron: !isSelecting,
+    // Long-press starts the bundle, the same gesture Inventory's selection
+    // uses. A tick box in every row would be permanent chrome for something
+    // most sales are not.
+    onLongPress: () =>
+        ref.read(recordSaleSelectionProvider.notifier).toggle(item.id),
+    onTap: isSelecting
+        ? () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id)
+        : () => _pick(context),
   );
 }
 

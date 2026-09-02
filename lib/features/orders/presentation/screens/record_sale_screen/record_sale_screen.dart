@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/mark_sold_sheet.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/domain/enums/item_status.dart';
@@ -31,6 +32,12 @@ part 'record_sale_screen_item_list.dart';
 /// is nothing here to sell that inventory has never heard of — and a business
 /// with nothing on hand is sent to Inventory rather than shown a form it
 /// cannot complete.
+///
+/// **This is also the only place a bundle is built.** Long-pressing a row
+/// starts a selection — the same gesture Inventory uses — and the pinned bar
+/// sells the whole selection as one order. It lives here rather than on an
+/// item's action sheet because a bundle starts with the seller choosing, and
+/// an item's own screen has already chosen.
 class RecordSaleScreen extends ConsumerStatefulWidget {
   const RecordSaleScreen({super.key});
 
@@ -50,6 +57,9 @@ class _RecordSaleScreenState extends ConsumerState<RecordSaleScreen> {
     // opens filtered by the last visit's search.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(recordSaleQueryProvider.notifier).clear();
+      // A bundle half-built when the seller left last time is not one they
+      // came back for.
+      ref.read(recordSaleSelectionProvider.notifier).clear();
     });
   }
 
@@ -59,14 +69,45 @@ class _RecordSaleScreenState extends ConsumerState<RecordSaleScreen> {
     super.dispose();
   }
 
+  /// Sell everything ticked as one order.
+  Future<void> _sellBundle() async {
+    final List<Item> selected = ref.read(recordSaleSelectionItemsProvider);
+    final NavigatorState navigator = Navigator.of(context);
+
+    if (selected.isEmpty) return;
+
+    final bool? recorded = await MarkSoldSheet.show(context, selected);
+
+    if (!mounted || !(recorded ?? false)) return;
+
+    ref.read(recordSaleSelectionProvider.notifier).clear();
+    navigator.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Item> items = ref.watch(recordSaleItemsProvider);
     final bool hasAny = ref.watch(sellableItemsProvider).isNotEmpty;
     final AsyncValue<List<Item>> source = ref.watch(itemsProvider);
+    final List<Item> selected = ref.watch(recordSaleSelectionItemsProvider);
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.recordSaleTitle),
+      // Only once something is ticked: a bundle button over an empty
+      // selection is an action that would write an order of nothing.
+      bottomNavigationBar: selected.isEmpty
+          ? null
+          : AppPinnedAction(
+              label: context.l10n.recordSaleSellBundle(selected.length),
+              icon: AppIconConstant.shoppingBag,
+              onPressed: _sellBundle,
+              secondary: SdButtonV3(
+                variant: SdButtonVariantV3.text,
+                label: context.l10n.commonClear,
+                onPressed: () =>
+                    ref.read(recordSaleSelectionProvider.notifier).clear(),
+              ),
+            ),
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),

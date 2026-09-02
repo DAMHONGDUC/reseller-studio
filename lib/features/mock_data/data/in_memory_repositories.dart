@@ -231,24 +231,37 @@ class InMemoryOrderRepository implements OrderRepository {
   );
 
   @override
-  Future<void> recordSale(Order order, Item item) async {
-    final int index = _store.items.indexWhere(
-      (Item current) => current.id == item.id,
-    );
-    if (index == -1 ||
-        _store.items[index].quantity <= 0 ||
-        _store.items[index].status == ItemStatus.sold ||
-        _store.items[index].status == ItemStatus.archived) {
-      throw StateError('Item ${item.id} is no longer sellable');
+  Future<void> recordSale(Order order, List<Item> items) async {
+    final Map<String, int> found = <String, int>{};
+
+    // Every item is checked before any is written: a bundle whose third item
+    // has already sold must leave the first two alone.
+    for (final Item item in items) {
+      final int index = _store.items.indexWhere(
+        (Item current) => current.id == item.id,
+      );
+
+      if (index == -1 ||
+          _store.items[index].quantity <= 0 ||
+          _store.items[index].status == ItemStatus.sold ||
+          _store.items[index].status == ItemStatus.archived) {
+        throw StateError('Item ${item.id} is no longer sellable');
+      }
+
+      found[item.id] = index;
     }
 
-    final Item current = _store.items[index];
-    final int left = current.quantity - 1;
-    _store.items[index] = current.copyWith(
-      quantity: left,
-      status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
-      soldAt: left == 0 ? order.orderedAt : null,
-    );
+    for (final MapEntry<String, int> entry in found.entries) {
+      final Item current = _store.items[entry.value];
+      final int left = current.quantity - 1;
+
+      _store.items[entry.value] = current.copyWith(
+        quantity: left,
+        status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
+        soldAt: left == 0 ? order.orderedAt : null,
+      );
+    }
+
     _store.upsert(_store.orders, order, (Order other) => other.id == order.id);
   }
 

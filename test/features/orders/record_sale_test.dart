@@ -67,7 +67,7 @@ void main() {
       final String orderId = await container
           .read(recordSaleControllerProvider.notifier)
           .record(
-            item,
+            <Item>[item],
             salePrice: Money(12500, 'USD'),
             marketplace: Marketplace.other,
             soldAt: testNow,
@@ -99,7 +99,7 @@ void main() {
     await container
         .read(recordSaleControllerProvider.notifier)
         .record(
-          draft,
+          <Item>[draft],
           salePrice: Money(4000, 'USD'),
           marketplace: Marketplace.ebay,
           soldAt: testNow,

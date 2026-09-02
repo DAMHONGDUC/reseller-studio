@@ -14,8 +14,12 @@ abstract interface class OrderRepository {
 
   Future<void> save(Order order);
 
-  /// Writes the order and decrements its inventory item as one commit.
-  Future<void> recordSale(Order order, Item item);
+  /// Writes the order and decrements every item it names, as one commit.
+  ///
+  /// **A list because an order may be a bundle.** One payment for three things
+  /// is one order, and three separate commits is a state where two items are
+  /// sold, the screen showed an error, and nobody can tell which two.
+  Future<void> recordSale(Order order, List<Item> items);
 
   /// Writes the returned order and restores line quantities as one commit.
   Future<void> closeReturn(Order order, {required bool restock});

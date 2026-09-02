@@ -2095,6 +2095,32 @@
   "@taxPackExport": {
     "description": "Shares the summary, the sales, the expenses and the note as one set of files."
   },
+  "recordSaleSellBundle": "{count, plural, =1{Sell 1 item} other{Sell {count} items as one order}}",
+  "@recordSaleSellBundle": {
+    "description": "Pinned action that records everything ticked as a single bundle order.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markSoldBundleTitle": "Record a sale of {count} items",
+  "@markSoldBundleTitle": {
+    "description": "Title of the record-sale sheet when several items sold together as one order.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markSoldSplitByExpected": "Split across the items by what you expected for each",
+  "@markSoldSplitByExpected": {
+    "description": "Says how a bundle price was divided when every item has an expected price."
+  },
+  "markSoldSplitEvenly": "Split evenly — one of these has no expected price",
+  "@markSoldSplitEvenly": {
+    "description": "Says how a bundle price was divided when an item has no expected price to weight by."
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."

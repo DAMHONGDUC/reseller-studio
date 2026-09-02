@@ -205,7 +205,10 @@ class ItemActionsSheet extends ConsumerWidget {
 
           _guarded(context, ref, ItemStatus.sold, () {
             Navigator.of(context).pop();
-            MarkSoldSheet.show(context, item);
+            // One item: selling several at once starts from the Orders tab,
+            // where the seller is already picking rather than already inside
+            // one record.
+            MarkSoldSheet.show(context, <Item>[item]);
           });
         },
       ),

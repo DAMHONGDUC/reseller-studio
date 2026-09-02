@@ -90,7 +90,7 @@ void main() {
     final String id = await container
         .read(recordSaleControllerProvider.notifier)
         .record(
-          item,
+          <Item>[item],
           salePrice: Money(12000, 'USD'),
           marketplaceId: 'sunday-market',
           marketplaceName: 'Sunday Market',

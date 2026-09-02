@@ -11,6 +11,7 @@ import '../../../mock_data/providers.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/enums/order_status.dart';
 import '../../domain/repositories/order_repository.dart';
+import '../../domain/services/bundle_allocation.dart';
 
 /// Recording a sale — the one place an order is created.
 ///
@@ -32,11 +33,18 @@ class RecordSaleController extends Notifier<bool> {
 
   /// Record a sale (plan §28's manual order), and return the new order's id.
   ///
-  /// **Creates the order as well as moving the item**, because profit is
+  /// **Creates the order as well as moving the items**, because profit is
   /// derived from orders (hard rule 3) and an item marked sold with no order
   /// would vanish from every figure the product is judged on.
+  ///
+  /// **[items] is a list because an order may be a bundle.** One payment for
+  /// three things is one order — Poshmark bundles and Depop's "2 for £15" are
+  /// everyday — and splitting it into three orders with invented prices
+  /// destroys the per-item ROI Sourcing exists to measure. [salePrice] is what
+  /// the buyer paid in total; `BundleAllocation` decides each line's share of
+  /// it, and the lines always add back up to the total exactly.
   Future<String> record(
-    Item item, {
+    List<Item> items, {
     required Money salePrice,
     Marketplace? marketplace,
     String? marketplaceId,
@@ -51,9 +59,17 @@ class RecordSaleController extends Notifier<bool> {
         marketplaceId ?? marketplace?.name ?? 'other';
     final String resolvedMarketplaceName =
         marketplaceName ?? marketplace?.displayName ?? 'Other';
+    final List<Money> shares = BundleAllocation.across(
+      salePrice,
+      <Money?>[for (final Item item in items) item.expectedPrice],
+    );
+
+    if (items.isEmpty) {
+      throw StateError('A sale must name at least one item');
+    }
 
     SdLogger.action(LogTagConstant.order, 'Record sale', <String, Object>{
-      'itemId': item.id,
+      'itemIds': <String>[for (final Item item in items) item.id],
       'marketplaceId': resolvedMarketplaceId,
       'salePriceMinor': salePrice.minor,
     });
@@ -67,15 +83,16 @@ class RecordSaleController extends Notifier<bool> {
         marketplaceRecordId: resolvedMarketplaceId,
         marketplaceNameSnapshot: resolvedMarketplaceName,
         lines: <OrderLine>[
-          OrderLine(
-            itemId: item.id,
-            title: item.title,
-            quantity: 1,
-            unitPrice: salePrice,
-            // Null when nobody entered a cost — the order's profit is then
-            // `—` rather than the whole sale price (hard rule 5).
-            unitCost: item.purchasePrice,
-          ),
+          for (int i = 0; i < items.length; i++)
+            OrderLine(
+              itemId: items[i].id,
+              title: items[i].title,
+              quantity: 1,
+              unitPrice: shares[i],
+              // Null when nobody entered a cost — the order's profit is then
+              // `—` rather than the whole sale price (hard rule 5).
+              unitCost: items[i].purchasePrice,
+            ),
         ],
         salePrice: salePrice,
         orderedAt: soldAt,
@@ -87,17 +104,19 @@ class RecordSaleController extends Notifier<bool> {
         fees: fees,
       );
 
-      await orders.recordSale(order, item);
+      await orders.recordSale(order, items);
 
       SdLogger.info(LogTagConstant.order, 'Sale recorded', <String, Object>{
-        'itemId': item.id,
+        'items': items.length,
         'orderId': orderId,
       });
       AppAnalytics.instance.itemSold(
         marketplace: resolvedMarketplaceId,
         // The share of sales with no cost is the health metric for the whole
         // "insight" half of the product — it is what makes profit unknowable.
-        hadCost: item.purchasePrice != null,
+        // A bundle counts as costed only when every line is: one unknown cost
+        // makes the whole order's profit unknowable.
+        hadCost: items.every((Item item) => item.purchasePrice != null),
       );
 
       return orderId;
@@ -107,7 +126,9 @@ class RecordSaleController extends Notifier<bool> {
         'Failed to record sale',
         error: error,
         stackTrace: stackTrace,
-        data: <String, Object>{'itemId': item.id},
+        data: <String, Object>{
+          'itemIds': <String>[for (final Item item in items) item.id],
+        },
       );
 
       rethrow;

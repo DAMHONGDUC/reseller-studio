@@ -78,6 +78,35 @@ final marketplacesForItemProvider =
       return listed.isEmpty ? active : listed;
     });
 
+/// The platforms a whole bundle may be sold on.
+///
+/// **The union of what its items are on, not the intersection.** A bundle is
+/// several things the buyer happened to take together, and they are rarely all
+/// live on the same platform — an intersection would usually be empty, which
+/// is the empty picker `marketplacesForItemProvider` exists to prevent. A
+/// bundle where none of the items is listed anywhere gets the full list, the
+/// same fallback and for the same reason: cash in hand is a sale.
+final marketplacesForItemsProvider =
+    Provider.family<List<Marketplace>, List<String>>((
+      Ref ref,
+      List<String> itemIds,
+    ) {
+      final List<Marketplace> active = ref.watch(activeMarketplacesProvider);
+      final Set<String> keys = <String>{
+        for (final String itemId in itemIds)
+          ...ListingMarketplaces.keys(
+            ref.watch(listingsForItemProvider(itemId)).value ??
+                const <Listing>[],
+          ),
+      };
+      final List<Marketplace> listed = MarketplaceMatching.matching(
+        active,
+        keys,
+      );
+
+      return listed.isEmpty ? active : listed;
+    });
+
 /// Id → the name the seller gave it. What every row renders through
 /// `MarketplaceLabel`.
 final Provider<Map<String, String>> marketplaceNamesProvider =

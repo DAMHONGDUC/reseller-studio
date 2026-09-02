@@ -81,17 +81,48 @@ opens.
 - `test/features/orders/record_sale_test.dart` pins the row, both halves of
   the picker, and the price following it.
 
-## An order always names an item
+## An order always names an item, and may name several
 
-`OrderLine.itemId` is non-null, so there is no walk-in sale — nothing sells
-that inventory has never heard of. `RecordSaleScreen` therefore lists what is
-on hand and nothing else, and a workspace with no items sends the seller to
-Inventory rather than offering a form that cannot be completed.
+`OrderLine.itemId` is non-null, so there is still no walk-in sale — nothing
+sells that inventory has never heard of. `RecordSaleScreen` therefore lists
+what is on hand and nothing else, and a workspace with no items sends the
+seller to Inventory rather than offering a form that cannot be completed.
 
-Multi-line orders, and lines that belong to no item, are a product decision
-that has not been made. Both would change the entity, every screen that taps
-through to an item, and what "profit" means for an order — raise it before
-building either.
+**Multi-line orders are now built; lines that belong to no item are still
+not.** The owner approved the first half only, and the two halves are
+independent: a bundle is several of the seller's own items, while a line with
+no item is a sale the app cannot cost, cannot move stock for and cannot
+attribute to a source. Raise that one before building it.
+
+### A bundle is one payment, split by judgement
+
+- **One order, one line per item.** Poshmark bundles and Depop's "2 for £15"
+  are everyday, and writing them as several orders with invented prices
+  destroys the per-item ROI that Sourcing exists to measure.
+- **`Order.salePrice` is what the buyer paid**; `BundleAllocation` decides each
+  line's share. By `expectedPrice` when every item has one, evenly when any
+  does not — weighting only the priced ones would load the bundle onto them
+  and report the rest as nearly free.
+- **The parts always sum to the total, exactly.** Money is integer minor units,
+  so a proportional split leaves a remainder; it is handed to the largest
+  parts rather than dropped, because an order whose lines do not add up to the
+  payment is a reconciliation nobody can close.
+- **The split is shown before the sale, not discovered after it.** The sheet
+  lists each item's share as the total is typed, and says which of the two
+  rules produced it.
+- **The picker offers the union of the items' platforms**, not the
+  intersection. A bundle is things the buyer happened to take together and
+  they are rarely all live on the same platform, so an intersection would
+  usually be empty — the empty picker `marketplacesForItemProvider` exists to
+  prevent. None listed anywhere still falls back to the full list.
+- **A bundle is built on `RecordSaleScreen` and nowhere else.** Long-press
+  starts a selection, the same gesture Inventory uses; an item's own action
+  sheet has already chosen one item, so it passes a list of one.
+- **`recordSale` takes a list and commits once.** Every item is checked before
+  any is written, so a bundle whose third item has already sold leaves the
+  first two alone.
+- `test/features/orders/bundle_allocation_test.dart` and
+  `bundle_sale_test.dart` pin the split, the totals and the selection.
 
 ## The create button obeys the app-wide create rules
 

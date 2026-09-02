@@ -9,6 +9,7 @@ import '../../features/listings/providers.dart';
 import '../../features/marketplaces/domain/entities/marketplace.dart';
 import '../../features/marketplaces/domain/services/marketplace_matching.dart';
 import '../../features/marketplaces/providers.dart';
+import '../../features/orders/domain/services/bundle_allocation.dart';
 import '../../features/orders/providers.dart';
 import '../../features/workspace/providers.dart';
 import '../constants/date_picker_constant.dart';
@@ -32,26 +33,33 @@ import 'picker_field.dart';
 /// are the two ways an order is created, and they are one sheet on purpose
 /// (`lib/features/orders/CLAUDE.md`).
 ///
-/// **It offers only the marketplaces the item is actually on** — owner's
+/// **It offers only the marketplaces the items are actually on** — owner's
 /// rule. A picker listing every platform the business sells on makes the
 /// seller find the one of them this jacket was live at, and picking a wrong
-/// one writes an order against a platform that never carried it. An item on
-/// no marketplace still has to be sellable — cash in hand is a sale — so that
+/// one writes an order against a platform that never carried it. Items on no
+/// marketplace still have to be sellable — cash in hand is a sale — so that
 /// case falls back to the full list rather than to an empty picker.
+///
+/// **It takes a list, because an order may be a bundle.** One payment for
+/// three things is one order; splitting it into three with invented prices
+/// destroys the per-item ROI Sourcing exists to measure. The sale price is
+/// what the buyer paid in total and `BundleAllocation` decides each line's
+/// share — by expected price when every item has one, evenly otherwise, and
+/// the shares always add back up to the total exactly.
 class MarkSoldSheet extends ConsumerStatefulWidget {
-  const MarkSoldSheet({required this.item, super.key});
+  const MarkSoldSheet({required this.items, super.key});
 
-  final Item item;
+  final List<Item> items;
 
   /// True when a sale was recorded, null when the seller dismissed the sheet.
   ///
   /// The record-sale screen pops itself on a true so the seller lands back on
   /// Orders with the new order under them; Inventory's Actions sheet has
   /// nothing to close and ignores it.
-  static Future<bool?> show(BuildContext context, Item item) =>
+  static Future<bool?> show(BuildContext context, List<Item> items) =>
       showSdBottomSheetV3<bool>(
         context: context,
-        builder: (BuildContext context) => MarkSoldSheet(item: item),
+        builder: (BuildContext context) => MarkSoldSheet(items: items),
       );
 
   @override
@@ -75,10 +83,11 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
   Marketplace? _marketplace;
   DateTime _soldAt = DateTime.now();
 
-  /// The platforms this sale may name — this item's, or all of them when it
-  /// is on none.
-  Provider<List<Marketplace>> get _options =>
-      marketplacesForItemProvider(widget.item.id);
+  /// The platforms this sale may name — these items', or all of them when
+  /// they are on none.
+  Provider<List<Marketplace>> get _options => marketplacesForItemsProvider(
+    <String>[for (final Item item in widget.items) item.id],
+  );
 
   /// What the box should read for [marketplace].
   ///
@@ -88,17 +97,36 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
   /// between them; a marketplace it is not listed on has none, and the
   /// expected price is the one number that is true either way
   /// (`lib/features/inventory/CLAUDE.md`).
+  ///
+  /// **A bundle seeds the sum of those answers.** It is a starting point and
+  /// nothing more — a bundle is discounted by definition, so the seller
+  /// almost always types over it.
   String _priceFor(Marketplace? marketplace) {
+    final List<Money> parts = <Money>[
+      for (final Item item in widget.items)
+        ?_priceOf(item, marketplace),
+    ];
+
+    if (parts.isEmpty) return '';
+
+    return parts
+        .reduce((Money running, Money next) => running + next)
+        .toInputString();
+  }
+
+  Money? _priceOf(Item item, Marketplace? marketplace) {
     final Map<String, Money> prices = ListingPricing.byMarketplace(
-      ref.read(listingsForItemProvider(widget.item.id)).value ??
-          const <Listing>[],
+      ref.read(listingsForItemProvider(item.id)).value ?? const <Listing>[],
     );
     final Money? listed = marketplace == null
         ? null
         : MarketplaceMatching.valueFor(marketplace, prices);
 
-    return (listed ?? widget.item.expectedPrice)?.toInputString() ?? '';
+    return listed ?? item.expectedPrice;
   }
+
+  /// What is in the price box right now, or null while it is empty.
+  Money? _typedPrice(String currency) => Money.tryParse(_price.text, currency);
 
   /// Picking a platform moves the price with it — including over a number the
   /// seller had typed, which is the point: the box says what that marketplace
@@ -136,7 +164,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
       await ref
           .read(recordSaleControllerProvider.notifier)
           .record(
-            widget.item,
+            widget.items,
             salePrice: price,
             marketplaceId: marketplace.id,
             marketplaceName: marketplace.name,
@@ -171,7 +199,9 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
 
     return SdBottomSheetV3(
-      title: context.l10n.markSoldTitle,
+      title: widget.items.length == 1
+          ? context.l10n.markSoldTitle
+          : context.l10n.markSoldBundleTitle(widget.items.length),
       closeTooltip: context.l10n.commonClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -181,6 +211,11 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             isRequired: true,
             controller: _price,
             currency: currency,
+            // Only a bundle needs this: it is what redraws the split under
+            // the box as the seller types, and a single sale has no split.
+            onChanged: widget.items.length == 1
+                ? null
+                : (_) => setState(() {}),
             textInputAction: TextInputAction.next,
           ),
           SizedBox(height: SdSpacingConstant.h16),
@@ -228,6 +263,13 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
               setState(() => _soldAt = picked);
             },
           ),
+          // How the one payment lands on each line. A bundle price is a
+          // judgement, so the seller sees the judgement rather than finding
+          // it later on three order lines.
+          if (widget.items.length > 1) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h8),
+            _BundleSplit(items: widget.items, total: _typedPrice(currency)),
+          ],
           SizedBox(height: SdSpacingConstant.h16),
           MoneyField(
             label: context.l10n.markSoldFees,
@@ -260,6 +302,72 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// How a bundle's one price lands on each item.
+///
+/// **Shown before the sale, not discovered after it.** The split is a
+/// judgement `BundleAllocation` makes — by expected price when every item has
+/// one, evenly otherwise — and a seller who disagrees with it can see that
+/// they do while they can still change the total.
+class _BundleSplit extends StatelessWidget {
+  const _BundleSplit({required this.items, required this.total});
+
+  final List<Item> items;
+
+  /// Null while the price box is empty, which is a form that is not ready
+  /// rather than a bundle worth nothing.
+  final Money? total;
+
+  @override
+  Widget build(BuildContext context) {
+    final Money? amount = total;
+
+    if (amount == null) return const SizedBox.shrink();
+
+    final List<Money> shares = BundleAllocation.across(amount, <Money?>[
+      for (final Item item in items) item.expectedPrice,
+    ]);
+    final bool byExpected = items.every(
+      (Item item) => item.expectedPrice != null,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Text(
+          byExpected
+              ? context.l10n.markSoldSplitByExpected
+              : context.l10n.markSoldSplitEvenly,
+          style: context.textTheme3.bodySmall!.faint3(context),
+        ),
+        SizedBox(height: SdSpacingConstant.h6),
+        for (int i = 0; i < items.length; i++)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: SdSpacingConstant.h4),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    items[i].title,
+                    style: context.textTheme3.bodySmall!.muted3(context),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: SdSpacingConstant.w8),
+                Text(
+                  context.money(shares[i]),
+                  style: context.textTheme3.bodySmall!.tabular3.copyWith(
+                    color: context.sdTheme3.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

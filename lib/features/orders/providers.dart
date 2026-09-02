@@ -296,3 +296,40 @@ final Provider<List<Item>> recordSaleItemsProvider = Provider<List<Item>>((
 
   return items.where((Item item) => ItemSearch.matches(item, query)).toList();
 });
+
+/// Which items a bundle sale is being built from.
+///
+/// **Its own controller rather than the screen's `State`.** It survives the
+/// keyboard opening and the shell rebuilding the branch — a set held in the
+/// widget resets under the seller mid-selection, which is the bug
+/// `CrossListController` was given the same treatment for.
+class RecordSaleSelectionController extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => <String>{};
+
+  void toggle(String itemId) => state = state.contains(itemId)
+      ? (<String>{...state}..remove(itemId))
+      : <String>{...state, itemId};
+
+  void clear() => state = <String>{};
+}
+
+final NotifierProvider<RecordSaleSelectionController, Set<String>>
+recordSaleSelectionProvider =
+    NotifierProvider<RecordSaleSelectionController, Set<String>>(
+      RecordSaleSelectionController.new,
+    );
+
+/// The selected items themselves, in the order the shelf lists them.
+///
+/// Filtered against what is still sellable: an item sold on another device
+/// mid-selection must not join the bundle.
+final Provider<List<Item>> recordSaleSelectionItemsProvider =
+    Provider<List<Item>>((Ref ref) {
+      final Set<String> selected = ref.watch(recordSaleSelectionProvider);
+
+      return ref
+          .watch(sellableItemsProvider)
+          .where((Item item) => selected.contains(item.id))
+          .toList();
+    });
