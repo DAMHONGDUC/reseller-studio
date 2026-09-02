@@ -67,6 +67,11 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
   final TextEditingController _buyer = TextEditingController();
 
+  /// Left empty on purpose. An empty box means "not known", and the profit
+  /// statement then shows a labelled estimate — a pre-filled guess would be
+  /// stored as though the platform had reported it.
+  final TextEditingController _fees = TextEditingController();
+
   Marketplace? _marketplace;
   DateTime _soldAt = DateTime.now();
 
@@ -110,6 +115,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
   void dispose() {
     _price.dispose();
     _buyer.dispose();
+    _fees.dispose();
     super.dispose();
   }
 
@@ -136,6 +142,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             marketplaceName: marketplace.name,
             soldAt: _soldAt,
             buyerName: _buyer.text.trim().isEmpty ? null : _buyer.text.trim(),
+            fees: Money.tryParse(_fees.text, currency),
           );
 
       if (!mounted) return;
@@ -220,6 +227,21 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
               setState(() => _soldAt = picked);
             },
+          ),
+          SizedBox(height: SdSpacingConstant.h16),
+          MoneyField(
+            label: context.l10n.markSoldFees,
+            controller: _fees,
+            currency: currency,
+            // Quotes the rate the estimate would use rather than filling the
+            // box with it — typed is a fact, empty is a labelled estimate.
+            helperText: marketplace == null
+                ? null
+                : context.l10n.orderFeeHelper(
+                    marketplace.name,
+                    context.percent(marketplace.feeRate, decimals: 1),
+                  ),
+            textInputAction: TextInputAction.next,
           ),
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(

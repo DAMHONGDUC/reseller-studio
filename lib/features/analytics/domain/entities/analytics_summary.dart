@@ -22,6 +22,7 @@ class AnalyticsSummary {
     required this.totalExpenses,
     required this.costOfGoodsSold,
     required this.isProfitComplete,
+    required this.hasEstimatedFees,
   });
 
   /// Fold the rows into the summary.
@@ -34,6 +35,7 @@ class AnalyticsSummary {
     required List<Item> items,
     required List<Expense> expenses,
     required String currency,
+    Map<String, double> feeRates = const <String, double>{},
   }) {
     final Money zero = Money.zero(currency);
 
@@ -51,8 +53,11 @@ class AnalyticsSummary {
 
     final Money? cogs = costs.totalOfKnown();
 
+    // Estimated from the platform's rate where the seller has not entered one
+    // — `order.fees ?? zero` claimed every unreported commission was free,
+    // which overstated this whole summary (`Order.effectiveFees`).
     final Money? fees = counted
-        .map((Order order) => order.fees ?? zero)
+        .map((Order order) => order.effectiveFees(feeRates))
         .totalOrNull();
 
     final Money? shipping = counted
@@ -98,6 +103,7 @@ class AnalyticsSummary {
       // False when any sold item's cost was missing, so the UI can mark the
       // figure partial instead of presenting it as the whole truth.
       isProfitComplete: costs.allKnown && costs.isNotEmpty,
+      hasEstimatedFees: counted.any((Order order) => order.feesAreEstimated),
     );
   }
 
@@ -112,6 +118,11 @@ class AnalyticsSummary {
 
   /// Whether every sold item had a known cost.
   final bool isProfitComplete;
+
+  /// Whether any counted order's commission was estimated rather than
+  /// reported, so the screen can label the figure instead of presenting a
+  /// guess as a fact.
+  final bool hasEstimatedFees;
 
   /// Profit as a fraction of revenue, or null when either is unknown.
   double? get margin {
@@ -142,6 +153,7 @@ class MarketplacePerformance {
     required this.profit,
     required this.fees,
     required this.orderCount,
+    required this.hasEstimatedFees,
   });
 
   factory MarketplacePerformance.from({
@@ -149,6 +161,7 @@ class MarketplacePerformance {
     required String marketplaceName,
     required List<Order> orders,
     required String currency,
+    Map<String, double> feeRates = const <String, double>{},
   }) {
     final Money zero = Money.zero(currency);
 
@@ -159,10 +172,13 @@ class MarketplacePerformance {
         zero;
 
     final Money fees =
-        orders.map((Order order) => order.fees ?? zero).totalOrNull() ?? zero;
+        orders
+            .map((Order order) => order.effectiveFees(feeRates))
+            .totalOrNull() ??
+        zero;
 
     final List<Money?> profits = orders
-        .map((Order order) => order.profit().netProfit)
+        .map((Order order) => order.profit(feeRates: feeRates).netProfit)
         .toList();
 
     return MarketplacePerformance(
@@ -172,6 +188,7 @@ class MarketplacePerformance {
       profit: profits.totalOfKnown(),
       fees: fees,
       orderCount: orders.length,
+      hasEstimatedFees: orders.any((Order order) => order.feesAreEstimated),
     );
   }
 
@@ -182,6 +199,10 @@ class MarketplacePerformance {
     (Marketplace value) => value.name == marketplaceId,
     orElse: () => Marketplace.other,
   );
+  /// Whether any of this platform's orders had its commission estimated
+  /// rather than reported, so a row can mark the figure as approximate.
+  final bool hasEstimatedFees;
+
   final Money revenue;
 
   /// Null when any order on this platform had an unknown cost.

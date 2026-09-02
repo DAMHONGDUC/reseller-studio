@@ -1,6 +1,6 @@
 part of 'orders_screen.dart';
 
-class _OrderCard extends StatelessWidget {
+class _OrderCard extends ConsumerWidget {
   const _OrderCard({
     required this.order,
     required this.now,
@@ -12,9 +12,12 @@ class _OrderCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bool isOverdue = order.isOverdue(now) ?? false;
-    final Money? profit = order.profit().netProfit;
+    final ProfitBreakdown breakdown = order.profit(
+      feeRates: ref.watch(marketplaceFeeRatesProvider),
+    );
+    final Money? profit = breakdown.netProfit;
 
     return SdCardV3(
       onTap: onTap,
@@ -97,7 +100,11 @@ class _OrderCard extends StatelessWidget {
                       style: context.textTheme3.bodySmall!.faint3(context),
                     ),
                     Text(
-                      context.money(profit),
+                      breakdown.feesAreEstimated && profit != null
+                          ? context.l10n.commonApproximate(
+                              context.money(profit),
+                            )
+                          : context.money(profit),
                       style: context.textTheme3.bodySmall!.semiBold3.tabular3
                           .copyWith(
                             color: profit == null

@@ -22,9 +22,14 @@ part of 'order_detail_screen.dart';
 /// could tell a seller.
 /// The read half of an editable section, so it draws no card of its own.
 class _ProfitStatement extends StatelessWidget {
-  const _ProfitStatement({required this.profit, this.feesField});
+  const _ProfitStatement({required this.profit, this.feesField, this.feeNote});
 
   final ProfitBreakdown profit;
+
+  /// Says what the estimate was built from, when the fee is one. Built by the
+  /// caller because it names the marketplace and its rate, and the statement
+  /// is handed a breakdown rather than an order.
+  final String? feeNote;
 
   /// Replaces the platform-fee row while the section is being edited. **The
   /// one stored figure here** — everything else is derived (hard rule 3), so
@@ -49,7 +54,9 @@ class _ProfitStatement extends StatelessWidget {
           feesField!
         else
           _OrderDetailRow(
-            label: context.l10n.orderPlatformFees,
+            label: profit.feesAreEstimated
+                ? context.l10n.orderPlatformFeesEstimated
+                : context.l10n.orderPlatformFees,
             value: context.money(profit.fees),
           ),
         _OrderDetailRow(
@@ -81,6 +88,15 @@ class _ProfitStatement extends StatelessWidget {
           label: context.l10n.commonRoi,
           value: context.percent(profit.roi),
         ),
+        if (profit.feesAreEstimated && feeNote != null) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h8),
+          Text(
+            feeNote!,
+            style: context.textTheme3.bodySmall!.copyWith(
+              color: context.sdTheme3.textSecondary,
+            ),
+          ),
+        ],
         if (!profit.isComplete) ...<Widget>[
           SizedBox(height: SdSpacingConstant.h8),
           Text(

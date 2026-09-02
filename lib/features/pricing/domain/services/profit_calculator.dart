@@ -27,6 +27,7 @@ class ProfitBreakdown {
     required this.fees,
     required this.shipping,
     required this.otherExpenses,
+    this.feesAreEstimated = false,
   });
 
   /// What the buyer paid.
@@ -38,6 +39,15 @@ class ProfitBreakdown {
 
   /// Marketplace commission and payment processing.
   final Money fees;
+
+  /// Whether [fees] is the platform's published rate rather than what it
+  /// actually charged.
+  ///
+  /// **The UI must say so when this is true.** The same rule
+  /// `PayoutReconciliation.awaitingIsEstimated` follows: a figure a seller
+  /// acts on has to declare when part of it is a guess, or a mismatch later
+  /// reads as a mistake rather than as the estimate it always was.
+  final bool feesAreEstimated;
 
   /// What shipping cost the seller.
   final Money shipping;

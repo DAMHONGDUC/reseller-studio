@@ -37,6 +37,7 @@ final Provider<AnalyticsSummary> analyticsSummaryProvider =
         items: items,
         expenses: expenses,
         currency: currency,
+        feeRates: ref.watch(marketplaceFeeRatesProvider),
       );
     });
 
@@ -134,6 +135,9 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
       final List<Order> orders =
           ref.watch(ordersProvider).value ?? const <Order>[];
       final String currency = ref.watch(workspaceCurrencyProvider);
+      final Map<String, double> feeRates = ref.watch(
+        marketplaceFeeRatesProvider,
+      );
 
       final Map<String, List<Order>> grouped = <String, List<Order>>{};
 
@@ -152,6 +156,7 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
                       marketplaceName: entry.value.first.marketplaceName,
                       orders: entry.value,
                       currency: currency,
+                      feeRates: feeRates,
                     ),
               )
               .toList()

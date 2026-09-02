@@ -43,6 +43,7 @@ class RecordSaleController extends Notifier<bool> {
     String? marketplaceName,
     required DateTime soldAt,
     String? buyerName,
+    Money? fees,
   }) async {
     final OrderRepository orders = ref.read(orderRepositoryProvider);
     final String orderId = _uuid.v4();
@@ -79,6 +80,11 @@ class RecordSaleController extends Notifier<bool> {
         salePrice: salePrice,
         orderedAt: soldAt,
         buyerName: buyerName,
+        // Null when the seller did not type one, and it stays null: the
+        // profit statement then estimates it from the platform's rate and
+        // says so, rather than claiming the platform took nothing
+        // (`Order.effectiveFees`).
+        fees: fees,
       );
 
       await orders.recordSale(order, item);

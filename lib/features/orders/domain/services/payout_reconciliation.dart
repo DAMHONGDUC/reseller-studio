@@ -94,11 +94,7 @@ final class PayoutReconciliation {
     Map<String, double> feeRates = const <String, double>{},
   }) {
     final Money zero = Money.zero(order.salePrice.currency);
-    final Money fees =
-        order.fees ??
-        order.salePrice.applyRate(
-          feeRates[order.marketplaceId] ?? order.marketplace.estimatedFeeRate,
-        );
+    final Money fees = order.effectiveFees(feeRates);
 
     return order.salePrice -
         (order.refund ?? zero) -
@@ -107,7 +103,7 @@ final class PayoutReconciliation {
   }
 
   /// Whether [expected] had to guess this order's fee.
-  static bool isEstimated(Order order) => order.fees == null;
+  static bool isEstimated(Order order) => order.feesAreEstimated;
 
   static MarketplacePayout _payout(
     String marketplaceId,

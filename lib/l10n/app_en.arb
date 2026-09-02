@@ -1265,6 +1265,10 @@
   "@markSoldDate": {
     "description": "When it sold."
   },
+  "markSoldFees": "Platform fee (optional)",
+  "@markSoldFees": {
+    "description": "What the marketplace took, on the record-sale sheet. Optional: left empty the app estimates it and says so."
+  },
   "markSoldBuyer": "Buyer (optional)",
   "@markSoldBuyer": {
     "description": "The buyer's name. Optional, and never sent to analytics."
@@ -1798,9 +1802,46 @@
       }
     }
   },
+  "commonApproximate": "~{value}",
+  "@commonApproximate": {
+    "description": "Marks a figure as approximate where a row has no space to say why — an estimated platform fee is the only thing that produces one.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."
+  },
+  "orderPlatformFeesEstimated": "Platform fees (estimated)",
+  "@orderPlatformFeesEstimated": {
+    "description": "The fee row's label when nobody has entered what the platform actually charged, so the figure is the published rate."
+  },
+  "orderFeesEstimatedNote": "Estimated at {rate} of the sale price. Enter what {marketplace} actually took to make this exact.",
+  "@orderFeesEstimatedNote": {
+    "description": "Explains an estimated platform fee and how to replace it with the real one.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "orderFeeHelper": "{marketplace} usually takes {rate}",
+  "@orderFeeHelper": {
+    "description": "Helper under the platform-fee box, quoting the rate the estimate would use.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
   },
   "orderOtherExpenses": "Other expenses",
   "@orderOtherExpenses": {

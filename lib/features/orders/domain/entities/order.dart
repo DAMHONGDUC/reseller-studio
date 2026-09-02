@@ -92,9 +92,14 @@ class Order {
 
   final DateTime orderedAt;
 
-  /// The platform's commission. Null until the integration reports it — and
-  /// `Marketplace.estimatedFeeRate` is only ever a planning estimate, never
-  /// written here.
+  /// The platform's commission, as the seller reported it.
+  ///
+  /// **Null means nobody has entered it, and it is never treated as zero.**
+  /// There is no marketplace integration to report one (hard rule 10), so
+  /// this arrives only when a seller types what the platform actually took.
+  /// Until then every figure that needs a fee uses [effectiveFees] and says
+  /// it is an estimate — a zero here would claim the platform worked for
+  /// free, which on Poshmark overstates profit by a fifth of the sale price.
   final Money? fees;
 
   final Money? shippingCost;
@@ -143,20 +148,46 @@ class Order {
     return costs.cast<Money>().reduce((Money a, Money b) => a + b);
   }
 
+  /// What this order's platform charges, as a fraction of the sale price.
+  ///
+  /// **One resolution, asked by everything that needs a fee** — the profit
+  /// statement, the payout forecast and the marketplace breakdown all come
+  /// here, so they cannot disagree about what eBay takes. [overrides] is
+  /// `Workspace.marketplaceFeeRates`, which holds only the rates this
+  /// business has corrected.
+  double feeRate(Map<String, double> overrides) =>
+      overrides[marketplaceId] ?? marketplace.estimatedFeeRate;
+
+  /// Whether nobody has entered what the platform actually charged.
+  bool get feesAreEstimated => fees == null;
+
+  /// What the platform took: reported when the seller entered it, estimated
+  /// from [feeRate] when they have not.
+  Money effectiveFees(Map<String, double> feeRates) =>
+      fees ?? salePrice.applyRate(feeRate(feeRates));
+
   /// The full profit statement for this order.
   ///
   /// [otherExpenses] is anything from the Expenses feature attributed to this
   /// sale — passed in rather than looked up, because an entity does not reach
-  /// into a repository.
-  ProfitBreakdown profit({Money? otherExpenses}) {
+  /// into a repository. [feeRates] is passed the same way and for the same
+  /// reason.
+  ///
+  /// **An unreported fee is estimated, never zeroed**, and the breakdown
+  /// carries `feesAreEstimated` so the screen can label it.
+  ProfitBreakdown profit({
+    Money? otherExpenses,
+    Map<String, double> feeRates = const <String, double>{},
+  }) {
     final Money zero = Money.zero(salePrice.currency);
 
     return ProfitBreakdown(
       revenue: salePrice - (refund ?? zero),
       cogs: costOfGoods,
-      fees: fees ?? zero,
+      fees: effectiveFees(feeRates),
       shipping: shippingCost ?? zero,
       otherExpenses: otherExpenses ?? zero,
+      feesAreEstimated: feesAreEstimated,
     );
   }
 

@@ -1,13 +1,16 @@
 part of 'home_screen.dart';
 
-class _ActivityRow extends StatelessWidget {
+class _ActivityRow extends ConsumerWidget {
   const _ActivityRow({required this.order});
 
   final Order order;
 
   @override
-  Widget build(BuildContext context) {
-    final Money? profit = order.profit().netProfit;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ProfitBreakdown breakdown = order.profit(
+      feeRates: ref.watch(marketplaceFeeRatesProvider),
+    );
+    final Money? profit = breakdown.netProfit;
 
     return Padding(
       padding: SdContentPaddingV3.row,
@@ -60,7 +63,9 @@ class _ActivityRow extends StatelessWidget {
                     .copyWith(color: context.sdTheme3.textPrimary),
               ),
               Text(
-                context.money(profit),
+                breakdown.feesAreEstimated && profit != null
+                    ? context.l10n.commonApproximate(context.money(profit))
+                    : context.money(profit),
                 style: context.textTheme3.bodySmall!.tabular3.copyWith(
                   color: profit == null
                       ? context.sdTheme3.textTertiary

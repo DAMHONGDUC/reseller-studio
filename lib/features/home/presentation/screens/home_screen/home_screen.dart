@@ -24,6 +24,7 @@ import '../../../../offers/domain/entities/offer.dart';
 import '../../../../offers/providers.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
+import '../../../../pricing/domain/services/profit_calculator.dart';
 import '../../../../subscription/domain/enums/seller_plan.dart';
 import '../../../../subscription/providers.dart';
 import '../../../../workspace/domain/entities/workspace.dart';

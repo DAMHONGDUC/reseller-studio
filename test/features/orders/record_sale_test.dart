@@ -277,7 +277,9 @@ void main() {
       tester
           .widget<TextField>(
             find.descendant(
-              of: find.byType(MoneyField),
+              // By label: the sheet also carries a platform-fee box, and an
+              // unscoped MoneyField finder would match both.
+              of: find.widgetWithText(MoneyField, 'Sale price'),
               matching: find.byType(TextField),
             ),
           )
@@ -311,7 +313,9 @@ void main() {
       tester
           .widget<TextField>(
             find.descendant(
-              of: find.byType(MoneyField),
+              // By label: the sheet also carries a platform-fee box, and an
+              // unscoped MoneyField finder would match both.
+              of: find.widgetWithText(MoneyField, 'Sale price'),
               matching: find.byType(TextField),
             ),
           )

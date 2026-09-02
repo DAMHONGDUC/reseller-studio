@@ -79,6 +79,8 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
       orderDetailEditControllerProvider.notifier,
     );
     final String currency = ref.watch(workspaceCurrencyProvider);
+    final Map<String, double> feeRates = ref.watch(marketplaceFeeRatesProvider);
+    final String rate = context.percent(order.feeRate(feeRates), decimals: 1);
 
     // Costs already inside the order's own shipping figure are not added
     // again — counting a label twice understates profit.
@@ -86,7 +88,10 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         .map((Expense expense) => expense.amount)
         .totalOrNull();
 
-    final ProfitBreakdown profit = order.profit(otherExpenses: otherExpenses);
+    final ProfitBreakdown profit = order.profit(
+      otherExpenses: otherExpenses,
+      feeRates: feeRates,
+    );
 
     return ListView(
       padding: SdContentPaddingV3.screen(context),
@@ -146,7 +151,13 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
           onSave: () => _save(
             () => controller.saveProfit(orderId: order.id, fees: _fees.text),
           ),
-          reading: _ProfitStatement(profit: profit),
+          reading: _ProfitStatement(
+            profit: profit,
+            feeNote: context.l10n.orderFeesEstimatedNote(
+              rate,
+              order.marketplaceName,
+            ),
+          ),
           // The fee is the one stored figure on this statement; every other
           // line is derived (hard rule 3), so it stays a row while its own
           // becomes a box in the same place.
@@ -156,6 +167,12 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
               label: context.l10n.orderPlatformFees,
               controller: _fees,
               currency: currency,
+              // The rate the estimate would use, so the seller can see what
+              // they are replacing rather than guessing at it.
+              helperText: context.l10n.orderFeeHelper(
+                order.marketplaceName,
+                rate,
+              ),
               textInputAction: TextInputAction.done,
             ),
           ),
