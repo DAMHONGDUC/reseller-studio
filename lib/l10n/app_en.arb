@@ -3367,7 +3367,7 @@
       }
     }
   },
-  "notificationProfitIncomplete": "{count, plural, =1{1 sale is missing a figure, so its profit is a guess} other{{count} sales are missing a figure, so their profit is a guess}}",
+  "notificationProfitIncomplete": "{count, plural, =1{1 sale still has an estimated fee} other{{count} sales still have an estimated fee}}",
   "@notificationProfitIncomplete": {
     "description": "Inbox row for the weekly bookkeeping reminder.",
     "placeholders": {
@@ -3432,11 +3432,11 @@
   "@notificationTypePayoutMissingBody": {
     "description": "Notification settings: what turning the payout not arrived reminder off costs."
   },
-  "notificationTypeProfitIncomplete": "Books need a number",
+  "notificationTypeProfitIncomplete": "Fees still estimated",
   "@notificationTypeProfitIncomplete": {
     "description": "Notification settings: the name of the books need a number reminder."
   },
-  "notificationTypeProfitIncompleteBody": "A weekly note about sales whose fee or cost is still missing.",
+  "notificationTypeProfitIncompleteBody": "A weekly note about sales whose real platform fee you have not entered yet.",
   "@notificationTypeProfitIncompleteBody": {
     "description": "Notification settings: what turning the books need a number reminder off costs."
   },

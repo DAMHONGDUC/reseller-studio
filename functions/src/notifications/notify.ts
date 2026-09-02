@@ -11,7 +11,13 @@ import { db, paths } from '../lib/firestore';
 export type NotificationType =
   | 'orderCreated'
   | 'offerReceived'
+  | 'shipByToday'
   | 'shipmentsDue'
+  | 'offerExpiring'
+  | 'payoutMissing'
+  | 'profitIncomplete'
+  | 'taxSeason'
+  | 'restockWinner'
   | 'staleInventory'
   | 'lowInventory'
   | 'memberJoined';

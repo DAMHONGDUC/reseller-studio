@@ -28,6 +28,34 @@
       ]
     },
     {
+      "//": "Payouts a platform still owes: shipped or delivered orders with no reported payout, oldest first. Backs the daily payoutMissing reminder, the one that hands the seller money back.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "payoutMinor", "order": "ASCENDING" },
+        { "fieldPath": "shippedAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "Sales whose platform fee is still the published estimate. Backs the weekly profitIncomplete reminder, which is what keeps the tax export exact.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "feesMinor", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "One month of sales, oldest first. Backs the monthly restockWinner join, which reads a closed month rather than a page of the newest orders.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "orderedAt", "order": "ASCENDING" }
+      ]
+    },
+    {
       "//": "Orders by status, newest first. Backs every Orders tab.",
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
