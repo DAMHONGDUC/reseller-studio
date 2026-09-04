@@ -241,6 +241,17 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
               _selectMarketplace(picked);
             },
           ),
+          // Under the platform it is a fact about — owner's rule. Only while
+          // nobody has typed a fee: with one in the box there is nothing to
+          // estimate, and stating it anyway reads as a second figure.
+          if (marketplace != null &&
+              Money.tryParse(_fees.text, currency) == null) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h8),
+            _FeeEstimate(
+              marketplace: marketplace,
+              price: _typedPrice(currency),
+            ),
+          ],
           SizedBox(height: SdSpacingConstant.h16),
           PickerField(
             label: context.l10n.markSoldDate,
@@ -277,16 +288,6 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             onChanged: (_) => setState(() {}),
             textInputAction: TextInputAction.next,
           ),
-          // Only while nobody has typed one: with a fee in the box there is
-          // nothing to estimate, and echoing it back reads as a second figure.
-          if (marketplace != null &&
-              Money.tryParse(_fees.text, currency) == null) ...<Widget>[
-            SizedBox(height: SdSpacingConstant.h8),
-            _FeeEstimate(
-              marketplace: marketplace,
-              price: _typedPrice(currency),
-            ),
-          ],
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
             label: context.l10n.markSoldBuyer,
