@@ -12,11 +12,13 @@ import '../../features/marketplaces/providers.dart';
 import '../../features/orders/domain/services/bundle_allocation.dart';
 import '../../features/orders/providers.dart';
 import '../../features/workspace/providers.dart';
+import '../constants/app_icon_constant.dart';
 import '../constants/date_picker_constant.dart';
 import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../money/money.dart';
 import '../utils/date_time_utils.dart';
+import 'fee_explainer_sheet.dart';
 import 'money_field.dart';
 import 'option_picker_sheet.dart';
 import 'picker_field.dart';
@@ -250,6 +252,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             _FeeEstimate(
               marketplace: marketplace,
               price: _typedPrice(currency),
+              onExplain: () => FeeExplainerSheet.show(context),
             ),
           ],
           SizedBox(height: SdSpacingConstant.h16),
@@ -284,9 +287,21 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             controller: _fees,
             currency: currency,
             // The box is never pre-filled — typed is a fact, empty is a
-            // labelled estimate — so the estimate is stated under it instead.
+            // labelled estimate — so the estimate is stated under Sold on.
             onChanged: (_) => setState(() {}),
             textInputAction: TextInputAction.next,
+          ),
+          // The estimate card above is not always drawn, and this is the
+          // moment a seller most needs to know which fee the box wants.
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SdButtonV3(
+              variant: SdButtonVariantV3.text,
+              size: SdButtonSizeV3.small,
+              icon: AppIconConstant.info,
+              label: context.l10n.feeExplainerTitle,
+              onPressed: () => FeeExplainerSheet.show(context),
+            ),
           ),
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
@@ -383,7 +398,11 @@ class _BundleSplit extends StatelessWidget {
 /// to. It says where the rate lives too: a number the app presents as its own
 /// is one nobody thinks to go and correct.
 class _FeeEstimate extends StatelessWidget {
-  const _FeeEstimate({required this.marketplace, required this.price});
+  const _FeeEstimate({
+    required this.marketplace,
+    required this.price,
+    required this.onExplain,
+  });
 
   final Marketplace marketplace;
 
@@ -391,9 +410,13 @@ class _FeeEstimate extends StatelessWidget {
   /// rather than a zero (hard rule 5).
   final Money? price;
 
+  /// Opens the sheet that says what this figure is and what the other fee is.
+  final VoidCallback onExplain;
+
   @override
   Widget build(BuildContext context) => SdCardV3(
     layer: SdCardLayerV3.sunken,
+    onTap: onExplain,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -415,12 +438,28 @@ class _FeeEstimate extends StatelessWidget {
           ],
         ),
         SizedBox(height: SdSpacingConstant.h4),
-        Text(
-          context.l10n.markSoldFeeEstimateHint(
-            marketplace.name,
-            context.percent(marketplace.feeRate, decimals: 1),
-          ),
-          style: context.textTheme3.bodySmall!.faint3(context),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                context.l10n.markSoldFeeEstimateHint(
+                  marketplace.name,
+                  context.percent(marketplace.feeRate, decimals: 1),
+                ),
+                style: context.textTheme3.bodySmall!.faint3(context),
+              ),
+            ),
+            SizedBox(width: SdSpacingConstant.w8),
+            // The card is tappable, so it says so — a block of text that opens
+            // something with no mark on it is one nobody taps.
+            SdIconV3(
+              AppIconConstant.info,
+              size: SdIconV3.smallSize,
+              color: context.sdTheme3.textTertiary,
+              semanticLabel: context.l10n.feeExplainerTitle,
+            ),
+          ],
         ),
       ],
     ),

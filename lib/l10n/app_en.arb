@@ -1283,6 +1283,34 @@
   "@markSoldFees": {
     "description": "What the marketplace took, on the record-sale sheet. Optional: left empty the app estimates it and says so."
   },
+  "feeExplainerTitle": "About fees",
+  "@feeExplainerTitle": {
+    "description": "Title of the sheet explaining the platform fee and the marketplace rate."
+  },
+  "feeExplainerPlatformTitle": "Platform fee",
+  "@feeExplainerPlatformTitle": {
+    "description": "The first block of the fee explainer: the fee on one order."
+  },
+  "feeExplainerPlatformBody": "What the marketplace actually took from this sale. Enter it when you know it — a reported fee always wins, and it is the only fee this app stores.",
+  "@feeExplainerPlatformBody": {
+    "description": "What the platform fee field on an order means."
+  },
+  "feeExplainerRateTitle": "Marketplace fee rate",
+  "@feeExplainerRateTitle": {
+    "description": "The second block of the fee explainer: the percentage set per marketplace."
+  },
+  "feeExplainerRateBody": "The percentage a marketplace usually takes, set for each one in More → Marketplaces. It is used only to estimate a sale nobody has entered a fee for.",
+  "@feeExplainerRateBody": {
+    "description": "What the marketplace fee rate is and where it is edited."
+  },
+  "feeExplainerNote": "An estimated fee is labelled as one wherever it appears, and changing the rate never rewrites an order whose fee you entered.",
+  "@feeExplainerNote": {
+    "description": "Closing note of the fee explainer."
+  },
+  "feeExplainerOpenMarketplaces": "Open Marketplaces",
+  "@feeExplainerOpenMarketplaces": {
+    "description": "Primary action of the fee explainer — goes to More → Marketplaces, where the rates are edited."
+  },
   "markSoldFeeEstimateLabel": "Estimated fee",
   "@markSoldFeeEstimateLabel": {
     "description": "Label of the fee the app would use on the mark-as-sold sheet when the seller leaves the fee box empty."
