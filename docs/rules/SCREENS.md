@@ -56,9 +56,19 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
     the button under the resting thumb is the one the screen is for, and the
     variant is what says which is which. What the slot must never hold is a
     second way to do the same thing at the same weight.
-  - **A conditional second action carries its own gap.** `_DangerZone` renders
-    nothing for a seller who cannot delete, and a gap owned by the slot would
-    leave a hole above Save on every screen that does not draw one.
+  - **The gap between the two is `SdContentPaddingV3.stackedActionsGap`, and
+    the slot draws it** — owner's rule, and it **reverses "a conditional
+    second action carries its own gap"**. Two of the three screens with a
+    second action drew no gap at all and their buttons touched, while the
+    third drew its own — which is exactly the drift a shared widget exists to
+    stop, and the same argument that put the inset above and below the slot
+    inside it.
+  - **A second action that does not apply is `null`, never an empty widget.**
+    That is what the old rule was really protecting against: `_DangerZone`
+    rendered a `SizedBox.shrink()` for a seller who cannot delete, so a gap
+    owned by the slot would have left a hole above Save. The screen decides
+    whether there is a second action; the slot decides what it looks like
+    when there is.
   - **The button disappears rather than moves when it does not apply.** A
     screen whose action is conditional — Subscription only sells to a seller
     who is not paying, the paywall only buys once the store has answered —
