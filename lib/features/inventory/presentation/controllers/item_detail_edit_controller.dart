@@ -12,10 +12,11 @@ import '../../domain/services/item_transition.dart';
 
 /// Which block of the item detail screen is open for editing.
 ///
-/// **Status is not here.** Listing, selling and archiving carry writes beyond
-/// the field — see `lib/features/inventory/CLAUDE.md`. The one exception is
-/// [quantity]: stock put behind a sold row brings it back, and its section is
-/// where a seller edits the count now that Restock is gone.
+/// **The verbs are still not here.** Listing, selling and archiving carry
+/// writes beyond the field — see `lib/features/inventory/CLAUDE.md`. What
+/// [status] and [quantity] are is the seller's own answer to two independent
+/// questions: neither writes the other, and a pair that cannot both be true is
+/// drawn as an alert tag rather than corrected.
 ///
 /// **Nor are listings.** What a marketplace asks is edited on Marketplaces
 /// management, which the Listings section links to rather than opening boxes
@@ -23,6 +24,7 @@ import '../../domain/services/item_transition.dart';
 enum ItemDetailSection {
   overview,
   quantity,
+  status,
   pricing,
   provenance,
   description,
@@ -38,6 +40,7 @@ class ItemDetailEditState {
   const ItemDetailEditState({
     this.editing,
     this.isSaving = false,
+    this.status = ItemStatus.draft,
     this.condition,
     this.sourceId,
     this.categoryId,
@@ -51,6 +54,10 @@ class ItemDetailEditState {
 
   final bool isSaving;
 
+  /// What the status section is showing as picked. Meaningless while that
+  /// section is closed — [edit] seeds it from the record on every open.
+  final ItemStatus status;
+
   final ItemCondition? condition;
   final String? sourceId;
   final String? categoryId;
@@ -60,6 +67,7 @@ class ItemDetailEditState {
   bool isOpen(ItemDetailSection section) => editing == section;
 
   ItemDetailEditState copyWith({
+    ItemStatus? status,
     ItemCondition? condition,
     String? sourceId,
     String? categoryId,
@@ -94,6 +102,7 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
   void edit(ItemDetailSection section, Item item) =>
       state = ItemDetailEditState(
         editing: section,
+        status: item.status,
         condition: item.condition,
         sourceId: item.sourceId,
         categoryId: item.categoryId,
@@ -102,6 +111,11 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
       );
 
   void cancel() => state = const ItemDetailEditState();
+
+  /// **Nothing is refused** — owner's rule. This is the screen where a seller
+  /// corrects what the app got wrong.
+  void selectStatus(ItemStatus status) =>
+      state = state.copyWith(status: status);
 
   void selectCondition(ItemCondition condition) =>
       state = state.copyWith(condition: condition);
@@ -126,7 +140,11 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
     });
   }
 
-  /// Writes the count, and brings a sold row back if there is stock behind it.
+  /// Writes the count, and nothing else.
+  ///
+  /// **A count moves no status** — owner's rule. A sold row given stock stays
+  /// sold and wears an alert tag saying so; the seller picks the status in its
+  /// own section.
   Future<void> saveQuantity({
     required String itemId,
     required String quantity,
@@ -135,15 +153,23 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
     // unparseable box means one rather than nothing.
     final int count = int.tryParse(quantity.trim()) ?? 1;
 
-    return _write(itemId, ItemDetailSection.quantity, (Item current) {
-      final Item edited = current.copyWith(quantity: count);
-
-      // Putting stock behind a sold row is the seller saying they have the
-      // thing again — a recorded instant, so the wall clock rather than
-      // `clockProvider`.
-      return ItemTransition.restocked(edited, now: DateTime.now());
-    });
+    return _write(
+      itemId,
+      ItemDetailSection.quantity,
+      (Item current) => current.copyWith(quantity: count),
+    );
   }
+
+  /// Writes the status the seller picked, refusing nothing.
+  ///
+  /// Through `ItemTransition.setStatus`, which is what carries `soldAt` — a
+  /// recorded instant, so the wall clock rather than `clockProvider`.
+  Future<void> saveStatus({required String itemId}) => _write(
+    itemId,
+    ItemDetailSection.status,
+    (Item current) =>
+        ItemTransition.setStatus(current, state.status, now: DateTime.now()),
+  );
 
   Future<void> savePricing({
     required String itemId,

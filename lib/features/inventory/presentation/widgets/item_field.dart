@@ -59,6 +59,42 @@ class ItemTagGroupField extends StatelessWidget {
   );
 }
 
+/// Where the item is in its life — four tags, each wearing its own colour.
+///
+/// **Switching is free** — owner's rule. No requirement is checked and no move
+/// is refused: this is where a seller corrects what the app got wrong, and a
+/// correction that argues back is the thing they came to fix. The *verbs* are
+/// unchanged — `ItemTransition.check` still gates Mark as sold and the bulk
+/// paths, which is where a missing price actually matters.
+///
+/// **It writes no order** (hard rule 3) and **moves no count** (quantity and
+/// status are independent, `lib/features/inventory/CLAUDE.md`): a pair that
+/// cannot both be true is drawn as an alert tag instead.
+class ItemStatusField extends StatelessWidget {
+  const ItemStatusField({
+    required this.selected,
+    required this.onSelected,
+    super.key,
+  });
+
+  final ItemStatus selected;
+  final ValueChanged<ItemStatus> onSelected;
+
+  @override
+  Widget build(BuildContext context) => ItemTagGroupField(
+    label: context.l10n.itemStatus,
+    children: <Widget>[
+      for (final ItemStatus status in ItemStatus.values)
+        SdTagV3(
+          label: status.label(context),
+          color: status.color(context),
+          selected: selected == status,
+          onSelected: () => onSelected(status),
+        ),
+    ],
+  );
+}
+
 /// The condition grades resellers actually use in listings.
 ///
 /// **Tags, not a sheet** — owner's rule. Seven grades behind a picker is a

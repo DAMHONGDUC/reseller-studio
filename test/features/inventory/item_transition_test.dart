@@ -146,15 +146,19 @@ void main() {
       expect(() => ItemTransition.sell(soldOut, now: now), throwsStateError);
     });
 
-    test('putting stock behind a sold row puts it back on the shelf', () {
-      final Item restocked = ItemTransition.restocked(
-        item(status: ItemStatus.sold, soldAt: now, quantity: 4),
+    test('a status move leaves the count exactly where it was', () {
+      // Quantity and status are independent — owner's rule. Picking `sold`
+      // used to empty the count, which is the app editing a field the seller
+      // did not touch; the contradiction is drawn as a tag instead.
+      final Item sold = ItemTransition.setStatus(
+        item(status: ItemStatus.inStock, quantity: 4),
+        ItemStatus.sold,
         now: now,
       );
 
-      expect(restocked.status, ItemStatus.inStock);
-      expect(restocked.soldAt, isNull);
-      expect(restocked.quantityOnHand, 4);
+      expect(sold.status, ItemStatus.sold);
+      expect(sold.quantity, 4);
+      expect(sold.soldAt, now);
     });
 
     test('going live stamps the clock instead of moving the status', () {
@@ -176,14 +180,17 @@ void main() {
       );
     });
 
-    test('a count does not undo an archive', () {
-      // Archiving is a deliberate withdrawal; only a verb brings it back.
-      final Item archived = ItemTransition.restocked(
-        item(status: ItemStatus.archived, quantity: 4),
-        now: now,
+    test('a count moves no status at all', () {
+      // Not the archive, and not a sale either: only the tags the seller picks
+      // and the verbs move a state.
+      expect(
+        item(status: ItemStatus.archived, quantity: 4).status,
+        ItemStatus.archived,
       );
-
-      expect(archived.status, ItemStatus.archived);
+      expect(
+        item(status: ItemStatus.sold, quantity: 4).status,
+        ItemStatus.sold,
+      );
     });
 
     test('coming back onto the shelf clears the sold date', () {

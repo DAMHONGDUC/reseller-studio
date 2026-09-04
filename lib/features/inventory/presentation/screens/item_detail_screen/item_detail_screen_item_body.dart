@@ -54,6 +54,10 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         _title.text = item.title;
       case ItemDetailSection.quantity:
         _quantity.text = item.quantity.toString();
+      // The tags read what the controller seeded from the record, so this
+      // section has no box of its own to fill.
+      case ItemDetailSection.status:
+        break;
       case ItemDetailSection.pricing:
         _cost.text = item.purchasePrice?.toInputString() ?? '';
         _expected.text = item.expectedPrice?.toInputString() ?? '';
@@ -93,11 +97,16 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
       itemDetailEditControllerProvider.notifier,
     );
     final String currency = ref.watch(workspaceCurrencyProvider);
+    final List<ItemWarning> warnings = ItemConsistency.warnings(item);
 
     return ListView(
       padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
+        if (warnings.isNotEmpty) ...<Widget>[
+          _Warnings(warnings: warnings),
+          SizedBox(height: SdContentPaddingV3.sectionGap),
+        ],
         if (item.photoUrls.isNotEmpty) ...<Widget>[
           _Photos(urls: item.photoUrls),
           SizedBox(height: SdContentPaddingV3.sectionGap),
@@ -151,6 +160,20 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
             isRequired: true,
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.done,
+          ),
+        ),
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+        _Section(
+          section: ItemDetailSection.status,
+          title: context.l10n.itemStatus,
+          edit: edit,
+          onEdit: _startEdit,
+          onCancel: controller.cancel,
+          onSave: () => _save(() => controller.saveStatus(itemId: item.id)),
+          reading: _StatusFacts(item: item),
+          editing: ItemStatusField(
+            selected: edit.status,
+            onSelected: controller.selectStatus,
           ),
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
@@ -336,7 +359,11 @@ class _Section extends StatelessWidget {
   }
 }
 
-/// Title, state and grade — what the item is.
+/// Title and grade — what the item is.
+///
+/// **The status badge left with the status section.** Two answers to one
+/// question is how a screen ends up showing a state its own tags disagree
+/// with.
 class _OverviewFacts extends StatelessWidget {
   const _OverviewFacts({required this.item});
 
@@ -352,22 +379,54 @@ class _OverviewFacts extends StatelessWidget {
           color: context.sdTheme3.textPrimary,
         ),
       ),
-      SizedBox(height: SdSpacingConstant.h8),
-      Wrap(
-        spacing: SdSpacingConstant.w6,
-        runSpacing: SdSpacingConstant.h4,
-        children: <Widget>[
-          SdBadgeV3(
-            label: item.status.label(context),
-            color: item.status.color(context),
-          ),
-          if (item.condition != null)
-            SdBadgeV3(
-              label: item.condition!.label(context),
-              color: item.condition!.color(context),
-            ),
-        ],
-      ),
+      if (item.condition != null) ...<Widget>[
+        SizedBox(height: SdSpacingConstant.h8),
+        SdBadgeV3(
+          label: item.condition!.label(context),
+          color: item.condition!.color(context),
+        ),
+      ],
+    ],
+  );
+}
+
+/// The state the record is in — the section's whole answer.
+class _StatusFacts extends StatelessWidget {
+  const _StatusFacts({required this.item});
+
+  final Item item;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.centerLeft,
+    child: SdBadgeV3(
+      label: item.status.label(context),
+      color: item.status.color(context),
+    ),
+  );
+}
+
+/// What the record says that cannot all be true at once.
+///
+/// **Above everything, and outside every section**, because a contradiction is
+/// about a pair of fields rather than about one card — and because a seller
+/// who has just made one has to see it without going looking.
+class _Warnings extends StatelessWidget {
+  const _Warnings({required this.warnings});
+
+  final List<ItemWarning> warnings;
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: SdSpacingConstant.w6,
+    runSpacing: SdSpacingConstant.h4,
+    children: <Widget>[
+      for (final ItemWarning warning in warnings)
+        SdBadgeV3(
+          label: warning.label(context),
+          color: warning.color(context),
+          icon: AppIconConstant.warning,
+        ),
     ],
   );
 }

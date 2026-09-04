@@ -11,7 +11,8 @@ import '../../support/pump_app.dart';
 
 /// **There is no Restock verb; the count is edited on the detail screen** —
 /// owner's rule. A count is a fact about the record, and a sheet that added to
-/// it beside a field that replaced it was two answers to one question.
+/// it beside a field that replaced it was two answers to one question. It
+/// writes the count and nothing else: quantity and status are independent.
 void main() {
   Future<void> openActions(WidgetTester tester) async {
     await pumpScreen(tester, const InventoryScreen());
@@ -55,7 +56,7 @@ void main() {
     expect(find.text('Make it in stock'), findsNothing);
   });
 
-  test('the detail screen puts a sold row back on the shelf', () async {
+  test('the detail screen writes the count and moves no status', () async {
     final ProviderContainer container = mockContainer();
 
     await warmUp(container);
@@ -68,12 +69,11 @@ void main() {
         .read(itemDetailEditControllerProvider.notifier)
         .saveQuantity(itemId: sold.id, quantity: '5');
 
-    final Item restocked = await saved(container, 'itm-1');
+    final Item edited = await saved(container, 'itm-1');
 
-    expect(restocked.status, ItemStatus.inStock);
-    expect(restocked.quantity, 5);
-    // The sale is undone with it: a row on the shelf carrying a sold date is
-    // one every export reads as sold.
-    expect(restocked.soldAt, isNull);
+    // Quantity and status are independent — the seller picks the status in the
+    // section below, and the contradiction shows as a tag until they do.
+    expect(edited.quantity, 5);
+    expect(edited.status, ItemStatus.sold);
   });
 }

@@ -19,6 +19,8 @@ import '../../../../sourcing/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/enums/item_status.dart';
+import '../../../domain/enums/item_warning.dart';
+import '../../../domain/services/item_consistency.dart';
 import '../../../domain/services/item_transition.dart';
 import '../../../item_block_presenter.dart';
 import '../../../providers.dart';

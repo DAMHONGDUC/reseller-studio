@@ -431,16 +431,12 @@ class ItemFormController extends Notifier<ItemFormState> {
           ? item
           : ItemTransition.setStatus(item, state.status, now: now);
 
-      // Putting stock behind a sold row is the seller saying they have the
-      // thing again — the domain decides what that means, not the form.
-      final Item saved = ItemTransition.restocked(moved, now: now);
-
-      await ref.read(itemRepositoryProvider).save(saved);
+      await ref.read(itemRepositoryProvider).save(moved);
       await _saveListingPrices(id);
 
       SdLogger.info(LogTagConstant.item, 'Item form saved', <String, Object>{
         'itemId': id,
-        'status': saved.status.name,
+        'status': moved.status.name,
         'repriced': state.listingPrices.length,
       });
 

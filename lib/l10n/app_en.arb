@@ -138,6 +138,14 @@
     "description": "Detail row label: when the record last changed. Read-only."
   },
   "itemStatus": "Status",
+  "itemWarningEmptyShelf": "None on the shelf",
+  "@itemWarningEmptyShelf": {
+    "description": "Alert tag on the item detail screen: the item is on hand but its count is zero."
+  },
+  "itemWarningSoldWithStock": "Sold, count not zero",
+  "@itemWarningSoldWithStock": {
+    "description": "Alert tag on the item detail screen: the item is marked sold while its count still says there are some."
+  },
   "@itemStatus": {
     "description": "Field label on the item form for the item's state."
   },

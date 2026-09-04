@@ -138,20 +138,10 @@ final class ItemTransition {
     // stays listed, and its staleness clock is not touched.
     if (left > 0) return item.copyWith(quantity: left);
 
-    return apply(item, ItemStatus.sold, now: now);
-  }
-
-  /// [item] after its count was edited — back on the shelf if the seller put
-  /// stock behind a sold record.
-  ///
-  /// **The other half of the rule above** — owner's rule. A sold row given a
-  /// quantity again is a seller saying they have the thing, and leaving it
-  /// sold made the card claim nothing was left of ten. Nothing else moves:
-  /// archiving is a deliberate withdrawal, and a count does not undo it.
-  static Item restocked(Item item, {required DateTime now}) {
-    if (item.status != ItemStatus.sold || item.quantity <= 0) return item;
-
-    return apply(item, ItemStatus.inStock, now: now);
+    // **The last one out the door moves both, and it is the only thing that
+    // does** — a sale is an event the app recorded, not a field the seller
+    // typed, so it empties the count itself now that [setStatus] does not.
+    return setStatus(item.copyWith(quantity: 0), ItemStatus.sold, now: now);
   }
 
   /// [item] moved to [target], with the timestamps that move implies.
@@ -179,18 +169,17 @@ final class ItemTransition {
   /// unchanged: [apply] still checks, so Mark as sold and the bulk paths ask
   /// for what they need.
   ///
-  /// The side effects come along either way, because they are what keeps the
-  /// record consistent rather than what keeps it legal.
+  /// **The count is not touched** — owner's rule: quantity and status are
+  /// independent, and a pair that cannot both be true is drawn as an alert
+  /// tag rather than fixed behind the seller's back (`ItemConsistency`).
+  /// `soldAt` still rides along, because it is a timestamp of this move
+  /// rather than a second opinion about the shelf.
   static Item setStatus(
     Item item,
     ItemStatus target, {
     required DateTime now,
   }) => item.copyWith(
     status: target,
-    // Sold means sold out, whichever way it was reached: the count goes to
-    // zero so the card, the quantity box and Analytics all agree with the
-    // status rather than each other.
-    quantity: target == ItemStatus.sold ? 0 : null,
     soldAt: target == ItemStatus.sold ? now : null,
     // Coming back onto the shelf undoes the sale, and the date has to go with
     // it: an item on hand that still carries a sold date is one every export
