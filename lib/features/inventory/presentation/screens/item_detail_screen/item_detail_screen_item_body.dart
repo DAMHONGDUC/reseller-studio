@@ -104,7 +104,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
         if (warnings.isNotEmpty) ...<Widget>[
-          _Warnings(warnings: warnings),
+          ItemWarningLines(item: item, warnings: warnings),
           SizedBox(height: SdContentPaddingV3.sectionGap),
         ],
         if (item.photoUrls.isNotEmpty) ...<Widget>[
@@ -403,31 +403,6 @@ class _StatusFacts extends StatelessWidget {
       label: item.status.label(context),
       color: item.status.color(context),
     ),
-  );
-}
-
-/// What the record says that cannot all be true at once.
-///
-/// **Above everything, and outside every section**, because a contradiction is
-/// about a pair of fields rather than about one card — and because a seller
-/// who has just made one has to see it without going looking.
-class _Warnings extends StatelessWidget {
-  const _Warnings({required this.warnings});
-
-  final List<ItemWarning> warnings;
-
-  @override
-  Widget build(BuildContext context) => Wrap(
-    spacing: SdSpacingConstant.w6,
-    runSpacing: SdSpacingConstant.h4,
-    children: <Widget>[
-      for (final ItemWarning warning in warnings)
-        SdBadgeV3(
-          label: warning.label(context),
-          color: warning.color(context),
-          icon: AppIconConstant.warning,
-        ),
-    ],
   );
 }
 

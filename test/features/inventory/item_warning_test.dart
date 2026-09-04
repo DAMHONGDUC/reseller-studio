@@ -28,16 +28,13 @@ void main() {
     );
   });
 
-  test('sold while the count says there are some is a contradiction', () {
+  test('a row that has left the shelf keeping its count is not a warning', () {
+    // `quantity` is what was taken in and `quantityOnHand` already reads zero
+    // off the shelf, so this is the normal state of every sold item.
     expect(
       ItemConsistency.warnings(item(status: ItemStatus.sold, quantity: 4)),
-      <ItemWarning>[ItemWarning.soldWithStock],
+      isEmpty,
     );
-  });
-
-  test('an archived item with stock is not a warning', () {
-    // Withdrawing something is not giving it away, and the count is what the
-    // seller still owns.
     expect(
       ItemConsistency.warnings(item(status: ItemStatus.archived, quantity: 4)),
       isEmpty,

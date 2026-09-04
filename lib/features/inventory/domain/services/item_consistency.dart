@@ -1,5 +1,4 @@
 import '../entities/item.dart';
-import '../enums/item_status.dart';
 import '../enums/item_warning.dart';
 
 /// What an item says that cannot all be true at once.
@@ -13,17 +12,14 @@ import '../enums/item_warning.dart';
 final class ItemConsistency {
   /// Every contradiction [item] currently holds, in the order they are shown.
   ///
-  /// **An archived item with stock is not one.** Withdrawing something is not
-  /// giving it away, and the count is what the seller still owns.
+  /// **Only what is on the shelf is checked.** An archived or sold row keeping
+  /// a count is not a contradiction: withdrawing something is not giving it
+  /// away, and `Item.quantityOnHand` already reads zero for both.
   static List<ItemWarning> warnings(Item item) {
     final List<ItemWarning> found = <ItemWarning>[];
 
     if (item.status.isOnHand && item.quantity <= 0) {
       found.add(ItemWarning.emptyShelf);
-    }
-
-    if (item.status == ItemStatus.sold && item.quantity > 0) {
-      found.add(ItemWarning.soldWithStock);
     }
 
     return List<ItemWarning>.unmodifiable(found);
