@@ -138,6 +138,10 @@
     "description": "Detail row label: when the record last changed. Read-only."
   },
   "itemStatus": "Status",
+  "itemWarningEmptyShelfTag": "None on the shelf",
+  "@itemWarningEmptyShelfTag": {
+    "description": "The inventory row's warning tag, beside the update date. Short — the sentence that explains it is on the detail screen."
+  },
   "itemWarningEmptyShelf": "Warning: none on the shelf but status is {status} — please update",
   "@itemWarningEmptyShelf": {
     "description": "Consistency warning on the item row and the detail screen: the item is on hand but its count is zero. Names both halves so the seller knows which two facts disagree.",
@@ -5275,6 +5279,10 @@
   "listingsNoMatch": "No listings under this tab.",
   "@listingsNoMatch": {
     "description": "Listings screen, shown when a tab is empty but others are not."
+  },
+  "recordSaleCannotSell": "Cannot sell",
+  "@recordSaleCannotSell": {
+    "description": "The sale picker's warning tag on a row that cannot be sold. Short — tapping the row opens the reason in full."
   },
   "recordSaleBlockedTitle": "This item cannot be sold",
   "@recordSaleBlockedTitle": {

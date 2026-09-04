@@ -103,9 +103,9 @@ class _SaleItemRow extends ConsumerWidget {
       now: now,
       isSelected: isSelected,
       isSelecting: isSelecting,
-      notice: check.isAllowed
-          ? null
-          : ItemBlockPresenter.messages(context, check.blocks),
+      // Short, because it is a tag beside the date: the reason in full is what
+      // the tap opens (`CannotSellSheet`).
+      notice: check.isAllowed ? null : context.l10n.recordSaleCannotSell,
       // Neither the actions button nor the marketplace arrow is wired: this
       // screen's tap is the sale, and a second verb on the row would take the
       // seller out of the flow they came for.

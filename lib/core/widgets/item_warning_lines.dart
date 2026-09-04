@@ -7,18 +7,14 @@ import '../constants/app_icon_constant.dart';
 
 /// What the record says that cannot all be true at once.
 ///
-/// **One widget, drawn by the row and by the detail screen** — owner's rule.
-/// A contradiction is something a seller has to find while scanning the list,
-/// so it cannot live only on the screen they reach after going looking.
-///
-/// **A full-width line, never a compact badge.** The message names both halves
-/// and asks for the fix, and shortening it to fit a badge row is how it
-/// stopped saying anything.
+/// **The sentence, for a screen with room for one.** The inventory row flags
+/// the same thing as a tag beside its update date — short, because a row's job
+/// is to be scanned (`lib/features/inventory/CLAUDE.md`); this is where the
+/// contradiction is named in full.
 class ItemWarningLines extends StatelessWidget {
   const ItemWarningLines({
     required this.item,
     required this.warnings,
-    this.isCompact = false,
     super.key,
   });
 
@@ -28,11 +24,6 @@ class ItemWarningLines extends StatelessWidget {
   /// a gap above this widget without asking twice.
   final List<ItemWarning> warnings;
 
-  /// The list row's size. The card is already carrying a title, four badges
-  /// and three figures, so the sentence goes in at the size the money band's
-  /// labels use.
-  final bool isCompact;
-
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +32,6 @@ class ItemWarningLines extends StatelessWidget {
         AppWarningLine(
           message: warning.message(context, item),
           color: warning.color(context),
-          isCompact: isCompact,
         ),
     ],
   );
@@ -54,16 +44,10 @@ class ItemWarningLines extends StatelessWidget {
 /// itself, and a sale picker row saying why it cannot be sold. One shape, so a
 /// seller learns to read it once.
 class AppWarningLine extends StatelessWidget {
-  const AppWarningLine({
-    required this.message,
-    required this.color,
-    this.isCompact = false,
-    super.key,
-  });
+  const AppWarningLine({required this.message, required this.color, super.key});
 
   final String message;
   final Color color;
-  final bool isCompact;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -71,23 +55,16 @@ class AppWarningLine extends StatelessWidget {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SdIconV3(
-          AppIconConstant.warning,
-          color: color,
-          size: isCompact ? SdIconV3.smallSize : SdIconV3.defaultSize,
-        ),
+        SdIconV3(AppIconConstant.warning, color: color),
         SizedBox(width: SdSpacingConstant.w6),
         Expanded(
           child: Text(
             message,
-            // **Small, and on a card not bold either** — owner's rule.
-            // `bodySmall` is the floor of the scale, so the compact line gets
-            // quieter by shedding its weight rather than by an off-scale size.
-            style: isCompact
-                ? context.textTheme3.bodySmall!.copyWith(color: color)
-                : context.textTheme3.bodySmall!.semiBold3.copyWith(
-                    color: color,
-                  ),
+            // Small — owner's rule: `bodySmall` is the floor of the scale. A
+            // warning is a fact the screen carries, not a headline.
+            style: context.textTheme3.bodySmall!.semiBold3.copyWith(
+              color: color,
+            ),
           ),
         ),
       ],

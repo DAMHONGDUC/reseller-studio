@@ -24,6 +24,15 @@ enum ItemWarning {
 /// shape `ItemStatusDisplay` has: its words and its colour, so a value is
 /// asked and there is exactly one answer.
 extension ItemWarningDisplay on ItemWarning {
+  /// The tag's words — what the inventory row has room for beside the date.
+  ///
+  /// **Short, because the row's job is to flag it while a seller scans forty**
+  /// — owner's rule. The sentence that explains it is [message], and the
+  /// screens with room for one draw that instead.
+  String label(BuildContext context) => switch (this) {
+    ItemWarning.emptyShelf => context.l10n.itemWarningEmptyShelfTag,
+  };
+
   /// **It names both halves and asks for the fix** — owner's rule, and it is
   /// why the item comes with the context: "none on the shelf but status is In
   /// stock" tells the seller which two facts disagree, where "Check the count"

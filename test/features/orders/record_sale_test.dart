@@ -138,10 +138,10 @@ void main() {
     expect(
       find.descendant(
         of: find.ancestor(of: sold, matching: find.byType(ItemCard)),
-        matching: find.text('This item has already left inventory'),
+        matching: find.text('Cannot sell'),
       ),
       findsOneWidget,
-      reason: 'the row carries why it cannot be sold',
+      reason: 'the row flags it as a tag; the reason in full is a tap away',
     );
   });
 
@@ -157,6 +157,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(CannotSellSheet), findsOneWidget);
+    expect(find.text('This item has already left inventory'), findsOneWidget);
     expect(find.text('Open item'), findsOneWidget);
     // The sale sheet is what a sellable row opens, and this row is not one.
     expect(find.text('Sold on'), findsNothing);

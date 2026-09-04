@@ -15,7 +15,6 @@ import '../utils/date_time_utils.dart';
 import 'app_photo.dart';
 import 'app_row_chevron.dart';
 import 'app_row_icon_button.dart';
-import 'item_warning_lines.dart';
 
 part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
@@ -167,7 +166,11 @@ class ItemCard extends StatelessWidget {
                         ),
                         SizedBox(height: ItemCardMetricConstant.titleGap),
                         _StateBadges(item: item, now: now, listings: listings),
-                        _UpdatedLine(item: item),
+                        _UpdatedLine(
+                          item: item,
+                          warnings: warnings,
+                          notice: notice,
+                        ),
                       ],
                     ),
                   ),
@@ -192,38 +195,9 @@ class ItemCard extends StatelessWidget {
               padding: SdContentPaddingV3.card.copyWith(
                 top: ItemCardMetricConstant.bandGap,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _MoneyLine(
-                    item: item,
-                    onMarketPrices: isSelecting ? null : onMarketPrices,
-                  ),
-                  // Under the band rather than in the badge line — owner's rule.
-                  // The sentence names the count and the status, and the count
-                  // it is arguing with is the figure directly above it.
-                  if (warnings.isNotEmpty) ...<Widget>[
-                    SizedBox(height: ItemCardMetricConstant.warningGap),
-                    ItemWarningLines(
-                      item: item,
-                      warnings: warnings,
-                      isCompact: true,
-                    ),
-                  ],
-                  // **One warning line, and the record's own wins** —
-                  // owner's rule. "None on the shelf but status is In stock"
-                  // and "there is none of this left on the shelf" are one
-                  // sentence twice, and the second reads as a second
-                  // problem.
-                  if (warnings.isEmpty && notice != null) ...<Widget>[
-                    SizedBox(height: ItemCardMetricConstant.warningGap),
-                    AppWarningLine(
-                      message: notice!,
-                      color: context.sdTheme3.warning,
-                      isCompact: true,
-                    ),
-                  ],
-                ],
+              child: _MoneyLine(
+                item: item,
+                onMarketPrices: isSelecting ? null : onMarketPrices,
               ),
             ),
           ],

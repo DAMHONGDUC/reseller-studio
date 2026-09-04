@@ -14,7 +14,6 @@ import '../../../../../core/widgets/mark_sold_sheet.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/domain/enums/item_status.dart';
 import '../../../../inventory/domain/services/item_transition.dart';
-import '../../../../inventory/item_block_presenter.dart';
 import '../../../../inventory/providers.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/services/listings_by_item.dart';
