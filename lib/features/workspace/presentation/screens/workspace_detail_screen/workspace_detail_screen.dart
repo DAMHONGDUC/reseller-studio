@@ -271,7 +271,9 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
             label: context.l10n.actionSave,
             isBusy: state.isSaving,
             onPressed: state.canSubmit ? _submit : null,
-            secondary: _DangerZone(workspace: workspace),
+            secondary: _DangerZone.isOffered(ref, workspace)
+                ? _DangerZone(workspace: workspace)
+                : null,
           ),
         ],
       ),
