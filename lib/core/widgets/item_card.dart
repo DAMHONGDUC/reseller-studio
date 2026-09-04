@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:system_design/index.dart';
 
-import '../../../../core/constants/app_icon_constant.dart';
-import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/utils/date_time_utils.dart';
-import '../../../../core/widgets/app_photo.dart';
-import '../../../../core/widgets/app_row_chevron.dart';
-import '../../../../core/widgets/app_row_icon_button.dart';
-import '../../../listings/domain/entities/listing.dart';
-import '../../../listings/domain/services/listing_marketplaces.dart';
-import '../../../pricing/domain/services/profit_calculator.dart';
-import '../../domain/entities/item.dart';
-import '../../domain/enums/item_status.dart';
-import '../../domain/enums/item_warning.dart';
-import '../../domain/services/item_consistency.dart';
-import '../../item_card_metric_constant.dart';
+import '../../features/inventory/domain/entities/item.dart';
+import '../../features/inventory/domain/enums/item_status.dart';
+import '../../features/inventory/domain/enums/item_warning.dart';
+import '../../features/inventory/domain/services/item_consistency.dart';
+import '../../features/listings/domain/entities/listing.dart';
+import '../../features/listings/domain/services/listing_marketplaces.dart';
+import '../../features/pricing/domain/services/profit_calculator.dart';
+import '../constants/app_icon_constant.dart';
+import '../constants/item_card_metric_constant.dart';
+import '../extensions/context_extensions.dart';
+import '../utils/date_time_utils.dart';
+import 'app_photo.dart';
+import 'app_row_chevron.dart';
+import 'app_row_icon_button.dart';
 import 'item_warning_lines.dart';
 
 part 'item_card_marketplaces.dart';

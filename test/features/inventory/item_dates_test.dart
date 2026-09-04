@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/widgets/item_card.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/domain/repositories/item_repository.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
-import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/mock_data/providers.dart';
 

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/widgets/app_list_row.dart';
 import 'package:reseller_studio/core/widgets/app_row_chevron.dart';
+import 'package:reseller_studio/core/widgets/item_card.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
-import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:system_design/index.dart';
 
@@ -30,8 +30,9 @@ void main() {
     final List<({String file, int line, String body})> found =
         <({String file, int line, String body})>[];
 
-    for (final FileSystemEntity entity
-        in Directory('lib').listSync(recursive: true)) {
+    for (final FileSystemEntity entity in Directory(
+      'lib',
+    ).listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
       // The widget's own declaration is not a call site.
       if (entity.path.endsWith('app_list_row.dart')) continue;
@@ -74,9 +75,7 @@ void main() {
 
     for (final ({String file, int line, String body}) row in rows()) {
       final bool hidesChevron = row.body.contains('showChevron: false');
-      final bool isTappable = RegExp(
-        r'onTap:\s*(?!null\b)',
-      ).hasMatch(row.body);
+      final bool isTappable = RegExp(r'onTap:\s*(?!null\b)').hasMatch(row.body);
       final bool hasTrailing =
           row.body.contains('trailing:') || row.body.contains('trailingText:');
 

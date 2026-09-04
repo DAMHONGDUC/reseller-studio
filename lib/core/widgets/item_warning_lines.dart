@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:system_design/index.dart';
 
-import '../../../../core/constants/app_icon_constant.dart';
-import '../../domain/entities/item.dart';
-import '../../domain/enums/item_warning.dart';
+import '../../features/inventory/domain/entities/item.dart';
+import '../../features/inventory/domain/enums/item_warning.dart';
+import '../constants/app_icon_constant.dart';
 
 /// What the record says that cannot all be true at once.
 ///

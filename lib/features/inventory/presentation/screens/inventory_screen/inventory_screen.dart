@@ -14,6 +14,7 @@ import '../../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
+import '../../../../../core/widgets/item_card.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/providers.dart';
@@ -27,7 +28,6 @@ import '../../controllers/item_actions_controller.dart';
 import '../../widgets/bulk_list_sheet.dart';
 import '../../widgets/inventory_filter_sheet.dart';
 import '../../widgets/item_actions_sheet.dart';
-import '../../widgets/item_card.dart';
 import '../../widgets/reprice_sheet.dart';
 
 part 'inventory_screen_bulk_bar.dart';

@@ -11,6 +11,7 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_editable_section.dart';
 import '../../../../../core/widgets/app_photo.dart';
+import '../../../../../core/widgets/item_warning_lines.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
@@ -28,7 +29,6 @@ import '../../controllers/item_actions_controller.dart';
 import '../../controllers/item_detail_edit_controller.dart';
 import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_field.dart';
-import '../../widgets/item_warning_lines.dart';
 
 part 'item_detail_screen_detail_row.dart';
 part 'item_detail_screen_item_body.dart';
