@@ -154,11 +154,8 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
             ),
           ),
           reading: _QuantityFacts(item: item),
-          editing: SdTextFieldV3(
-            label: context.l10n.commonQuantity,
+          editing: ItemQuantityField(
             controller: _quantity,
-            isRequired: true,
-            keyboardType: TextInputType.number,
             textInputAction: TextInputAction.done,
           ),
         ),

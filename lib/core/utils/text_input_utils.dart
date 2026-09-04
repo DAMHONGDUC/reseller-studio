@@ -13,4 +13,15 @@ final class TextInputUtils {
 
     return trimmed.isEmpty ? null : trimmed;
   }
+
+  /// [value] read as a count, moved by [by], and never below zero.
+  ///
+  /// **An unreadable box counts as zero**, so `+1` on an empty field gives
+  /// one — the same answer saving an empty box already writes.
+  static int stepCount(String value, int by) {
+    final int current = int.tryParse(value.trim()) ?? 0;
+    final int next = current + by;
+
+    return next < 0 ? 0 : next;
+  }
 }

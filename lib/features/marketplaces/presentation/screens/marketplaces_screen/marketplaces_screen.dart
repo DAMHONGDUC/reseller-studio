@@ -8,7 +8,9 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../domain/entities/marketplace.dart';
+import '../../../marketplace_fee_label.dart';
 import '../../../providers.dart';
 
 /// The places this business sells and the fee estimate each one uses.
@@ -55,14 +57,32 @@ class MarketplacesScreen extends ConsumerWidget {
                   .map(
                     (Marketplace marketplace) => AppListRow(
                       title: marketplace.name,
-                      subtitle: context.l10n.marketplacesEstimatedFeeLine(
-                        (marketplace.feeRate * 100).toStringAsFixed(1),
-                        context.l10n.marketplacesEstimatedFee,
-                      ),
+                      subtitle: context.l10n.marketplacesEstimatedFee,
                       icon: AppIconConstant.storefront,
                       // The colour is picked on the detail screen; this is
                       // where the seller sees what they picked.
                       iconTint: marketplace.hue.of(context),
+                      // **The fee is the loudest thing on the row** — owner's
+                      // rule. It is the number every profit figure downstream
+                      // is computed from, and it was the smallest type here.
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          SdBadgeV3(
+                            label: MarketplaceFeeLabel.percent(
+                              context,
+                              marketplace.feeRate,
+                            ),
+                            color: marketplace.hue.of(context),
+                          ),
+                          SizedBox(width: SdSpacingConstant.w8),
+                          // The chevron comes back by hand: a row that hands
+                          // in its own trailing widget loses the one
+                          // `AppListRow` would have drawn, and this row still
+                          // opens a screen.
+                          const AppRowChevron(),
+                        ],
+                      ),
                       onTap: () =>
                           context.push(AppRoutes.marketplace(marketplace.id)),
                     ),

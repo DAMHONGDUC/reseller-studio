@@ -775,6 +775,15 @@
   "@marketplaceDeleteBody": {
     "description": "Marketplace add/edit screen."
   },
+  "marketplaceFeePercent": "{rate}%",
+  "@marketplaceFeePercent": {
+    "description": "A marketplace's estimated fee rate, as a percentage. The figure alone — the words naming it are the row's caption.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
   "marketplacesEstimatedFee": "Estimated fee",
   "@marketplacesEstimatedFee": {
     "description": "Caption on a marketplace row. A planning estimate, never used as accounting."
@@ -856,6 +865,14 @@
     "description": "The seller's own stock code. Not translated — SKU is the term resellers use in every language."
   },
   "commonQuantity": "Quantity",
+  "itemQuantityDecrement": "−1",
+  "@itemQuantityDecrement": {
+    "description": "Stepper button beside the quantity box: one fewer. The character is a minus sign, not a hyphen."
+  },
+  "itemQuantityIncrement": "+1",
+  "@itemQuantityIncrement": {
+    "description": "Stepper button beside the quantity box: one more."
+  },
   "@commonQuantity": {
     "description": "How many of an item are on hand."
   },
@@ -3144,18 +3161,6 @@
     "description": "App bar title on the tax screen. The label is a tax year, which is not a calendar year in every country.",
     "placeholders": {
       "year": {
-        "type": "String"
-      }
-    }
-  },
-  "marketplacesEstimatedFeeLine": "{rate}% {label}",
-  "@marketplacesEstimatedFeeLine": {
-    "description": "A marketplace's estimated fee rate. Replaces composing the number and the words at the call site.",
-    "placeholders": {
-      "rate": {
-        "type": "String"
-      },
-      "label": {
         "type": "String"
       }
     }
