@@ -490,16 +490,19 @@ asked how many arrived, added that to `quantity` and moved the item to
 `inStock`. The row, `RestockSheet`, `ItemActionsController.restock` and
 `ItemTransition.restock` are all gone.
 
-- **A count is a fact about the record, not a verb.** The detail screen's
-  Overview block is where a seller corrects what the app got wrong, and the
-  quantity box is already in it. One place changes the number — not a sheet
-  that adds to it and a field that replaces it, disagreeing about what the
-  seller just typed.
+- **A count is a fact about the record, not a verb.** The detail screen is
+  where a seller corrects what the app got wrong, so one place changes the
+  number — not a sheet that adds to it and a field that replaces it,
+  disagreeing about what the seller just typed.
+- **It is its own section, not a box inside Overview** — owner's rule.
+  Overview answers what the item *is*: a title, a state, a grade. How many
+  there are is a different question and the one most often reopened, and its
+  own Edit is what stops changing it from putting a title box on screen too.
 - **The box takes the new total, not an addend**, so the arithmetic the sheet
   spelled out is not arithmetic any more: the figure the record holds is on
   screen while the seller types over it.
 - **Putting stock behind a sold row still brings it back.**
-  `ItemDetailEditController.saveOverview` runs `ItemTransition.restocked` —
+  `ItemDetailEditController.saveQuantity` runs `ItemTransition.restocked` —
   the call `ItemFormController.submit` already made, now on both screens that
   edit a count. A sold row given a quantity again is a seller saying they have
   the thing, and leaving it sold made the card claim nothing was left of ten.
@@ -509,9 +512,9 @@ asked how many arrived, added that to `quantity` and moved the item to
 - **`Make it in stock` is the draft's own row**, shown only on a draft. It
   carries no count: the item already has one, and what the seller is saying is
   that it is ready to sell.
-- **Quantity reads as a row on the Overview card, not as a badge.** It was
-  `×5` beside the status tags and only drawn above one, so on most items the
-  number the block exists to edit was not on the screen at all.
+- **The section's card carries the figure, and a badge never did.** It read
+  `×5` beside the status tags and only when it was above one, so on most items
+  the number the seller came to change was not on the screen at all.
 - `test/features/inventory/item_quantity_test.dart` holds both halves: the
   actions sheet offering no Restock, and the detail screen putting a sold row
   back on the shelf.
