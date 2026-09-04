@@ -108,7 +108,8 @@ class ItemCard extends StatelessWidget {
   /// actually true. Every gesture goes with the look, so the two cannot drift.
   final bool isEnabled;
 
-  /// Why the card is disabled, drawn where its own warnings are.
+  /// Why the card is disabled, drawn where its own warnings are — and only
+  /// when it has none, so one row never states the same problem twice.
   final String? notice;
 
   @override
@@ -219,9 +220,12 @@ class ItemCard extends StatelessWidget {
                         isCompact: true,
                       ),
                     ],
-                    // The same line in the same place: one shape for "this row
-                    // is trying to tell you something".
-                    if (notice != null) ...<Widget>[
+                    // **One warning line, and the record's own wins** —
+                    // owner's rule. "None on the shelf but status is In stock"
+                    // and "there is none of this left on the shelf" are one
+                    // sentence twice, and the second reads as a second
+                    // problem.
+                    if (warnings.isEmpty && notice != null) ...<Widget>[
                       SizedBox(height: ItemCardMetricConstant.warningGap),
                       AppWarningLine(
                         message: notice!,

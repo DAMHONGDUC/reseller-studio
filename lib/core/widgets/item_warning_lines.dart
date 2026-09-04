@@ -80,12 +80,14 @@ class AppWarningLine extends StatelessWidget {
         Expanded(
           child: Text(
             message,
-            style:
-                (isCompact
-                        ? context.textTheme3.bodySmall!
-                        : context.textTheme3.bodyMedium!)
-                    .semiBold3
-                    .copyWith(color: color),
+            // **Small, and on a card not bold either** — owner's rule.
+            // `bodySmall` is the floor of the scale, so the compact line gets
+            // quieter by shedding its weight rather than by an off-scale size.
+            style: isCompact
+                ? context.textTheme3.bodySmall!.copyWith(color: color)
+                : context.textTheme3.bodySmall!.semiBold3.copyWith(
+                    color: color,
+                  ),
           ),
         ),
       ],
