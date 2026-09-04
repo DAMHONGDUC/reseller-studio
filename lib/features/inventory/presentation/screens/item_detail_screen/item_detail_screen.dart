@@ -62,7 +62,8 @@ class ItemDetailScreen extends ConsumerWidget {
           if (value != null)
             AppDetailActionButton(
               label: context.l10n.commonActions,
-              onPressed: () => ItemActionsSheet.show(context, value),
+              onPressed: () =>
+                  ItemActionsSheet.show(context, value, isOnDetail: true),
             ),
         ],
       ),
