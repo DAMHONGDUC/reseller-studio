@@ -20,7 +20,6 @@ import '../../item_block_presenter.dart';
 import '../../providers.dart';
 import '../controllers/item_actions_controller.dart';
 import 'reprice_sheet.dart';
-import 'restock_sheet.dart';
 
 /// Everything a seller can do to one item, in one sheet (plan §7).
 ///
@@ -226,17 +225,6 @@ class ItemActionsSheet extends ConsumerWidget {
             () => _makeInStock(context, ref),
           ),
         ),
-      // **Restock is how a sold-out row comes back** — owner's rule. It adds
-      // to the count and moves the status with it, so the seller never has to
-      // un-sell an item by hand before saying more arrived.
-      AppSheetActionRow(
-        icon: AppIconConstant.autorenew,
-        label: context.l10n.itemActionRestock,
-        onTap: () {
-          Navigator.of(context).pop();
-          RestockSheet.show(context, item);
-        },
-      ),
       // **Archive, or come back — decided by whether the item is on the shelf,
       // not by whether it is archived.** A sold item had no way back at all:
       // the row said Archive, and the only route to stock was archiving it

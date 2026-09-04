@@ -154,27 +154,6 @@ final class ItemTransition {
     return apply(item, ItemStatus.inStock, now: now);
   }
 
-  /// [count] more of [item] on the shelf.
-  ///
-  /// **Restocking adds to the count and puts the row back in stock** —
-  /// owner's rule. A seller who buys five more of something that sold out is
-  /// not creating a new item: it is the same record, with the same cost
-  /// history and the same listings, and having to un-sell it by hand first
-  /// was the step that made people create a duplicate instead.
-  ///
-  /// Adds rather than replaces: the box asks how many arrived, which is the
-  /// number on the receipt in the seller's hand. An archived item comes back
-  /// too — restocking it is the seller saying they have it again.
-  static Item restock(Item item, int count, {required DateTime now}) {
-    final Item stocked = item.copyWith(quantity: item.quantity + count);
-
-    if (count <= 0) {
-      throw StateError('Cannot restock item ${item.id} by $count');
-    }
-
-    return apply(stocked, ItemStatus.inStock, now: now);
-  }
-
   /// [item] moved to [target], with the timestamps that move implies.
   ///
   /// **Throws if the move is blocked.** Callers check first; this is the
@@ -209,7 +188,7 @@ final class ItemTransition {
   }) => item.copyWith(
     status: target,
     // Sold means sold out, whichever way it was reached: the count goes to
-    // zero so the card, the restock box and Analytics all agree with the
+    // zero so the card, the quantity box and Analytics all agree with the
     // status rather than each other.
     quantity: target == ItemStatus.sold ? 0 : null,
     soldAt: target == ItemStatus.sold ? now : null,

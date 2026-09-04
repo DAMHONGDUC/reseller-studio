@@ -325,7 +325,11 @@ class _Section extends StatelessWidget {
   }
 }
 
-/// Title, state and grade — what the item is.
+/// Title, state, grade and how many — what the item is.
+///
+/// **The count is a row, not a badge.** It read `×5` beside the tags and only
+/// when it was above one, so on most items the number this block exists to
+/// edit was not on the screen at all.
 class _OverviewFacts extends StatelessWidget {
   const _OverviewFacts({required this.item});
 
@@ -355,9 +359,12 @@ class _OverviewFacts extends StatelessWidget {
               label: item.condition!.label(context),
               color: item.condition!.color(context),
             ),
-          if (item.quantity > 1)
-            SdBadgeV3(label: context.l10n.itemQuantityTimes(item.quantity)),
         ],
+      ),
+      SizedBox(height: SdSpacingConstant.h8),
+      _DetailRow(
+        label: context.l10n.commonQuantity,
+        value: '${item.quantity}',
       ),
     ],
   );

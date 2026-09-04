@@ -157,34 +157,6 @@ void main() {
       expect(restocked.quantityOnHand, 4);
     });
 
-    test('restocking adds to the count and puts the row back in stock', () {
-      final Item soldOut = item(
-        status: ItemStatus.sold,
-        quantity: 0,
-        soldAt: now,
-      );
-
-      final Item restocked = ItemTransition.restock(soldOut, 5, now: now);
-
-      // Adds rather than replaces: the box asks how many arrived.
-      expect(restocked.quantity, 5);
-      expect(restocked.status, ItemStatus.inStock);
-      expect(restocked.soldAt, isNull);
-    });
-
-    test('restocking an item that still has stock adds to what is there', () {
-      final Item onShelf = item(quantity: 2);
-
-      expect(ItemTransition.restock(onShelf, 3, now: now).quantity, 5);
-    });
-
-    test('restocking by nothing is refused', () {
-      expect(
-        () => ItemTransition.restock(item(quantity: 1), 0, now: now),
-        throwsStateError,
-      );
-    });
-
     test('going live stamps the clock instead of moving the status', () {
       final Item draft = item(status: ItemStatus.draft);
 

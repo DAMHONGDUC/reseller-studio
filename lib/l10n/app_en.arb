@@ -1197,29 +1197,9 @@
   "@itemActionMarkSold": {
     "description": "Records a sale. Creates the order too — profit is derived from orders."
   },
-  "itemActionRestock": "Restock",
-  "@itemActionRestock": {
-    "description": "Adds stock to an item and puts it back in stock."
-  },
   "itemActionMakeInStock": "Make it in stock",
   "@itemActionMakeInStock": {
     "description": "Moves a draft onto the shelf, ready to sell."
-  },
-  "restockHowMany": "How many arrived",
-  "@restockHowMany": {
-    "description": "Field label in the restock sheet — what is added to the count, not the new total."
-  },
-  "restockOnShelfNow": "On the shelf now",
-  "@restockOnShelfNow": {
-    "description": "Restock sheet: how many the item has before anything is added."
-  },
-  "restockNewTotal": "New total",
-  "@restockNewTotal": {
-    "description": "Restock sheet: what the count becomes once the arrivals are added. An em dash until the box holds a usable number."
-  },
-  "restockCountRequired": "Enter how many arrived",
-  "@restockCountRequired": {
-    "description": "Shown when the restock box is empty or not a positive number."
   },
   "itemActionArchive": "Archive",
   "@itemActionArchive": {
@@ -3140,15 +3120,6 @@
   "itemQuantityShort": "Qty",
   "@itemQuantityShort": {
     "description": "Label of the inventory row's quantity cell — how many are still on hand. Short because it shares a band with three amounts."
-  },
-  "itemQuantityTimes": "×{quantity}",
-  "@itemQuantityTimes": {
-    "description": "How many of an item. The × is a multiplication sign, not the letter x.",
-    "placeholders": {
-      "quantity": {
-        "type": "int"
-      }
-    }
   },
   "reportsAsOf": "As of {date}",
   "@reportsAsOf": {

@@ -8,11 +8,14 @@ import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
+import '../../domain/services/item_transition.dart';
 
 /// Which block of the item detail screen is open for editing.
 ///
 /// **Status is not here.** Listing, selling and archiving carry writes beyond
-/// the field — see `lib/features/inventory/CLAUDE.md`.
+/// the field — see `lib/features/inventory/CLAUDE.md`. The one exception is
+/// the count: stock put behind a sold row brings it back, and Overview is
+/// where a seller edits it now that Restock is gone.
 ///
 /// **Nor are listings.** What a marketplace asks is edited on Marketplaces
 /// management, which the Listings section links to rather than opening boxes
@@ -122,13 +125,18 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
     final String trimmed = title.trim();
 
     return _write(itemId, ItemDetailSection.overview, (Item current) {
-      return current.copyWith(
+      final Item edited = current.copyWith(
         title: trimmed,
         // One is the answer for almost every reseller item, so an empty or
         // unparseable box means one rather than nothing.
         quantity: int.tryParse(quantity.trim()) ?? 1,
         condition: state.condition,
       );
+
+      // Putting stock behind a sold row is the seller saying they have the
+      // thing again — a recorded instant, so the wall clock rather than
+      // `clockProvider`.
+      return ItemTransition.restocked(edited, now: DateTime.now());
     });
   }
 
