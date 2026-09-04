@@ -419,8 +419,13 @@ class _QuantityFacts extends StatelessWidget {
     alignment: Alignment.centerLeft,
     child: Text(
       '${item.quantity}',
+      // **Red once the shelf is empty** — owner's rule, and the same predicate
+      // the card reads, so the two screens cannot disagree about which zero is
+      // a problem.
       style: context.textTheme3.titleMedium!.semiBold3.tabular3.copyWith(
-        color: context.sdTheme3.textPrimary,
+        color: ItemConsistency.isShelfEmpty(item)
+            ? context.sdTheme3.danger
+            : context.sdTheme3.textPrimary,
       ),
     ),
   );

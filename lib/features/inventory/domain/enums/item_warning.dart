@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:system_design/index.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/theme/app_tag_hue.dart';
 import '../entities/item.dart';
 import 'item_status.dart';
 
@@ -43,9 +43,10 @@ extension ItemWarningDisplay on ItemWarning {
     ),
   };
 
-  /// **Amber, not red.** A row on the shelf with no count is a number nobody
-  /// has entered yet — a gap to fill rather than a claim that is false.
+  /// **The same red the count is drawn in** — owner's rule: one condition is
+  /// one colour, and a figure meaning "something is wrong" takes the semantic
+  /// token rather than a tag hue.
   Color color(BuildContext context) => switch (this) {
-    ItemWarning.emptyShelf => AppTagHue.amber,
-  }.of(context);
+    ItemWarning.emptyShelf => context.sdTheme3.danger,
+  };
 }

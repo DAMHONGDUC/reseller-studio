@@ -45,6 +45,22 @@ void main() {
     );
   });
 
+  test('the same predicate reddens the count and raises the tag', () {
+    // One answer, two readers: a red figure with no tag, or a tag with a plain
+    // figure, is not a state the app can reach.
+    final Item empty = item(status: ItemStatus.inStock, quantity: 0);
+
+    expect(ItemConsistency.isShelfEmpty(empty), isTrue);
+    expect(ItemConsistency.warnings(empty), <ItemWarning>[
+      ItemWarning.emptyShelf,
+    ]);
+    // A sold row is off the shelf, so its zero is a fact rather than a gap.
+    expect(
+      ItemConsistency.isShelfEmpty(item(status: ItemStatus.sold, quantity: 0)),
+      isFalse,
+    );
+  });
+
   test('a record that agrees with itself says nothing', () {
     expect(
       ItemConsistency.warnings(item(status: ItemStatus.inStock, quantity: 3)),

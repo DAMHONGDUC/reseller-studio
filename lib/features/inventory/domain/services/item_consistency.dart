@@ -18,10 +18,16 @@ final class ItemConsistency {
   static List<ItemWarning> warnings(Item item) {
     final List<ItemWarning> found = <ItemWarning>[];
 
-    if (item.status.isOnHand && item.quantity <= 0) {
-      found.add(ItemWarning.emptyShelf);
-    }
+    if (isShelfEmpty(item)) found.add(ItemWarning.emptyShelf);
 
     return List<ItemWarning>.unmodifiable(found);
   }
+
+  /// True when the row claims to be stock with nothing on the shelf.
+  ///
+  /// **The one predicate behind both signals** — the warning tag and the red
+  /// count read it, so a figure in red without its tag, or the other way
+  /// round, is not a state the app can reach.
+  static bool isShelfEmpty(Item item) =>
+      item.status.isOnHand && item.quantity <= 0;
 }
