@@ -686,6 +686,25 @@ The record arrives on a stream, so the form learns it exists inside a `build` �
 and writing the form's controller from there throws. See
 `docs/rules/SCREENS.md`, which carries the rule and the reason.
 
+## The item card lives in `core/widgets/`, because two features draw it
+
+Owner's rule, and it is the repo's own remedy applied: **a widget a second
+feature needs moves to `core/widgets/`** (root `CLAUDE.md`). Inventory's list
+and the Orders sale picker draw the same rows, so the card is no longer
+Inventory's to keep.
+
+- **It moved, it did not fork.** `ItemCard`, its six `part` files,
+  `ItemWarningLines` and `ItemCardMetricConstant` are one set in
+  `core/widgets/` and `core/constants/`. Every rule about the row below still
+  holds — what changed is which folder they are enforced in.
+- **Core may import a feature's `domain/`**, which is how the card still reads
+  `Item`, `StaleInventoryPolicy` and `ListingMarketplaces`. What it must never
+  do is reach into a feature's `presentation/`, and this move is precisely how
+  Orders avoids doing that.
+- **The picker's card is the same card, differently wired**: it passes no
+  actions button and no marketplace arrow, and a row it cannot sell arrives
+  disabled with its reason (`lib/features/orders/CLAUDE.md`).
+
 ## The row carries enough; what it must do is stay short without crowding
 
 Owner's rule. The information on the inventory card is settled — every figure

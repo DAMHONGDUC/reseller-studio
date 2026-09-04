@@ -87,15 +87,27 @@ Owner's rule, and it is hard rule 2's shape one level up — the same one the
 item actions sheet already follows: **the rows that would be refused are
 shown, not hidden.**
 
+- **The picker draws the inventory card, not a list row** — owner's rule. A
+  seller picking a jacket recognises it by its photo, its tags and what it
+  cost, which is the whole reason Inventory's list is cards and not rows; a
+  chooser that strips all of that asks them to identify stock by its title
+  alone. The card moved to `core/widgets/` to make this legal rather than
+  being copied (`lib/features/inventory/CLAUDE.md`).
+  - **It arrives with two slots empty.** No actions button and no marketplace
+    arrow: this screen's tap is the sale, and a second verb on the row would
+    take the seller out of the flow they came for.
+  - **A blocked row carries its reason where the card carries its warnings** —
+    the same `AppWarningLine` under the money band that a contradiction uses,
+    so a seller learns one shape for "this row is trying to tell you
+    something".
 - **The picker lists every item the business has**, not only what is on the
   shelf. A seller looking for a jacket that is already marked sold used to
   find an empty search and no explanation — the row was filtered out, so the
   screen said the item does not exist rather than that it cannot be sold.
-- **A row that cannot be sold is drawn disabled, with the reason as its
-  caption.** No tap, no long-press, no chevron, the whole row at the disabled
-  opacity, and a warning glyph where the inventory mark was. What replaces the
-  "status · SKU · marketplaces" line is `ItemBlockPresenter.messages` — the
-  same sentences the actions sheet shows, because it is the same
+- **A row that cannot be sold is drawn disabled, with the reason under it.**
+  No tap and no long-press, the whole card at the disabled opacity, and the
+  sentence from `ItemBlockPresenter.messages` on a warning line — the same
+  sentences the actions sheet shows, because it is the same
   `ItemTransition.check(item, sold)` deciding.
 - **`ItemBlockPresenter` is imported across the feature boundary on purpose.**
   It is a root-level presenter, the tier `item_label.dart` sits at, and the
