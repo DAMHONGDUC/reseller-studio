@@ -475,29 +475,38 @@ Owner's rule, and it replaces the six-state lifecycle:
 - **The Inventory tabs follow**: All, Draft, In stock, Sold, Stale. Stale is
   still a query, not a status (`docs/DATA_MODEL.md`).
 
-## Restock adds to the count and brings the row back
+## There is no Restock verb; the count is edited on the detail screen
 
-Owner's rule. `ItemTransition.restock` takes how many arrived, adds them to
-`quantity`, and moves the item to `inStock` in the same write.
+Owner's rule, and it replaces one. Restock was a row in the actions sheet that
+asked how many arrived, added that to `quantity` and moved the item to
+`inStock`. The row, `RestockSheet`, `ItemActionsController.restock` and
+`ItemTransition.restock` are all gone.
 
-- **The box asks how many arrived, not what the new total is** — that is the
-  number on the receipt in the seller's hand, and the only one they do not
-  have to work out.
-- **The sheet does the arithmetic out loud** — owner's rule: what is on the
-  shelf now, and what will be there after, updating as the seller types. A box
-  that only takes an addend leaves them adding in their head to check they
-  typed the right thing. The total is `—` until the box holds a usable count,
-  never the current figure (hard rule 5).
-- **It is the way a sold-out row comes back.** Having to un-sell an item by
-  hand before saying more arrived is the step that made sellers create a
-  duplicate item instead — and a duplicate loses the cost history, the
-  listings and the sales the original carries.
-- **An archived item comes back too**: restocking one is the seller saying
-  they have it again.
+- **A count is a fact about the record, not a verb.** The detail screen's
+  Overview block is where a seller corrects what the app got wrong, and the
+  quantity box is already in it. One place changes the number — not a sheet
+  that adds to it and a field that replaces it, disagreeing about what the
+  seller just typed.
+- **The box takes the new total, not an addend**, so the arithmetic the sheet
+  spelled out is not arithmetic any more: the figure the record holds is on
+  screen while the seller types over it.
+- **Putting stock behind a sold row still brings it back.**
+  `ItemDetailEditController.saveOverview` runs `ItemTransition.restocked` —
+  the call `ItemFormController.submit` already made, now on both screens that
+  edit a count. A sold row given a quantity again is a seller saying they have
+  the thing, and leaving it sold made the card claim nothing was left of ten.
+- **An archived item still needs the verb.** Archiving is a deliberate
+  withdrawal and a count does not undo it (`ItemTransition.restocked` refuses
+  anything that is not sold); "Put back in stock" is what returns it.
 - **`Make it in stock` is the draft's own row**, shown only on a draft. It
   carries no count: the item already has one, and what the seller is saying is
   that it is ready to sell.
-- Both go through `_bulk`, so forty rows are one write (hard rule 16).
+- **Quantity reads as a row on the Overview card, not as a badge.** It was
+  `×5` beside the status tags and only drawn above one, so on most items the
+  number the block exists to edit was not on the screen at all.
+- `test/features/inventory/item_quantity_test.dart` holds both halves: the
+  actions sheet offering no Restock, and the detail screen putting a sold row
+  back on the shelf.
 
 ## The create form opens on the last filing
 
@@ -581,11 +590,12 @@ that each opened a sheet.
 
 Owner's rule, after a sold item was given a quantity of 10 and stayed sold.
 
-- **Status never moves through the item form.** `ItemFormController.submit`
-  writes back the status it was seeded with, so editing quantity, price or
-  photos cannot change what state an item is in. Hard rule 2 puts state
-  changes behind verbs, and `ItemTransition` is the one place that decides —
-  a form field that quietly restocked a sold item would be a second one.
+- **Two things move a status without a verb, and no third one may.** The
+  status tags the seller picks, and a count put behind a sold row —
+  `ItemTransition.restocked`, which both the form and the detail screen run.
+  Every other field is inert: a price, a photo or a note cannot change what
+  state an item is in. Hard rule 2 puts state changes behind verbs, and
+  `ItemTransition` stays the one place that decides.
 - **The archive row is decided by `status.isOnHand`, not by `archived`.** On
   the shelf it offers Archive; off it — sold *or* archived — it offers "Put
   back in stock". A sold item previously had no way back at all: the row said
