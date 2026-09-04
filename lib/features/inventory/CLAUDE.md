@@ -713,7 +713,11 @@ Inventory's to keep.
   Orders avoids doing that.
 - **The picker's card is the same card, differently wired**: it passes no
   actions button and no marketplace arrow, and a row it cannot sell arrives
-  disabled with its reason (`lib/features/orders/CLAUDE.md`).
+  carrying its reason (`lib/features/orders/CLAUDE.md`).
+- **No card is ever drawn dead.** A greyed, untappable row was tried and
+  taken back out: it says the seller did something wrong and offers nothing,
+  which is the failure the "shown, not hidden" rule exists to avoid in the
+  first place. A row that cannot do the thing takes the tap and explains.
 
 ## The row carries enough; what it must do is stay short without crowding
 

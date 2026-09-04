@@ -108,11 +108,21 @@ shown, not hidden.**
   shelf. A seller looking for a jacket that is already marked sold used to
   find an empty search and no explanation — the row was filtered out, so the
   screen said the item does not exist rather than that it cannot be sold.
-- **A row that cannot be sold is drawn disabled, with the reason under it.**
-  No tap and no long-press, the whole card at the disabled opacity, and the
-  sentence from `ItemBlockPresenter.messages` on a warning line — the same
-  sentences the actions sheet shows, because it is the same
-  `ItemTransition.check(item, sold)` deciding.
+- **A row that cannot be sold still takes a tap; the tap explains.** Owner's
+  rule, and it replaced a greyed-out card. A dead row tells a seller they did
+  something wrong and nothing else — worse than the filtered-out row it
+  replaced, because now they can see the thing and still cannot use it. So the
+  card is drawn at full strength, carries the reason on its warning line, and
+  a tap (or a long-press, which would otherwise start a bundle it cannot join)
+  opens `CannotSellSheet`.
+  - **The sheet names the reason and points at the fix.** The sentences are
+    `ItemBlockPresenter.messages` — the same ones the actions sheet shows,
+    because it is the same `ItemTransition.check(item, sold)` deciding — and
+    the primary action opens the item, where the status and the count are both
+    edited.
+  - **A sheet rather than a snackbar**, unlike the actions sheet's refusal: a
+    snackbar over a list the seller is scanning is gone before they have
+    finished reading it, and this one has somewhere to send them.
 - **`ItemBlockPresenter` is imported across the feature boundary on purpose.**
   It is a root-level presenter, the tier `item_label.dart` sits at, and the
   alternative is Orders writing its own sentence for Inventory's block enum —
