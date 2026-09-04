@@ -54,6 +54,27 @@ class OrderActionsController extends Notifier<bool> {
     );
   }
 
+  /// Mark a whole post-office run shipped, with one carrier for all of it.
+  ///
+  /// **No tracking number, and that is the point.** A tracking number belongs
+  /// to one parcel, so asking for one here would put the seller back into
+  /// twelve sheets — which is the thing this replaces. The carrier is the
+  /// half that really is the same for the run, and anything per-parcel is
+  /// added afterwards on the order itself.
+  ///
+  /// Sequential rather than a `Future.wait`: a mid-run failure must leave the
+  /// orders before it shipped and the queue honest about the rest.
+  Future<void> markManyShipped(List<Order> orders, {String? carrier}) async {
+    SdLogger.action(LogTagConstant.order, 'Ship orders', <String, Object>{
+      'count': orders.length,
+      'hasCarrier': carrier != null,
+    });
+
+    for (final Order order in orders) {
+      await markShipped(order, carrier: carrier);
+    }
+  }
+
   Future<void> markDelivered(Order order) => _save(
     'Deliver order',
     OrderTransition.deliver(order, at: DateTime.now()),

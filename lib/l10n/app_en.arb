@@ -2451,6 +2451,38 @@
     "description": "Empty state body."
   },
   "shippingQueueShip": "Ship",
+  "shippingSelectedCount": "{count} selected",
+  "@shippingSelectedCount": {
+    "description": "How many parcels are ticked for one post-office run.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "shippingBulkShip": "Mark shipped",
+  "@shippingBulkShip": {
+    "description": "Ships every ticked parcel at once."
+  },
+  "shippingBulkCarrierTitle": "{count, plural, =1{Carrier for 1 parcel} other{Carrier for {count} parcels}}",
+  "@shippingBulkCarrierTitle": {
+    "description": "Asked once for a whole run — the carrier is the half that really is the same for all of it.",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "shippingBulkDone": "{count, plural, =1{1 parcel shipped} other{{count} parcels shipped}}",
+  "@shippingBulkDone": {
+    "description": "Confirms a whole run left the queue.",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "@shippingQueueShip": {
     "description": "The per-row action, so posting a parcel is one tap rather than two."
   },

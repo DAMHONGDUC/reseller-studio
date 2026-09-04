@@ -6,6 +6,7 @@ import 'package:system_design/common.dart';
 
 import '../../core/constants/log_tag_constant.dart';
 import '../../core/money/money.dart';
+import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/services/item_search.dart';
@@ -296,6 +297,33 @@ final Provider<List<Item>> recordSaleItemsProvider = Provider<List<Item>>((
 
   return items.where((Item item) => ItemSearch.matches(item, query)).toList();
 });
+
+/// Which parcels the seller is about to post in one go.
+///
+/// **The shared `SelectionController` in `core/state/`**, the way Inventory
+/// and Listings tick rows — one behaviour, so a third screen cannot invent a
+/// fourth meaning for "clear".
+class ShippingSelectionController extends SelectionController {}
+
+final NotifierProvider<ShippingSelectionController, Set<String>>
+shippingSelectionProvider =
+    NotifierProvider<ShippingSelectionController, Set<String>>(
+      ShippingSelectionController.new,
+    );
+
+/// The ticked orders themselves, in queue order.
+///
+/// Read from the queue rather than from every order: one shipped on another
+/// device mid-selection drops out of the run instead of being shipped twice.
+final Provider<List<Order>> selectedShippingOrdersProvider =
+    Provider<List<Order>>((Ref ref) {
+      final Set<String> selected = ref.watch(shippingSelectionProvider);
+
+      return ref
+          .watch(ordersNeedingActionProvider)
+          .where((Order order) => selected.contains(order.id))
+          .toList();
+    });
 
 /// Which items a bundle sale is being built from.
 ///
