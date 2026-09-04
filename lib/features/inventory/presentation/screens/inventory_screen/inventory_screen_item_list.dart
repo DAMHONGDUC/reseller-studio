@@ -11,12 +11,9 @@ class _ItemList extends ConsumerWidget {
     final DateTime now = ref.watch(clockProvider).now();
     // Grouped once here rather than watched per card: a family subscription
     // on every row rebuilds the whole list on any listing write.
-    final Map<String, List<Listing>> listings = <String, List<Listing>>{};
-
-    for (final Listing listing
-        in ref.watch(listingsProvider).value ?? const <Listing>[]) {
-      listings.putIfAbsent(listing.itemId, () => <Listing>[]).add(listing);
-    }
+    final Map<String, List<Listing>> listings = ListingsByItem.group(
+      ref.watch(listingsProvider).value ?? const <Listing>[],
+    );
     final Set<String> selected = ref.watch(inventorySelectionProvider);
     final bool isSelecting = selected.isNotEmpty;
 

@@ -53,6 +53,8 @@ class ItemCard extends StatelessWidget {
     this.onMarketPrices,
     this.isSelected = false,
     this.isSelecting = false,
+    this.isEnabled = true,
+    this.notice,
     super.key,
   });
 
@@ -98,6 +100,17 @@ class ItemCard extends StatelessWidget {
   /// gives no sign that tapping now selects instead of opening.
   final bool isSelecting;
 
+  /// A card that is shown but cannot be used — the sale picker's items that
+  /// have left the shelf (`lib/features/orders/CLAUDE.md`).
+  ///
+  /// **Shown rather than filtered out**: a row that disappears says the record
+  /// does not exist, where a greyed one with [notice] under it says what is
+  /// actually true. Every gesture goes with the look, so the two cannot drift.
+  final bool isEnabled;
+
+  /// Why the card is disabled, drawn where its own warnings are.
+  final String? notice;
+
   @override
   // The long-press wraps the card rather than living on it: `SdCardV3` takes
   // a tap and nothing else, and giving the design system a second gesture for
@@ -105,105 +118,122 @@ class ItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<ItemWarning> warnings = ItemConsistency.warnings(item);
 
-    return GestureDetector(
-      onLongPress: onLongPress,
-      child: SdCardV3(
-        onTap: onTap,
-        // Outlined as well as ticked: colour is never the only signal, and
-        // the tick is never the only one either.
-        borderColor: isSelected ? context.colorScheme3.primary : null,
-        // The card holds no inset of its own: the hairline between its two
-        // zones runs edge to edge, so the padding belongs to the zones it
-        // separates rather than to the card around both of them.
-        padding: EdgeInsets.zero,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // The money band runs to the card's own left edge — owner's rule —
-            // so the Row above holds only what sits beside the photo.
-            Padding(
-              padding: SdContentPaddingV3.card.copyWith(
-                bottom: ItemCardMetricConstant.bandGap,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  if (isSelecting) ...<Widget>[
-                    SdIconV3(
-                      isSelected
-                          ? AppIconConstant.checkCircle
-                          : AppIconConstant.radioButtonUnchecked,
-                      color: isSelected
-                          ? context.colorScheme3.primary
-                          : context.sdTheme3.textTertiary,
-                      semanticLabel: isSelected
-                          ? context.l10n.inventorySelected
-                          : context.l10n.inventoryNotSelected,
-                    ),
+    return Opacity(
+      opacity: isEnabled ? 1 : SdButtonStyleV3.disabledOpacity,
+      child: GestureDetector(
+        onLongPress: isEnabled ? onLongPress : null,
+        child: SdCardV3(
+          onTap: isEnabled ? onTap : null,
+          // Outlined as well as ticked: colour is never the only signal, and
+          // the tick is never the only one either.
+          borderColor: isSelected ? context.colorScheme3.primary : null,
+          // The card holds no inset of its own: the hairline between its two
+          // zones runs edge to edge, so the padding belongs to the zones it
+          // separates rather than to the card around both of them.
+          padding: EdgeInsets.zero,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              // The money band runs to the card's own left edge — owner's rule —
+              // so the Row above holds only what sits beside the photo.
+              Padding(
+                padding: SdContentPaddingV3.card.copyWith(
+                  bottom: ItemCardMetricConstant.bandGap,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    if (isSelecting) ...<Widget>[
+                      SdIconV3(
+                        isSelected
+                            ? AppIconConstant.checkCircle
+                            : AppIconConstant.radioButtonUnchecked,
+                        color: isSelected
+                            ? context.colorScheme3.primary
+                            : context.sdTheme3.textTertiary,
+                        semanticLabel: isSelected
+                            ? context.l10n.inventorySelected
+                            : context.l10n.inventoryNotSelected,
+                      ),
+                      SizedBox(width: SdSpacingConstant.w12),
+                    ],
+                    _Thumbnail(item: item),
                     SizedBox(width: SdSpacingConstant.w12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            item.title,
+                            style: context.textTheme3.bodyLarge!.semiBold3
+                                .copyWith(color: context.sdTheme3.textPrimary),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: ItemCardMetricConstant.titleGap),
+                          _StateBadges(
+                            item: item,
+                            now: now,
+                            listings: listings,
+                          ),
+                          _UpdatedLine(item: item),
+                        ],
+                      ),
+                    ),
+                    // `more_vert`, not the detail screen's `tune` — owner's rule.
+                    // A glyph is all the width allows next to a title and a price,
+                    // so it has to be one a seller already knows.
+                    if (onActions != null && !isSelecting)
+                      AppRowIconButton(
+                        icon: AppIconConstant.moreVert,
+                        tooltip: context.l10n.commonActions,
+                        onPressed: onActions!,
+                      ),
                   ],
-                  _Thumbnail(item: item),
-                  SizedBox(width: SdSpacingConstant.w12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          item.title,
-                          style: context.textTheme3.bodyLarge!.semiBold3
-                              .copyWith(color: context.sdTheme3.textPrimary),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: ItemCardMetricConstant.titleGap),
-                        _StateBadges(item: item, now: now, listings: listings),
-                        _UpdatedLine(item: item),
-                      ],
-                    ),
-                  ),
-                  // `more_vert`, not the detail screen's `tune` — owner's rule.
-                  // A glyph is all the width allows next to a title and a price,
-                  // so it has to be one a seller already knows.
-                  if (onActions != null && !isSelecting)
-                    AppRowIconButton(
-                      icon: AppIconConstant.moreVert,
-                      tooltip: context.l10n.commonActions,
-                      onPressed: onActions!,
-                    ),
-                ],
+                ),
               ),
-            ),
-            // Edge to edge, with no gap of its own — owner's rule. A hairline
-            // that stops short of the card reads as a line drawn on the
-            // content; one that crosses it is the card's two zones. The air
-            // around it is the zones' padding, the way `AppListCard` does it.
-            const SdDividerV3(),
-            Padding(
-              padding: SdContentPaddingV3.card.copyWith(
-                top: ItemCardMetricConstant.bandGap,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _MoneyLine(
-                    item: item,
-                    onMarketPrices: isSelecting ? null : onMarketPrices,
-                  ),
-                  // Under the band rather than in the badge line — owner's rule.
-                  // The sentence names the count and the status, and the count
-                  // it is arguing with is the figure directly above it.
-                  if (warnings.isNotEmpty) ...<Widget>[
-                    SizedBox(height: ItemCardMetricConstant.warningGap),
-                    ItemWarningLines(
+              // Edge to edge, with no gap of its own — owner's rule. A hairline
+              // that stops short of the card reads as a line drawn on the
+              // content; one that crosses it is the card's two zones. The air
+              // around it is the zones' padding, the way `AppListCard` does it.
+              const SdDividerV3(),
+              Padding(
+                padding: SdContentPaddingV3.card.copyWith(
+                  top: ItemCardMetricConstant.bandGap,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _MoneyLine(
                       item: item,
-                      warnings: warnings,
-                      isCompact: true,
+                      onMarketPrices: isSelecting ? null : onMarketPrices,
                     ),
+                    // Under the band rather than in the badge line — owner's rule.
+                    // The sentence names the count and the status, and the count
+                    // it is arguing with is the figure directly above it.
+                    if (warnings.isNotEmpty) ...<Widget>[
+                      SizedBox(height: ItemCardMetricConstant.warningGap),
+                      ItemWarningLines(
+                        item: item,
+                        warnings: warnings,
+                        isCompact: true,
+                      ),
+                    ],
+                    // The same line in the same place: one shape for "this row
+                    // is trying to tell you something".
+                    if (notice != null) ...<Widget>[
+                      SizedBox(height: ItemCardMetricConstant.warningGap),
+                      AppWarningLine(
+                        message: notice!,
+                        color: context.sdTheme3.warning,
+                        isCompact: true,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

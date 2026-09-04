@@ -38,7 +38,7 @@ class ItemWarningLines extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       for (final ItemWarning warning in warnings)
-        _WarningLine(
+        AppWarningLine(
           message: warning.message(context, item),
           color: warning.color(context),
           isCompact: isCompact,
@@ -47,12 +47,18 @@ class ItemWarningLines extends StatelessWidget {
   );
 }
 
-/// One contradiction, spelled out beside the glyph that flags it.
-class _WarningLine extends StatelessWidget {
-  const _WarningLine({
+/// One thing a row is trying to tell the seller, beside the glyph that flags
+/// it.
+///
+/// **Public, because two kinds of message use it** — a record that contradicts
+/// itself, and a sale picker row saying why it cannot be sold. One shape, so a
+/// seller learns to read it once.
+class AppWarningLine extends StatelessWidget {
+  const AppWarningLine({
     required this.message,
     required this.color,
-    required this.isCompact,
+    this.isCompact = false,
+    super.key,
   });
 
   final String message;
