@@ -66,7 +66,7 @@ void main() {
 
     await container
         .read(itemDetailEditControllerProvider.notifier)
-        .saveOverview(itemId: sold.id, title: sold.title, quantity: '5');
+        .saveQuantity(itemId: sold.id, quantity: '5');
 
     final Item restocked = await saved(container, 'itm-1');
 

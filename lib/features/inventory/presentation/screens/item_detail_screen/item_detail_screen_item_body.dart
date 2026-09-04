@@ -52,6 +52,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
     switch (section) {
       case ItemDetailSection.overview:
         _title.text = item.title;
+      case ItemDetailSection.quantity:
         _quantity.text = item.quantity.toString();
       case ItemDetailSection.pricing:
         _cost.text = item.purchasePrice?.toInputString() ?? '';
@@ -110,11 +111,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
           onCancel: controller.cancel,
           canSave: _title.text.trim().isNotEmpty,
           onSave: () => _save(
-            () => controller.saveOverview(
-              itemId: item.id,
-              title: _title.text,
-              quantity: _quantity.text,
-            ),
+            () => controller.saveOverview(itemId: item.id, title: _title.text),
           ),
           reading: _OverviewFacts(item: item),
           editing: Column(
@@ -127,19 +124,33 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
                 onChanged: (String _) => setState(() {}),
               ),
               SizedBox(height: SdSpacingConstant.h16),
-              SdTextFieldV3(
-                label: context.l10n.commonQuantity,
-                controller: _quantity,
-                isRequired: true,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-              ),
-              SizedBox(height: SdSpacingConstant.h16),
               ItemConditionField(
                 selected: edit.condition,
                 onSelected: controller.selectCondition,
               ),
             ],
+          ),
+        ),
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+        _Section(
+          section: ItemDetailSection.quantity,
+          title: context.l10n.commonQuantity,
+          edit: edit,
+          onEdit: _startEdit,
+          onCancel: controller.cancel,
+          onSave: () => _save(
+            () => controller.saveQuantity(
+              itemId: item.id,
+              quantity: _quantity.text,
+            ),
+          ),
+          reading: _QuantityFacts(item: item),
+          editing: SdTextFieldV3(
+            label: context.l10n.commonQuantity,
+            controller: _quantity,
+            isRequired: true,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
           ),
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
@@ -325,11 +336,7 @@ class _Section extends StatelessWidget {
   }
 }
 
-/// Title, state, grade and how many — what the item is.
-///
-/// **The count is a row, not a badge.** It read `×5` beside the tags and only
-/// when it was above one, so on most items the number this block exists to
-/// edit was not on the screen at all.
+/// Title, state and grade — what the item is.
 class _OverviewFacts extends StatelessWidget {
   const _OverviewFacts({required this.item});
 
@@ -361,12 +368,30 @@ class _OverviewFacts extends StatelessWidget {
             ),
         ],
       ),
-      SizedBox(height: SdSpacingConstant.h8),
-      _DetailRow(
-        label: context.l10n.commonQuantity,
-        value: '${item.quantity}',
-      ),
     ],
+  );
+}
+
+/// How many there are — the section's whole answer.
+///
+/// **A figure, not a labelled row.** The card's header already says Quantity,
+/// and a row repeating the word to say one number is the label twice. It was
+/// a `×5` badge before, drawn only above one, so on most items the number the
+/// seller came to change was not on the screen at all.
+class _QuantityFacts extends StatelessWidget {
+  const _QuantityFacts({required this.item});
+
+  final Item item;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      '${item.quantity}',
+      style: context.textTheme3.titleMedium!.semiBold3.tabular3.copyWith(
+        color: context.sdTheme3.textPrimary,
+      ),
+    ),
   );
 }
 

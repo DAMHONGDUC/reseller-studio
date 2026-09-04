@@ -14,14 +14,15 @@ import '../../domain/services/item_transition.dart';
 ///
 /// **Status is not here.** Listing, selling and archiving carry writes beyond
 /// the field — see `lib/features/inventory/CLAUDE.md`. The one exception is
-/// the count: stock put behind a sold row brings it back, and Overview is
-/// where a seller edits it now that Restock is gone.
+/// [quantity]: stock put behind a sold row brings it back, and its section is
+/// where a seller edits the count now that Restock is gone.
 ///
 /// **Nor are listings.** What a marketplace asks is edited on Marketplaces
 /// management, which the Listings section links to rather than opening boxes
 /// of its own.
 enum ItemDetailSection {
   overview,
+  quantity,
   pricing,
   provenance,
   description,
@@ -117,21 +118,25 @@ class ItemDetailEditController extends Notifier<ItemDetailEditState> {
   void selectPurchaseDate(DateTime date) =>
       state = state.copyWith(purchaseDate: date);
 
-  Future<void> saveOverview({
-    required String itemId,
-    required String title,
-    required String quantity,
-  }) {
+  Future<void> saveOverview({required String itemId, required String title}) {
     final String trimmed = title.trim();
 
     return _write(itemId, ItemDetailSection.overview, (Item current) {
-      final Item edited = current.copyWith(
-        title: trimmed,
-        // One is the answer for almost every reseller item, so an empty or
-        // unparseable box means one rather than nothing.
-        quantity: int.tryParse(quantity.trim()) ?? 1,
-        condition: state.condition,
-      );
+      return current.copyWith(title: trimmed, condition: state.condition);
+    });
+  }
+
+  /// Writes the count, and brings a sold row back if there is stock behind it.
+  Future<void> saveQuantity({
+    required String itemId,
+    required String quantity,
+  }) {
+    // One is the answer for almost every reseller item, so an empty or
+    // unparseable box means one rather than nothing.
+    final int count = int.tryParse(quantity.trim()) ?? 1;
+
+    return _write(itemId, ItemDetailSection.quantity, (Item current) {
+      final Item edited = current.copyWith(quantity: count);
 
       // Putting stock behind a sold row is the seller saying they have the
       // thing again — a recorded instant, so the wall clock rather than
