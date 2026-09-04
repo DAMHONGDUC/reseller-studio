@@ -557,6 +557,16 @@ of them is saying that one thing, not two.
   are in the sentence.
 - **It is a full-width line, never a compact badge.** A sentence does not fit
   the badge row, and shortening it to fit is how it stopped saying anything.
+- **It is set small, and on a card it is not bold either** — owner's rule.
+  `bodySmall` is the floor of the scale (`AppTheme._textTheme`), so the card's
+  line gets quieter still by shedding its weight rather than by an off-scale
+  size. A warning is a fact the row carries, not a headline competing with the
+  title above it.
+- **One warning line per card, and the record's own wins** — owner's rule. A
+  card that can also be handed a `notice` (the sale picker's reason) draws it
+  only when the item has no warning of its own: "none on the shelf but status
+  is In stock" and "there is none of this left on the shelf" are the same
+  sentence twice, and the seller reads the second one as a second problem.
 - **It shows on the inventory row as well as on the detail screen** — owner's
   rule, and it is why `ItemWarningLines` is one widget both draw. A row that
   contradicts itself is one a seller has to find while scanning the list; a

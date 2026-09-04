@@ -100,6 +100,10 @@ shown, not hidden.**
     the same `AppWarningLine` under the money band that a contradiction uses,
     so a seller learns one shape for "this row is trying to tell you
     something".
+  - **It is not drawn twice.** An item on the shelf with a count of zero is
+    both a contradiction and a reason it cannot be sold, and the two sentences
+    say the same thing; the card keeps its own warning and drops the picker's
+    (`lib/features/inventory/CLAUDE.md`).
 - **The picker lists every item the business has**, not only what is on the
   shelf. A seller looking for a jacket that is already marked sold used to
   find an empty search and no explanation — the row was filtered out, so the
