@@ -2721,6 +2721,24 @@
     "description": "Shown on the sourcing screens."
   },
   "sourcingNewSource": "New source",
+  "purchasesNoSource": "No source",
+  "@purchasesNoSource": {
+    "description": "A purchase row whose buying trip was never tied to a shop."
+  },
+  "purchasesItemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@purchasesItemCount": {
+    "description": "How many items came out of one purchase.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "purchasesNoneFromSource": "Nothing recorded from this source yet.",
+  "@purchasesNoneFromSource": {
+    "description": "Purchases, opened on a source that has no buying trips on it."
+  },
   "@sourcingNewSource": {
     "description": "Shown on the sourcing screens."
   },

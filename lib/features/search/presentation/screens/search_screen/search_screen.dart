@@ -54,7 +54,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       case SearchHitKind.order:
         context.push(AppRoutes.order(hit.id));
       case SearchHitKind.source:
-        context.push(AppRoutes.sources);
+        // The shop the seller searched for, not the list they would then have
+        // to find it in again.
+        context.push(AppRoutes.purchasesFrom(hit.id));
     }
   }
 

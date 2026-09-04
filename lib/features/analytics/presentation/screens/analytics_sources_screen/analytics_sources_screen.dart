@@ -58,8 +58,9 @@ class AnalyticsSourcesScreen extends ConsumerWidget {
                     title: names[row.sourceId] ?? row.sourceId,
                     // The last step of the lifecycle, made a step rather than
                     // a report: this screen says where to go next Saturday,
-                    // and now it opens the place it named.
-                    onTap: () => context.push(AppRoutes.source(row.sourceId)),
+                    // and the tap opens what was bought there.
+                    onTap: () =>
+                        context.push(AppRoutes.purchasesFrom(row.sourceId)),
                     rows: <Widget>[
                       MetricRow(
                         label: context.l10n.commonRoi,

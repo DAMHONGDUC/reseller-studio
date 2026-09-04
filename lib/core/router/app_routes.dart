@@ -110,7 +110,6 @@ final class AppRoutes {
   static const String purchaseDetail = '/more/sourcing/purchases/:purchaseId';
   static const String addPurchase = '/more/sourcing/purchases/new';
   static const String sources = '/more/sourcing/sources';
-  static const String sourceDetail = '/more/sourcing/sources/:sourceId';
 
   /// The calculation a reseller does standing in a shop (plan §11). Its own
   /// route because it is reached mid-hunt, not from a record.
@@ -193,7 +192,15 @@ final class AppRoutes {
       ? addItem
       : '$addItem?code=${Uri.encodeComponent(code)}';
 
-  static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
+  /// Purchases, narrowed to one source.
+  ///
+  /// **A source has no screen of its own, and this is what it means to open
+  /// one**: what was bought there. There was a `/sources/:sourceId` path for a
+  /// while and no route ever answered it, so Analytics' ROI rows bounced the
+  /// seller to Home — a query parameter on a list that exists cannot rot the
+  /// same way.
+  static String purchasesFrom(String sourceId) =>
+      '$purchases?source=${Uri.encodeComponent(sourceId)}';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';
 }

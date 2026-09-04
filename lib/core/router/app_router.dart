@@ -434,7 +434,9 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         parentNavigatorKey: AppNavigatorKey.root,
                         path: 'purchases',
                         builder: (BuildContext context, GoRouterState state) =>
-                            const PurchasesScreen(),
+                            PurchasesScreen(
+                              sourceId: state.uri.queryParameters['source'],
+                            ),
                         routes: <RouteBase>[
                           GoRoute(
                             parentNavigatorKey: AppNavigatorKey.root,

@@ -9,6 +9,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
+import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/purchase.dart';
 import '../../../providers.dart';
@@ -20,8 +21,15 @@ import '../../widgets/purchase_form_sheet.dart';
 /// not the sum of the item costs. The two legitimately disagree when a box lot
 /// is apportioned by judgement, and deriving the total would rewrite what was
 /// actually paid.
+///
+/// **Opened on a source, it is that source's own screen.** A source has no
+/// detail screen and does not need one: what a seller asks about a shop is
+/// what they bought there, which is this list with one name on it.
 class PurchasesScreen extends ConsumerWidget {
-  const PurchasesScreen({super.key});
+  const PurchasesScreen({this.sourceId, super.key});
+
+  /// Null for every purchase, set to show one source's.
+  final String? sourceId;
 
   Future<void> _add(BuildContext context, WidgetRef ref) async {
     try {
@@ -40,21 +48,36 @@ class PurchasesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<Purchase>> source = ref.watch(purchasesProvider);
-    final List<Purchase> purchases = source.value ?? const <Purchase>[];
+    final List<Purchase> all = source.value ?? const <Purchase>[];
     final Map<String, String> sourceNames = ref.watch(sourceNamesProvider);
+    final String? filterId = sourceId;
+    final List<Purchase> purchases = filterId == null
+        ? all
+        : all
+              .where((Purchase purchase) => purchase.sourceId == filterId)
+              .toList();
 
     return AppAddFabScaffold(
-      appBar: SdAppBarV3(title: context.l10n.sourcingPurchases),
-      addLabel: 'Record a purchase',
+      appBar: SdAppBarV3(
+        title: context.l10n.sourcingPurchases,
+        // The name, not the id: a seller who arrived from an ROI row has to
+        // be able to see which shop this is.
+        subtitle: filterId == null ? null : sourceNames[filterId],
+      ),
+      addLabel: context.l10n.homeQuickRecordPurchase,
       onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<Purchase>>() when !source.hasValue =>
           const SdLoadingV3Page(),
-        _ when purchases.isEmpty => SdEmptyStateV3(
-          icon: AppIconConstant.localMall,
-          title: context.l10n.sourcingNoPurchasesYet,
-          message: context.l10n.sourcingRecordABuyingTripAndEvery,
-          action: SdButtonV3(
+        // `hasAny` reads the unfiltered list: a business with purchases from
+        // other shops has started, whatever this source shows.
+        _ when purchases.isEmpty => AppListEmptyState(
+          hasAny: all.isNotEmpty,
+          noMatchMessage: context.l10n.purchasesNoneFromSource,
+          emptyIcon: AppIconConstant.localMall,
+          emptyTitle: context.l10n.sourcingNoPurchasesYet,
+          emptyMessage: context.l10n.sourcingRecordABuyingTripAndEvery,
+          emptyAction: SdButtonV3(
             variant: SdButtonVariantV3.primary,
             label: context.l10n.homeQuickRecordPurchase,
             onPressed: () => _add(context, ref),
@@ -73,9 +96,10 @@ class PurchasesScreen extends ConsumerWidget {
                         locale: context.localeTag,
                       ),
                       subtitle: <String>[
-                        sourceNames[purchase.sourceId] ?? 'No source',
+                        sourceNames[purchase.sourceId] ??
+                            context.l10n.purchasesNoSource,
                         if (purchase.itemCount > 0)
-                          '${purchase.itemCount} items',
+                          context.l10n.purchasesItemCount(purchase.itemCount),
                       ].join(' · '),
                       icon: AppIconConstant.localMall,
                       trailingText: context.money(purchase.totalCost),
