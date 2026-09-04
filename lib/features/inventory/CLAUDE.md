@@ -70,6 +70,14 @@ list: the detail screen's Actions button, and **the `more_vert` button on
 - **One sheet, not two lists of verbs.** Both entry points call
   `ItemActionsSheet.show`, so an action added there cannot go missing from the
   row.
+- **Edit is the first row, and it is the way into the record.** Owner's rule.
+  Every other row is one verb; changing a title, a count or a price is the
+  detail screen's job, and from the list the only step to it was closing the
+  sheet and tapping the card underneath it.
+- **It is the one row the detail screen does not draw** — `isOnDetail` says
+  so. An Edit that pushes the screen it was opened from is a verb that does
+  nothing, and that is not an action going missing from the row: the screen it
+  leads to is already the one under the sheet.
 - **`more_vert`, not the detail screen's `tune`** — owner's rule. A glyph is
   all the width allows beside a title, two badges and a price line, so it has
   to be one a seller already knows; `tune` reads as filtering when it is not
