@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/money/money.dart';
-import 'package:reseller_studio/core/widgets/app_list_row.dart';
+import 'package:reseller_studio/core/widgets/item_card.dart';
 import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/core/widgets/option_picker_sheet.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -136,8 +136,8 @@ void main() {
     expect(sold, findsOneWidget);
     expect(
       tester
-          .widget<AppListRow>(
-            find.ancestor(of: sold, matching: find.byType(AppListRow)),
+          .widget<ItemCard>(
+            find.ancestor(of: sold, matching: find.byType(ItemCard)),
           )
           .isEnabled,
       isFalse,
@@ -145,7 +145,7 @@ void main() {
     );
     expect(
       find.descendant(
-        of: find.ancestor(of: sold, matching: find.byType(AppListRow)),
+        of: find.ancestor(of: sold, matching: find.byType(ItemCard)),
         matching: find.text('This item has already left inventory'),
       ),
       findsOneWidget,
@@ -172,12 +172,14 @@ void main() {
       'fetch, never a listing price', (WidgetTester tester) async {
     // Owner's rule: the price on this row was the highest of several and the
     // seller was about to be asked to confirm it anyway. What decides which
-    // row to tap is where the thing is live and what they wanted for it.
+    // row to tap is where the thing is live and what they wanted for it. The
+    // card is Inventory's own — a second owner's rule — so both facts arrive
+    // as the badge and the money band it already draws.
     await pumpScreen(tester, const RecordSaleScreen());
 
     final Finder row = find.ancestor(
       of: find.text('Vintage Levi 501 — 34x32, redline selvedge'),
-      matching: find.byType(AppListRow),
+      matching: find.byType(ItemCard),
     );
 
     // itm-4 is on eBay and Depop, and is expected to fetch 180.
@@ -198,7 +200,7 @@ void main() {
 
     final Finder row = find.ancestor(
       of: find.text('Nike windbreaker — XL'),
-      matching: find.byType(AppListRow),
+      matching: find.byType(ItemCard),
     );
 
     expect(
@@ -206,8 +208,9 @@ void main() {
       findsOneWidget,
     );
     // Nobody entered an expected price for it — a dash, never a zero
-    // (hard rule 5).
-    expect(find.descendant(of: row, matching: find.text('—')), findsOneWidget);
+    // (hard rule 5). The band carries a cell per figure, so more than one of
+    // them can be a dash on an item nobody has costed either.
+    expect(find.descendant(of: row, matching: find.text('—')), findsWidgets);
   });
 
   group('the sale offers only the marketplaces the item is on', () {
