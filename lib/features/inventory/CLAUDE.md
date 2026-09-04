@@ -501,6 +501,16 @@ asked how many arrived, added that to `quantity` and moved the item to
 - **The box takes the new total, not an addend**, so the arithmetic the sheet
   spelled out is not arithmetic any more: the figure the record holds is on
   screen while the seller types over it.
+- **A stepper flanks the box** — owner's rule. One more or one fewer is what
+  actually happens to a count, and doing it by selecting a number and typing
+  another is three interactions for an increment. The box stays for the times
+  the answer is twelve.
+  - **It stops at zero**, so `-1` is disabled on an empty shelf rather than
+    writing a negative count nothing in the app can mean.
+  - **An unreadable box counts as zero for the stepper**, so `+1` on an empty
+    field gives one — the same answer typing nothing already saves.
+  - `ItemQuantityField` owns both halves, so a second screen taking a count
+    cannot offer a box without the buttons.
 - **A count moves nothing else.** `saveQuantity` writes the count and stops
   there: a sold row given stock stays sold and says so with an alert tag, and
   the seller picks the status themselves in the section under it. The rule and

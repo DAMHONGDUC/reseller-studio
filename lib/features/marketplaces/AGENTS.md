@@ -14,6 +14,16 @@ workflow that creates a workspace.
   opens that screen; the list itself does not carry inline fee controls. One
   editing surface keeps the name and estimated rate in one transaction and
   gives deletion enough context to explain its effect.
+- **The fee is the loudest thing on the row** — owner's rule. It was grey
+  caption text under the name, which is the smallest type on the card for the
+  only number the screen exists to hold: it is what every profit, margin and
+  ROI figure downstream is computed from. It is now the row's trailing badge,
+  in the marketplace's own hue, with "Estimated fee" left as the caption
+  saying what the figure is.
+  - **A badge, not a control.** The rule above is unchanged — the row still
+    only navigates, and the rate is still edited on the detail screen.
+  - `MarketplaceFeeLabel.percent` writes the figure, so the list and anything
+    that shows a rate next cannot round it two ways.
 - **Delete is an app-bar icon on marketplace detail.** It appears only for an
   existing marketplace and still opens the confirmation dialog. Keeping the
   destructive action in the chrome leaves the form body for editable fields
