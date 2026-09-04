@@ -543,6 +543,19 @@ of them is saying that one thing, not two.
   carries the words and the hue. There is exactly one today: **on hand with
   nothing on the shelf** — a row whose tag says In stock or Draft while its
   count says zero.
+- **That count is drawn in red, on the card and on the detail screen** —
+  owner's rule. A figure a seller reads in a grid of three is not something
+  they stop to interpret, so the number says it itself rather than leaving the
+  tag beside it to do all the work.
+  - **One predicate decides both**: `ItemConsistency.isShelfEmpty`, which is
+    also what `warnings` reports. A red figure with no tag, or the other way
+    round, would be two answers to one question.
+  - **A sold or archived row keeps a plain zero.** `Item.quantityOnHand` reads
+    zero for everything off the shelf, so reddening every zero would paint the
+    Sold tab and teach the seller to ignore the colour — the same trap the
+    "sold with a count left" warning fell into.
+  - **The red is `SdThemeV3.danger`, and the tag wears it too.** One condition
+    is one colour; the tag was amber and is not any more.
 - **"Sold with a count left" is deliberately not one of them.** It looks like
   the obvious second warning and it is wrong: `quantity` is what was taken in
   and `Item.quantityOnHand` already reads zero for anything off the shelf, so
