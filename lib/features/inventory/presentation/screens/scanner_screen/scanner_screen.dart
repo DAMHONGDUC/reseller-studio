@@ -92,7 +92,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
           SdDialogActionV3(
             label: context.l10n.scannerAddItem,
             isPrimary: true,
-            onPressed: () => context.pushReplacement(AppRoutes.addItem),
+            onPressed: () =>
+                context.pushReplacement(AppRoutes.addItemWithCode(code: code)),
           ),
           // The other reason a code matches nothing: the seller does not own
           // it yet and is deciding whether to. That decision is made standing

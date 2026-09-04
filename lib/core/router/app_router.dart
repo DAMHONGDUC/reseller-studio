@@ -245,7 +245,9 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     parentNavigatorKey: AppNavigatorKey.root,
                     path: 'add',
                     builder: (BuildContext context, GoRouterState state) =>
-                        const ItemFormScreen(),
+                        ItemFormScreen(
+                          initialBarcode: state.uri.queryParameters['code'],
+                        ),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

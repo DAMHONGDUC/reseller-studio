@@ -184,6 +184,15 @@ final class AppRoutes {
       ? purchaseEvaluator
       : '$purchaseEvaluator?code=${Uri.encodeComponent(code)}';
 
+  /// The item form, optionally opened on a code the seller just scanned.
+  ///
+  /// A query parameter for the same reason [evaluate] takes one: the form is
+  /// how every other screen creates an item, with no code at all, and a path
+  /// segment would make that the second route rather than the first.
+  static String addItemWithCode({String? code}) => code == null || code.isEmpty
+      ? addItem
+      : '$addItem?code=${Uri.encodeComponent(code)}';
+
   static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';
