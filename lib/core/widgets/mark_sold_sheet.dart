@@ -103,8 +103,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
   /// almost always types over it.
   String _priceFor(Marketplace? marketplace) {
     final List<Money> parts = <Money>[
-      for (final Item item in widget.items)
-        ?_priceOf(item, marketplace),
+      for (final Item item in widget.items) ?_priceOf(item, marketplace),
     ];
 
     if (parts.isEmpty) return '';
@@ -211,11 +210,9 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             isRequired: true,
             controller: _price,
             currency: currency,
-            // Only a bundle needs this: it is what redraws the split under
-            // the box as the seller types, and a single sale has no split.
-            onChanged: widget.items.length == 1
-                ? null
-                : (_) => setState(() {}),
+            // Redraws what depends on the price as it is typed: a bundle's
+            // split, and the fee this sale would be estimated at.
+            onChanged: (_) => setState(() {}),
             textInputAction: TextInputAction.next,
           ),
           SizedBox(height: SdSpacingConstant.h16),
@@ -275,16 +272,21 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
             label: context.l10n.markSoldFees,
             controller: _fees,
             currency: currency,
-            // Quotes the rate the estimate would use rather than filling the
-            // box with it — typed is a fact, empty is a labelled estimate.
-            helperText: marketplace == null
-                ? null
-                : context.l10n.orderFeeHelper(
-                    marketplace.name,
-                    context.percent(marketplace.feeRate, decimals: 1),
-                  ),
+            // The box is never pre-filled — typed is a fact, empty is a
+            // labelled estimate — so the estimate is stated under it instead.
+            onChanged: (_) => setState(() {}),
             textInputAction: TextInputAction.next,
           ),
+          // Only while nobody has typed one: with a fee in the box there is
+          // nothing to estimate, and echoing it back reads as a second figure.
+          if (marketplace != null &&
+              Money.tryParse(_fees.text, currency) == null) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h8),
+            _FeeEstimate(
+              marketplace: marketplace,
+              price: _typedPrice(currency),
+            ),
+          ],
           SizedBox(height: SdSpacingConstant.h16),
           SdTextFieldV3(
             label: context.l10n.markSoldBuyer,
@@ -370,4 +372,56 @@ class _BundleSplit extends StatelessWidget {
       ],
     );
   }
+}
+
+/// What this sale would be charged, and where that rate is edited.
+///
+/// **The figure, not just the rate** — owner's rule. A percentage is a fact
+/// about the platform; what the seller is deciding whether to accept is an
+/// amount, so the sheet does the arithmetic out loud rather than leaving them
+/// to. It says where the rate lives too: a number the app presents as its own
+/// is one nobody thinks to go and correct.
+class _FeeEstimate extends StatelessWidget {
+  const _FeeEstimate({required this.marketplace, required this.price});
+
+  final Marketplace marketplace;
+
+  /// Null while the price box is empty, which is what makes the figure a dash
+  /// rather than a zero (hard rule 5).
+  final Money? price;
+
+  @override
+  Widget build(BuildContext context) => SdCardV3(
+    layer: SdCardLayerV3.sunken,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              context.l10n.markSoldFeeEstimateLabel,
+              style: context.textTheme3.bodyMedium!.copyWith(
+                color: context.sdTheme3.textSecondary,
+              ),
+            ),
+            Text(
+              context.money(price?.applyRate(marketplace.feeRate)),
+              style: context.textTheme3.titleSmall!.bold3.tabular3.copyWith(
+                color: context.sdTheme3.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: SdSpacingConstant.h4),
+        Text(
+          context.l10n.markSoldFeeEstimateHint(
+            marketplace.name,
+            context.percent(marketplace.feeRate, decimals: 1),
+          ),
+          style: context.textTheme3.bodySmall!.faint3(context),
+        ),
+      ],
+    ),
+  );
 }

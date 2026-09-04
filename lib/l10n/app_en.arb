@@ -1283,6 +1283,22 @@
   "@markSoldFees": {
     "description": "What the marketplace took, on the record-sale sheet. Optional: left empty the app estimates it and says so."
   },
+  "markSoldFeeEstimateLabel": "Estimated fee",
+  "@markSoldFeeEstimateLabel": {
+    "description": "Label of the fee the app would use on the mark-as-sold sheet when the seller leaves the fee box empty."
+  },
+  "markSoldFeeEstimateHint": "{marketplace} takes {rate}. Change the rate in More → Marketplaces.",
+  "@markSoldFeeEstimateHint": {
+    "description": "Under the estimated fee: which rate it used and where the seller edits it.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
   "markSoldBuyer": "Buyer (optional)",
   "@markSoldBuyer": {
     "description": "The buyer's name. Optional, and never sent to analytics."
