@@ -1,11 +1,13 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/photo_constant.dart';
+import '../../../../core/constants/prefs_key_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/storage/file_uploader.dart';
 import '../../../../core/utils/text_input_utils.dart';
@@ -13,8 +15,11 @@ import '../../../listings/domain/entities/listing.dart';
 import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
+import '../../domain/entities/item_category.dart';
+import '../../domain/entities/storage_location.dart';
 import '../../domain/enums/item_status.dart';
 import '../../domain/services/item_transition.dart';
+import '../../providers.dart';
 
 /// The choices on the Add/Edit Item form that are not typed.
 ///
@@ -141,8 +146,79 @@ class ItemFormController extends Notifier<ItemFormState> {
   @override
   ItemFormState build() => const ItemFormState();
 
-  /// Start a fresh create form.
-  void startCreate() => state = const ItemFormState();
+  /// Start a fresh create form, on the shelf the last new item went to.
+  ///
+  /// **Prefilled, never required** (hard rule 2): both pickers are on screen
+  /// and one tap changes either. What it saves is the twenty repeats a seller
+  /// booking in one haul would otherwise make — the same problem the intake
+  /// session solved by asking for the source once a trip.
+  void startCreate() {
+    final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
+
+    state = ItemFormState(
+      categoryId: _stillThere(
+        prefs?.getString(PrefsKeyConstant.lastItemCategoryId),
+        ref
+            .read(categoriesProvider)
+            .value
+            ?.map((ItemCategory category) => category.id),
+      ),
+      locationId: _stillThere(
+        prefs?.getString(PrefsKeyConstant.lastItemLocationId),
+        ref
+            .read(locationsProvider)
+            .value
+            ?.map((StorageLocation location) => location.id),
+      ),
+    );
+  }
+
+  /// A remembered id that no longer names anything is dropped.
+  ///
+  /// A deleted bin left in preferences would seed a picker with a value the
+  /// list cannot show, and the seller would be looking at a blank field they
+  /// did not empty.
+  static String? _stillThere(String? id, Iterable<String>? available) =>
+      id != null && (available?.contains(id) ?? false) ? id : null;
+
+  /// Remember where a newly created item was filed.
+  ///
+  /// Only on a create: correcting one old item's bin is not a decision about
+  /// the next twenty. Failing to write is not worth failing a save over, so
+  /// it is logged and swallowed (hard rule 8).
+  Future<void> _rememberFiling() async {
+    final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
+
+    if (prefs == null) return;
+
+    try {
+      await _remember(
+        prefs,
+        PrefsKeyConstant.lastItemCategoryId,
+        state.categoryId,
+      );
+      await _remember(
+        prefs,
+        PrefsKeyConstant.lastItemLocationId,
+        state.locationId,
+      );
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.item,
+        'Could not remember where the item was filed',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Nothing picked clears the key rather than keeping the last answer: a
+  /// seller who deliberately filed one item nowhere is saying so.
+  static Future<void> _remember(
+    SharedPreferences prefs,
+    String key,
+    String? value,
+  ) => value == null ? prefs.remove(key) : prefs.setString(key, value);
 
   /// Load an existing item into the form.
   ///
@@ -373,6 +449,7 @@ class ItemFormController extends Notifier<ItemFormState> {
           viaQuickAdd: false,
           hasPhoto: state.photoUrls.isNotEmpty,
         );
+        await _rememberFiling();
       }
 
       return id;
