@@ -81,6 +81,37 @@ opens.
 - `test/features/orders/record_sale_test.dart` pins the row, both halves of
   the picker, and the price following it.
 
+## Nothing is hidden from the sale picker; what cannot be sold is disabled
+
+Owner's rule, and it is hard rule 2's shape one level up — the same one the
+item actions sheet already follows: **the rows that would be refused are
+shown, not hidden.**
+
+- **The picker lists every item the business has**, not only what is on the
+  shelf. A seller looking for a jacket that is already marked sold used to
+  find an empty search and no explanation — the row was filtered out, so the
+  screen said the item does not exist rather than that it cannot be sold.
+- **A row that cannot be sold is drawn disabled, with the reason as its
+  caption.** No tap, no long-press, no chevron, the whole row at the disabled
+  opacity, and a warning glyph where the inventory mark was. What replaces the
+  "status · SKU · marketplaces" line is `ItemBlockPresenter.messages` — the
+  same sentences the actions sheet shows, because it is the same
+  `ItemTransition.check(item, sold)` deciding.
+- **`ItemBlockPresenter` is imported across the feature boundary on purpose.**
+  It is a root-level presenter, the tier `item_label.dart` sits at, and the
+  alternative is Orders writing its own sentence for Inventory's block enum —
+  two answers to "why can this not be sold", which is exactly what the
+  presenter exists to stop.
+- **The bundle is still built from sellable items only.** A disabled row
+  cannot be ticked, and `recordSaleSelectionItemsProvider` still reads
+  `sellableItemsProvider`, so an item that goes off the shelf mid-selection
+  drops out of the run rather than being sold twice.
+- **The empty state now means an empty business.** With nothing filtered out,
+  the only way the list is empty is that there are no items at all — which is
+  what "Nothing to sell" already said, and the way on is still Inventory.
+- **Source order is kept**, blocked rows included: re-sorting the refused ones
+  to the bottom would list items in an order Inventory does not.
+
 ## An order always names an item, and may name several
 
 `OrderLine.itemId` is non-null, so there is still no walk-in sale — nothing
