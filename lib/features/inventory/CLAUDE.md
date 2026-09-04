@@ -499,6 +499,34 @@ Owner's rule. `ItemTransition.restock` takes how many arrived, adds them to
   that it is ready to sell.
 - Both go through `_bulk`, so forty rows are one write (hard rule 16).
 
+## The create form opens on the last filing
+
+A seller booking in twenty things from one haul picked the same category and
+the same bin twenty times. The intake session had already answered this shape
+of problem by asking for the source **once for the trip**; the full form is
+the other half of the same afternoon and got the same treatment.
+
+- **Prefilled, never required** (hard rule 2). Both pickers are on screen with
+  the value in them, and one tap changes either. Nothing is refused and no new
+  field is asked for.
+- **Only on create, and only from a create.** `startCreate` seeds the two
+  pickers; `submit` writes them back **only when the form was not editing** —
+  correcting one old item's bin is not a decision about the next twenty.
+- **Never on Quick Add.** That screen shows neither field, so a remembered bin
+  there would be filing stock somewhere the seller was never shown. Quick Add
+  still asks for a title and nothing else.
+- **Device-local, in `PrefsKeyConstant`** — `lastItemCategoryId` and
+  `lastItemLocationId`. It is a fact about the afternoon this phone is having,
+  like the theme and the intro flag, not about the business.
+- **A remembered id that no longer names anything is dropped.** A deleted bin
+  left in preferences would seed a picker with a value its own list cannot
+  show, and the seller would be looking at a blank field they did not empty —
+  so the id is checked against the live categories and locations first.
+- **Nothing picked clears the key** rather than keeping the last answer: a
+  seller who deliberately filed one item nowhere is saying so.
+- `test/features/inventory/item_form_remembers_filing_test.dart` holds all
+  five.
+
 ## Quantity is required on the item form, and only there
 
 Owner's rule. The full Add/Edit form refuses to save without a count; **Quick
