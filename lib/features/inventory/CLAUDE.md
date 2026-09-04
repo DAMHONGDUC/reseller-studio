@@ -530,11 +530,15 @@ of them is saying that one thing, not two.
   had — beside the count's own section.
 - **A pair that cannot both be true is drawn, never refused.**
   `ItemConsistency.warnings` names the contradictions and `ItemWarning`
-  carries the words and the hue:
-  - on hand with nothing on the shelf — amber, because it is a gap in the
-    record rather than a claim that is false;
-  - sold while the count says there are some — red, because the row
-    contradicts itself.
+  carries the words and the hue. There is exactly one today: **on hand with
+  nothing on the shelf** — a row whose tag says In stock or Draft while its
+  count says zero.
+- **"Sold with a count left" is deliberately not one of them.** It looks like
+  the obvious second warning and it is wrong: `quantity` is what was taken in
+  and `Item.quantityOnHand` already reads zero for anything off the shelf, so
+  a sold row keeping its count is the normal state of every sold item — the
+  seeded ones included. A warning that fires on every sold row teaches sellers
+  to ignore the warning.
 - **The message names both halves and asks for the fix** — owner's rule.
   "Warning: none on the shelf but status is In stock — please update", not
   "Check the count": a seller reading it has to know which two facts disagree
