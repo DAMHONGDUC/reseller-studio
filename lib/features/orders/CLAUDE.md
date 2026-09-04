@@ -52,6 +52,21 @@ opens.
   there and what they wanted for it — so the subtitle counts the marketplaces
   (`Not listed` when there are none) and the trailing figure is
   `Item.expectedPrice` (`lib/features/inventory/CLAUDE.md`).
+- **The sheet states the fee it would estimate, and where to change it** —
+  owner's rule. The box was optional with a rate quoted under it, so a seller
+  who left it empty had no idea what number the app was about to use, or that
+  the rate behind it was theirs to correct.
+  - **The figure, not just the rate.** `salePrice × rate` in money, recomputed
+    as the price is typed — a percentage is a fact about the platform, and
+    what the seller is deciding whether to accept is an amount.
+  - **It says where the rate lives**: More → Marketplaces. A number the app
+    presents as its own is one nobody thinks to go and fix.
+  - **It disappears the moment a fee is typed.** Then there is nothing to
+    estimate: the box holds the fact, and echoing it back under itself would
+    read as a second figure.
+  - The rate is the marketplace record's own (`Marketplace.feeRate`), which is
+    what that screen edits.
+
 - **The marketplace picker offers only the platforms that item is on.** A list
   of every marketplace the business sells on makes the seller find the one
   this jacket was live at, and a mis-pick writes an order against a platform
