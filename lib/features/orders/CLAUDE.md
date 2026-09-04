@@ -61,6 +61,10 @@ opens.
     what the seller is deciding whether to accept is an amount.
   - **It says where the rate lives**: More → Marketplaces. A number the app
     presents as its own is one nobody thinks to go and fix.
+  - **It sits under Sold on, not under the fee box** — owner's rule. The
+    estimate is a fact about the platform the seller just picked, so it
+    belongs to that answer; under the fee box it read as a note about a field
+    they had deliberately left empty.
   - **It disappears the moment a fee is typed.** Then there is nothing to
     estimate: the box holds the fact, and echoing it back under itself would
     read as a second figure.
