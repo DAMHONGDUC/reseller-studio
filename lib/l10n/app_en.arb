@@ -116,9 +116,9 @@
   "@itemBlockMissingSalePrice": {
     "description": "Why an item cannot move to Sold."
   },
-  "itemBlockWrongStatus": "This item cannot move there from where it is",
+  "itemBlockWrongStatus": "This item has already left inventory",
   "@itemBlockWrongStatus": {
-    "description": "Why a transition is refused because the item's current status is not a valid starting point."
+    "description": "Why a transition is refused because the item's current status is not a valid starting point. In practice this block is only ever raised for a sold or archived item, so it says which rather than 'cannot move there'."
   },
   "itemUpdatedAt": "Updated {date}",
   "@itemUpdatedAt": {
@@ -150,7 +150,7 @@
   "@itemStatus": {
     "description": "Field label on the item form for the item's state."
   },
-  "itemBlockNoQuantity": "Nothing left in stock to move",
+  "itemBlockNoQuantity": "There is none of this left on the shelf",
   "@itemBlockNoQuantity": {
     "description": "Why a transition is refused because quantity is zero."
   },

@@ -120,7 +120,7 @@ void main() {
     expect(find.text('Record a sale'), findsOneWidget);
   });
 
-  testWidgets('the picker lists the shelf and nothing that has left it', (
+  testWidgets('the picker lists what has left the shelf too, disabled', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const RecordSaleScreen());
@@ -129,10 +129,27 @@ void main() {
       find.text('Vintage Levi 501 — 34x32, redline selvedge'),
       findsOneWidget,
     );
+    // **Shown, not hidden** — owner's rule. Filtering the row out said the
+    // item does not exist, where the truth is that it cannot be sold again.
+    final Finder sold = find.text('Patagonia Synchilla fleece — mens L');
+
+    expect(sold, findsOneWidget);
     expect(
-      find.text('Patagonia Synchilla fleece — mens L'),
-      findsNothing,
-      reason: 'already sold, so it cannot be sold again',
+      tester
+          .widget<AppListRow>(
+            find.ancestor(of: sold, matching: find.byType(AppListRow)),
+          )
+          .isEnabled,
+      isFalse,
+      reason: 'already sold, so the row is drawn but cannot be tapped',
+    );
+    expect(
+      find.descendant(
+        of: find.ancestor(of: sold, matching: find.byType(AppListRow)),
+        matching: find.text('This item has already left inventory'),
+      ),
+      findsOneWidget,
+      reason: 'the reason takes the caption of a row that cannot be sold',
     );
   });
 

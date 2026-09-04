@@ -12,6 +12,8 @@ import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/mark_sold_sheet.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/domain/enums/item_status.dart';
+import '../../../../inventory/domain/services/item_transition.dart';
+import '../../../../inventory/item_block_presenter.dart';
 import '../../../../inventory/providers.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/services/listing_marketplaces.dart';
@@ -28,9 +30,11 @@ part 'record_sale_screen_item_list.dart';
 /// end: from an item the seller already has open, or from Orders having just
 /// sold something.
 ///
-/// **Only what is on the shelf is offered.** An order names an item, so there
-/// is nothing here to sell that inventory has never heard of — and a business
-/// with nothing on hand is sent to Inventory rather than shown a form it
+/// **Everything is offered, and what cannot be sold is disabled** — owner's
+/// rule. A row filtered out says the item does not exist, which is the wrong
+/// answer for a jacket the seller marked sold last week; a greyed row with
+/// "It has already left inventory" under it is the right one. A business with
+/// no items at all is still sent to Inventory rather than shown a form it
 /// cannot complete.
 ///
 /// **This is also the only place a bundle is built.** Long-pressing a row
@@ -87,9 +91,11 @@ class _RecordSaleScreenState extends ConsumerState<RecordSaleScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Item> items = ref.watch(recordSaleItemsProvider);
-    final bool hasAny = ref.watch(sellableItemsProvider).isNotEmpty;
     final AsyncValue<List<Item>> source = ref.watch(itemsProvider);
     final List<Item> selected = ref.watch(recordSaleSelectionItemsProvider);
+    // Nothing is filtered out any more, so an empty list is an empty business
+    // rather than a shelf that happens to be clear.
+    final bool hasAny = (source.value ?? const <Item>[]).isNotEmpty;
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.recordSaleTitle),

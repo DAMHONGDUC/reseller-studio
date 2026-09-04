@@ -94,26 +94,48 @@ class _SaleItemRow extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => AppListRow(
-    title: item.title,
-    subtitle: _subtitle(context),
-    // A ticked row reads as ticked without reading the words — and the row
-    // still carries its own title, so colour is never the only signal.
-    icon: isSelected ? AppIconConstant.checkCircle : AppIconConstant.inventory,
-    iconTint: isSelected ? context.colorScheme3.primary : null,
-    // What the seller expects for it — `—` when nobody entered one, never a
-    // zero (hard rule 5).
-    trailingText: context.money(item.expectedPrice),
-    showChevron: !isSelecting,
-    // Long-press starts the bundle, the same gesture Inventory's selection
-    // uses. A tick box in every row would be permanent chrome for something
-    // most sales are not.
-    onLongPress: () =>
-        ref.read(recordSaleSelectionProvider.notifier).toggle(item.id),
-    onTap: isSelecting
-        ? () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id)
-        : () => _pick(context),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    // **Shown, not hidden** — owner's rule. The same check the actions sheet
+    // runs, so one place decides what may be sold and one set of sentences
+    // says why not.
+    final ItemTransitionCheck check = ItemTransition.check(
+      item,
+      ItemStatus.sold,
+    );
+    final bool canSell = check.isAllowed;
+
+    return AppListRow(
+      title: item.title,
+      // The reason takes the caption's place on a row that cannot be sold:
+      // what platform it is on matters less than why it is not for sale.
+      subtitle: canSell
+          ? _subtitle(context)
+          : ItemBlockPresenter.messages(context, check.blocks),
+      // A ticked row reads as ticked without reading the words — and the row
+      // still carries its own title, so colour is never the only signal.
+      icon: switch ((canSell, isSelected)) {
+        (false, _) => AppIconConstant.warning,
+        (true, true) => AppIconConstant.checkCircle,
+        (true, false) => AppIconConstant.inventory,
+      },
+      iconTint: canSell
+          ? (isSelected ? context.colorScheme3.primary : null)
+          : context.sdTheme3.warning,
+      // What the seller expects for it — `—` when nobody entered one, never a
+      // zero (hard rule 5).
+      trailingText: context.money(item.expectedPrice),
+      showChevron: !isSelecting,
+      isEnabled: canSell,
+      // Long-press starts the bundle, the same gesture Inventory's selection
+      // uses. A tick box in every row would be permanent chrome for something
+      // most sales are not.
+      onLongPress: () =>
+          ref.read(recordSaleSelectionProvider.notifier).toggle(item.id),
+      onTap: isSelecting
+          ? () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id)
+          : () => _pick(context),
+    );
+  }
 }
 
 /// Nothing to sell, told apart from nothing matching the search.

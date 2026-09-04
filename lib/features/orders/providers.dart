@@ -292,7 +292,11 @@ recordSaleQueryProvider = NotifierProvider<RecordSaleQueryController, String>(
 final Provider<List<Item>> recordSaleItemsProvider = Provider<List<Item>>((
   Ref ref,
 ) {
-  final List<Item> items = ref.watch(sellableItemsProvider);
+  // **Everything the business has, not only what is on the shelf** — owner's
+  // rule (`lib/features/orders/CLAUDE.md`). A row that cannot be sold is
+  // disabled with the reason under it; filtering it out said the item did not
+  // exist.
+  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
   final String query = ref.watch(recordSaleQueryProvider);
 
   return items.where((Item item) => ItemSearch.matches(item, query)).toList();
