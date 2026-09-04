@@ -530,12 +530,25 @@ of them is saying that one thing, not two.
   had — beside the count's own section.
 - **A pair that cannot both be true is drawn, never refused.**
   `ItemConsistency.warnings` names the contradictions and `ItemWarning`
-  carries the words and the hue, as an alert tag at the top of the detail
-  screen:
+  carries the words and the hue:
   - on hand with nothing on the shelf — amber, because it is a gap in the
     record rather than a claim that is false;
   - sold while the count says there are some — red, because the row
     contradicts itself.
+- **The message names both halves and asks for the fix** — owner's rule.
+  "Warning: none on the shelf but status is In stock — please update", not
+  "Check the count": a seller reading it has to know which two facts disagree
+  without opening anything, and what to do about it. That is why
+  `ItemWarningDisplay.message` takes the item — the status word and the count
+  are in the sentence.
+- **It is a full-width line, never a compact badge.** A sentence does not fit
+  the badge row, and shortening it to fit is how it stopped saying anything.
+- **It shows on the inventory row as well as on the detail screen** — owner's
+  rule, and it is why `ItemWarningLines` is one widget both draw. A row that
+  contradicts itself is one a seller has to find while scanning the list; a
+  warning only the detail screen carries is one they see after they have
+  already gone looking for something else. On the card it sits under the money
+  band, which is where the count it is arguing with already is.
 - **An archived item with stock is not one of them.** Withdrawing something is
   not giving it away, and the count is what the seller still owns.
 - **The verbs still move both, because a sale is an event rather than an
