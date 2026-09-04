@@ -51,6 +51,11 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
     always the one the screen is for. `AppPinnedAction.secondary` is the slot,
     and both share the one bottom inset — a second padded widget would clear
     the home indicator twice.
+  - **The second slot is not only for a destructive verb.** Quick Add pins
+    Save with "Save and add another" above it — same stacking, same reason:
+    the button under the resting thumb is the one the screen is for, and the
+    variant is what says which is which. What the slot must never hold is a
+    second way to do the same thing at the same weight.
   - **A conditional second action carries its own gap.** `_DangerZone` renders
     nothing for a seller who cannot delete, and a gap owned by the slot would
     leave a hole above Save on every screen that does not draw one.
