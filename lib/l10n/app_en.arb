@@ -80,6 +80,10 @@
   "@emptyValuePlaceholder": {
     "description": "Shown instead of a number when there is not enough data to compute it — profit with no cost entered, ROI with no sale. Never render 0 here: 0 is a claim, — is an absence. See the master plan §15."
   },
+  "quickAddSaveAndAnother": "Save and add another",
+  "@quickAddSaveAndAnother": {
+    "description": "Writes the item and keeps the empty box, for a seller holding several things."
+  },
   "quickAddTitle": "Quick Add",
   "@quickAddTitle": {
     "description": "Screen title for the fastest create path, and the label on the Inventory FAB that opens it."

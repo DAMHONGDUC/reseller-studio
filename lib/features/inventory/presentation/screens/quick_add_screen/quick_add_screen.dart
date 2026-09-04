@@ -28,11 +28,26 @@ class QuickAddScreen extends ConsumerStatefulWidget {
 
 class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   final TextEditingController _title = TextEditingController();
+  final FocusNode _titleFocus = FocusNode();
 
   @override
   void dispose() {
     _title.dispose();
+    _titleFocus.dispose();
     super.dispose();
+  }
+
+  /// Saves and stays, so a seller holding three things types three titles.
+  ///
+  /// The cleared box is the confirmation — the same argument as the row
+  /// appearing behind the sheet, and the reason there is still no success
+  /// message here (owner's rule).
+  Future<void> _submitAndContinue() async {
+    if (await _save() == null) return;
+
+    _title.clear();
+    ref.read(quickAddControllerProvider.notifier).updateTitle('');
+    _titleFocus.requestFocus();
   }
 
   /// Saves, then leaves. The controller has already logged both outcomes, so
@@ -40,6 +55,17 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   /// the new row in the list behind (owner's rule).
   Future<void> _submit() async {
     final NavigatorState navigator = Navigator.of(context);
+
+    if (await _save() == null) return;
+
+    navigator.pop();
+  }
+
+  /// Writes the item and returns its id, or null when nothing was written.
+  ///
+  /// Shared by both buttons, so the plan gate and the error message cannot
+  /// differ between saving once and saving again.
+  Future<String?> _save() async {
     final PlanBlock block = ref.read(addItemBlockProvider);
 
     if (block != PlanBlock.none) {
@@ -49,7 +75,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
         plan: ref.read(currentPlanProvider),
       );
 
-      return;
+      return null;
     }
 
     try {
@@ -57,15 +83,15 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
           .read(quickAddControllerProvider.notifier)
           .submit();
 
-      if (id == null || !mounted) return;
-
-      navigator.pop();
+      return mounted ? id : null;
     } catch (_) {
       // Already logged by the controller; the seller gets the one message
       // hard rule 6 allows.
-      if (!mounted) return;
+      if (!mounted) return null;
 
       SdSnackBarUtilsV3.error(context, context.l10n.errorGenericMessage);
+
+      return null;
     }
   }
 
@@ -87,6 +113,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 SizedBox(height: SdContentPaddingV3.topGap),
                 SdTextFieldV3(
                   controller: _title,
+                  focusNode: _titleFocus,
                   label: context.l10n.quickAddNameLabel,
                   hint: context.l10n.quickAddNameHint,
                   isRequired: true,
@@ -108,6 +135,15 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
             label: context.l10n.actionSave,
             isBusy: state.isSaving,
             onPressed: state.canSubmit ? _submit : null,
+            // Above Save and quieter than it: the common case is one item,
+            // and the button under the resting thumb stays the one that
+            // finishes (`docs/rules/SCREENS.md`).
+            secondary: SdButtonV3(
+              variant: SdButtonVariantV3.outlined,
+              label: context.l10n.quickAddSaveAndAnother,
+              expand: true,
+              onPressed: state.canSubmit ? _submitAndContinue : null,
+            ),
           ),
         ],
       ),

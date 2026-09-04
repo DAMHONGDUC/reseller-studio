@@ -98,22 +98,50 @@ void main() {
   });
 
   group('QuickAddScreen', () {
+    /// The pinned Save, told apart from the quieter button stacked above it.
+    SdButtonV3 saveButton(WidgetTester tester) =>
+        tester.widget<SdButtonV3>(find.widgetWithText(SdButtonV3, 'Save'));
+
     testWidgets('Save is disabled until a title is typed', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const QuickAddScreen());
 
-      expect(
-        tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
-        isNull,
-      );
+      expect(saveButton(tester).onPressed, isNull);
 
       await tester.enterText(find.byType(TextField), 'Nike Air Max 90');
       await tester.pumpAndSettle();
 
+      expect(saveButton(tester).onPressed, isNotNull);
+    });
+
+    testWidgets('both buttons wait for a title', (WidgetTester tester) async {
+      await pumpScreen(tester, const QuickAddScreen());
+
+      final SdButtonV3 another = tester.widget<SdButtonV3>(
+        find.widgetWithText(SdButtonV3, 'Save and add another'),
+      );
+
+      expect(another.onPressed, isNull);
+    });
+
+    testWidgets('saving and adding another keeps the screen and the keyboard', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const QuickAddScreen());
+      await tester.enterText(find.byType(TextField), 'Nike Air Max 90');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save and add another'));
+      await tester.pumpAndSettle();
+
+      // Still here, with an empty box: the cleared field is the confirmation,
+      // which is why there is no success message either (owner's rule).
+      expect(find.byType(QuickAddScreen), findsOneWidget);
+      expect(find.text('Nike Air Max 90'), findsNothing);
+      expect(saveButton(tester).onPressed, isNull);
       expect(
-        tester.widget<SdButtonV3>(find.byType(SdButtonV3)).onPressed,
-        isNotNull,
+        tester.widget<TextField>(find.byType(TextField)).focusNode?.hasFocus,
+        isTrue,
       );
     });
 
