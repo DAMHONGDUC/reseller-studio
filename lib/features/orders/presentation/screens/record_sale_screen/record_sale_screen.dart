@@ -20,6 +20,7 @@ import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/services/listings_by_item.dart';
 import '../../../../listings/providers.dart';
 import '../../../providers.dart';
+import '../../widgets/cannot_sell_sheet.dart';
 
 part 'record_sale_screen_item_list.dart';
 

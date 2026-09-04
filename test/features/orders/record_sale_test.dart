@@ -17,6 +17,7 @@ import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.d
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
+import 'package:reseller_studio/features/orders/presentation/widgets/cannot_sell_sheet.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 
 import '../../support/pump_app.dart';
@@ -120,7 +121,7 @@ void main() {
     expect(find.text('Record a sale'), findsOneWidget);
   });
 
-  testWidgets('the picker lists what has left the shelf too, disabled', (
+  testWidgets('the picker lists what has left the shelf too, with its reason', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const RecordSaleScreen());
@@ -135,22 +136,30 @@ void main() {
 
     expect(sold, findsOneWidget);
     expect(
-      tester
-          .widget<ItemCard>(
-            find.ancestor(of: sold, matching: find.byType(ItemCard)),
-          )
-          .isEnabled,
-      isFalse,
-      reason: 'already sold, so the row is drawn but cannot be tapped',
-    );
-    expect(
       find.descendant(
         of: find.ancestor(of: sold, matching: find.byType(ItemCard)),
         matching: find.text('This item has already left inventory'),
       ),
       findsOneWidget,
-      reason: 'the reason takes the caption of a row that cannot be sold',
+      reason: 'the row carries why it cannot be sold',
     );
+  });
+
+  testWidgets('tapping a row that cannot be sold explains instead of nothing', (
+    WidgetTester tester,
+  ) async {
+    // **The card is never drawn dead** — owner's rule. A greyed row says the
+    // seller did something wrong and offers nothing; the tap is what turns the
+    // refusal into an explanation with somewhere to go.
+    await pumpScreen(tester, const RecordSaleScreen());
+
+    await tester.tap(find.text('Patagonia Synchilla fleece — mens L'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CannotSellSheet), findsOneWidget);
+    expect(find.text('Open item'), findsOneWidget);
+    // The sale sheet is what a sellable row opens, and this row is not one.
+    expect(find.text('Sold on'), findsNothing);
   });
 
   testWidgets('the search box narrows the shelf by SKU', (

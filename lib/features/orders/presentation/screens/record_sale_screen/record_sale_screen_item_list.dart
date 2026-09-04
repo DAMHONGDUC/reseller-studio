@@ -44,9 +44,10 @@ class _SaleItemList extends ConsumerWidget {
 
 /// One item to sell.
 ///
-/// **A row that cannot be sold is shown, disabled, with the reason under it**
-/// — owner's rule. Filtering it out said the item does not exist, where the
-/// truth is that it cannot be sold again.
+/// **A row that cannot be sold still takes the tap** — owner's rule. It
+/// carries the reason on its warning line and opens `CannotSellSheet` when
+/// tapped: a greyed card says the seller did something wrong and offers
+/// nothing, which is worse than the filtered-out row it replaced.
 class _SaleItemRow extends ConsumerWidget {
   const _SaleItemRow({
     required this.item,
@@ -81,6 +82,12 @@ class _SaleItemRow extends ConsumerWidget {
     context.pop();
   }
 
+  /// A tap or a long-press on a row that cannot be sold — both explain rather
+  /// than doing nothing, since a long-press would otherwise start a bundle
+  /// this item cannot join.
+  Future<void> _explain(BuildContext context, ItemTransitionCheck check) =>
+      CannotSellSheet.show(context, item: item, blocks: check.blocks);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // The same check the actions sheet runs, so one place decides what may be
@@ -96,20 +103,24 @@ class _SaleItemRow extends ConsumerWidget {
       now: now,
       isSelected: isSelected,
       isSelecting: isSelecting,
-      isEnabled: check.isAllowed,
       notice: check.isAllowed
           ? null
           : ItemBlockPresenter.messages(context, check.blocks),
-      // Neither slot is wired: this screen's tap is the sale, and a second
-      // verb on the row would take the seller out of the flow they came for.
-      onTap: isSelecting
-          ? () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id)
-          : () => _pick(context),
+      // Neither the actions button nor the marketplace arrow is wired: this
+      // screen's tap is the sale, and a second verb on the row would take the
+      // seller out of the flow they came for.
+      onTap: switch ((check.isAllowed, isSelecting)) {
+        (false, _) => () => _explain(context, check),
+        (true, true) =>
+          () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id),
+        (true, false) => () => _pick(context),
+      },
       // Long-press starts the bundle, the same gesture Inventory's selection
       // uses. A tick box in every row would be permanent chrome for something
       // most sales are not.
-      onLongPress: () =>
-          ref.read(recordSaleSelectionProvider.notifier).toggle(item.id),
+      onLongPress: check.isAllowed
+          ? () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id)
+          : () => _explain(context, check),
     );
   }
 }

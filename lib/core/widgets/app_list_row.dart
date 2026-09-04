@@ -24,7 +24,6 @@ class AppListRow extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.showChevron = true,
-    this.isEnabled = true,
     super.key,
   });
 
@@ -58,71 +57,58 @@ class AppListRow extends StatelessWidget {
   /// affordance that leads nowhere is worse than none.
   final bool showChevron;
 
-  /// A row that is shown but cannot be used — the sale picker's items that
-  /// have left the shelf.
-  ///
-  /// **Shown rather than filtered out** (`lib/features/orders/CLAUDE.md`): a
-  /// row that disappears says the record does not exist, where a disabled one
-  /// with its reason underneath says what is actually true. It takes the
-  /// design system's own disabled opacity, and every gesture with it — the
-  /// look and the deadness cannot drift apart.
-  final bool isEnabled;
-
   @override
   Widget build(BuildContext context) {
     final Color tint = iconTint ?? context.colorScheme3.primary;
 
-    return Opacity(
-      opacity: isEnabled ? 1 : SdButtonStyleV3.disabledOpacity,
-      child: InkWell(
-        onTap: isEnabled ? onTap : null,
-        onLongPress: isEnabled ? onLongPress : null,
-        borderRadius: SdRadiusV3.cardAll,
-        child: Padding(
-          padding: SdContentPaddingV3.row,
-          child: Row(
-            children: <Widget>[
-              if (icon != null) ...<Widget>[
-                SdIconTileV3(icon: icon!, tint: tint),
-                SizedBox(width: SdSpacingConstant.w12),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
+    return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      borderRadius: SdRadiusV3.cardAll,
+      child: Padding(
+        padding: SdContentPaddingV3.row,
+        child: Row(
+          children: <Widget>[
+            if (icon != null) ...<Widget>[
+              SdIconTileV3(icon: icon!, tint: tint),
+              SizedBox(width: SdSpacingConstant.w12),
+            ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    title,
+                    style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
+                      color: context.sdTheme3.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (subtitle != null) ...<Widget>[
+                    SizedBox(height: SdSpacingConstant.h2),
                     Text(
-                      title,
-                      style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
-                        color: context.sdTheme3.textPrimary,
-                      ),
-                      maxLines: 1,
+                      subtitle!,
+                      style: context.textTheme3.bodySmall!.faint3(context),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (subtitle != null) ...<Widget>[
-                      SizedBox(height: SdSpacingConstant.h2),
-                      Text(
-                        subtitle!,
-                        style: context.textTheme3.bodySmall!.faint3(context),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
-              if (trailing != null)
-                trailing!
-              else if (trailingText != null)
-                Text(
-                  trailingText!,
-                  style: context.textTheme3.bodyMedium!.tabular3.copyWith(
-                    color: context.sdTheme3.textPrimary,
-                  ),
-                )
-              else if (showChevron && isEnabled && onTap != null)
-                const AppRowChevron(),
-            ],
-          ),
+            ),
+            if (trailing != null)
+              trailing!
+            else if (trailingText != null)
+              Text(
+                trailingText!,
+                style: context.textTheme3.bodyMedium!.tabular3.copyWith(
+                  color: context.sdTheme3.textPrimary,
+                ),
+              )
+            else if (showChevron && onTap != null)
+              const AppRowChevron(),
+          ],
         ),
       ),
     );

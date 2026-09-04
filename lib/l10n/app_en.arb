@@ -5276,6 +5276,18 @@
   "@listingsNoMatch": {
     "description": "Listings screen, shown when a tab is empty but others are not."
   },
+  "recordSaleBlockedTitle": "This item cannot be sold",
+  "@recordSaleBlockedTitle": {
+    "description": "Title of the sheet opened by tapping a sale-picker row that cannot be sold."
+  },
+  "recordSaleBlockedHint": "Its status and how many are on the shelf are both edited on the item itself.",
+  "@recordSaleBlockedHint": {
+    "description": "Under the reasons in the blocked-sale sheet: where the seller fixes it."
+  },
+  "recordSaleOpenItem": "Open item",
+  "@recordSaleOpenItem": {
+    "description": "Primary action of the blocked-sale sheet — opens the item's detail screen."
+  },
   "commonGoToInventory": "Go to inventory",
   "@commonGoToInventory": {
     "description": "Empty-state button on a list fed by inventory."
