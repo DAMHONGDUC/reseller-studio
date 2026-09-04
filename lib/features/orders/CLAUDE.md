@@ -65,6 +65,21 @@ opens.
     estimate is a fact about the platform the seller just picked, so it
     belongs to that answer; under the fee box it read as a note about a field
     they had deliberately left empty.
+- **One sheet explains the two fees, and both are one tap from the sale** —
+  owner's rule. "Platform fee" on this order and the marketplace's rate are
+  different things that share a word, and a seller who cannot tell them apart
+  either leaves the box empty forever or types the estimate back into it as
+  though it were reported.
+  - `FeeExplainerSheet` (`core/widgets/`) says what each one is: the fee is
+    what the platform actually took and the only fee this app stores; the rate
+    is a percentage per marketplace, used only to estimate a sale nobody has
+    entered one for.
+  - **It ends on the way to the rate** — the primary action opens
+    More → Marketplaces, because the sentence that explains where a number
+    lives is worth less than the button that goes there.
+  - **Two ways in, because the estimate card is not always drawn**: the card
+    itself is tappable, and a text button under the fee box is there whether
+    or not a fee has been typed.
   - **It disappears the moment a fee is typed.** Then there is nothing to
     estimate: the box holds the fact, and echoing it back under itself would
     read as a second figure.
