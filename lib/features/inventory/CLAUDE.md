@@ -457,7 +457,7 @@ is live on** — no names and no amounts.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
 
-## Four statuses, and quantity moves between two of them
+## Four statuses, and the seller picks between them
 
 Owner's rule, and it replaces the six-state lifecycle:
 
@@ -501,14 +501,10 @@ asked how many arrived, added that to `quantity` and moved the item to
 - **The box takes the new total, not an addend**, so the arithmetic the sheet
   spelled out is not arithmetic any more: the figure the record holds is on
   screen while the seller types over it.
-- **Putting stock behind a sold row still brings it back.**
-  `ItemDetailEditController.saveQuantity` runs `ItemTransition.restocked` —
-  the call `ItemFormController.submit` already made, now on both screens that
-  edit a count. A sold row given a quantity again is a seller saying they have
-  the thing, and leaving it sold made the card claim nothing was left of ten.
-- **An archived item still needs the verb.** Archiving is a deliberate
-  withdrawal and a count does not undo it (`ItemTransition.restocked` refuses
-  anything that is not sold); "Put back in stock" is what returns it.
+- **A count moves nothing else.** `saveQuantity` writes the count and stops
+  there: a sold row given stock stays sold and says so with an alert tag, and
+  the seller picks the status themselves in the section under it. The rule and
+  its reasons are the section below.
 - **`Make it in stock` is the draft's own row**, shown only on a draft. It
   carries no count: the item already has one, and what the seller is saying is
   that it is ready to sell.
@@ -518,6 +514,36 @@ asked how many arrived, added that to `quantity` and moved the item to
 - `test/features/inventory/item_quantity_test.dart` holds both halves: the
   actions sheet offering no Restock, and the detail screen putting a sold row
   back on the shelf.
+
+## Quantity and status are independent, and a contradiction is a tag
+
+Owner's rule, and it cuts every link between the two. A seller who types one
+of them is saying that one thing, not two.
+
+- **Editing one never writes the other.** Picking `sold` no longer empties the
+  count, and putting stock behind a sold row no longer brings it back —
+  `ItemTransition.restocked` is deleted, and the `quantity` line is out of
+  `setStatus`. What stays there is `soldAt`, which is a timestamp of the move
+  rather than a second opinion about the shelf.
+- **Both are edited freely, and nothing is refused.** Status is its own
+  section on the detail screen — four tags, the same freedom the form already
+  had — beside the count's own section.
+- **A pair that cannot both be true is drawn, never refused.**
+  `ItemConsistency.warnings` names the contradictions and `ItemWarning`
+  carries the words and the hue, as an alert tag at the top of the detail
+  screen:
+  - on hand with nothing on the shelf — amber, because it is a gap in the
+    record rather than a claim that is false;
+  - sold while the count says there are some — red, because the row
+    contradicts itself.
+- **An archived item with stock is not one of them.** Withdrawing something is
+  not giving it away, and the count is what the seller still owns.
+- **The verbs still move both, because a sale is an event rather than an
+  edit.** `ItemTransition.sell` takes one off the shelf and marks the row sold
+  when it empties — a fact the app recorded, not a field somebody typed. The
+  freedom in this rule is the seller's over their own record; it is not a
+  licence for a flow to write two fields when it was asked for one.
+- `test/features/inventory/item_warning_test.dart` holds the pairs.
 
 ## The create form opens on the last filing
 
@@ -590,9 +616,10 @@ that each opened a sheet.
   - **The verbs are unchanged.** `ItemTransition.check` still gates Mark as
     sold, cross-listing and the bulk paths, which is where a missing price
     actually matters.
-  - **The side effects still ride along**, because they keep the record
-    consistent rather than legal: setting `sold` empties the count, and coming
-    back onto the shelf clears `soldAt`.
+  - **The one side effect left is `soldAt`**: it is stamped on the way to
+    `sold` and cleared on the way back, because a row on hand carrying a sold
+    date is one every export reads as sold. The count is not touched — see the
+    section on quantity and status being independent.
   - It writes **no order**: revenue and profit are read from orders (hard rule
     3), so a sale that has to show up in the figures is recorded through Mark
     as sold.
@@ -601,12 +628,10 @@ that each opened a sheet.
 
 Owner's rule, after a sold item was given a quantity of 10 and stayed sold.
 
-- **Two things move a status without a verb, and no third one may.** The
-  status tags the seller picks, and a count put behind a sold row —
-  `ItemTransition.restocked`, which both the form and the detail screen run.
-  Every other field is inert: a price, a photo or a note cannot change what
-  state an item is in. Hard rule 2 puts state changes behind verbs, and
-  `ItemTransition` stays the one place that decides.
+- **One thing moves a status without a verb: the tags the seller picks.**
+  Every field is inert — a count, a price, a photo or a note cannot change
+  what state an item is in. Hard rule 2 puts state changes behind verbs, and
+  `ItemTransition` stays the one place that decides what a move carries.
 - **The archive row is decided by `status.isOnHand`, not by `archived`.** On
   the shelf it offers Archive; off it — sold *or* archived — it offers "Put
   back in stock". A sold item previously had no way back at all: the row said
