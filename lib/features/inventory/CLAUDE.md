@@ -555,18 +555,26 @@ of them is saying that one thing, not two.
   without opening anything, and what to do about it. That is why
   `ItemWarningDisplay.message` takes the item — the status word and the count
   are in the sentence.
-- **It is a full-width line, never a compact badge.** A sentence does not fit
-  the badge row, and shortening it to fit is how it stopped saying anything.
-- **It is set small, and on a card it is not bold either** — owner's rule.
-  `bodySmall` is the floor of the scale (`AppTheme._textTheme`), so the card's
-  line gets quieter still by shedding its weight rather than by an off-scale
-  size. A warning is a fact the row carries, not a headline competing with the
-  title above it.
-- **One warning line per card, and the record's own wins** — owner's rule. A
-  card that can also be handed a `notice` (the sale picker's reason) draws it
-  only when the item has no warning of its own: "none on the shelf but status
-  is In stock" and "there is none of this left on the shelf" are the same
-  sentence twice, and the seller reads the second one as a second problem.
+- **On the card it is a tag beside the update date; the sentence belongs to
+  the detail screen** — owner's rule, and it replaced a full-width line under
+  the money band. The row's job is to flag the problem while a seller scans
+  forty of them, and a sentence wide enough to explain it is a paragraph in a
+  list. So `ItemWarning` carries two halves: `label` for the tag and `message`
+  for the sentence.
+  - **It sits with the date rather than with the badges** — the tags above say
+    what the item *is*, and this says something about the record, which is the
+    line the date already answers.
+  - The tag is the card's own `_DisplayTag` at `compact`, so it is the same
+    marker the status and the grade wear.
+  - **The sentence still names both halves** where there is room for it: the
+    detail screen draws `ItemWarningLines` at full width, above every card.
+- **The sentence is set small** — owner's rule: `bodySmall`, the floor of the
+  scale (`AppTheme._textTheme`). A warning is a fact the screen carries, not a
+  headline competing with the title above it.
+- **One warning tag per card, and the record's own wins** — owner's rule. A
+  card that can also be handed a `notice` (the sale picker's short reason)
+  draws it only when the item has no warning of its own: two tags saying the
+  same thing read as two problems.
 - **It shows on the inventory row as well as on the detail screen** — owner's
   rule, and it is why `ItemWarningLines` is one widget both draw. A row that
   contradicts itself is one a seller has to find while scanning the list; a

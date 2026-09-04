@@ -97,9 +97,10 @@ shown, not hidden.**
     arrow: this screen's tap is the sale, and a second verb on the row would
     take the seller out of the flow they came for.
   - **A blocked row carries its reason where the card carries its warnings** —
-    the same `AppWarningLine` under the money band that a contradiction uses,
-    so a seller learns one shape for "this row is trying to tell you
-    something".
+    a tag beside the update date, the same place and the same marker a
+    contradiction uses, so a seller learns one shape for "this row is trying
+    to tell you something". The tag is short on purpose: the reason in full is
+    what the tap opens.
   - **It is not drawn twice.** An item on the shelf with a count of zero is
     both a contradiction and a reason it cannot be sold, and the two sentences
     say the same thing; the card keeps its own warning and drops the picker's
