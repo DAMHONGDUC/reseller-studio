@@ -17,7 +17,7 @@ class FirestoreOfferRepository implements OfferRepository {
 
   @override
   Stream<List<Offer>> watchOffers() => FirestoreStream.collection(
-    _context.collections.offers.orderBy('createdAt', descending: true),
+    _context.collections.offers.query.orderBy('createdAt', descending: true),
     _toEntity,
     operation: 'load offers',
   );

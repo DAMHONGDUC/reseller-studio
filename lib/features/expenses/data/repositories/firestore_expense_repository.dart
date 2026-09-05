@@ -17,7 +17,7 @@ class FirestoreExpenseRepository implements ExpenseRepository {
 
   @override
   Stream<List<Expense>> watchExpenses() => FirestoreStream.collection(
-    _context.collections.expenses.orderBy('date', descending: true),
+    _context.collections.expenses.query.orderBy('date', descending: true),
     _toEntity,
     operation: 'load expenses',
   ).map(_live);
@@ -25,7 +25,10 @@ class FirestoreExpenseRepository implements ExpenseRepository {
   @override
   Stream<List<Expense>> watchExpensesForOrder(String orderId) =>
       FirestoreStream.collection(
-        _context.collections.expenses.where('orderId', isEqualTo: orderId),
+        _context.collections.expenses.query.where(
+          'orderId',
+          isEqualTo: orderId,
+        ),
         _toEntity,
         operation: 'load expenses for order',
       ).map(_live);

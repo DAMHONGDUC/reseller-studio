@@ -4,6 +4,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Source;
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../domain/entities/purchase.dart';
 import '../../domain/entities/source.dart';
@@ -18,7 +19,7 @@ final class SourceDto {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return Source(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       type: FirestoreMapper.enumOrNull(SourceType.values, data['type']),
@@ -65,7 +66,7 @@ final class PurchaseDto {
         FirestoreMapper.stringOrNull(data['currency']) ?? fallbackCurrency;
 
     return Purchase(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       purchaseDate: FirestoreMapper.dateOr(
         data['purchaseDate'],
         DateTime.now(),

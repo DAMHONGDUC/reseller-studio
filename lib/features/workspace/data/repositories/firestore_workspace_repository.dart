@@ -56,7 +56,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
   @override
   Stream<List<Member>> watchMembers(String workspaceId) =>
       FirestoreStream.collection(
-        WorkspaceCollections(_firestore, workspaceId).members,
+        WorkspaceCollections(_firestore, workspaceId).members.query,
         MemberDto.toEntity,
         operation: 'load team',
       );

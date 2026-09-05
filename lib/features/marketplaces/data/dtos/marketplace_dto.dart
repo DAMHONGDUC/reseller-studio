@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../../../core/theme/app_tag_hue.dart';
 import '../../domain/entities/marketplace.dart';
 
@@ -10,7 +11,7 @@ final class MarketplaceDto {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return Marketplace(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       // Stored by name, never by index: a reordered enum would otherwise

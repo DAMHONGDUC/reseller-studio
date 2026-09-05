@@ -2,7 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { logger } from 'firebase-functions';
 
-import { db, paths } from '../lib/firestore';
+import { db, paths, rowsOf } from '../lib/firestore';
 
 /**
  * What a notification is about. The list is plan §22, and the app renders the
@@ -92,7 +92,7 @@ export async function notifyWorkspace(options: {
   exceptUid?: string | null;
 }): Promise<void> {
   const { dedupeKey, notification, exceptUid } = options;
-  const members = await db().collection(paths.members(notification.workspaceId)).get();
+  const members = await rowsOf(notification.workspaceId, paths.members).get();
   const addressed = members.docs
     .map((doc) => doc.id)
     .filter((uid) => uid !== exceptUid);

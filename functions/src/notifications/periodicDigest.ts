@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
-import { db, paths } from '../lib/firestore';
+import { db, paths, rowsOf } from '../lib/firestore';
 import { LocalClock } from '../lib/timezone';
 import { notifyWorkspace } from './notify';
 
@@ -85,8 +85,7 @@ export async function periodicFor(
  * query into at all.
  */
 async function bookkeeping(workspaceId: string, day: string): Promise<number> {
-  const estimated = await db()
-    .collection(paths.records(workspaceId, 'orders'))
+  const estimated = await rowsOf(workspaceId, 'orders')
     .where('status', 'in', revenueStatuses)
     .where('feesMinor', '==', null)
     .count()
@@ -127,8 +126,7 @@ async function sourcingNote(workspaceId: string, firstOfMonth: Date): Promise<nu
 
   from.setUTCMonth(from.getUTCMonth() - 1);
 
-  const orders = await db()
-    .collection(paths.records(workspaceId, 'orders'))
+  const orders = await rowsOf(workspaceId, 'orders')
     .where('status', 'in', revenueStatuses)
     .where('orderedAt', '>=', Timestamp.fromDate(from))
     .where('orderedAt', '<', Timestamp.fromDate(firstOfMonth))
@@ -162,7 +160,7 @@ async function sourcingNote(workspaceId: string, firstOfMonth: Date): Promise<nu
   // and with nothing to beat it says nothing.
   if (winner === undefined || revenueBySource.size < 2) return 0;
 
-  const source = await db().doc(`${paths.records(workspaceId, 'sources')}/${winner[0]}`).get();
+  const source = await db().doc(paths.row('sources', workspaceId, winner[0])).get();
   const name = String(source.get('name') ?? '');
 
   if (name.length === 0) return 0;
@@ -193,7 +191,7 @@ async function groupBySource(
   for (let offset = 0; offset < ids.length; offset += readChunk) {
     const chunk = ids.slice(offset, offset + readChunk);
     const items = await db().getAll(
-      ...chunk.map((id) => db().doc(`${paths.records(workspaceId, 'items')}/${id}`)),
+      ...chunk.map((id) => db().doc(paths.row('items', workspaceId, id))),
     );
 
     for (const item of items) {

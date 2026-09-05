@@ -21,7 +21,7 @@ class FirestoreSourceRepository implements SourceRepository {
   @override
   Stream<List<Source>> watchSources() =>
       FirestoreStream.collection(
-        _context.collections.sources.orderBy('name'),
+        _context.collections.sources.query.orderBy('name'),
         SourceDto.toEntity,
         operation: 'load sources',
       ).map(
@@ -82,7 +82,10 @@ class FirestorePurchaseRepository implements PurchaseRepository {
 
   @override
   Stream<List<Purchase>> watchPurchases() => FirestoreStream.collection(
-    _context.collections.purchases.orderBy('purchaseDate', descending: true),
+    _context.collections.purchases.query.orderBy(
+      'purchaseDate',
+      descending: true,
+    ),
     _toEntity,
     operation: 'load purchases',
   ).map(_live);
@@ -90,7 +93,7 @@ class FirestorePurchaseRepository implements PurchaseRepository {
   @override
   Stream<List<Purchase>> watchPurchasesForSource(String sourceId) =>
       FirestoreStream.collection(
-        _context.collections.purchases
+        _context.collections.purchases.query
             .where('sourceId', isEqualTo: sourceId)
             .orderBy('purchaseDate', descending: true),
         _toEntity,

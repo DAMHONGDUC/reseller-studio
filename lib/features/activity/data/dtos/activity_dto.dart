@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../domain/entities/activity_entry.dart';
 
 /// How an [ActivityEntry] is stored. Read only — see the repository.
@@ -14,7 +15,7 @@ final class ActivityDto {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return ActivityEntry(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       entityType:
           FirestoreMapper.enumOrNull(
             ActivityEntityType.values,

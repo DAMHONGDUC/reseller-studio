@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
-import { db, paths } from '../lib/firestore';
+import { rowsOf } from '../lib/firestore';
 import { notifyWorkspace } from './notify';
 
 /**
@@ -28,8 +28,7 @@ const warnWithinHours = 4;
 export async function expiringOffersFor(workspaceId: string, now: Date): Promise<number> {
   const deadline = new Date(now.getTime() + warnWithinHours * 60 * 60 * 1000);
 
-  const expiring = await db()
-    .collection(paths.records(workspaceId, 'offers'))
+  const expiring = await rowsOf(workspaceId, 'offers')
     .where('status', '==', 'pending')
     // Still open: an offer whose deadline has passed is the platform's
     // problem now, and telling the seller about it is telling them off.

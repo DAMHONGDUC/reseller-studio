@@ -2,7 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
-import { db, paths, planFor, seatsByPlan } from '../lib/firestore';
+import { db, paths, planFor, rowsOf, seatsByPlan } from '../lib/firestore';
 import { clientFacing } from '../lib/runtime';
 
 /** Roles an invite may grant. `owner` is never handed out by invitation. */
@@ -63,7 +63,7 @@ export const inviteMember = onCall(clientFacing, async (request) => {
 
   if (seats !== null) {
     const [members, pending] = await Promise.all([
-      db().collection(paths.members(workspaceId)).count().get(),
+      rowsOf(workspaceId, paths.members).count().get(),
       db()
         .collection(paths.invites)
         .where('workspaceId', '==', workspaceId)

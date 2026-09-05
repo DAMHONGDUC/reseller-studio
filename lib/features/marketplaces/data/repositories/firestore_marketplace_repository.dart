@@ -21,7 +21,7 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
 
   @override
   Stream<List<Marketplace>> watchMarketplaces() => FirestoreStream.collection(
-    _context.collections.marketplaces.orderBy('createdAt'),
+    _context.collections.marketplaces.query.orderBy('createdAt'),
     MarketplaceDto.toEntity,
     operation: 'load marketplaces',
   );

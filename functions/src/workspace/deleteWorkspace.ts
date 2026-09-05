@@ -2,7 +2,7 @@ import { logger } from 'firebase-functions';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { requireFreshUid } from '../lib/caller';
-import { db, paths } from '../lib/firestore';
+import { db, paths, rowsOf } from '../lib/firestore';
 import { deleteWorkspaceData } from './teardown';
 import { clientFacing } from '../lib/runtime';
 
@@ -49,7 +49,7 @@ export const deleteWorkspace = onCall(clientFacing, async (request) => {
     throw new HttpsError('permission-denied', 'Only the owner can delete a business.');
   }
 
-  const members = await db().collection(paths.members(workspaceId)).count().get();
+  const members = await rowsOf(workspaceId, paths.members).count().get();
 
   await deleteWorkspaceData(workspaceId);
 

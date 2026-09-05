@@ -1,5 +1,6 @@
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 
+import { workspaceOf } from '../lib/firestore';
 import { actionFor, writeActivity } from './writeActivity';
 
 /**
@@ -22,15 +23,19 @@ const logged: ReadonlyArray<{ collection: string; entityType: string }> = [
 
 function trigger(collection: string, entityType: string) {
   return onDocumentWritten(
-    `workspaces/{workspaceId}/${collection}/{entityId}`,
+    `${collection}/{entityId}`,
     async (event) => {
       const action = actionFor(event.data);
+      // The table is flat, so the workspace is a column rather than a path
+      // parameter. A row without one is not a business record and is skipped
+      // rather than logged against an empty workspace.
+      const workspaceId = workspaceOf(event.data);
 
-      if (action === null) return;
+      if (action === null || workspaceId === null) return;
 
       await writeActivity({
         eventId: event.id,
-        workspaceId: event.params.workspaceId,
+        workspaceId,
         entityType,
         entityId: event.params.entityId,
         action,

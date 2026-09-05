@@ -19,7 +19,7 @@ class FirestoreCategoryRepository implements CategoryRepository {
   @override
   Stream<List<ItemCategory>> watchCategories() =>
       FirestoreStream.collection(
-        _context.collections.categories.orderBy('name'),
+        _context.collections.categories.query.orderBy('name'),
         ItemCategoryDto.toEntity,
         operation: 'load categories',
       ).map(
@@ -69,7 +69,7 @@ class FirestoreLocationRepository implements LocationRepository {
   @override
   Stream<List<StorageLocation>> watchLocations() =>
       FirestoreStream.collection(
-        _context.collections.locations.orderBy('name'),
+        _context.collections.locations.query.orderBy('name'),
         StorageLocationDto.toEntity,
         operation: 'load locations',
       ).map(

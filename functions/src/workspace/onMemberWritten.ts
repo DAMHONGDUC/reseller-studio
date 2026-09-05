@@ -2,7 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 
-import { db, paths } from '../lib/firestore';
+import { db, idSeparator, paths, workspaceOf } from '../lib/firestore';
 
 /**
  * Keeps `users/{uid}.workspaceIds` in step with the membership documents.
@@ -21,9 +21,17 @@ import { db, paths } from '../lib/firestore';
  * event lands on the same array.
  */
 export const onMemberWritten = onDocumentWritten(
-  'workspaces/{workspaceId}/members/{memberUid}',
+  'members/{memberId}',
   async (event) => {
-    const { workspaceId, memberUid } = event.params;
+    // `{workspaceId}_{uid}`: the workspace is a column, and the uid is what is
+    // left of the composite key once the workspace is taken off the front.
+    const workspaceId = workspaceOf(event.data);
+    const memberId = String(event.params.memberId);
+    const memberUid =
+      workspaceId === null ? '' : memberId.slice(workspaceId.length + idSeparator.length);
+
+    if (workspaceId === null || memberUid === '') return;
+
     const existedBefore = event.data?.before.exists ?? false;
     const existsAfter = event.data?.after.exists ?? false;
 

@@ -3,7 +3,7 @@ import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
 
 import { requireFreshUid } from '../lib/caller';
-import { db, paths } from '../lib/firestore';
+import { db, paths, rowsOf } from '../lib/firestore';
 import { deleteWorkspaceData } from '../workspace/teardown';
 import { clientFacing } from '../lib/runtime';
 
@@ -41,7 +41,7 @@ export const deleteAccount = onCall(clientFacing, async (request) => {
   let left = 0;
 
   for (const workspaceId of workspaceIds) {
-    const members = await db().collection(paths.members(workspaceId)).get();
+    const members = await rowsOf(workspaceId, paths.members).get();
     const mine = members.docs.find((doc) => doc.id === uid);
 
     if (!mine) continue;

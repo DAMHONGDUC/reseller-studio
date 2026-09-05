@@ -2,7 +2,7 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
-import { db, paths } from '../lib/firestore';
+import { db, rowsOf } from '../lib/firestore';
 import { localClock } from '../lib/timezone';
 import { expiringOffersFor } from './expiringOffers';
 import { notifyWorkspace } from './notify';
@@ -147,8 +147,7 @@ async function digestFor(
   payoutCutoff.setDate(payoutCutoff.getDate() - payoutOverdueDays);
 
   const [due, today, unpaid, stale, onHand] = await Promise.all([
-    db()
-      .collection(paths.records(workspaceId, 'orders'))
+    rowsOf(workspaceId, 'orders')
       .where('status', '==', 'toShip')
       .where('shipByDate', '<=', Timestamp.fromDate(now))
       .count()
@@ -156,28 +155,24 @@ async function digestFor(
     // Still in front of the deadline rather than behind it. By the time an
     // order is overdue the platform has already marked it late, which is the
     // thing this reminder exists to prevent.
-    db()
-      .collection(paths.records(workspaceId, 'orders'))
+    rowsOf(workspaceId, 'orders')
       .where('status', '==', 'toShip')
       .where('shipByDate', '>', Timestamp.fromDate(now))
       .where('shipByDate', '<=', Timestamp.fromDate(endOfDay))
       .count()
       .get(),
-    db()
-      .collection(paths.records(workspaceId, 'orders'))
+    rowsOf(workspaceId, 'orders')
       .where('status', 'in', awaitingPayoutStatuses)
       .where('payoutMinor', '==', null)
       .where('shippedAt', '<=', Timestamp.fromDate(payoutCutoff))
       .count()
       .get(),
-    db()
-      .collection(paths.records(workspaceId, 'items'))
+    rowsOf(workspaceId, 'items')
       .where('status', '==', 'listed')
       .where('listedAt', '<=', Timestamp.fromDate(staleBefore))
       .count()
       .get(),
-    db()
-      .collection(paths.records(workspaceId, 'items'))
+    rowsOf(workspaceId, 'items')
       .where('status', 'in', onHandStatuses)
       .count()
       .get(),

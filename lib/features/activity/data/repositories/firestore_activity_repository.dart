@@ -13,7 +13,7 @@ class FirestoreActivityRepository implements ActivityRepository {
   @override
   Stream<List<ActivityEntry>> watchRecent({int limit = 50}) =>
       FirestoreStream.collection(
-        _context.collections.activity
+        _context.collections.activity.query
             .orderBy('createdAt', descending: true)
             .limit(limit),
         (doc) => ActivityDto.toEntity(doc),

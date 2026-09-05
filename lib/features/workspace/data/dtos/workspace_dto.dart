@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/user_profile.dart';
@@ -65,7 +66,9 @@ final class MemberDto {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return Member(
-      uid: doc.id,
+      // The document id is `{workspaceId}_{uid}`: a membership is a composite
+      // key, because one uid belongs to several businesses.
+      uid: WorkspaceTable.localId(doc.id),
       role:
           FirestoreMapper.enumOrNull(MemberRole.values, data['role']) ??
           MemberRole.viewer,

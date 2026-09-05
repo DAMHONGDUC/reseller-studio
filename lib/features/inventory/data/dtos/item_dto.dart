@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 
@@ -31,7 +32,7 @@ final class ItemDto {
     return Item(
       // The id is the document id and is never stored as a field — storing it
       // twice means it can disagree with itself.
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       title: FirestoreMapper.stringOrNull(data['title']) ?? '',
       quantity: FirestoreMapper.intOrNull(data['quantity']) ?? 1,
       status: _status(data['status']),
