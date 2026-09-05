@@ -6290,5 +6290,59 @@
   "workspacePlanningFeeHelper": "Used only when working out whether a buy is worth making. Real fees are measured from each payout.",
   "@workspacePlanningFeeHelper": {
     "description": "Helper under the assumed platform fee picker."
+  },
+  "importPayoutsTitle": "Import payouts",
+  "@importPayoutsTitle": {
+    "description": "Title of the screen that reads a marketplace payout export."
+  },
+  "importPayoutsAction": "Import from a file",
+  "@importPayoutsAction": {
+    "description": "App bar action on Record payouts opening the import screen."
+  },
+  "importPayoutsIntro": "Export your payout report from the marketplace, open it, copy everything and paste it here. Nothing is saved until you have seen what matched.",
+  "@importPayoutsIntro": {
+    "description": "Line above the paste box on the import screen."
+  },
+  "importPayoutsPasteLabel": "Payout report",
+  "@importPayoutsPasteLabel": {
+    "description": "Label of the box the CSV is pasted into."
+  },
+  "importPayoutsPasteHint": "Order ID,Order earnings…",
+  "@importPayoutsPasteHint": {
+    "description": "Placeholder in the paste box, showing the shape of a CSV."
+  },
+  "importPayoutsUnreadable": "No order number and payout columns found. The file needs a header row naming both — eBay's Earnings report calls them Order ID and Order earnings.",
+  "@importPayoutsUnreadable": {
+    "description": "Shown when the pasted text has no usable columns."
+  },
+  "importPayoutsMatched": "Sales matched",
+  "@importPayoutsMatched": {
+    "description": "Label on the tile counting rows matched to orders awaiting a payout."
+  },
+  "importPayoutsColumns": "Read from {orderIdColumn} and {payoutColumn}",
+  "@importPayoutsColumns": {
+    "description": "Caption naming the two columns the import used.",
+    "placeholders": {
+      "orderIdColumn": {
+        "type": "String"
+      },
+      "payoutColumn": {
+        "type": "String"
+      }
+    }
+  },
+  "importPayoutsLeftOver": "{unmatched} rows name a sale that is not waiting, {skipped} had no amount",
+  "@importPayoutsLeftOver": {
+    "description": "Line under the summary saying what the import left alone.",
+    "placeholders": {
+      "unmatched": {
+        "type": "num",
+        "format": "compact"
+      },
+      "skipped": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
   }
 }

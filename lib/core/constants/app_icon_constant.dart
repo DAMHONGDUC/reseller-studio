@@ -109,6 +109,9 @@ final class AppIconConstant {
   /// Download or export content.
   static const IconData download = Symbols.download_rounded;
 
+  /// Bring content in from a file the user supplies.
+  static const IconData upload = Symbols.upload_rounded;
+
   /// Edit an existing record.
   static const IconData edit = Symbols.edit_rounded;
 

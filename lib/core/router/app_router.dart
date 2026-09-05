@@ -36,6 +36,7 @@ import '../../features/notifications/presentation/screens/notifications_screen/n
 import '../../features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen/onboarding_screen.dart';
 import '../../features/onboarding/providers.dart';
+import '../../features/orders/presentation/screens/import_payouts_screen/import_payouts_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import '../../features/orders/presentation/screens/payouts_screen/payouts_screen.dart';
@@ -475,6 +476,15 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         path: 'record',
                         builder: (BuildContext context, GoRouterState state) =>
                             const RecordPayoutsScreen(),
+                        routes: <RouteBase>[
+                          GoRoute(
+                            parentNavigatorKey: AppNavigatorKey.root,
+                            path: 'import',
+                            builder:
+                                (BuildContext context, GoRouterState state) =>
+                                    const ImportPayoutsScreen(),
+                          ),
+                        ],
                       ),
                     ],
                   ),

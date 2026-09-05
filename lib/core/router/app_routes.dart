@@ -126,6 +126,10 @@ final class AppRoutes {
   /// Under Payouts because it is the work that screen names.
   static const String recordPayouts = '/more/payouts/record';
 
+  /// The same queue, filled from a marketplace's own export rather than by
+  /// hand. Under Record payouts because it is the faster way to do that job.
+  static const String importPayouts = '/more/payouts/record/import';
+
   /// Everywhere the figures are still guessing. Under More next to Reports,
   /// because it is the screen a seller opens before handing anything over.
   static const String books = '/more/books';

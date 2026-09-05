@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
@@ -6,6 +7,7 @@ import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
@@ -112,7 +114,18 @@ class _RecordPayoutsScreenState extends ConsumerState<RecordPayoutsScreen> {
     }
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(title: context.l10n.recordPayoutsTitle),
+      appBar: SdAppBarV3(
+        title: context.l10n.recordPayoutsTitle,
+        actions: <Widget>[
+          // The file is the faster way through the same queue, so it lives on
+          // the screen that queue is on rather than a level up.
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.upload,
+            tooltip: context.l10n.importPayoutsAction,
+            onPressed: () => context.push(AppRoutes.importPayouts),
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           Expanded(
