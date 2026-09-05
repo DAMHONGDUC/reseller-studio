@@ -101,6 +101,9 @@ class WorkspacesScreen extends ConsumerWidget {
           : ListView(
               padding: AppAddFabScaffold.listPadding(context),
               children: <Widget>[
+                // The screen places it, the way every other list screen does
+                // — the gap under an app bar has one owner and one value.
+                SizedBox(height: SdContentPaddingV3.topGap),
                 // Above the list, because it is the answer to the question the
                 // create button is about to ask.
                 const PlanLimitMeters(
