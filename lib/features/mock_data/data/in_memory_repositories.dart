@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../../app_config/domain/entities/app_config.dart';
+import '../../app_config/domain/repositories/app_config_repository.dart';
 import '../../carriers/domain/entities/carrier.dart';
 import '../../carriers/domain/repositories/carrier_repository.dart';
 import '../../expenses/domain/entities/expense.dart';
@@ -777,4 +779,17 @@ class InMemoryWorkspaceRepository implements WorkspaceRepository {
     required String uid,
     required String workspaceId,
   }) async {}
+}
+
+/// App config with nothing behind it.
+///
+/// **It emits the fallback, so mock mode runs with monetisation ON.** A
+/// developer wants the gates in the way by default — a mock build that
+/// silently unlocked everything is one where a paywall bug is invisible until
+/// release. Flipping the switch is done on the real document.
+class InMemoryAppConfigRepository implements AppConfigRepository {
+  const InMemoryAppConfigRepository();
+
+  @override
+  Stream<AppConfig> watch() => Stream<AppConfig>.value(AppConfig.fallback);
 }

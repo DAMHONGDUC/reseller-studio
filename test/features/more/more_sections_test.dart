@@ -60,6 +60,29 @@ void main() {
     expect(business.destinations.first.route, '/more/businesses');
   });
 
+  test('monetisation off drops the Subscription row and nothing else', () {
+    final List<MoreSection> off = MoreConstant.sectionsFor(
+      signedIn: true,
+      premiumEnabled: false,
+    );
+    final List<MoreDestinationKind> kinds = off
+        .expand((MoreSection section) => section.destinations)
+        .map((MoreDestination destination) => destination.kind)
+        .toList();
+
+    // A row that opens a plan screen while nothing is for sale is a row that
+    // leads to an empty promise.
+    expect(kinds, isNot(contains(MoreDestinationKind.subscription)));
+    expect(kinds, contains(MoreDestinationKind.settings));
+    expect(
+      kinds.length,
+      MoreConstant.sectionsFor(signedIn: true)
+              .expand((MoreSection section) => section.destinations)
+              .length -
+          1,
+    );
+  });
+
   testWidgets('signed-in More renders every section title', (
     WidgetTester tester,
   ) async {

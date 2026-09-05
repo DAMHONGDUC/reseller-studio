@@ -243,6 +243,21 @@ service cloud.firestore {
       }
     }
 
+    // --- App config -------------------------------------------------------
+
+    // One document for the whole product, not a business record — nothing in
+    // it belongs to a seller, so it is deliberately not nested under a
+    // workspace (hard rule 14 governs records that are).
+    //
+    // Readable by anyone signed in; written by nobody with an app. The
+    // premium kill switch lives here, and a client that could write it could
+    // switch its own paywall off — the same reason the subscription document
+    // above is `if false`.
+    match /appConfig/{docId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
     // --- Invites ----------------------------------------------------------
 
     // Pending invites are keyed by email so an invitee can find theirs before

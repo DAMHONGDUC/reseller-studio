@@ -2,6 +2,7 @@
 /// real one. Other features import this file, never anything under `data/`.
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,9 @@ import '../../core/firestore/workspace_context.dart';
 import '../../core/storage/file_uploader.dart';
 import '../../core/storage/firebase_file_uploader.dart';
 import '../../core/storage/local_file_uploader.dart';
+import '../app_config/data/repositories/firestore_app_config_repository.dart';
+import '../app_config/domain/repositories/app_config_repository.dart';
+import '../auth/providers.dart';
 import '../carriers/data/repositories/firestore_carrier_repository.dart';
 import '../carriers/domain/repositories/carrier_repository.dart';
 import '../expenses/data/repositories/firestore_expense_repository.dart';
@@ -399,6 +403,27 @@ final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
       if (!AppEnv.hasBillingConfig) return UnconfiguredSubscriptionRepository();
 
       return RevenueCatSubscriptionRepository();
+    });
+
+/// The product's own switches, read by every client and written by none.
+///
+/// **A build with no Firebase gets the fallback rather than a crash.**
+/// `FirebaseFirestore.instance` throws `[core/no-app]` when
+/// `Firebase.initializeApp` has not run, and this provider is read before the
+/// first frame of a gated screen — the same reason `authUserProvider` checks
+/// `firebaseReadyProvider` first. It takes no `WorkspaceContext`: the flag is
+/// the product's, not a business's.
+final Provider<AppConfigRepository> appConfigRepositoryProvider =
+    Provider<AppConfigRepository>((Ref ref) {
+      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+        return const InMemoryAppConfigRepository();
+      }
+
+      if (!ref.watch(firebaseReadyProvider)) {
+        return const InMemoryAppConfigRepository();
+      }
+
+      return FirestoreAppConfigRepository(FirebaseFirestore.instance);
     });
 
 /// Writes the demo business through whatever repositories are live.

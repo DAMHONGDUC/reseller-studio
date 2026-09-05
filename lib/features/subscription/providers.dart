@@ -9,6 +9,7 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../app_config/providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
@@ -54,9 +55,18 @@ final FutureProvider<List<PlanOffering>> planOfferingsProvider =
 /// direction is deliberate: showing a paying seller the free tier for a
 /// moment is a cosmetic bug, whereas defaulting to Premium would hand the
 /// whole app away on every cold start.
+///
+/// **With monetisation switched off it answers Premium for everyone**, and
+/// that is the whole of the kill switch: every ceiling, capability and block
+/// in the app already asks this one question, so turning the plan system off
+/// is one answer changing rather than a flag threaded through forty call
+/// sites. `subscriptionStatusProvider` stays the honest record of what the
+/// seller actually bought — read that, never this, to say so on screen.
 final Provider<SellerPlan> currentPlanProvider = Provider<SellerPlan>((
   Ref ref,
 ) {
+  if (!ref.watch(premiumEnabledProvider)) return SellerPlan.premium;
+
   return ref.watch(subscriptionStatusProvider).value?.plan ?? SellerPlan.free;
 });
 

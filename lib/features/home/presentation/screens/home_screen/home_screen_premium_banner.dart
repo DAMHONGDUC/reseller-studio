@@ -11,6 +11,8 @@ class _HomePremiumBanner extends ConsumerWidget {
   /// Whether this draws anything, so the row beneath it knows whether it
   /// needs a gap. One predicate, read here and at the call site.
   static bool shows(WidgetRef ref) {
+    if (!ref.watch(premiumEnabledProvider)) return false;
+
     final SellerPlan? plan = ref.watch(subscriptionStatusProvider).value?.plan;
 
     return plan != null && plan != SellerPlan.premium;
