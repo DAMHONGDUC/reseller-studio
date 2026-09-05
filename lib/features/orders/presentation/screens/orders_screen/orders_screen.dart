@@ -103,11 +103,6 @@ class OrdersScreen extends ConsumerWidget {
           SizedBox(height: SdContentPaddingV3.topGap),
           const _OrderFilterStrip(),
           const _ActiveFilters(),
-          // Above the list rather than in it: the ceiling is about the whole
-          // tab, not about the rows a filter happens to be showing.
-          const PlanLimitMeters(
-            allowances: <PlanAllowance>[PlanAllowance.orders],
-          ),
           SizedBox(height: SdContentPaddingV3.topGap),
           Expanded(
             child: switch (source) {
