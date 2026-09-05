@@ -3,13 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
-import '../../../../../core/config/dev_flags.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../app_config/providers.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
 import '../../../../mock_data/providers.dart';
@@ -30,9 +30,9 @@ part 'settings_screen_mock_summary.dart';
 /// waiting on a backend or is a preference nobody has asked for yet, and a
 /// screen full of controls that do nothing is worse than a short one.
 ///
-/// The Developer block is compiled out of a release build: `DevFlags` is a
-/// `const` false there, so the tree-shaker removes the branch and everything
-/// only it reached.
+/// The Developer block is hidden unless `devModeEnabledProvider` says
+/// otherwise — every debug and profile build, and the release builds whose
+/// signed-in account `app_config` names.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -79,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
-        if (DevFlags.isDebugOrProfile) ...<Widget>[
+        if (ref.watch(devModeEnabledProvider)) ...<Widget>[
           SdSectionHeaderV3(
             title: context.l10n.settingsDeveloper,
             subtitle: context.l10n.settingsDeveloperNote,

@@ -62,10 +62,15 @@ final FutureProvider<List<PlanOffering>> planOfferingsProvider =
 /// is one answer changing rather than a flag threaded through forty call
 /// sites. `subscriptionStatusProvider` stays the honest record of what the
 /// seller actually bought — read that, never this, to say so on screen.
+///
+/// **An account `app_config` names is Premium without having bought it**, the
+/// same one-answer trick aimed at one person rather than everybody: the
+/// owner, a tester, a seller being made whole after a billing failure.
 final Provider<SellerPlan> currentPlanProvider = Provider<SellerPlan>((
   Ref ref,
 ) {
   if (!ref.watch(premiumEnabledProvider)) return SellerPlan.premium;
+  if (ref.watch(premiumGrantedByEmailProvider)) return SellerPlan.premium;
 
   return ref.watch(subscriptionStatusProvider).value?.plan ?? SellerPlan.free;
 });

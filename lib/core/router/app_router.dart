@@ -11,6 +11,7 @@ import '../../features/analytics/presentation/screens/analytics_profit_screen/an
 import '../../features/analytics/presentation/screens/analytics_sales_screen/analytics_sales_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_sources_screen/analytics_sources_screen.dart';
+import '../../features/app_config/presentation/screens/account_blocked_screen/account_blocked_screen.dart';
 import '../../features/app_config/presentation/screens/update_required_screen/update_required_screen.dart';
 import '../../features/app_config/providers.dart';
 import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
@@ -80,6 +81,9 @@ import 'app_routes.dart';
 /// none has nowhere to read or write. Rather than each screen checking either,
 /// one function does:
 ///
+/// - the config blocks this account → [AppRoutes.blocked], above everything
+///   but the forced update: it is decided by who is signed in, so nothing an
+///   onboarding flag or a workspace says can change it;
 /// - onboarding or auth state still unknown → [AppRoutes.splash]; showing the
 ///   login form here would flash it at a returning user before their session
 ///   resolves, and showing the intro would flash it at one who finished it
@@ -107,6 +111,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       final bool? signedIn = ref.read(isSignedInProvider);
       final OnboardingStatus onboarding = ref.read(onboardingStatusProvider);
       final bool updateRequired = ref.read(forceUpdateRequiredProvider);
+      final bool blocked = ref.read(accountBlockedProvider);
       final String location = state.matchedLocation;
       final bool onAuthRoute = _authRoutes.contains(location);
 
@@ -121,13 +126,25 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             : AppRoutes.updateRequired;
       }
 
+      // Next, and above the splash for the same reason: it is decided by the
+      // account rather than by anything a workspace or a preference can
+      // change, and it never reports "still loading" — an account nobody has
+      // named is not blocked, so a config that has not arrived cannot be why
+      // somebody is refused.
+      if (blocked) {
+        return location == AppRoutes.blocked ? null : AppRoutes.blocked;
+      }
+
       if (signedIn == null || onboarding == OnboardingStatus.loading) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
       }
 
-      // The screen is unreachable once the build is new enough: leaving it up
-      // would be a dead end with nothing to update to.
-      if (location == AppRoutes.updateRequired) return AppRoutes.home;
+      // Both screens are unreachable once their reason is gone: leaving one up
+      // would be a dead end — nothing to update to, nobody to unblock.
+      if (location == AppRoutes.updateRequired ||
+          location == AppRoutes.blocked) {
+        return AppRoutes.home;
+      }
 
       if (!signedIn) {
         // The intro is only ever shown to someone who is not signed in, so a
@@ -180,6 +197,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.updateRequired,
         builder: (BuildContext context, GoRouterState state) =>
             const UpdateRequiredScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.blocked,
+        builder: (BuildContext context, GoRouterState state) =>
+            const AccountBlockedScreen(),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
@@ -702,12 +724,14 @@ class _RouterRefreshListenable extends ChangeNotifier {
       _notifyIfChanged<OnboardingStatus>,
     );
     _forceUpdate = _listen<bool>(ref, forceUpdateRequiredProvider);
+    _blocked = _listen<bool>(ref, accountBlockedProvider);
   }
 
   late final ProviderSubscription<bool?> _signedIn;
   late final ProviderSubscription<WorkspaceStatus> _workspace;
   late final ProviderSubscription<OnboardingStatus> _onboarding;
   late final ProviderSubscription<bool> _forceUpdate;
+  late final ProviderSubscription<bool> _blocked;
 
   /// Typed on `Provider<T>` rather than the more general
   /// `ProviderListenable<T>` that `ref.listen` accepts: Riverpod 3 declares
@@ -716,7 +740,7 @@ class _RouterRefreshListenable extends ChangeNotifier {
   ProviderSubscription<T> _listen<T>(Ref ref, Provider<T> provider) =>
       ref.listen<T>(provider, _notifyIfChanged<T>);
 
-  /// One callback for all four, so a redirect cannot start re-running on one
+  /// One callback for all five, so a redirect cannot start re-running on one
   /// provider and not another.
   void _notifyIfChanged<T>(T? previous, T next) {
     if (previous != next) notifyListeners();
@@ -728,6 +752,7 @@ class _RouterRefreshListenable extends ChangeNotifier {
     _workspace.close();
     _onboarding.close();
     _forceUpdate.close();
+    _blocked.close();
     super.dispose();
   }
 }

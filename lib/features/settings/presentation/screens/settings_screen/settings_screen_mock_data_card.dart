@@ -2,16 +2,17 @@ part of 'settings_screen.dart';
 
 /// The mock-data switch.
 ///
-/// **Hidden entirely in a release build** rather than shown disabled. A
+/// **Hidden entirely without dev mode** rather than shown disabled. A
 /// greyed-out "use fake data" row in a shipped app is a support ticket at
-/// best and a trust problem at worst; `DevFlags.isDebugOrProfile` is a
-/// compile-time constant, so this whole subtree is tree-shaken out.
+/// best and a trust problem at worst. The check is duplicated from the
+/// section that holds it because this card is what turns the fake business
+/// on: one of the two guards being forgotten must not be enough.
 class _MockDataCard extends ConsumerWidget {
   const _MockDataCard();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (!DevFlags.isDebugOrProfile) return const SizedBox.shrink();
+    if (!ref.watch(devModeEnabledProvider)) return const SizedBox.shrink();
 
     final DataMode mode = ref.watch(dataModeProvider);
 

@@ -2,9 +2,8 @@ part of 'settings_screen.dart';
 
 /// Fills the open workspace with the demo business.
 ///
-/// **Hidden in a release build**, like the mock-data switch above it and for
-/// the same reason — `DevFlags.isDebugOrProfile` is a compile-time constant,
-/// so this subtree is tree-shaken out rather than shipped disabled.
+/// **Hidden without dev mode**, like the mock-data switch above it and for
+/// the same reason: it writes tens of documents into a real workspace.
 ///
 /// Strings are hardcoded English on purpose: this is developer UI that never
 /// reaches a seller, and putting it through ARB would mean translating it at
@@ -51,7 +50,7 @@ class _DemoSeedCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (!DevFlags.isDebugOrProfile) return const SizedBox.shrink();
+    if (!ref.watch(devModeEnabledProvider)) return const SizedBox.shrink();
 
     final bool running = ref.watch(demoSeedControllerProvider);
     final bool hasWorkspace = ref.watch(hasWorkspaceProvider);

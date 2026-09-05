@@ -176,6 +176,10 @@ final class AppRoutes {
   /// workspace can change.
   static const String updateRequired = '/update-required';
 
+  /// The other route nothing leaves. Reached when `app_config` names the
+  /// signed-in account on its block list — signing out is the only way off it.
+  static const String blocked = '/blocked';
+
   static const String search = '/search';
 
   /// Build a concrete path for a parameterised route.

@@ -10,9 +10,9 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../core/config/dev_flags.dart';
 import '../../core/firestore/workspace_collections.dart';
 import '../../core/firestore/workspace_context.dart';
+import '../app_config/providers.dart';
 import '../auth/providers.dart';
 import '../listings/domain/enums/listing_status.dart';
 import '../mock_data/data/in_memory_repositories.dart';
@@ -37,7 +37,7 @@ final Provider<WorkspaceRepository> workspaceRepositoryProvider =
     Provider<WorkspaceRepository>((Ref ref) {
       // Mock first, exactly like every business repository: put the Firestore
       // branch first and a demo run reaches for a backend that is not there.
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryWorkspaceRepository(ref.watch(mockStoreProvider));
       }
 
@@ -56,7 +56,7 @@ final Provider<WorkspaceRepository> workspaceRepositoryProvider =
 /// screen draws no add button rather than offering one that cannot work.
 final Provider<TeamRepository?> teamRepositoryProvider =
     Provider<TeamRepository?>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return null;
       }
 
@@ -95,7 +95,7 @@ final StreamProvider<UserProfile?> userProfileProvider =
       final String? uid = ref.watch(currentUidProvider);
 
       if (uid == null ||
-          (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock)) {
+          (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock)) {
         return Stream<UserProfile?>.value(null);
       }
 
@@ -106,7 +106,7 @@ final StreamProvider<UserProfile?> userProfileProvider =
 final Provider<String?> currentWorkspaceIdProvider = Provider<String?>((
   Ref ref,
 ) {
-  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
     return ref.watch(mockStoreProvider).dataset.workspace.id;
   }
 
@@ -132,7 +132,7 @@ final Provider<Workspace?> currentWorkspaceProvider = Provider<Workspace?>((
   // Both modes go through the same stream on purpose. Reading the seed
   // directly was simpler and made the demo the one place a workspace could
   // not be edited — the repository is what Settings writes through.
-  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
     final Workspace seed = ref.watch(mockStoreProvider).dataset.workspace;
 
     return ref.watch(liveWorkspaceProvider(seed.id)).value ?? seed;
@@ -164,7 +164,7 @@ enum WorkspaceStatus {
 
 final Provider<WorkspaceStatus> workspaceStatusProvider =
     Provider<WorkspaceStatus>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return WorkspaceStatus.ready;
       }
 
@@ -226,7 +226,7 @@ workspaceSwitchControllerProvider =
 final Provider<List<Workspace>> workspacesProvider = Provider<List<Workspace>>((
   Ref ref,
 ) {
-  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
     return <Workspace>[ref.watch(mockStoreProvider).dataset.workspace];
   }
 
@@ -245,7 +245,7 @@ final Provider<List<Workspace>> workspacesProvider = Provider<List<Workspace>>((
 /// answers yes without a context, because the in-memory repositories never
 /// look at one.
 final Provider<bool> hasWorkspaceProvider = Provider<bool>((Ref ref) {
-  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
     return true;
   }
 
@@ -294,7 +294,7 @@ final Provider<Duration> staleThresholdProvider = Provider<Duration>((Ref ref) {
 final Provider<List<Member>> workspaceMembersProvider = Provider<List<Member>>((
   Ref ref,
 ) {
-  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
     return ref.watch(mockStoreProvider).dataset.members;
   }
 

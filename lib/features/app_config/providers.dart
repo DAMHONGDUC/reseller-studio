@@ -9,7 +9,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:system_design/common.dart';
 
+import '../../core/config/dev_flags.dart';
 import '../../core/constants/log_tag_constant.dart';
+import '../auth/providers.dart';
 import '../mock_data/providers.dart';
 import 'domain/entities/app_config.dart';
 
@@ -23,9 +25,7 @@ final StreamProvider<AppConfig> appConfigProvider = StreamProvider<AppConfig>(
 /// the whole of [AppConfig.fallback]'s reasoning: the other direction gives
 /// the paid half of the app away on every cold start.
 final Provider<bool> premiumEnabledProvider = Provider<bool>(
-  (Ref ref) =>
-      ref.watch(appConfigProvider).value?.premiumEnabled ??
-      AppConfig.fallback.premiumEnabled,
+  (Ref ref) => ref.watch(_resolvedConfigProvider).premiumEnabled,
 );
 
 /// The build number this binary was compiled as — the `+7` of `1.0.0+7`.
@@ -75,8 +75,7 @@ const int _buildUnknown = 1 << 30;
 /// about an account, so it sits above every other redirect (hard rule 1's
 /// order is unchanged below it).
 final Provider<bool> forceUpdateRequiredProvider = Provider<bool>((Ref ref) {
-  final AppConfig config =
-      ref.watch(appConfigProvider).value ?? AppConfig.fallback;
+  final AppConfig config = ref.watch(_resolvedConfigProvider);
   final int build = ref.watch(appBuildNumberProvider).value ?? _buildUnknown;
 
   return config.forcesUpdate(build);
@@ -85,5 +84,62 @@ final Provider<bool> forceUpdateRequiredProvider = Provider<bool>((Ref ref) {
 /// Where the forced-update screen sends the seller, or null when the config
 /// names nowhere.
 final Provider<String?> updateUrlProvider = Provider<String?>(
-  (Ref ref) => ref.watch(appConfigProvider).value?.updateUrl,
+  (Ref ref) => ref.watch(_resolvedConfigProvider).updateUrl,
+);
+
+/// The live config, or the fallback while it has not arrived.
+///
+/// Every gate below reads this rather than `appConfigProvider` directly: an
+/// `AsyncValue` has three cases and a gate has two, and the fallback is the
+/// answer for the other one.
+final Provider<AppConfig> _resolvedConfigProvider = Provider<AppConfig>(
+  (Ref ref) => ref.watch(appConfigProvider).value ?? AppConfig.fallback,
+);
+
+/// Whether this account was handed Premium by the config rather than by a
+/// purchase.
+///
+/// **`currentPlanProvider` is the only thing that should read it.** A screen
+/// asking this directly would be a second answer to "what is this seller
+/// entitled to", and the gates already ask the first one.
+final Provider<bool> premiumGrantedByEmailProvider = Provider<bool>(
+  (Ref ref) => ref
+      .watch(_resolvedConfigProvider)
+      .grantsPremium(ref.watch(currentEmailProvider)),
+);
+
+/// Whether the developer affordances are available in this build, to this
+/// account.
+///
+/// **It replaces `DevFlags.isDebugOrProfile` at every runtime call site, and
+/// that is a deliberate loosening of the guard in
+/// `lib/features/mock_data/CLAUDE.md`.** That rule made the check a `const`
+/// so the in-memory repositories and their seed were tree-shaken out of a
+/// release binary; a list of emails is by definition a release-build grant,
+/// so the branch has to survive compilation and the seed now ships. What
+/// stops a seller reaching it is the config, not the compiler.
+///
+/// `DevFlags.mockDataDefault` and `DevFlags.verboseLogging` keep their `const`
+/// guards — a *default* that flips itself on in release is not something an
+/// email list was asked to buy.
+///
+/// why: see `docs/rules/DECISIONS.md` § Dev mode is granted by email
+final Provider<bool> devModeEnabledProvider = Provider<bool>((Ref ref) {
+  if (DevFlags.isDebugOrProfile) return true;
+
+  return ref
+      .watch(_resolvedConfigProvider)
+      .grantsDevMode(ref.watch(currentEmailProvider));
+});
+
+/// Whether this account is refused the app.
+///
+/// **False while the config has not arrived, and false when nobody is signed
+/// in** — the same direction as the forced update, for the same reason: a
+/// gate that answers "yes" from a failed read locks people out of an app they
+/// cannot fix from their side. The block lands a frame later instead.
+final Provider<bool> accountBlockedProvider = Provider<bool>(
+  (Ref ref) => ref
+      .watch(_resolvedConfigProvider)
+      .blocks(ref.watch(currentEmailProvider)),
 );

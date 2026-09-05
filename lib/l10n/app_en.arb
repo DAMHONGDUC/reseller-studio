@@ -238,6 +238,14 @@
   "@updateRequiredFailed": {
     "description": "Shown when the store link would not open."
   },
+  "accountBlockedTitle": "Account unavailable",
+  "@accountBlockedTitle": {
+    "description": "Title of the screen shown when the config blocks this account."
+  },
+  "accountBlockedBody": "This account cannot use Reseller Studio. Contact support if you think this is a mistake.",
+  "@accountBlockedBody": {
+    "description": "Body of the blocked-account screen."
+  },
   "onboardingSkip": "Skip",
   "@onboardingSkip": {
     "description": "Dismisses the intro and goes straight to the sign-in gate."

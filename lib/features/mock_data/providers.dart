@@ -18,6 +18,7 @@ import '../../core/storage/firebase_file_uploader.dart';
 import '../../core/storage/local_file_uploader.dart';
 import '../app_config/data/repositories/firestore_app_config_repository.dart';
 import '../app_config/domain/repositories/app_config_repository.dart';
+import '../app_config/providers.dart';
 import '../auth/providers.dart';
 import '../carriers/data/repositories/firestore_carrier_repository.dart';
 import '../carriers/domain/repositories/carrier_repository.dart';
@@ -63,18 +64,25 @@ enum DataMode {
 /// a shipped binary, whereas this is a *setting* a developer toggles from
 /// inside the running app and expects to still be set tomorrow.
 ///
-/// That makes it the weaker of the two guarantees, so it carries two of its
-/// own. **[build] refuses to return [DataMode.mock] in a release build**,
+/// That makes it the weaker of the two guarantees, so it carries one of its
+/// own: **[build] refuses to return [DataMode.mock] without dev mode**,
 /// whatever is stored — a user who somehow had the flag set could otherwise
 /// be shown a fake business as if it were theirs, which is worse than any
-/// crash. And every repository provider below tests
-/// `DevFlags.isDebugOrProfile` *first*, which is `const` false in release, so
-/// the mock branch folds away and the in-memory repositories and their seed
-/// leave the shipped binary rather than merely going unreachable inside it.
+/// crash. Every repository provider below tests `devModeEnabledProvider`
+/// *first*, for the same reason.
+///
+/// **The guard used to be `const` and no longer is.** Dev mode is granted by
+/// email in `app_config` (owner's rule), which is a release-build grant by
+/// definition, so the mock branch has to survive compilation — the in-memory
+/// repositories and the seed now ship in the release binary, unreachable
+/// unless the config names the signed-in account. Keep the check first when
+/// adding a provider: put it second and the fake business is one stale
+/// preference away.
 class DataModeController extends Notifier<DataMode> {
   @override
   DataMode build() {
     final SharedPreferences? prefs = ref.watch(sharedPreferencesProvider).value;
+    final bool devMode = ref.watch(devModeEnabledProvider);
 
     if (prefs == null) return _default;
 
@@ -82,7 +90,7 @@ class DataModeController extends Notifier<DataMode> {
         prefs.getBool(PrefsKeyConstant.dataModeMock) ??
         DevFlags.mockDataDefault;
 
-    return stored ? _guarded(DataMode.mock) : DataMode.live;
+    return stored ? _guarded(DataMode.mock, devMode) : DataMode.live;
   }
 
   /// What mock mode starts as before anyone touches the switch.
@@ -95,11 +103,14 @@ class DataModeController extends Notifier<DataMode> {
   static DataMode get _default =>
       DevFlags.mockDataDefault ? DataMode.mock : DataMode.live;
 
-  static DataMode _guarded(DataMode mode) {
-    if (mode.isMock && !DevFlags.isDebugOrProfile) {
+  /// Takes the grant rather than reading it, so `build` subscribes to it once
+  /// and `setMode` reads it once — a `ref.read` in here would leave the stored
+  /// mode unguarded the moment the config changed.
+  static DataMode _guarded(DataMode mode, bool devModeEnabled) {
+    if (mode.isMock && !devModeEnabled) {
       SdLogger.warning(
         LogTagConstant.mockData,
-        'Mock data requested in a release build — ignoring',
+        'Mock data requested without dev mode — ignoring',
       );
 
       return DataMode.live;
@@ -109,7 +120,7 @@ class DataModeController extends Notifier<DataMode> {
   }
 
   Future<void> setMode(DataMode mode) async {
-    final DataMode resolved = _guarded(mode);
+    final DataMode resolved = _guarded(mode, ref.read(devModeEnabledProvider));
 
     state = resolved;
 
@@ -215,7 +226,7 @@ final class LiveRepositoryGuard {
 
 final Provider<ItemRepository> itemRepositoryProvider =
     Provider<ItemRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryItemRepository(ref.watch(mockStoreProvider));
       }
 
@@ -228,7 +239,7 @@ final Provider<ItemRepository> itemRepositoryProvider =
 
 final Provider<OrderRepository> orderRepositoryProvider =
     Provider<OrderRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryOrderRepository(ref.watch(mockStoreProvider));
       }
 
@@ -241,7 +252,7 @@ final Provider<OrderRepository> orderRepositoryProvider =
 
 final Provider<OfferRepository> offerRepositoryProvider =
     Provider<OfferRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryOfferRepository(ref.watch(mockStoreProvider));
       }
 
@@ -254,7 +265,7 @@ final Provider<OfferRepository> offerRepositoryProvider =
 
 final Provider<MarketplaceRepository> marketplaceRepositoryProvider =
     Provider<MarketplaceRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryMarketplaceRepository(ref.watch(mockStoreProvider));
       }
 
@@ -269,7 +280,7 @@ final Provider<MarketplaceRepository> marketplaceRepositoryProvider =
 
 final Provider<CarrierRepository> carrierRepositoryProvider =
     Provider<CarrierRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryCarrierRepository(ref.watch(mockStoreProvider));
       }
 
@@ -282,7 +293,7 @@ final Provider<CarrierRepository> carrierRepositoryProvider =
 
 final Provider<ListingRepository> listingRepositoryProvider =
     Provider<ListingRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryListingRepository(ref.watch(mockStoreProvider));
       }
 
@@ -297,7 +308,7 @@ final Provider<ListingRepository> listingRepositoryProvider =
 
 final Provider<SourceRepository> sourceRepositoryProvider =
     Provider<SourceRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemorySourceRepository(ref.watch(mockStoreProvider));
       }
 
@@ -310,7 +321,7 @@ final Provider<SourceRepository> sourceRepositoryProvider =
 
 final Provider<PurchaseRepository> purchaseRepositoryProvider =
     Provider<PurchaseRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryPurchaseRepository(ref.watch(mockStoreProvider));
       }
 
@@ -330,7 +341,7 @@ final Provider<PurchaseRepository> purchaseRepositoryProvider =
 final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>((
   Ref ref,
 ) {
-  if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
     return const LocalFileUploader();
   }
 
@@ -343,7 +354,7 @@ final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>((
 
 final Provider<CategoryRepository> categoryRepositoryProvider =
     Provider<CategoryRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryCategoryRepository(ref.watch(mockStoreProvider));
       }
 
@@ -358,7 +369,7 @@ final Provider<CategoryRepository> categoryRepositoryProvider =
 
 final Provider<LocationRepository> locationRepositoryProvider =
     Provider<LocationRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryLocationRepository(ref.watch(mockStoreProvider));
       }
 
@@ -373,7 +384,7 @@ final Provider<LocationRepository> locationRepositoryProvider =
 
 final Provider<ExpenseRepository> expenseRepositoryProvider =
     Provider<ExpenseRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemoryExpenseRepository(ref.watch(mockStoreProvider));
       }
 
@@ -396,7 +407,7 @@ final Provider<ExpenseRepository> expenseRepositoryProvider =
 /// not to a workspace.
 final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
     Provider<SubscriptionRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
+      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
         return InMemorySubscriptionRepository(ref.watch(mockStoreProvider));
       }
 
@@ -413,12 +424,16 @@ final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
 /// first frame of a gated screen — the same reason `authUserProvider` checks
 /// `firebaseReadyProvider` first. It takes no `WorkspaceContext`: the flag is
 /// the product's, not a business's.
+///
+/// **It is the one repository mock mode does not swap, and it has to be.**
+/// Dev mode is now granted by `app_config` itself, so every other provider
+/// below asks `devModeEnabledProvider` — which reads this. Mocking it here
+/// would make the config depend on the switch the config decides, and Riverpod
+/// answers a circular dependency by throwing. Nothing is lost: the mock
+/// implementation returned `AppConfig.fallback`, which is what a build with no
+/// Firebase already gets.
 final Provider<AppConfigRepository> appConfigRepositoryProvider =
     Provider<AppConfigRepository>((Ref ref) {
-      if (DevFlags.isDebugOrProfile && ref.watch(dataModeProvider).isMock) {
-        return const InMemoryAppConfigRepository();
-      }
-
       if (!ref.watch(firebaseReadyProvider)) {
         return const InMemoryAppConfigRepository();
       }
