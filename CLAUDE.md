@@ -472,10 +472,17 @@ behind it.
     uses a token happens in a Cloud Function — the app asks the backend, the
     backend asks the platform. Nothing in the app reads or stores one.
     **Marketplace connection is not a feature of this app** (owner's rule):
-    there is no OAuth, no sync, and no `marketplaces/{id}` collection. What the
-    app keeps about a platform is what it charges — see
-    `lib/features/workspace/CLAUDE.md`. Reinstating a connection is a product
-    decision, and this rule is what it would have to be built under.
+    there is no OAuth, no sync, and no client that talks to a platform.
+    Reinstating one is a product decision, and this rule is what it would have
+    to be built under.
+    - **A file the seller exports is not a connection.** `PayoutCsvImport`
+      reads a payout report the seller downloaded and handed over — no token,
+      no account, nothing leaving the device. It is the honest way to collect
+      the figures this app measures rather than guesses (hard rule 3), and it
+      is the only import there is.
+    - **An importer reads the columns it needs and no others.** A marketplace
+      export carries buyer names and addresses; two values are taken from each
+      row and the rest is never held or logged (hard rule 9).
 
 11. **Workspace membership is the only ACL, and nobody edits their own
     membership document.** `firestore.rules` decides everything from
