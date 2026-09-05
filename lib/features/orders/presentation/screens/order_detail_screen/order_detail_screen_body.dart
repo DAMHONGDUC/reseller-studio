@@ -19,7 +19,7 @@ class _OrderBody extends ConsumerStatefulWidget {
 class _OrderBodyState extends ConsumerState<_OrderBody> {
   final TextEditingController _buyer = TextEditingController();
   final TextEditingController _salePrice = TextEditingController();
-  final TextEditingController _fees = TextEditingController();
+  final TextEditingController _payout = TextEditingController();
   final TextEditingController _tracking = TextEditingController();
   final TextEditingController _shippingCost = TextEditingController();
 
@@ -27,7 +27,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
   void dispose() {
     _buyer.dispose();
     _salePrice.dispose();
-    _fees.dispose();
+    _payout.dispose();
     _tracking.dispose();
     _shippingCost.dispose();
     super.dispose();
@@ -43,7 +43,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         _buyer.text = order.buyerName ?? '';
         _salePrice.text = order.salePrice.toInputString();
       case OrderDetailSection.profit:
-        _fees.text = order.fees?.toInputString() ?? '';
+        _payout.text = order.payout?.toInputString() ?? '';
       case OrderDetailSection.shipping:
         _tracking.text = order.trackingNumber ?? '';
         _shippingCost.text = order.shippingCost?.toInputString() ?? '';
@@ -79,8 +79,6 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
       orderDetailEditControllerProvider.notifier,
     );
     final String currency = ref.watch(workspaceCurrencyProvider);
-    final Map<String, double> feeRates = ref.watch(marketplaceFeeRatesProvider);
-    final String rate = context.percent(order.feeRate(feeRates), decimals: 1);
 
     // Costs already inside the order's own shipping figure are not added
     // again — counting a label twice understates profit.
@@ -88,10 +86,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         .map((Expense expense) => expense.amount)
         .totalOrNull();
 
-    final ProfitBreakdown profit = order.profit(
-      otherExpenses: otherExpenses,
-      feeRates: feeRates,
-    );
+    final ProfitBreakdown profit = order.profit(otherExpenses: otherExpenses);
 
     return ListView(
       padding: SdContentPaddingV3.screen(context),
@@ -149,30 +144,20 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
           onEdit: _startEdit,
           onCancel: controller.cancel,
           onSave: () => _save(
-            () => controller.saveProfit(orderId: order.id, fees: _fees.text),
+            () =>
+                controller.saveProfit(orderId: order.id, payout: _payout.text),
           ),
-          reading: _ProfitStatement(
-            profit: profit,
-            feeNote: context.l10n.orderFeesEstimatedNote(
-              rate,
-              order.marketplaceName,
-            ),
-          ),
-          // The fee is the one stored figure on this statement; every other
-          // line is derived (hard rule 3), so it stays a row while its own
-          // becomes a box in the same place.
+          reading: _ProfitStatement(profit: profit),
+          // The payout is the one stored figure on this statement; every other
+          // line is derived from it (hard rule 3), so the statement keeps its
+          // shape and gains a box rather than swapping a row for one.
           editing: _ProfitStatement(
             profit: profit,
-            feesField: MoneyField(
-              label: context.l10n.orderPlatformFees,
-              controller: _fees,
+            payoutField: MoneyField(
+              label: context.l10n.settlePayout,
+              controller: _payout,
               currency: currency,
-              // The rate the estimate would use, so the seller can see what
-              // they are replacing rather than guessing at it.
-              helperText: context.l10n.orderFeeHelper(
-                order.marketplaceName,
-                rate,
-              ),
+              helperText: context.l10n.settlePayoutHelp,
               textInputAction: TextInputAction.done,
             ),
           ),

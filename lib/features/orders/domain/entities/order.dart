@@ -58,7 +58,6 @@ class Order {
     this.marketplace = Marketplace.other,
     this.marketplaceRecordId,
     this.marketplaceNameSnapshot,
-    this.fees,
     this.shippingCost,
     this.refund,
     this.payout,
@@ -91,16 +90,6 @@ class Order {
   final Money salePrice;
 
   final DateTime orderedAt;
-
-  /// The platform's commission, as the seller reported it.
-  ///
-  /// **Null means nobody has entered it, and it is never treated as zero.**
-  /// There is no marketplace integration to report one (hard rule 10), so
-  /// this arrives only when a seller types what the platform actually took.
-  /// Until then every figure that needs a fee uses [effectiveFees] and says
-  /// it is an estimate — a zero here would claim the platform worked for
-  /// free, which on Poshmark overstates profit by a fifth of the sale price.
-  final Money? fees;
 
   final Money? shippingCost;
   final Money? refund;
@@ -148,49 +137,51 @@ class Order {
     return costs.cast<Money>().reduce((Money a, Money b) => a + b);
   }
 
-  /// What this order's platform charges, as a fraction of the sale price.
+  /// What the platform kept, measured — never estimated (hard rule 3).
   ///
-  /// **One resolution, asked by everything that needs a fee** — the profit
-  /// statement, the payout forecast and the marketplace breakdown all come
-  /// here, so they cannot disagree about what eBay takes. [rates] is
-  /// `marketplaceFeeRatesProvider`: the seller's own marketplace records, so a
-  /// rate corrected on that screen lands on every past order's estimate.
+  /// It is the remainder of what the buyer paid that never arrived —
+  /// `salePrice - refund - payout - shippingCost`, which is
+  /// `PayoutReconciliation.expected` solved for the fee, so the two can never
+  /// disagree.
   ///
-  /// The enum's published rate is the fallback for an order that names no
-  /// record — a legacy row, or one imported before the records existed.
-  double feeRate(Map<String, double> rates) =>
-      rates[marketplaceId] ?? marketplace.estimatedFeeRate;
+  /// **Null until [payout] is in**, which is what makes this order's profit
+  /// `—` rather than a plausible number (hard rule 5), and what puts the order
+  /// in the Payouts queue.
+  ///
+  /// A label bought through the platform is already inside [payout], so it is
+  /// subtracted back out here; one bought elsewhere was never deducted, and
+  /// the fee line then reads low by that amount while the profit total stays
+  /// exact — the shipping line carries it either way.
+  Money? get platformFees {
+    final Money? net = payout;
 
-  /// Whether nobody has entered what the platform actually charged.
-  bool get feesAreEstimated => fees == null;
+    if (net == null) return null;
 
-  /// What the platform took: reported when the seller entered it, estimated
-  /// from [feeRate] when they have not.
-  Money effectiveFees(Map<String, double> feeRates) =>
-      fees ?? salePrice.applyRate(feeRate(feeRates));
+    final Money zero = Money.zero(salePrice.currency);
+
+    return salePrice - (refund ?? zero) - net - (shippingCost ?? zero);
+  }
+
+  /// Whether the platform's cut is still unknown — the order is work.
+  bool get needsPayout => platformFees == null;
 
   /// The full profit statement for this order.
   ///
   /// [otherExpenses] is anything from the Expenses feature attributed to this
   /// sale — passed in rather than looked up, because an entity does not reach
-  /// into a repository. [feeRates] is passed the same way and for the same
-  /// reason.
+  /// into a repository.
   ///
-  /// **An unreported fee is estimated, never zeroed**, and the breakdown
-  /// carries `feesAreEstimated` so the screen can label it.
-  ProfitBreakdown profit({
-    Money? otherExpenses,
-    Map<String, double> feeRates = const <String, double>{},
-  }) {
+  /// **An unknown fee stays unknown**: the breakdown carries a null and every
+  /// figure built on it reads `—`.
+  ProfitBreakdown profit({Money? otherExpenses}) {
     final Money zero = Money.zero(salePrice.currency);
 
     return ProfitBreakdown(
       revenue: salePrice - (refund ?? zero),
       cogs: costOfGoods,
-      fees: effectiveFees(feeRates),
+      fees: platformFees,
       shipping: shippingCost ?? zero,
       otherExpenses: otherExpenses ?? zero,
-      feesAreEstimated: feesAreEstimated,
     );
   }
 
@@ -223,7 +214,6 @@ class Order {
     OrderStatus? status,
     Money? salePrice,
     DateTime? orderedAt,
-    Money? fees,
     Money? shippingCost,
     Money? refund,
     Money? payout,
@@ -231,7 +221,7 @@ class Order {
     String? trackingNumber,
     String? carrier,
     DateTime? shipByDate,
-    bool clearFees = false,
+    bool clearPayout = false,
     bool clearShippingCost = false,
     bool clearBuyerName = false,
     bool clearTrackingNumber = false,
@@ -252,10 +242,9 @@ class Order {
     lines: lines,
     salePrice: salePrice ?? this.salePrice,
     orderedAt: orderedAt ?? this.orderedAt,
-    fees: clearFees ? null : fees ?? this.fees,
     shippingCost: clearShippingCost ? null : shippingCost ?? this.shippingCost,
     refund: refund ?? this.refund,
-    payout: payout ?? this.payout,
+    payout: clearPayout ? null : payout ?? this.payout,
     externalOrderId: externalOrderId,
     buyerName: clearBuyerName ? null : buyerName ?? this.buyerName,
     trackingNumber: clearTrackingNumber

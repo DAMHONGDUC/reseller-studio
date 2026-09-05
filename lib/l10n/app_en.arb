@@ -779,15 +779,6 @@
   "@marketplaceDeleteBody": {
     "description": "Marketplace add/edit screen."
   },
-  "marketplaceFeePercent": "{rate}%",
-  "@marketplaceFeePercent": {
-    "description": "A marketplace's estimated fee rate, as a percentage. The figure alone — the words naming it are the row's caption.",
-    "placeholders": {
-      "rate": {
-        "type": "String"
-      }
-    }
-  },
   "marketplacesEstimatedFee": "Estimated fee",
   "@marketplacesEstimatedFee": {
     "description": "Caption on a marketplace row. A planning estimate, never used as accounting."
@@ -1278,50 +1269,6 @@
   "markSoldDate": "Sale date",
   "@markSoldDate": {
     "description": "When it sold."
-  },
-  "markSoldFees": "Platform fee (optional)",
-  "@markSoldFees": {
-    "description": "What the marketplace took, on the record-sale sheet. Optional: left empty the app estimates it and says so."
-  },
-  "feeExplainerTitle": "About fees",
-  "@feeExplainerTitle": {
-    "description": "Title of the sheet explaining the platform fee and the marketplace rate."
-  },
-  "feeExplainerPlatformTitle": "Platform fee",
-  "@feeExplainerPlatformTitle": {
-    "description": "The first block of the fee explainer: the fee on one order."
-  },
-  "feeExplainerPlatformBody": "What the marketplace actually took from this sale. Enter it when you know it — a reported fee always wins, and it is the only fee this app stores.",
-  "@feeExplainerPlatformBody": {
-    "description": "What the platform fee field on an order means."
-  },
-  "feeExplainerRateTitle": "Marketplace fee rate",
-  "@feeExplainerRateTitle": {
-    "description": "The second block of the fee explainer: the percentage set per marketplace."
-  },
-  "feeExplainerRateBody": "The percentage a marketplace usually takes, set for each one in More → Marketplaces. It only estimates a sale with no fee entered — changing it never rewrites one you typed.",
-  "@feeExplainerRateBody": {
-    "description": "What the marketplace fee rate is and where it is edited."
-  },
-  "feeExplainerOpenMarketplaces": "Open Marketplaces",
-  "@feeExplainerOpenMarketplaces": {
-    "description": "Primary action of the fee explainer — goes to More → Marketplaces, where the rates are edited."
-  },
-  "markSoldFeeEstimateLabel": "Estimated fee",
-  "@markSoldFeeEstimateLabel": {
-    "description": "Label of the fee the app would use on the mark-as-sold sheet when the seller leaves the fee box empty."
-  },
-  "markSoldFeeEstimateHint": "{marketplace} takes {rate}. Change the rate in More → Marketplaces.",
-  "@markSoldFeeEstimateHint": {
-    "description": "Under the estimated fee: which rate it used and where the seller edits it.",
-    "placeholders": {
-      "marketplace": {
-        "type": "String"
-      },
-      "rate": {
-        "type": "String"
-      }
-    }
   },
   "markSoldBuyer": "Buyer (optional)",
   "@markSoldBuyer": {
@@ -1856,15 +1803,6 @@
       }
     }
   },
-  "commonApproximate": "~{value}",
-  "@commonApproximate": {
-    "description": "Marks a figure as approximate where a row has no space to say why — an estimated platform fee is the only thing that produces one.",
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "homePayoutOverdue": "Not paid out yet",
   "@homePayoutOverdue": {
     "description": "Home attention row for sales a marketplace should have settled by now."
@@ -1967,7 +1905,7 @@
   "@booksEstimatedFees": {
     "description": "Group header for sales with no reported platform fee."
   },
-  "booksEstimatedFeesBody": "Profit uses the platform\u2019s published rate until you enter what it actually took.",
+  "booksEstimatedFeesBody": "Profit uses the platform’s published rate until you enter what it actually took.",
   "@booksEstimatedFeesBody": {
     "description": "What an estimated fee costs the seller in accuracy."
   },
@@ -2203,34 +2141,6 @@
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."
   },
-  "orderPlatformFeesEstimated": "Platform fees (estimated)",
-  "@orderPlatformFeesEstimated": {
-    "description": "The fee row's label when nobody has entered what the platform actually charged, so the figure is the published rate."
-  },
-  "orderFeesEstimatedNote": "Estimated at {rate} of the sale price. Enter what {marketplace} actually took to make this exact.",
-  "@orderFeesEstimatedNote": {
-    "description": "Explains an estimated platform fee and how to replace it with the real one.",
-    "placeholders": {
-      "rate": {
-        "type": "String"
-      },
-      "marketplace": {
-        "type": "String"
-      }
-    }
-  },
-  "orderFeeHelper": "{marketplace} usually takes {rate}",
-  "@orderFeeHelper": {
-    "description": "Helper under the platform-fee box, quoting the rate the estimate would use.",
-    "placeholders": {
-      "marketplace": {
-        "type": "String"
-      },
-      "rate": {
-        "type": "String"
-      }
-    }
-  },
   "orderOtherExpenses": "Other expenses",
   "@orderOtherExpenses": {
     "description": "Costs attributed to this sale from the Expenses feature."
@@ -2322,10 +2232,6 @@
   "settleTitle": "Fees and payout",
   "@settleTitle": {
     "description": "Sheet title."
-  },
-  "settleFeesHelp": "What the marketplace took",
-  "@settleFeesHelp": {
-    "description": "Helper under the fees field."
   },
   "settlePayout": "Payout",
   "@settlePayout": {
@@ -3465,10 +3371,6 @@
       }
     }
   },
-  "payoutsEstimatedNote": "Includes an estimated fee where the platform has not reported one",
-  "@payoutsEstimatedNote": {
-    "description": "Warns that part of the awaiting figure is a guess."
-  },
   "payoutsNothingOutstanding": "Everything is settled",
   "@payoutsNothingOutstanding": {
     "description": "Empty state when no order is missing a payout."
@@ -3480,14 +3382,6 @@
   "payoutsExpected": "Expected",
   "@payoutsExpected": {
     "description": "What an order should pay out: sale price less refund, fees and postage."
-  },
-  "payoutsFeeIsEstimated": "Fee estimated — the platform has not reported one",
-  "@payoutsFeeIsEstimated": {
-    "description": "Caption when the expected figure leans on the marketplace's estimated rate."
-  },
-  "payoutsFeeIsReported": "Fee as the platform reported it",
-  "@payoutsFeeIsReported": {
-    "description": "Caption when the expected figure uses a real reported fee."
   },
   "payoutsOrderedOn": "Ordered {date}",
   "@payoutsOrderedOn": {
@@ -6083,7 +5977,7 @@
   },
   "filterAny": "Any",
   "@filterAny": {
-    "description": "The unfiltered option of a three-state group \u2014 with photos, without photos, or any."
+    "description": "The unfiltered option of a three-state group — with photos, without photos, or any."
   },
   "filterAnyTime": "Any time",
   "@filterAnyTime": {
@@ -6147,7 +6041,7 @@
   },
   "filterCostMissing": "No cost",
   "@filterCostMissing": {
-    "description": "Items with no purchase price \u2014 the rows that make every profit figure read as unknown."
+    "description": "Items with no purchase price — the rows that make every profit figure read as unknown."
   },
   "filterAskingPrice": "Asking price",
   "@filterAskingPrice": {
@@ -6287,6 +6181,37 @@
   },
   "orderSectionOrder": "Order",
   "@orderSectionOrder": {
-    "description": "Order detail section: the sale itself \u2014 price, buyer, date."
+    "description": "Order detail section: the sale itself — price, buyer, date."
+  },
+  "markSoldPayout": "Net received (optional)",
+  "@markSoldPayout": {
+    "description": "Sale sheet: what the platform actually paid, when the seller already knows it."
+  },
+  "markSoldPayoutHelp": "What landed in your account. Leave it empty and add it when the platform pays.",
+  "@markSoldPayoutHelp": {
+    "description": "Helper under the net received box on the sale sheet."
+  },
+  "markSoldImpliedFee": "Platform kept",
+  "@markSoldImpliedFee": {
+    "description": "Label on the card showing sale price minus net received."
+  },
+  "payoutsAwaitingCount": "{count, plural, =1{1 sale still to record} other{{count} sales still to record}}",
+  "@payoutsAwaitingCount": {
+    "description": "Subtitle on a marketplace payout card: how many of its sales have no payout yet.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "settleFeeImplied": "Out of {salePrice} the buyer paid",
+  "@settleFeeImplied": {
+    "description": "Caption under the platform-fee figure on the settlement sheet.",
+    "placeholders": {
+      "salePrice": {
+        "type": "String"
+      }
+    }
   }
 }

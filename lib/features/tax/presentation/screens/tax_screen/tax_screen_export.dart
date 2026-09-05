@@ -66,7 +66,7 @@ class _ExportPack extends ConsumerWidget {
                 gaps.isClear
                     ? context.l10n.taxPackExact
                     : context.l10n.taxPackApproximate(
-                        gaps.estimatedFees.length,
+                        gaps.missingPayouts.length,
                         gaps.unknownCost.length,
                       ),
                 style: context.textTheme3.bodySmall!.copyWith(

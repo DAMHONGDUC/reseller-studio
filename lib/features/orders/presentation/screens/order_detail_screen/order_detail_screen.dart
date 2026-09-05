@@ -26,7 +26,6 @@ import '../../../../carriers/domain/entities/carrier.dart';
 import '../../../../carriers/providers.dart';
 import '../../../../expenses/domain/entities/expense.dart';
 import '../../../../expenses/providers.dart';
-import '../../../../marketplaces/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/order.dart';

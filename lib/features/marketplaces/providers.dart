@@ -24,7 +24,6 @@ final Provider<List<Marketplace>> defaultMarketplacesProvider =
           Marketplace(
             id: seed.id,
             name: seed.name,
-            feeRate: seed.feeRate,
             // A millisecond apart, never one instant: the list is read back
             // ordered by `createdAt`, and five identical stamps leave the tie
             // to the document id — the seeded order in mock data and
@@ -65,18 +64,20 @@ final Provider<List<Marketplace>> activeMarketplacesProvider =
 /// sale, so an unlisted item must still be sellable, and an empty picker is a
 /// flow with no way out. The fallback is here rather than at the call site so
 /// two screens cannot disagree about what an unlisted item may be sold on.
-final marketplacesForItemProvider =
-    Provider.family<List<Marketplace>, String>((Ref ref, String itemId) {
-      final List<Marketplace> active = ref.watch(activeMarketplacesProvider);
-      final List<Marketplace> listed = MarketplaceMatching.matching(
-        active,
-        ListingMarketplaces.keys(
-          ref.watch(listingsForItemProvider(itemId)).value ?? const <Listing>[],
-        ),
-      );
+final marketplacesForItemProvider = Provider.family<List<Marketplace>, String>((
+  Ref ref,
+  String itemId,
+) {
+  final List<Marketplace> active = ref.watch(activeMarketplacesProvider);
+  final List<Marketplace> listed = MarketplaceMatching.matching(
+    active,
+    ListingMarketplaces.keys(
+      ref.watch(listingsForItemProvider(itemId)).value ?? const <Listing>[],
+    ),
+  );
 
-      return listed.isEmpty ? active : listed;
-    });
+  return listed.isEmpty ? active : listed;
+});
 
 /// The platforms a whole bundle may be sold on.
 ///
@@ -132,29 +133,5 @@ final Provider<Map<String, AppTagHue>> marketplaceHuesProvider =
         for (final Marketplace marketplace
             in ref.watch(marketplacesProvider).value ?? const <Marketplace>[])
           marketplace.id: marketplace.hue,
-      };
-    });
-
-/// Id → what that platform takes, as a fraction of the sale.
-///
-/// **The only answer to "what does this platform charge", and it comes from
-/// the seller's own records.** Every estimate in the app reads this one map —
-/// the profit statement, the payout forecast, the sourcing calculator, the
-/// cross-list panel — so a rate corrected on the Marketplaces screen moves all
-/// of them at once. A second map of "corrections" living on the workspace was
-/// what this replaced: nothing ever wrote it, so every screen silently fell
-/// back to a hardcoded published rate and ignored what the seller had typed.
-///
-/// **Deleted marketplaces are in here too**, because a past order still names
-/// one and its fee has to keep resolving.
-///
-/// **A planning estimate, never accounting.** A fee an order actually reported
-/// is a fact and always wins — see `PayoutReconciliation.expected`.
-final Provider<Map<String, double>> marketplaceFeeRatesProvider =
-    Provider<Map<String, double>>((Ref ref) {
-      return <String, double>{
-        for (final Marketplace marketplace
-            in ref.watch(marketplacesProvider).value ?? const <Marketplace>[])
-          marketplace.id: marketplace.feeRate,
       };
     });

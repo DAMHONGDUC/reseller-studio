@@ -9,7 +9,6 @@ import '../../../../../core/state/form_seed.dart';
 import '../../../../../core/theme/app_tag_hue.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../domain/entities/marketplace.dart';
-import '../../../domain/services/marketplace_rate_input_utils.dart';
 import '../../../providers.dart';
 import '../../controllers/marketplace_form_controller.dart';
 import '../../widgets/marketplace_hue_field.dart';
@@ -33,7 +32,6 @@ class _MarketplaceDetailScreenState
     extends ConsumerState<MarketplaceDetailScreen>
     with FormSeed<MarketplaceDetailScreen> {
   final TextEditingController _name = TextEditingController();
-  final TextEditingController _percent = TextEditingController();
 
   @override
   void initState() {
@@ -49,26 +47,12 @@ class _MarketplaceDetailScreenState
   @override
   void dispose() {
     _name.dispose();
-    _percent.dispose();
     super.dispose();
   }
 
   void _seed(Marketplace marketplace) {
     _name.text = marketplace.name;
-    _percent.text = (marketplace.feeRate * 100).toStringAsFixed(2);
     ref.read(marketplaceFormControllerProvider.notifier).seed(marketplace);
-  }
-
-  void _updateRate(String value) {
-    final String trimmed = value.trim();
-
-    ref
-        .read(marketplaceFormControllerProvider.notifier)
-        .updateFeeRate(
-          trimmed.isEmpty
-              ? null
-              : MarketplaceRateInputUtils.parse(trimmed) ?? -1,
-        );
   }
 
   Future<void> _submit() async {
@@ -191,25 +175,6 @@ class _MarketplaceDetailScreenState
                   onChanged: (String _) => setState(() {}),
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
-                SdTextFieldV3(
-                  label: context.l10n.marketplaceFeeLabel,
-                  controller: _percent,
-                  isRequired: true,
-                  suffix: Text(
-                    '%',
-                    style: context.textTheme3.bodyMedium!.muted3(context),
-                  ),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  helperText: context.l10n.marketplaceFeeHelper,
-                  errorText: state.feeRate == null || state.isFeeRateValid
-                      ? null
-                      : context.l10n.marketplaceFeeInvalid,
-                  textInputAction: TextInputAction.done,
-                  onChanged: _updateRate,
-                  onSubmitted: (_) => _submit(),
-                ),
                 SizedBox(height: SdSpacingConstant.h16),
                 MarketplaceHueField(
                   label: context.l10n.marketplaceColorLabel,

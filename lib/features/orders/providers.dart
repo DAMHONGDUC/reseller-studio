@@ -11,7 +11,6 @@ import '../../core/time/app_clock.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/services/item_search.dart';
 import '../inventory/providers.dart';
-import '../marketplaces/providers.dart';
 import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
@@ -220,7 +219,6 @@ final Provider<List<MarketplacePayout>> marketplacePayoutsProvider =
     Provider<List<MarketplacePayout>>((Ref ref) {
       return PayoutReconciliation.byMarketplace(
         ref.watch(ordersProvider).value ?? const <Order>[],
-        feeRates: ref.watch(marketplaceFeeRatesProvider),
       );
     });
 
@@ -243,7 +241,6 @@ final Provider<Money?> overduePayoutTotalProvider = Provider<Money?>((Ref ref) {
   return PayoutReconciliation.overdueTotal(
     ref.watch(ordersProvider).value ?? const <Order>[],
     ref.watch(clockProvider).now(),
-    feeRates: ref.watch(marketplaceFeeRatesProvider),
   );
 });
 

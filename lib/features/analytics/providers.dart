@@ -15,7 +15,6 @@ import '../expenses/providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
-import '../marketplaces/providers.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
@@ -38,7 +37,6 @@ final Provider<AnalyticsSummary> analyticsSummaryProvider =
         items: items,
         expenses: expenses,
         currency: currency,
-        feeRates: ref.watch(marketplaceFeeRatesProvider),
       );
     });
 
@@ -136,9 +134,6 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
       final List<Order> orders =
           ref.watch(ordersProvider).value ?? const <Order>[];
       final String currency = ref.watch(workspaceCurrencyProvider);
-      final Map<String, double> feeRates = ref.watch(
-        marketplaceFeeRatesProvider,
-      );
 
       final Map<String, List<Order>> grouped = <String, List<Order>>{};
 
@@ -157,7 +152,6 @@ final Provider<List<MarketplacePerformance>> marketplacePerformanceProvider =
                       marketplaceName: entry.value.first.marketplaceName,
                       orders: entry.value,
                       currency: currency,
-                      feeRates: feeRates,
                     ),
               )
               .toList()

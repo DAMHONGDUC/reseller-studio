@@ -5,6 +5,7 @@ import '../../../listings/domain/enums/listing_status.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/workspace.dart';
+import '../../workspace_constant.dart';
 
 /// How a [Workspace] is stored.
 final class WorkspaceDto {
@@ -27,6 +28,9 @@ final class WorkspaceDto {
       lowStockThreshold:
           FirestoreMapper.intOrNull(data['lowStockThreshold']) ??
           LowStockPolicy.defaultThreshold,
+      planningFeeRate:
+          FirestoreMapper.doubleOrNull(data['planningFeeRate']) ??
+          WorkspaceConstant.defaultPlanningFeeRate,
     );
   }
 
@@ -45,6 +49,7 @@ final class WorkspaceDto {
         'logoUrl': workspace.logoUrl,
         'staleThresholdDays': workspace.staleThresholdDays,
         'lowStockThreshold': workspace.lowStockThreshold,
+        'planningFeeRate': workspace.planningFeeRate,
         'updatedAt': FirestoreMapper.serverTimestamp,
       });
 }

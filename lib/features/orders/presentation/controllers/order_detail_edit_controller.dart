@@ -99,15 +99,15 @@ class OrderDetailEditController extends Notifier<OrderDetailEditState> {
     });
   }
 
-  Future<void> saveProfit({required String orderId, required String fees}) {
+  Future<void> saveProfit({required String orderId, required String payout}) {
     final String currency = ref.read(workspaceCurrencyProvider);
-    final Money? amount = Money.tryParse(fees, currency);
+    final Money? amount = Money.tryParse(payout, currency);
 
     return _write(orderId, OrderDetailSection.profit, (Order current) {
-      // Null is "the platform has not told us", which is not zero — the
-      // payout reconciliation falls back to the estimate for exactly that
-      // case (hard rule 5).
-      return current.copyWith(fees: amount, clearFees: amount == null);
+      // Null is "nobody has recorded what landed", which is not zero: the
+      // statement then reads `—` rather than claiming the platform took
+      // everything (hard rule 5).
+      return current.copyWith(payout: amount, clearPayout: amount == null);
     });
   }
 

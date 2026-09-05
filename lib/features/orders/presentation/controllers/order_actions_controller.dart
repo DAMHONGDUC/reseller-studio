@@ -86,17 +86,11 @@ class OrderActionsController extends Notifier<bool> {
   /// **The one stored figure that is not derived** (hard rule 3): it is a fact
   /// the platform reported, and it is what the seller reconciles their bank
   /// against.
-  Future<void> recordSettlement(Order order, {Money? fees, Money? payout}) =>
-      _save(
-        'Record settlement',
-        OrderTransition.settle(
-          order,
-          at: DateTime.now(),
-          fees: fees,
-          payout: payout,
-        ),
-        <String, Object>{'hasFees': fees != null, 'hasPayout': payout != null},
-      );
+  Future<void> recordSettlement(Order order, {Money? payout}) => _save(
+    'Record settlement',
+    OrderTransition.settle(order, at: DateTime.now(), payout: payout),
+    <String, Object>{'hasPayout': payout != null},
+  );
 
   Future<void> requestReturn(Order order) {
     AppAnalytics.instance.returnOpened();

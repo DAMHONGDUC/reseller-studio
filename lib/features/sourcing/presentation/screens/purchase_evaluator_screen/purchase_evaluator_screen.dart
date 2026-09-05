@@ -14,8 +14,6 @@ import '../../../../../core/widgets/picker_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';
 import '../../../../marketplaces/domain/enums/marketplace.dart';
-import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
-import '../../../../marketplaces/providers.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';
@@ -146,15 +144,11 @@ class _PurchaseEvaluatorScreenState
     final Money? sale = Money.tryParse(_sale.text, currency);
     final Money shipping = Money.tryParse(_shipping.text, currency) ?? zero;
 
-    // The fee is estimated from the platform's published rate. It is a
-    // planning number and is never written to an order — the real fee arrives
-    // from the marketplace when the sale settles.
-    final Map<String, double> feeRates = ref.read(marketplaceFeeRatesProvider);
-    final Money fees =
-        sale?.applyRate(
-          MarketplaceFeePolicy.rateFor(_marketplace, rates: feeRates),
-        ) ??
-        zero;
+    // The business's own planning rate — the last estimate left in the app
+    // (hard rule 3). Nothing has sold, so there is no payout to measure, and
+    // this figure is never written to an order.
+    final double feeRate = ref.read(planningFeeRateProvider);
+    final Money fees = sale?.applyRate(feeRate) ?? zero;
 
     final PurchaseEvaluation? evaluation = sale == null
         ? null
@@ -206,28 +200,23 @@ class _PurchaseEvaluatorScreenState
                       PickerField(
                         label: context.l10n.commonMarketplace,
                         icon: AppIconConstant.storefront,
-                        value:
-                            '${_marketplace.displayName} · '
-                            '${(MarketplaceFeePolicy.rateFor(_marketplace, rates: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
+                        value: _marketplace.displayName,
                         onTap: () async {
-                          final Marketplace?
-                          picked = await OptionPickerSheet.show<Marketplace>(
-                            context,
-                            title: context.l10n.commonMarketplace,
-                            selected: _marketplace,
-                            options: Marketplace.values
-                                .map(
-                                  (
-                                    Marketplace marketplace,
-                                  ) => PickerOption<Marketplace>(
-                                    value: marketplace,
-                                    label: marketplace.displayName,
-                                    caption:
-                                        '${(MarketplaceFeePolicy.rateFor(marketplace, rates: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
-                                  ),
-                                )
-                                .toList(),
-                          );
+                          final Marketplace? picked =
+                              await OptionPickerSheet.show<Marketplace>(
+                                context,
+                                title: context.l10n.commonMarketplace,
+                                selected: _marketplace,
+                                options: Marketplace.values
+                                    .map(
+                                      (Marketplace marketplace) =>
+                                          PickerOption<Marketplace>(
+                                            value: marketplace,
+                                            label: marketplace.displayName,
+                                          ),
+                                    )
+                                    .toList(),
+                              );
 
                           if (picked == null) return;
 

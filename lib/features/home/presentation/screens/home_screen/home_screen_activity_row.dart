@@ -1,16 +1,13 @@
 part of 'home_screen.dart';
 
-class _ActivityRow extends ConsumerWidget {
+class _ActivityRow extends StatelessWidget {
   const _ActivityRow({required this.order});
 
   final Order order;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ProfitBreakdown breakdown = order.profit(
-      feeRates: ref.watch(marketplaceFeeRatesProvider),
-    );
-    final Money? profit = breakdown.netProfit;
+  Widget build(BuildContext context) {
+    final Money? profit = order.profit().netProfit;
 
     return Padding(
       padding: SdContentPaddingV3.row,
@@ -62,10 +59,10 @@ class _ActivityRow extends ConsumerWidget {
                 style: context.textTheme3.bodyMedium!.semiBold3.tabular3
                     .copyWith(color: context.sdTheme3.textPrimary),
               ),
+              // A dash rather than an approximation: the payout is not in
+              // yet, so this sale's profit is unknown (hard rule 5).
               Text(
-                breakdown.feesAreEstimated && profit != null
-                    ? context.l10n.commonApproximate(context.money(profit))
-                    : context.money(profit),
+                context.money(profit),
                 style: context.textTheme3.bodySmall!.tabular3.copyWith(
                   color: profit == null
                       ? context.sdTheme3.textTertiary

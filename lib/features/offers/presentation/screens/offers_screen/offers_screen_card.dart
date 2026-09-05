@@ -111,10 +111,7 @@ class _OfferCard extends ConsumerWidget {
     final Item? item = ref.watch(itemProvider(offer.itemId)).value;
     final OfferEvaluation evaluation = OfferEvaluation.of(
       offer,
-      feeRate: MarketplaceFeePolicy.rateFor(
-        offer.marketplace,
-        rates: ref.watch(marketplaceFeeRatesProvider),
-      ),
+      feeRate: ref.watch(planningFeeRateProvider),
       cost: item?.purchasePrice,
       minimumPrice: item?.minimumPrice,
     );

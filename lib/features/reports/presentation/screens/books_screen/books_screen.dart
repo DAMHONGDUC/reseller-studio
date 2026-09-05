@@ -64,7 +64,7 @@ class BooksScreen extends ConsumerWidget {
                   title: context.l10n.booksEstimatedFees,
                   explanation: context.l10n.booksEstimatedFeesBody,
                   icon: AppIconConstant.receiptLong,
-                  orders: gaps.estimatedFees,
+                  orders: gaps.missingPayouts,
                   first: true,
                 ),
                 _OrderGroup(

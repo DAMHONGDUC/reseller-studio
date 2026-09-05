@@ -20,16 +20,16 @@ import '../../../sourcing/domain/entities/purchase.dart';
 /// kind, and a service that fetched its own data could be tested at neither.
 class BookkeepingGaps {
   const BookkeepingGaps({
-    required this.estimatedFees,
+    required this.missingPayouts,
     required this.unknownCost,
     required this.unpaidPayouts,
     required this.receiptlessPurchases,
     required this.checkedOrders,
   });
 
-  /// Sales where nobody entered what the platform actually charged, so the
-  /// profit is the published rate rather than the real one.
-  final List<Order> estimatedFees;
+  /// Sales where nobody has recorded what the platform paid, so the fee — and
+  /// with it the profit — is unknown rather than approximate (hard rule 3).
+  final List<Order> missingPayouts;
 
   /// Sales where an item's cost was never entered, so the profit is not an
   /// estimate at all — it is unknowable, and renders `—`.
@@ -80,8 +80,8 @@ class BookkeepingGaps {
 
     return BookkeepingGaps(
       checkedOrders: counted.length,
-      estimatedFees: counted
-          .where((Order order) => order.feesAreEstimated)
+      missingPayouts: counted
+          .where((Order order) => order.needsPayout)
           .toList(),
       unknownCost: counted
           .where((Order order) => order.costOfGoods == null)
@@ -107,7 +107,7 @@ class BookkeepingGaps {
   /// is two pieces of work, and rolling it into one would understate what is
   /// left to do.
   int get total =>
-      estimatedFees.length +
+      missingPayouts.length +
       unknownCost.length +
       unpaidPayouts.length +
       receiptlessPurchases.length;

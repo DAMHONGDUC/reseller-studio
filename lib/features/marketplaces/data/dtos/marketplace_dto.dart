@@ -12,10 +12,6 @@ final class MarketplaceDto {
     return Marketplace(
       id: doc.id,
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
-      // Zero rather than a guess when the field is missing or malformed: an
-      // invented cut is a wrong profit figure on every order, whereas a
-      // missing one is visibly zero and gets corrected.
-      feeRate: (data['feeRate'] as num?)?.toDouble() ?? 0,
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       // Stored by name, never by index: a reordered enum would otherwise
       // repaint every marketplace in the business.
@@ -29,7 +25,6 @@ final class MarketplaceDto {
     required String createdBy,
   }) => FirestoreMapper.pruned(<String, Object?>{
     'name': marketplace.name,
-    'feeRate': marketplace.feeRate,
     'hue': marketplace.hue.name,
     'deletedAt': marketplace.deletedAt == null
         ? null

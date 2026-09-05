@@ -142,7 +142,7 @@ class ReportController extends Notifier<bool> {
       'year': year.label,
       'jurisdiction': year.jurisdiction.name,
       'checkedOrders': gaps.checkedOrders,
-      'estimatedFees': gaps.estimatedFees.length,
+      'missingPayouts': gaps.missingPayouts.length,
     });
     AppAnalytics.instance.reportExported(kind: 'tax-pack');
 
@@ -178,10 +178,11 @@ class ReportController extends Notifier<bool> {
         ),
       );
 
-      SdLogger.info(LogTagConstant.report, 'Tax pack exported', <String, Object>{
-        'year': year.label,
-        'files': files.length,
-      });
+      SdLogger.info(
+        LogTagConstant.report,
+        'Tax pack exported',
+        <String, Object>{'year': year.label, 'files': files.length},
+      );
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.report,
@@ -215,7 +216,9 @@ class ReportController extends Notifier<bool> {
     final StringBuffer note = StringBuffer()
       ..writeln('Reseller Studio — tax pack')
       ..writeln('Business: $workspace')
-      ..writeln('Tax year: ${year.label} (${year.jurisdiction.name.toUpperCase()})')
+      ..writeln(
+        'Tax year: ${year.label} (${year.jurisdiction.name.toUpperCase()})',
+      )
       ..writeln(
         'Period: ${DateTimeUtils.isoDate(year.start)} to '
         '${DateTimeUtils.isoDate(year.endExclusive)} (end exclusive)',
@@ -231,7 +234,7 @@ class ReportController extends Notifier<bool> {
       ..writeln('  Sales checked: ${gaps.checkedOrders}')
       ..writeln(
         '  Platform fee estimated rather than reported: '
-        '${gaps.estimatedFees.length}',
+        '${gaps.missingPayouts.length}',
       )
       ..writeln('  Item cost never entered: ${gaps.unknownCost.length}')
       ..writeln(
@@ -239,7 +242,7 @@ class ReportController extends Notifier<bool> {
         '${gaps.receiptlessPurchases.length}',
       );
 
-    if (gaps.estimatedFees.isNotEmpty) {
+    if (gaps.missingPayouts.isNotEmpty) {
       note
         ..writeln()
         ..writeln(
@@ -265,9 +268,12 @@ class ReportController extends Notifier<bool> {
   /// sold for. An order-level row would hide a two-item sale's economics
   /// behind one total.
   String _salesCsv({TaxYear? year}) {
-    final List<Order> orders = (ref.read(ordersProvider).value ?? const <Order>[])
-        .where((Order order) => year == null || year.contains(order.orderedAt))
-        .toList();
+    final List<Order> orders =
+        (ref.read(ordersProvider).value ?? const <Order>[])
+            .where(
+              (Order order) => year == null || year.contains(order.orderedAt),
+            )
+            .toList();
     final List<List<String>> rows = <List<String>>[];
 
     for (final Order order in orders) {
@@ -281,7 +287,7 @@ class ReportController extends Notifier<bool> {
           '${line.quantity}',
           _major(line.unitPrice),
           _major(line.unitCost),
-          _major(order.fees),
+          _major(order.platformFees),
           _major(order.shippingCost),
           _major(order.payout),
           order.salePrice.currency,
@@ -354,8 +360,7 @@ class ReportController extends Notifier<bool> {
     final List<Expense> expenses =
         (ref.read(expensesProvider).value ?? const <Expense>[])
             .where(
-              (Expense expense) =>
-                  year == null || year.contains(expense.date),
+              (Expense expense) => year == null || year.contains(expense.date),
             )
             .toList();
 

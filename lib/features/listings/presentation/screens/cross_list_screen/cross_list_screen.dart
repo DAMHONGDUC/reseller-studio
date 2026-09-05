@@ -12,8 +12,6 @@ import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/presentation/controllers/item_actions_controller.dart';
 import '../../../../inventory/providers.dart';
 import '../../../../marketplaces/domain/enums/marketplace.dart';
-import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
-import '../../../../marketplaces/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/listing.dart';
 import '../../../domain/services/listing_pricing.dart';

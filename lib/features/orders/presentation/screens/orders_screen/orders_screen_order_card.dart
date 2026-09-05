@@ -14,10 +14,7 @@ class _OrderCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isOverdue = order.isOverdue(now) ?? false;
-    final ProfitBreakdown breakdown = order.profit(
-      feeRates: ref.watch(marketplaceFeeRatesProvider),
-    );
-    final Money? profit = breakdown.netProfit;
+    final Money? profit = order.profit().netProfit;
 
     return SdCardV3(
       onTap: onTap,
@@ -99,12 +96,10 @@ class _OrderCard extends ConsumerWidget {
                       '${context.l10n.orderProfitPrefix} ',
                       style: context.textTheme3.bodySmall!.faint3(context),
                     ),
+                    // `—` until the payout is in: nothing is approximated
+                    // any more (hard rule 3).
                     Text(
-                      breakdown.feesAreEstimated && profit != null
-                          ? context.l10n.commonApproximate(
-                              context.money(profit),
-                            )
-                          : context.money(profit),
+                      context.money(profit),
                       style: context.textTheme3.bodySmall!.semiBold3.tabular3
                           .copyWith(
                             color: profit == null

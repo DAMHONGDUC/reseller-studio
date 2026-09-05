@@ -22,7 +22,7 @@ class AnalyticsSummary {
     required this.totalExpenses,
     required this.costOfGoodsSold,
     required this.isProfitComplete,
-    required this.hasEstimatedFees,
+    required this.ordersMissingPayout,
   });
 
   /// Fold the rows into the summary.
@@ -35,7 +35,6 @@ class AnalyticsSummary {
     required List<Item> items,
     required List<Expense> expenses,
     required String currency,
-    Map<String, double> feeRates = const <String, double>{},
   }) {
     final Money zero = Money.zero(currency);
 
@@ -53,12 +52,16 @@ class AnalyticsSummary {
 
     final Money? cogs = costs.totalOfKnown();
 
-    // Estimated from the platform's rate where the seller has not entered one
-    // — `order.fees ?? zero` claimed every unreported commission was free,
-    // which overstated this whole summary (`Order.effectiveFees`).
+    // Measured, never estimated (hard rule 3). An order whose payout nobody
+    // recorded contributes nothing here and makes the profit below unknown —
+    // `order.fees ?? zero` would claim the platform worked for free.
+    final List<Order> unmeasured = counted
+        .where((Order order) => order.needsPayout)
+        .toList();
+
     final Money? fees = counted
-        .map((Order order) => order.effectiveFees(feeRates))
-        .totalOrNull();
+        .map((Order order) => order.platformFees)
+        .totalOfKnown();
 
     final Money? shipping = counted
         .map((Order order) => order.shippingCost ?? zero)
@@ -72,6 +75,9 @@ class AnalyticsSummary {
         .map((Expense expense) => expense.amount)
         .totalOrNull();
 
+    // Folded over what is known and flagged partial, the same way a missing
+    // item cost is handled two lines up — one unrecorded payout must not blank
+    // the whole business's figures, it must send the seller to Payouts.
     final Money? profit = (revenue == null || cogs == null)
         ? null
         : revenue -
@@ -102,8 +108,9 @@ class AnalyticsSummary {
       costOfGoodsSold: cogs,
       // False when any sold item's cost was missing, so the UI can mark the
       // figure partial instead of presenting it as the whole truth.
-      isProfitComplete: costs.allKnown && costs.isNotEmpty,
-      hasEstimatedFees: counted.any((Order order) => order.feesAreEstimated),
+      isProfitComplete:
+          costs.allKnown && costs.isNotEmpty && unmeasured.isEmpty,
+      ordersMissingPayout: unmeasured.length,
     );
   }
 
@@ -119,10 +126,13 @@ class AnalyticsSummary {
   /// Whether every sold item had a known cost.
   final bool isProfitComplete;
 
-  /// Whether any counted order's commission was estimated rather than
-  /// reported, so the screen can label the figure instead of presenting a
-  /// guess as a fact.
-  final bool hasEstimatedFees;
+  /// How many counted orders still have no payout, so the screen can send the
+  /// seller to collect them instead of showing a blank it cannot explain.
+  ///
+  /// **This is the number that makes the whole statement complete.** Nothing
+  /// is estimated any more, so one unrecorded payout is the difference between
+  /// a profit figure and a `—`.
+  final int ordersMissingPayout;
 
   /// Profit as a fraction of revenue, or null when either is unknown.
   double? get margin {
@@ -153,7 +163,7 @@ class MarketplacePerformance {
     required this.profit,
     required this.fees,
     required this.orderCount,
-    required this.hasEstimatedFees,
+    required this.ordersMissingPayout,
   });
 
   factory MarketplacePerformance.from({
@@ -161,7 +171,6 @@ class MarketplacePerformance {
     required String marketplaceName,
     required List<Order> orders,
     required String currency,
-    Map<String, double> feeRates = const <String, double>{},
   }) {
     final Money zero = Money.zero(currency);
 
@@ -172,13 +181,10 @@ class MarketplacePerformance {
         zero;
 
     final Money fees =
-        orders
-            .map((Order order) => order.effectiveFees(feeRates))
-            .totalOrNull() ??
-        zero;
+        orders.map((Order order) => order.platformFees).totalOfKnown() ?? zero;
 
     final List<Money?> profits = orders
-        .map((Order order) => order.profit(feeRates: feeRates).netProfit)
+        .map((Order order) => order.profit().netProfit)
         .toList();
 
     return MarketplacePerformance(
@@ -188,7 +194,9 @@ class MarketplacePerformance {
       profit: profits.totalOfKnown(),
       fees: fees,
       orderCount: orders.length,
-      hasEstimatedFees: orders.any((Order order) => order.feesAreEstimated),
+      ordersMissingPayout: orders
+          .where((Order order) => order.needsPayout)
+          .length,
     );
   }
 
@@ -199,9 +207,10 @@ class MarketplacePerformance {
     (Marketplace value) => value.name == marketplaceId,
     orElse: () => Marketplace.other,
   );
-  /// Whether any of this platform's orders had its commission estimated
-  /// rather than reported, so a row can mark the figure as approximate.
-  final bool hasEstimatedFees;
+
+  /// How many of this platform's orders still have no payout, so a row can
+  /// say the cut below is measured over part of them.
+  final int ordersMissingPayout;
 
   final Money revenue;
 

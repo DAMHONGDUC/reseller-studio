@@ -149,7 +149,6 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
         collections.marketplaces.doc(marketplace.id),
         FirestoreMapper.pruned(<String, Object?>{
           'name': marketplace.name,
-          'feeRate': marketplace.feeRate,
           'createdAt': FirestoreMapper.serverTimestamp,
           'updatedAt': FirestoreMapper.serverTimestamp,
           'createdBy': ownerId,

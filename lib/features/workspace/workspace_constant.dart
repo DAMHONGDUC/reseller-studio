@@ -32,4 +32,25 @@ final class WorkspaceConstant {
   /// Round numbers for the same reason as the list above, and `LowStockPolicy`
   /// owns the default — which is one of these.
   static const List<int> lowStockChoices = <int>[5, 10, 20, 50, 100];
+
+  /// What this business assumes a platform takes, when it is working out
+  /// whether a buy is worth making.
+  ///
+  /// **A planning assumption, and the only rate left in the app** (hard rule
+  /// 3). Sourcing and the cross-list comparison run before any sale exists, so
+  /// they have nothing to measure; everything after a sale reads the payout.
+  /// One number rather than one per marketplace: a seller standing in a shop
+  /// does not yet know which platform it will sell on.
+  static const List<double> planningFeeRateChoices = <double>[
+    0.05,
+    0.10,
+    0.13,
+    0.15,
+    0.20,
+  ];
+
+  /// The middle of the range above, and close to what eBay and the mid-tier
+  /// platforms charge — the rate a new business plans with until it says
+  /// otherwise.
+  static const double defaultPlanningFeeRate = 0.13;
 }

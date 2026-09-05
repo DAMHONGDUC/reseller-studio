@@ -52,10 +52,9 @@ void main() {
         isEmpty,
       );
       expect(
-        PayoutReconciliation.overdue(
-          <Order>[shippedDaysAgo(PayoutReconciliation.overdueAfterDays - 1)],
-          now,
-        ),
+        PayoutReconciliation.overdue(<Order>[
+          shippedDaysAgo(PayoutReconciliation.overdueAfterDays - 1),
+        ], now),
         isEmpty,
       );
     });
@@ -71,10 +70,9 @@ void main() {
       // Never shipped, so no platform owes anything yet — counting it would
       // turn this into a complaint about the seller's own queue.
       expect(
-        PayoutReconciliation.overdue(
-          <Order>[orderOf(status: OrderStatus.toShip)],
-          now,
-        ),
+        PayoutReconciliation.overdue(<Order>[
+          orderOf(status: OrderStatus.toShip),
+        ], now),
         isEmpty,
       );
     });
@@ -106,11 +104,12 @@ void main() {
   });
 
   group('PayoutReconciliation.overdueTotal', () {
-    test('sums what the sales should have paid, net of the fee', () {
-      // $100 on eBay at 13.25% is $86.75 expected.
+    test('sums only the sales whose payout was recorded', () {
+      // Nothing is estimated any more (hard rule 3): an overdue sale nobody
+      // has a figure for is a prompt, not an amount.
       expect(
         PayoutReconciliation.overdueTotal(<Order>[shippedDaysAgo(30)], now),
-        usdOf(8675),
+        isNull,
       );
     });
 

@@ -26,6 +26,7 @@ import 'domain/entities/workspace.dart';
 import 'domain/repositories/team_repository.dart';
 import 'domain/repositories/workspace_repository.dart';
 import 'presentation/controllers/workspace_switch_controller.dart';
+import 'workspace_constant.dart';
 
 /// The `FirebaseFirestore` instance, behind a provider so a test can override
 /// it and so nothing in a feature reaches for the singleton.
@@ -351,6 +352,18 @@ final Provider<bool> canEditWorkspaceProvider = Provider<bool>((Ref ref) {
 /// not comparable. Hiding an edit control from the demo hides a feature;
 /// drawing a delete control there offers to destroy the one business the
 /// demo has, with no account behind it to authorise the call.
+/// What this business assumes a platform takes, when nothing has sold yet.
+///
+/// **The only fee rate left in the app** (hard rule 3). Sourcing and the
+/// cross-list comparison run before a sale exists and have nothing to measure;
+/// everything after a sale reads what actually landed. Read this rather than
+/// the workspace, so a screen rebuilds when the rate changes and not when
+/// somebody renames the business.
+final Provider<double> planningFeeRateProvider = Provider<double>((Ref ref) {
+  return ref.watch(currentWorkspaceProvider)?.planningFeeRate ??
+      WorkspaceConstant.defaultPlanningFeeRate;
+});
+
 final Provider<bool> canDeleteWorkspaceProvider = Provider<bool>((Ref ref) {
   return ref.watch(currentMemberRoleProvider)?.canOwn ?? false;
 });

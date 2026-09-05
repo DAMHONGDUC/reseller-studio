@@ -22,9 +22,9 @@ class _MarketplaceCard extends StatelessWidget {
       SdSectionHeaderV3(
         title: row.marketplaceName,
         leading: AppMarketplaceDot(marketplaceId: row.marketplaceId),
-        subtitle: row.awaitingIsEstimated
-            ? context.l10n.payoutsEstimatedNote
-            : null,
+        subtitle: row.awaiting.isEmpty
+            ? null
+            : context.l10n.payoutsAwaitingCount(row.awaiting.length),
         first: true,
       ),
       Row(

@@ -23,7 +23,6 @@ void main() {
   Order orderOf({
     required String id,
     OrderStatus status = OrderStatus.delivered,
-    Money? fees,
     Money? unitCost,
     Money? payout,
     DateTime? shippedAt,
@@ -42,7 +41,6 @@ void main() {
     ],
     salePrice: usdOf(10000),
     orderedAt: now.subtract(const Duration(days: 40)),
-    fees: fees,
     payout: payout,
     shippedAt: shippedAt,
   );
@@ -61,29 +59,24 @@ void main() {
         now: now,
       );
 
-  test('a fee nobody entered is a gap; one that was entered is not', () {
+  test('a payout nobody recorded is a gap; one that was is not', () {
     final BookkeepingGaps gaps = gapsFor(<Order>[
-      orderOf(id: 'a', unitCost: usdOf(3000), payout: usdOf(8000)),
-      orderOf(
-        id: 'b',
-        fees: usdOf(1325),
-        unitCost: usdOf(3000),
-        payout: usdOf(8000),
-      ),
+      orderOf(id: 'a', unitCost: usdOf(3000)),
+      orderOf(id: 'b', unitCost: usdOf(3000), payout: usdOf(8000)),
     ]);
 
-    expect(gaps.estimatedFees.map((Order o) => o.id), <String>['a']);
+    expect(gaps.missingPayouts.map((Order o) => o.id), <String>['a']);
   });
 
-  test('a missing item cost is its own gap, worse than an estimate', () {
+  test('a missing item cost is its own gap, counted separately', () {
     final BookkeepingGaps gaps = gapsFor(<Order>[
-      orderOf(id: 'a', fees: usdOf(1325), payout: usdOf(8000)),
+      orderOf(id: 'a', payout: usdOf(8000)),
     ]);
 
-    // Nothing to estimate from: the profit is not approximate, it is
-    // unknowable, and the app renders a dash (hard rule 5).
+    // The payout is in, so the platform's cut is known; the cost is not, and
+    // the profit is a dash for that reason alone (hard rule 5).
     expect(gaps.unknownCost.map((Order o) => o.id), <String>['a']);
-    expect(gaps.estimatedFees, isEmpty);
+    expect(gaps.missingPayouts, isEmpty);
   });
 
   test('a cancelled sale is never work to do', () {
@@ -106,18 +99,13 @@ void main() {
       ],
     );
 
-    expect(
-      gaps.receiptlessPurchases.map((Purchase p) => p.id),
-      <String>['p1'],
-    );
+    expect(gaps.receiptlessPurchases.map((Purchase p) => p.id), <String>['p1']);
   });
 
   test('one sale missing two figures is two pieces of work', () {
     // Rolling them into one would understate what is left to do, and the
     // count is the whole point of the screen's opening line.
-    final BookkeepingGaps gaps = gapsFor(<Order>[
-      orderOf(id: 'a', payout: usdOf(8000)),
-    ]);
+    final BookkeepingGaps gaps = gapsFor(<Order>[orderOf(id: 'a')]);
 
     expect(gaps.total, 2);
     expect(gaps.isClear, isFalse);
@@ -125,12 +113,7 @@ void main() {
 
   test('nothing missing reads as clear', () {
     final BookkeepingGaps gaps = gapsFor(<Order>[
-      orderOf(
-        id: 'a',
-        fees: usdOf(1325),
-        unitCost: usdOf(3000),
-        payout: usdOf(8000),
-      ),
+      orderOf(id: 'a', unitCost: usdOf(3000), payout: usdOf(8000)),
     ]);
 
     expect(gaps.total, 0);
@@ -176,22 +159,12 @@ void main() {
     test('the checked count is what gives the estimate count meaning', () {
       // "0 estimated" says nothing without "out of 128".
       final BookkeepingGaps gaps = gapsFor(<Order>[
-        orderOf(
-          id: 'a',
-          fees: usdOf(1325),
-          unitCost: usdOf(3000),
-          payout: usdOf(8000),
-        ),
-        orderOf(
-          id: 'b',
-          fees: usdOf(1325),
-          unitCost: usdOf(3000),
-          payout: usdOf(8000),
-        ),
+        orderOf(id: 'a', unitCost: usdOf(3000), payout: usdOf(8000)),
+        orderOf(id: 'b', unitCost: usdOf(3000), payout: usdOf(8000)),
       ]);
 
       expect(gaps.checkedOrders, 2);
-      expect(gaps.estimatedFees, isEmpty);
+      expect(gaps.missingPayouts, isEmpty);
     });
   });
 }

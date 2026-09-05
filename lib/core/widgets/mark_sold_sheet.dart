@@ -12,14 +12,12 @@ import '../../features/marketplaces/providers.dart';
 import '../../features/orders/domain/services/bundle_allocation.dart';
 import '../../features/orders/providers.dart';
 import '../../features/workspace/providers.dart';
-import '../constants/app_icon_constant.dart';
 import '../constants/date_picker_constant.dart';
 import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../money/money.dart';
 import '../state/form_seed.dart';
 import '../utils/date_time_utils.dart';
-import 'fee_explainer_sheet.dart';
 import 'money_field.dart';
 import 'option_picker_sheet.dart';
 import 'picker_field.dart';
@@ -82,10 +80,13 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
 
   final TextEditingController _buyer = TextEditingController();
 
-  /// Left empty on purpose. An empty box means "not known", and the profit
-  /// statement then shows a labelled estimate — a pre-filled guess would be
-  /// stored as though the platform had reported it.
-  final TextEditingController _fees = TextEditingController();
+  /// What the platform paid, when the seller already knows it.
+  ///
+  /// **Left empty on purpose and optional.** Most sales are recorded before
+  /// the platform pays, and a pre-filled guess is indistinguishable from a
+  /// fact the moment it is saved (hard rule 3). Empty means the order's profit
+  /// reads `—` and the order joins the Payouts queue.
+  final TextEditingController _payout = TextEditingController();
 
   Marketplace? _marketplace;
   DateTime _soldAt = DateTime.now();
@@ -156,7 +157,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
   void dispose() {
     _price.dispose();
     _buyer.dispose();
-    _fees.dispose();
+    _payout.dispose();
     super.dispose();
   }
 
@@ -183,7 +184,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
             marketplaceName: marketplace.name,
             soldAt: _soldAt,
             buyerName: _buyer.text.trim().isEmpty ? null : _buyer.text.trim(),
-            fees: Money.tryParse(_fees.text, currency),
+            payout: Money.tryParse(_payout.text, currency),
           );
 
       if (!mounted) return;
@@ -252,8 +253,8 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
                 isRequired: true,
                 controller: _price,
                 currency: currency,
-                // Redraws what depends on the price as it is typed: a bundle's
-                // split, and the fee this sale would be estimated at.
+                // Redraws what depends on the price as it is typed: a
+                // bundle's split, and the cut the payout box implies.
                 onChanged: (_) => setState(() {}),
                 textInputAction: TextInputAction.next,
               ),
@@ -283,18 +284,6 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
                   _selectMarketplace(picked);
                 },
               ),
-              // Under the platform it is a fact about — owner's rule. Only while
-              // nobody has typed a fee: with one in the box there is nothing to
-              // estimate, and stating it anyway reads as a second figure.
-              if (marketplace != null &&
-                  Money.tryParse(_fees.text, currency) == null) ...<Widget>[
-                SizedBox(height: SdSpacingConstant.h8),
-                _FeeEstimate(
-                  marketplace: marketplace,
-                  price: _typedPrice(currency),
-                  onExplain: () => FeeExplainerSheet.show(context),
-                ),
-              ],
               SizedBox(height: SdSpacingConstant.h16),
               PickerField(
                 label: context.l10n.markSoldDate,
@@ -326,19 +315,25 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
               ],
               SizedBox(height: SdSpacingConstant.h16),
               MoneyField(
-                label: context.l10n.markSoldFees,
-                controller: _fees,
+                label: context.l10n.markSoldPayout,
+                controller: _payout,
                 currency: currency,
-                // The box is never pre-filled — typed is a fact, empty is a
-                // labelled estimate — so the estimate is stated under Sold on.
+                helperText: context.l10n.markSoldPayoutHelp,
+                // The card under it says what this figure means the platform
+                // kept, so it has to move as the figure is typed.
                 onChanged: (_) => setState(() {}),
-                // The estimate card carries the same tap, but a typed fee hides
-                // it — and that is the moment a seller most needs to know which
-                // fee this box wants.
-                onInfo: () => FeeExplainerSheet.show(context),
-                infoTooltip: context.l10n.feeExplainerTitle,
                 textInputAction: TextInputAction.next,
               ),
+              // Only once there is something to say. An empty box is a sale
+              // whose fee nobody knows yet, not a fee of nothing.
+              if (_typedPrice(currency) != null &&
+                  Money.tryParse(_payout.text, currency) != null) ...<Widget>[
+                SizedBox(height: SdSpacingConstant.h8),
+                _ImpliedFee(
+                  price: _typedPrice(currency)!,
+                  payout: Money.tryParse(_payout.text, currency)!,
+                ),
+              ],
               SizedBox(height: SdSpacingConstant.h16),
               SdTextFieldV3(
                 label: context.l10n.markSoldBuyer,
@@ -428,76 +423,35 @@ class _BundleSplit extends StatelessWidget {
   }
 }
 
-/// What this sale would be charged, and where that rate is edited.
+/// What the two boxes say the platform kept.
 ///
-/// **The figure, not just the rate** — owner's rule. A percentage is a fact
-/// about the platform; what the seller is deciding whether to accept is an
-/// amount, so the sheet does the arithmetic out loud rather than leaving them
-/// to. It says where the rate lives too: a number the app presents as its own
-/// is one nobody thinks to go and correct.
-class _FeeEstimate extends StatelessWidget {
-  const _FeeEstimate({
-    required this.marketplace,
-    required this.price,
-    required this.onExplain,
-  });
+/// **Arithmetic the seller can check, not a rate they have to trust** — the
+/// app no longer guesses a fee (hard rule 3), so the only thing worth showing
+/// here is the subtraction it just did. It appears only once both figures are
+/// in, because a cut of an unknown payout is not a number.
+class _ImpliedFee extends StatelessWidget {
+  const _ImpliedFee({required this.price, required this.payout});
 
-  final Marketplace marketplace;
-
-  /// Null while the price box is empty, which is what makes the figure a dash
-  /// rather than a zero (hard rule 5).
-  final Money? price;
-
-  /// Opens the sheet that says what this figure is and what the other fee is.
-  final VoidCallback onExplain;
+  final Money price;
+  final Money payout;
 
   @override
   Widget build(BuildContext context) => SdCardV3(
     layer: SdCardLayerV3.sunken,
-    onTap: onExplain,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Text(
-              context.l10n.markSoldFeeEstimateLabel,
-              style: context.textTheme3.bodyMedium!.copyWith(
-                color: context.sdTheme3.textSecondary,
-              ),
-            ),
-            Text(
-              context.money(price?.applyRate(marketplace.feeRate)),
-              style: context.textTheme3.titleSmall!.bold3.tabular3.copyWith(
-                color: context.sdTheme3.textPrimary,
-              ),
-            ),
-          ],
+        Text(
+          context.l10n.markSoldImpliedFee,
+          style: context.textTheme3.bodyMedium!.copyWith(
+            color: context.sdTheme3.textSecondary,
+          ),
         ),
-        SizedBox(height: SdSpacingConstant.h4),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                context.l10n.markSoldFeeEstimateHint(
-                  marketplace.name,
-                  context.percent(marketplace.feeRate, decimals: 1),
-                ),
-                style: context.textTheme3.bodySmall!.faint3(context),
-              ),
-            ),
-            SizedBox(width: SdSpacingConstant.w8),
-            // The card is tappable, so it says so — a block of text that opens
-            // something with no mark on it is one nobody taps.
-            SdIconV3(
-              AppIconConstant.info,
-              size: SdIconV3.smallSize,
-              color: context.sdTheme3.textTertiary,
-              semanticLabel: context.l10n.feeExplainerTitle,
-            ),
-          ],
+        Text(
+          context.money(price - payout),
+          style: context.textTheme3.titleSmall!.bold3.tabular3.copyWith(
+            color: context.sdTheme3.textPrimary,
+          ),
         ),
       ],
     ),

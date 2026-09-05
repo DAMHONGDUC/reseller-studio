@@ -11,7 +11,6 @@ class MarketplacePayout {
     required this.awaiting,
     required this.settledTotal,
     required this.awaitingTotal,
-    required this.awaitingIsEstimated,
   });
 
   final String marketplaceId;
@@ -32,16 +31,12 @@ class MarketplacePayout {
   /// What the platform actually paid, summed. A fact, not a derivation.
   final Money? settledTotal;
 
-  /// What it still owes, net of fees and the shipping the seller paid.
-  final Money? awaitingTotal;
-
-  /// Whether [awaitingTotal] leans on `Marketplace.estimatedFeeRate` for any
-  /// order.
+  /// What it still owes, over the orders whose fee the seller has recorded.
   ///
-  /// **The UI must say so when this is true.** A figure a seller reconciles
-  /// their bank against has to declare when part of it is a guess, or the
-  /// first mismatch reads as a missing payment rather than a fee estimate.
-  final bool awaitingIsEstimated;
+  /// **Null when none of them has one** (hard rule 5), which is the normal
+  /// state: nothing is estimated any more, so an outstanding order usually
+  /// contributes a count rather than an amount.
+  final Money? awaitingTotal;
 
   bool get isEmpty => settled.isEmpty && awaiting.isEmpty;
 }
@@ -89,19 +84,11 @@ final class PayoutReconciliation {
   ///
   /// Null when there are none — hard rule 5: no outstanding payout is not
   /// the same claim as zero money owed.
-  static Money? overdueTotal(
-    List<Order> orders,
-    DateTime now, {
-    Map<String, double> feeRates = const <String, double>{},
-  }) => overdue(orders, now)
-      .map((Order order) => expected(order, feeRates: feeRates))
-      .totalOrNull();
+  static Money? overdueTotal(List<Order> orders, DateTime now) =>
+      overdue(orders, now).map(expected).totalOfKnown();
 
   /// One entry per marketplace that has an order worth money, busiest first.
-  static List<MarketplacePayout> byMarketplace(
-    List<Order> orders, {
-    Map<String, double> feeRates = const <String, double>{},
-  }) {
+  static List<MarketplacePayout> byMarketplace(List<Order> orders) {
     final Map<String, List<Order>> grouped = <String, List<Order>>{};
 
     for (final Order order in orders) {
@@ -113,7 +100,7 @@ final class PayoutReconciliation {
     final List<MarketplacePayout> rows = grouped.entries
         .map(
           (MapEntry<String, List<Order>> entry) =>
-              _payout(entry.key, entry.value, feeRates),
+              _payout(entry.key, entry.value),
         )
         .toList();
 
@@ -126,30 +113,39 @@ final class PayoutReconciliation {
   /// What one order should land in the bank as.
   ///
   /// Sale price, less anything refunded, less the platform's cut, less the
-  /// postage the seller bought. **A missing fee falls back to
-  /// `Marketplace.estimatedFeeRate`** rather than to zero: zero would claim
-  /// the platform worked for free, which overstates every figure built on it.
-  static Money expected(
-    Order order, {
-    Map<String, double> feeRates = const <String, double>{},
-  }) {
+  /// postage the seller bought.
+  ///
+  /// **Null when the cut is not known** (hard rule 3): the app stopped
+  /// guessing a fee from a published rate, so an order nobody has recorded a
+  /// payout or a fee for has no forecast — it has a prompt to go and read one
+  /// off the platform.
+  static Money? expected(Order order) {
+    final Money? cut = order.platformFees;
+
+    if (cut == null) return null;
+
     final Money zero = Money.zero(order.salePrice.currency);
-    final Money fees = order.effectiveFees(feeRates);
 
     return order.salePrice -
         (order.refund ?? zero) -
-        fees -
+        cut -
         (order.shippingCost ?? zero);
   }
 
-  /// Whether [expected] had to guess this order's fee.
-  static bool isEstimated(Order order) => order.feesAreEstimated;
+  /// What a [payout] of this size says the platform kept.
+  ///
+  /// The inverse of [expected], and it lives here so the sheet that takes the
+  /// figure and the statement that reads it back cannot derive it two ways.
+  static Money feeImpliedBy(Order order, Money payout) {
+    final Money zero = Money.zero(order.salePrice.currency);
 
-  static MarketplacePayout _payout(
-    String marketplaceId,
-    List<Order> orders,
-    Map<String, double> feeRates,
-  ) {
+    return order.salePrice -
+        (order.refund ?? zero) -
+        payout -
+        (order.shippingCost ?? zero);
+  }
+
+  static MarketplacePayout _payout(String marketplaceId, List<Order> orders) {
     final List<Order> settled =
         orders.where((Order order) => order.payout != null).toList()
           ..sort((Order a, Order b) => b.orderedAt.compareTo(a.orderedAt));
@@ -164,10 +160,7 @@ final class PayoutReconciliation {
       settled: settled,
       awaiting: awaiting,
       settledTotal: settled.map((Order order) => order.payout).totalOfKnown(),
-      awaitingTotal: awaiting
-          .map((Order order) => expected(order, feeRates: feeRates))
-          .totalOrNull(),
-      awaitingIsEstimated: awaiting.any(isEstimated),
+      awaitingTotal: awaiting.map(expected).totalOfKnown(),
     );
   }
 }

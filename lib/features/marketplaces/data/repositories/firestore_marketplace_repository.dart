@@ -39,10 +39,7 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
         SdLogger.info(
           LogTagConstant.marketplace,
           'Marketplace saved',
-          <String, Object>{
-            'marketplaceId': marketplace.id,
-            'feePercent': marketplace.feeRate * 100,
-          },
+          <String, Object>{'marketplaceId': marketplace.id},
         );
       });
 

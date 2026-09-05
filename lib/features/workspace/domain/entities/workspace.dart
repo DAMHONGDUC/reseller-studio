@@ -1,5 +1,6 @@
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
+import '../../workspace_constant.dart';
 
 /// A business. **Every business record in Firestore lives under one** (hard
 /// rule 14), so this is the root of everything the app reads or writes.
@@ -20,6 +21,7 @@ class Workspace {
     this.logoUrl,
     this.staleThresholdDays = StaleInventoryPolicy.defaultThresholdDays,
     this.lowStockThreshold = LowStockPolicy.defaultThreshold,
+    this.planningFeeRate = WorkspaceConstant.defaultPlanningFeeRate,
   });
 
   final String id;
@@ -43,6 +45,13 @@ class Workspace {
   final String? timezone;
   final String? businessType;
   final String? logoUrl;
+
+  /// What a platform is assumed to take when this business is deciding
+  /// whether to buy something.
+  ///
+  /// **The only fee rate left in the app, and it never reaches an `Order`**
+  /// (hard rule 3). See `WorkspaceConstant.planningFeeRateChoices`.
+  final double planningFeeRate;
 
   /// How long a listing sits before this workspace calls it stale. Per
   /// workspace because the right answer differs wildly: fast fashion goes
@@ -74,6 +83,7 @@ class Workspace {
     String? logoUrl,
     int? staleThresholdDays,
     int? lowStockThreshold,
+    double? planningFeeRate,
   }) => Workspace(
     id: id,
     name: name ?? this.name,
@@ -86,6 +96,7 @@ class Workspace {
     logoUrl: logoUrl ?? this.logoUrl,
     staleThresholdDays: staleThresholdDays ?? this.staleThresholdDays,
     lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
+    planningFeeRate: planningFeeRate ?? this.planningFeeRate,
   );
 }
 

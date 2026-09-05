@@ -51,7 +51,7 @@ class RecordSaleController extends Notifier<bool> {
     String? marketplaceName,
     required DateTime soldAt,
     String? buyerName,
-    Money? fees,
+    Money? payout,
   }) async {
     final OrderRepository orders = ref.read(orderRepositoryProvider);
     final String orderId = _uuid.v4();
@@ -59,10 +59,9 @@ class RecordSaleController extends Notifier<bool> {
         marketplaceId ?? marketplace?.name ?? 'other';
     final String resolvedMarketplaceName =
         marketplaceName ?? marketplace?.displayName ?? 'Other';
-    final List<Money> shares = BundleAllocation.across(
-      salePrice,
-      <Money?>[for (final Item item in items) item.expectedPrice],
-    );
+    final List<Money> shares = BundleAllocation.across(salePrice, <Money?>[
+      for (final Item item in items) item.expectedPrice,
+    ]);
 
     if (items.isEmpty) {
       throw StateError('A sale must name at least one item');
@@ -97,11 +96,10 @@ class RecordSaleController extends Notifier<bool> {
         salePrice: salePrice,
         orderedAt: soldAt,
         buyerName: buyerName,
-        // Null when the seller did not type one, and it stays null: the
-        // profit statement then estimates it from the platform's rate and
-        // says so, rather than claiming the platform took nothing
-        // (`Order.effectiveFees`).
-        fees: fees,
+        // Null when the seller does not have it yet — most sales are recorded
+        // before the platform pays. The order then reads `—` for profit and
+        // joins the Payouts queue rather than carrying a guess.
+        payout: payout,
       );
 
       await orders.recordSale(order, items);
