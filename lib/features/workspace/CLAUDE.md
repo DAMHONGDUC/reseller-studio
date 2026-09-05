@@ -84,17 +84,37 @@ before the new business has every default record.
   leaves an unreachable workspace rather than a reachable business with a
   partial default list.
 
+## Two screens, and they are not the same job
+
+Owner's rule, and it **replaces "More → Business opens the business the seller
+is currently standing in"**. There are now two:
+
+- **`WorkspacesScreen` (More → Businesses)** manages the *list*: every
+  business the seller belongs to, the plan's ceiling on how many, and the one
+  action that spends the next slot. It names no record, so its row on More is
+  a plain `const` destination — `MoreConstant.sectionsFor` no longer takes a
+  workspace id, and the current business is one tap away, marked with a badge.
+- **`WorkspaceDetailScreen`** edits *one* business.
+
+**The switcher sheet stays a switcher.** It opens from Home's title mid-task
+and closes the moment a business is picked — the wrong surface for a plan
+meter, an empty state or a list somebody is auditing.
+
+**Both list surfaces use one interaction, deliberately.** Tapping a row
+switches to that business; the pencil beside it opens the detail screen. Two
+gestures that do different things must not swap places between the sheet and
+the screen.
+
 ## One screen edits a business, and two places open it
 
 Owner's rule. `WorkspaceDetailScreen` is where a business's name, country,
 currency, business type and thresholds are changed, and it is reached from
-both places a seller sees a business:
+both places a seller sees a list of businesses:
 
 - **the switcher sheet**, where every row carries an edit affordance beside
   it — so the business you want to correct is editable from the list you were
   already looking at, without switching to it first;
-- **More → Business**, its own row above Marketplaces, which opens the
-  business the seller is currently standing in.
+- **the Businesses screen**, the same affordance on the same kind of row.
 
 **Settings does not show the business at all any more.** Owner's rule, and it
 replaces the rule that used to stand here — that Settings held the facts and
@@ -103,9 +123,6 @@ account, and the developer block. A business is a record, records are managed
 from More, and a seller looking for their business had to know it was filed
 under a screen about preferences.
 
-- **The row is built from the resolved workspace id, not from a const route.**
-  `MoreConstant.sectionsFor` takes the id and drops the row when there is
-  none — the screen still takes an explicit id, which is the point below.
 - **Settings no longer edits a field in place** either. It used to open a
   picker per row and write on the tap; two screens writing the same document
   is the state where one of them quietly stops matching.
