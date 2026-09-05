@@ -122,6 +122,30 @@ notification and the push is a copy of it.
 Lifecycle timestamps remain facts even after status changes. Lines are embedded
 because they are small, always read with the order, and immutable after sale.
 
+## App config
+
+`appConfig/current` is one document for the whole product, read by every
+client and written by none. **It is not a business record**, so it is not
+nested under a workspace — nothing in it belongs to a seller, and two
+businesses on the same build read the same answer.
+
+| Field | Meaning |
+|---|---|
+| `premiumEnabled` | Whether the plan system applies at all |
+
+`premiumEnabled: false` turns monetisation off for everyone: `currentPlanProvider`
+answers Premium, so no ceiling blocks a create and every capability is
+included, and the Subscription row and the Home upgrade banner are not drawn.
+
+**A missing document, a missing field, a mistyped value or a failed read all
+resolve to `AppConfig.fallback`, which has monetisation ON.** The document is
+edited by hand, so a typo is the likely failure, and the one thing it must not
+do is hand the paid half of the app to everyone. Same direction as
+`currentPlanProvider` falling back to Free.
+
+`firestore.rules` allows any signed-in read and no write at all — a client
+that could write this could switch off its own paywall.
+
 ## Indexes
 
 `firestore.indexes.json` is the index authority. Add an index in the same
