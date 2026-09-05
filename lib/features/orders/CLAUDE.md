@@ -93,6 +93,30 @@ opens.
     Overdue is what makes one urgent, not what makes it exist, so it is the
     row's detail rather than its trigger.
 
+- **The queue fills from the platform's own export, and reads two columns of
+  it.** `PayoutCsvImport` is the fast path through the work above — a payout
+  report copies hundreds of figures at once, where typing them is what the
+  seller gives up by not being guessed at.
+  - **Columns are found by name, never by position.** eBay, Etsy and a
+    spreadsheet somebody keeps by hand put the two useful values in different
+    places, and a fixed index turns a reordered export into silently wrong
+    money. The header aliases are the service's own list.
+  - **The payout is the platform's earnings figure, not its net-of-cost one.**
+    eBay's `Order earnings` is what it paid; `Net order earnings` subtracts
+    what the seller paid for the item, which this app derives itself and must
+    not take twice.
+  - **Only orders still awaiting a figure are matched.** A file covers a whole
+    period and names orders settled weeks ago; rewriting one would overwrite a
+    figure the seller may have corrected by hand.
+  - **Nothing is written until the seller has seen what matched**, and the
+    summary names the two columns it read. Money written from a column nobody
+    saw chosen is money nobody can check — the same failure as an estimated
+    fee, arriving through a different door.
+  - **Text is pasted, not a file picked.** A file picker is a third-party
+    plugin and adding one is the owner's call (root `CLAUDE.md`); paste works
+    with what already ships. Swapping it later changes this screen and nothing
+    else.
+
 - **The marketplace picker offers only the platforms that item is on.** A list
   of every marketplace the business sells on makes the seller find the one
   this jacket was live at, and a mis-pick writes an order against a platform
