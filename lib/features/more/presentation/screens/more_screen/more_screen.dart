@@ -5,7 +5,10 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../../auth/providers.dart';
+import '../../../../subscription/domain/enums/seller_plan.dart';
+import '../../../../subscription/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../more_constant.dart';
 
@@ -38,6 +41,7 @@ class MoreScreen extends ConsumerWidget {
       signedIn: signedIn,
       workspaceId: ref.watch(currentWorkspaceIdProvider),
     );
+    final SellerPlan plan = ref.watch(currentPlanProvider);
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.navMore),
@@ -46,7 +50,16 @@ class MoreScreen extends ConsumerWidget {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           for (int index = 0; index < sections.length; index++)
-            _MoreSection(section: sections[index], first: index == 0),
+            _MoreSection(
+              section: sections[index],
+              first: index == 0,
+              plan: plan,
+              signedIn: signedIn,
+            ),
+          // Signed out there is no business to count against a ceiling, and
+          // saying "0 of 1" about one nobody has named is the claim hard
+          // rule 1 keeps the other tabs from making.
+          if (signedIn) const PlanLimitMeters(),
         ],
       ),
     );

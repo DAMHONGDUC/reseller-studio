@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
+import '../subscription/domain/enums/seller_plan.dart';
 
 /// One row on the More screen.
 ///
@@ -69,6 +70,27 @@ final class MoreLabel {
         MoreDestinationKind.subscription => context.l10n.moreSubscription,
         MoreDestinationKind.settings => context.l10n.moreSettings,
       };
+}
+
+/// The value at the end of a More row — what the seller would otherwise have
+/// to open the screen to find out.
+///
+/// **Two rows have one, and the rest return null.** A value on every row would
+/// be a second column of text competing with the labels; these two answer
+/// questions a seller asks before tapping — which plan am I on, and am I
+/// signed in.
+final class MoreValueLabel {
+  static String? of(
+    BuildContext context,
+    MoreDestinationKind kind, {
+    required SellerPlan plan,
+    required bool signedIn,
+  }) => switch (kind) {
+    MoreDestinationKind.subscription => plan.label,
+    MoreDestinationKind.settings =>
+      signedIn ? context.l10n.settingsSignedIn : context.l10n.settingsSignedOut,
+    _ => null,
+  };
 }
 
 /// One titled group on More.
