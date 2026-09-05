@@ -7,11 +7,15 @@ import '../../domain/entities/app_config.dart';
 /// **A missing or mistyped field reads as the fallback, never as false.** The
 /// document is edited by hand in the console, so a typo is the likely failure,
 /// and the one thing it must not do is switch the paywall off for everyone.
+///
+/// **The stored key is snake_case; the Dart property is not.** Owner's rule,
+/// and this class is the whole of the translation — nothing above it spells a
+/// field name, so the two conventions never have to meet twice.
 final class AppConfigDto {
   static const String collection = 'app_config';
   static const String document = 'current';
 
-  static const String _premiumEnabled = 'premiumEnabled';
+  static const String _premiumEnabled = 'premium_enabled';
 
   static AppConfig toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
     final Object? enabled = doc.data()?[_premiumEnabled];
