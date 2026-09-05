@@ -20,6 +20,7 @@ import '../workspace/providers.dart';
 import 'domain/entities/plan_limits.dart';
 import 'domain/entities/plan_offering.dart';
 import 'domain/entities/subscription_status.dart';
+import 'domain/enums/plan_allowance.dart';
 import 'domain/enums/plan_feature.dart';
 import 'domain/enums/seller_plan.dart';
 import 'domain/services/plan_gate.dart';
@@ -104,6 +105,23 @@ final Provider<int> countedWorkspacesProvider = Provider<int>((Ref ref) {
   final List<Workspace> workspaces = ref.watch(workspacesProvider);
 
   return workspaces.length;
+});
+
+/// How many of one allowance are in use, whichever allowance is asked for.
+///
+/// **The three counters above, reachable by enum**, so a screen that walks
+/// `PlanAllowance.values` never has to name them one at a time.
+// See `itemProvider` for why a family's type is inferred rather than written.
+// ignore: type_annotate_public_apis
+final countedAllowanceProvider = Provider.family<int, PlanAllowance>((
+  Ref ref,
+  PlanAllowance allowance,
+) {
+  return switch (allowance) {
+    PlanAllowance.items => ref.watch(countedItemsProvider),
+    PlanAllowance.orders => ref.watch(countedOrdersProvider),
+    PlanAllowance.workspaces => ref.watch(countedWorkspacesProvider),
+  };
 });
 
 /// Whether one more item may be created, and why not when it may not.
