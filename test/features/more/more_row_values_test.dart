@@ -44,7 +44,7 @@ void main() {
     expect(find.text('Not signed in'), findsOneWidget);
   });
 
-  testWidgets('Free meters only the allowance that has a ceiling', (
+  testWidgets('Free meters every allowance that has a ceiling', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -58,27 +58,25 @@ void main() {
 
     final Finder meters = find.byType(SdFreeLimitProgressV3);
 
+    // Scrolled to by a single row: `scrollUntilVisible` needs a finder that
+    // matches one widget, and by then every meter beside it is built.
     await tester.scrollUntilVisible(
-      meters,
+      find.text(PlanAllowance.workspaces.meterTitle(SellerPlan.free)),
       300,
       scrollable: find.byType(Scrollable).first,
     );
 
-    // Items and orders are unlimited on Free, so a meter for either would be
-    // a bar that can never fill.
-    expect(meters, findsOneWidget);
-    expect(
-      find.text(PlanAllowance.workspaces.meterTitle(SellerPlan.free)),
-      findsOneWidget,
-    );
-    expect(
-      find.text(PlanAllowance.items.meterTitle(SellerPlan.free)),
-      findsNothing,
-    );
-    expect(
-      find.text(PlanAllowance.orders.meterTitle(SellerPlan.free)),
-      findsNothing,
-    );
+    // More is the overview, so it meters every ceiling Free has rather than
+    // the one allowance a list screen is about.
+    expect(meters, findsNWidgets(PlanAllowance.values.length));
+
+    for (final PlanAllowance allowance in PlanAllowance.values) {
+      expect(
+        find.text(allowance.meterTitle(SellerPlan.free)),
+        findsOneWidget,
+        reason: 'Free caps ${allowance.name}, so More meters it',
+      );
+    }
   });
 
   testWidgets('Premium has no ceiling, so it draws no meter', (

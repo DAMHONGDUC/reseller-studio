@@ -9,20 +9,27 @@ import 'package:reseller_studio/features/subscription/domain/services/plan_gate.
 void main() {
   final PlanLimits free = PlanLimits.of(SellerPlan.free);
 
-  test('Free no longer counts items or orders', () {
-    // The ceiling used to stop a seller at 50 items — which is exactly where
-    // sell-through, ROI by source and the tax pack start being worth
-    // something, so it blocked the reason to pay. Premium sells the answers
-    // instead; see `PlanLimits.byPlan`.
-    expect(free.items, isNull);
-    expect(free.orders, isNull);
+  test('Free counts items and orders, and the last slot is usable', () {
+    // The boundary, not the number: off by one here makes the advertised last
+    // item impossible to create. See `PlanLimits.byPlan` for why the ceilings
+    // are back.
+    expect(free.items, isNotNull);
+    expect(free.orders, isNotNull);
     expect(
-      PlanGate.canAddItem(SellerPlan.free, currentItems: 100000),
+      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items! - 1),
       PlanBlock.none,
     );
     expect(
-      PlanGate.canAddOrder(SellerPlan.free, currentOrders: 100000),
+      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items!),
+      PlanBlock.itemLimit,
+    );
+    expect(
+      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders! - 1),
       PlanBlock.none,
+    );
+    expect(
+      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders!),
+      PlanBlock.orderLimit,
     );
   });
 
