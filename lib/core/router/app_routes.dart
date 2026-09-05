@@ -145,6 +145,11 @@ final class AppRoutes {
   static const String carriers = '/more/carriers';
   static const String addCarrier = '/more/carriers/new';
   static const String carrierDetailPath = '/more/carriers/:carrierId';
+  /// Every business the seller belongs to, with the plan's ceiling on how
+  /// many. Under More rather than in Settings: a business is a record, and
+  /// records are managed from More.
+  static const String workspaces = '/more/businesses';
+
   static const String team = '/more/team';
   static const String settings = '/more/settings';
 

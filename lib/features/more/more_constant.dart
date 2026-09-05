@@ -29,7 +29,7 @@ class MoreDestination {
 
 /// What a More row points at.
 enum MoreDestinationKind {
-  business,
+  businesses,
   books,
   sourcing,
   listings,
@@ -52,7 +52,7 @@ enum MoreDestinationKind {
 final class MoreLabel {
   static String of(BuildContext context, MoreDestinationKind kind) =>
       switch (kind) {
-        MoreDestinationKind.business => context.l10n.workspaceDetailTitle,
+        MoreDestinationKind.businesses => context.l10n.workspacesTitle,
         MoreDestinationKind.books => context.l10n.booksTitle,
         MoreDestinationKind.sourcing => context.l10n.moreSourcing,
         MoreDestinationKind.listings => context.l10n.moreListings,
@@ -159,6 +159,12 @@ final class MoreConstant {
       kind: MoreSectionKind.business,
       destinations: <MoreDestination>[
         MoreDestination(
+          kind: MoreDestinationKind.businesses,
+          icon: AppIconConstant.storefront,
+          route: AppRoutes.workspaces,
+          isBuilt: true,
+        ),
+        MoreDestination(
           kind: MoreDestinationKind.marketplaces,
           icon: AppIconConstant.hub,
           route: AppRoutes.marketplaces,
@@ -251,15 +257,11 @@ final class MoreConstant {
 
   /// What More lists for this seller.
   ///
-  /// **The business row is built here, not declared above**, because it is the
-  /// one destination that names a record: it opens the business the seller is
-  /// standing in, so it needs [workspaceId] and cannot be a `const` route. No
-  /// workspace, no row — the screen behind it takes an explicit id and has
-  /// nothing to open (`lib/features/workspace/CLAUDE.md`).
-  static List<MoreSection> sectionsFor({
-    required bool signedIn,
-    String? workspaceId,
-  }) {
+  /// **Every row is a `const` destination now.** The business row used to be
+  /// built here from the resolved workspace id because it opened one record;
+  /// it opens the list instead, which names none
+  /// (`lib/features/workspace/CLAUDE.md`).
+  static List<MoreSection> sectionsFor({required bool signedIn}) {
     if (!signedIn) {
       final MoreDestination settings = destinations.firstWhere(
         (MoreDestination destination) =>
@@ -274,25 +276,6 @@ final class MoreConstant {
       ];
     }
 
-    if (workspaceId == null) return sections;
-
-    return <MoreSection>[
-      for (final MoreSection section in sections)
-        if (section.kind == MoreSectionKind.business)
-          MoreSection(
-            kind: section.kind,
-            destinations: <MoreDestination>[
-              MoreDestination(
-                kind: MoreDestinationKind.business,
-                icon: AppIconConstant.business,
-                route: AppRoutes.workspaceDetail(workspaceId),
-                isBuilt: true,
-              ),
-              ...section.destinations,
-            ],
-          )
-        else
-          section,
-    ];
+    return sections;
   }
 }

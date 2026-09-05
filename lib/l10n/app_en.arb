@@ -5054,6 +5054,22 @@
   "@workspaceDetailTitle": {
     "description": "Title of the screen that edits one business."
   },
+  "workspacesTitle": "Businesses",
+  "@workspacesTitle": {
+    "description": "Screen that lists every business the seller belongs to."
+  },
+  "workspacesCurrent": "Current",
+  "@workspacesCurrent": {
+    "description": "Marks the business the seller is standing in."
+  },
+  "workspacesEmptyTitle": "No businesses yet",
+  "@workspacesEmptyTitle": {
+    "description": "Empty state on the businesses screen."
+  },
+  "workspacesEmptyBody": "Everything you track lives under a business. Create one to start.",
+  "@workspacesEmptyBody": {
+    "description": "Empty state body on the businesses screen."
+  },
   "workspaceEdit": "Edit business",
   "@workspaceEdit": {
     "description": "Opens the business details screen. Also the tooltip on the switcher row."

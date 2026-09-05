@@ -9,7 +9,6 @@ import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../../auth/providers.dart';
 import '../../../../subscription/domain/enums/seller_plan.dart';
 import '../../../../subscription/providers.dart';
-import '../../../../workspace/providers.dart';
 import '../../../more_constant.dart';
 
 part 'more_screen_more_row.dart';
@@ -39,7 +38,6 @@ class MoreScreen extends ConsumerWidget {
     // rows that all bounce back here (owner's rule).
     final List<MoreSection> sections = MoreConstant.sectionsFor(
       signedIn: signedIn,
-      workspaceId: ref.watch(currentWorkspaceIdProvider),
     );
     final SellerPlan plan = ref.watch(currentPlanProvider);
 

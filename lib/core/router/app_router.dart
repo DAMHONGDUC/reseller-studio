@@ -59,6 +59,7 @@ import '../../features/tax/presentation/screens/tax_screen/tax_screen.dart';
 import '../../features/workspace/presentation/screens/team_screen/team_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_detail_screen/workspace_detail_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
+import '../../features/workspace/presentation/screens/workspaces_screen/workspaces_screen.dart';
 import '../../features/workspace/providers.dart';
 import '../constants/log_tag_constant.dart';
 import '../extensions/context_extensions.dart';
@@ -552,6 +553,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                             ),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'businesses',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const WorkspacesScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
