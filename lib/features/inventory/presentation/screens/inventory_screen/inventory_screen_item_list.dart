@@ -25,7 +25,10 @@ class _ItemList extends ConsumerWidget {
       // every other create screen uses, rather than a second copy of it: this
       // list is a sliver, so it takes the number instead of the `EdgeInsets`.
       padding: EdgeInsets.only(
-        bottom: AppAddFabScaffold.listPadding(context, floatingNav: true).bottom,
+        bottom: AppAddFabScaffold.listPadding(
+          context,
+          floatingNav: true,
+        ).bottom,
       ),
       sliver: SliverList.separated(
         itemCount: items.length,

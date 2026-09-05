@@ -17,10 +17,7 @@ class _OrderList extends ConsumerWidget {
     // between the filter strip and the list has one owner and one value
     // (`docs/rules/DESIGN_SYSTEM.md`), so nothing may sit in it.
     final int header =
-        PlanLimitMeters.cappedIn(
-          ref,
-          allowances: _meterAllowances,
-        ).isEmpty
+        PlanLimitMeters.cappedIn(ref, allowances: _meterAllowances).isEmpty
         ? 0
         : 1;
 
@@ -29,11 +26,10 @@ class _OrderList extends ConsumerWidget {
       // last order sits under the button and cannot be tapped.
       padding: AppAddFabScaffold.listPadding(context, floatingNav: true),
       itemCount: orders.length + header,
-      separatorBuilder: (BuildContext context, int index) => index < header
-          // The meter carries its own gap below it; a separator here would be
-          // the second owner of one boundary.
-          ? const SizedBox.shrink()
-          : SizedBox(height: SdContentPaddingV3.listItemGap),
+      // The separator between the meter and the first card is the same gap
+      // as between two cards, and it belongs to neither of them.
+      separatorBuilder: (BuildContext context, int index) =>
+          SizedBox(height: SdContentPaddingV3.listItemGap),
       itemBuilder: (BuildContext context, int index) {
         if (index < header) {
           return const PlanLimitMeters(allowances: _meterAllowances);

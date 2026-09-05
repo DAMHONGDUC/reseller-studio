@@ -75,29 +75,32 @@ class PlanBlockSheet extends ConsumerWidget {
           ),
           if (target != null) ...<Widget>[
             SizedBox(height: SdSpacingConstant.h16),
-            for (final String line in SubscriptionLabels.allowances(target))
-              Padding(
-                padding: EdgeInsets.only(bottom: SdSpacingConstant.h4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SdIconV3(
-                      AppIconConstant.check,
-                      size: SdIconV3.smallSize,
-                      color: context.sdTheme3.success,
-                    ),
-                    SizedBox(width: SdSpacingConstant.w8),
-                    Expanded(
-                      child: Text(
-                        line,
-                        style: context.textTheme3.bodyMedium!.copyWith(
-                          color: context.sdTheme3.textPrimary,
-                        ),
+            // Indexed so the gap sits above each line but the first: a bottom
+            // padding on every row would give the last one a gap under it
+            // that nothing asked for (`docs/rules/DESIGN_SYSTEM.md`).
+            for (final (int index, String line)
+                in SubscriptionLabels.allowances(target).indexed) ...<Widget>[
+              if (index > 0) SizedBox(height: SdSpacingConstant.h4),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SdIconV3(
+                    AppIconConstant.check,
+                    size: SdIconV3.smallSize,
+                    color: context.sdTheme3.success,
+                  ),
+                  SizedBox(width: SdSpacingConstant.w8),
+                  Expanded(
+                    child: Text(
+                      line,
+                      style: context.textTheme3.bodyMedium!.copyWith(
+                        color: context.sdTheme3.textPrimary,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ],
           ],
           SizedBox(height: SdSpacingConstant.h20),
           SdButtonV3(

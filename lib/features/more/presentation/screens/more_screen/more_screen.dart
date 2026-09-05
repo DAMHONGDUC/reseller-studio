@@ -61,8 +61,13 @@ class MoreScreen extends ConsumerWidget {
             // More's list is `fullBleed` — every section pads itself, so this
             // one does too.
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: SdContentPaddingV3.horizontal,
+              // The meter is what sits under the last section, so the gap
+              // above it is its own — never that section's bottom padding.
+              padding: EdgeInsets.fromLTRB(
+                SdContentPaddingV3.horizontal,
+                SdContentPaddingV3.sectionGap,
+                SdContentPaddingV3.horizontal,
+                0,
               ),
               child: const PlanLimitMeters(),
             ),

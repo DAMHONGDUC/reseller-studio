@@ -36,6 +36,11 @@ part 'workspaces_screen_row.dart';
 class WorkspacesScreen extends ConsumerWidget {
   const WorkspacesScreen({super.key});
 
+  /// The one ceiling this screen's records count against.
+  static const List<PlanAllowance> _meterAllowances = <PlanAllowance>[
+    PlanAllowance.workspaces,
+  ];
+
   Future<void> _switch(
     BuildContext context,
     WidgetRef ref,
@@ -106,9 +111,14 @@ class WorkspacesScreen extends ConsumerWidget {
                 SizedBox(height: SdContentPaddingV3.topGap),
                 // Above the list, because it is the answer to the question the
                 // create button is about to ask.
-                const PlanLimitMeters(
-                  allowances: <PlanAllowance>[PlanAllowance.workspaces],
-                ),
+                const PlanLimitMeters(allowances: _meterAllowances),
+                // The gap belongs to the card under the meter, and exists
+                // only when the meter does.
+                if (PlanLimitMeters.cappedIn(
+                  ref,
+                  allowances: _meterAllowances,
+                ).isNotEmpty)
+                  SizedBox(height: SdContentPaddingV3.listItemGap),
                 AppListCard(
                   children: workspaces
                       .map(

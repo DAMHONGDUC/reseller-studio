@@ -71,6 +71,11 @@ class InventoryScreen extends ConsumerStatefulWidget {
 }
 
 class _InventoryScreenState extends ConsumerState<InventoryScreen> {
+  /// The one ceiling this screen's records count against.
+  static const List<PlanAllowance> _meterAllowances = <PlanAllowance>[
+    PlanAllowance.items,
+  ];
+
   final TextEditingController _search = TextEditingController();
 
   @override
@@ -105,6 +110,10 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     final List<Item> items = ref.watch(visibleItemsProvider);
     final AsyncValue<List<Item>> source = ref.watch(itemsProvider);
     final bool isSelecting = ref.watch(inventorySelectionProvider).isNotEmpty;
+    final bool hasMeter = PlanLimitMeters.cappedIn(
+      ref,
+      allowances: _meterAllowances,
+    ).isNotEmpty;
 
     return AppAddFabScaffold(
       addLabel: context.l10n.quickAddTitle,
@@ -171,44 +180,48 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 // the ceiling is worth knowing once, not at every scroll
                 // position.
                 const SliverToBoxAdapter(
-                  child: PlanLimitMeters(
-                    allowances: <PlanAllowance>[PlanAllowance.items],
+                  child: PlanLimitMeters(allowances: _meterAllowances),
+                ),
+                // The gap belongs to what sits under the meter, and exists
+                // only when the meter does.
+                if (hasMeter)
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: SdContentPaddingV3.listItemGap),
                   ),
-                ),
                 switch (source) {
-            // A screen that has not loaded is not empty — saying "No items"
-            // to a seller with four hundred is worse than a spinner.
-            AsyncLoading<List<Item>>() when !source.hasValue =>
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: SdLoadingV3Page(),
-              ),
-            AsyncError<List<Item>>() => SliverFillRemaining(
-              hasScrollBody: false,
-              child: SdEmptyStateV3(
-                icon: AppIconConstant.error,
-                title: context.l10n.inventoryLoadFailed,
-                message: context.l10n.commonCouldNotLoad,
-              ),
-            ),
-            _ when items.isEmpty => SliverFillRemaining(
-              hasScrollBody: false,
-              child: AppListEmptyState(
-                hasAny: (source.value ?? const <Item>[]).isNotEmpty,
-                noMatchMessage: context.l10n.inventoryNoMatch,
-                emptyIcon: AppIconConstant.inventory,
-                emptyTitle: context.l10n.inventoryEmptyTitle,
-                emptyMessage: context.l10n.inventoryEmptyBody,
-                // The FAB says the same thing, and it is the wrong place to
-                // find it: on the first empty screen a seller ever sees, the
-                // eye is in the middle, not the corner.
-                emptyAction: SdButtonV3(
-                  variant: SdButtonVariantV3.primary,
-                  label: context.l10n.quickAddTitle,
-                  onPressed: () => _add(AppRoutes.quickAdd),
-                ),
-              ),
-            ),
+                  // A screen that has not loaded is not empty — saying "No items"
+                  // to a seller with four hundred is worse than a spinner.
+                  AsyncLoading<List<Item>>() when !source.hasValue =>
+                    const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: SdLoadingV3Page(),
+                    ),
+                  AsyncError<List<Item>>() => SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: SdEmptyStateV3(
+                      icon: AppIconConstant.error,
+                      title: context.l10n.inventoryLoadFailed,
+                      message: context.l10n.commonCouldNotLoad,
+                    ),
+                  ),
+                  _ when items.isEmpty => SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: AppListEmptyState(
+                      hasAny: (source.value ?? const <Item>[]).isNotEmpty,
+                      noMatchMessage: context.l10n.inventoryNoMatch,
+                      emptyIcon: AppIconConstant.inventory,
+                      emptyTitle: context.l10n.inventoryEmptyTitle,
+                      emptyMessage: context.l10n.inventoryEmptyBody,
+                      // The FAB says the same thing, and it is the wrong place to
+                      // find it: on the first empty screen a seller ever sees, the
+                      // eye is in the middle, not the corner.
+                      emptyAction: SdButtonV3(
+                        variant: SdButtonVariantV3.primary,
+                        label: context.l10n.quickAddTitle,
+                        onPressed: () => _add(AppRoutes.quickAdd),
+                      ),
+                    ),
+                  ),
                   _ => _ItemList(items: items),
                 },
               ],

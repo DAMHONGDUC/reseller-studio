@@ -22,10 +22,11 @@ import '../../features/subscription/providers.dart';
 /// A plan with no ceiling at all renders nothing, so Premium needs no check,
 /// and neither does a screen placing this.
 ///
-/// **It carries no horizontal gutter.** The screen placing it does, the same
-/// way it does for every card and row it lays out — a widget that padded
-/// itself would sit 32 in on the two screens whose list already holds a
-/// gutter, and there is no flag that makes one widget right in both places.
+/// **It carries no padding at all.** The screen placing it owns the gutter,
+/// the same way it does for every card and row it lays out, and whatever sits
+/// under it owns the gap between them — a widget never pads its own bottom to
+/// hold a sibling off (`docs/rules/DESIGN_SYSTEM.md`). Ask [cappedIn] whether
+/// there is anything to stand clear of.
 ///
 /// In `core/widgets/` because four features draw it: More, Inventory, Orders
 /// and the Businesses screen.
@@ -62,24 +63,18 @@ class PlanLimitMeters extends ConsumerWidget {
 
     if (capped.isEmpty) return const SizedBox.shrink();
 
-    return Padding(
-      // Only the gap under it, and it belongs inside so nothing is left
-      // behind when nothing is drawn at all. **The gutter is not here** —
-      // whoever places this owns it, the way it owns `ItemCard`'s.
-      padding: EdgeInsets.only(bottom: SdContentPaddingV3.listItemGap),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          for (int index = 0; index < capped.length; index++) ...<Widget>[
-            if (index > 0) SizedBox(height: SdContentPaddingV3.listItemGap),
-            _PlanLimitMeter(
-              allowance: capped[index],
-              limit: capped[index].ceilingIn(limits)!,
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (int index = 0; index < capped.length; index++) ...<Widget>[
+          if (index > 0) SizedBox(height: SdContentPaddingV3.listItemGap),
+          _PlanLimitMeter(
+            allowance: capped[index],
+            limit: capped[index].ceilingIn(limits)!,
+          ),
         ],
-      ),
+      ],
     );
   }
 }

@@ -230,8 +230,14 @@ class _FlowStepDetails extends StatelessWidget {
           style: context.textTheme3.bodySmall!.muted3(context),
         ),
         SizedBox(height: SdSpacingConstant.h8),
-        for (final String line in WorkflowLabel.how(context, step.kind))
-          _FlowStepLine(text: line),
+        for (
+          int index = 0;
+          index < WorkflowLabel.how(context, step.kind).length;
+          index++
+        ) ...<Widget>[
+          if (index > 0) SizedBox(height: SdSpacingConstant.h6),
+          _FlowStepLine(text: WorkflowLabel.how(context, step.kind)[index]),
+        ],
         SizedBox(height: SdSpacingConstant.h8),
         SdButtonV3(
           variant: SdButtonVariantV3.text,
@@ -263,34 +269,31 @@ class _FlowStepLine extends StatelessWidget {
   static double get dotSize => SdSpacingConstant.r4;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: SdSpacingConstant.h6),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        ExcludeSemantics(
-          child: Container(
-            width: dotSize,
-            height: dotSize,
-            // Lines the dot up with the middle of the first line of text
-            // rather than with the top of its box.
-            margin: EdgeInsets.only(top: SdSpacingConstant.h8),
-            decoration: BoxDecoration(
-              color: context.sdTheme3.textTertiary,
-              shape: BoxShape.circle,
-            ),
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      ExcludeSemantics(
+        child: Container(
+          width: dotSize,
+          height: dotSize,
+          // Lines the dot up with the middle of the first line of text
+          // rather than with the top of its box.
+          margin: EdgeInsets.only(top: SdSpacingConstant.h8),
+          decoration: BoxDecoration(
+            color: context.sdTheme3.textTertiary,
+            shape: BoxShape.circle,
           ),
         ),
-        SizedBox(width: SdSpacingConstant.w8),
-        Expanded(
-          child: Text(
-            text,
-            style: context.textTheme3.bodySmall!.copyWith(
-              color: context.sdTheme3.textPrimary,
-            ),
+      ),
+      SizedBox(width: SdSpacingConstant.w8),
+      Expanded(
+        child: Text(
+          text,
+          style: context.textTheme3.bodySmall!.copyWith(
+            color: context.sdTheme3.textPrimary,
           ),
         ),
-      ],
-    ),
+      ),
+    ],
   );
 }

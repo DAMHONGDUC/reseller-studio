@@ -135,6 +135,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSectionTitle(title: context.l10n.commonItems),
+        SizedBox(height: SdSpacingConstant.h8),
         _OrderLines(order: order),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSection(
@@ -208,6 +209,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSectionTitle(title: context.l10n.orderTimeline),
+        SizedBox(height: SdSpacingConstant.h8),
         _Timeline(order: order),
         SizedBox(height: SdContentPaddingV3.bottomGap),
       ],
@@ -516,13 +518,10 @@ class _OrderSectionTitle extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: SdSpacingConstant.h8),
-    child: Text(
-      title,
-      style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-        color: context.sdTheme3.textPrimary,
-      ),
+  Widget build(BuildContext context) => Text(
+    title,
+    style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+      color: context.sdTheme3.textPrimary,
     ),
   );
 }

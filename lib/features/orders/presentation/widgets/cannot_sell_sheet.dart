@@ -55,29 +55,29 @@ class CannotSellSheet extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        for (final ItemTransitionBlock block in blocks)
-          Padding(
-            padding: EdgeInsets.only(bottom: SdSpacingConstant.h8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SdIconV3(
-                  AppIconConstant.warning,
-                  size: SdIconV3.smallSize,
-                  color: context.sdTheme3.warning,
-                ),
-                SizedBox(width: SdSpacingConstant.w8),
-                Expanded(
-                  child: Text(
-                    ItemBlockPresenter.message(context, block),
-                    style: context.textTheme3.bodyMedium!.copyWith(
-                      color: context.sdTheme3.textPrimary,
-                    ),
+        for (final (int index, ItemTransitionBlock block)
+            in blocks.indexed) ...<Widget>[
+          if (index > 0) SizedBox(height: SdSpacingConstant.h8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SdIconV3(
+                AppIconConstant.warning,
+                size: SdIconV3.smallSize,
+                color: context.sdTheme3.warning,
+              ),
+              SizedBox(width: SdSpacingConstant.w8),
+              Expanded(
+                child: Text(
+                  ItemBlockPresenter.message(context, block),
+                  style: context.textTheme3.bodyMedium!.copyWith(
+                    color: context.sdTheme3.textPrimary,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ],
         SizedBox(height: SdSpacingConstant.h8),
         Text(
           context.l10n.recordSaleBlockedHint,

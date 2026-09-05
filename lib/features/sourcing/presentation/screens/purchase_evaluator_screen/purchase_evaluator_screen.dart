@@ -174,6 +174,10 @@ class _PurchaseEvaluatorScreenState
                 _Verdict(evaluation: evaluation, marketplace: _marketplace),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
                 _SoldBeforeCard(found: _soldBefore),
+                // The gap belongs to the card under it, and exists only when
+                // the history card above does.
+                if (_soldBefore != null)
+                  SizedBox(height: SdSpacingConstant.h16),
                 SdCardV3(
                   child: Column(
                     children: <Widget>[
@@ -377,45 +381,36 @@ class _SoldBeforeCard extends StatelessWidget {
 
     if (sale == null) return const SizedBox.shrink();
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: SdSpacingConstant.h16),
-      child: SdCardV3(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              context.l10n.sourcingSoldBefore,
-              style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-                color: context.sdTheme3.textPrimary,
-              ),
+    return SdCardV3(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            context.l10n.sourcingSoldBefore,
+            style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+              color: context.sdTheme3.textPrimary,
             ),
-            SizedBox(height: SdSpacingConstant.h4),
-            Text(
-              context.l10n.sourcingSoldOnceFor(
-                sale.title,
-                context.money(sale.salePrice),
-                DateTimeUtils.mediumDate(
-                  sale.soldAt,
-                  locale: context.localeTag,
-                ),
-              ),
-              style: context.textTheme3.bodyMedium!.copyWith(
-                color: context.sdTheme3.textPrimary,
-              ),
+          ),
+          SizedBox(height: SdSpacingConstant.h4),
+          Text(
+            context.l10n.sourcingSoldOnceFor(
+              sale.title,
+              context.money(sale.salePrice),
+              DateTimeUtils.mediumDate(sale.soldAt, locale: context.localeTag),
             ),
-            SizedBox(height: SdSpacingConstant.h4),
-            Text(
-              context.l10n.sourcingSoldTimes(
-                sale.timesSold,
-                DateTimeUtils.mediumDate(
-                  sale.soldAt,
-                  locale: context.localeTag,
-                ),
-              ),
-              style: context.textTheme3.bodySmall!.faint3(context),
+            style: context.textTheme3.bodyMedium!.copyWith(
+              color: context.sdTheme3.textPrimary,
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: SdSpacingConstant.h4),
+          Text(
+            context.l10n.sourcingSoldTimes(
+              sale.timesSold,
+              DateTimeUtils.mediumDate(sale.soldAt, locale: context.localeTag),
+            ),
+            style: context.textTheme3.bodySmall!.faint3(context),
+          ),
+        ],
       ),
     );
   }
