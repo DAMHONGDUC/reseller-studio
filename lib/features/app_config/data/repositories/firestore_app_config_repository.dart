@@ -6,7 +6,7 @@ import '../../domain/entities/app_config.dart';
 import '../../domain/repositories/app_config_repository.dart';
 import '../dtos/app_config_dto.dart';
 
-/// The one document at `appConfig/current`.
+/// The one document at `app_config/current`.
 ///
 /// **It never lets an error reach the app.** Every other stream in `data/`
 /// maps a failure and rethrows it (`FirestoreStream`), because a screen with

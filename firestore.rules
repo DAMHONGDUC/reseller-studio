@@ -253,7 +253,7 @@ service cloud.firestore {
     // premium kill switch lives here, and a client that could write it could
     // switch its own paywall off — the same reason the subscription document
     // above is `if false`.
-    match /appConfig/{docId} {
+    match /app_config/{docId} {
       allow read: if signedIn();
       allow write: if false;
     }
