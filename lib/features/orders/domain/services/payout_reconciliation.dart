@@ -146,12 +146,14 @@ final class PayoutReconciliation {
   }
 
   static MarketplacePayout _payout(String marketplaceId, List<Order> orders) {
+    // One predicate for "still owed a figure", shared with the queue provider
+    // — two spellings of it is how a card and a count come to disagree.
     final List<Order> settled =
-        orders.where((Order order) => order.payout != null).toList()
+        orders.where((Order order) => !order.needsPayout).toList()
           ..sort((Order a, Order b) => b.orderedAt.compareTo(a.orderedAt));
 
     final List<Order> awaiting =
-        orders.where((Order order) => order.payout == null).toList()
+        orders.where((Order order) => order.needsPayout).toList()
           ..sort((Order a, Order b) => a.orderedAt.compareTo(b.orderedAt));
 
     return MarketplacePayout(
