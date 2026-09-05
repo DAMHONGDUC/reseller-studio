@@ -573,6 +573,33 @@ that drifts, and it drifts invisibly: each file looks right on its own.
   each other, because "looks about right" is exactly the judgement that let
   this through.
 
+### A gap belongs to the item BELOW it, never the one above
+
+Owner's rule, and it is the sharper half of "a boundary belongs to one side of
+it" — it says *which* side. **A widget never pads its own bottom to hold a
+sibling off.** `topGap`, `listItemGap`, `sectionGap`: whatever the distance
+means, the thing underneath owns it.
+
+- **`padding: EdgeInsets.only(bottom: gap)` on an upper sibling is the shape
+  this rule forbids.** `PlanLimitMeters` padded its own bottom to stand off
+  the list under it, so the gap between the meter and the first row lived in a
+  file that has nothing to do with lists — and a screen that placed the meter
+  with no list under it got a trailing gap belonging to nothing.
+- **A repeated row is the same rule with an index.** `for (final x in xs)
+  Padding(bottom: gap, …)` gives the *last* row a gap under it that nobody
+  asked for; the form is an indexed loop with `if (index > 0) SizedBox(height:
+  gap)` before the row, so the first row starts flush and every later one
+  carries its own leading distance.
+- **The gap may be the lower item's top padding or a `SizedBox` immediately
+  above it** — both belong to the lower item; only bottom padding on the upper
+  one is out. That is what keeps the existing `topGap` rule intact: it is a
+  `SizedBox` the screen places *in front of its first content*, which is the
+  content's gap and never the app bar's.
+- **A bottom inset that is not a sibling gap is untouched.** The clearance
+  under the last row of a list — `bottomGap`, the FAB and glass-bar
+  arithmetic in `AppAddFabScaffold.listPadding` — holds content off the
+  *window*, not off a sibling, so it stays where it is.
+
 ### The traps — each one cost a real bug
 
 - **Insets come off the view, not the ambient `MediaQuery`.** `Scaffold` wraps
