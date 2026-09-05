@@ -59,41 +59,22 @@ opens.
   `SingleChildScrollView`, so it is content-sized when short and scrolls when
   long, rather than taking a fixed `heightFactor` that would leave a one-item
   sale mostly dead space.
-- **The sheet states the fee it would estimate, and where to change it** —
-  owner's rule. The box was optional with a rate quoted under it, so a seller
-  who left it empty had no idea what number the app was about to use, or that
-  the rate behind it was theirs to correct.
-  - **The figure, not just the rate.** `salePrice × rate` in money, recomputed
-    as the price is typed — a percentage is a fact about the platform, and
-    what the seller is deciding whether to accept is an amount.
-  - **It says where the rate lives**: More → Marketplaces. A number the app
-    presents as its own is one nobody thinks to go and fix.
-  - **It sits under Sold on, not under the fee box** — owner's rule. The
-    estimate is a fact about the platform the seller just picked, so it
-    belongs to that answer; under the fee box it read as a note about a field
-    they had deliberately left empty.
-- **One sheet explains the two fees, and both are one tap from the sale** —
-  owner's rule. "Platform fee" on this order and the marketplace's rate are
-  different things that share a word, and a seller who cannot tell them apart
-  either leaves the box empty forever or types the estimate back into it as
-  though it were reported.
-  - `FeeExplainerSheet` (`core/widgets/`) says what each one is: the fee is
-    what the platform actually took and the only fee this app stores; the rate
-    is a percentage per marketplace, used only to estimate a sale nobody has
-    entered one for.
-  - **It ends on the way to the rate** — the primary action opens
-    More → Marketplaces, because the sentence that explains where a number
-    lives is worth less than the button that goes there.
-  - **Two ways in, and neither costs a row**: the estimate card is tappable,
-    and the fee box carries an `ⓘ` beside its currency (`MoneyField.onInfo`)
-    for when a typed fee has hidden the card. A text button under the box was
-    tried and taken out — the sheet is a form, and a row that only explains
-    pushes the one that submits off the screen.
-  - **It disappears the moment a fee is typed.** Then there is nothing to
-    estimate: the box holds the fact, and echoing it back under itself would
-    read as a second figure.
-  - The rate is the marketplace record's own (`Marketplace.feeRate`), which is
-    what that screen edits.
+- **The sheet asks what landed in the bank, and never what the fee was** —
+  owner's rule, and it replaced a fee box with an estimate card beside it.
+  Every platform shows the seller what they actually received; no platform
+  shows them a number this app could have guessed better. So the sheet takes
+  the sale price and **Net received**, and the fee is what falls out of the
+  two (hard rule 3).
+  - **Net received is optional and opens empty.** A seller marking something
+    sold on their phone in a queue does not have the payout yet, and a
+    pre-filled guess is indistinguishable from a fact the moment it is saved —
+    which is the failure the whole rule exists to prevent.
+  - **Empty is not zero and not an estimate**: the order's profit reads `—`
+    until the figure arrives (hard rule 5), and the order joins the Payouts
+    queue as work.
+  - **No fee box, no estimate card, no fee explainer.** `FeeExplainerSheet`
+    existed only because two fees shared a word; with the estimate gone there
+    is one fee, and it is measured.
 
 - **The marketplace picker offers only the platforms that item is on.** A list
   of every marketplace the business sells on makes the seller find the one
