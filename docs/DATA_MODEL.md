@@ -10,47 +10,54 @@ belongs to `SELLER_OS_FINAL_MASTER_PLAN.md`; access belongs to
 users/{uid}
   devices/{token}
   notifications/{notificationId}
+
 invites/{inviteId}
+app_config/current
 
 workspaces/{workspaceId}
-  members/{uid}
-  sources/{sourceId}
-  purchases/{purchaseId}
-  items/{itemId}
-  listings/{listingId}
-  offers/{offerId}
-  orders/{orderId}
-  expenses/{expenseId}
-  receipts/{receiptId}
-  categories/{categoryId}
-  locations/{locationId}
-  marketplaces/{marketplaceId}
-  carriers/{carrierId}
-  activity/{activityId}
-  subscription/{docId}
-  usage/{docId}
+
+members/{workspaceId}_{uid}
+sources/{workspaceId}_{sourceId}
+purchases/{workspaceId}_{purchaseId}
+items/{workspaceId}_{itemId}
+listings/{workspaceId}_{listingId}
+offers/{workspaceId}_{offerId}
+orders/{workspaceId}_{orderId}
+expenses/{workspaceId}_{expenseId}
+receipts/{workspaceId}_{receiptId}
+categories/{workspaceId}_{categoryId}
+locations/{workspaceId}_{locationId}
+marketplaces/{workspaceId}_{marketplaceId}
+carriers/{workspaceId}_{carrierId}
+activity/{workspaceId}_{activityId}
+
+subscription/{workspaceId}
+usage/{workspaceId}
 ```
 
-**This tree is the shape that is stored today, and it is backlog.** Hard rule
-14 now says every table is flat and top-level with `workspaceId` as a field,
-modelled the way SQL would model it, so a move off Firestore is an export
-rather than a reshape. Nothing above has been migrated yet; this file stays the
-authority on what is *actually* stored, so the two shapes are told apart here
-rather than guessed at.
+**Every business table is flat and top-level, modelled the way SQL would model
+it** (hard rule 14). Each row carries a `workspaceId` column and is keyed by a
+composite `{workspaceId}_{id}`, which is how SQL spells a composite primary
+key — without it every business's `ebay` marketplace, `usps` carrier and
+`{uid}` membership would be the same row.
 
-| | Shape | Where |
-|---|---|---|
-| Written from now on | Flat, `workspaceId` as a field | hard rule 14 |
-| Stored today | Nested under `workspaces/{workspaceId}` | the tree above |
+| | Where it is enforced |
+|---|---|
+| Every read filters on `workspaceId` | `WorkspaceTable.query` — there is no accessor that returns an unfiltered collection |
+| Every write stamps `workspaceId` | the converter in `WorkspaceCollections._table`, so no DTO carries the column |
+| A row cannot be moved between businesses | `canUpdateRow()` in `firestore.rules` compares the stored column with the incoming one |
+| An unfiltered query is denied, not leaked | a `list` rule runs per row, so foreign rows fail it and take the query down |
+| Deleting a business sweeps every table | `WorkspaceCollections.tableNames` / `workspaceTables` in `functions/` |
 
-`app_config` is the one collection already in the target shape — it is
-top-level because it belongs to no workspace at all.
+`subscription` and `usage` are keyed by the workspace id alone: there is
+exactly one row of each per business, so the id *is* the key.
 
-What the nesting buys while it is still there: workspace membership is part of
-every path, so a query cannot omit an ownership filter. Flattening moves that
-guarantee out of the path and onto `WorkspaceCollections` plus a
-`firestore.rules` clause that requires the filter — which is the cost hard rule
-14 names and accepts.
+`users/{uid}` keeps its two subcollections. They belong to a person rather than
+a business, and a device token is addressed to whoever holds the phone.
+
+**Migrating existing data is `functions/src/scripts/flattenTables.ts`** — it
+copies every nested record into its flat table, and only sweeps the originals
+when told to, so a half-finished run loses nothing.
 
 ## Shared contracts
 

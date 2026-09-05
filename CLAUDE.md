@@ -545,10 +545,10 @@ behind it.
       would keep in a column: a value object with no identity, or a snapshot
       frozen at write time (a price as sold, a marketplace name as printed).
 
-    **The records nested today are backlog, not compliance.**
-    `docs/DATA_MODEL.md` stays the authority on what is *actually* stored and
-    says which shape each collection is in. This rule governs what is written
-    next.
+    **Every table is migrated.** `docs/DATA_MODEL.md` is the authority on the
+    shape and on where each half of the boundary is enforced;
+    `functions/src/scripts/flattenTables.ts` moves data written before the
+    change.
 
 15. **Soft-delete anything another record points at** — items, sources,
     purchases, categories, locations carry `deletedAt`. Hard-deleting a source
