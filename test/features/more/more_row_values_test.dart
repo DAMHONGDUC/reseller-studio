@@ -67,9 +67,18 @@ void main() {
     // Items and orders are unlimited on Free, so a meter for either would be
     // a bar that can never fill.
     expect(meters, findsOneWidget);
-    expect(find.text(PlanAllowance.workspaces.label), findsOneWidget);
-    expect(find.text(PlanAllowance.items.label), findsNothing);
-    expect(find.text(PlanAllowance.orders.label), findsNothing);
+    expect(
+      find.text(PlanAllowance.workspaces.meterTitle(SellerPlan.free)),
+      findsOneWidget,
+    );
+    expect(
+      find.text(PlanAllowance.items.meterTitle(SellerPlan.free)),
+      findsNothing,
+    );
+    expect(
+      find.text(PlanAllowance.orders.meterTitle(SellerPlan.free)),
+      findsNothing,
+    );
   });
 
   testWidgets('Premium has no ceiling, so it draws no meter', (

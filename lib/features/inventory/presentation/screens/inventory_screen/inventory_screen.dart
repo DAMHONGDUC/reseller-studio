@@ -16,9 +16,11 @@ import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/item_card.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/services/listings_by_item.dart';
 import '../../../../listings/providers.dart';
+import '../../../../subscription/domain/enums/plan_allowance.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';
@@ -154,6 +156,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             delegate: _PinnedFilterStrip(
               showActiveFilters:
                   ref.watch(inventoryActiveFilterCountProvider) > 0,
+            ),
+          ),
+          // Under the pinned strip, so it scrolls away with the list: the
+          // ceiling is worth knowing once, not at every scroll position.
+          const SliverToBoxAdapter(
+            child: PlanLimitMeters(
+              allowances: <PlanAllowance>[PlanAllowance.items],
             ),
           ),
           switch (source) {
