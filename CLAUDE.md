@@ -379,6 +379,25 @@ behind it.
    corrected, and it will be corrected. `orders.payoutMinor` is the one
    exception because it is a fact the marketplace reported, not a derivation.
 
+   **And never estimate one either.** Owner's rule, and the half this app is
+   built on: a platform's fee is measured, never guessed from a published
+   rate. What the seller records is what the platform actually paid —
+   `orders.payoutMinor` — and the fee falls out of it as
+   `salePrice - refund - payout - shippingCost`, the same statement read
+   backwards. A rate table tops out near 95% on the one platform that already
+   shows the seller the true number, and it goes stale every time a
+   marketplace reprices; an order with no payout renders `—` (hard rule 5)
+   rather than a plausible figure nobody can tell apart from a fact.
+   - **A rate survives in exactly one place: before a sale exists.** Sourcing
+     has nothing to measure — the item is still in the shop — so
+     `Workspace.planningFeeRate` carries a single planning assumption for
+     `PurchaseEvaluation` and the cross-list comparison. It never reaches an
+     `Order`, and there is never a second one per marketplace.
+   - **An order with no payout is work, not a blank.** Payouts gathers them
+     and takes them in bulk (hard rule 16): the app says what needs attention
+     today, and "the platform paid you and nobody wrote it down" is exactly
+     that.
+
 4. **Money is an integer of minor units, never a double.** Use the `Money`
    value type in `core/money/` — it stores minor units with a currency and
    refuses to combine two currencies. `19.99` is not representable in binary
