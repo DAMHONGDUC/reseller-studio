@@ -163,6 +163,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
           const SliverToBoxAdapter(
             child: PlanLimitMeters(
               allowances: <PlanAllowance>[PlanAllowance.items],
+              hasHorizontalPadding: true,
             ),
           ),
           switch (source) {

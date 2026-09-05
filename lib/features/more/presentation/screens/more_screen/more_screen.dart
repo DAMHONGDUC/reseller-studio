@@ -57,7 +57,11 @@ class MoreScreen extends ConsumerWidget {
           // Signed out there is no business to count against a ceiling, and
           // saying "0 of 1" about one nobody has named is the claim hard
           // rule 1 keeps the other tabs from making.
-          if (signedIn) const PlanLimitMeters(),
+          if (signedIn)
+            // More's list is `fullBleed` — every section pads itself — so the
+            // meter carries the gutter here and not on the two screens whose
+            // list already holds one.
+            const PlanLimitMeters(hasHorizontalPadding: true),
         ],
       ),
     );
