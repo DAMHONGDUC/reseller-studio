@@ -113,7 +113,7 @@ class _OfferCard extends ConsumerWidget {
       offer,
       feeRate: MarketplaceFeePolicy.rateFor(
         offer.marketplace,
-        overrides: ref.watch(marketplaceFeeRatesProvider),
+        rates: ref.watch(marketplaceFeeRatesProvider),
       ),
       cost: item?.purchasePrice,
       minimumPrice: item?.minimumPrice,

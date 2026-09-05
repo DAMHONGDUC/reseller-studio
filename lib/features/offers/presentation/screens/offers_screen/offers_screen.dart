@@ -19,6 +19,7 @@ import '../../../../inventory/providers.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/providers.dart';
 import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
+import '../../../../marketplaces/providers.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';

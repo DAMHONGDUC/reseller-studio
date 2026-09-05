@@ -2,16 +2,18 @@ import '../enums/marketplace.dart';
 
 /// What a marketplace's commission is *for this business*.
 ///
-/// **The published rate is a starting point, not the answer** — owner's rule.
-/// Real fees vary by category, seller tier, promotion and country, and a
-/// seller on eBay's shop tier pays a different cut from one who is not. The
-/// enum keeps the platform's headline number; a workspace may correct it, and
-/// `Workspace.marketplaceFeeRates` holds only the corrections.
+/// **The seller's own rate wins over the published one** — owner's rule. Real
+/// fees vary by category, seller tier, promotion and country, and a seller on
+/// eBay's shop tier pays a different cut from one who is not. The rates come
+/// from that business's own marketplace records
+/// (`marketplaceFeeRatesProvider`); the enum's published number is the
+/// fallback for a platform this business has no record of.
 ///
-/// **Only the exceptions are stored.** A map filled in with every platform's
-/// default would make "this seller told us their rate" indistinguishable from
-/// "nobody has said", and a published rate that later changed would be frozen
-/// at whatever the app shipped with.
+/// **This is the half of the app that still speaks the enum** — listings,
+/// offers and the sourcing calculator hold a `Marketplace` value rather than a
+/// record id, so the lookup is by `Marketplace.name`. It matches the seeded
+/// ids, and a platform outside that overlap falls back. Anything holding a
+/// record id asks `Order.feeRate` or the record itself.
 ///
 /// Pure Dart, and the rates arrive as an argument rather than from a provider,
 /// because `PayoutReconciliation` runs here too and `domain/` imports no
@@ -29,12 +31,6 @@ final class MarketplaceFeePolicy {
   /// This workspace's rate for [marketplace], or the platform's published one.
   static double rateFor(
     Marketplace marketplace, {
-    Map<String, double> overrides = const <String, double>{},
-  }) => overrides[marketplace.name] ?? marketplace.estimatedFeeRate;
-
-  /// Whether the seller has corrected this platform's rate themselves.
-  static bool isOverridden(
-    Marketplace marketplace, {
-    Map<String, double> overrides = const <String, double>{},
-  }) => overrides.containsKey(marketplace.name);
+    Map<String, double> rates = const <String, double>{},
+  }) => rates[marketplace.name] ?? marketplace.estimatedFeeRate;
 }

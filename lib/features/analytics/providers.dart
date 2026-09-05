@@ -15,6 +15,7 @@ import '../expenses/providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
+import '../marketplaces/providers.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';

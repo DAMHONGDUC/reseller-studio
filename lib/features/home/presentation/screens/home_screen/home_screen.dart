@@ -20,6 +20,7 @@ import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
 import '../../../../inventory/domain/entities/item.dart';
+import '../../../../marketplaces/providers.dart';
 import '../../../../offers/domain/entities/offer.dart';
 import '../../../../offers/providers.dart';
 import '../../../../orders/domain/entities/order.dart';

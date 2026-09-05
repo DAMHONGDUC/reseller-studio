@@ -195,7 +195,7 @@ final class _AfterFees {
     }
 
     final Money fee = price.applyRate(
-      MarketplaceFeePolicy.rateFor(marketplace, overrides: feeRates),
+      MarketplaceFeePolicy.rateFor(marketplace, rates: feeRates),
     );
 
     return context.l10n.crossListAfterFees(

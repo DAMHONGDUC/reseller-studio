@@ -2,8 +2,7 @@ import '../enums/notification_type.dart';
 
 /// Which reminders one person still wants.
 ///
-/// **Only the mutes are stored**, the same shape `Workspace.marketplaceFeeRates`
-/// uses and for the same reason: a map filled in with every type would make
+/// **Only the mutes are stored**: a map filled in with every type would make
 /// "this person chose to keep it" indistinguishable from "nobody has said",
 /// and a type added in a later build would arrive switched off for everybody
 /// who upgraded into it.

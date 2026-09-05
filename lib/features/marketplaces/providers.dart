@@ -137,6 +137,17 @@ final Provider<Map<String, AppTagHue>> marketplaceHuesProvider =
 
 /// Id → what that platform takes, as a fraction of the sale.
 ///
+/// **The only answer to "what does this platform charge", and it comes from
+/// the seller's own records.** Every estimate in the app reads this one map —
+/// the profit statement, the payout forecast, the sourcing calculator, the
+/// cross-list panel — so a rate corrected on the Marketplaces screen moves all
+/// of them at once. A second map of "corrections" living on the workspace was
+/// what this replaced: nothing ever wrote it, so every screen silently fell
+/// back to a hardcoded published rate and ignored what the seller had typed.
+///
+/// **Deleted marketplaces are in here too**, because a past order still names
+/// one and its fee has to keep resolving.
+///
 /// **A planning estimate, never accounting.** A fee an order actually reported
 /// is a fact and always wins — see `PayoutReconciliation.expected`.
 final Provider<Map<String, double>> marketplaceFeeRatesProvider =

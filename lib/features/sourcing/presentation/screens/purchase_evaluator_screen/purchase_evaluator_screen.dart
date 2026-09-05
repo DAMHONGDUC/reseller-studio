@@ -15,6 +15,7 @@ import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';
 import '../../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
+import '../../../../marketplaces/providers.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';
@@ -151,7 +152,7 @@ class _PurchaseEvaluatorScreenState
     final Map<String, double> feeRates = ref.read(marketplaceFeeRatesProvider);
     final Money fees =
         sale?.applyRate(
-          MarketplaceFeePolicy.rateFor(_marketplace, overrides: feeRates),
+          MarketplaceFeePolicy.rateFor(_marketplace, rates: feeRates),
         ) ??
         zero;
 
@@ -207,7 +208,7 @@ class _PurchaseEvaluatorScreenState
                         icon: AppIconConstant.storefront,
                         value:
                             '${_marketplace.displayName} · '
-                            '${(MarketplaceFeePolicy.rateFor(_marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
+                            '${(MarketplaceFeePolicy.rateFor(_marketplace, rates: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
                         onTap: () async {
                           final Marketplace?
                           picked = await OptionPickerSheet.show<Marketplace>(
@@ -222,7 +223,7 @@ class _PurchaseEvaluatorScreenState
                                     value: marketplace,
                                     label: marketplace.displayName,
                                     caption:
-                                        '${(MarketplaceFeePolicy.rateFor(marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
+                                        '${(MarketplaceFeePolicy.rateFor(marketplace, rates: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
                                   ),
                                 )
                                 .toList(),

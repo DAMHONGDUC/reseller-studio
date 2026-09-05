@@ -152,11 +152,14 @@ class Order {
   ///
   /// **One resolution, asked by everything that needs a fee** — the profit
   /// statement, the payout forecast and the marketplace breakdown all come
-  /// here, so they cannot disagree about what eBay takes. [overrides] is
-  /// `Workspace.marketplaceFeeRates`, which holds only the rates this
-  /// business has corrected.
-  double feeRate(Map<String, double> overrides) =>
-      overrides[marketplaceId] ?? marketplace.estimatedFeeRate;
+  /// here, so they cannot disagree about what eBay takes. [rates] is
+  /// `marketplaceFeeRatesProvider`: the seller's own marketplace records, so a
+  /// rate corrected on that screen lands on every past order's estimate.
+  ///
+  /// The enum's published rate is the fallback for an order that names no
+  /// record — a legacy row, or one imported before the records existed.
+  double feeRate(Map<String, double> rates) =>
+      rates[marketplaceId] ?? marketplace.estimatedFeeRate;
 
   /// Whether nobody has entered what the platform actually charged.
   bool get feesAreEstimated => fees == null;

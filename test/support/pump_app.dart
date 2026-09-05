@@ -15,6 +15,8 @@ import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
+import 'package:reseller_studio/features/marketplaces/providers.dart';
 import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
 import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
 import 'package:reseller_studio/features/mock_data/providers.dart';
@@ -232,6 +234,14 @@ Future<void> warmUp(ProviderContainer container) async {
   container.listen<AsyncValue<List<Purchase>>>(
     purchasesProvider,
     (AsyncValue<List<Purchase>>? previous, AsyncValue<List<Purchase>> next) {},
+    fireImmediately: true,
+  );
+  container.listen<AsyncValue<List<Marketplace>>>(
+    marketplacesProvider,
+    (
+      AsyncValue<List<Marketplace>>? previous,
+      AsyncValue<List<Marketplace>> next,
+    ) {},
     fireImmediately: true,
   );
 

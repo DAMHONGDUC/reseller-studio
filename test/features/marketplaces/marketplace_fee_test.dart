@@ -223,6 +223,40 @@ void main() {
       expect(countAfter, countBefore);
     });
 
+    test('a rate the seller edits reaches an order\'s estimated fee', () async {
+      final ProviderContainer container = mockContainer();
+      final MarketplaceFormController controller = container.read(
+        marketplaceFormControllerProvider.notifier,
+      );
+      final MarketplaceRepository repository = container.read(
+        mock_providers.marketplaceRepositoryProvider,
+      );
+      final record.Marketplace ebay =
+          (await repository.watchMarketplaces().first).firstWhere(
+            (record.Marketplace row) => row.id == 'ebay',
+          );
+
+      await warmUp(container);
+
+      // The seeded rate, so the estimate is the published 13.25%.
+      expect(
+        order().effectiveFees(container.read(marketplaceFeeRatesProvider)),
+        const Money(1325, 'USD'),
+      );
+
+      controller.seed(ebay);
+      controller.updateFeeRate(0.08);
+      await controller.submit(name: ebay.name, marketplaceId: ebay.id);
+      await Future<void>.delayed(Duration.zero);
+
+      // The one this fix exists for: the correction has to move every estimate,
+      // not just the sale sheet that reads the record directly.
+      expect(
+        order().effectiveFees(container.read(marketplaceFeeRatesProvider)),
+        const Money(800, 'USD'),
+      );
+    });
+
     test('the form controller edits and soft-deletes a marketplace', () async {
       final ProviderContainer container = mockContainer();
       final MarketplaceFormController controller = container.read(
