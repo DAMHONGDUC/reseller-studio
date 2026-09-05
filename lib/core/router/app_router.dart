@@ -39,6 +39,7 @@ import '../../features/onboarding/providers.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import '../../features/orders/presentation/screens/payouts_screen/payouts_screen.dart';
+import '../../features/orders/presentation/screens/record_payouts_screen/record_payouts_screen.dart';
 import '../../features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
 import '../../features/receipts/presentation/screens/receipts_screen/receipts_screen.dart';
@@ -420,8 +421,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         path: 'evaluate',
                         builder: (BuildContext context, GoRouterState state) =>
                             PurchaseEvaluatorScreen(
-                              initialCode:
-                                  state.uri.queryParameters['code'],
+                              initialCode: state.uri.queryParameters['code'],
                             ),
                       ),
                       GoRoute(
@@ -469,6 +469,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'payouts',
                     builder: (BuildContext context, GoRouterState state) =>
                         const PayoutsScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'record',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const RecordPayoutsScreen(),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../subscription/domain/enums/plan_feature.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -35,9 +38,8 @@ class PayoutsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<MarketplacePayout> rows = ref.watch(marketplacePayoutsProvider);
-    final bool settledUp = rows.every(
-      (MarketplacePayout row) => row.awaiting.isEmpty,
-    );
+    final int awaiting = ref.watch(ordersAwaitingPayoutProvider);
+    final bool settledUp = awaiting == 0;
 
     // **The figure is free; chasing it is not.** Hiding the number would make
     // this a screen nobody opens twice, and a locked screen that says nothing
@@ -60,23 +62,40 @@ class PayoutsScreen extends ConsumerWidget {
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.payoutsTitle),
-      body: ListView(
-        padding: SdContentPaddingV3.screen(context),
+      body: Column(
         children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          // Said once at the top rather than repeated on every card: the
-          // useful fact is that nothing is outstanding anywhere.
-          if (settledUp) ...<Widget>[
-            SdStatTileV3(
-              label: context.l10n.payoutsNothingOutstanding,
-              value: context.l10n.payoutsNothingOutstandingNote,
-              icon: AppIconConstant.checkCircle,
-              tone: SdStatToneV3.profit,
+          Expanded(
+            child: ListView(
+              padding: SdContentPaddingV3.screen(context),
+              children: <Widget>[
+                SizedBox(height: SdContentPaddingV3.topGap),
+                // Said once at the top rather than repeated on every card: the
+                // useful fact is that nothing is outstanding anywhere.
+                if (settledUp) ...<Widget>[
+                  SdStatTileV3(
+                    label: context.l10n.payoutsNothingOutstanding,
+                    value: context.l10n.payoutsNothingOutstandingNote,
+                    icon: AppIconConstant.checkCircle,
+                    tone: SdStatToneV3.profit,
+                  ),
+                  SizedBox(height: SdContentPaddingV3.sectionGap),
+                ],
+                for (final MarketplacePayout row in rows)
+                  _MarketplaceCard(row: row),
+                SizedBox(height: SdContentPaddingV3.bottomGap),
+              ],
             ),
-            SizedBox(height: SdContentPaddingV3.sectionGap),
-          ],
-          for (final MarketplacePayout row in rows) _MarketplaceCard(row: row),
-          SizedBox(height: SdContentPaddingV3.bottomGap),
+          ),
+          // **The screen's whole point once nothing is estimated.** Every one
+          // of these orders is a profit figure the app cannot show, so the
+          // action is the queue itself rather than a per-row sheet
+          // (hard rule 16).
+          if (!settledUp)
+            AppPinnedAction(
+              label: context.l10n.payoutsRecordAll(awaiting),
+              icon: AppIconConstant.payments,
+              onPressed: () => context.push(AppRoutes.recordPayouts),
+            ),
         ],
       ),
     );

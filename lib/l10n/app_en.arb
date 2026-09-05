@@ -1803,22 +1803,6 @@
       }
     }
   },
-  "homePayoutOverdue": "Not paid out yet",
-  "@homePayoutOverdue": {
-    "description": "Home attention row for sales a marketplace should have settled by now."
-  },
-  "homePayoutOverdueDetail": "{amount} owed, {days} days or more since you posted",
-  "@homePayoutOverdueDetail": {
-    "description": "How much is outstanding and how long it has been. The amount is what makes this worth opening.",
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      },
-      "days": {
-        "type": "int"
-      }
-    }
-  },
   "intakeTitle": "Intake session",
   "@intakeTitle": {
     "description": "Title of the batch intake screen — one buying trip, many items."
@@ -6213,5 +6197,98 @@
         "type": "String"
       }
     }
+  },
+  "payoutsRecordAll": "{count, plural, =1{Record 1 payout} other{Record {count} payouts}}",
+  "@payoutsRecordAll": {
+    "description": "Pinned action on Payouts opening the bulk entry screen.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "recordPayoutsTitle": "Record payouts",
+  "@recordPayoutsTitle": {
+    "description": "Title of the bulk payout entry screen."
+  },
+  "recordPayoutsIntro": "Copy what each platform actually paid. Until a sale has one, its profit is unknown.",
+  "@recordPayoutsIntro": {
+    "description": "Line above the list on the bulk payout entry screen."
+  },
+  "recordPayoutsRowHint": "Sold {date}",
+  "@recordPayoutsRowHint": {
+    "description": "Helper under an empty payout box: when the sale was made.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recordPayoutsRowKept": "Platform kept {amount}",
+  "@recordPayoutsRowKept": {
+    "description": "Helper under a filled payout box: sale price minus what landed.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recordPayoutsSubmit": "{count, plural, =0{Save} =1{Save 1 payout} other{Save {count} payouts}}",
+  "@recordPayoutsSubmit": {
+    "description": "Pinned action on the bulk payout entry screen.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "recordPayoutsDone": "{count, plural, =1{1 payout recorded} other{{count} payouts recorded}}",
+  "@recordPayoutsDone": {
+    "description": "Snackbar after saving a run of payouts.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "recordPayoutsAllDone": "Every sale is accounted for",
+  "@recordPayoutsAllDone": {
+    "description": "Empty state title when no sale is missing a payout."
+  },
+  "recordPayoutsAllDoneNote": "Nothing here needs a figure. Profit is exact across the whole book.",
+  "@recordPayoutsAllDoneNote": {
+    "description": "Empty state message when no sale is missing a payout."
+  },
+  "homePayoutsToRecord": "Payouts to record",
+  "@homePayoutsToRecord": {
+    "description": "Home attention row: sales whose payout nobody has entered."
+  },
+  "homePayoutsToRecordDetail": "Profit is unknown until each one has a figure",
+  "@homePayoutsToRecordDetail": {
+    "description": "Detail under the payouts row when none is overdue."
+  },
+  "homePayoutOverdueDetail": "{count} waiting more than {days} days",
+  "@homePayoutOverdueDetail": {
+    "description": "Detail under the payouts row when some are past the settlement window.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "workspacePlanningFee": "Assumed platform fee",
+  "@workspacePlanningFee": {
+    "description": "Workspace setting: the planning rate used before a sale exists."
+  },
+  "workspacePlanningFeeHelper": "Used only when working out whether a buy is worth making. Real fees are measured from each payout.",
+  "@workspacePlanningFeeHelper": {
+    "description": "Helper under the assumed platform fee picker."
   }
 }

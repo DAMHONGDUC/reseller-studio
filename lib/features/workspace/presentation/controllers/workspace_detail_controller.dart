@@ -4,6 +4,7 @@ import 'package:system_design/common.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../domain/entities/workspace.dart';
 import '../../providers.dart';
+import '../../workspace_constant.dart';
 
 /// The business detail form's draft.
 ///
@@ -20,6 +21,7 @@ class WorkspaceDetailState {
     this.businessType,
     this.staleThresholdDays = 0,
     this.lowStockThreshold = 0,
+    this.planningFeeRate = WorkspaceConstant.defaultPlanningFeeRate,
     this.isSaving = false,
   });
 
@@ -30,6 +32,10 @@ class WorkspaceDetailState {
   final String? businessType;
   final int staleThresholdDays;
   final int lowStockThreshold;
+
+  /// What a platform is assumed to take when the business is deciding whether
+  /// to buy something. The only rate the app still has (hard rule 3).
+  final double planningFeeRate;
   final bool isSaving;
 
   /// A business always has a name (plan §28), so an emptied field is the one
@@ -45,6 +51,7 @@ class WorkspaceDetailState {
     String? businessType,
     int? staleThresholdDays,
     int? lowStockThreshold,
+    double? planningFeeRate,
     bool? isSaving,
   }) => WorkspaceDetailState(
     workspaceId: workspaceId ?? this.workspaceId,
@@ -54,6 +61,7 @@ class WorkspaceDetailState {
     businessType: businessType ?? this.businessType,
     staleThresholdDays: staleThresholdDays ?? this.staleThresholdDays,
     lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
+    planningFeeRate: planningFeeRate ?? this.planningFeeRate,
     isSaving: isSaving ?? this.isSaving,
   );
 }
@@ -86,6 +94,7 @@ class WorkspaceDetailController extends Notifier<WorkspaceDetailState> {
       businessType: workspace.businessType,
       staleThresholdDays: workspace.staleThresholdDays,
       lowStockThreshold: workspace.lowStockThreshold,
+      planningFeeRate: workspace.planningFeeRate,
     );
   }
 
@@ -110,6 +119,13 @@ class WorkspaceDetailController extends Notifier<WorkspaceDetailState> {
   /// the backend, so this setting is the only thing the app contributes to it.
   void selectLowStockThreshold(int items) =>
       state = state.copyWith(lowStockThreshold: items);
+
+  /// What Sourcing and the cross-list comparison assume a platform takes.
+  ///
+  /// **Never reaches an order** (hard rule 3): everything after a sale reads
+  /// the payout, so this only ever answers "is this buy worth making".
+  void selectPlanningFeeRate(double rate) =>
+      state = state.copyWith(planningFeeRate: rate);
 
   /// Writes the draft over the record, and answers whether it went.
   ///
@@ -136,6 +152,7 @@ class WorkspaceDetailController extends Notifier<WorkspaceDetailState> {
         'currency': draft.currency,
         'staleThresholdDays': draft.staleThresholdDays,
         'lowStockThreshold': draft.lowStockThreshold,
+        'planningFeePercent': draft.planningFeeRate * 100,
       },
     );
 
@@ -150,6 +167,7 @@ class WorkspaceDetailController extends Notifier<WorkspaceDetailState> {
               businessType: draft.businessType,
               staleThresholdDays: draft.staleThresholdDays,
               lowStockThreshold: draft.lowStockThreshold,
+              planningFeeRate: draft.planningFeeRate,
             ),
           );
 

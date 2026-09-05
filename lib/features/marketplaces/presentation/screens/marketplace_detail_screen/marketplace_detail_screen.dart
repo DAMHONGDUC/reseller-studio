@@ -175,7 +175,6 @@ class _MarketplaceDetailScreenState
                   onChanged: (String _) => setState(() {}),
                 ),
                 SizedBox(height: SdSpacingConstant.h16),
-                SizedBox(height: SdSpacingConstant.h16),
                 MarketplaceHueField(
                   label: context.l10n.marketplaceColorLabel,
                   helperText: context.l10n.marketplaceColorHelper,

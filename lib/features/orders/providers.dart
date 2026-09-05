@@ -257,6 +257,23 @@ final Provider<int> ordersAwaitingPayoutProvider = Provider<int>((Ref ref) {
       );
 });
 
+/// Every sale whose payout nobody has recorded, oldest first.
+///
+/// **The work the payout-first model creates, gathered in one place.** A sale
+/// with no payout has no fee and therefore no profit (hard rule 3), so this is
+/// not a tidy-up list — it is the difference between Analytics reading `—` and
+/// reading a number. Oldest first because that is the one most likely to have
+/// been missed.
+final Provider<List<Order>>
+ordersAwaitingPayoutListProvider = Provider<List<Order>>((Ref ref) {
+  final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
+
+  return orders
+      .where((Order order) => order.status.countsAsRevenue && order.needsPayout)
+      .toList()
+    ..sort((Order a, Order b) => a.orderedAt.compareTo(b.orderedAt));
+});
+
 /// The one way an order is written — see `lib/features/orders/CLAUDE.md`.
 ///
 /// Declared here rather than beside the controller because Inventory's Mark

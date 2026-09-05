@@ -121,6 +121,11 @@ final class AppRoutes {
   /// rather than inside Orders: it is a weekly reconciliation against a bank
   /// statement, not part of draining today's queue.
   static const String payouts = '/more/payouts';
+
+  /// The queue of sales whose payout nobody has recorded, taken in bulk.
+  /// Under Payouts because it is the work that screen names.
+  static const String recordPayouts = '/more/payouts/record';
+
   /// Everywhere the figures are still guessing. Under More next to Reports,
   /// because it is the screen a seller opens before handing anything over.
   static const String books = '/more/books';
@@ -174,6 +179,7 @@ final class AppRoutes {
   static String order(String orderId) => '/orders/$orderId';
   static String workspaceDetail(String workspaceId) =>
       '/workspace/$workspaceId';
+
   /// The buy calculator, optionally opened on a code the seller just scanned.
   ///
   /// A query parameter rather than a path segment: the screen is perfectly

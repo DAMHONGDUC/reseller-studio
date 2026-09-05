@@ -127,6 +127,28 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
         .selectStaleThresholdDays(days);
   }
 
+  Future<void> _pickPlanningFeeRate() async {
+    final double? rate = await OptionPickerSheet.show<double>(
+      context,
+      title: context.l10n.workspacePlanningFee,
+      selected: ref.read(workspaceDetailControllerProvider).planningFeeRate,
+      options: WorkspaceConstant.planningFeeRateChoices
+          .map(
+            (double rate) => PickerOption<double>(
+              value: rate,
+              label: context.percent(rate, decimals: 0),
+            ),
+          )
+          .toList(),
+    );
+
+    if (rate == null) return;
+
+    ref
+        .read(workspaceDetailControllerProvider.notifier)
+        .selectPlanningFeeRate(rate);
+  }
+
   Future<void> _pickLowStock() async {
     final int? items = await OptionPickerSheet.show<int>(
       context,
@@ -262,6 +284,20 @@ class _WorkspaceDetailScreenState extends ConsumerState<WorkspaceDetailScreen>
                     state.lowStockThreshold,
                   ),
                   onTap: _pickLowStock,
+                ),
+                SizedBox(height: SdSpacingConstant.h16),
+                PickerField(
+                  label: context.l10n.workspacePlanningFee,
+                  icon: AppIconConstant.payments,
+                  value: context.percent(state.planningFeeRate, decimals: 0),
+                  onTap: _pickPlanningFeeRate,
+                ),
+                SizedBox(height: SdSpacingConstant.h6),
+                // Said out loud because the two fees share a word: this one
+                // never touches an order (hard rule 3).
+                Text(
+                  context.l10n.workspacePlanningFeeHelper,
+                  style: context.textTheme3.bodySmall!.faint3(context),
                 ),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
               ],

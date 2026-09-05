@@ -92,6 +92,35 @@ class OrderActionsController extends Notifier<bool> {
     <String, Object>{'hasPayout': payout != null},
   );
 
+  /// Record a run of payouts in one sitting.
+  ///
+  /// **The screen this serves is the answer to the payout-first model's one
+  /// real cost** — the seller has to type a figure the app used to guess. One
+  /// at a time through the order detail is the version nobody finishes, so
+  /// this takes a whole marketplace's deposit at once (hard rule 16).
+  ///
+  /// Sequential rather than a `Future.wait`, the same reason `markManyShipped`
+  /// is: a mid-run failure must leave the orders before it recorded and the
+  /// queue honest about the rest.
+  Future<void> recordManySettlements(
+    List<Order> orders,
+    Map<String, Money> payoutsByOrderId,
+  ) async {
+    SdLogger.action(
+      LogTagConstant.order,
+      'Record settlements',
+      <String, Object>{'count': payoutsByOrderId.length},
+    );
+
+    for (final Order order in orders) {
+      final Money? payout = payoutsByOrderId[order.id];
+
+      if (payout == null) continue;
+
+      await recordSettlement(order, payout: payout);
+    }
+  }
+
   Future<void> requestReturn(Order order) {
     AppAnalytics.instance.returnOpened();
 

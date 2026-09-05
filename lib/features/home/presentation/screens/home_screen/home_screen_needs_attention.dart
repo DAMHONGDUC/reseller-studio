@@ -43,8 +43,8 @@ class _NeedsAttention extends ConsumerWidget {
     final List<Offer> offers = ref.watch(pendingOffersProvider);
     final List<Item> stale = ref.watch(staleItemsProvider);
     final List<Item> unlisted = ref.watch(unlistedItemsProvider);
-    final List<Order> unpaid = ref.watch(overduePayoutsProvider);
-    final Money? owed = ref.watch(overduePayoutTotalProvider);
+    final List<Order> unpaid = ref.watch(ordersAwaitingPayoutListProvider);
+    final int overduePayouts = ref.watch(overduePayoutsProvider).length;
     final DateTime now = ref.watch(clockProvider).now();
 
     final int overdue = pending
@@ -81,19 +81,25 @@ class _NeedsAttention extends ConsumerWidget {
         ),
       // Third: it is money already earned, so it outranks stock decisions
       // but not the two rows with somebody else's clock running on them.
+      //
+      // **Every sale still owed a figure, not only the late ones.** Nothing is
+      // estimated any more (hard rule 3), so each of these is a profit the app
+      // cannot show — the count is the work, and being overdue is what makes
+      // one of them urgent rather than what makes it exist.
       if (unpaid.isNotEmpty)
         _AttentionRow(
           icon: AppIconConstant.payments,
-          label: context.l10n.homePayoutOverdue,
+          label: context.l10n.homePayoutsToRecord,
           count: unpaid.length,
-          // The amount, not the count, is what makes this worth opening —
-          // and it leans on the estimated fee, so it is written as a figure
-          // the payouts screen then breaks down rather than a promise.
-          detail: context.l10n.homePayoutOverdueDetail(
-            context.money(owed),
-            PayoutReconciliation.overdueAfterDays,
-          ),
-          tint: context.sdTheme3.warning,
+          detail: overduePayouts > 0
+              ? context.l10n.homePayoutOverdueDetail(
+                  overduePayouts,
+                  PayoutReconciliation.overdueAfterDays,
+                )
+              : context.l10n.homePayoutsToRecordDetail,
+          tint: overduePayouts > 0
+              ? context.sdTheme3.warning
+              : context.sdTheme3.info,
           onTap: () => context.push(AppRoutes.payouts),
         ),
       if (unlisted.isNotEmpty)
