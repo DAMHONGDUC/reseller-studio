@@ -124,7 +124,7 @@ because they are small, always read with the order, and immutable after sale.
 
 ## App config
 
-`appConfig/current` is one document for the whole product, read by every
+`app_config/current` is one document for the whole product, read by every
 client and written by none. **It is not a business record**, so it is not
 nested under a workspace — nothing in it belongs to a seller, and two
 businesses on the same build read the same answer.
