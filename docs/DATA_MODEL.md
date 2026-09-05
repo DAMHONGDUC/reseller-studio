@@ -153,19 +153,38 @@ client and written by none. **It is not a business record**, so it is not
 nested under a workspace — nothing in it belongs to a seller, and two
 businesses on the same build read the same answer.
 
-| Field | Meaning |
-|---|---|
-| `premium_enabled` | Whether the plan system applies at all |
+| Field | Type | Meaning |
+|---|---|---|
+| `premium_enabled` | bool | Whether the plan system applies at all |
+| `minimum_build` | int | The oldest build allowed to run |
+| `update_url` | string | Where the forced-update screen sends the seller |
 
 `premium_enabled: false` turns monetisation off for everyone: `currentPlanProvider`
 answers Premium, so no ceiling blocks a create and every capability is
 included, and the Subscription row and the Home upgrade banner are not drawn.
 
+`minimum_build` is compared against the running build — the `+7` of `1.0.0+7`.
+**A build number, never a version string**: it is the monotonic integer the
+stores already order by, so the comparison is `<` and nothing else, where
+`1.10.0` against `1.9.0` is exactly where a hand-written semver comparator is
+wrong. Anything below it is sent to `/update-required` and cannot leave.
+`update_url` is configured rather than compiled in, because a broken store
+link must be fixable without shipping a release — which is the one thing a
+forced-update screen cannot ask for.
+
 **A missing document, a missing field, a mistyped value or a failed read all
-resolve to `AppConfig.fallback`, which has monetisation ON.** The document is
-edited by hand, so a typo is the likely failure, and the one thing it must not
-do is hand the paid half of the app to everyone. Same direction as
-`currentPlanProvider` falling back to Free.
+resolve to `AppConfig.fallback`.** The document is edited by hand, so a typo
+is the likely failure — and the two flags fall back in **opposite**
+directions, each the safe one for what it controls:
+
+| Flag | Falls back to | Why that way |
+|---|---|---|
+| `premium_enabled` | on | Defaulting off hands the paid half of the app to everyone the first time Firestore is slow |
+| `minimum_build` | `0`, forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
+
+The forced-update gate also has **no loading state**: until an answer arrives
+the build counts as new enough, so the check can never be the reason the app
+will not start.
 
 `firestore.rules` allows any signed-in read and no write at all — a client
 that could write this could switch off its own paywall.
