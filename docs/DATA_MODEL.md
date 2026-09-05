@@ -158,6 +158,9 @@ businesses on the same build read the same answer.
 | `premium_enabled` | bool | Whether the plan system applies at all |
 | `minimum_build` | int | The oldest build allowed to run |
 | `update_url` | string | Where the forced-update screen sends the seller |
+| `premium_emails` | string[] | Accounts handed Premium without buying it |
+| `dev_mode_emails` | string[] | Accounts that get the developer affordances in a release build |
+| `blocked_emails` | string[] | Accounts refused the app |
 
 `premium_enabled: false` turns monetisation off for everyone: `currentPlanProvider`
 answers Premium, so no ceiling blocks a create and every capability is
@@ -174,20 +177,70 @@ forced-update screen cannot ask for.
 
 **A missing document, a missing field, a mistyped value or a failed read all
 resolve to `AppConfig.fallback`.** The document is edited by hand, so a typo
-is the likely failure — and the two flags fall back in **opposite**
-directions, each the safe one for what it controls:
+is the likely failure — and the fields fall back in **opposite** directions,
+each the safe one for what it controls:
 
 | Flag | Falls back to | Why that way |
 |---|---|---|
 | `premium_enabled` | on | Defaulting off hands the paid half of the app to everyone the first time Firestore is slow |
 | `minimum_build` | `0`, forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
+| every email list | empty | Nobody is refused the app over a read that failed, and nobody is handed a grant the owner did not type |
 
-The forced-update gate also has **no loading state**: until an answer arrives
-the build counts as new enough, so the check can never be the reason the app
-will not start.
+The forced-update and blocked gates also have **no loading state**: until an
+answer arrives the build counts as new enough and the account counts as
+allowed, so neither check can be the reason the app will not start.
+
+## The three email lists
+
+Each is an array of plain addresses, **lowercased and trimmed on read** — the
+document is typed by hand, so ` Owner@Gmail.com ` is the expected shape of a
+correct entry and a case-sensitive comparison would silently match nobody.
+Anything that is not a list of non-empty strings reads as no entries.
+
+| List | What it changes | Where |
+|---|---|---|
+| `premium_emails` | `currentPlanProvider` answers Premium, so every ceiling and capability opens | `premiumGrantedByEmailProvider` |
+| `dev_mode_emails` | Settings' Developer block, mock data and the demo seed appear in a **release** build | `devModeEnabledProvider` |
+| `blocked_emails` | The account is sent to `/blocked` and can do nothing but sign out | `accountBlockedProvider` |
+
+`premium_emails` is a **grant, never a record of a purchase**: the
+`subscription` row stays the honest answer to what the seller actually bought,
+so a screen saying so on screen reads that and not this.
+
+`dev_mode_emails` is the one that changed an existing guarantee — the mock
+branch used to be tree-shaken out of a release binary by a `const` and now is
+not, because an email list is a release-build grant by definition. See
+`docs/rules/DECISIONS.md` § Dev mode is granted by email.
+
+`blocked_emails` is a **UI gate, not a permission**. A blocked account still
+holds a valid token; `firestore.rules` does not know the list exists. Anything
+that must actually be refused is refused there, or by disabling the account in
+the Firebase console.
+
+**Every signed-in account can read all three**, because the rule below allows
+any signed-in read, a rule cannot filter fields, and a client has to be able to
+check its own address. Keep the lists short and do not put anything in them
+that must not be public — `docs/rules/DECISIONS.md` § The block list is a UI
+gate carries the reasoning and what was chosen over it.
 
 `firestore.rules` allows any signed-in read and no write at all — a client
 that could write this could switch off its own paywall.
+
+The whole document, with every field filled in:
+
+```json
+{
+  "premium_enabled": true,
+  "minimum_build": 12,
+  "update_url": "https://apps.apple.com/app/id0000000000",
+  "premium_emails": ["owner@example.com", "tester@example.com"],
+  "dev_mode_emails": ["owner@example.com"],
+  "blocked_emails": ["banned@example.com"]
+}
+```
+
+Every field is optional. An absent one reads as the fallback above, so the
+smallest document that does anything is a single key.
 
 ## Indexes
 

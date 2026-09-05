@@ -118,6 +118,21 @@ personal data in this app that is not the seller's own.
 - `AppAnalytics` takes no free-text parameter for this reason — every event
   parameter is an id, an enum or a count.
 
+## The `app_config` email lists
+
+`app_config/current` carries three lists of addresses — `premium_emails`,
+`dev_mode_emails`, `blocked_emails` — and **every signed-in account can read
+all three**. The rule allows any signed-in read, a rule cannot filter fields,
+and a client has to be able to check its own address.
+
+- Treat anything you put in them as public to your users. The block list is
+  the awkward one: it names people you refused.
+- `AppConfig.toLogData` carries **counts, never addresses** — hard rule 9's
+  reasoning applied to somebody else's email.
+- Anything that must not be public is done in the Firebase console instead:
+  disabling an account is the real block. `docs/rules/DECISIONS.md` § The
+  block list is a UI gate carries what was chosen over this and why.
+
 ## Before anything leaves the app
 
 Exports and shares are the other way data escapes. `reports/` writes CSV to a
