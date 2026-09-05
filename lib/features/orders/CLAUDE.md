@@ -52,6 +52,13 @@ opens.
   there and what they wanted for it — so the subtitle counts the marketplaces
   (`Not listed` when there are none) and the trailing figure is
   `Item.expectedPrice` (`lib/features/inventory/CLAUDE.md`).
+- **The sheet scrolls; it does not grow.** A bundle of three carries a split
+  line each, and with the fee estimate under Sold on the column overflowed —
+  `RenderFlex overflowed by 16 pixels`, which is content the seller cannot
+  reach rather than a cosmetic complaint. The body is `Flexible` over a
+  `SingleChildScrollView`, so it is content-sized when short and scrolls when
+  long, rather than taking a fixed `heightFactor` that would leave a one-item
+  sale mostly dead space.
 - **The sheet states the fee it would estimate, and where to change it** —
   owner's rule. The box was optional with a rate quoted under it, so a seller
   who left it empty had no idea what number the app was about to use, or that
@@ -77,9 +84,11 @@ opens.
   - **It ends on the way to the rate** — the primary action opens
     More → Marketplaces, because the sentence that explains where a number
     lives is worth less than the button that goes there.
-  - **Two ways in, because the estimate card is not always drawn**: the card
-    itself is tappable, and a text button under the fee box is there whether
-    or not a fee has been typed.
+  - **Two ways in, and neither costs a row**: the estimate card is tappable,
+    and the fee box carries an `ⓘ` beside its currency (`MoneyField.onInfo`)
+    for when a typed fee has hidden the card. A text button under the box was
+    tried and taken out — the sheet is a form, and a row that only explains
+    pushes the one that submits off the screen.
   - **It disappears the moment a fee is typed.** Then there is nothing to
     estimate: the box holds the fact, and echoing it back under itself would
     read as a second figure.
