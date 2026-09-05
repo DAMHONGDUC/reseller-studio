@@ -45,8 +45,10 @@ filter.
 | Money | Integer minor units; field names end in `Minor` |
 | Currency | Store beside money or inherit the workspace currency |
 | Missing money | `null` means unknown; it is not zero |
-| Derived finance | Never store profit, margin or ROI |
+| Derived finance | Never store profit, margin or ROI — and never estimate a fee |
 | Payout exception | `orders.payoutMinor` is stored because it is a reported fact |
+| Platform fee | Derived: `salePrice - refund - payout - shippingCost`; null until a payout is recorded |
+| Planning rate | `workspaces/{id}.planningFeeRate` — one assumption for Sourcing, never written to an order |
 | Deletion | Referenced records are soft-deleted with `deletedAt` |
 
 ## Relationships
@@ -77,7 +79,7 @@ the relationship chain supports workflows and analytics, not item validity.
 | `locations/{id}` | Warehouse/shelf/bin identity and `deletedAt` | Seller-owned storage hierarchy |
 | `listings/{id}` | Item, marketplace, price, status, external IDs/URL | One record per item per marketplace; external fields remain null without integration |
 | `offers/{id}` | Listing/order references, amount, status and timestamps | Offer state drives accept/decline/counter workflows |
-| `marketplaces/{id}` | `name`, `feeRate`, `deletedAt` | Seller-owned; `feeRate` is a planning estimate, never accounting |
+| `marketplaces/{id}` | `name`, `hue`, `deletedAt` | Seller-owned; carries no fee rate — a platform's cut is measured per order |
 | `carriers/{id}` | `name`, `deletedAt` | Business-owned shipping choices |
 | `orders/{id}` | Prices/costs, status, marketplace snapshot, lifecycle timestamps, `lines` | Order facts and embedded immutable sale-time lines |
 | `expenses/{id}` | Category, amount, date, recurrence link | One document per occurrence |
@@ -112,7 +114,7 @@ notification and the push is a copy of it.
 
 | Group | Fields |
 |---|---|
-| Money | `salePriceMinor`, `feesMinor`, `shippingCostMinor`, `refundMinor`, `payoutMinor` |
+| Money | `salePriceMinor`, `shippingCostMinor`, `refundMinor`, `payoutMinor` (a legacy `feesMinor` is read back as the payout it implies) |
 | Marketplace | `marketplaceId`, `marketplaceName`, `externalOrderId` |
 | Lifecycle | `orderedAt`, `shipByDate`, `shippedAt`, `deliveredAt`, `returnRequestedAt`, `returnedAt`, `refundedAt`, `settledAt` |
 | Lines | `{itemId, title, quantity, unitPriceMinor, unitCostMinor}` |

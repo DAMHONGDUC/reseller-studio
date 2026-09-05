@@ -76,6 +76,23 @@ opens.
     existed only because two fees shared a word; with the estimate gone there
     is one fee, and it is measured.
 
+- **A sale with no payout is a queue entry, not a blank.** Owner's rule, and
+  it is what makes the payout-first model payable. Nothing is estimated any
+  more (hard rule 3), so an unrecorded payout is a profit figure the app cannot
+  show anywhere — Analytics included.
+  - `ordersAwaitingPayoutListProvider` is the queue, **oldest first**: that one
+    is the most likely to have been missed.
+  - **Payouts pins the action that opens it**, and `RecordPayoutsScreen` takes
+    the whole run in one sitting — a box per sale, one Save (hard rule 16).
+    One-at-a-time through the order detail is the version nobody finishes.
+  - **Each box says what the figure implies the platform kept**, recomputed as
+    it is typed. The seller is checking a subtraction, not copying a number
+    blind, and a payout larger than the sale is a typo they can only see
+    against the sale price on the same row.
+  - **Home counts every sale awaiting a figure, not only the late ones.**
+    Overdue is what makes one urgent, not what makes it exist, so it is the
+    row's detail rather than its trigger.
+
 - **The marketplace picker offers only the platforms that item is on.** A list
   of every marketplace the business sells on makes the seller find the one
   this jacket was live at, and a mis-pick writes an order against a platform
