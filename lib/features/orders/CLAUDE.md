@@ -109,6 +109,16 @@ opens.
   - The join is `MarketplaceMatching`: a listing names a `Marketplace` *enum*
     and an order names a marketplace *record*, and nothing stores a key
     between them.
+- **The box opens on that platform's own price, not only after a re-pick** —
+  owner's rule, and it was broken: the sheet seeded its controller in a field
+  initialiser, where `listingsForItemProvider` has not emitted yet, so every
+  sale opened on `Item.expectedPrice` and only showed the listed price once
+  the seller re-picked the marketplace they were already on.
+  - **It seeds through `FormSeed`** (`docs/rules/SCREENS.md`), once, after the
+    listings arrive — the same fix the item form uses for the same reason.
+  - **One read of `listingsProvider`, grouped by item**, rather than a family
+    read per item: the seed and the picker have to answer from the same data,
+    and two live reads resolve at different times, which is what the bug was.
 - **Picking a platform fills the sale price with what that platform is
   asking** — owner's rule, and it overwrites a figure the seller had already
   typed. That is the point: the box is what *this* marketplace is asking, and
