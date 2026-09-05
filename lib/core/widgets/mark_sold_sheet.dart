@@ -204,121 +204,124 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
           ? context.l10n.markSoldTitle
           : context.l10n.markSoldBundleTitle(widget.items.length),
       closeTooltip: context.l10n.commonClose,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          MoneyField(
-            label: context.l10n.markSoldPrice,
-            isRequired: true,
-            controller: _price,
-            currency: currency,
-            // Redraws what depends on the price as it is typed: a bundle's
-            // split, and the fee this sale would be estimated at.
-            onChanged: (_) => setState(() {}),
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: SdSpacingConstant.h16),
-          PickerField(
-            label: context.l10n.markSoldOn,
-            value: marketplace?.name,
-            onTap: () async {
-              final Marketplace? picked =
-                  await OptionPickerSheet.show<Marketplace>(
-                    context,
-                    title: context.l10n.commonMarketplace,
-                    selected: marketplace,
-                    options: marketplaces
-                        .map(
-                          (Marketplace marketplace) =>
-                              PickerOption<Marketplace>(
-                                value: marketplace,
-                                label: marketplace.name,
-                              ),
-                        )
-                        .toList(),
+      // **It scrolls rather than grows** — a bundle carries a split line per
+      // item, and the column overflowed at three. `Flexible` keeps a one-item
+      // sale sized to its own rows instead of a fixed height of dead space.
+      child: Flexible(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              MoneyField(
+                label: context.l10n.markSoldPrice,
+                isRequired: true,
+                controller: _price,
+                currency: currency,
+                // Redraws what depends on the price as it is typed: a bundle's
+                // split, and the fee this sale would be estimated at.
+                onChanged: (_) => setState(() {}),
+                textInputAction: TextInputAction.next,
+              ),
+              SizedBox(height: SdSpacingConstant.h16),
+              PickerField(
+                label: context.l10n.markSoldOn,
+                value: marketplace?.name,
+                onTap: () async {
+                  final Marketplace? picked =
+                      await OptionPickerSheet.show<Marketplace>(
+                        context,
+                        title: context.l10n.commonMarketplace,
+                        selected: marketplace,
+                        options: marketplaces
+                            .map(
+                              (Marketplace marketplace) =>
+                                  PickerOption<Marketplace>(
+                                    value: marketplace,
+                                    label: marketplace.name,
+                                  ),
+                            )
+                            .toList(),
+                      );
+
+                  if (picked == null) return;
+
+                  _selectMarketplace(picked);
+                },
+              ),
+              // Under the platform it is a fact about — owner's rule. Only while
+              // nobody has typed a fee: with one in the box there is nothing to
+              // estimate, and stating it anyway reads as a second figure.
+              if (marketplace != null &&
+                  Money.tryParse(_fees.text, currency) == null) ...<Widget>[
+                SizedBox(height: SdSpacingConstant.h8),
+                _FeeEstimate(
+                  marketplace: marketplace,
+                  price: _typedPrice(currency),
+                  onExplain: () => FeeExplainerSheet.show(context),
+                ),
+              ],
+              SizedBox(height: SdSpacingConstant.h16),
+              PickerField(
+                label: context.l10n.markSoldDate,
+                value: DateTimeUtils.mediumDate(
+                  _soldAt,
+                  locale: context.localeTag,
+                ),
+                onTap: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: _soldAt,
+                    firstDate: DateTime(
+                      now.year - DatePickerConstant.recentEntryYearsBack,
+                    ),
+                    lastDate: now,
                   );
 
-              if (picked == null) return;
+                  if (picked == null) return;
 
-              _selectMarketplace(picked);
-            },
+                  setState(() => _soldAt = picked);
+                },
+              ),
+              // How the one payment lands on each line. A bundle price is a
+              // judgement, so the seller sees the judgement rather than finding
+              // it later on three order lines.
+              if (widget.items.length > 1) ...<Widget>[
+                SizedBox(height: SdSpacingConstant.h8),
+                _BundleSplit(items: widget.items, total: _typedPrice(currency)),
+              ],
+              SizedBox(height: SdSpacingConstant.h16),
+              MoneyField(
+                label: context.l10n.markSoldFees,
+                controller: _fees,
+                currency: currency,
+                // The box is never pre-filled — typed is a fact, empty is a
+                // labelled estimate — so the estimate is stated under Sold on.
+                onChanged: (_) => setState(() {}),
+                // The estimate card carries the same tap, but a typed fee hides
+                // it — and that is the moment a seller most needs to know which
+                // fee this box wants.
+                onInfo: () => FeeExplainerSheet.show(context),
+                infoTooltip: context.l10n.feeExplainerTitle,
+                textInputAction: TextInputAction.next,
+              ),
+              SizedBox(height: SdSpacingConstant.h16),
+              SdTextFieldV3(
+                label: context.l10n.markSoldBuyer,
+                controller: _buyer,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _submit(),
+              ),
+              SizedBox(height: SdSpacingConstant.h24),
+              SdButtonV3(
+                variant: SdButtonVariantV3.primary,
+                label: context.l10n.markSoldSubmit,
+                expand: true,
+                busy: isBusy,
+                onPressed: isBusy || marketplace == null ? null : _submit,
+              ),
+            ],
           ),
-          // Under the platform it is a fact about — owner's rule. Only while
-          // nobody has typed a fee: with one in the box there is nothing to
-          // estimate, and stating it anyway reads as a second figure.
-          if (marketplace != null &&
-              Money.tryParse(_fees.text, currency) == null) ...<Widget>[
-            SizedBox(height: SdSpacingConstant.h8),
-            _FeeEstimate(
-              marketplace: marketplace,
-              price: _typedPrice(currency),
-              onExplain: () => FeeExplainerSheet.show(context),
-            ),
-          ],
-          SizedBox(height: SdSpacingConstant.h16),
-          PickerField(
-            label: context.l10n.markSoldDate,
-            value: DateTimeUtils.mediumDate(_soldAt, locale: context.localeTag),
-            onTap: () async {
-              final DateTime? picked = await showDatePicker(
-                context: context,
-                initialDate: _soldAt,
-                firstDate: DateTime(
-                  now.year - DatePickerConstant.recentEntryYearsBack,
-                ),
-                lastDate: now,
-              );
-
-              if (picked == null) return;
-
-              setState(() => _soldAt = picked);
-            },
-          ),
-          // How the one payment lands on each line. A bundle price is a
-          // judgement, so the seller sees the judgement rather than finding
-          // it later on three order lines.
-          if (widget.items.length > 1) ...<Widget>[
-            SizedBox(height: SdSpacingConstant.h8),
-            _BundleSplit(items: widget.items, total: _typedPrice(currency)),
-          ],
-          SizedBox(height: SdSpacingConstant.h16),
-          MoneyField(
-            label: context.l10n.markSoldFees,
-            controller: _fees,
-            currency: currency,
-            // The box is never pre-filled — typed is a fact, empty is a
-            // labelled estimate — so the estimate is stated under Sold on.
-            onChanged: (_) => setState(() {}),
-            textInputAction: TextInputAction.next,
-          ),
-          // The estimate card above is not always drawn, and this is the
-          // moment a seller most needs to know which fee the box wants.
-          Align(
-            alignment: Alignment.centerLeft,
-            child: SdButtonV3(
-              variant: SdButtonVariantV3.text,
-              size: SdButtonSizeV3.small,
-              icon: AppIconConstant.info,
-              label: context.l10n.feeExplainerTitle,
-              onPressed: () => FeeExplainerSheet.show(context),
-            ),
-          ),
-          SizedBox(height: SdSpacingConstant.h16),
-          SdTextFieldV3(
-            label: context.l10n.markSoldBuyer,
-            controller: _buyer,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _submit(),
-          ),
-          SizedBox(height: SdSpacingConstant.h24),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
-            label: context.l10n.markSoldSubmit,
-            expand: true,
-            busy: isBusy,
-            onPressed: isBusy || marketplace == null ? null : _submit,
-          ),
-        ],
+        ),
       ),
     );
   }

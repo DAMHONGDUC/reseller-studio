@@ -1299,13 +1299,9 @@
   "@feeExplainerRateTitle": {
     "description": "The second block of the fee explainer: the percentage set per marketplace."
   },
-  "feeExplainerRateBody": "The percentage a marketplace usually takes, set for each one in More → Marketplaces. It is used only to estimate a sale nobody has entered a fee for.",
+  "feeExplainerRateBody": "The percentage a marketplace usually takes, set for each one in More → Marketplaces. It only estimates a sale with no fee entered — changing it never rewrites one you typed.",
   "@feeExplainerRateBody": {
     "description": "What the marketplace fee rate is and where it is edited."
-  },
-  "feeExplainerNote": "An estimated fee is labelled as one wherever it appears, and changing the rate never rewrites an order whose fee you entered.",
-  "@feeExplainerNote": {
-    "description": "Closing note of the fee explainer."
   },
   "feeExplainerOpenMarketplaces": "Open Marketplaces",
   "@feeExplainerOpenMarketplaces": {

@@ -44,11 +44,6 @@ class FeeExplainerSheet extends StatelessWidget {
           title: context.l10n.feeExplainerRateTitle,
           body: context.l10n.feeExplainerRateBody,
         ),
-        SizedBox(height: SdSpacingConstant.h16),
-        Text(
-          context.l10n.feeExplainerNote,
-          style: context.textTheme3.bodySmall!.faint3(context),
-        ),
         SizedBox(height: SdSpacingConstant.h20),
         SdButtonV3(
           variant: SdButtonVariantV3.primary,
