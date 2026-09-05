@@ -293,6 +293,29 @@ void main() {
     });
   });
 
+  testWidgets('the sheet opens on what the first platform is asking', (
+    WidgetTester tester,
+  ) async {
+    // Owner's rule: itm-4 is live at 185 on eBay, and 180 is what the item
+    // expects. The box seeded from the expected price until the sheet learned
+    // to wait for the listings — so the seller had to re-pick the marketplace
+    // they were already on to see the right number.
+    await pumpScreen(tester, const RecordSaleScreen());
+    await tester.tap(
+      await revealText(tester, 'Vintage Levi 501 — 34x32, redline selvedge'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('eBay'), findsOneWidget, reason: 'the sheet opens on it');
+    expect(
+      tester
+          .widget<MoneyField>(find.widgetWithText(MoneyField, 'Sale price'))
+          .controller
+          .text,
+      '185.00',
+    );
+  });
+
   testWidgets('picking a marketplace fills the sale price with what that '
       'platform is asking', (WidgetTester tester) async {
     // Owner's rule: itm-4 is live at 185 on eBay and 175 on Depop, so the box

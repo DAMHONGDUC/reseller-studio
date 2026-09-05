@@ -17,6 +17,7 @@ import '../constants/date_picker_constant.dart';
 import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../money/money.dart';
+import '../state/form_seed.dart';
 import '../utils/date_time_utils.dart';
 import 'fee_explainer_sheet.dart';
 import 'money_field.dart';
@@ -68,12 +69,16 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
   ConsumerState<MarkSoldSheet> createState() => _MarkSoldSheetState();
 }
 
-class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
-  /// Seeded from the marketplace the sheet opens on, and refilled every time
-  /// the seller picks another one.
-  late final TextEditingController _price = TextEditingController(
-    text: _priceFor(ref.read(_options).firstOrNull),
-  );
+class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
+    with FormSeed<MarkSoldSheet> {
+  /// Filled once the listings arrive, and refilled every time the seller
+  /// picks another marketplace.
+  ///
+  /// **Empty until then, never a guess.** Seeding it in a field initialiser
+  /// read `listingsForItemProvider` before it had emitted, so every sale
+  /// opened on `Item.expectedPrice` and only showed what the platform was
+  /// asking once the seller re-picked the platform they were already on.
+  final TextEditingController _price = TextEditingController();
 
   final TextEditingController _buyer = TextEditingController();
 
@@ -84,6 +89,13 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
   Marketplace? _marketplace;
   DateTime _soldAt = DateTime.now();
+
+  /// Every listing of the items being sold, grouped by item id.
+  ///
+  /// **One read, filled in `build`.** The seed and the marketplace picker have
+  /// to answer from the same data: two live reads resolve at different moments,
+  /// which is exactly how the box came to hold the wrong number.
+  Map<String, List<Listing>> _listings = const <String, List<Listing>>{};
 
   /// The platforms this sale may name — these items', or all of them when
   /// they are on none.
@@ -117,7 +129,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
 
   Money? _priceOf(Item item, Marketplace? marketplace) {
     final Map<String, Money> prices = ListingPricing.byMarketplace(
-      ref.read(listingsForItemProvider(item.id)).value ?? const <Listing>[],
+      _listings[item.id] ?? const <Listing>[],
     );
     final Money? listed = marketplace == null
         ? null
@@ -198,6 +210,29 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet> {
     // none (`marketplacesForItemProvider`).
     final List<Marketplace> marketplaces = ref.watch(_options);
     final Marketplace? marketplace = _marketplace ?? marketplaces.firstOrNull;
+    final Map<String, AsyncValue<List<Listing>>> listings =
+        <String, AsyncValue<List<Listing>>>{
+          for (final Item item in widget.items)
+            item.id: ref.watch(listingsForItemProvider(item.id)),
+        };
+
+    _listings = <String, List<Listing>>{
+      for (final MapEntry<String, AsyncValue<List<Listing>>> entry
+          in listings.entries)
+        entry.key: entry.value.value ?? const <Listing>[],
+    };
+
+    // **Both halves of the answer have to be in.** The sheet opens on the
+    // platform the item is live at, so seeding before the marketplaces or the
+    // listings have arrived fills the box from `Item.expectedPrice` — and
+    // `seedOnce` never comes back to correct it.
+    final bool isReady =
+        ref.watch(marketplacesProvider).hasValue &&
+        listings.values.every((AsyncValue<List<Listing>> one) => one.hasValue);
+
+    // Once only: re-seeding on a later frame would throw away what the seller
+    // had typed (`docs/rules/SCREENS.md`).
+    if (isReady) seedOnce(() => _price.text = _priceFor(marketplace));
 
     return SdBottomSheetV3(
       title: widget.items.length == 1
