@@ -32,6 +32,14 @@ workflow that creates a workspace.
   size.** Owner's rule. The registry currently resolves it to Flutter's
   `Icons.delete_outline_rounded`; the screen does not choose between Material
   Icons and Symbols itself.
+- **`marketplaceFeeRatesProvider` is the only source of a fee rate, and it is
+  this feature's.** Every estimate in the app folds over that one map — the
+  order profit statement, the payout forecast, analytics, the sourcing
+  calculator, the cross-list panel — so a rate corrected on the detail screen
+  moves all of them together. A second map of "corrections" on the workspace
+  document was what this replaced: nothing ever wrote it, so every screen fell
+  back to a hardcoded published rate and silently ignored what the seller had
+  typed. **Never read a rate from anywhere else**, and never add a second map.
 - **There is no "Use published rate" toggle.** The marketplace record always
   carries the business's current estimated fee rate, and the seller edits it
   directly on the detail screen. A published rate and an override are two
