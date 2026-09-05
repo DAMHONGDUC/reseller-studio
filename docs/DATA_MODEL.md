@@ -31,9 +31,26 @@ workspaces/{workspaceId}
   usage/{docId}
 ```
 
-Business records are nested under a workspace. This makes workspace membership
-part of every path and prevents a query from accidentally omitting an ownership
-filter.
+**This tree is the shape that is stored today, and it is backlog.** Hard rule
+14 now says every table is flat and top-level with `workspaceId` as a field,
+modelled the way SQL would model it, so a move off Firestore is an export
+rather than a reshape. Nothing above has been migrated yet; this file stays the
+authority on what is *actually* stored, so the two shapes are told apart here
+rather than guessed at.
+
+| | Shape | Where |
+|---|---|---|
+| Written from now on | Flat, `workspaceId` as a field | hard rule 14 |
+| Stored today | Nested under `workspaces/{workspaceId}` | the tree above |
+
+`app_config` is the one collection already in the target shape — it is
+top-level because it belongs to no workspace at all.
+
+What the nesting buys while it is still there: workspace membership is part of
+every path, so a query cannot omit an ownership filter. Flattening moves that
+guarantee out of the path and onto `WorkspaceCollections` plus a
+`firestore.rules` clause that requires the filter — which is the cost hard rule
+14 names and accepts.
 
 ## Shared contracts
 
