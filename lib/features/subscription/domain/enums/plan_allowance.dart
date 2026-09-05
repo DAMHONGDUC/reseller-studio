@@ -1,4 +1,5 @@
 import '../entities/plan_limits.dart';
+import 'seller_plan.dart';
 
 /// A countable thing a plan can put a ceiling on (plan §27).
 ///
@@ -35,6 +36,14 @@ extension PlanAllowanceDisplay on PlanAllowance {
     PlanAllowance.orders => 'Orders',
     PlanAllowance.workspaces => 'Businesses',
   };
+
+  /// The meter's headline: which allowance, and whose ceiling it is.
+  ///
+  /// **It names the plan on purpose.** The meter is drawn under screen titles
+  /// that already say the allowance — Businesses, Orders — and a card headed
+  /// with the same word says nothing twice; the plan is the part the seller
+  /// cannot read off the chrome.
+  String meterTitle(SellerPlan plan) => '$label on ${plan.label}';
 
   /// The two counts as one string. Not a percentage: "1/1" says how many are
   /// left at a glance, where "100%" has to be worked out.
