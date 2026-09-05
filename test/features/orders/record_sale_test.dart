@@ -127,12 +127,15 @@ void main() {
     await pumpScreen(tester, const RecordSaleScreen());
 
     expect(
-      find.text('Vintage Levi 501 — 34x32, redline selvedge'),
+      await revealText(tester, 'Vintage Levi 501 — 34x32, redline selvedge'),
       findsOneWidget,
     );
     // **Shown, not hidden** — owner's rule. Filtering the row out said the
     // item does not exist, where the truth is that it cannot be sold again.
-    final Finder sold = find.text('Patagonia Synchilla fleece — mens L');
+    final Finder sold = await revealText(
+      tester,
+      'Patagonia Synchilla fleece — mens L',
+    );
 
     expect(sold, findsOneWidget);
     expect(
@@ -153,7 +156,9 @@ void main() {
     // refusal into an explanation with somewhere to go.
     await pumpScreen(tester, const RecordSaleScreen());
 
-    await tester.tap(find.text('Patagonia Synchilla fleece — mens L'));
+    await tester.tap(
+      await revealText(tester, 'Patagonia Synchilla fleece — mens L'),
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(CannotSellSheet), findsOneWidget);
@@ -188,7 +193,10 @@ void main() {
     await pumpScreen(tester, const RecordSaleScreen());
 
     final Finder row = find.ancestor(
-      of: find.text('Vintage Levi 501 — 34x32, redline selvedge'),
+      of: await revealText(
+        tester,
+        'Vintage Levi 501 — 34x32, redline selvedge',
+      ),
       matching: find.byType(ItemCard),
     );
 
@@ -209,7 +217,7 @@ void main() {
     await pumpScreen(tester, const RecordSaleScreen());
 
     final Finder row = find.ancestor(
-      of: find.text('Nike windbreaker — XL'),
+      of: await revealText(tester, 'Nike windbreaker — XL'),
       matching: find.byType(ItemCard),
     );
 
@@ -229,7 +237,7 @@ void main() {
       String title,
     ) async {
       await pumpScreen(tester, const RecordSaleScreen());
-      await tester.tap(find.text(title));
+      await tester.tap(await revealText(tester, title));
       await tester.pumpAndSettle();
 
       // The sheet's marketplace box, opened onto the picker beneath it.
@@ -290,7 +298,9 @@ void main() {
     // Owner's rule: itm-4 is live at 185 on eBay and 175 on Depop, so the box
     // follows the picker rather than holding one of the two.
     await pumpScreen(tester, const RecordSaleScreen());
-    await tester.tap(find.text('Vintage Levi 501 — 34x32, redline selvedge'));
+    await tester.tap(
+      await revealText(tester, 'Vintage Levi 501 — 34x32, redline selvedge'),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sold on'));
@@ -324,7 +334,7 @@ void main() {
     // itm-11 is listed nowhere, so every platform is offered and none of them
     // has a price of its own.
     await pumpScreen(tester, const RecordSaleScreen());
-    await tester.tap(find.text('Nike windbreaker — XL'));
+    await tester.tap(await revealText(tester, 'Nike windbreaker — XL'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sold on'));

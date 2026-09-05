@@ -144,11 +144,13 @@ void main() {
     // empty selection would write an order of nothing.
     expect(find.textContaining('as one order'), findsNothing);
 
-    await tester.longPress(
-      find.text('Vintage Levi 501 — 34x32, redline selvedge'),
-    );
-    await tester.pumpAndSettle();
+    // Top of the list first, then the one further down: revealing a row that
+    // is already above the fold means scrolling back up for it.
     await tester.longPress(find.text('Nike windbreaker — XL'));
+    await tester.pumpAndSettle();
+    await tester.longPress(
+      await revealText(tester, 'Vintage Levi 501 — 34x32, redline selvedge'),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Sell 2 items as one order'), findsOneWidget);

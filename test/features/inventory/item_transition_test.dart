@@ -72,10 +72,11 @@ void main() {
       );
     });
 
-    test('a hand-picked sold is allowed, and empties the shelf with it', () {
-      // Owner's rule: the status is editable, `sold` included. It writes no
-      // order, so revenue and profit still come from Mark as sold — what it
-      // records is that the stock has gone.
+    test('a hand-picked sold is allowed, and leaves the count alone', () {
+      // Owner's rule: the status is editable, `sold` included, and quantity
+      // and status are independent — the count is the seller's other answer,
+      // not something the status writes. It records no order either, so
+      // revenue and profit still come from Mark as sold.
       final Item sold = ItemTransition.apply(
         item(askingPrice: const Money(4500, 'USD'), quantity: 3),
         ItemStatus.sold,
@@ -83,7 +84,7 @@ void main() {
       );
 
       expect(sold.status, ItemStatus.sold);
-      expect(sold.quantity, 0);
+      expect(sold.quantity, 3);
       expect(sold.soldAt, now);
     });
   });

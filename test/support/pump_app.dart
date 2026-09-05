@@ -238,3 +238,25 @@ Future<void> warmUp(ProviderContainer container) async {
   // The generators yield their first value on a microtask.
   await Future<void>.delayed(Duration.zero);
 }
+
+/// Scrolls [text] into view, then returns the finder for it.
+///
+/// **Extracted on its second copy.** The sale picker draws the inventory card,
+/// so three or four rows fill a phone screen and a `tap` on the fifth finds
+/// nothing — a test that fails on layout rather than on what it is asserting.
+///
+/// **The list is the last scrollable, never the first.** A search field owns
+/// one of its own and it comes first in the tree; dragging that scrolls
+/// nothing and disposes itself mid-drag, which surfaces as `No element`.
+Future<Finder> revealText(WidgetTester tester, String text) async {
+  final Finder target = find.text(text);
+
+  await tester.scrollUntilVisible(
+    target,
+    200,
+    scrollable: find.byType(Scrollable).last,
+  );
+  await tester.pumpAndSettle();
+
+  return target;
+}
