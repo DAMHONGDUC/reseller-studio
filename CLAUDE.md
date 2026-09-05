@@ -520,10 +520,35 @@ behind it.
     screen growing is fine; the bottom bar growing is a product decision, not
     a layout one.
 
-14. **Business records are nested under their workspace, never flat.** See
-    `docs/DATA_MODEL.md`. A flat collection makes every rule re-derive
-    ownership from a field and every query carry a `where` clause; one
-    forgotten clause is a leak between two sellers.
+14. **Every table is flat and top-level, modelled the way SQL would model
+    it.** Owner's rule, and it **reverses "business records are nested under
+    their workspace, never flat"**. One collection per entity, keyed by its
+    id, with `workspaceId` and every other relationship stored as a **field**
+    — never as a path segment, never as a subcollection. The reason is the
+    move off Firestore: a document tree has no relational equivalent and has
+    to be reshaped, while a flat collection with a `workspaceId` column
+    already *is* a table, so migrating becomes an export.
+
+    The old rule's argument was not wrong and is now a cost this one accepts
+    knowingly:
+    - **`workspaceId` is the whole security boundary.** A rule cannot inspect
+      the result set of a query, so it must be proven from the query's own
+      filters: every client query carries the filter and `firestore.rules`
+      *requires* it. One forgotten `where` is a leak between two sellers, and
+      nothing structural stops it any more — `WorkspaceCollections` is what
+      does, so no read reaches Firestore around it.
+    - **Every composite index gains `workspaceId` as its first field.** All of
+      them, not some.
+    - **Deleting a workspace becomes a query per table**, written once and
+      enumerating every table it sweeps.
+    - **A child list is a table with a foreign key.** Embed only what SQL
+      would keep in a column: a value object with no identity, or a snapshot
+      frozen at write time (a price as sold, a marketplace name as printed).
+
+    **The records nested today are backlog, not compliance.**
+    `docs/DATA_MODEL.md` stays the authority on what is *actually* stored and
+    says which shape each collection is in. This rule governs what is written
+    next.
 
 15. **Soft-delete anything another record points at** — items, sources,
     purchases, categories, locations carry `deletedAt`. Hard-deleting a source
