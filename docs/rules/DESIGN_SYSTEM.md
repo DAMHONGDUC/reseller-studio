@@ -573,6 +573,27 @@ that drifts, and it drifts invisibly: each file looks right on its own.
   each other, because "looks about right" is exactly the judgement that let
   this through.
 
+### A shared widget carries no gutter — the screen placing it does
+
+Owner's rule, and it is what killed `PlanLimitMeters.hasHorizontalPadding`. A
+widget that pads its own sides sits at twice `horizontal` inside a list that
+already holds a gutter, and flush against the edge inside one that does not —
+and no flag makes one widget right in both places. `ItemCard` and `AppListRow`
+have always worked this way; anything reusable follows them.
+
+- **A scroll view gives everything below the chrome ONE gutter.** Inventory
+  wraps its content slivers in a single `SliverPadding` over a
+  `SliverMainAxisGroup`, so the meter, the list and every empty state sit on
+  the same grid. Each sliver padding itself is how two of them drift apart
+  with both files reading correctly.
+- **What stays with the list is the clearance only it needs** — the floating
+  bar and the FAB stacked above it, through `AppAddFabScaffold.listPadding`.
+  The search header and the filter strip do not want that, so it never rises
+  to the shared padding.
+- **`fullBleed` is the other half of the same rule, not an exception.** More's
+  list holds no gutter because each section pads itself; a widget placed there
+  is wrapped by the screen, exactly as the sections are.
+
 ### A gap belongs to the item BELOW it, never the one above
 
 Owner's rule, and it is the sharper half of "a boundary belongs to one side of
