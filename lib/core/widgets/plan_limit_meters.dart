@@ -22,16 +22,15 @@ import '../../features/subscription/providers.dart';
 /// A plan with no ceiling at all renders nothing, so Premium needs no check,
 /// and neither does a screen placing this.
 ///
+/// **It carries no horizontal gutter.** The screen placing it does, the same
+/// way it does for every card and row it lays out — a widget that padded
+/// itself would sit 32 in on the two screens whose list already holds a
+/// gutter, and there is no flag that makes one widget right in both places.
+///
 /// In `core/widgets/` because four features draw it: More, Inventory, Orders
 /// and the Businesses screen.
 class PlanLimitMeters extends ConsumerWidget {
-  const PlanLimitMeters({
-    this.allowances,
-    this.hasHorizontalPadding = false,
-    super.key,
-  });
-
-  final bool hasHorizontalPadding;
+  const PlanLimitMeters({this.allowances, super.key});
 
   /// Which ceilings this screen is about. **Null means every capped one** —
   /// what More shows, because More is the overview. A list screen names the
@@ -64,14 +63,10 @@ class PlanLimitMeters extends ConsumerWidget {
     if (capped.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      // The gaps belong inside, so nothing is left behind when nothing is
-      // drawn at all.
-      padding: EdgeInsets.fromLTRB(
-        hasHorizontalPadding ? SdContentPaddingV3.horizontal : 0,
-        0,
-        hasHorizontalPadding ? SdContentPaddingV3.horizontal : 0,
-        SdContentPaddingV3.listItemGap,
-      ),
+      // Only the gap under it, and it belongs inside so nothing is left
+      // behind when nothing is drawn at all. **The gutter is not here** —
+      // whoever places this owns it, the way it owns `ItemCard`'s.
+      padding: EdgeInsets.only(bottom: SdContentPaddingV3.listItemGap),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

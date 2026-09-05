@@ -158,15 +158,24 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                   ref.watch(inventoryActiveFilterCountProvider) > 0,
             ),
           ),
-          // Under the pinned strip, so it scrolls away with the list: the
-          // ceiling is worth knowing once, not at every scroll position.
-          const SliverToBoxAdapter(
-            child: PlanLimitMeters(
-              allowances: <PlanAllowance>[PlanAllowance.items],
-              hasHorizontalPadding: true,
+          // **One gutter for everything below the chrome** — the meter, the
+          // list and every empty state share it, rather than each sliver
+          // padding itself and drifting from the others.
+          SliverPadding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
             ),
-          ),
-          switch (source) {
+            sliver: SliverMainAxisGroup(
+              slivers: <Widget>[
+                // Under the pinned strip, so it scrolls away with the list:
+                // the ceiling is worth knowing once, not at every scroll
+                // position.
+                const SliverToBoxAdapter(
+                  child: PlanLimitMeters(
+                    allowances: <PlanAllowance>[PlanAllowance.items],
+                  ),
+                ),
+                switch (source) {
             // A screen that has not loaded is not empty — saying "No items"
             // to a seller with four hundred is worse than a spinner.
             AsyncLoading<List<Item>>() when !source.hasValue =>
@@ -200,8 +209,11 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 ),
               ),
             ),
-            _ => _ItemList(items: items),
-          },
+                  _ => _ItemList(items: items),
+                },
+              ],
+            ),
+          ),
         ],
       ),
     );

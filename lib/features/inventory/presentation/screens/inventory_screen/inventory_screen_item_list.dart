@@ -18,16 +18,14 @@ class _ItemList extends ConsumerWidget {
     final bool isSelecting = selected.isNotEmpty;
 
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(
-        SdContentPaddingV3.horizontal,
-        0,
-        SdContentPaddingV3.horizontal,
-        // Clears the floating tab bar AND the FAB stacked above it —
-        // otherwise the last row sits under "Quick Add" and cannot be tapped.
-        // The same arithmetic every other create screen uses, rather than a
-        // second copy of it here: this list is a sliver, so it takes the
-        // number instead of the whole `EdgeInsets`.
-        AppAddFabScaffold.listPadding(context, floatingNav: true).bottom,
+      // The gutter is the screen's now — one for every sliver below the
+      // chrome. What is left here is the clearance only this list needs:
+      // the floating tab bar AND the FAB stacked above it, or the last row
+      // sits under "Quick Add" and cannot be tapped. The same arithmetic
+      // every other create screen uses, rather than a second copy of it: this
+      // list is a sliver, so it takes the number instead of the `EdgeInsets`.
+      padding: EdgeInsets.only(
+        bottom: AppAddFabScaffold.listPadding(context, floatingNav: true).bottom,
       ),
       sliver: SliverList.separated(
         itemCount: items.length,
