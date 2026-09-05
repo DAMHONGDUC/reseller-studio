@@ -131,9 +131,9 @@ businesses on the same build read the same answer.
 
 | Field | Meaning |
 |---|---|
-| `premiumEnabled` | Whether the plan system applies at all |
+| `premium_enabled` | Whether the plan system applies at all |
 
-`premiumEnabled: false` turns monetisation off for everyone: `currentPlanProvider`
+`premium_enabled: false` turns monetisation off for everyone: `currentPlanProvider`
 answers Premium, so no ceiling blocks a create and every capability is
 included, and the Subscription row and the Home upgrade banner are not drawn.
 
