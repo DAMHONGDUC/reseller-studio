@@ -121,6 +121,7 @@ enum QuickActionKind {
   addSource,
   addCategory,
   addLocation,
+  addWorkspace,
   addMarketplace,
   addCarrier,
   inviteTeammate,
@@ -232,6 +233,11 @@ final class QuickActionConstant {
       kind: QuickActionSectionKind.business,
       actions: <QuickAction>[
         QuickAction(
+          kind: QuickActionKind.addWorkspace,
+          icon: AppIconConstant.storefront,
+          route: AppRoutes.workspaces,
+        ),
+        QuickAction(
           kind: QuickActionKind.addMarketplace,
           icon: AppIconConstant.hub,
           route: AppRoutes.marketplaces,
@@ -285,6 +291,7 @@ final class QuickActionLabel {
         QuickActionKind.addSource => context.l10n.homeQuickAddSource,
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
+        QuickActionKind.addWorkspace => context.l10n.workspaceAddTitle,
         QuickActionKind.addMarketplace => context.l10n.marketplaceAdd,
         QuickActionKind.addCarrier => context.l10n.carrierAdd,
         QuickActionKind.inviteTeammate => context.l10n.teamInvite,
