@@ -171,6 +171,11 @@ final class AppRoutes {
 
   // --- Global, reachable from anywhere ---
 
+  /// The one route nothing leaves. Above every other redirect, because a
+  /// build too old to talk to the backend is not a state an account or a
+  /// workspace can change.
+  static const String updateRequired = '/update-required';
+
   static const String search = '/search';
 
   /// Build a concrete path for a parameterised route.

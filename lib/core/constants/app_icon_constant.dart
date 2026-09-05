@@ -285,6 +285,9 @@ final class AppIconConstant {
   /// Represent a listing or sale tag.
   static const IconData sell = Symbols.sell_rounded;
 
+  /// A build too old to run, on the forced-update screen.
+  static const IconData systemUpdate = Symbols.system_update_rounded;
+
   /// Open application settings.
   static const IconData settings = Symbols.settings_rounded;
 

@@ -22,7 +22,9 @@ class _FixedConfig implements AppConfigRepository {
 
   @override
   Stream<AppConfig> watch() =>
-      Stream<AppConfig>.value(AppConfig(premiumEnabled: premiumEnabled));
+      Stream<AppConfig>.value(
+        AppConfig(premiumEnabled: premiumEnabled, minimumBuild: 0),
+      );
 }
 
 void main() {

@@ -11,6 +11,8 @@ import '../../features/analytics/presentation/screens/analytics_profit_screen/an
 import '../../features/analytics/presentation/screens/analytics_sales_screen/analytics_sales_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_sources_screen/analytics_sources_screen.dart';
+import '../../features/app_config/presentation/screens/update_required_screen/update_required_screen.dart';
+import '../../features/app_config/providers.dart';
 import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
 import '../../features/auth/providers.dart';
 import '../../features/carriers/presentation/screens/carrier_detail_screen/carrier_detail_screen.dart';
@@ -104,12 +106,28 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
     redirect: (BuildContext context, GoRouterState state) {
       final bool? signedIn = ref.read(isSignedInProvider);
       final OnboardingStatus onboarding = ref.read(onboardingStatusProvider);
+      final bool updateRequired = ref.read(forceUpdateRequiredProvider);
       final String location = state.matchedLocation;
       final bool onAuthRoute = _authRoutes.contains(location);
+
+      // **Above everything, the intro included.** A build too old to talk to
+      // the backend is not a state an account, a workspace or a preference
+      // can change, so nothing below this line gets a say. It never reports
+      // "still loading", so it can never be the reason the app will not
+      // start — see `forceUpdateRequiredProvider`.
+      if (updateRequired) {
+        return location == AppRoutes.updateRequired
+            ? null
+            : AppRoutes.updateRequired;
+      }
 
       if (signedIn == null || onboarding == OnboardingStatus.loading) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
       }
+
+      // The screen is unreachable once the build is new enough: leaving it up
+      // would be a dead end with nothing to update to.
+      if (location == AppRoutes.updateRequired) return AppRoutes.home;
 
       if (!signedIn) {
         // The intro is only ever shown to someone who is not signed in, so a
@@ -157,6 +175,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.splash,
         builder: (BuildContext context, GoRouterState state) =>
             const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.updateRequired,
+        builder: (BuildContext context, GoRouterState state) =>
+            const UpdateRequiredScreen(),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
@@ -678,11 +701,13 @@ class _RouterRefreshListenable extends ChangeNotifier {
       onboardingStatusProvider,
       _notifyIfChanged<OnboardingStatus>,
     );
+    _forceUpdate = _listen<bool>(ref, forceUpdateRequiredProvider);
   }
 
   late final ProviderSubscription<bool?> _signedIn;
   late final ProviderSubscription<WorkspaceStatus> _workspace;
   late final ProviderSubscription<OnboardingStatus> _onboarding;
+  late final ProviderSubscription<bool> _forceUpdate;
 
   /// Typed on `Provider<T>` rather than the more general
   /// `ProviderListenable<T>` that `ref.listen` accepts: Riverpod 3 declares
@@ -691,7 +716,7 @@ class _RouterRefreshListenable extends ChangeNotifier {
   ProviderSubscription<T> _listen<T>(Ref ref, Provider<T> provider) =>
       ref.listen<T>(provider, _notifyIfChanged<T>);
 
-  /// One callback for all three, so a redirect cannot start re-running on one
+  /// One callback for all four, so a redirect cannot start re-running on one
   /// provider and not another.
   void _notifyIfChanged<T>(T? previous, T next) {
     if (previous != next) notifyListeners();
@@ -702,6 +727,7 @@ class _RouterRefreshListenable extends ChangeNotifier {
     _signedIn.close();
     _workspace.close();
     _onboarding.close();
+    _forceUpdate.close();
     super.dispose();
   }
 }

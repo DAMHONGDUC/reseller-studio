@@ -222,6 +222,22 @@
   "@onboardingProfitBody": {
     "description": "Intro page 3 body. Profit is derived, never stored (hard rule 3), which is why it stays right when a fee is corrected."
   },
+  "updateRequiredTitle": "Time to update",
+  "@updateRequiredTitle": {
+    "description": "Title of the screen shown when the build is too old to run."
+  },
+  "updateRequiredBody": "This version of Reseller Studio is no longer supported. Update to keep your business in sync.",
+  "@updateRequiredBody": {
+    "description": "Body of the forced-update screen."
+  },
+  "updateRequiredAction": "Update now",
+  "@updateRequiredAction": {
+    "description": "Opens the store listing from the forced-update screen."
+  },
+  "updateRequiredFailed": "Could not open the store. Search for Reseller Studio to update.",
+  "@updateRequiredFailed": {
+    "description": "Shown when the store link would not open."
+  },
   "onboardingSkip": "Skip",
   "@onboardingSkip": {
     "description": "Dismisses the intro and goes straight to the sign-in gate."
