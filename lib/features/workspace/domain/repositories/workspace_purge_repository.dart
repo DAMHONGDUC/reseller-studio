@@ -24,4 +24,12 @@ abstract interface class WorkspacePurgeRepository {
   /// **Idempotent**: every step is a delete, so a second run returns 0 rather
   /// than failing on what is already gone.
   Future<int> deleteAllRecords();
+
+  /// The same sweep, keeping the defaults a workspace is created with.
+  ///
+  /// What the seeder empties before it fills. A seed writes no marketplaces
+  /// and no carriers, so [deleteAllRecords] before a seed would leave a
+  /// business with no platform to list on and no way to get one back short of
+  /// creating another workspace.
+  Future<int> deleteRecordsExceptDefaults();
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/seed_data/domain/seed_dataset.dart';
 import 'package:reseller_studio/features/seed_data/domain/services/seed_data_seeder.dart';
@@ -43,6 +44,7 @@ void main() {
     addTearDown(store.dispose);
 
     seeder = SeedDataSeeder(
+      purge: InMemoryWorkspacePurgeRepository(store),
       items: InMemoryItemRepository(store),
       listings: InMemoryListingRepository(store),
       orders: InMemoryOrderRepository(store),
@@ -93,6 +95,29 @@ void main() {
     expect(second, first);
     expect(store.items, hasLength(seed.items.length));
     expect(store.orders, hasLength(seed.orders.length));
+  });
+
+  test('empties the workspace first, so nothing else survives', () async {
+    // Owner's rule. Upserting on the seed's own ids replaces the seeded rows
+    // and leaves every other one behind, which is a business whose totals no
+    // longer match the dataset they are supposed to be checkable against.
+    store.items.add(
+      Item(
+        id: 'not-from-the-seed',
+        title: 'Typed in by hand',
+        quantity: 1,
+        status: ItemStatus.draft,
+        createdAt: testNow,
+      ),
+    );
+
+    await seeder.seed(seed);
+
+    expect(store.items, hasLength(seed.items.length));
+    expect(
+      store.items.where((Item item) => item.id == 'not-from-the-seed'),
+      isEmpty,
+    );
   });
 
   test('keeps the dates the seed placed, so it looks lived-in', () async {

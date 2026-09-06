@@ -22,6 +22,10 @@ class _FailingPurge implements WorkspacePurgeRepository {
 
   @override
   Future<int> deleteAllRecords() async => throw Exception('no backend');
+
+  @override
+  Future<int> deleteRecordsExceptDefaults() async =>
+      throw Exception('no backend');
 }
 
 void main() {
@@ -39,6 +43,30 @@ void main() {
         WorkspaceCollections.recordTableNames,
         WorkspaceCollections.tableNames
             .where((String name) => name != 'members' && name != 'activity')
+            .toList(),
+      );
+    });
+
+    test('the seeder sweep keeps the defaults a workspace is created with', () {
+      // The seed writes no marketplaces and no carriers, so clearing them
+      // would leave a business with no platform to list on and no way back.
+      expect(
+        WorkspaceCollections.refillableTableNames,
+        isNot(contains('marketplaces')),
+      );
+      expect(
+        WorkspaceCollections.refillableTableNames,
+        isNot(contains('carriers')),
+      );
+
+      // Derived from the full sweep, for the same reason that one is.
+      expect(
+        WorkspaceCollections.refillableTableNames,
+        WorkspaceCollections.recordTableNames
+            .where(
+              (String name) =>
+                  !WorkspaceCollections.defaultTableNames.contains(name),
+            )
             .toList(),
       );
     });

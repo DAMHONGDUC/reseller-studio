@@ -120,7 +120,11 @@ class MockStore {
   /// business with nothing in it — which is the state this exists to show. The
   /// dataset is untouched too: it is the known-good seed, and a restart puts
   /// the rows back.
-  int clearRecords() {
+  ///
+  /// [keepDefaults] leaves the marketplaces and carriers a workspace is
+  /// created with, which is what the seeder's own sweep does — see
+  /// `WorkspacePurgeRepository.deleteRecordsExceptDefaults`.
+  int clearRecords({bool keepDefaults = false}) {
     final List<List<Object>> lists = <List<Object>>[
       items,
       orders,
@@ -131,8 +135,7 @@ class MockStore {
       categories,
       locations,
       offers,
-      marketplaces,
-      carriers,
+      if (!keepDefaults) ...<List<Object>>[marketplaces, carriers],
     ];
 
     int cleared = 0;
@@ -829,6 +832,10 @@ class InMemoryWorkspacePurgeRepository implements WorkspacePurgeRepository {
 
   @override
   Future<int> deleteAllRecords() async => _store.clearRecords();
+
+  @override
+  Future<int> deleteRecordsExceptDefaults() async =>
+      _store.clearRecords(keepDefaults: true);
 }
 
 /// App config with nothing behind it.

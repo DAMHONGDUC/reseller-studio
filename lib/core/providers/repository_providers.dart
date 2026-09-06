@@ -249,6 +249,7 @@ final Provider<WorkspacePurgeRepository> workspacePurgeRepositoryProvider =
 final Provider<SeedDataSeeder> seedDataSeederProvider =
     Provider<SeedDataSeeder>(
       (Ref ref) => SeedDataSeeder(
+        purge: ref.watch(workspacePurgeRepositoryProvider),
         items: ref.watch(itemRepositoryProvider),
         listings: ref.watch(listingRepositoryProvider),
         orders: ref.watch(orderRepositoryProvider),

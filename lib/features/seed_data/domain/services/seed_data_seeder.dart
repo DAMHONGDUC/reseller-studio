@@ -15,6 +15,7 @@ import '../../../orders/domain/repositories/order_repository.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
 import '../../../sourcing/domain/entities/source.dart';
 import '../../../sourcing/domain/repositories/sourcing_repository.dart';
+import '../../../workspace/domain/repositories/workspace_purge_repository.dart';
 import '../seed_dataset.dart';
 
 /// Writes [SeedDataset] into the open workspace, through the real
@@ -37,8 +38,17 @@ import '../seed_dataset.dart';
 ///
 /// It is also the only thing that exercises every live write path in one go —
 /// so a failure here is a real bug in `data/`, found before a seller finds it.
+///
+/// **It empties the workspace before it fills it** (owner's rule). Upserting
+/// on the seed's own ids replaces the seeded rows and nothing else, so a
+/// workspace somebody had been typing into came back as the seed plus their
+/// leftovers — a business whose arithmetic no longer matches the dataset that
+/// is supposed to be checkable by eye. The marketplaces and carriers a
+/// workspace is created with survive, because the seed does not write them
+/// back: see `WorkspacePurgeRepository.deleteRecordsExceptDefaults`.
 class SeedDataSeeder {
   const SeedDataSeeder({
+    required this.purge,
     required this.items,
     required this.listings,
     required this.orders,
@@ -50,6 +60,7 @@ class SeedDataSeeder {
     required this.purchases,
   });
 
+  final WorkspacePurgeRepository purge;
   final ItemRepository items;
   final ListingRepository listings;
   final OrderRepository orders;
@@ -60,7 +71,12 @@ class SeedDataSeeder {
   final SourceRepository sources;
   final PurchaseRepository purchases;
 
-  /// Writes the whole dataset and returns how many documents it wrote.
+  /// Empties the workspace, writes the whole dataset, and returns how many
+  /// documents it wrote.
+  ///
+  /// **The sweep runs first and its count is not part of the answer.** What
+  /// the caller reports is the size of the business that is now on screen;
+  /// how much was cleared to get there is a log line.
   ///
   /// **Catalogue first, then the chain that points at it** — categories and
   /// locations, then sources, purchases, items, and finally what refers to an
@@ -69,10 +85,18 @@ class SeedDataSeeder {
   /// remaining rows still resolve, rather than orders pointing at items that
   /// were never written.
   ///
-  /// Ids come from the seed, and every write is an upsert on that id, so
-  /// running it twice replaces the demo business rather than doubling it.
+  /// Ids come from the seed and every write is an upsert on that id, so the
+  /// dataset is idempotent on its own; the sweep is what makes the *workspace*
+  /// idempotent, rows nobody seeded included.
   Future<int> seed(SeedDataset dataset) async {
+    final int cleared = await purge.deleteRecordsExceptDefaults();
     int written = 0;
+
+    SdLogger.info(
+      LogTagConstant.seedData,
+      'Workspace cleared before seeding',
+      <String, Object>{'documents': cleared},
+    );
 
     for (final ItemCategory category in dataset.categories) {
       await categories.save(category);
@@ -120,6 +144,7 @@ class SeedDataSeeder {
       'Seed data written',
       <String, Object>{
         'documents': written,
+        'cleared': cleared,
         'items': dataset.items.length,
         'orders': dataset.orders.length,
       },

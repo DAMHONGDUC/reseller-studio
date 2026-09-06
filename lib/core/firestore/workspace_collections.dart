@@ -128,6 +128,23 @@ class WorkspaceCollections {
 
   static const Set<String> _keptTables = <String>{'members', 'activity'};
 
+  /// The tables a workspace is *created* with — written by workspace setup and
+  /// by nothing else afterwards.
+  static const Set<String> defaultTableNames = <String>{
+    'marketplaces',
+    'carriers',
+  };
+
+  /// [recordTableNames] minus [defaultTableNames] — what a sweep that intends
+  /// to refill the business may empty.
+  ///
+  /// A seed writes no marketplaces and no carriers, so clearing them leaves a
+  /// business with no platform to list on and no way back: only creating
+  /// another workspace writes them again.
+  static List<String> get refillableTableNames => recordTableNames
+      .where((String name) => !defaultTableNames.contains(name))
+      .toList(growable: false);
+
   /// One table by name, for anything that sweeps all of them.
   ///
   /// Public so [recordTableNames] can be walked; it hands out the same

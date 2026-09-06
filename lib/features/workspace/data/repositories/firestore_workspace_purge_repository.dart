@@ -29,26 +29,38 @@ class FirestoreWorkspacePurgeRepository implements WorkspacePurgeRepository {
   final WorkspaceContext _context;
 
   @override
-  Future<int> deleteAllRecords() =>
-      FailureMapper.guard('delete all data', () async {
-        int deleted = 0;
+  Future<int> deleteAllRecords() => _sweepTables(
+    'delete all data',
+    'All workspace data deleted',
+    WorkspaceCollections.recordTableNames,
+  );
 
-        for (final String table in WorkspaceCollections.recordTableNames) {
-          deleted += await _sweep(table);
-        }
+  @override
+  Future<int> deleteRecordsExceptDefaults() => _sweepTables(
+    'delete data before seeding',
+    'Workspace data deleted, defaults kept',
+    WorkspaceCollections.refillableTableNames,
+  );
 
-        SdLogger.action(
-          LogTagConstant.workspace,
-          'All workspace data deleted',
-          <String, Object>{
-            'workspaceId': _context.workspaceId,
-            'documents': deleted,
-            'tables': WorkspaceCollections.recordTableNames.length,
-          },
-        );
+  Future<int> _sweepTables(
+    String operation,
+    String logMessage,
+    List<String> tables,
+  ) => FailureMapper.guard(operation, () async {
+    int deleted = 0;
 
-        return deleted;
-      });
+    for (final String table in tables) {
+      deleted += await _sweep(table);
+    }
+
+    SdLogger.action(LogTagConstant.workspace, logMessage, <String, Object>{
+      'workspaceId': _context.workspaceId,
+      'documents': deleted,
+      'tables': tables.length,
+    });
+
+    return deleted;
+  });
 
   /// Every row this workspace owns in one table, a page at a time.
   ///
