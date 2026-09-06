@@ -127,6 +127,18 @@ about how the backend is written.
 - **Every failure crossing this boundary goes through `FailureMapper.guard`**
   (hard rule 6), and the `catch` logs the full error object, not a sentence
   about it (hard rule 8).
+- **A stream's failure is reported once, not once per retry.** `guard` wraps a
+  future and a listener fails repeatedly, so `FirestoreStream` does the logging
+  instead — and it remembers what it already reported. A Firestore listener
+  retries underneath the app, so an index that is still building or a device
+  with no signal arrives as the same error every few seconds; since
+  `SdLogger.error` reports to Crashlytics, logging each one turned one missing
+  index into dozens of identical non-fatals in a single launch. The first
+  failure is reported in full and so is a *different* one; a repeat of the same
+  one drops to `SdLogger.debug`, and a snapshot arriving makes the next failure
+  news again. **The stream still carries every error to its watcher** — this
+  changes what is recorded, never what the UI decides.
+  `test/core/firestore/firestore_stream_test.dart` pins all three.
 
 ## Cloud Functions
 

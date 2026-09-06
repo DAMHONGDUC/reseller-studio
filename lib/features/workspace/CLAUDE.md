@@ -163,6 +163,13 @@ is that neither one is a version of the other:
   refuses the delete, so including it would fail the sweep on its first row).
   It is **derived** from `tableNames`, so a table added there is swept without
   anyone remembering a second list.
+- **There are two sweeps, and the seeder uses the narrower one.**
+  `deleteAllRecords` empties every record table; `deleteRecordsExceptDefaults`
+  keeps `WorkspaceCollections.defaultTableNames` — the marketplaces and
+  carriers workspace *creation* writes and nothing writes again. The seed
+  refills the rest and not those, so seeding over the full sweep would leave a
+  business with no platform to list on. `refillableTableNames` is derived from
+  `recordTableNames` for the same reason that one is derived from `tableNames`.
 - **A client sweep, not a callable**, unlike deleting the business: the rules
   already let a member delete a row in every table it touches, so the Admin
   SDK would buy nothing. It is paged, 400 rows at a time, under the batch cap.

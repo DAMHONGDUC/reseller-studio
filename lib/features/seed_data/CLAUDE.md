@@ -41,8 +41,18 @@ where a fake belongs. `test/support/pump_app.dart` wires them, and
   **one expense is recurring and older than a month** (so Expenses' "Due now"
   block is populated). The two a test names have ids on
   `SeedDatasetConstant`; the rest are an implementation detail.
-- **Ids come from the seed and every write is an upsert**, so running it twice
-  replaces the seeded business rather than doubling it.
+- **It empties the workspace before it fills it.** Owner's rule. Ids come from
+  the seed and every write is an upsert, so the *dataset* was already
+  idempotent — what it could not do is remove rows nobody seeded, and a
+  workspace somebody had been typing into came back as the seed plus their
+  leftovers. The sweep is what makes the workspace itself idempotent.
+- **The sweep keeps the marketplaces and carriers a workspace is created
+  with**, because the seed does not write them back: clearing them leaves a
+  business with no platform to list on and no way to get one short of creating
+  another workspace. That is
+  `WorkspacePurgeRepository.deleteRecordsExceptDefaults`, not
+  `deleteAllRecords` — the Delete all data button beside it still sweeps
+  everything.
 - **Every row keeps the seed's own dates.** The DTOs write `createdAt` from
   the entity rather than a server timestamp, which is what makes the business
   look lived-in — a listing that went stale weeks ago, an offer about to
