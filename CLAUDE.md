@@ -857,14 +857,19 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
   change.
 - **A PR title and description are short, plain and written as bullets.**
   Owner's rule. No prose paragraphs, no essay: a one-line title and a body
-  that is a list. A reviewer opens a PR to find out what changed and what to
-  watch for — anything they have to read twice is a cost, and a wall of text
-  is how the one blocking caveat gets skipped.
+  that is a list. Anything a reviewer has to read twice is a cost, and a wall
+  of text is how the line that mattered gets skipped.
   - One line per point, each starting with `-`. Group under short `##`
     headings only when the list is long enough to need them.
   - Say what changed and what it affects. Cut the reasoning that already
     lives in the commit messages or in `docs/rules/`.
-  - **Blockers go at the top**, not buried at the bottom.
+- **A PR description lists the features that branch built, and nothing else.**
+  Owner's rule, and it **replaces "blockers go at the top"**. No deploy steps,
+  no migration order, no caveats, no test counts, no diff stats, no
+  attribution footer — a reviewer opens a PR to find out what the branch does,
+  and every other line is one they read past to get there. What is cut still
+  has a home: `RELEASE_ACTIONS.md` holds what must happen before a build
+  ships, and the commit that made a change holds why it was made.
 
 ## Definition of done
 
