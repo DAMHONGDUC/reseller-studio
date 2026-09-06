@@ -152,7 +152,7 @@ The developer block in More → Settings has two opposite buttons, and the rule
 is that neither one is a version of the other:
 
 - **Seed demo data** fills the open workspace (`DemoDataSeeder`, in
-  `lib/features/mock_data/`).
+  `lib/features/seed_data/`).
 - **Delete all data** empties it (`WorkspacePurgeRepository`). The business
   survives, so this is not `deleteWorkspace` with a flag — that one ends the
   record this one leaves standing, is owner-only, and is a Cloud Function.
@@ -170,9 +170,9 @@ is that neither one is a version of the other:
   a row joinable for whatever points at it, and nothing points at anything
   once the sweep finishes — a workspace full of `deletedAt` rows is not the
   empty workspace this exists to reproduce.
-- **Dev mode gates it twice**, the section and the card, the same as the
-  mock-data switch: this one deletes, so one guard being forgotten must not be
+- **Dev mode gates it twice**, the section and the card, the same as the seed
+  card beside it: this one deletes, so one guard being forgotten must not be
   enough.
 - Its strings are hardcoded English, the developer-UI exception to hard rule 7
-  that `_DemoSeedCard` and `_MockSummary` already take.
+  that `_SeedDataCard` already takes.
 - `test/features/workspace/delete_all_data_test.dart` pins what survives.
