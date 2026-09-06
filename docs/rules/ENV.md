@@ -154,12 +154,20 @@ as a fresh install.**
   nothing and knows nothing about storage: reading, recording and wiping
   arrive as `SdFreshInstallPolicy` callbacks, which is what keeps a widget
   package free of `shared_preferences` and Firebase.
+- **`SdFreshInstall` runs the wipe** (design system, `core/common/`, pure
+  Dart). It reads and records the env name through an `SdFreshInstallStore`
+  the host implements, runs an ordered list of `SdFreshInstallStep`s, and
+  clears the store last — every app of ours wipes to the same shape, and only
+  the plugin behind the store and the SDKs with a session to drop differ. Each
+  step guards itself and nothing throws: this runs before `runApp`, where a
+  throw is not an error screen but an app that never starts.
 - **`AppFreshInstall` is the half that touches the device**
-  (`lib/core/bootstrap/`): sign out of Firebase and Google, `terminate` then
-  `clearPersistence` on Firestore, then clear every preference — the
-  onboarding flag included, because that is what a fresh install is. Each step
-  guards itself; this runs before `runApp`, where a throw is not an error
-  screen but an app that never starts.
+  (`lib/core/bootstrap/`): `shared_preferences` behind the store, and two
+  steps — sign out of Firebase and Google, then `terminate` and
+  `clearPersistence` on Firestore. Both carry a `when` that is false in a
+  build with no Firebase config. Clearing preferences is `SdFreshInstall`'s
+  own last step and takes the onboarding flag with it, because that is what a
+  fresh install is.
 - **The child is held back until the check finishes.** `clearPersistence`
   throws `failed-precondition` while the Firestore client is running, and a
   first screen building alongside the wipe would race its own sign-out.
