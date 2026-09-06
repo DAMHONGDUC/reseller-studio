@@ -32,6 +32,17 @@ outside the class that defines it. A number copied into a sentence goes stale
 silently — the sibling app's prose still claims a gap the code stopped using,
 and nobody noticed because prose does not fail to compile.
 
+**A document created by hand gets a sample in `sample_data/`, in the same turn
+it gains a field.** Owner's rule. `app_config` is typed into the Firebase
+console, so the only record of what a correct one looks like was a code block
+in a doc that nobody diffs — `sample_data/<collection>/<documentId>.json` is
+that record, with every field present including the optional ones.
+`docs/DATA_MODEL.md` stays the authority on what a field *means* and which way
+it fails; the sample only says what a filled-in document looks like. Nothing
+reads these files, and nothing may start to: a fixture a test depends on is a
+file that stops being a reference the first time a test needs it to be
+something else.
+
 **Every document in this repo is written in English, in full.** `CLAUDE.md`,
 everything under `docs/`, every `README.md`. No mixed-language paragraphs and
 no untranslated quotes. The app's user-facing strings are the exception and
@@ -81,6 +92,7 @@ in the left.
 | anything that looks like missing infrastructure — Firebase, signing, icons | `docs/rules/SETUP.md` |
 | asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
 | asking what is already built, or what is left and why | `docs/DONE_WORK.md`, `docs/REMAINING_WORK.md` |
+| a document created by hand in the Firebase console | `sample_data/README.md` |
 | anything in `lib/features/mock_data/` | `lib/features/mock_data/CLAUDE.md` (loads on its own) |
 | anything in `lib/features/workspace/` | `lib/features/workspace/CLAUDE.md` (loads on its own) |
 
@@ -193,6 +205,7 @@ functions/                 # Cloud Functions (TypeScript)
 packages/system_design/    # the design system, its own git repo (submodule)
 test/features/             # mirrors lib/features
 packages/system_design/tool/ # shared melos script bodies (submodule)
+sample_data/               # one JSON file per hand-created Firestore document
 docs/
 ```
 
