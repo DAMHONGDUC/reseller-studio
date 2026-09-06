@@ -98,6 +98,20 @@ about how the backend is written.
   prove the project has them. Every entry in that file carries a `"//"` note
   naming the screen it serves — keep that up, or nobody can tell a live index
   from a leftover.
+- **`test/core/firestore/query_indexes_test.dart` is that test, and it reads
+  the repositories rather than a hand-kept list.** It was written because the
+  rule above was not followed: every *base* list query — items, orders,
+  listings, offers, expenses, and every catalogue table — shipped with no
+  index at all, because the declared ones all assumed a second filter. A real
+  project answered `failed-precondition` on five collections at once and the
+  app came up empty, with nothing on screen saying why.
+  - It scans `lib/features/*/data/repositories/` for `.query…` chains and
+    builds each one's `workspaceId` + equality filters + sort, then fails on
+    any signature `firestore.indexes.json` does not cover — counting a prefix
+    of a longer index as covered, the way Firestore does.
+  - It is a regex over Dart rather than a parse, so it **also asserts it
+    matched something**. A scanner that quietly stops matching is worse than
+    no scanner: it goes green forever.
 
 ## Reading a document
 
