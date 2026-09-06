@@ -42,6 +42,12 @@ platform :ios do
     #    twenty-five minutes.
     build_number = settle_build_number(bump: options[:bump].to_s == "true", api_key: key)
 
+    # Composed here and nowhere else: the number is only settled one line up,
+    # so a note written by the caller before the lane ran would name the
+    # previous build. Never blank — a build with no note says nothing about
+    # which environment it came from.
+    notes = default_release_note(flavor, build_number) if notes.empty?
+
     # 3. Signing. CI only — a laptop already has the certificate in its
     #    keychain and Xcode's automatic signing handles the rest.
     export_options = nil
@@ -78,14 +84,14 @@ platform :ios do
     ipa = Dir[File.join(REPO_ROOT, "build/ios/ipa/*.ipa")].first
     UI.user_error!("no .ipa in build/ios/ipa") if ipa.nil?
 
-    # 5. Upload. macOS minutes bill at 10x and nothing in this lane reads the
-    #    result, so processing is not waited on — except when there is a note
-    #    to attach, which is the only thing on the build that says dev or prod.
+    # 5. Upload. App Store Connect takes a changelog only once processing has
+    #    finished, and every build carries one — so the wait is paid on every
+    #    release, at 10x macOS minutes, on purpose.
     upload_to_testflight(
       api_key: key,
       ipa: ipa,
-      skip_waiting_for_build_processing: notes.empty?,
-      changelog: notes.empty? ? nil : notes,
+      skip_waiting_for_build_processing: false,
+      changelog: notes,
       distribute_external: false,
       skip_submission: true
     )
@@ -158,6 +164,14 @@ platform :ios do
 
   def ci?
     is_ci
+  end
+
+  # `dev - 1.0.0 (20)` — the flavour, the version and the build, which together
+  # are everything the TestFlight list does not already show.
+  def default_release_note(flavor, build_number)
+    version, = pubspec_version
+
+    "#{flavor} - #{version} (#{build_number})"
   end
 
   def require_flavor(options)
