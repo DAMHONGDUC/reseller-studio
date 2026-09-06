@@ -19,6 +19,22 @@ about how the backend is written.
   so an afternoon goes into the deploy pipeline before anyone reads the rule.
   - The one combined rule left is `users/{uid}`, which is only ever fetched by
     document id and never queried. Split it the day anything queries it.
+- **`app_config/current` is readable without an account, and nothing goes in
+  it that a stranger may not read.** Owner's rule. `ForceUpdateGate` wraps the
+  app above the router, so the config is read before anyone has signed in — a
+  forced update is about the binary, not about a seller — and `signedIn()`
+  denied that read on every cold start. The denial was worse than noise: the
+  stream is swallowed and closed by `FirestoreAppConfigRepository`, and the
+  repository provider does not watch auth, so nothing re-listened after
+  sign-in and the whole session ran on `AppConfig.fallback`.
+  - **The cost is that its email lists are world-readable.** `premium_emails`,
+    `dev_mode_emails` and `blocked_emails` are now readable by anyone with the
+    project id, which every binary carries. They stay because none of them is
+    a credential and all three are already a grant this app cannot enforce
+    client-side; **a new field that names a person more than an address does
+    belongs in a Cloud Function, not in this document.**
+  - It is the only public read in the file. Everything else needs an account,
+    and business records need a membership.
 - **Check both directions of ownership on a write** — the stored document *and*
   the incoming one. Without the second, a client rewrites the owner id and
   plants a record in someone else's account. `workspaces/{workspaceId}` is the
