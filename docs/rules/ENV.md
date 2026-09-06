@@ -148,42 +148,35 @@ preferences and cached Firestore documents — a dev account writing into the
 real project, or the reverse. Owner's rule: **an environment change is treated
 as a fresh install.**
 
-- **`SdFreshInstallGuard` makes the comparison** (design system, `core/`). It
-  reads the env name the last launch recorded, and when it differs from
-  `AppEnv.flavor.name` it wipes before the app's first frame. It renders
-  nothing and knows nothing about storage: reading, recording and wiping
-  arrive as `SdFreshInstallPolicy` callbacks, which is what keeps a widget
-  package free of `shared_preferences` and Firebase.
-- **`SdFreshInstall` owns the env record** (design system, `core/common/`,
-  pure Dart): it reads and writes the env name through an `SdFreshInstallStore`
-  the host implements, and asks for the wipe when the two differ.
-- **`SdDeviceWipe` is the wipe, and it is written once.** Owner's rule. A
-  reinstall (`SdReinstallGuard`) and an environment change detect completely
-  different things and then do the same list of vendor calls in the same
-  order, so the list lives in one class and both call it. Each
-  `SdDeviceWipeStep` guards itself and nothing throws: this runs before
-  `runApp`, where a throw is not an error screen but an app that never starts.
-  `SdDeviceWipeFailure.halt` is the one way a step stops the wipe, and this
-  case uses none.
+- **`SdFreshInstall` is the whole check, and it is one class** (design system,
+  `core/common/`, pure Dart). It compares a stamp on the device against
+  `AppEnv.flavor.name` and wipes when they differ. It was three classes — a
+  reinstall guard, an environment guard and a widget — until the owner merged
+  them: both were asking whether the state on this device belongs to the app
+  now running. `packages/system_design/WIDGET_RULES.md` holds the decision
+  table.
+- **`AppBootstrap` awaits it before `runApp`, after Google Sign-In.** Not a
+  widget: `clearPersistence` throws `failed-precondition` once the Firestore
+  client is running, so the wipe has to be finished before the first screen can
+  open a stream — and signing out needs the auth SDKs to be up. It never
+  throws; a device that could not be checked starts on whatever it has.
 - **`AppFreshInstall` is the half that touches the device**
-  (`lib/core/bootstrap/`): `shared_preferences` behind the store, and two
-  steps — sign out of Firebase and Google, then `terminate` and
-  `clearPersistence` on Firestore. Both carry a `when` that is false in a
-  build with no Firebase config. Clearing preferences is appended by
-  `SdFreshInstall` as the last step and takes the onboarding flag with it,
-  because that is what a fresh install is.
-- **The child is held back until the check finishes.** `clearPersistence`
-  throws `failed-precondition` while the Firestore client is running, and a
-  first screen building alongside the wipe would race its own sign-out.
-- **The record is written after the wipe, never before** — the wipe clears the
-  store the record lives in, so a wipe interrupted half way is repeated on the
-  next launch rather than skipped.
-- **It is mounted through `SdDevWrapper`, and it runs whatever `visible`
-  says.** The tag is about which build a screenshot came from; the guard is
-  about the data underneath it, and the launch that needs cleaning is as often
-  the prod build started over a dev install as the other way round.
-  `packages/system_design/test/core/sd_fresh_install_guard_test.dart` pins
-  both directions and that a prod build with no tag still runs it.
+  (`lib/core/bootstrap/`): `shared_preferences` behind `SdInstallScopedStore`,
+  and two `SdDeviceWipeStep`s — sign out of Firebase and Google, then
+  `terminate` and `clearPersistence` on Firestore. Both carry a `when` that is
+  false in a build with no Firebase config. Emptying preferences is appended by
+  `SdFreshInstall` and takes the onboarding flag with it, because that is what
+  a fresh install is.
+- **It passes `PrefsKeyConstant.lastEnv` as the stamp key**, which is what
+  installs in the wild already hold — so the first launch after the merge reads
+  a valid stamp and is a normal launch, with no migration branch and no wipe.
+- **There is no device-scoped store here.** Nothing this app writes outlives a
+  delete, so a reinstall is already a first install and that row cannot fire.
+  That is the difference from the sibling app, whose iOS Keychain kept a
+  session across one.
+- **The stamp is written after the wipe, never before** — the wipe clears the
+  store it lives in, so a wipe that halted is repeated on the next launch
+  rather than skipped.
 
 ## The build tag is drawn from the flavour, never from `kDebugMode`
 
