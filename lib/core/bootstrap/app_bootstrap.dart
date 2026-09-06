@@ -14,6 +14,7 @@ import '../analytics/app_analytics.dart';
 import '../config/app_env.dart';
 import '../constants/log_tag_constant.dart';
 import '../logging/firebase_crash_reporter.dart';
+import 'app_fresh_install.dart';
 
 /// Everything that happens before `runApp`, so `main.dart` stays a list of
 /// what happens rather than how.
@@ -41,6 +42,12 @@ final class AppBootstrap {
   /// can fail. Everything here runs before `runApp`, where an unhandled throw
   /// does not show an error screen — it stops the app from starting at all —
   /// so every step needs a fallback that leaves the app usable.
+  ///
+  /// **[AppFreshInstall] runs after Google Sign-In and before everything
+  /// else reads.** It signs out and calls Firestore's `clearPersistence`,
+  /// which throws `failed-precondition` once that client is running — so it
+  /// has to be finished before the first screen can open a stream, and it
+  /// needs the auth SDKs it signs out of to be up.
   static Future<void> init(Widget Function() builder) async {
     await runZonedGuarded<Future<void>>(
       () async {
@@ -49,6 +56,8 @@ final class AppBootstrap {
         await _initializeFirebase();
 
         await _initializeGoogleSignIn();
+
+        await AppFreshInstall.run();
 
         await _initializeBilling();
 

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design/common.dart';
 
 import '../config/app_env.dart';
 import '../constants/log_tag_constant.dart';
@@ -14,29 +14,31 @@ import '../constants/prefs_key_constant.dart';
 /// The dev and prod flavours share a sandbox wherever they share a bundle id,
 /// so installing one over the other leaves the new binary reading the old
 /// one's signed-in session, preferences and cached documents — a dev account
-/// pointed at the real project, or the reverse. `SdFreshInstallGuard` makes
-/// the comparison and [SdFreshInstall] runs the wipe; what is left here is
-/// the only part that is this app's — which SDKs have something to drop, and
-/// the `shared_preferences` behind [SdFreshInstallStore].
+/// pointed at the real project, or the reverse. [SdFreshInstall] decides;
+/// what is left here is the only part that is this app's — which SDKs have
+/// something to drop, and the `shared_preferences` behind the store.
+///
+/// **There is no device-scoped store.** Nothing this app writes outlives a
+/// delete, so a reinstall is a first install already and that half of the
+/// check cannot fire.
 final class AppFreshInstall {
   const AppFreshInstall._();
 
-  /// The wiring handed to `SdDevWrapper`. One instance, so a rebuild of the
-  /// app widget does not hand the guard a new policy every frame.
+  /// Take the device back to a fresh install if it needs it.
   ///
   /// Order matters: sign out first so nothing is still writing, then drop the
-  /// cached documents that session pulled down. Preferences go last and
-  /// [SdFreshInstall] does that itself.
-  static final SdFreshInstallPolicy policy = SdFreshInstall.policy(
+  /// cached documents that session pulled down. Emptying preferences is
+  /// appended by [SdFreshInstall] and takes the onboarding flag with it,
+  /// because that is what a fresh install is.
+  static Future<void> run() => SdFreshInstall.run(
     logTag: LogTagConstant.freshInstall,
-    envKey: PrefsKeyConstant.lastEnv,
-    store: const _PrefsStore(),
-    steps: <SdDeviceWipeStep>[
-      SdDeviceWipeStep(
-        name: 'Sign out',
-        when: _hasFirebase,
-        run: _signOut,
-      ),
+    buildStamp: AppEnv.flavor.name,
+    installScoped: const _PrefsStore(),
+    // The key this app has always used, so an install that predates the
+    // merge already carries a valid stamp and reads as a normal launch.
+    stampKey: PrefsKeyConstant.lastEnv,
+    wipe: <SdDeviceWipeStep>[
+      SdDeviceWipeStep(name: 'Sign out', when: _hasFirebase, run: _signOut),
       SdDeviceWipeStep(
         name: 'Clear Firestore cache',
         when: _hasFirebase,
@@ -56,8 +58,8 @@ final class AppFreshInstall {
   ///
   /// **`terminate` first, and this only works before anything reads.**
   /// `clearPersistence` throws `failed-precondition` while the client is
-  /// running, which is why the guard holds the app's first frame back rather
-  /// than wiping alongside it.
+  /// running, which is why this runs before `runApp` rather than alongside the
+  /// first screen.
   static Future<void> _clearFirestoreCache() async {
     await FirebaseFirestore.instance.terminate();
     await FirebaseFirestore.instance.clearPersistence();
@@ -73,30 +75,30 @@ final class AppFreshInstall {
 }
 
 /// `shared_preferences` behind the store the design system asks for.
-///
-/// Clearing takes the onboarding flag with it, deliberately — a fresh install
-/// is exactly what this is pretending to be.
-class _PrefsStore implements SdFreshInstallStore {
+class _PrefsStore implements SdInstallScopedStore {
   const _PrefsStore();
 
   @override
-  Future<String?> readString(String key) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    return prefs.getString(key);
-  }
+  Future<Iterable<String>> getKeys() async =>
+      (await SharedPreferences.getInstance()).getKeys();
 
   @override
-  Future<void> writeString(String key, String value) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    await prefs.setString(key, value);
-  }
+  Future<Object?> get(String key) async =>
+      (await SharedPreferences.getInstance()).get(key);
 
   @override
-  Future<void> clear() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  Future<String?> getString(String key) async =>
+      (await SharedPreferences.getInstance()).getString(key);
 
-    await prefs.clear();
-  }
+  @override
+  Future<void> setString(String key, String value) async =>
+      (await SharedPreferences.getInstance()).setString(key, value);
+
+  @override
+  Future<void> remove(String key) async =>
+      (await SharedPreferences.getInstance()).remove(key);
+
+  @override
+  Future<void> clear() async =>
+      (await SharedPreferences.getInstance()).clear();
 }

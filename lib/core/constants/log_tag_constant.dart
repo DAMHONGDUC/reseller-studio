@@ -62,8 +62,8 @@ final class LogTagConstant {
   static const String onboarding = 'Onboarding';
   static const String seedData = 'Seed Data';
 
-  /// The environment check that runs before the app's first frame. Matches
-  /// the tag `SdFreshInstallGuard` prints from inside the design system, so
-  /// both halves of one launch read back as one flow.
+  /// The fresh-install check that runs before `runApp`. Handed to
+  /// `SdFreshInstall` as its `logTag`, so the design system's half and this
+  /// app's steps read back as one flow.
   static const String freshInstall = 'Fresh Install';
 }

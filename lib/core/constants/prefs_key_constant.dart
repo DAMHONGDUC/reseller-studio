@@ -30,10 +30,15 @@ final class PrefsKeyConstant {
 
   /// Which environment the last launch ran as — `dev`, `staging`, `prod`.
   ///
-  /// Read by `AppFreshInstall` before anything else on the device is trusted.
-  /// Two flavours sharing a bundle id share this store, so it is the only
-  /// record of whose data is sitting here — and it is written *after* a wipe,
-  /// never before, because the wipe clears the store it lives in.
+  /// `SdFreshInstall`'s stamp, read before anything else on the device is
+  /// trusted. Two flavours sharing a bundle id share this store, so it is the
+  /// only record of whose data is sitting here — and it is written *after* a
+  /// wipe, never before, because the wipe clears the store it lives in.
+  ///
+  /// **The name is kept deliberately.** It is what installs in the wild
+  /// already hold, so passing it as `stampKey` migrates them with no branch:
+  /// the value they carry is a valid stamp on the first launch after the
+  /// merge.
   static const String lastEnv = 'last_env';
 
   /// Light, dark or system. Device-local on purpose — see

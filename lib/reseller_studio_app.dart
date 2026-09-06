@@ -7,7 +7,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:system_design/index.dart';
 
-import 'core/bootstrap/app_fresh_install.dart';
 import 'core/config/app_env.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
@@ -78,7 +77,6 @@ class ResellerStudioApp extends ConsumerWidget {
         // flavour is a release binary and is the one nobody can otherwise
         // tell apart from the real app in a screenshot.
         visible: !AppEnv.flavor.isProd,
-        freshInstall: AppFreshInstall.policy,
         child: MaterialApp.router(
           routerConfig: router,
           debugShowCheckedModeBanner: false,
