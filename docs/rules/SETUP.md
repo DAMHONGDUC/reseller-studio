@@ -15,6 +15,7 @@ a code defect. The owner completes every row with external access.
 | Android release | App configuration exists | Add Play listing and release signing |
 
 Without Firebase, the app resolves to signed out and remains usable only with
-debug mock data from More → Settings. There is no auth bypass (hard rule 1).
+seed a workspace from More → Settings → Developer. There is no auth bypass
+(hard rule 1).
 
 The full owner checklist is [`../../RELEASE_ACTIONS.md`](../../RELEASE_ACTIONS.md).

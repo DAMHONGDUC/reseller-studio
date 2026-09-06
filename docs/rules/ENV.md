@@ -95,20 +95,21 @@ bright shop floor and the same seller packing at 1am want opposite answers on
 two devices, so syncing it to the account would make one of them wrong. The
 same reasoning puts the intro flag in preferences.
 
-**`MOCK_DATA_DEFAULT` is off, and no other flag turns it on** — owner's rule.
-It used to be ORed with the auth bypass in `DevFlags`, so any dev run opened
-onto a fake business. It no longer is, and the two are independent:
+**`MOCK_DATA_DEFAULT` is gone, and no flag replaces it** — owner's rule. The
+app has one backend. A dev run opens on **what a new seller sees** — five tabs
+with nothing in them (hard rule 1) — and what puts rows in them is
+More → Settings → Developer → Seed demo data, which writes real documents
+into the open workspace.
 
-- A dev run now opens on **what a new seller sees** — five tabs with nothing in
-  them (hard rule 1). That is a real shipped state, and a default that replaced
-  it with seeded data meant nobody was looking at it.
-- Turning it on is deliberate: `"MOCK_DATA_DEFAULT": true` in the env file, or
-  the switch in More → Settings, which is the path it is designed to be reached
-  by — the stored preference is what `DataModeController` reads.
-- The release guard is unchanged and is the part that matters:
-  `DevFlags.mockDataDefault` is still ANDed with `!kReleaseMode`, and
-  `DataModeController.build` refuses `mock` in release whatever is stored.
-  `test/core/config/app_env_test.dart` holds both.
+- **There is no build-time way to fake a business any more.** The switch was
+  persisted and dev mode is granted by email in `app_config`, so a fake
+  business was two booleans away from being shown to a seller as if it were
+  theirs. Deleting the mode deleted the failure — see
+  `lib/features/seed_data/CLAUDE.md`.
+- `VERBOSE_LOGGING` is the only development switch left in the template, and
+  the release guard on it is unchanged: `DevFlags` ANDs it with
+  `!kReleaseMode`. `test/core/config/app_env_test.dart` holds that the
+  template and `AppEnv` still name exactly the same keys.
 
 The two secret-handling rules for `env/` — that nothing in it is secret, and
 that `AppEnv` states the request while `DevFlags` states the permission — are

@@ -93,7 +93,7 @@ in the left.
 | asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
 | asking what is already built, or what is left and why | `docs/DONE_WORK.md`, `docs/REMAINING_WORK.md` |
 | a document created by hand in the Firebase console | `sample_data/README.md` |
-| anything in `lib/features/mock_data/` | `lib/features/mock_data/CLAUDE.md` (loads on its own) |
+| anything in `lib/features/seed_data/` | `lib/features/seed_data/CLAUDE.md` (loads on its own) |
 | anything in `lib/features/workspace/` | `lib/features/workspace/CLAUDE.md` (loads on its own) |
 
 ## What this project is
@@ -325,8 +325,8 @@ behind it.
    dead end before Firebase existed. The five tabs now render empty without an
    account, so that reason expired and the flag went with it — `bypassAuth`,
    `bypassUid`, `BYPASS_AUTH` and the `AUTH OFF` banner are all deleted. **Do
-   not reintroduce one.** To develop without a backend, turn on mock data in
-   More → Settings, which is reachable in the signed-out shell.
+   not reintroduce one.** To put rows on screen, sign in and seed a workspace
+   from More → Settings → Developer.
 
    **A build with no Firebase resolves to signed OUT, never signed in.**
    `firebaseReadyProvider` is checked before anything touches
@@ -351,8 +351,7 @@ behind it.
    - **Neither works until the owner configures it** — an OAuth client for
      Google, a Services ID and key for Apple. Until then the buttons are the
      only way in and no account can be created; the app opens on the
-     signed-out shell, and mock data in More → Settings is how it is developed
-     against. See `RELEASE_ACTIONS.md`.
+     signed-out shell. See `RELEASE_ACTIONS.md`.
    - **Both marks are `SimpleIcons` glyphs, passed as `SdButtonV3.icon`** —
      owner's rule, restated after Google's own SVG was wired in and taken back
      out. A font cannot fail to load, and that is the point: the buttons once
@@ -691,7 +690,8 @@ feature's own `CLAUDE.md`.
   what is overdue, what is stale, whether an offer has expired, how many days
   are left — reads the clock, so a test pins it with `FixedClock` and the same
   assertion cannot pass in June and fail in August. That is exactly how
-  `test/features/screens_with_mock_data_test.dart` broke: the seed was placed
+  `test/features/screens_with_fake_backend_test.dart` broke: the seed was
+  placed
   against a fixed instant and Home read the wall clock.
   - **A recorded timestamp is the opposite and stays `DateTime.now()`**:
     `createdAt`, `deletedAt`, the instant an order shipped, the default date

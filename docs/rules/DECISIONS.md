@@ -302,37 +302,32 @@ gets its own `LiquidGlassLayer` rather than joining the bar's blend group,
 which is the one thing that looks like a free simplification and silently
 deletes the capsule.
 
-## Dev mode is granted by email, so the mock branch stops being tree-shaken
+## Mock data was deleted; seeding a real workspace replaced it
 
-The earlier rule is in `lib/features/mock_data/CLAUDE.md`: every repository
-provider tests `DevFlags.isDebugOrProfile` **first**, which is `const` false in
-release, so the mock branch folds away at compile time and the in-memory
-repositories and their seed leave the shipped binary rather than merely going
-unreachable inside it. That is a stronger property than a runtime check, and
-nothing about the argument for it was wrong.
+The app used to carry two backends and choose between them at runtime — a
+persisted `DataMode`, an in-memory repository behind every provider, and a
+switch in Settings. Owner's rule removed it, and two things made that the
+right way round rather than a loss:
 
-Owner's rule adds `dev_mode_emails` to `app_config`, and a list of email
-addresses is a **release-build** grant by definition — a debug build already
-has dev mode, so a list that only worked there would grant nothing. The branch
-therefore has to survive compilation, and the seed now ships.
+- **The app a developer looked at was not the app a seller runs.** Nothing
+  exercised a write path, so `data/` could be broken for weeks and every
+  screen would still look right.
+- **A fake business was one stale preference away from being real.** The mode
+  was persisted and dev mode is granted by email in `app_config` — a
+  release-build grant by definition — so the branch survived compilation. Two
+  booleans stood between a seller and somebody else's invented inventory.
 
-What replaces the compiler as the guard is `devModeEnabledProvider`: true in
-every debug and profile build, and in a release build only when the config
-names the signed-in account. `DataModeController` still refuses to return
-`mock` without it, and the mock-data card in Settings still hides itself — two
-checks rather than one, because the thing on the other side is a fake business
-shown to a real seller.
+What replaced it is `SeedDataSeeder`: three rows of everything, written into
+the open workspace through the same repositories every screen reads. It is the
+only thing that drives every live write path in one run, so a failure in it is
+a real bug in `data/` found before a seller finds it.
 
-`DevFlags.mockDataDefault` and `DevFlags.verboseLogging` keep their `const`
-guards. A *default* that turns itself on in a shipped build is not what an
-email list was asked to buy.
+**The fakes were moved, not deleted.** They live in `test/support/fakes/`,
+where a fake belongs, and `FakeOverrides` is the single place that says which
+provider gets which. The app has one backend.
 
-**The config repository is the one thing mock mode no longer swaps.** Dev mode
-is now read out of `app_config`, so mocking the repository that supplies it
-would make the config depend on the switch the config decides, and Riverpod
-answers a circular dependency by throwing. Nothing is lost: the in-memory
-implementation returned `AppConfig.fallback`, which is exactly what a build
-with no Firebase already gets.
+`DevFlags.verboseLogging` keeps its `const` guard. A *default* that turns
+itself on in a shipped build is not what an email list was asked to buy.
 
 ## The block list is a UI gate, and it is deliberately not a permission
 
