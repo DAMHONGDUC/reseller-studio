@@ -41,6 +41,8 @@ import '../sourcing/domain/repositories/sourcing_repository.dart';
 import '../subscription/data/repositories/revenue_cat_subscription_repository.dart';
 import '../subscription/data/repositories/unconfigured_subscription_repository.dart';
 import '../subscription/domain/repositories/subscription_repository.dart';
+import '../workspace/data/repositories/firestore_workspace_purge_repository.dart';
+import '../workspace/domain/repositories/workspace_purge_repository.dart';
 import '../workspace/providers.dart';
 import 'data/in_memory_repositories.dart';
 import 'domain/services/demo_data_seeder.dart';
@@ -439,6 +441,28 @@ final Provider<AppConfigRepository> appConfigRepositoryProvider =
       }
 
       return FirestoreAppConfigRepository(FirebaseFirestore.instance);
+    });
+
+/// Empties the open workspace of every business record.
+///
+/// **Developer-only**, and it is the seeder's opposite number — the card that
+/// reads it lives in the same block of Settings, behind the same grant. Mock
+/// mode clears the in-memory store, so the empty screens can be looked at
+/// without a backend at all.
+final Provider<WorkspacePurgeRepository> workspacePurgeRepositoryProvider =
+    Provider<WorkspacePurgeRepository>((Ref ref) {
+      if (ref.watch(devModeEnabledProvider) &&
+          ref.watch(dataModeProvider).isMock) {
+        return InMemoryWorkspacePurgeRepository(ref.watch(mockStoreProvider));
+      }
+
+      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
+
+      if (context == null) {
+        LiveRepositoryGuard.noWorkspace('WorkspacePurgeRepository');
+      }
+
+      return FirestoreWorkspacePurgeRepository(context);
     });
 
 /// Writes the demo business through whatever repositories are live.

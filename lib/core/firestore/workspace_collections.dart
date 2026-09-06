@@ -74,19 +74,19 @@ class WorkspaceCollections {
   DocumentReference<Map<String, Object?>> get workspace =>
       _firestore.collection(_workspaces).doc(workspaceId);
 
-  WorkspaceTable get members => _table('members');
-  WorkspaceTable get items => _table('items');
-  WorkspaceTable get listings => _table('listings');
-  WorkspaceTable get orders => _table('orders');
-  WorkspaceTable get offers => _table('offers');
-  WorkspaceTable get purchases => _table('purchases');
-  WorkspaceTable get sources => _table('sources');
-  WorkspaceTable get expenses => _table('expenses');
-  WorkspaceTable get categories => _table('categories');
-  WorkspaceTable get locations => _table('locations');
-  WorkspaceTable get marketplaces => _table('marketplaces');
-  WorkspaceTable get carriers => _table('carriers');
-  WorkspaceTable get activity => _table('activity');
+  WorkspaceTable get members => table('members');
+  WorkspaceTable get items => table('items');
+  WorkspaceTable get listings => table('listings');
+  WorkspaceTable get orders => table('orders');
+  WorkspaceTable get offers => table('offers');
+  WorkspaceTable get purchases => table('purchases');
+  WorkspaceTable get sources => table('sources');
+  WorkspaceTable get expenses => table('expenses');
+  WorkspaceTable get categories => table('categories');
+  WorkspaceTable get locations => table('locations');
+  WorkspaceTable get marketplaces => table('marketplaces');
+  WorkspaceTable get carriers => table('carriers');
+  WorkspaceTable get activity => table('activity');
 
   /// Every table this workspace owns rows in, for anything that has to sweep
   /// all of them — deleting a business, or migrating one.
@@ -110,7 +110,31 @@ class WorkspaceCollections {
     'activity',
   ];
 
-  WorkspaceTable _table(String name) => WorkspaceTable(
+  /// The tables holding records a sweep may empty — [tableNames] minus the two
+  /// that must survive one.
+  ///
+  /// - **`members` is the ACL** (hard rule 11). Emptying it locks every seller
+  ///   out of a business that still exists, and no rule would let them back
+  ///   in: every permission is decided by the row that was just deleted.
+  /// - **`activity` is append-only** (hard rule 12) and `firestore.rules`
+  ///   refuses a client delete outright, so a sweep including it fails on the
+  ///   first row rather than skipping it.
+  ///
+  /// Derived from [tableNames] rather than typed a second time: a table added
+  /// there is swept without anyone remembering this list exists.
+  static List<String> get recordTableNames => tableNames
+      .where((String name) => !_keptTables.contains(name))
+      .toList(growable: false);
+
+  static const Set<String> _keptTables = <String>{'members', 'activity'};
+
+  /// One table by name, for anything that sweeps all of them.
+  ///
+  /// Public so [recordTableNames] can be walked; it hands out the same
+  /// filtered, stamped [WorkspaceTable] the named getters do, so naming a
+  /// table rather than reading a getter gives up none of hard rule 14's
+  /// boundary.
+  WorkspaceTable table(String name) => WorkspaceTable(
     _firestore
         .collection(name)
         .withConverter<Map<String, Object?>>(

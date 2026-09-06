@@ -30,6 +30,7 @@ import '../../subscription/domain/enums/seller_plan.dart';
 import '../../subscription/domain/repositories/subscription_repository.dart';
 import '../../workspace/domain/entities/user_profile.dart';
 import '../../workspace/domain/entities/workspace.dart';
+import '../../workspace/domain/repositories/workspace_purge_repository.dart';
 import '../../workspace/domain/repositories/workspace_repository.dart';
 import '../domain/mock_dataset.dart';
 
@@ -111,6 +112,39 @@ class MockStore {
 
   void dispose() {
     unawaited(_changes.close());
+  }
+
+  /// Empty every record list, then publish. Returns how many rows went.
+  ///
+  /// **The workspace, its members and its plan stay**, so the demo is the same
+  /// business with nothing in it — which is the state this exists to show. The
+  /// dataset is untouched too: it is the known-good seed, and a restart puts
+  /// the rows back.
+  int clearRecords() {
+    final List<List<Object>> lists = <List<Object>>[
+      items,
+      orders,
+      listings,
+      sources,
+      purchases,
+      expenses,
+      categories,
+      locations,
+      offers,
+      marketplaces,
+      carriers,
+    ];
+
+    int cleared = 0;
+
+    for (final List<Object> list in lists) {
+      cleared += list.length;
+      list.clear();
+    }
+
+    notifyChanged();
+
+    return cleared;
   }
 
   /// Insert or replace by id, then publish.
@@ -779,6 +813,21 @@ class InMemoryWorkspaceRepository implements WorkspaceRepository {
     required String uid,
     required String workspaceId,
   }) async {}
+}
+
+/// Emptying the demo business, in memory.
+///
+/// **It really does empty it**, unlike [InMemoryWorkspaceRepository]'s no-op
+/// delete: there is nothing to authorise and nothing to fall back to, so the
+/// screens can be looked at with no rows in them and the seed card fills them
+/// again. A restart does too — nothing here is persisted.
+class InMemoryWorkspacePurgeRepository implements WorkspacePurgeRepository {
+  const InMemoryWorkspacePurgeRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Future<int> deleteAllRecords() async => _store.clearRecords();
 }
 
 /// App config with nothing behind it.
