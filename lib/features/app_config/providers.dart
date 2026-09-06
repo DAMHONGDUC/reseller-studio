@@ -46,21 +46,32 @@ final Provider<bool> premiumEnabledProvider = Provider<bool>(
 final FutureProvider<int> appBuildNumberProvider = FutureProvider<int>((
   Ref ref,
 ) async {
-  try {
-    final PackageInfo info = await PackageInfo.fromPlatform();
+  final PackageInfo? info = await ref.watch(packageInfoProvider.future);
 
-    return int.tryParse(info.buildNumber) ?? _buildUnknown;
-  } catch (error, stackTrace) {
-    SdLogger.error(
-      LogTagConstant.appConfig,
-      'Could not read the build number — nothing will be forced',
-      error: error,
-      stackTrace: stackTrace,
-    );
-
-    return _buildUnknown;
-  }
+  return int.tryParse(info?.buildNumber ?? '') ?? _buildUnknown;
 });
+
+/// What this binary calls itself — `1.0.0+8`, as the platform reports it.
+///
+/// Null when the platform channel could not answer, which is a widget test
+/// with no plugin registered as often as it is a real failure. Every reader
+/// treats null as "unknown" rather than waiting: the dev tag leaves the
+/// version out of its label, and [appBuildNumberProvider] forces nothing.
+final FutureProvider<PackageInfo?> packageInfoProvider =
+    FutureProvider<PackageInfo?>((Ref ref) async {
+      try {
+        return await PackageInfo.fromPlatform();
+      } catch (error, stackTrace) {
+        SdLogger.error(
+          LogTagConstant.appConfig,
+          'Could not read the package info — nothing will be forced',
+          error: error,
+          stackTrace: stackTrace,
+        );
+
+        return null;
+      }
+    });
 
 /// What a build this app could not identify counts as: newer than any ceiling
 /// anyone would set, so [forceUpdateProvider] answers `notRequired`.

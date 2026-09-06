@@ -61,4 +61,9 @@ final class LogTagConstant {
   static const String settings = 'Settings';
   static const String onboarding = 'Onboarding';
   static const String mockData = 'Mock Data';
+
+  /// The environment check that runs before the app's first frame. Matches
+  /// the tag `SdFreshInstallGuard` prints from inside the design system, so
+  /// both halves of one launch read back as one flow.
+  static const String freshInstall = 'Fresh Install';
 }
