@@ -283,6 +283,9 @@ The whole document, with every field filled in:
 Every field is optional. An absent one reads as the fallback above, so the
 smallest document that does anything is a single key.
 
+The same document is kept as a file at `sample_data/app_config/current.json`,
+which is what to copy when creating it in the console.
+
 ## Indexes
 
 `firestore.indexes.json` is the index authority. Add an index in the same
