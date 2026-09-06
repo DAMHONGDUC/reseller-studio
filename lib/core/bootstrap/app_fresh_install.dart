@@ -31,13 +31,13 @@ final class AppFreshInstall {
     logTag: LogTagConstant.freshInstall,
     envKey: PrefsKeyConstant.lastEnv,
     store: const _PrefsStore(),
-    steps: <SdFreshInstallStep>[
-      SdFreshInstallStep(
+    steps: <SdDeviceWipeStep>[
+      SdDeviceWipeStep(
         name: 'Sign out',
         when: _hasFirebase,
         run: _signOut,
       ),
-      SdFreshInstallStep(
+      SdDeviceWipeStep(
         name: 'Clear Firestore cache',
         when: _hasFirebase,
         run: _clearFirestoreCache,
