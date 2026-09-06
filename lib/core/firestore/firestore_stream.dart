@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:system_design/common.dart';
 
-import '../constants/log_tag_constant.dart';
-import '../error/failure_mapper.dart';
+import 'firestore_stream_reporter.dart';
 
 /// Turning Firestore's snapshot streams into streams of entities.
 ///
@@ -19,16 +17,23 @@ final class FirestoreStream {
     Query<Map<String, Object?>> query,
     T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity, {
     required String operation,
-  }) => query
-      .snapshots()
-      .map(
-        (QuerySnapshot<Map<String, Object?>> snapshot) =>
-            snapshot.docs.map(toEntity).toList(),
-      )
-      .handleError(
-        (Object error, StackTrace stackTrace) =>
-            _rethrowMapped(error, stackTrace, operation),
-      );
+  }) {
+    final FirestoreStreamReporter reporter = FirestoreStreamReporter(
+      operation,
+    );
+
+    return query
+        .snapshots()
+        .map((QuerySnapshot<Map<String, Object?>> snapshot) {
+          reporter.recovered();
+
+          return snapshot.docs.map(toEntity).toList();
+        })
+        .handleError(
+          (Object error, StackTrace stackTrace) =>
+              reporter.rethrowMapped(error, stackTrace),
+        );
+  }
 
   /// One live document, or null when it does not exist.
   ///
@@ -38,29 +43,21 @@ final class FirestoreStream {
     DocumentReference<Map<String, Object?>> reference,
     T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity, {
     required String operation,
-  }) => reference
-      .snapshots()
-      .map(
-        (DocumentSnapshot<Map<String, Object?>> doc) =>
-            doc.exists ? toEntity(doc) : null,
-      )
-      .handleError(
-        (Object error, StackTrace stackTrace) =>
-            _rethrowMapped(error, stackTrace, operation),
-      );
-
-  static Never _rethrowMapped(
-    Object error,
-    StackTrace stackTrace,
-    String operation,
-  ) {
-    SdLogger.error(
-      LogTagConstant.firestore,
-      'Failed to $operation',
-      error: error,
-      stackTrace: stackTrace,
+  }) {
+    final FirestoreStreamReporter reporter = FirestoreStreamReporter(
+      operation,
     );
 
-    throw FailureMapper.map(error);
+    return reference
+        .snapshots()
+        .map((DocumentSnapshot<Map<String, Object?>> doc) {
+          reporter.recovered();
+
+          return doc.exists ? toEntity(doc) : null;
+        })
+        .handleError(
+          (Object error, StackTrace stackTrace) =>
+              reporter.rethrowMapped(error, stackTrace),
+        );
   }
 }
