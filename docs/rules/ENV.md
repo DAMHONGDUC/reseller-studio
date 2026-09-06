@@ -155,18 +155,25 @@ as a fresh install.**
   them: both were asking whether the state on this device belongs to the app
   now running. `packages/system_design/WIDGET_RULES.md` holds the decision
   table.
-- **`AppBootstrap` awaits it before `runApp`, after Google Sign-In.** Not a
-  widget: `clearPersistence` throws `failed-precondition` once the Firestore
-  client is running, so the wipe has to be finished before the first screen can
-  open a stream — and signing out needs the auth SDKs to be up. It never
-  throws; a device that could not be checked starts on whatever it has.
-- **`AppFreshInstall` is the half that touches the device**
-  (`lib/core/bootstrap/`): `shared_preferences` behind `SdInstallScopedStore`,
-  and two `SdDeviceWipeStep`s — sign out of Firebase and Google, then
-  `terminate` and `clearPersistence` on Firestore. Both carry a `when` that is
-  false in a build with no Firebase config. Emptying preferences is appended by
-  `SdFreshInstall` and takes the onboarding flag with it, because that is what
-  a fresh install is.
+- **`FreshInstallGate` runs it behind the app's own splash screen**
+  (`lib/core/fresh_install/`), and it is deliberately not a bootstrap step.
+  Before `runApp` the only thing on screen is the platform launch image, so a
+  wipe that takes a second looks like a hang; here the app is up and themed and
+  shows the same `SplashScreen` a returning seller already sees while auth
+  resolves.
+- **The gate sits above `ForceUpdateGate`, and that ordering is the point.**
+  `clearPersistence` throws `failed-precondition` once the Firestore client is
+  running, and `ForceUpdateGate`'s `app_config` read is what starts it on the
+  first frame — so nothing below the gate may build until the check returns.
+  Letting the first screen build alongside would also race the sign-out against
+  the screens reading that session.
+  `test/core/fresh_install/fresh_install_gate_test.dart` pins both states.
+- **`AppFreshInstall` is the half that touches the device**, and it is an
+  `SdFreshInstallHost`: `isBackendReady`, `signOut` (Google then Firebase), and
+  `clearCache` (`terminate` then `clearPersistence`). Nothing else — the order
+  of a wipe and the names of its steps are `SdFreshInstall`'s. Emptying
+  preferences is appended there and takes the onboarding flag with it, because
+  that is what a fresh install is.
 - **It passes `PrefsKeyConstant.lastEnv` as the stamp key**, which is what
   installs in the wild already hold — so the first launch after the merge reads
   a valid stamp and is a normal launch, with no migration branch and no wipe.

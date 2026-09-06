@@ -628,14 +628,17 @@ feature's own `CLAUDE.md`.
   `AppBootstrap` (`core/bootstrap/app_bootstrap.dart`), so the entry point
   stays a list of what happens rather than how. Anything new that must run
   before `runApp` goes there, not back into `main.dart`.
-- **`AppBootstrap.init` guards each step separately, never the whole
-  function.** Its concerns are independent, and one `try` around all of them
-  lets the first failure skip everything after it — including the crash
-  reporting that would have named it. **Firebase goes first** so Crashlytics
-  is up before anything else can fail. Anything added here runs **before
-  `runApp`**, where an unhandled throw does not show an error screen — it
-  stops the app from starting at all — so it needs its own `try`/`catch` and a
-  fallback that leaves the app usable.
+- **`AppBootstrap` is a list of `SdBootstrapStep`s and nothing else.**
+  `SdBootstrap` (design system) owns the guarded zone, the ordering, the
+  per-step `try`, the logging and the three framework error hooks; this app
+  supplies only what comes up. A step therefore does **not** write its own
+  `try`/`catch` — that is the one place in the repo where the catch rule is
+  satisfied by the caller, and it is why the step list reads as a list.
+  **Firebase goes first** so Crashlytics is up before anything else can fail.
+- **Nothing slow goes in that list.** Every step runs **before `runApp`**,
+  where the only thing on screen is the platform launch image — so work a
+  seller could be shown a splash for belongs in a widget above the app, the way
+  `FreshInstallGate` does it, not in the steps.
 
 ### Extraction and placement
 
