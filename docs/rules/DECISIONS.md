@@ -356,3 +356,36 @@ been blocked. Owner's call, taken over storing SHA-256 hashes instead, because
 a document nobody can read in the console is a document nobody maintains. Keep
 the lists short, and use the Firebase console for anything that must not be
 public.
+
+## The forced update is a sheet, and the block is one field per store
+
+Two changes to the same feature, both owner's rules, and both reverse what was
+written a commit earlier.
+
+**The ceiling is per platform.** `minimum_build` and `update_url` were one
+pair for the whole product. A build number is only meaningful next to the
+store that issued it: `41` on the App Store and `41` on Google Play are
+different binaries, reviewed at different times, released in whichever order
+the queues allowed. One ceiling for both either stops a build that shipped or
+lets an old one through, and the store link was always going to be two links.
+So `ios` and `android` each carry `enable_force_update`, `build_number`,
+`build_name` and `store_link`, and the app reads only its own.
+
+**`enable_force_update` exists so the numbers can be kept current without
+blocking anybody.** Without it, `build_number` would be both the record of
+what shipped and the trigger, so routine maintenance would be indistinguishable
+from an emergency. The switch is checked first: raising the build alone forces
+nothing.
+
+**The UI is a bottom sheet nothing dismisses, and `/update-required` is
+deleted.** The screen was a route the redirect sent every location to, above
+every other gate. What that bought was a guarantee nothing could be behind it;
+what it cost was a route, a redirect branch, a `refreshListenable`
+subscription, and a dead end to unwind when the config was corrected. The sheet
+gets the same guarantee from `SdBottomSheetExitV3.blocked` — no close button,
+no grab handle, no barrier tap, no back gesture — and `ForceUpdateGate` raises
+it from above the router, so it covers signed-out screens, deep links and
+mid-form states alike without any of them knowing.
+
+The gate is what closes it too: a build number typed one digit too high is
+corrected in the console, and the seller is released without a release.

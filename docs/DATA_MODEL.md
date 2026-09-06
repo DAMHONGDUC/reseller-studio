@@ -156,8 +156,8 @@ businesses on the same build read the same answer.
 | Field | Type | Meaning |
 |---|---|---|
 | `premium_enabled` | bool | Whether the plan system applies at all |
-| `minimum_build` | int | The oldest build allowed to run |
-| `update_url` | string | Where the forced-update screen sends the seller |
+| `ios` | map | What the App Store says about the running build |
+| `android` | map | What Google Play says about the running build |
 | `premium_emails` | string[] | Accounts handed Premium without buying it |
 | `dev_mode_emails` | string[] | Accounts that get the developer affordances in a release build |
 | `blocked_emails` | string[] | Accounts refused the app |
@@ -166,29 +166,60 @@ businesses on the same build read the same answer.
 answers Premium, so no ceiling blocks a create and every capability is
 included, and the Subscription row and the Home upgrade banner are not drawn.
 
-`minimum_build` is compared against the running build — the `+7` of `1.0.0+7`.
+## The forced update
+
+`ios` and `android` are the same four fields, and there is **one block per
+store** because the two are never in step: `41` on the App Store and `41` on
+Google Play are different binaries reviewed at different times, so a single
+ceiling for both either stops a release that shipped or lets an old one
+through. The app reads the block for the platform it is running on and never
+looks at the other.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `enable_force_update` | bool | The master switch for this store |
+| `build_number` | int | The build the store is on — the `+41` of `1.4.0+41` |
+| `build_name` | string | The version the seller recognises. Shown, never compared |
+| `store_link` | string | Where the seller is sent to update |
+
+**The switch is checked before the number, and that is the point of having
+both.** The owner keeps `build_number` current as a matter of routine and
+turns `enable_force_update` on deliberately, once, when a build really cannot
+be left running. Raising the build alone forces nothing.
+
 **A build number, never a version string**: it is the monotonic integer the
 stores already order by, so the comparison is `<` and nothing else, where
 `1.10.0` against `1.9.0` is exactly where a hand-written semver comparator is
-wrong. Anything below it is sent to `/update-required` and cannot leave.
-`update_url` is configured rather than compiled in, because a broken store
+wrong. `build_name` is display only — the sheet names a version the seller
+recognises, and the app never parses it.
+
+`store_link` is configured rather than compiled in, because a broken store
 link must be fixable without shipping a release — which is the one thing a
-forced-update screen cannot ask for.
+forced-update prompt cannot ask for. Null leaves the sheet without a button
+rather than drawing one that does nothing.
+
+**The UI is a bottom sheet nothing dismisses, not a route.** `ForceUpdateGate`
+wraps the whole app and raises it over whatever is on screen; there is no
+`/update-required` path, no redirect and no back stack to unwind when the
+config is corrected. `docs/rules/DECISIONS.md` § The forced update is a sheet
+carries why.
 
 **A missing document, a missing field, a mistyped value or a failed read all
 resolve to `AppConfig.fallback`.** The document is edited by hand, so a typo
 is the likely failure — and the fields fall back in **opposite** directions,
 each the safe one for what it controls:
 
-| Flag | Falls back to | Why that way |
+| Field | Falls back to | Why that way |
 |---|---|---|
 | `premium_enabled` | on | Defaulting off hands the paid half of the app to everyone the first time Firestore is slow |
-| `minimum_build` | `0`, forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
+| `ios` / `android` | forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
 | every email list | empty | Nobody is refused the app over a read that failed, and nobody is handed a grant the owner did not type |
 
 The forced-update and blocked gates also have **no loading state**: until an
 answer arrives the build counts as new enough and the account counts as
-allowed, so neither check can be the reason the app will not start.
+allowed, so neither check can be the reason the app will not start. A build the
+platform plugin could not name counts as newer than any ceiling, for the same
+reason.
 
 ## The three email lists
 
@@ -231,8 +262,18 @@ The whole document, with every field filled in:
 ```json
 {
   "premium_enabled": true,
-  "minimum_build": 12,
-  "update_url": "https://apps.apple.com/app/id0000000000",
+  "ios": {
+    "store_link": "https://apps.apple.com/app/id0000000000",
+    "build_name": "1.4.0",
+    "build_number": 41,
+    "enable_force_update": false
+  },
+  "android": {
+    "store_link": "https://play.google.com/store/apps/details?id=com.example.app",
+    "build_name": "1.4.0",
+    "build_number": 41,
+    "enable_force_update": false
+  },
   "premium_emails": ["owner@example.com", "tester@example.com"],
   "dev_mode_emails": ["owner@example.com"],
   "blocked_emails": ["banned@example.com"]

@@ -827,6 +827,13 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   one exit nothing has to teach, and it sits where the thumb already is.
   - **No sheet draws its own.** A second close inside the content is two
     controls doing one job, and only one of them is the one people find.
+  - **One exception: `SdBottomSheetExitV3.blocked`.** A sheet presented that
+    way has no close button, no grab handle, no barrier tap and no back
+    gesture, because it *is* the app's state rather than something shown over
+    it — the forced update, and nothing else so far. The exit is set on
+    `showSdBottomSheetV3` and reaches the chrome through an inherited scope, so
+    a sheet with no close button cannot also be barrier-dismissable.
+    `closeTooltip` stays required for every other sheet and is null only here.
 - **A sheet sizes to its content, unless it is a document.** `SdBottomSheetV3`
   is `mainAxisSize.min` by default, which is right for a menu: a sheet taller
   than its rows is a sheet with dead space under the seller's thumb. A sheet
