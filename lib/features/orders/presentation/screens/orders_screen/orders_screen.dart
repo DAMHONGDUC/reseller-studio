@@ -14,6 +14,8 @@ import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../../core/widgets/plan_limit_meters.dart';
+import '../../../../subscription/domain/enums/plan_allowance.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';

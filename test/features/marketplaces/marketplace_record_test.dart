@@ -4,66 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
-import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart'
     as record;
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:reseller_studio/features/marketplaces/domain/repositories/marketplace_repository.dart';
-import 'package:reseller_studio/features/marketplaces/domain/services/marketplace_fee_policy.dart';
 import 'package:reseller_studio/features/marketplaces/presentation/controllers/marketplace_form_controller.dart';
 import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplace_detail_screen/marketplace_detail_screen.dart';
 import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import 'package:reseller_studio/features/marketplaces/providers.dart';
 import 'package:reseller_studio/features/mock_data/providers.dart'
     as mock_providers;
-import 'package:reseller_studio/features/orders/domain/entities/order.dart';
-import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
-import 'package:reseller_studio/features/orders/domain/services/payout_reconciliation.dart';
 
 import '../../support/pump_app.dart';
 
 void main() {
-  Order order({Money? fees}) => Order(
-    id: 'o-1',
-    status: OrderStatus.delivered,
-    marketplace: Marketplace.ebay,
-    lines: const <OrderLine>[],
-    salePrice: const Money(10000, 'USD'),
-    orderedAt: testNow,
-    fees: fees,
-  );
-
-  group('legacy order estimates', () {
-    test('a correction wins when an order reports no fee', () {
-      expect(
-        PayoutReconciliation.expected(
-          order(),
-          feeRates: const <String, double>{'ebay': 0.08},
-        ),
-        const Money(9200, 'USD'),
-      );
-    });
-
-    test('a reported fee still wins over an estimate', () {
-      expect(
-        PayoutReconciliation.expected(
-          order(fees: const Money(500, 'USD')),
-          feeRates: const <String, double>{'ebay': 0.08},
-        ),
-        const Money(9500, 'USD'),
-      );
-    });
-
-    test('a rate outside 0–100% is invalid', () {
-      expect(MarketplaceFeePolicy.isValid(0), isTrue);
-      expect(MarketplaceFeePolicy.isValid(1), isTrue);
-      expect(MarketplaceFeePolicy.isValid(-0.01), isFalse);
-      expect(MarketplaceFeePolicy.isValid(1.5), isFalse);
-    });
-  });
-
   group('seller-owned marketplaces', () {
-    test('a new business receives the five defaults with rates', () {
+    test('a new business receives the five defaults', () {
       final ProviderContainer container = mockContainer();
       final List<record.Marketplace> defaults = container.read(
         defaultMarketplacesProvider,
@@ -76,18 +31,6 @@ void main() {
         'Poshmark',
         'Vinted',
       ]);
-      expect(
-        <String, double>{
-          for (final record.Marketplace row in defaults) row.name: row.feeRate,
-        },
-        <String, double>{
-          'eBay': 0.1325,
-          'Etsy': 0.095,
-          'Depop': 0.10,
-          'Poshmark': 0.20,
-          'Vinted': 0,
-        },
-      );
     });
 
     testWidgets('the list has add and detail rows but no publish toggle', (
@@ -101,7 +44,7 @@ void main() {
       expect(find.byType(Switch), findsNothing);
     });
 
-    testWidgets('detail edits name and estimated rate together', (
+    testWidgets('detail edits the name and the colour', (
       WidgetTester tester,
     ) async {
       await pumpScreen(
@@ -111,13 +54,12 @@ void main() {
 
       expect(find.text('Edit marketplace'), findsOneWidget);
       expect(find.widgetWithText(TextField, 'eBay'), findsOneWidget);
-      expect(find.widgetWithText(TextField, '13.25'), findsOneWidget);
       expect(find.byTooltip('Delete'), findsOneWidget);
       expect(find.byIcon(Icons.delete_outline_rounded), findsOneWidget);
       expect(find.byType(Switch), findsNothing);
     });
 
-    testWidgets('saving an existing marketplace accepts a decimal comma', (
+    testWidgets('saving an existing marketplace renames it', (
       WidgetTester tester,
     ) async {
       await pumpScreen(
@@ -129,7 +71,6 @@ void main() {
       );
 
       await tester.enterText(find.widgetWithText(TextField, 'eBay'), 'eBay UK');
-      await tester.enterText(find.widgetWithText(TextField, '13.25'), '13,5');
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
@@ -142,11 +83,9 @@ void main() {
           );
 
       expect(changed.name, 'eBay UK');
-      expect(changed.feeRate, 0.135);
-      expect(find.text('Enter a percentage between 0 and 100.'), findsNothing);
     });
 
-    testWidgets('a valid rate shows no validation error while saving', (
+    testWidgets('saving stays busy until the write lands', (
       WidgetTester tester,
     ) async {
       final _DelayedMarketplaceRepository repository =
@@ -163,8 +102,6 @@ void main() {
 
       await tester.tap(find.text('Save'));
       await tester.pump();
-
-      expect(find.text('Enter a percentage between 0 and 100.'), findsNothing);
 
       repository.completeSave();
       await tester.pumpAndSettle();
@@ -189,7 +126,6 @@ void main() {
       );
 
       controller.startCreate();
-      controller.updateFeeRate(0.12);
       final String? id = await controller.submit(name: 'Mercari');
       final List<record.Marketplace> rows = await repository
           .watchMarketplaces()
@@ -202,7 +138,7 @@ void main() {
       );
     });
 
-    test('the form controller refuses an invalid fee rate', () async {
+    test('the form controller refuses an empty name', () async {
       final ProviderContainer container = mockContainer();
       final MarketplaceFormController controller = container.read(
         marketplaceFormControllerProvider.notifier,
@@ -214,8 +150,7 @@ void main() {
           (await repository.watchMarketplaces().first).length;
 
       controller.startCreate();
-      controller.updateFeeRate(-1);
-      final String? id = await controller.submit(name: 'Invalid market');
+      final String? id = await controller.submit(name: '   ');
       final int countAfter =
           (await repository.watchMarketplaces().first).length;
 
@@ -237,13 +172,11 @@ void main() {
           );
 
       controller.seed(ebay);
-      controller.updateFeeRate(0.15);
       await controller.submit(name: 'eBay UK', marketplaceId: ebay.id);
       record.Marketplace changed = (await repository.watchMarketplaces().first)
           .firstWhere((record.Marketplace row) => row.id == ebay.id);
 
       expect(changed.name, 'eBay UK');
-      expect(changed.feeRate, 0.15);
 
       await controller.delete(ebay.id);
       changed = (await repository.watchMarketplaces().first).firstWhere(
@@ -260,7 +193,6 @@ class _DelayedMarketplaceRepository implements MarketplaceRepository {
   final record.Marketplace _marketplace = record.Marketplace(
     id: 'ebay',
     name: 'eBay',
-    feeRate: 0.1325,
     createdAt: testNow,
   );
 

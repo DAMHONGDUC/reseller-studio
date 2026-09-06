@@ -61,26 +61,22 @@ class _DangerZone extends ConsumerWidget {
     }
   }
 
+  /// Whether this seller may be offered the button at all.
+  ///
+  /// Read by the screen rather than by this widget: the pinned slot draws the
+  /// gap above the primary, so an action that does not apply has to be absent
+  /// from the slot rather than an empty widget inside it
+  /// (`docs/rules/SCREENS.md`).
+  static bool isOffered(WidgetRef ref, Workspace workspace) =>
+      ref.watch(currentWorkspaceIdProvider) == workspace.id &&
+      ref.watch(canDeleteWorkspaceProvider);
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bool isCurrent =
-        ref.watch(currentWorkspaceIdProvider) == workspace.id;
-
-    if (!isCurrent || !ref.watch(canDeleteWorkspaceProvider)) {
-      return const SizedBox.shrink();
-    }
-
-    // Its own gap: this button is conditional, and a gap owned by the pinned
-    // slot would leave a hole above Save for everyone who cannot delete.
-    return Padding(
-      padding: EdgeInsets.only(bottom: SdSpacingConstant.h12),
-      child: SdButtonV3(
-        variant: SdButtonVariantV3.destructive,
-        label: context.l10n.workspaceDelete,
-        icon: AppIconConstant.deleteForever,
-        expand: true,
-        onPressed: () => _confirm(context, ref),
-      ),
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => SdButtonV3(
+    variant: SdButtonVariantV3.destructive,
+    label: context.l10n.workspaceDelete,
+    icon: AppIconConstant.deleteForever,
+    expand: true,
+    onPressed: () => _confirm(context, ref),
+  );
 }

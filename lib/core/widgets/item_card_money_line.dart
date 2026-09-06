@@ -55,8 +55,14 @@ class _MoneyLine extends StatelessWidget {
           label: context.l10n.itemQuantityShort,
           content: Text(
             item.quantityOnHand.toString(),
+            // **Red once the shelf is empty** — owner's rule. A figure read in
+            // a grid of three is not one a seller stops to interpret, so the
+            // number says it itself. A sold row's zero is not this one: it is
+            // off the shelf, and `ItemConsistency` tells them apart.
             style: context.textTheme3.bodyMedium!.bold3.tabular3.copyWith(
-              color: context.sdTheme3.textPrimary,
+              color: ItemConsistency.isShelfEmpty(item)
+                  ? context.sdTheme3.danger
+                  : context.sdTheme3.textPrimary,
             ),
           ),
         ),

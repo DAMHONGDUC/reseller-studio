@@ -11,6 +11,8 @@ import '../../features/analytics/presentation/screens/analytics_profit_screen/an
 import '../../features/analytics/presentation/screens/analytics_sales_screen/analytics_sales_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_sources_screen/analytics_sources_screen.dart';
+import '../../features/app_config/presentation/screens/account_blocked_screen/account_blocked_screen.dart';
+import '../../features/app_config/providers.dart';
 import '../../features/auth/presentation/screens/login_screen/login_screen.dart';
 import '../../features/auth/providers.dart';
 import '../../features/carriers/presentation/screens/carrier_detail_screen/carrier_detail_screen.dart';
@@ -18,6 +20,7 @@ import '../../features/carriers/presentation/screens/carriers_screen/carriers_sc
 import '../../features/expenses/presentation/screens/expenses_screen/expenses_screen.dart';
 import '../../features/home/presentation/screens/home_screen/home_screen.dart';
 import '../../features/inventory/presentation/screens/categories_screen/categories_screen.dart';
+import '../../features/inventory/presentation/screens/intake_session_screen/intake_session_screen.dart';
 import '../../features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import '../../features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import '../../features/inventory/presentation/screens/item_form_screen/item_form_screen.dart';
@@ -30,16 +33,20 @@ import '../../features/marketplaces/presentation/screens/marketplace_detail_scre
 import '../../features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import '../../features/more/presentation/screens/about_screen/about_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
+import '../../features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen/notifications_screen.dart';
 import '../../features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen/onboarding_screen.dart';
 import '../../features/onboarding/providers.dart';
+import '../../features/orders/presentation/screens/import_payouts_screen/import_payouts_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import '../../features/orders/presentation/screens/payouts_screen/payouts_screen.dart';
+import '../../features/orders/presentation/screens/record_payouts_screen/record_payouts_screen.dart';
 import '../../features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
 import '../../features/receipts/presentation/screens/receipts_screen/receipts_screen.dart';
+import '../../features/reports/presentation/screens/books_screen/books_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen/reports_screen.dart';
 import '../../features/search/presentation/screens/search_screen/search_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen/settings_screen.dart';
@@ -54,6 +61,7 @@ import '../../features/tax/presentation/screens/tax_screen/tax_screen.dart';
 import '../../features/workspace/presentation/screens/team_screen/team_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_detail_screen/workspace_detail_screen.dart';
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
+import '../../features/workspace/presentation/screens/workspaces_screen/workspaces_screen.dart';
 import '../../features/workspace/providers.dart';
 import '../constants/log_tag_constant.dart';
 import '../extensions/context_extensions.dart';
@@ -72,6 +80,9 @@ import 'app_routes.dart';
 /// none has nowhere to read or write. Rather than each screen checking either,
 /// one function does:
 ///
+/// - the config blocks this account → [AppRoutes.blocked], above everything:
+///   it is decided by who is signed in, so nothing an onboarding flag or a
+///   workspace says can change it;
 /// - onboarding or auth state still unknown → [AppRoutes.splash]; showing the
 ///   login form here would flash it at a returning user before their session
 ///   resolves, and showing the intro would flash it at one who finished it
@@ -98,12 +109,30 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
     redirect: (BuildContext context, GoRouterState state) {
       final bool? signedIn = ref.read(isSignedInProvider);
       final OnboardingStatus onboarding = ref.read(onboardingStatusProvider);
+      final bool blocked = ref.read(accountBlockedProvider);
       final String location = state.matchedLocation;
       final bool onAuthRoute = _authRoutes.contains(location);
+
+      // **Above everything, the intro included.** It is decided by the account
+      // rather than by anything a workspace or a preference can change, and it
+      // never reports "still loading" — an account nobody has named is not
+      // blocked, so a config that has not arrived cannot be why somebody is
+      // refused.
+      //
+      // The forced update is not here at all: it is a sheet raised over
+      // whatever is on screen (`ForceUpdateGate`), so it needs no route and no
+      // redirect of its own.
+      if (blocked) {
+        return location == AppRoutes.blocked ? null : AppRoutes.blocked;
+      }
 
       if (signedIn == null || onboarding == OnboardingStatus.loading) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
       }
+
+      // Unreachable once the reason is gone: leaving it up would be a dead end
+      // with nobody to unblock.
+      if (location == AppRoutes.blocked) return AppRoutes.home;
 
       if (!signedIn) {
         // The intro is only ever shown to someone who is not signed in, so a
@@ -151,6 +180,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.splash,
         builder: (BuildContext context, GoRouterState state) =>
             const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.blocked,
+        builder: (BuildContext context, GoRouterState state) =>
+            const AccountBlockedScreen(),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
@@ -234,9 +268,17 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'intake',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const IntakeSessionScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'add',
                     builder: (BuildContext context, GoRouterState state) =>
-                        const ItemFormScreen(),
+                        ItemFormScreen(
+                          initialBarcode: state.uri.queryParameters['code'],
+                        ),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -380,9 +422,23 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'books',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const BooksScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
                     path: 'settings',
                     builder: (BuildContext context, GoRouterState state) =>
                         const SettingsScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'notifications',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const NotificationSettingsScreen(),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -394,7 +450,9 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         parentNavigatorKey: AppNavigatorKey.root,
                         path: 'evaluate',
                         builder: (BuildContext context, GoRouterState state) =>
-                            const PurchaseEvaluatorScreen(),
+                            PurchaseEvaluatorScreen(
+                              initialCode: state.uri.queryParameters['code'],
+                            ),
                       ),
                       GoRoute(
                         parentNavigatorKey: AppNavigatorKey.root,
@@ -406,7 +464,9 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         parentNavigatorKey: AppNavigatorKey.root,
                         path: 'purchases',
                         builder: (BuildContext context, GoRouterState state) =>
-                            const PurchasesScreen(),
+                            PurchasesScreen(
+                              sourceId: state.uri.queryParameters['source'],
+                            ),
                         routes: <RouteBase>[
                           GoRoute(
                             parentNavigatorKey: AppNavigatorKey.root,
@@ -439,6 +499,23 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'payouts',
                     builder: (BuildContext context, GoRouterState state) =>
                         const PayoutsScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'record',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const RecordPayoutsScreen(),
+                        routes: <RouteBase>[
+                          GoRoute(
+                            parentNavigatorKey: AppNavigatorKey.root,
+                            path: 'import',
+                            builder:
+                                (BuildContext context, GoRouterState state) =>
+                                    const ImportPayoutsScreen(),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -504,6 +581,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                             ),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'businesses',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const WorkspacesScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -623,11 +706,13 @@ class _RouterRefreshListenable extends ChangeNotifier {
       onboardingStatusProvider,
       _notifyIfChanged<OnboardingStatus>,
     );
+    _blocked = _listen<bool>(ref, accountBlockedProvider);
   }
 
   late final ProviderSubscription<bool?> _signedIn;
   late final ProviderSubscription<WorkspaceStatus> _workspace;
   late final ProviderSubscription<OnboardingStatus> _onboarding;
+  late final ProviderSubscription<bool> _blocked;
 
   /// Typed on `Provider<T>` rather than the more general
   /// `ProviderListenable<T>` that `ref.listen` accepts: Riverpod 3 declares
@@ -636,7 +721,7 @@ class _RouterRefreshListenable extends ChangeNotifier {
   ProviderSubscription<T> _listen<T>(Ref ref, Provider<T> provider) =>
       ref.listen<T>(provider, _notifyIfChanged<T>);
 
-  /// One callback for all three, so a redirect cannot start re-running on one
+  /// One callback for all four, so a redirect cannot start re-running on one
   /// provider and not another.
   void _notifyIfChanged<T>(T? previous, T next) {
     if (previous != next) notifyListeners();
@@ -647,6 +732,7 @@ class _RouterRefreshListenable extends ChangeNotifier {
     _signedIn.close();
     _workspace.close();
     _onboarding.close();
+    _blocked.close();
     super.dispose();
   }
 }

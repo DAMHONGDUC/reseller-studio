@@ -10,30 +10,54 @@ belongs to `SELLER_OS_FINAL_MASTER_PLAN.md`; access belongs to
 users/{uid}
   devices/{token}
   notifications/{notificationId}
+
 invites/{inviteId}
+app_config/current
 
 workspaces/{workspaceId}
-  members/{uid}
-  sources/{sourceId}
-  purchases/{purchaseId}
-  items/{itemId}
-  listings/{listingId}
-  offers/{offerId}
-  orders/{orderId}
-  expenses/{expenseId}
-  receipts/{receiptId}
-  categories/{categoryId}
-  locations/{locationId}
-  marketplaces/{marketplaceId}
-  carriers/{carrierId}
-  activity/{activityId}
-  subscription/{docId}
-  usage/{docId}
+
+members/{workspaceId}_{uid}
+sources/{workspaceId}_{sourceId}
+purchases/{workspaceId}_{purchaseId}
+items/{workspaceId}_{itemId}
+listings/{workspaceId}_{listingId}
+offers/{workspaceId}_{offerId}
+orders/{workspaceId}_{orderId}
+expenses/{workspaceId}_{expenseId}
+receipts/{workspaceId}_{receiptId}
+categories/{workspaceId}_{categoryId}
+locations/{workspaceId}_{locationId}
+marketplaces/{workspaceId}_{marketplaceId}
+carriers/{workspaceId}_{carrierId}
+activity/{workspaceId}_{activityId}
+
+subscription/{workspaceId}
+usage/{workspaceId}
 ```
 
-Business records are nested under a workspace. This makes workspace membership
-part of every path and prevents a query from accidentally omitting an ownership
-filter.
+**Every business table is flat and top-level, modelled the way SQL would model
+it** (hard rule 14). Each row carries a `workspaceId` column and is keyed by a
+composite `{workspaceId}_{id}`, which is how SQL spells a composite primary
+key — without it every business's `ebay` marketplace, `usps` carrier and
+`{uid}` membership would be the same row.
+
+| | Where it is enforced |
+|---|---|
+| Every read filters on `workspaceId` | `WorkspaceTable.query` — there is no accessor that returns an unfiltered collection |
+| Every write stamps `workspaceId` | the converter in `WorkspaceCollections._table`, so no DTO carries the column |
+| A row cannot be moved between businesses | `canUpdateRow()` in `firestore.rules` compares the stored column with the incoming one |
+| An unfiltered query is denied, not leaked | a `list` rule runs per row, so foreign rows fail it and take the query down |
+| Deleting a business sweeps every table | `WorkspaceCollections.tableNames` / `workspaceTables` in `functions/` |
+
+`subscription` and `usage` are keyed by the workspace id alone: there is
+exactly one row of each per business, so the id *is* the key.
+
+`users/{uid}` keeps its two subcollections. They belong to a person rather than
+a business, and a device token is addressed to whoever holds the phone.
+
+**Migrating existing data is `functions/src/scripts/flattenTables.ts`** — it
+copies every nested record into its flat table, and only sweeps the originals
+when told to, so a half-finished run loses nothing.
 
 ## Shared contracts
 
@@ -45,8 +69,10 @@ filter.
 | Money | Integer minor units; field names end in `Minor` |
 | Currency | Store beside money or inherit the workspace currency |
 | Missing money | `null` means unknown; it is not zero |
-| Derived finance | Never store profit, margin or ROI |
+| Derived finance | Never store profit, margin or ROI — and never estimate a fee |
 | Payout exception | `orders.payoutMinor` is stored because it is a reported fact |
+| Platform fee | Derived: `salePrice - refund - payout - shippingCost`; null until a payout is recorded |
+| Planning rate | `workspaces/{id}.planningFeeRate` — one assumption for Sourcing, never written to an order |
 | Deletion | Referenced records are soft-deleted with `deletedAt` |
 
 ## Relationships
@@ -64,7 +90,7 @@ the relationship chain supports workflows and analytics, not item validity.
 
 | Path | Main fields | Contract |
 |---|---|---|
-| `users/{uid}` | `displayName`, `email`, `avatarUrl`, `locale`, `lastWorkspaceId`, `workspaceIds` | Person and workspace pointers only; no business records |
+| `users/{uid}` | `displayName`, `email`, `avatarUrl`, `locale`, `lastWorkspaceId`, `workspaceIds`, `notificationPrefs` | Person and workspace pointers only; no business records |
 | `users/{uid}/devices/{token}` | `token`, `platform`, `updatedAt` | Token is also the document ID; never log it |
 | `users/{uid}/notifications/{id}` | `type`, `workspaceId`, `entityId`, `count`, `route`, `title`, `body`, `readAt`, `createdAt` | Functions create; client may update only `readAt`; ID is the dedupe key |
 | `invites/{id}` | Invitee email, workspace, role, status and timestamps | Functions own writes; invitee access is rule-scoped |
@@ -77,7 +103,7 @@ the relationship chain supports workflows and analytics, not item validity.
 | `locations/{id}` | Warehouse/shelf/bin identity and `deletedAt` | Seller-owned storage hierarchy |
 | `listings/{id}` | Item, marketplace, price, status, external IDs/URL | One record per item per marketplace; external fields remain null without integration |
 | `offers/{id}` | Listing/order references, amount, status and timestamps | Offer state drives accept/decline/counter workflows |
-| `marketplaces/{id}` | `name`, `feeRate`, `deletedAt` | Seller-owned; `feeRate` is a planning estimate, never accounting |
+| `marketplaces/{id}` | `name`, `hue`, `deletedAt` | Seller-owned; carries no fee rate — a platform's cut is measured per order |
 | `carriers/{id}` | `name`, `deletedAt` | Business-owned shipping choices |
 | `orders/{id}` | Prices/costs, status, marketplace snapshot, lifecycle timestamps, `lines` | Order facts and embedded immutable sale-time lines |
 | `expenses/{id}` | Category, amount, date, recurrence link | One document per occurrence |
@@ -96,17 +122,175 @@ the relationship chain supports workflows and analytics, not item validity.
 | Order line title, price and cost | Repricing an item must not rewrite an existing sale |
 | Notification `title`, `body` | Push delivery needs text; the app renders inbox copy from `type` and `count` |
 
+## Notification preferences
+
+`users/{uid}.notificationPrefs` maps a `NotificationType` name to whether that
+reminder is wanted. **Only the mutes are stored**: an absent key is on, so a
+type added in a later build arrives switched on rather than silently off for
+everyone who upgraded into it.
+
+It hangs off the person rather than the workspace because two people sharing a
+business do not want the same reminders. **A mute silences the push only** —
+`notifyWorkspace` still writes the inbox row, because the row is the
+notification and the push is a copy of it.
+
 ## Order contract
 
 | Group | Fields |
 |---|---|
-| Money | `salePriceMinor`, `feesMinor`, `shippingCostMinor`, `refundMinor`, `payoutMinor` |
+| Money | `salePriceMinor`, `shippingCostMinor`, `refundMinor`, `payoutMinor` (a legacy `feesMinor` is read back as the payout it implies) |
 | Marketplace | `marketplaceId`, `marketplaceName`, `externalOrderId` |
 | Lifecycle | `orderedAt`, `shipByDate`, `shippedAt`, `deliveredAt`, `returnRequestedAt`, `returnedAt`, `refundedAt`, `settledAt` |
 | Lines | `{itemId, title, quantity, unitPriceMinor, unitCostMinor}` |
 
 Lifecycle timestamps remain facts even after status changes. Lines are embedded
 because they are small, always read with the order, and immutable after sale.
+
+## App config
+
+`app_config/current` is one document for the whole product, read by every
+client and written by none. **It is not a business record**, so it is not
+nested under a workspace — nothing in it belongs to a seller, and two
+businesses on the same build read the same answer.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `premium_enabled` | bool | Whether the plan system applies at all |
+| `force_update` | map | One block per store — `ios` and `android` |
+| `premium_emails` | string[] | Accounts handed Premium without buying it |
+| `dev_mode_emails` | string[] | Accounts that get the developer affordances in a release build |
+| `blocked_emails` | string[] | Accounts refused the app |
+
+`premium_enabled: false` turns monetisation off for everyone: `currentPlanProvider`
+answers Premium, so no ceiling blocks a create and every capability is
+included, and the Subscription row and the Home upgrade banner are not drawn.
+
+## The forced update
+
+`force_update` holds one block per store, `ios` and `android`, each the same
+four fields. They are nested under one field rather than sitting loose at the
+top level: a document with `ios` and `android` in it reads as a config *about
+platforms*, when what it holds is one feature that happens to be configured per
+store.
+
+There is one block per store because the two are never in step: `41` on the App Store and `41` on
+Google Play are different binaries reviewed at different times, so a single
+ceiling for both either stops a release that shipped or lets an old one
+through. The app reads the block for the platform it is running on and never
+looks at the other.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `enable_force_update` | bool | The master switch for this store |
+| `build_number` | int | The build the store is on — the `+41` of `1.4.0+41` |
+| `build_name` | string | The version the seller recognises. Shown, never compared |
+| `store_link` | string | Where the seller is sent to update |
+
+**The switch is checked before the number, and that is the point of having
+both.** The owner keeps `build_number` current as a matter of routine and
+turns `enable_force_update` on deliberately, once, when a build really cannot
+be left running. Raising the build alone forces nothing.
+
+**A build number, never a version string**: it is the monotonic integer the
+stores already order by, so the comparison is `<` and nothing else, where
+`1.10.0` against `1.9.0` is exactly where a hand-written semver comparator is
+wrong. `build_name` is display only — the sheet names a version the seller
+recognises, and the app never parses it.
+
+`store_link` is configured rather than compiled in, because a broken store
+link must be fixable without shipping a release — which is the one thing a
+forced-update prompt cannot ask for. Null leaves the sheet without a button
+rather than drawing one that does nothing.
+
+**The UI is a bottom sheet nothing dismisses, not a route.** `ForceUpdateGate`
+wraps the whole app and raises it over whatever is on screen; there is no
+`/update-required` path, no redirect and no back stack to unwind when the
+config is corrected. `docs/rules/DECISIONS.md` § The forced update is a sheet
+carries why.
+
+**A missing document, a missing field, a mistyped value or a failed read all
+resolve to `AppConfig.fallback`.** The document is edited by hand, so a typo
+is the likely failure — and the fields fall back in **opposite** directions,
+each the safe one for what it controls:
+
+| Field | Falls back to | Why that way |
+|---|---|---|
+| `premium_enabled` | on | Defaulting off hands the paid half of the app to everyone the first time Firestore is slow |
+| `force_update` | forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
+| every email list | empty | Nobody is refused the app over a read that failed, and nobody is handed a grant the owner did not type |
+
+The forced-update and blocked gates also have **no loading state**: until an
+answer arrives the build counts as new enough and the account counts as
+allowed, so neither check can be the reason the app will not start. A build the
+platform plugin could not name counts as newer than any ceiling, for the same
+reason.
+
+## The three email lists
+
+Each is an array of plain addresses, **lowercased and trimmed on read** — the
+document is typed by hand, so ` Owner@Gmail.com ` is the expected shape of a
+correct entry and a case-sensitive comparison would silently match nobody.
+Anything that is not a list of non-empty strings reads as no entries.
+
+| List | What it changes | Where |
+|---|---|---|
+| `premium_emails` | `currentPlanProvider` answers Premium, so every ceiling and capability opens | `premiumGrantedByEmailProvider` |
+| `dev_mode_emails` | Settings' Developer block, mock data and the demo seed appear in a **release** build | `devModeEnabledProvider` |
+| `blocked_emails` | The account is sent to `/blocked` and can do nothing but sign out | `accountBlockedProvider` |
+
+`premium_emails` is a **grant, never a record of a purchase**: the
+`subscription` row stays the honest answer to what the seller actually bought,
+so a screen saying so on screen reads that and not this.
+
+`dev_mode_emails` is the one that changed an existing guarantee — the mock
+branch used to be tree-shaken out of a release binary by a `const` and now is
+not, because an email list is a release-build grant by definition. See
+`docs/rules/DECISIONS.md` § Dev mode is granted by email.
+
+`blocked_emails` is a **UI gate, not a permission**. A blocked account still
+holds a valid token; `firestore.rules` does not know the list exists. Anything
+that must actually be refused is refused there, or by disabling the account in
+the Firebase console.
+
+**Every signed-in account can read all three**, because the rule below allows
+any signed-in read, a rule cannot filter fields, and a client has to be able to
+check its own address. Keep the lists short and do not put anything in them
+that must not be public — `docs/rules/DECISIONS.md` § The block list is a UI
+gate carries the reasoning and what was chosen over it.
+
+`firestore.rules` allows any signed-in read and no write at all — a client
+that could write this could switch off its own paywall.
+
+The whole document, with every field filled in:
+
+```json
+{
+  "premium_enabled": true,
+  "force_update": {
+    "ios": {
+      "store_link": "https://apps.apple.com/app/id0000000000",
+      "build_name": "1.4.0",
+      "build_number": 41,
+      "enable_force_update": false
+    },
+    "android": {
+      "store_link": "https://play.google.com/store/apps/details?id=com.example.app",
+      "build_name": "1.4.0",
+      "build_number": 41,
+      "enable_force_update": false
+    }
+  },
+  "premium_emails": ["owner@example.com", "tester@example.com"],
+  "dev_mode_emails": ["owner@example.com"],
+  "blocked_emails": ["banned@example.com"]
+}
+```
+
+Every field is optional. An absent one reads as the fallback above, so the
+smallest document that does anything is a single key.
+
+The same document is kept as a file at `sample_data/app_config/current.json`,
+which is what to copy when creating it in the console.
 
 ## Indexes
 

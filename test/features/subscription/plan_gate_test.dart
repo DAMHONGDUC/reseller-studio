@@ -9,7 +9,12 @@ import 'package:reseller_studio/features/subscription/domain/services/plan_gate.
 void main() {
   final PlanLimits free = PlanLimits.of(SellerPlan.free);
 
-  test('Free allows the last item and blocks the next one', () {
+  test('Free counts items and orders, and the last slot is usable', () {
+    // The boundary, not the number: off by one here makes the advertised last
+    // item impossible to create. See `PlanLimits.byPlan` for why the ceilings
+    // are back.
+    expect(free.items, isNotNull);
+    expect(free.orders, isNotNull);
     expect(
       PlanGate.canAddItem(SellerPlan.free, currentItems: free.items! - 1),
       PlanBlock.none,
@@ -18,9 +23,6 @@ void main() {
       PlanGate.canAddItem(SellerPlan.free, currentItems: free.items!),
       PlanBlock.itemLimit,
     );
-  });
-
-  test('Free allows the last order and blocks the next one', () {
     expect(
       PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders! - 1),
       PlanBlock.none,
@@ -31,7 +33,7 @@ void main() {
     );
   });
 
-  test('Free allows its first business and blocks another one', () {
+  test('a second business is still the one Free ceiling', () {
     expect(
       PlanGate.canAddWorkspace(
         SellerPlan.free,
@@ -81,6 +83,20 @@ void main() {
         PlanGate.upgradeFor(block, from: SellerPlan.free),
         block == PlanBlock.none ? isNull : SellerPlan.premium,
       );
+    }
+  });
+
+  test('Premium is what buys the answers, not permission to type', () {
+    // The paid line is a capability now. Every one of these is what a seller
+    // opens the app at year end or on payout day to do.
+    for (final PlanFeature capability in <PlanFeature>[
+      PlanFeature.taxExport,
+      PlanFeature.payoutReconciliation,
+      PlanFeature.advancedAnalytics,
+      PlanFeature.team,
+    ]) {
+      expect(PlanGate.has(SellerPlan.free, capability), isFalse);
+      expect(PlanGate.has(SellerPlan.premium, capability), isTrue);
     }
   });
 }

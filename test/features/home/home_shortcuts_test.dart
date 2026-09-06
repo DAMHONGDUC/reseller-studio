@@ -107,6 +107,14 @@ void main() {
     final BuildContext context = tester.element(find.byType(HomeScreen));
 
     expect(cardFor(context, HomeShortcutKind.scan), findsOneWidget);
+
+    // Flow overview is below the numbers, and Home is taller than a phone —
+    // the card has to be scrolled to before it exists to be found.
+    await tester.scrollUntilVisible(
+      find.text(context.l10n.homeFlowOverview),
+      200,
+    );
+
     expect(find.text(context.l10n.homeFlowOverview), findsOneWidget);
     expect(
       find.ancestor(

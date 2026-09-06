@@ -4,6 +4,46 @@ Rules specific to the item list, the item forms and what a seller can do to an
 item. The root `CLAUDE.md` still applies in full; this file only holds what
 would be wrong to generalise.
 
+## Two ways in: Quick Add for one thing, the intake session for a trip
+
+Both create items and **both require only a title** (hard rule 2). What
+separates them is how many things the seller is holding.
+
+- **Quick Add** (`/inventory/quick-add`) is the single item found on a shelf.
+  One field, save, gone.
+- **The intake session** (`/inventory/intake`) is the car boot, the estate
+  sale, the auction lot — thirty things from one source on one day. It asks
+  for the source and the date **once for the trip**, then loops on title and
+  cost with the keyboard up.
+
+**The cost box is why it exists.** What a seller paid is the only figure that
+lives solely in the moment they are standing in the shop; a week later nobody
+remembers whether the jumper was $3 or $5. A missing cost makes every profit
+figure downstream `—` (hard rule 5), so this is the flow the whole insight
+half of the product is fed by. Asking for a source and a date per item is two
+extra taps thirty times over, which is why in practice neither was ever filled
+in.
+
+**It adds no required field.** The cost stays optional exactly as it is
+everywhere else. What changed is where it sits.
+
+**Items are written as they are typed; the purchase is written at the end.**
+That order is the whole durability story and it is deliberate:
+
+- an abandoned session still leaves every item entered, with its cost, source
+  and date — nothing typed is lost;
+- and it leaves **no purchase**, because there was no completed trip. A
+  purchase created up front would be a record of a visit that did not happen,
+  and a `purchaseId` stamped on items before it existed would dangle.
+
+**`Purchase.totalCost` is the receipt, not the sum of the lines.** The screen
+offers a separate optional box for it, because that field is the one place in
+the app allowed to disagree with its items — a $40 box lot apportioned across
+eleven things is exactly the case it exists for. Never fill it in from the
+running total.
+
+`test/features/inventory/intake_session_test.dart` pins all four.
+
 ## New-business category defaults
 
 Every new business starts with three normal category records: Clothing,
@@ -30,6 +70,14 @@ list: the detail screen's Actions button, and **the `more_vert` button on
 - **One sheet, not two lists of verbs.** Both entry points call
   `ItemActionsSheet.show`, so an action added there cannot go missing from the
   row.
+- **Edit is the first row, and it is the way into the record.** Owner's rule.
+  Every other row is one verb; changing a title, a count or a price is the
+  detail screen's job, and from the list the only step to it was closing the
+  sheet and tapping the card underneath it.
+- **It is the one row the detail screen does not draw** — `isOnDetail` says
+  so. An Edit that pushes the screen it was opened from is a verb that does
+  nothing, and that is not an action going missing from the row: the screen it
+  leads to is already the one under the sheet.
 - **`more_vert`, not the detail screen's `tune`** — owner's rule. A glyph is
   all the width allows beside a title, two badges and a price line, so it has
   to be one a seller already knows; `tune` reads as filtering when it is not
@@ -409,7 +457,7 @@ is live on** — no names and no amounts.
   `item_card_figures_test.dart` holds the money and the age;
   `item_derived_test.dart` holds the two getters they read.
 
-## Four statuses, and quantity moves between two of them
+## Four statuses, and the seller picks between them
 
 Owner's rule, and it replaces the six-state lifecycle:
 
@@ -435,29 +483,153 @@ Owner's rule, and it replaces the six-state lifecycle:
 - **The Inventory tabs follow**: All, Draft, In stock, Sold, Stale. Stale is
   still a query, not a status (`docs/DATA_MODEL.md`).
 
-## Restock adds to the count and brings the row back
+## There is no Restock verb; the count is edited on the detail screen
 
-Owner's rule. `ItemTransition.restock` takes how many arrived, adds them to
-`quantity`, and moves the item to `inStock` in the same write.
+Owner's rule, and it replaces one. Restock was a row in the actions sheet that
+asked how many arrived, added that to `quantity` and moved the item to
+`inStock`. The row, `RestockSheet`, `ItemActionsController.restock` and
+`ItemTransition.restock` are all gone.
 
-- **The box asks how many arrived, not what the new total is** — that is the
-  number on the receipt in the seller's hand, and the only one they do not
-  have to work out.
-- **The sheet does the arithmetic out loud** — owner's rule: what is on the
-  shelf now, and what will be there after, updating as the seller types. A box
-  that only takes an addend leaves them adding in their head to check they
-  typed the right thing. The total is `—` until the box holds a usable count,
-  never the current figure (hard rule 5).
-- **It is the way a sold-out row comes back.** Having to un-sell an item by
-  hand before saying more arrived is the step that made sellers create a
-  duplicate item instead — and a duplicate loses the cost history, the
-  listings and the sales the original carries.
-- **An archived item comes back too**: restocking one is the seller saying
-  they have it again.
+- **A count is a fact about the record, not a verb.** The detail screen is
+  where a seller corrects what the app got wrong, so one place changes the
+  number — not a sheet that adds to it and a field that replaces it,
+  disagreeing about what the seller just typed.
+- **It is its own section, not a box inside Overview** — owner's rule.
+  Overview answers what the item *is*: a title, a state, a grade. How many
+  there are is a different question and the one most often reopened, and its
+  own Edit is what stops changing it from putting a title box on screen too.
+- **The box takes the new total, not an addend**, so the arithmetic the sheet
+  spelled out is not arithmetic any more: the figure the record holds is on
+  screen while the seller types over it.
+- **A stepper flanks the box** — owner's rule. One more or one fewer is what
+  actually happens to a count, and doing it by selecting a number and typing
+  another is three interactions for an increment. The box stays for the times
+  the answer is twelve.
+  - **It stops at zero**, so `-1` is disabled on an empty shelf rather than
+    writing a negative count nothing in the app can mean.
+  - **An unreadable box counts as zero for the stepper**, so `+1` on an empty
+    field gives one — the same answer typing nothing already saves.
+  - `ItemQuantityField` owns both halves, so a second screen taking a count
+    cannot offer a box without the buttons.
+- **A count moves nothing else.** `saveQuantity` writes the count and stops
+  there: a sold row given stock stays sold and says so with an alert tag, and
+  the seller picks the status themselves in the section under it. The rule and
+  its reasons are the section below.
 - **`Make it in stock` is the draft's own row**, shown only on a draft. It
   carries no count: the item already has one, and what the seller is saying is
   that it is ready to sell.
-- Both go through `_bulk`, so forty rows are one write (hard rule 16).
+- **The section's card carries the figure, and a badge never did.** It read
+  `×5` beside the status tags and only when it was above one, so on most items
+  the number the seller came to change was not on the screen at all.
+- `test/features/inventory/item_quantity_test.dart` holds both halves: the
+  actions sheet offering no Restock, and the detail screen putting a sold row
+  back on the shelf.
+
+## Quantity and status are independent, and a contradiction is a tag
+
+Owner's rule, and it cuts every link between the two. A seller who types one
+of them is saying that one thing, not two.
+
+- **Editing one never writes the other.** Picking `sold` no longer empties the
+  count, and putting stock behind a sold row no longer brings it back —
+  `ItemTransition.restocked` is deleted, and the `quantity` line is out of
+  `setStatus`. What stays there is `soldAt`, which is a timestamp of the move
+  rather than a second opinion about the shelf.
+- **Both are edited freely, and nothing is refused.** Status is its own
+  section on the detail screen — four tags, the same freedom the form already
+  had — beside the count's own section.
+- **A pair that cannot both be true is drawn, never refused.**
+  `ItemConsistency.warnings` names the contradictions and `ItemWarning`
+  carries the words and the hue. There is exactly one today: **on hand with
+  nothing on the shelf** — a row whose tag says In stock or Draft while its
+  count says zero.
+- **That count is drawn in red, on the card and on the detail screen** —
+  owner's rule. A figure a seller reads in a grid of three is not something
+  they stop to interpret, so the number says it itself rather than leaving the
+  tag beside it to do all the work.
+  - **One predicate decides both**: `ItemConsistency.isShelfEmpty`, which is
+    also what `warnings` reports. A red figure with no tag, or the other way
+    round, would be two answers to one question.
+  - **A sold or archived row keeps a plain zero.** `Item.quantityOnHand` reads
+    zero for everything off the shelf, so reddening every zero would paint the
+    Sold tab and teach the seller to ignore the colour — the same trap the
+    "sold with a count left" warning fell into.
+  - **The red is `SdThemeV3.danger`, and the tag wears it too.** One condition
+    is one colour; the tag was amber and is not any more.
+- **"Sold with a count left" is deliberately not one of them.** It looks like
+  the obvious second warning and it is wrong: `quantity` is what was taken in
+  and `Item.quantityOnHand` already reads zero for anything off the shelf, so
+  a sold row keeping its count is the normal state of every sold item — the
+  seeded ones included. A warning that fires on every sold row teaches sellers
+  to ignore the warning.
+- **The message names both halves and asks for the fix** — owner's rule.
+  "Warning: none on the shelf but status is In stock — please update", not
+  "Check the count": a seller reading it has to know which two facts disagree
+  without opening anything, and what to do about it. That is why
+  `ItemWarningDisplay.message` takes the item — the status word and the count
+  are in the sentence.
+- **On the card it is a tag beside the update date; the sentence belongs to
+  the detail screen** — owner's rule, and it replaced a full-width line under
+  the money band. The row's job is to flag the problem while a seller scans
+  forty of them, and a sentence wide enough to explain it is a paragraph in a
+  list. So `ItemWarning` carries two halves: `label` for the tag and `message`
+  for the sentence.
+  - **It sits with the date rather than with the badges** — the tags above say
+    what the item *is*, and this says something about the record, which is the
+    line the date already answers.
+  - The tag is the card's own `_DisplayTag` at `compact`, so it is the same
+    marker the status and the grade wear.
+  - **The sentence still names both halves** where there is room for it: the
+    detail screen draws `ItemWarningLines` at full width, above every card.
+- **The sentence is set small** — owner's rule: `bodySmall`, the floor of the
+  scale (`AppTheme._textTheme`). A warning is a fact the screen carries, not a
+  headline competing with the title above it.
+- **One warning tag per card, and the record's own wins** — owner's rule. A
+  card that can also be handed a `notice` (the sale picker's short reason)
+  draws it only when the item has no warning of its own: two tags saying the
+  same thing read as two problems.
+- **It shows on the inventory row as well as on the detail screen** — owner's
+  rule, and it is why `ItemWarningLines` is one widget both draw. A row that
+  contradicts itself is one a seller has to find while scanning the list; a
+  warning only the detail screen carries is one they see after they have
+  already gone looking for something else. On the card it sits under the money
+  band, which is where the count it is arguing with already is.
+- **An archived item with stock is not one of them.** Withdrawing something is
+  not giving it away, and the count is what the seller still owns.
+- **The verbs still move both, because a sale is an event rather than an
+  edit.** `ItemTransition.sell` takes one off the shelf and marks the row sold
+  when it empties — a fact the app recorded, not a field somebody typed. The
+  freedom in this rule is the seller's over their own record; it is not a
+  licence for a flow to write two fields when it was asked for one.
+- `test/features/inventory/item_warning_test.dart` holds the pairs.
+
+## The create form opens on the last filing
+
+A seller booking in twenty things from one haul picked the same category and
+the same bin twenty times. The intake session had already answered this shape
+of problem by asking for the source **once for the trip**; the full form is
+the other half of the same afternoon and got the same treatment.
+
+- **Prefilled, never required** (hard rule 2). Both pickers are on screen with
+  the value in them, and one tap changes either. Nothing is refused and no new
+  field is asked for.
+- **Only on create, and only from a create.** `startCreate` seeds the two
+  pickers; `submit` writes them back **only when the form was not editing** —
+  correcting one old item's bin is not a decision about the next twenty.
+- **Never on Quick Add.** That screen shows neither field, so a remembered bin
+  there would be filing stock somewhere the seller was never shown. Quick Add
+  still asks for a title and nothing else.
+- **Device-local, in `PrefsKeyConstant`** — `lastItemCategoryId` and
+  `lastItemLocationId`. It is a fact about the afternoon this phone is having,
+  like the theme and the intro flag, not about the business.
+- **A remembered id that no longer names anything is dropped.** A deleted bin
+  left in preferences would seed a picker with a value its own list cannot
+  show, and the seller would be looking at a blank field they did not empty —
+  so the id is checked against the live categories and locations first.
+- **Nothing picked clears the key** rather than keeping the last answer: a
+  seller who deliberately filed one item nowhere is saying so.
+- `test/features/inventory/item_form_remembers_filing_test.dart` holds all
+  five.
 
 ## Quantity is required on the item form, and only there
 
@@ -502,9 +674,10 @@ that each opened a sheet.
   - **The verbs are unchanged.** `ItemTransition.check` still gates Mark as
     sold, cross-listing and the bulk paths, which is where a missing price
     actually matters.
-  - **The side effects still ride along**, because they keep the record
-    consistent rather than legal: setting `sold` empties the count, and coming
-    back onto the shelf clears `soldAt`.
+  - **The one side effect left is `soldAt`**: it is stamped on the way to
+    `sold` and cleared on the way back, because a row on hand carrying a sold
+    date is one every export reads as sold. The count is not touched — see the
+    section on quantity and status being independent.
   - It writes **no order**: revenue and profit are read from orders (hard rule
     3), so a sale that has to show up in the figures is recorded through Mark
     as sold.
@@ -513,11 +686,10 @@ that each opened a sheet.
 
 Owner's rule, after a sold item was given a quantity of 10 and stayed sold.
 
-- **Status never moves through the item form.** `ItemFormController.submit`
-  writes back the status it was seeded with, so editing quantity, price or
-  photos cannot change what state an item is in. Hard rule 2 puts state
-  changes behind verbs, and `ItemTransition` is the one place that decides —
-  a form field that quietly restocked a sold item would be a second one.
+- **One thing moves a status without a verb: the tags the seller picks.**
+  Every field is inert — a count, a price, a photo or a note cannot change
+  what state an item is in. Hard rule 2 puts state changes behind verbs, and
+  `ItemTransition` stays the one place that decides what a move carries.
 - **The archive row is decided by `status.isOnHand`, not by `archived`.** On
   the shelf it offers Archive; off it — sold *or* archived — it offers "Put
   back in stock". A sold item previously had no way back at all: the row said
@@ -544,6 +716,29 @@ sell" teaches the rule and points at the fix.
 The record arrives on a stream, so the form learns it exists inside a `build` —
 and writing the form's controller from there throws. See
 `docs/rules/SCREENS.md`, which carries the rule and the reason.
+
+## The item card lives in `core/widgets/`, because two features draw it
+
+Owner's rule, and it is the repo's own remedy applied: **a widget a second
+feature needs moves to `core/widgets/`** (root `CLAUDE.md`). Inventory's list
+and the Orders sale picker draw the same rows, so the card is no longer
+Inventory's to keep.
+
+- **It moved, it did not fork.** `ItemCard`, its six `part` files,
+  `ItemWarningLines` and `ItemCardMetricConstant` are one set in
+  `core/widgets/` and `core/constants/`. Every rule about the row below still
+  holds — what changed is which folder they are enforced in.
+- **Core may import a feature's `domain/`**, which is how the card still reads
+  `Item`, `StaleInventoryPolicy` and `ListingMarketplaces`. What it must never
+  do is reach into a feature's `presentation/`, and this move is precisely how
+  Orders avoids doing that.
+- **The picker's card is the same card, differently wired**: it passes no
+  actions button and no marketplace arrow, and a row it cannot sell arrives
+  carrying its reason (`lib/features/orders/CLAUDE.md`).
+- **No card is ever drawn dead.** A greyed, untappable row was tried and
+  taken back out: it says the seller did something wrong and offers nothing,
+  which is the failure the "shown, not hidden" rule exists to avoid in the
+  first place. A row that cannot do the thing takes the tap and explains.
 
 ## The row carries enough; what it must do is stay short without crowding
 

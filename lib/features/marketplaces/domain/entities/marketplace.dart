@@ -10,8 +10,12 @@ import '../../../../core/theme/app_tag_hue.dart';
 /// about.
 ///
 /// **It is per business** (`workspaces/{id}/marketplaces/{id}`), because two
-/// businesses in one account sell in different places and pay different rates.
-/// A new business is seeded with `MarketplaceConstant.defaults`.
+/// businesses in one account sell in different places. A new business is
+/// seeded with `MarketplaceConstant.defaults`.
+///
+/// **It carries no fee rate.** What a platform charges is measured from each
+/// order's payout (hard rule 3); the one planning assumption left lives on the
+/// workspace (`Workspace.planningFeeRate`).
 ///
 /// **Soft-deleted** (hard rule 15): listings and orders point at one by id, so
 /// hard-deleting would orphan them and take the marketplace out of every past
@@ -24,7 +28,6 @@ class Marketplace {
   const Marketplace({
     required this.id,
     required this.name,
-    required this.feeRate,
     required this.createdAt,
     this.hue = AppTagHue.grey,
     this.deletedAt,
@@ -35,13 +38,6 @@ class Marketplace {
   /// What the seller calls it. **Not localized** — a platform's name is a
   /// brand, and a stall's name is whatever the seller typed.
   final String name;
-
-  /// The platform's cut, as a fraction of the sale price.
-  ///
-  /// **An estimate for planning, never accounting.** A fee an order actually
-  /// reported is a fact and always wins — see `PayoutReconciliation.expected`,
-  /// which falls back to this only when `fees` is null.
-  final double feeRate;
 
   final DateTime createdAt;
 
@@ -58,17 +54,12 @@ class Marketplace {
 
   bool get isDeleted => deletedAt != null;
 
-  Marketplace copyWith({
-    String? name,
-    double? feeRate,
-    AppTagHue? hue,
-    DateTime? deletedAt,
-  }) => Marketplace(
-    id: id,
-    name: name ?? this.name,
-    feeRate: feeRate ?? this.feeRate,
-    createdAt: createdAt,
-    hue: hue ?? this.hue,
-    deletedAt: deletedAt ?? this.deletedAt,
-  );
+  Marketplace copyWith({String? name, AppTagHue? hue, DateTime? deletedAt}) =>
+      Marketplace(
+        id: id,
+        name: name ?? this.name,
+        createdAt: createdAt,
+        hue: hue ?? this.hue,
+        deletedAt: deletedAt ?? this.deletedAt,
+      );
 }

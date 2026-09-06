@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../domain/entities/marketplace.dart';
 import '../../../providers.dart';
 
@@ -55,14 +56,24 @@ class MarketplacesScreen extends ConsumerWidget {
                   .map(
                     (Marketplace marketplace) => AppListRow(
                       title: marketplace.name,
-                      subtitle: context.l10n.marketplacesEstimatedFeeLine(
-                        (marketplace.feeRate * 100).toStringAsFixed(1),
-                        context.l10n.marketplacesEstimatedFee,
-                      ),
+                      subtitle: context.l10n.marketplacesEstimatedFee,
                       icon: AppIconConstant.storefront,
                       // The colour is picked on the detail screen; this is
                       // where the seller sees what they picked.
                       iconTint: marketplace.hue.of(context),
+                      // The record carries a name and a colour; what the
+                      // platform charges is measured per order (hard rule 3),
+                      // so there is no rate to badge here.
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          // The chevron comes back by hand: a row that hands
+                          // in its own trailing widget loses the one
+                          // `AppListRow` would have drawn, and this row still
+                          // opens a screen.
+                          const AppRowChevron(),
+                        ],
+                      ),
                       onTap: () =>
                           context.push(AppRoutes.marketplace(marketplace.id)),
                     ),

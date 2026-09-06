@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../../app_config/domain/entities/app_config.dart';
+import '../../app_config/domain/repositories/app_config_repository.dart';
 import '../../carriers/domain/entities/carrier.dart';
 import '../../carriers/domain/repositories/carrier_repository.dart';
 import '../../expenses/domain/entities/expense.dart';
@@ -28,6 +30,7 @@ import '../../subscription/domain/enums/seller_plan.dart';
 import '../../subscription/domain/repositories/subscription_repository.dart';
 import '../../workspace/domain/entities/user_profile.dart';
 import '../../workspace/domain/entities/workspace.dart';
+import '../../workspace/domain/repositories/workspace_purge_repository.dart';
 import '../../workspace/domain/repositories/workspace_repository.dart';
 import '../domain/mock_dataset.dart';
 
@@ -109,6 +112,39 @@ class MockStore {
 
   void dispose() {
     unawaited(_changes.close());
+  }
+
+  /// Empty every record list, then publish. Returns how many rows went.
+  ///
+  /// **The workspace, its members and its plan stay**, so the demo is the same
+  /// business with nothing in it — which is the state this exists to show. The
+  /// dataset is untouched too: it is the known-good seed, and a restart puts
+  /// the rows back.
+  int clearRecords() {
+    final List<List<Object>> lists = <List<Object>>[
+      items,
+      orders,
+      listings,
+      sources,
+      purchases,
+      expenses,
+      categories,
+      locations,
+      offers,
+      marketplaces,
+      carriers,
+    ];
+
+    int cleared = 0;
+
+    for (final List<Object> list in lists) {
+      cleared += list.length;
+      list.clear();
+    }
+
+    notifyChanged();
+
+    return cleared;
   }
 
   /// Insert or replace by id, then publish.
@@ -231,24 +267,37 @@ class InMemoryOrderRepository implements OrderRepository {
   );
 
   @override
-  Future<void> recordSale(Order order, Item item) async {
-    final int index = _store.items.indexWhere(
-      (Item current) => current.id == item.id,
-    );
-    if (index == -1 ||
-        _store.items[index].quantity <= 0 ||
-        _store.items[index].status == ItemStatus.sold ||
-        _store.items[index].status == ItemStatus.archived) {
-      throw StateError('Item ${item.id} is no longer sellable');
+  Future<void> recordSale(Order order, List<Item> items) async {
+    final Map<String, int> found = <String, int>{};
+
+    // Every item is checked before any is written: a bundle whose third item
+    // has already sold must leave the first two alone.
+    for (final Item item in items) {
+      final int index = _store.items.indexWhere(
+        (Item current) => current.id == item.id,
+      );
+
+      if (index == -1 ||
+          _store.items[index].quantity <= 0 ||
+          _store.items[index].status == ItemStatus.sold ||
+          _store.items[index].status == ItemStatus.archived) {
+        throw StateError('Item ${item.id} is no longer sellable');
+      }
+
+      found[item.id] = index;
     }
 
-    final Item current = _store.items[index];
-    final int left = current.quantity - 1;
-    _store.items[index] = current.copyWith(
-      quantity: left,
-      status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
-      soldAt: left == 0 ? order.orderedAt : null,
-    );
+    for (final MapEntry<String, int> entry in found.entries) {
+      final Item current = _store.items[entry.value];
+      final int left = current.quantity - 1;
+
+      _store.items[entry.value] = current.copyWith(
+        quantity: left,
+        status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
+        soldAt: left == 0 ? order.orderedAt : null,
+      );
+    }
+
     _store.upsert(_store.orders, order, (Order other) => other.id == order.id);
   }
 
@@ -764,4 +813,32 @@ class InMemoryWorkspaceRepository implements WorkspaceRepository {
     required String uid,
     required String workspaceId,
   }) async {}
+}
+
+/// Emptying the demo business, in memory.
+///
+/// **It really does empty it**, unlike [InMemoryWorkspaceRepository]'s no-op
+/// delete: there is nothing to authorise and nothing to fall back to, so the
+/// screens can be looked at with no rows in them and the seed card fills them
+/// again. A restart does too — nothing here is persisted.
+class InMemoryWorkspacePurgeRepository implements WorkspacePurgeRepository {
+  const InMemoryWorkspacePurgeRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Future<int> deleteAllRecords() async => _store.clearRecords();
+}
+
+/// App config with nothing behind it.
+///
+/// **It emits the fallback, so mock mode runs with monetisation ON.** A
+/// developer wants the gates in the way by default — a mock build that
+/// silently unlocked everything is one where a paywall bug is invisible until
+/// release. Flipping the switch is done on the real document.
+class InMemoryAppConfigRepository implements AppConfigRepository {
+  const InMemoryAppConfigRepository();
+
+  @override
+  Stream<AppConfig> watch() => Stream<AppConfig>.value(AppConfig.fallback);
 }

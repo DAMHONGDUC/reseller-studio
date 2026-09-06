@@ -52,7 +52,12 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
     switch (section) {
       case ItemDetailSection.overview:
         _title.text = item.title;
+      case ItemDetailSection.quantity:
         _quantity.text = item.quantity.toString();
+      // The tags read what the controller seeded from the record, so this
+      // section has no box of its own to fill.
+      case ItemDetailSection.status:
+        break;
       case ItemDetailSection.pricing:
         _cost.text = item.purchasePrice?.toInputString() ?? '';
         _expected.text = item.expectedPrice?.toInputString() ?? '';
@@ -92,11 +97,16 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
       itemDetailEditControllerProvider.notifier,
     );
     final String currency = ref.watch(workspaceCurrencyProvider);
+    final List<ItemWarning> warnings = ItemConsistency.warnings(item);
 
     return ListView(
       padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
+        if (warnings.isNotEmpty) ...<Widget>[
+          ItemWarningLines(item: item, warnings: warnings),
+          SizedBox(height: SdContentPaddingV3.sectionGap),
+        ],
         if (item.photoUrls.isNotEmpty) ...<Widget>[
           _Photos(urls: item.photoUrls),
           SizedBox(height: SdContentPaddingV3.sectionGap),
@@ -110,11 +120,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
           onCancel: controller.cancel,
           canSave: _title.text.trim().isNotEmpty,
           onSave: () => _save(
-            () => controller.saveOverview(
-              itemId: item.id,
-              title: _title.text,
-              quantity: _quantity.text,
-            ),
+            () => controller.saveOverview(itemId: item.id, title: _title.text),
           ),
           reading: _OverviewFacts(item: item),
           editing: Column(
@@ -127,19 +133,44 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
                 onChanged: (String _) => setState(() {}),
               ),
               SizedBox(height: SdSpacingConstant.h16),
-              SdTextFieldV3(
-                label: context.l10n.commonQuantity,
-                controller: _quantity,
-                isRequired: true,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-              ),
-              SizedBox(height: SdSpacingConstant.h16),
               ItemConditionField(
                 selected: edit.condition,
                 onSelected: controller.selectCondition,
               ),
             ],
+          ),
+        ),
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+        _Section(
+          section: ItemDetailSection.quantity,
+          title: context.l10n.commonQuantity,
+          edit: edit,
+          onEdit: _startEdit,
+          onCancel: controller.cancel,
+          onSave: () => _save(
+            () => controller.saveQuantity(
+              itemId: item.id,
+              quantity: _quantity.text,
+            ),
+          ),
+          reading: _QuantityFacts(item: item),
+          editing: ItemQuantityField(
+            controller: _quantity,
+            textInputAction: TextInputAction.done,
+          ),
+        ),
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+        _Section(
+          section: ItemDetailSection.status,
+          title: context.l10n.itemStatus,
+          edit: edit,
+          onEdit: _startEdit,
+          onCancel: controller.cancel,
+          onSave: () => _save(() => controller.saveStatus(itemId: item.id)),
+          reading: _StatusFacts(item: item),
+          editing: ItemStatusField(
+            selected: edit.status,
+            onSelected: controller.selectStatus,
           ),
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
@@ -325,7 +356,11 @@ class _Section extends StatelessWidget {
   }
 }
 
-/// Title, state and grade — what the item is.
+/// Title and grade — what the item is.
+///
+/// **The status badge left with the status section.** Two answers to one
+/// question is how a screen ends up showing a state its own tags disagree
+/// with.
 class _OverviewFacts extends StatelessWidget {
   const _OverviewFacts({required this.item});
 
@@ -341,25 +376,58 @@ class _OverviewFacts extends StatelessWidget {
           color: context.sdTheme3.textPrimary,
         ),
       ),
-      SizedBox(height: SdSpacingConstant.h8),
-      Wrap(
-        spacing: SdSpacingConstant.w6,
-        runSpacing: SdSpacingConstant.h4,
-        children: <Widget>[
-          SdBadgeV3(
-            label: item.status.label(context),
-            color: item.status.color(context),
-          ),
-          if (item.condition != null)
-            SdBadgeV3(
-              label: item.condition!.label(context),
-              color: item.condition!.color(context),
-            ),
-          if (item.quantity > 1)
-            SdBadgeV3(label: context.l10n.itemQuantityTimes(item.quantity)),
-        ],
-      ),
+      if (item.condition != null) ...<Widget>[
+        SizedBox(height: SdSpacingConstant.h8),
+        SdBadgeV3(
+          label: item.condition!.label(context),
+          color: item.condition!.color(context),
+        ),
+      ],
     ],
+  );
+}
+
+/// The state the record is in — the section's whole answer.
+class _StatusFacts extends StatelessWidget {
+  const _StatusFacts({required this.item});
+
+  final Item item;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.centerLeft,
+    child: SdBadgeV3(
+      label: item.status.label(context),
+      color: item.status.color(context),
+    ),
+  );
+}
+
+/// How many there are — the section's whole answer.
+///
+/// **A figure, not a labelled row.** The card's header already says Quantity,
+/// and a row repeating the word to say one number is the label twice. It was
+/// a `×5` badge before, drawn only above one, so on most items the number the
+/// seller came to change was not on the screen at all.
+class _QuantityFacts extends StatelessWidget {
+  const _QuantityFacts({required this.item});
+
+  final Item item;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      '${item.quantity}',
+      // **Red once the shelf is empty** — owner's rule, and the same predicate
+      // the card reads, so the two screens cannot disagree about which zero is
+      // a problem.
+      style: context.textTheme3.titleMedium!.semiBold3.tabular3.copyWith(
+        color: ItemConsistency.isShelfEmpty(item)
+            ? context.sdTheme3.danger
+            : context.sdTheme3.textPrimary,
+      ),
+    ),
   );
 }
 

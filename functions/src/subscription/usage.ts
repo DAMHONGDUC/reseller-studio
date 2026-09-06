@@ -1,6 +1,6 @@
 import { logger } from 'firebase-functions';
 
-import { ceilingGrace, ceilingsByPlan, db, paths, planFor } from '../lib/firestore';
+import { ceilingGrace, ceilingsByPlan, db, paths, planFor, rowsOf } from '../lib/firestore';
 
 /** What the workspace is holding, and whether the rules should refuse more. */
 export interface WorkspaceUsage {
@@ -43,8 +43,8 @@ export function atCeiling(plan: string, count: number, kind: 'items' | 'orders')
  */
 export async function refreshUsage(workspaceId: string): Promise<WorkspaceUsage> {
   const plan = await planFor(workspaceId);
-  const items = db().collection(paths.records(workspaceId, 'items'));
-  const orders = db().collection(paths.records(workspaceId, 'orders'));
+  const items = rowsOf(workspaceId, 'items');
+  const orders = rowsOf(workspaceId, 'orders');
 
   const [total, sold, archived, deleted, orderCount] = await Promise.all([
     items.count().get(),

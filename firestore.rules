@@ -42,7 +42,7 @@ service cloud.firestore {
     }
 
     function memberPath(workspaceId) {
-      return /databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid);
+      return /databases/$(database)/documents/members/$(workspaceId + '_' + request.auth.uid);
     }
 
     function isMember(workspaceId) {
@@ -77,6 +77,45 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
+    // --- Row helpers: ownership is a column now ---------------------------
+    //
+    // Hard rule 14 moved every table flat, so ownership left the path and
+    // became a `workspaceId` column on the row. These are the whole boundary.
+    //
+    // **`create` reads the incoming row and `update` reads both.** Without the
+    // second check an update rewrites `workspaceId` and moves a record into
+    // somebody else's business (`docs/rules/BACKEND.md`).
+
+    function canReadRow() {
+      return isMember(resource.data.workspaceId);
+    }
+
+    function canCreateRow() {
+      return canWrite(request.resource.data.workspaceId);
+    }
+
+    function canUpdateRow() {
+      return canWrite(resource.data.workspaceId)
+             && request.resource.data.workspaceId == resource.data.workspaceId;
+    }
+
+    function canDeleteRow() {
+      return canWrite(resource.data.workspaceId);
+    }
+
+    function canAdminRow() {
+      return canAdmin(request.resource.data.workspaceId);
+    }
+
+    // The composite key a membership row is stored under, spelled once.
+    //
+    // **The separator matches `WorkspaceTable.idSeparator`.** Two spellings of
+    // one key is how a membership becomes unreadable to the rule that decides
+    // every other permission.
+    function memberDocId(workspaceId, uid) {
+      return workspaceId + '_' + uid;
+    }
+
     // Whether the workspace has run past what its plan allows.
     //
     // **A rule cannot count a collection**, only read one document — so the
@@ -91,7 +130,7 @@ service cloud.firestore {
     // through. The failure mode of failing closed is a seller who cannot add
     // stock and no way to ship the fix (`docs/rules/BACKEND.md`).
     function withinCeiling(workspaceId, flag) {
-      let usage = /databases/$(database)/documents/workspaces/$(workspaceId)/usage/current;
+      let usage = /databases/$(database)/documents/usage/$(workspaceId);
 
       return !exists(usage) || get(usage).data.get(flag, false) != true;
     }
@@ -148,99 +187,127 @@ service cloud.firestore {
                     // membership documents in the same transaction.
                     && request.resource.data.ownerId == resource.data.ownerId;
 
-      // Deleting a workspace orphans every subcollection under it — Firestore
-      // does not cascade. The `deleteWorkspace` callable does the teardown;
-      // no client deletes this document.
+      // Deleting a workspace leaves rows behind in every table — they are flat
+      // now, so there is not even a subtree to orphan. The `deleteWorkspace`
+      // callable sweeps them; no client deletes this row.
       allow delete: if false;
+    }
 
-      // --- Membership: the ACL itself ------------------------------------
+    // --- Membership: the ACL itself ---------------------------------------
 
-      match /members/{memberUid} {
-        allow read: if canRead(workspaceId);
+    // Flat, keyed `{workspaceId}_{uid}` — a composite primary key, because one
+    // person belongs to several businesses and a bare uid would collide.
+    match /members/{memberId} {
+      allow read: if canReadRow();
 
-        // Only admins invite and remove. **Nobody edits their own membership
-        // document** — without that clause a member could set their own role
-        // to owner, and every rule above is decided by this document.
-        //
-        // The second clause is the bootstrap, and it is the one case where
-        // somebody writes their own membership. `canAdmin` cannot authorise
-        // it: it reads the very document being created, so the first member
-        // of a new workspace could never be written and the workspace would
-        // be unreadable by anyone, forever. It is narrow on purpose — only
-        // the uid the workspace itself names as `ownerId`, only as `owner`,
-        // and only as a create, so it cannot be used to promote anyone later.
-        allow create: if canAdmin(workspaceId)
-                      || (signedIn()
-                          && memberUid == request.auth.uid
-                          && request.resource.data.role == 'owner'
-                          && get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.ownerId == request.auth.uid);
-        allow delete: if canAdmin(workspaceId);
-        allow update: if canAdmin(workspaceId)
-                      && memberUid != request.auth.uid;
-
-        // The last owner cannot be demoted or removed, or the workspace
-        // becomes unadministrable. Enforced in the `removeMember` callable,
-        // which does both jobs because the check is one count either way; a
-        // rule cannot take that count at all.
-      }
-
-      // --- Business records ----------------------------------------------
+      // Only admins invite and remove. **Nobody edits their own membership
+      // row** — without that clause a member could set their own role to
+      // owner, and every rule here is decided by this row.
       //
-      // Same shape for all of them, so a new collection is one line rather
-      // than a new policy to reason about.
+      // The second clause is the bootstrap, and it is the one case where
+      // somebody writes their own membership. `canAdmin` cannot authorise it:
+      // it reads the very row being created, so the first member of a new
+      // workspace could never be written and the workspace would be
+      // unreadable by anyone, forever. It is narrow on purpose — only the uid
+      // the workspace itself names as `ownerId`, only as `owner`, and only as
+      // a create, so it cannot be used to promote anyone later.
+      allow create: if canAdminRow()
+                    || (signedIn()
+                        && memberId == memberDocId(request.resource.data.workspaceId, request.auth.uid)
+                        && request.resource.data.role == 'owner'
+                        && get(/databases/$(database)/documents/workspaces/$(request.resource.data.workspaceId)).data.ownerId == request.auth.uid);
+      allow delete: if canAdmin(resource.data.workspaceId);
+      allow update: if canAdmin(resource.data.workspaceId)
+                    && request.resource.data.workspaceId == resource.data.workspaceId
+                    && memberId != memberDocId(resource.data.workspaceId, request.auth.uid);
 
-      // Items and orders are the two the Free plan puts a ceiling on (plan
-      // §27), so their creates carry one more condition than the rest. Only
-      // creates: a downgrade never deletes or freezes what a seller already
-      // has, which is the same promise `PlanGate` makes in the app.
-      match /items/{itemId} {
-        allow read: if canRead(workspaceId);
-        allow create: if canWrite(workspaceId) && withinCeiling(workspaceId, 'itemsAtCeiling');
-        allow update, delete: if canWrite(workspaceId);
-      }
-      match /orders/{orderId} {
-        allow read: if canRead(workspaceId);
-        allow create: if canWrite(workspaceId) && withinCeiling(workspaceId, 'ordersAtCeiling');
-        allow update, delete: if canWrite(workspaceId);
-      }
+      // The last owner cannot be demoted or removed, or the workspace becomes
+      // unadministrable. Enforced in the `removeMember` callable, which does
+      // both jobs because the check is one count either way; a rule cannot
+      // take that count at all.
+    }
 
-      match /listings/{listingId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /offers/{offerId}              { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /purchases/{purchaseId}        { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /sources/{sourceId}            { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /expenses/{expenseId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /locations/{locationId}        { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /categories/{categoryId}       { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /marketplaces/{marketplaceId}  { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /carriers/{carrierId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
-      match /receipts/{receiptId}          { allow read: if canRead(workspaceId); allow write: if canWrite(workspaceId); }
+    // --- Business tables --------------------------------------------------
+    //
+    // Flat and top-level, every row carrying its `workspaceId` column (hard
+    // rule 14). Same shape for all of them, so a new table is one line rather
+    // than a new policy to reason about.
+    //
+    // **An unfiltered query is denied, not leaked.** A `list` rule runs
+    // against every row the query would return, so a read without
+    // `where('workspaceId', ...)` picks up another seller's rows, fails on
+    // them, and takes the whole query down. `WorkspaceTable.query` is what
+    // makes sure the filter is always there.
 
-      // --- Audit log ------------------------------------------------------
+    // Items and orders are the two the Free plan puts a ceiling on (plan
+    // §27), so their creates carry one more condition than the rest. Only
+    // creates: a downgrade never deletes or freezes what a seller already
+    // has, which is the same promise `PlanGate` makes in the app.
+    match /items/{itemId} {
+      allow read: if canReadRow();
+      allow create: if canCreateRow() && withinCeiling(request.resource.data.workspaceId, 'itemsAtCeiling');
+      allow update: if canUpdateRow();
+      allow delete: if canDeleteRow();
+    }
+    match /orders/{orderId} {
+      allow read: if canReadRow();
+      allow create: if canCreateRow() && withinCeiling(request.resource.data.workspaceId, 'ordersAtCeiling');
+      allow update: if canUpdateRow();
+      allow delete: if canDeleteRow();
+    }
 
-      // Append-only, and never mutable. An audit log a client can edit is not
-      // an audit log (plan §23). Entries are written by Cloud Functions
-      // triggers so `actorId` cannot be forged.
-      match /activity/{activityId} {
-        allow read: if canRead(workspaceId);
-        allow create, update, delete: if false;
-      }
+    match /listings/{listingId}          { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /offers/{offerId}              { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /purchases/{purchaseId}        { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /sources/{sourceId}            { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /expenses/{expenseId}          { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /locations/{locationId}        { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /categories/{categoryId}       { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /marketplaces/{marketplaceId}  { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /carriers/{carrierId}          { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /receipts/{receiptId}          { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
 
-      // --- Subscription ---------------------------------------------------
+    // --- Audit log --------------------------------------------------------
 
-      // Plan state comes from the store via a webhook. A client that could
-      // write this could grant itself Business tier.
-      match /subscription/{docId} {
-        allow read: if canRead(workspaceId);
-        allow write: if false;
-      }
+    // Append-only, and never mutable. An audit log a client can edit is not an
+    // audit log (plan §23). Rows are written by Cloud Functions triggers so
+    // `actorId` cannot be forged.
+    match /activity/{activityId} {
+      allow read: if canReadRow();
+      allow create, update, delete: if false;
+    }
 
-      // What the workspace holds, recounted by a trigger. A client that could
-      // write this could clear its own ceiling flag, which is the whole thing
-      // this document exists to stop.
-      match /usage/{docId} {
-        allow read: if canRead(workspaceId);
-        allow write: if false;
-      }
+    // --- Subscription -----------------------------------------------------
+
+    // One row per workspace, keyed by the workspace id itself. Plan state
+    // comes from the store via a webhook; a client that could write this could
+    // grant itself Premium.
+    match /subscription/{workspaceId} {
+      allow read: if canRead(workspaceId);
+      allow write: if false;
+    }
+
+    // What the workspace holds, recounted by a trigger and keyed the same way.
+    // A client that could write this could clear its own ceiling flag, which
+    // is the whole thing this row exists to stop.
+    match /usage/{workspaceId} {
+      allow read: if canRead(workspaceId);
+      allow write: if false;
+    }
+
+    // --- App config -------------------------------------------------------
+
+    // One document for the whole product, not a business record — nothing in
+    // it belongs to a seller, so it is deliberately not nested under a
+    // workspace (hard rule 14 governs records that are).
+    //
+    // Readable by anyone signed in; written by nobody with an app. The
+    // premium kill switch lives here, and a client that could write it could
+    // switch its own paywall off — the same reason the subscription document
+    // above is `if false`.
+    match /app_config/{docId} {
+      allow read: if signedIn();
+      allow write: if false;
     }
 
     // --- Invites ----------------------------------------------------------

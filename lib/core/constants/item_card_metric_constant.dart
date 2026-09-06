@@ -38,6 +38,11 @@ final class ItemCardMetricConstant {
   /// Around the hairline over the money band.
   static double get bandGap => SdSpacingConstant.h8;
 
+  /// Between the money band and a consistency warning under it. The same gap
+  /// the band itself takes, because the warning is a second line of the band
+  /// rather than a third zone.
+  static double get warningGap => SdSpacingConstant.h8;
+
   /// Above the "last updated" line, the quietest thing on the card.
   static double get updatedGap => SdSpacingConstant.h6;
 }

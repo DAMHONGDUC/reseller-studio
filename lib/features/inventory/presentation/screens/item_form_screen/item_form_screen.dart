@@ -38,10 +38,17 @@ part 'item_form_screen_sections.dart';
 /// item arrives. Everything typed is handed to [ItemFormController] at
 /// submit — parsing money and building the entity is not a widget's job.
 class ItemFormScreen extends ConsumerStatefulWidget {
-  const ItemFormScreen({this.itemId, super.key});
+  const ItemFormScreen({this.itemId, this.initialBarcode, super.key});
 
   /// Null to create, set to edit.
   final String? itemId;
+
+  /// A code the seller just scanned, filled into the barcode box on create.
+  ///
+  /// The scanner's own dialog offers to "add an item and keep the code on
+  /// it", and this is the half that keeps it. Ignored while editing: that
+  /// item already has whatever code it has.
+  final String? initialBarcode;
 
   @override
   ConsumerState<ItemFormScreen> createState() => _ItemFormScreenState();
@@ -64,6 +71,11 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
     super.initState();
 
     if (widget.itemId == null) {
+      // Set here rather than deferred like the provider below: a text
+      // controller is not a provider, and the box has to be filled by the
+      // first frame or the seller watches it appear.
+      _barcode.text = widget.initialBarcode ?? '';
+
       // The provider outlives one visit to the form, so a create started
       // after an edit would otherwise inherit that item's category.
       WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -61,7 +61,8 @@ class OfferActionsController extends Notifier<bool> {
       await ref
           .read(recordSaleControllerProvider.notifier)
           .record(
-            item,
+            // An accepted offer is always for the one item it was made on.
+            <Item>[item],
             salePrice: offer.amount,
             marketplace: offer.marketplace,
             soldAt: DateTime.now(),

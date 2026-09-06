@@ -1,0 +1,20 @@
+{
+  "premium_enabled": true,
+  "force_update": {
+    "ios": {
+      "store_link": "https://apps.apple.com/app/id0000000000",
+      "build_name": "1.4.0",
+      "build_number": 41,
+      "enable_force_update": false
+    },
+    "android": {
+      "store_link": "https://play.google.com/store/apps/details?id=com.example.app",
+      "build_name": "1.4.0",
+      "build_number": 41,
+      "enable_force_update": false
+    }
+  },
+  "premium_emails": ["owner@example.com", "tester@example.com"],
+  "dev_mode_emails": ["owner@example.com"],
+  "blocked_emails": ["banned@example.com"]
+}

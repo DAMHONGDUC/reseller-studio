@@ -56,7 +56,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
   @override
   Stream<List<Member>> watchMembers(String workspaceId) =>
       FirestoreStream.collection(
-        WorkspaceCollections(_firestore, workspaceId).members,
+        WorkspaceCollections(_firestore, workspaceId).members.query,
         MemberDto.toEntity,
         operation: 'load team',
       );
@@ -149,7 +149,6 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
         collections.marketplaces.doc(marketplace.id),
         FirestoreMapper.pruned(<String, Object?>{
           'name': marketplace.name,
-          'feeRate': marketplace.feeRate,
           'createdAt': FirestoreMapper.serverTimestamp,
           'updatedAt': FirestoreMapper.serverTimestamp,
           'createdBy': ownerId,

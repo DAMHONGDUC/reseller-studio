@@ -20,6 +20,18 @@ final class PrefsKeyConstant {
   /// about their business is behind it.
   static const String onboardingSeen = 'onboarding_seen';
 
+  /// The category and the shelf the last created item was filed under.
+  ///
+  /// Device-local, and remembered for the same reason the intake session asks
+  /// for a source once per trip: a seller booking in twenty things from one
+  /// haul picks the same bin twenty times otherwise. Prefilled on the create
+  /// form only, where both pickers are on screen and one tap changes either —
+  /// never on Quick Add, which shows neither field and would be filing stock
+  /// somewhere the seller was never shown.
+  static const String lastItemCategoryId = 'last_item_category_id';
+
+  static const String lastItemLocationId = 'last_item_location_id';
+
   /// Light, dark or system. Device-local on purpose — see
   /// `ThemeModeController`.
   static const String themeMode = 'theme_mode';

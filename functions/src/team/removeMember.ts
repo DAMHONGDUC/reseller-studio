@@ -1,7 +1,7 @@
 import { logger } from 'firebase-functions';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
-import { db, paths } from '../lib/firestore';
+import { db, paths, workspaceField } from '../lib/firestore';
 import { clientFacing } from '../lib/runtime';
 
 /**
@@ -49,7 +49,7 @@ export const removeMember = onCall(clientFacing, async (request) => {
 
   if (target.get('role') === 'owner' && nextRole !== 'owner') {
     const owners = await db()
-      .collection(paths.members(workspaceId))
+      .collection(paths.members).where(workspaceField, '==', workspaceId)
       .where('role', '==', 'owner')
       .count()
       .get();

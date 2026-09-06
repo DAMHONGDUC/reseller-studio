@@ -24,7 +24,6 @@ final Provider<List<Marketplace>> defaultMarketplacesProvider =
           Marketplace(
             id: seed.id,
             name: seed.name,
-            feeRate: seed.feeRate,
             // A millisecond apart, never one instant: the list is read back
             // ordered by `createdAt`, and five identical stamps leave the tie
             // to the document id — the seeded order in mock data and
@@ -65,14 +64,45 @@ final Provider<List<Marketplace>> activeMarketplacesProvider =
 /// sale, so an unlisted item must still be sellable, and an empty picker is a
 /// flow with no way out. The fallback is here rather than at the call site so
 /// two screens cannot disagree about what an unlisted item may be sold on.
-final marketplacesForItemProvider =
-    Provider.family<List<Marketplace>, String>((Ref ref, String itemId) {
+final marketplacesForItemProvider = Provider.family<List<Marketplace>, String>((
+  Ref ref,
+  String itemId,
+) {
+  final List<Marketplace> active = ref.watch(activeMarketplacesProvider);
+  final List<Marketplace> listed = MarketplaceMatching.matching(
+    active,
+    ListingMarketplaces.keys(
+      ref.watch(listingsForItemProvider(itemId)).value ?? const <Listing>[],
+    ),
+  );
+
+  return listed.isEmpty ? active : listed;
+});
+
+/// The platforms a whole bundle may be sold on.
+///
+/// **The union of what its items are on, not the intersection.** A bundle is
+/// several things the buyer happened to take together, and they are rarely all
+/// live on the same platform — an intersection would usually be empty, which
+/// is the empty picker `marketplacesForItemProvider` exists to prevent. A
+/// bundle where none of the items is listed anywhere gets the full list, the
+/// same fallback and for the same reason: cash in hand is a sale.
+final marketplacesForItemsProvider =
+    Provider.family<List<Marketplace>, List<String>>((
+      Ref ref,
+      List<String> itemIds,
+    ) {
       final List<Marketplace> active = ref.watch(activeMarketplacesProvider);
+      final Set<String> keys = <String>{
+        for (final String itemId in itemIds)
+          ...ListingMarketplaces.keys(
+            ref.watch(listingsForItemProvider(itemId)).value ??
+                const <Listing>[],
+          ),
+      };
       final List<Marketplace> listed = MarketplaceMatching.matching(
         active,
-        ListingMarketplaces.keys(
-          ref.watch(listingsForItemProvider(itemId)).value ?? const <Listing>[],
-        ),
+        keys,
       );
 
       return listed.isEmpty ? active : listed;
@@ -103,18 +133,5 @@ final Provider<Map<String, AppTagHue>> marketplaceHuesProvider =
         for (final Marketplace marketplace
             in ref.watch(marketplacesProvider).value ?? const <Marketplace>[])
           marketplace.id: marketplace.hue,
-      };
-    });
-
-/// Id → what that platform takes, as a fraction of the sale.
-///
-/// **A planning estimate, never accounting.** A fee an order actually reported
-/// is a fact and always wins — see `PayoutReconciliation.expected`.
-final Provider<Map<String, double>> marketplaceFeeRatesProvider =
-    Provider<Map<String, double>>((Ref ref) {
-      return <String, double>{
-        for (final Marketplace marketplace
-            in ref.watch(marketplacesProvider).value ?? const <Marketplace>[])
-          marketplace.id: marketplace.feeRate,
       };
     });

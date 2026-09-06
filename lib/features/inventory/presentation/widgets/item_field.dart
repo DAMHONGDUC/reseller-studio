@@ -6,6 +6,7 @@ import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/date_time_utils.dart';
+import '../../../../core/utils/text_input_utils.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../core/widgets/picker_field.dart';
 import '../../../sourcing/domain/entities/source.dart';
@@ -56,6 +57,105 @@ class ItemTagGroupField extends StatelessWidget {
         ),
       ],
     ),
+  );
+}
+
+/// How many there are — a box to type in, and a step either side of it.
+///
+/// **The stepper is the point** — owner's rule. One more or one fewer is what
+/// actually happens to a count, and doing that by selecting a number and
+/// typing another is three interactions for an increment. The box stays for
+/// the times the answer is twelve.
+///
+/// **`-1` stops at zero.** A negative count is a number nothing in the app can
+/// mean, so the button is disabled rather than writing one.
+class ItemQuantityField extends StatelessWidget {
+  const ItemQuantityField({
+    required this.controller,
+    this.textInputAction,
+    super.key,
+  });
+
+  final TextEditingController controller;
+  final TextInputAction? textInputAction;
+
+  void _step(int by) {
+    final int next = TextInputUtils.stepCount(controller.text, by);
+
+    // Through the controller, so the box and the buttons cannot disagree
+    // about what the count is.
+    controller.text = '$next';
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<TextEditingValue>(
+        valueListenable: controller,
+        builder: (BuildContext context, TextEditingValue value, Widget? _) =>
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SdButtonV3(
+                  variant: SdButtonVariantV3.outlined,
+                  label: context.l10n.itemQuantityDecrement,
+                  onPressed: TextInputUtils.stepCount(value.text, 0) == 0
+                      ? null
+                      : () => _step(-1),
+                ),
+                SizedBox(width: SdSpacingConstant.w8),
+                Expanded(
+                  child: SdTextFieldV3(
+                    label: context.l10n.commonQuantity,
+                    controller: controller,
+                    isRequired: true,
+                    keyboardType: TextInputType.number,
+                    textInputAction: textInputAction,
+                  ),
+                ),
+                SizedBox(width: SdSpacingConstant.w8),
+                SdButtonV3(
+                  variant: SdButtonVariantV3.outlined,
+                  label: context.l10n.itemQuantityIncrement,
+                  onPressed: () => _step(1),
+                ),
+              ],
+            ),
+      );
+}
+
+/// Where the item is in its life — four tags, each wearing its own colour.
+///
+/// **Switching is free** — owner's rule. No requirement is checked and no move
+/// is refused: this is where a seller corrects what the app got wrong, and a
+/// correction that argues back is the thing they came to fix. The *verbs* are
+/// unchanged — `ItemTransition.check` still gates Mark as sold and the bulk
+/// paths, which is where a missing price actually matters.
+///
+/// **It writes no order** (hard rule 3) and **moves no count** (quantity and
+/// status are independent, `lib/features/inventory/CLAUDE.md`): a pair that
+/// cannot both be true is drawn as an alert tag instead.
+class ItemStatusField extends StatelessWidget {
+  const ItemStatusField({
+    required this.selected,
+    required this.onSelected,
+    super.key,
+  });
+
+  final ItemStatus selected;
+  final ValueChanged<ItemStatus> onSelected;
+
+  @override
+  Widget build(BuildContext context) => ItemTagGroupField(
+    label: context.l10n.itemStatus,
+    children: <Widget>[
+      for (final ItemStatus status in ItemStatus.values)
+        SdTagV3(
+          label: status.label(context),
+          color: status.color(context),
+          selected: selected == status,
+          onSelected: () => onSelected(status),
+        ),
+    ],
   );
 }
 

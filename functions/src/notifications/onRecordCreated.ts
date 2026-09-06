@@ -1,6 +1,12 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 
+import { idSeparator, workspaceOf } from '../lib/firestore';
 import { notifyWorkspace } from './notify';
+
+/** A record's own id, out of the composite key it is stored under. */
+function localId(workspaceId: string | null, rowId: string): string {
+  return workspaceId === null ? '' : rowId.slice(workspaceId.length + idSeparator.length);
+}
 
 /**
  * The two notifications that come from a record appearing (plan §22).
@@ -14,9 +20,15 @@ import { notifyWorkspace } from './notify';
  * lands on the row it already wrote rather than a second one.
  */
 export const onOrderCreated = onDocumentCreated(
-  'workspaces/{workspaceId}/orders/{orderId}',
+  'orders/{rowId}',
   async (event) => {
-    const { workspaceId, orderId } = event.params;
+    // Flat tables: the workspace is a column, and the record's own id is what
+    // is left of the composite key `{workspaceId}_{orderId}`.
+    const workspaceId = workspaceOf({ after: event.data });
+    const orderId = localId(workspaceId, String(event.params.rowId));
+
+    if (workspaceId === null || orderId === '') return;
+
     // The line items are embedded (`docs/DATA_MODEL.md`), and `get()` cannot
     // index into an array — so the array is read whole and the first line's
     // title is what names the push.
@@ -41,9 +53,13 @@ export const onOrderCreated = onDocumentCreated(
 );
 
 export const onOfferCreated = onDocumentCreated(
-  'workspaces/{workspaceId}/offers/{offerId}',
+  'offers/{rowId}',
   async (event) => {
-    const { workspaceId, offerId } = event.params;
+    const workspaceId = workspaceOf({ after: event.data });
+    const offerId = localId(workspaceId, String(event.params.rowId));
+
+    if (workspaceId === null || offerId === '') return;
+
 
     await notifyWorkspace({
       dedupeKey: event.id,
@@ -67,10 +83,13 @@ export const onOfferCreated = onDocumentCreated(
  * added any other way — a future transfer, a repair script — is announced too.
  */
 export const onMemberJoined = onDocumentCreated(
-  'workspaces/{workspaceId}/members/{memberUid}',
+  'members/{memberId}',
   async (event) => {
-    const { workspaceId, memberUid } = event.params;
+    const workspaceId = workspaceOf({ after: event.data });
+    const memberUid = localId(workspaceId, String(event.params.memberId));
     const name = String(event.data?.get('displayName') ?? '').trim();
+
+    if (workspaceId === null || memberUid === '') return;
 
     await notifyWorkspace({
       dedupeKey: event.id,

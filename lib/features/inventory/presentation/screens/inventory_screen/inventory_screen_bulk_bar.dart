@@ -51,6 +51,18 @@ class _BulkActionBar extends ConsumerWidget {
     );
   }
 
+  /// Clears the selection on success, so the bar leaves with the work it did.
+  Future<void> _list(BuildContext context, WidgetRef ref) async {
+    final bool? listed = await BulkListSheet.show(
+      context,
+      ref.read(selectedItemsProvider),
+    );
+
+    if (listed != true || !context.mounted) return;
+
+    ref.read(inventorySelectionProvider.notifier).clear();
+  }
+
   Future<void> _move(BuildContext context, WidgetRef ref) async {
     final List<StorageLocation> locations =
         ref.read(locationsProvider).value ?? const <StorageLocation>[];
@@ -133,11 +145,23 @@ class _BulkActionBar extends ConsumerWidget {
               ],
             ),
             SizedBox(height: SdSpacingConstant.h8),
+            // Its own full-width row above the three: listing is the verb a
+            // whole session is made of, and reprice, move and archive are the
+            // maintenance around it. Four small buttons in one row would have
+            // made the main action the narrowest thing on the bar.
+            SdButtonV3(
+              variant: SdButtonVariantV3.primary,
+              label: context.l10n.itemActionList,
+              size: SdButtonSizeV3.small,
+              expand: true,
+              onPressed: () => _list(context, ref),
+            ),
+            SizedBox(height: SdSpacingConstant.h8),
             Row(
               children: <Widget>[
                 Expanded(
                   child: SdButtonV3(
-                    variant: SdButtonVariantV3.primary,
+                    variant: SdButtonVariantV3.secondary,
                     label: context.l10n.itemActionReprice,
                     size: SdButtonSizeV3.small,
                     expand: true,
@@ -151,7 +175,7 @@ class _BulkActionBar extends ConsumerWidget {
                 SizedBox(width: SdSpacingConstant.w8),
                 Expanded(
                   child: SdButtonV3(
-                    variant: SdButtonVariantV3.secondary,
+                    variant: SdButtonVariantV3.outlined,
                     label: context.l10n.itemActionMove,
                     size: SdButtonSizeV3.small,
                     expand: true,

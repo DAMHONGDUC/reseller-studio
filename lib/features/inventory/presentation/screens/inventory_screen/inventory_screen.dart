@@ -14,9 +14,13 @@ import '../../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
+import '../../../../../core/widgets/item_card.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../../listings/domain/entities/listing.dart';
+import '../../../../listings/domain/services/listings_by_item.dart';
 import '../../../../listings/providers.dart';
+import '../../../../subscription/domain/enums/plan_allowance.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';
@@ -24,9 +28,9 @@ import '../../../domain/entities/item.dart';
 import '../../../domain/entities/storage_location.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
+import '../../widgets/bulk_list_sheet.dart';
 import '../../widgets/inventory_filter_sheet.dart';
 import '../../widgets/item_actions_sheet.dart';
-import '../../widgets/item_card.dart';
 import '../../widgets/reprice_sheet.dart';
 
 part 'inventory_screen_bulk_bar.dart';
@@ -67,6 +71,11 @@ class InventoryScreen extends ConsumerStatefulWidget {
 }
 
 class _InventoryScreenState extends ConsumerState<InventoryScreen> {
+  /// The one ceiling this screen's records count against.
+  static const List<PlanAllowance> _meterAllowances = <PlanAllowance>[
+    PlanAllowance.items,
+  ];
+
   final TextEditingController _search = TextEditingController();
 
   @override
@@ -101,6 +110,10 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     final List<Item> items = ref.watch(visibleItemsProvider);
     final AsyncValue<List<Item>> source = ref.watch(itemsProvider);
     final bool isSelecting = ref.watch(inventorySelectionProvider).isNotEmpty;
+    final bool hasMeter = PlanLimitMeters.cappedIn(
+      ref,
+      allowances: _meterAllowances,
+    ).isNotEmpty;
 
     return AppAddFabScaffold(
       addLabel: context.l10n.quickAddTitle,
@@ -154,42 +167,66 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                   ref.watch(inventoryActiveFilterCountProvider) > 0,
             ),
           ),
-          switch (source) {
-            // A screen that has not loaded is not empty — saying "No items"
-            // to a seller with four hundred is worse than a spinner.
-            AsyncLoading<List<Item>>() when !source.hasValue =>
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: SdLoadingV3Page(),
-              ),
-            AsyncError<List<Item>>() => SliverFillRemaining(
-              hasScrollBody: false,
-              child: SdEmptyStateV3(
-                icon: AppIconConstant.error,
-                title: context.l10n.inventoryLoadFailed,
-                message: context.l10n.commonCouldNotLoad,
-              ),
+          // **One gutter for everything below the chrome** — the meter, the
+          // list and every empty state share it, rather than each sliver
+          // padding itself and drifting from the others.
+          SliverPadding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
             ),
-            _ when items.isEmpty => SliverFillRemaining(
-              hasScrollBody: false,
-              child: AppListEmptyState(
-                hasAny: (source.value ?? const <Item>[]).isNotEmpty,
-                noMatchMessage: context.l10n.inventoryNoMatch,
-                emptyIcon: AppIconConstant.inventory,
-                emptyTitle: context.l10n.inventoryEmptyTitle,
-                emptyMessage: context.l10n.inventoryEmptyBody,
-                // The FAB says the same thing, and it is the wrong place to
-                // find it: on the first empty screen a seller ever sees, the
-                // eye is in the middle, not the corner.
-                emptyAction: SdButtonV3(
-                  variant: SdButtonVariantV3.primary,
-                  label: context.l10n.quickAddTitle,
-                  onPressed: () => _add(AppRoutes.quickAdd),
+            sliver: SliverMainAxisGroup(
+              slivers: <Widget>[
+                // Under the pinned strip, so it scrolls away with the list:
+                // the ceiling is worth knowing once, not at every scroll
+                // position.
+                const SliverToBoxAdapter(
+                  child: PlanLimitMeters(allowances: _meterAllowances),
                 ),
-              ),
+                // The gap belongs to what sits under the meter, and exists
+                // only when the meter does.
+                if (hasMeter)
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: SdContentPaddingV3.listItemGap),
+                  ),
+                switch (source) {
+                  // A screen that has not loaded is not empty — saying "No items"
+                  // to a seller with four hundred is worse than a spinner.
+                  AsyncLoading<List<Item>>() when !source.hasValue =>
+                    const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: SdLoadingV3Page(),
+                    ),
+                  AsyncError<List<Item>>() => SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: SdEmptyStateV3(
+                      icon: AppIconConstant.error,
+                      title: context.l10n.inventoryLoadFailed,
+                      message: context.l10n.commonCouldNotLoad,
+                    ),
+                  ),
+                  _ when items.isEmpty => SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: AppListEmptyState(
+                      hasAny: (source.value ?? const <Item>[]).isNotEmpty,
+                      noMatchMessage: context.l10n.inventoryNoMatch,
+                      emptyIcon: AppIconConstant.inventory,
+                      emptyTitle: context.l10n.inventoryEmptyTitle,
+                      emptyMessage: context.l10n.inventoryEmptyBody,
+                      // The FAB says the same thing, and it is the wrong place to
+                      // find it: on the first empty screen a seller ever sees, the
+                      // eye is in the middle, not the corner.
+                      emptyAction: SdButtonV3(
+                        variant: SdButtonVariantV3.primary,
+                        label: context.l10n.quickAddTitle,
+                        onPressed: () => _add(AppRoutes.quickAdd),
+                      ),
+                    ),
+                  ),
+                  _ => _ItemList(items: items),
+                },
+              ],
             ),
-            _ => _ItemList(items: items),
-          },
+          ),
         ],
       ),
     );

@@ -105,6 +105,17 @@ class _OfferCard extends ConsumerWidget {
 
     final double? discount = offer.discountFrom(listed);
 
+    // What accepting would actually leave. The card used to answer "how far
+    // below asking" and stop there, which is the arithmetic and not the
+    // decision.
+    final Item? item = ref.watch(itemProvider(offer.itemId)).value;
+    final OfferEvaluation evaluation = OfferEvaluation.of(
+      offer,
+      feeRate: ref.watch(planningFeeRateProvider),
+      cost: item?.purchasePrice,
+      minimumPrice: item?.minimumPrice,
+    );
+
     return SdCardV3(
       onTap: () => context.push(AppRoutes.item(offer.itemId)),
       // Tinted only while it is still actionable — a closed offer is history
@@ -152,6 +163,24 @@ class _OfferCard extends ConsumerWidget {
                     if (offer.buyerName != null) offer.buyerName!,
                   ].join(' · '),
                   style: context.textTheme3.bodySmall!.faint3(context),
+                ),
+                SizedBox(height: SdSpacingConstant.h6),
+                Text(
+                  evaluation.isBelowFloor
+                      ? context.l10n.offerBelowFloor(
+                          context.money(evaluation.floor),
+                        )
+                      : context.l10n.offerLeaves(
+                          context.money(evaluation.profit),
+                        ),
+                  style: context.textTheme3.bodySmall!.semiBold3.copyWith(
+                    // Red only when it is actually a loss or under the
+                    // seller's own line. An unknown cost is not a warning —
+                    // a red line on every uncosted item is one nobody reads.
+                    color: evaluation.isLoss || evaluation.isBelowFloor
+                        ? context.sdTheme3.loss
+                        : context.sdTheme3.textSecondary,
+                  ),
                 ),
                 if (offer.message != null) ...<Widget>[
                   SizedBox(height: SdSpacingConstant.h6),

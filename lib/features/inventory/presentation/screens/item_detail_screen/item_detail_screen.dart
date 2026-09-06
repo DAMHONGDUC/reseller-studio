@@ -11,6 +11,7 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_editable_section.dart';
 import '../../../../../core/widgets/app_photo.dart';
+import '../../../../../core/widgets/item_warning_lines.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
@@ -19,6 +20,8 @@ import '../../../../sourcing/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/enums/item_status.dart';
+import '../../../domain/enums/item_warning.dart';
+import '../../../domain/services/item_consistency.dart';
 import '../../../domain/services/item_transition.dart';
 import '../../../item_block_presenter.dart';
 import '../../../providers.dart';
@@ -62,7 +65,8 @@ class ItemDetailScreen extends ConsumerWidget {
           if (value != null)
             AppDetailActionButton(
               label: context.l10n.commonActions,
-              onPressed: () => ItemActionsSheet.show(context, value),
+              onPressed: () =>
+                  ItemActionsSheet.show(context, value, isOnDetail: true),
             ),
         ],
       ),

@@ -14,14 +14,14 @@ import '../domain/services/plan_gate.dart';
 /// English only for now: hard rule 7 defers the *translation*, not the ARB
 /// key, and these move into `app_en.arb` with the rest of the backfill.
 final class SubscriptionLabels {
-  static String name(SellerPlan plan) => switch (plan) {
-    SellerPlan.free => 'Free',
-    SellerPlan.premium => 'Premium',
-  };
+  /// Delegates to the enum's own display, which is where a name a second
+  /// feature needs has to live — More reads it too, and it may not import
+  /// this file (`presentation/` is private to its feature).
+  static String name(SellerPlan plan) => plan.label;
 
   static String tagline(SellerPlan plan) => switch (plan) {
-    SellerPlan.free => 'Enough to run a small shelf',
-    SellerPlan.premium => 'Unlimited selling, without usage ceilings',
+    SellerPlan.free => 'Run the whole shelf, however big it gets',
+    SellerPlan.premium => 'The answers: tax, payouts, and what to buy next',
   };
 
   /// **Two or three words each.** The paywall lists these in two columns, and
@@ -35,6 +35,8 @@ final class SubscriptionLabels {
     PlanFeature.team => 'Team members',
     PlanFeature.multipleWorkspaces => 'Multiple businesses',
     PlanFeature.advancedPermissions => 'Roles & permissions',
+    PlanFeature.taxExport => 'Tax pack export',
+    PlanFeature.payoutReconciliation => 'Payout chasing',
   };
 
   static String period(BillingPeriod period) => switch (period) {

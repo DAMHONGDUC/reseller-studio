@@ -17,7 +17,7 @@ class FirestoreListingRepository implements ListingRepository {
 
   @override
   Stream<List<Listing>> watchListings() => FirestoreStream.collection(
-    _context.collections.listings.orderBy('createdAt', descending: true),
+    _context.collections.listings.query.orderBy('createdAt', descending: true),
     _toEntity,
     operation: 'load listings',
   );
@@ -25,7 +25,7 @@ class FirestoreListingRepository implements ListingRepository {
   @override
   Stream<List<Listing>> watchListingsForItem(String itemId) =>
       FirestoreStream.collection(
-        _context.collections.listings.where('itemId', isEqualTo: itemId),
+        _context.collections.listings.query.where('itemId', isEqualTo: itemId),
         _toEntity,
         operation: 'load listings for item',
       );

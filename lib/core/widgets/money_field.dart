@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:system_design/index.dart';
 
+import '../constants/app_icon_constant.dart';
 import '../money/currency_decimals.dart';
 import '../money/currency_input_formatter.dart';
+import 'app_row_icon_button.dart';
 
 /// A field that takes an amount of money.
 ///
@@ -25,6 +27,8 @@ class MoneyField extends StatelessWidget {
     this.textInputAction,
     this.onChanged,
     this.onSubmitted,
+    this.onInfo,
+    this.infoTooltip,
     super.key,
   });
 
@@ -48,6 +52,17 @@ class MoneyField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
+  /// Opens whatever explains this amount, from a glyph beside the currency.
+  ///
+  /// **In the suffix rather than as a row under the box** — a form's sheet is
+  /// already as tall as the screen, and a row that only explains pushes the
+  /// one that submits off the bottom.
+  final VoidCallback? onInfo;
+
+  /// The glyph's tooltip and semantics label — required with [onInfo],
+  /// because the mark says nothing to a screen reader on its own.
+  final String? infoTooltip;
+
   /// `0.00` where there are cents, `0` where there are not — the hint is the
   /// only thing telling a seller in đồng that this box does not want decimals.
   String get _hint => CurrencyDecimals.of(currency) == 0
@@ -67,9 +82,19 @@ class MoneyField extends StatelessWidget {
     textInputAction: textInputAction,
     onChanged: onChanged,
     onSubmitted: onSubmitted,
-    suffix: Text(
-      currency,
-      style: context.textTheme3.bodySmall!.faint3(context),
+    suffix: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(currency, style: context.textTheme3.bodySmall!.faint3(context)),
+        if (onInfo != null) ...<Widget>[
+          SizedBox(width: SdSpacingConstant.w6),
+          AppRowIconButton(
+            icon: AppIconConstant.info,
+            tooltip: infoTooltip ?? '',
+            onPressed: onInfo!,
+          ),
+        ],
+      ],
     ),
   );
 }

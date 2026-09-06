@@ -50,7 +50,7 @@ export async function writeActivity(options: {
 
   try {
     await db()
-      .collection(paths.activity(workspaceId))
+      .collection(paths.activity)
       .doc(eventId)
       .create({
         entityType,

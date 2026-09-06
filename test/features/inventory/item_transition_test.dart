@@ -72,10 +72,11 @@ void main() {
       );
     });
 
-    test('a hand-picked sold is allowed, and empties the shelf with it', () {
-      // Owner's rule: the status is editable, `sold` included. It writes no
-      // order, so revenue and profit still come from Mark as sold — what it
-      // records is that the stock has gone.
+    test('a hand-picked sold is allowed, and leaves the count alone', () {
+      // Owner's rule: the status is editable, `sold` included, and quantity
+      // and status are independent — the count is the seller's other answer,
+      // not something the status writes. It records no order either, so
+      // revenue and profit still come from Mark as sold.
       final Item sold = ItemTransition.apply(
         item(askingPrice: const Money(4500, 'USD'), quantity: 3),
         ItemStatus.sold,
@@ -83,7 +84,7 @@ void main() {
       );
 
       expect(sold.status, ItemStatus.sold);
-      expect(sold.quantity, 0);
+      expect(sold.quantity, 3);
       expect(sold.soldAt, now);
     });
   });
@@ -146,43 +147,19 @@ void main() {
       expect(() => ItemTransition.sell(soldOut, now: now), throwsStateError);
     });
 
-    test('putting stock behind a sold row puts it back on the shelf', () {
-      final Item restocked = ItemTransition.restocked(
-        item(status: ItemStatus.sold, soldAt: now, quantity: 4),
+    test('a status move leaves the count exactly where it was', () {
+      // Quantity and status are independent — owner's rule. Picking `sold`
+      // used to empty the count, which is the app editing a field the seller
+      // did not touch; the contradiction is drawn as a tag instead.
+      final Item sold = ItemTransition.setStatus(
+        item(status: ItemStatus.inStock, quantity: 4),
+        ItemStatus.sold,
         now: now,
       );
 
-      expect(restocked.status, ItemStatus.inStock);
-      expect(restocked.soldAt, isNull);
-      expect(restocked.quantityOnHand, 4);
-    });
-
-    test('restocking adds to the count and puts the row back in stock', () {
-      final Item soldOut = item(
-        status: ItemStatus.sold,
-        quantity: 0,
-        soldAt: now,
-      );
-
-      final Item restocked = ItemTransition.restock(soldOut, 5, now: now);
-
-      // Adds rather than replaces: the box asks how many arrived.
-      expect(restocked.quantity, 5);
-      expect(restocked.status, ItemStatus.inStock);
-      expect(restocked.soldAt, isNull);
-    });
-
-    test('restocking an item that still has stock adds to what is there', () {
-      final Item onShelf = item(quantity: 2);
-
-      expect(ItemTransition.restock(onShelf, 3, now: now).quantity, 5);
-    });
-
-    test('restocking by nothing is refused', () {
-      expect(
-        () => ItemTransition.restock(item(quantity: 1), 0, now: now),
-        throwsStateError,
-      );
+      expect(sold.status, ItemStatus.sold);
+      expect(sold.quantity, 4);
+      expect(sold.soldAt, now);
     });
 
     test('going live stamps the clock instead of moving the status', () {
@@ -204,14 +181,17 @@ void main() {
       );
     });
 
-    test('a count does not undo an archive', () {
-      // Archiving is a deliberate withdrawal; only a verb brings it back.
-      final Item archived = ItemTransition.restocked(
-        item(status: ItemStatus.archived, quantity: 4),
-        now: now,
+    test('a count moves no status at all', () {
+      // Not the archive, and not a sale either: only the tags the seller picks
+      // and the verbs move a state.
+      expect(
+        item(status: ItemStatus.archived, quantity: 4).status,
+        ItemStatus.archived,
       );
-
-      expect(archived.status, ItemStatus.archived);
+      expect(
+        item(status: ItemStatus.sold, quantity: 4).status,
+        ItemStatus.sold,
+      );
     });
 
     test('coming back onto the shelf clears the sold date', () {

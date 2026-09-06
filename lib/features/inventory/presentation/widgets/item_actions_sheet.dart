@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/app_sheet_action_row.dart';
 import '../../../../core/widgets/app_sheet_option_list.dart';
 import '../../../../core/widgets/mark_sold_sheet.dart';
@@ -20,7 +22,6 @@ import '../../item_block_presenter.dart';
 import '../../providers.dart';
 import '../controllers/item_actions_controller.dart';
 import 'reprice_sheet.dart';
-import 'restock_sheet.dart';
 
 /// Everything a seller can do to one item, in one sheet (plan §7).
 ///
@@ -33,15 +34,27 @@ import 'restock_sheet.dart';
 /// on the detail screen, under Price, where the prices the seller came to
 /// change already are.
 class ItemActionsSheet extends ConsumerWidget {
-  const ItemActionsSheet({required this.item, super.key});
+  const ItemActionsSheet({
+    required this.item,
+    this.isOnDetail = false,
+    super.key,
+  });
 
   final Item item;
 
-  static Future<void> show(BuildContext context, Item item) =>
-      showSdBottomSheetV3<void>(
-        context: context,
-        builder: (BuildContext context) => ItemActionsSheet(item: item),
-      );
+  /// True when the sheet was opened from the item detail screen, which is the
+  /// one place Edit is not drawn — it would push the screen underneath it.
+  final bool isOnDetail;
+
+  static Future<void> show(
+    BuildContext context,
+    Item item, {
+    bool isOnDetail = false,
+  }) => showSdBottomSheetV3<void>(
+    context: context,
+    builder: (BuildContext context) =>
+        ItemActionsSheet(item: item, isOnDetail: isOnDetail),
+  );
 
   /// Runs [action] if the move is allowed, and says what is missing if not.
   void _guarded(
@@ -173,6 +186,21 @@ class ItemActionsSheet extends ConsumerWidget {
     final bool isOnHand = item.status.isOnHand;
 
     final List<Widget> actions = <Widget>[
+      // **Edit is the way into the record** — owner's rule. The rows below are
+      // single verbs; a title, a count or a price is changed on the detail
+      // screen, and from the list there was no step to it but closing the
+      // sheet and tapping the card underneath.
+      if (!isOnDetail)
+        AppSheetActionRow(
+          icon: AppIconConstant.edit,
+          label: context.l10n.actionEdit,
+          onTap: () {
+            final GoRouter router = GoRouter.of(context);
+
+            Navigator.of(context).pop();
+            router.push(AppRoutes.item(item.id));
+          },
+        ),
       AppSheetActionRow(
         icon: AppIconConstant.priceChange,
         label: context.l10n.itemActionReprice,
@@ -205,7 +233,10 @@ class ItemActionsSheet extends ConsumerWidget {
 
           _guarded(context, ref, ItemStatus.sold, () {
             Navigator.of(context).pop();
-            MarkSoldSheet.show(context, item);
+            // One item: selling several at once starts from the Orders tab,
+            // where the seller is already picking rather than already inside
+            // one record.
+            MarkSoldSheet.show(context, <Item>[item]);
           });
         },
       ),
@@ -223,17 +254,6 @@ class ItemActionsSheet extends ConsumerWidget {
             () => _makeInStock(context, ref),
           ),
         ),
-      // **Restock is how a sold-out row comes back** — owner's rule. It adds
-      // to the count and moves the status with it, so the seller never has to
-      // un-sell an item by hand before saying more arrived.
-      AppSheetActionRow(
-        icon: AppIconConstant.autorenew,
-        label: context.l10n.itemActionRestock,
-        onTap: () {
-          Navigator.of(context).pop();
-          RestockSheet.show(context, item);
-        },
-      ),
       // **Archive, or come back — decided by whether the item is on the shelf,
       // not by whether it is archived.** A sold item had no way back at all:
       // the row said Archive, and the only route to stock was archiving it

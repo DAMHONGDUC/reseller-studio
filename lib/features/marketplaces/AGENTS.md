@@ -14,6 +14,16 @@ workflow that creates a workspace.
   opens that screen; the list itself does not carry inline fee controls. One
   editing surface keeps the name and estimated rate in one transaction and
   gives deletion enough context to explain its effect.
+- **The fee is the loudest thing on the row** — owner's rule. It was grey
+  caption text under the name, which is the smallest type on the card for the
+  only number the screen exists to hold: it is what every profit, margin and
+  ROI figure downstream is computed from. It is now the row's trailing badge,
+  in the marketplace's own hue, with "Estimated fee" left as the caption
+  saying what the figure is.
+  - **A badge, not a control.** The rule above is unchanged — the row still
+    only navigates, and the rate is still edited on the detail screen.
+  - `MarketplaceFeeLabel.percent` writes the figure, so the list and anything
+    that shows a rate next cannot round it two ways.
 - **Delete is an app-bar icon on marketplace detail.** It appears only for an
   existing marketplace and still opens the confirmation dialog. Keeping the
   destructive action in the chrome leaves the form body for editable fields
@@ -22,11 +32,18 @@ workflow that creates a workspace.
   size.** Owner's rule. The registry currently resolves it to Flutter's
   `Icons.delete_outline_rounded`; the screen does not choose between Material
   Icons and Symbols itself.
-- **There is no "Use published rate" toggle.** The marketplace record always
-  carries the business's current estimated fee rate, and the seller edits it
-  directly on the detail screen. A published rate and an override are two
-  competing answers to one field after marketplaces become seller-owned
-  records.
+- **A marketplace record carries no fee rate.** Owner's rule, and it removed
+  `Marketplace.feeRate`, `MarketplaceFeePolicy`, `MarketplaceFeeLabel` and
+  `marketplaceFeeRatesProvider` together. What a platform charges is measured
+  from the payout on each order (hard rule 3), so a rate on the record was a
+  second answer that could only ever be the worse one — and a table this app
+  had to keep in step with nine marketplaces repricing on their own schedule.
+- **The one planning rate lives on the workspace, not here.**
+  `Workspace.planningFeeRate` is a single assumption for Sourcing and the
+  cross-list comparison, because those run before any sale exists and have
+  nothing to measure. **Never add a per-marketplace rate back** — that is the
+  shape that was removed, and it is removed for the reason above, not for
+  tidiness.
 - **Delete is soft-delete.** Listings and orders point at a marketplace id, so
   removing the document would erase the marketplace name from historical
   records and reports (hard rule 15).

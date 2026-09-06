@@ -100,3 +100,21 @@ final Provider<String?> currentUidProvider = Provider<String?>((Ref ref) {
   // here: nobody is signed in until the stream says so.
   return ref.watch(authUserProvider).value?.uid;
 });
+
+/// The signed-in account's email, lowercased, or null when nobody is.
+///
+/// **Lowercased here, once.** It is what `app_config` matches its grant and
+/// block lists against, and a comparison that is case-sensitive on one side
+/// silently matches nobody — which for the block list is a gate that never
+/// fires and for the premium list is a tester who keeps hitting the paywall.
+///
+/// Null for an account with no address at all: Apple's private relay always
+/// gives one, but a provider that did not would otherwise match an empty
+/// string against an empty entry.
+final Provider<String?> currentEmailProvider = Provider<String?>((Ref ref) {
+  final String? email = ref.watch(authUserProvider).value?.email;
+
+  if (email == null || email.trim().isEmpty) return null;
+
+  return email.trim().toLowerCase();
+});

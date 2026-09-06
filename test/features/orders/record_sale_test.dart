@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/money/money.dart';
-import 'package:reseller_studio/core/widgets/app_list_row.dart';
+import 'package:reseller_studio/core/widgets/item_card.dart';
 import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/core/widgets/option_picker_sheet.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -17,6 +17,7 @@ import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.d
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
+import 'package:reseller_studio/features/orders/presentation/widgets/cannot_sell_sheet.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 
 import '../../support/pump_app.dart';
@@ -67,7 +68,7 @@ void main() {
       final String orderId = await container
           .read(recordSaleControllerProvider.notifier)
           .record(
-            item,
+            <Item>[item],
             salePrice: Money(12500, 'USD'),
             marketplace: Marketplace.other,
             soldAt: testNow,
@@ -99,7 +100,7 @@ void main() {
     await container
         .read(recordSaleControllerProvider.notifier)
         .record(
-          draft,
+          <Item>[draft],
           salePrice: Money(4000, 'USD'),
           marketplace: Marketplace.ebay,
           soldAt: testNow,
@@ -120,20 +121,51 @@ void main() {
     expect(find.text('Record a sale'), findsOneWidget);
   });
 
-  testWidgets('the picker lists the shelf and nothing that has left it', (
+  testWidgets('the picker lists what has left the shelf too, with its reason', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const RecordSaleScreen());
 
     expect(
-      find.text('Vintage Levi 501 — 34x32, redline selvedge'),
+      await revealText(tester, 'Vintage Levi 501 — 34x32, redline selvedge'),
       findsOneWidget,
     );
-    expect(
-      find.text('Patagonia Synchilla fleece — mens L'),
-      findsNothing,
-      reason: 'already sold, so it cannot be sold again',
+    // **Shown, not hidden** — owner's rule. Filtering the row out said the
+    // item does not exist, where the truth is that it cannot be sold again.
+    final Finder sold = await revealText(
+      tester,
+      'Patagonia Synchilla fleece — mens L',
     );
+
+    expect(sold, findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.ancestor(of: sold, matching: find.byType(ItemCard)),
+        matching: find.text('Cannot sell'),
+      ),
+      findsOneWidget,
+      reason: 'the row flags it as a tag; the reason in full is a tap away',
+    );
+  });
+
+  testWidgets('tapping a row that cannot be sold explains instead of nothing', (
+    WidgetTester tester,
+  ) async {
+    // **The card is never drawn dead** — owner's rule. A greyed row says the
+    // seller did something wrong and offers nothing; the tap is what turns the
+    // refusal into an explanation with somewhere to go.
+    await pumpScreen(tester, const RecordSaleScreen());
+
+    await tester.tap(
+      await revealText(tester, 'Patagonia Synchilla fleece — mens L'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CannotSellSheet), findsOneWidget);
+    expect(find.text('This item has already left inventory'), findsOneWidget);
+    expect(find.text('Open item'), findsOneWidget);
+    // The sale sheet is what a sellable row opens, and this row is not one.
+    expect(find.text('Sold on'), findsNothing);
   });
 
   testWidgets('the search box narrows the shelf by SKU', (
@@ -155,12 +187,17 @@ void main() {
       'fetch, never a listing price', (WidgetTester tester) async {
     // Owner's rule: the price on this row was the highest of several and the
     // seller was about to be asked to confirm it anyway. What decides which
-    // row to tap is where the thing is live and what they wanted for it.
+    // row to tap is where the thing is live and what they wanted for it. The
+    // card is Inventory's own — a second owner's rule — so both facts arrive
+    // as the badge and the money band it already draws.
     await pumpScreen(tester, const RecordSaleScreen());
 
     final Finder row = find.ancestor(
-      of: find.text('Vintage Levi 501 — 34x32, redline selvedge'),
-      matching: find.byType(AppListRow),
+      of: await revealText(
+        tester,
+        'Vintage Levi 501 — 34x32, redline selvedge',
+      ),
+      matching: find.byType(ItemCard),
     );
 
     // itm-4 is on eBay and Depop, and is expected to fetch 180.
@@ -180,8 +217,8 @@ void main() {
     await pumpScreen(tester, const RecordSaleScreen());
 
     final Finder row = find.ancestor(
-      of: find.text('Nike windbreaker — XL'),
-      matching: find.byType(AppListRow),
+      of: await revealText(tester, 'Nike windbreaker — XL'),
+      matching: find.byType(ItemCard),
     );
 
     expect(
@@ -189,8 +226,9 @@ void main() {
       findsOneWidget,
     );
     // Nobody entered an expected price for it — a dash, never a zero
-    // (hard rule 5).
-    expect(find.descendant(of: row, matching: find.text('—')), findsOneWidget);
+    // (hard rule 5). The band carries a cell per figure, so more than one of
+    // them can be a dash on an item nobody has costed either.
+    expect(find.descendant(of: row, matching: find.text('—')), findsWidgets);
   });
 
   group('the sale offers only the marketplaces the item is on', () {
@@ -199,7 +237,7 @@ void main() {
       String title,
     ) async {
       await pumpScreen(tester, const RecordSaleScreen());
-      await tester.tap(find.text(title));
+      await tester.tap(await revealText(tester, title));
       await tester.pumpAndSettle();
 
       // The sheet's marketplace box, opened onto the picker beneath it.
@@ -255,12 +293,37 @@ void main() {
     });
   });
 
+  testWidgets('the sheet opens on what the first platform is asking', (
+    WidgetTester tester,
+  ) async {
+    // Owner's rule: itm-4 is live at 185 on eBay, and 180 is what the item
+    // expects. The box seeded from the expected price until the sheet learned
+    // to wait for the listings — so the seller had to re-pick the marketplace
+    // they were already on to see the right number.
+    await pumpScreen(tester, const RecordSaleScreen());
+    await tester.tap(
+      await revealText(tester, 'Vintage Levi 501 — 34x32, redline selvedge'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('eBay'), findsOneWidget, reason: 'the sheet opens on it');
+    expect(
+      tester
+          .widget<MoneyField>(find.widgetWithText(MoneyField, 'Sale price'))
+          .controller
+          .text,
+      '185.00',
+    );
+  });
+
   testWidgets('picking a marketplace fills the sale price with what that '
       'platform is asking', (WidgetTester tester) async {
     // Owner's rule: itm-4 is live at 185 on eBay and 175 on Depop, so the box
     // follows the picker rather than holding one of the two.
     await pumpScreen(tester, const RecordSaleScreen());
-    await tester.tap(find.text('Vintage Levi 501 — 34x32, redline selvedge'));
+    await tester.tap(
+      await revealText(tester, 'Vintage Levi 501 — 34x32, redline selvedge'),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sold on'));
@@ -277,7 +340,9 @@ void main() {
       tester
           .widget<TextField>(
             find.descendant(
-              of: find.byType(MoneyField),
+              // By label: the sheet also carries a platform-fee box, and an
+              // unscoped MoneyField finder would match both.
+              of: find.widgetWithText(MoneyField, 'Sale price'),
               matching: find.byType(TextField),
             ),
           )
@@ -292,7 +357,7 @@ void main() {
     // itm-11 is listed nowhere, so every platform is offered and none of them
     // has a price of its own.
     await pumpScreen(tester, const RecordSaleScreen());
-    await tester.tap(find.text('Nike windbreaker — XL'));
+    await tester.tap(await revealText(tester, 'Nike windbreaker — XL'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sold on'));
@@ -311,7 +376,9 @@ void main() {
       tester
           .widget<TextField>(
             find.descendant(
-              of: find.byType(MoneyField),
+              // By label: the sheet also carries a platform-fee box, and an
+              // unscoped MoneyField finder would match both.
+              of: find.widgetWithText(MoneyField, 'Sale price'),
               matching: find.byType(TextField),
             ),
           )

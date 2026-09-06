@@ -87,7 +87,7 @@ class ExpensesScreen extends ConsumerWidget {
 
     return AppAddFabScaffold(
       appBar: SdAppBarV3(title: context.l10n.commonExpenses),
-      addLabel: 'Add an expense',
+      addLabel: context.l10n.homeQuickAddExpense,
       onAdd: () => _add(context),
       body: switch (source) {
         AsyncLoading<List<Expense>>() when !source.hasValue =>

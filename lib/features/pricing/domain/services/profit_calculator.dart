@@ -20,6 +20,11 @@ import '../../../../core/money/money.dart';
 /// Treating the missing cost as zero would report the entire sale price as
 /// profit — the single most misleading thing this app could tell a seller,
 /// and the reason this returns a nullable rather than defaulting.
+///
+/// **[fees] is nullable for the same reason and it is the newer half.** The
+/// app does not estimate a platform's cut from a published rate any more
+/// (hard rule 3): it is measured from the payout, and until that arrives the
+/// profit is unknown rather than approximate.
 class ProfitBreakdown {
   const ProfitBreakdown({
     required this.revenue,
@@ -36,8 +41,9 @@ class ProfitBreakdown {
   /// purchase price was never entered.
   final Money? cogs;
 
-  /// Marketplace commission and payment processing.
-  final Money fees;
+  /// Marketplace commission and payment processing, as measured from the
+  /// payout. Null when the seller has not recorded what landed.
+  final Money? fees;
 
   /// What shipping cost the seller.
   final Money shipping;
@@ -46,13 +52,14 @@ class ProfitBreakdown {
   /// attributed to this sale.
   final Money otherExpenses;
 
-  /// Everything the sale cost, or null when [cogs] is unknown.
+  /// Everything the sale cost, or null when [cogs] or [fees] is unknown.
   Money? get totalCost {
     final Money? goods = cogs;
+    final Money? cut = fees;
 
-    if (goods == null) return null;
+    if (goods == null || cut == null) return null;
 
-    return goods + fees + shipping + otherExpenses;
+    return goods + cut + shipping + otherExpenses;
   }
 
   /// Revenue minus every cost. Null when any cost is unknown.
@@ -87,7 +94,7 @@ class ProfitBreakdown {
 
   /// True when every input was known, so the figures can be presented as
   /// complete rather than partial.
-  bool get isComplete => cogs != null;
+  bool get isComplete => cogs != null && fees != null;
 }
 
 /// What a potential buy is worth, before the seller commits to it.

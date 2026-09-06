@@ -14,12 +14,23 @@ out because Settings is; what it changes is not.
 - `DataMode` is **persisted** (unlike the auth bypass, which is a build flag),
   because it is a setting a developer toggles from inside the running app. It
   therefore carries two guards. `DataModeController` refuses to return `mock`
-  in a release build whatever is stored; and every repository provider tests
-  `DevFlags.isDebugOrProfile` **before** it reads the mode, which is `const`
-  false in release, so the whole mock branch folds away and the seed leaves
-  the binary. Keep that test first when adding a provider — put it second and
-  the fake business ships again. Showing a user a fake business as if it were
-  theirs is worse than any crash.
+  without dev mode whatever is stored; and every repository provider tests
+  `devModeEnabledProvider` **before** it reads the mode. Keep that test first
+  when adding a provider — put it second and the fake business is one stale
+  preference away. Showing a user a fake business as if it were theirs is
+  worse than any crash.
+- **The guard used to be `const` and no longer is.** It was
+  `DevFlags.isDebugOrProfile`, false at compile time in release, so the mock
+  branch folded away and the in-memory repositories and their seed left the
+  binary. Dev mode is now also granted by email in `app_config` (owner's
+  rule), which is a release-build grant by definition, so the branch survives
+  compilation and the seed ships — unreachable unless the config names the
+  signed-in account. why: see `docs/rules/DECISIONS.md` § Dev mode is granted
+  by email.
+- **`appConfigRepositoryProvider` is the one repository mock mode does not
+  swap**, and it cannot be: dev mode is read out of `app_config`, so mocking
+  the repository that supplies it is a circular dependency. It returned
+  `AppConfig.fallback` anyway, which is what a build with no Firebase gets.
 - **The seed is coherent, not random.** Every item traces to a purchase, every
   purchase to a source, every order to items that existed, and the totals add
   up by hand — `test/features/screens_with_mock_data_test.dart` asserts the
@@ -46,6 +57,12 @@ out because Settings is; what it changes is not.
   only thing that drives every live write path in one run, which makes it the
   fastest way to find out whether `data/` actually works against Firestore.
   `test/features/mock_data/demo_data_seeder_test.dart`.
+- **Delete all data is the button beside it and does not live here.** It
+  empties the open workspace instead of filling it, and the sweep belongs to
+  `workspace/` because what it must not delete is the membership and the audit
+  log — see `lib/features/workspace/CLAUDE.md`. In mock mode it clears the
+  in-memory store, which is how the empty screens are looked at with no
+  backend at all.
 
 Delete this feature when the real data layer is trusted — but note that
 `DemoDataSeeder` outlives the switch: it is about filling a real workspace,

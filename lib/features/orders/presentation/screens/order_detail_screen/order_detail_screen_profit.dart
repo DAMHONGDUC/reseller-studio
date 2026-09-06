@@ -22,14 +22,14 @@ part of 'order_detail_screen.dart';
 /// could tell a seller.
 /// The read half of an editable section, so it draws no card of its own.
 class _ProfitStatement extends StatelessWidget {
-  const _ProfitStatement({required this.profit, this.feesField});
+  const _ProfitStatement({required this.profit, this.payoutField});
 
   final ProfitBreakdown profit;
 
-  /// Replaces the platform-fee row while the section is being edited. **The
-  /// one stored figure here** — everything else is derived (hard rule 3), so
-  /// the statement keeps its shape and only that row becomes a box.
-  final Widget? feesField;
+  /// Sits under the statement while the section is being edited. **The one
+  /// stored figure here** — the platform's cut and everything below it are
+  /// derived from what landed (hard rule 3), so the rows stay rows.
+  final Widget? payoutField;
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +45,10 @@ class _ProfitStatement extends StatelessWidget {
           label: context.l10n.commonCostOfGoods,
           value: context.money(profit.cogs),
         ),
-        if (feesField != null)
-          feesField!
-        else
-          _OrderDetailRow(
-            label: context.l10n.orderPlatformFees,
-            value: context.money(profit.fees),
-          ),
+        _OrderDetailRow(
+          label: context.l10n.orderPlatformFees,
+          value: context.money(profit.fees),
+        ),
         _OrderDetailRow(
           label: context.l10n.commonShipping,
           value: context.money(profit.shipping),
@@ -81,6 +78,10 @@ class _ProfitStatement extends StatelessWidget {
           label: context.l10n.commonRoi,
           value: context.percent(profit.roi),
         ),
+        if (payoutField != null) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h16),
+          payoutField!,
+        ],
         if (!profit.isComplete) ...<Widget>[
           SizedBox(height: SdSpacingConstant.h8),
           Text(

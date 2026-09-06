@@ -4,6 +4,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../../../core/money/money.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../domain/entities/order.dart';
@@ -25,7 +26,7 @@ final class OrderDto {
     final Object? lines = data['lines'];
 
     return Order(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       status:
           FirestoreMapper.enumOrNull(OrderStatus.values, data['status']) ??
           OrderStatus.toShip,
@@ -46,7 +47,6 @@ final class OrderDto {
           FirestoreMapper.moneyOrNull(data['salePriceMinor'], currency) ??
           Money.zero(currency),
       orderedAt: FirestoreMapper.dateOr(data['orderedAt'], DateTime.now()),
-      fees: FirestoreMapper.moneyOrNull(data['feesMinor'], currency),
       shippingCost: FirestoreMapper.moneyOrNull(
         data['shippingCostMinor'],
         currency,
@@ -54,7 +54,7 @@ final class OrderDto {
       refund: FirestoreMapper.moneyOrNull(data['refundMinor'], currency),
       // The one stored figure that is not derived — a fact the marketplace
       // reported, not a calculation (hard rule 3).
-      payout: FirestoreMapper.moneyOrNull(data['payoutMinor'], currency),
+      payout: _payout(data, currency),
       externalOrderId: FirestoreMapper.stringOrNull(data['externalOrderId']),
       buyerName: FirestoreMapper.stringOrNull(data['buyerName']),
       trackingNumber: FirestoreMapper.stringOrNull(data['trackingNumber']),
@@ -70,6 +70,40 @@ final class OrderDto {
     );
   }
 
+  /// What the platform paid, and the one figure a fee is measured from.
+  ///
+  /// **A document written before the payout became the input carries
+  /// `feesMinor` instead**, so the payout it implies is reconstructed rather
+  /// than migrated: `salePrice - refund - fees - shippingCost` is the same
+  /// statement `Order.platformFees` reads backwards, so an old order keeps
+  /// exactly the fee it was saved with.
+  static Money? _payout(Map<String, Object?> data, String currency) {
+    final Money? recorded = FirestoreMapper.moneyOrNull(
+      data['payoutMinor'],
+      currency,
+    );
+
+    if (recorded != null) return recorded;
+
+    final Money? legacyFees = FirestoreMapper.moneyOrNull(
+      data['feesMinor'],
+      currency,
+    );
+
+    if (legacyFees == null) return null;
+
+    final Money zero = Money.zero(currency);
+    final Money sale =
+        FirestoreMapper.moneyOrNull(data['salePriceMinor'], currency) ?? zero;
+    final Money refund =
+        FirestoreMapper.moneyOrNull(data['refundMinor'], currency) ?? zero;
+    final Money shipping =
+        FirestoreMapper.moneyOrNull(data['shippingCostMinor'], currency) ??
+        zero;
+
+    return sale - refund - legacyFees - shipping;
+  }
+
   static Map<String, Object?> toMap(Order order, {required String createdBy}) =>
       FirestoreMapper.pruned(<String, Object?>{
         'status': order.status.name,
@@ -79,7 +113,6 @@ final class OrderDto {
         'lines': order.lines.map(_lineToMap).toList(),
         'salePriceMinor': order.salePrice.minor,
         'orderedAt': Timestamp.fromDate(order.orderedAt),
-        'feesMinor': FirestoreMapper.minorOrNull(order.fees),
         'shippingCostMinor': FirestoreMapper.minorOrNull(order.shippingCost),
         'refundMinor': FirestoreMapper.minorOrNull(order.refund),
         'payoutMinor': FirestoreMapper.minorOrNull(order.payout),

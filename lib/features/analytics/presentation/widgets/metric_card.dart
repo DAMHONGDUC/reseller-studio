@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../core/widgets/app_row_chevron.dart';
+
 /// One figure in an analytics breakdown: a label, and a number on the right.
 ///
 /// **Every value here is already a string**, formatted by the screen through
@@ -79,6 +81,7 @@ class MetricCard extends StatelessWidget {
     required this.title,
     required this.rows,
     this.leading,
+    this.onTap,
     super.key,
   });
 
@@ -88,6 +91,13 @@ class MetricCard extends StatelessWidget {
   /// A mark in front of the title — the colour of the marketplace this card
   /// is about. A widget, so this class never learns what the mark means.
   final Widget? leading;
+
+  /// Where this breakdown leads.
+  ///
+  /// **Null on a card that only reports.** A chevron on a card that goes
+  /// nowhere is an affordance leading nowhere, so the mark and the tap arrive
+  /// together or not at all.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -107,10 +117,11 @@ class MetricCard extends StatelessWidget {
               ),
             ),
           ),
+          if (onTap != null) const AppRowChevron(),
         ],
       ),
       SizedBox(height: SdSpacingConstant.h8),
-      SdCardV3(child: Column(children: rows)),
+      SdCardV3(onTap: onTap, child: Column(children: rows)),
     ],
   );
 }

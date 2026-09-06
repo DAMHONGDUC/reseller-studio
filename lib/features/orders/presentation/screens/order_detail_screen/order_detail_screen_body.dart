@@ -19,7 +19,7 @@ class _OrderBody extends ConsumerStatefulWidget {
 class _OrderBodyState extends ConsumerState<_OrderBody> {
   final TextEditingController _buyer = TextEditingController();
   final TextEditingController _salePrice = TextEditingController();
-  final TextEditingController _fees = TextEditingController();
+  final TextEditingController _payout = TextEditingController();
   final TextEditingController _tracking = TextEditingController();
   final TextEditingController _shippingCost = TextEditingController();
 
@@ -27,7 +27,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
   void dispose() {
     _buyer.dispose();
     _salePrice.dispose();
-    _fees.dispose();
+    _payout.dispose();
     _tracking.dispose();
     _shippingCost.dispose();
     super.dispose();
@@ -43,7 +43,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         _buyer.text = order.buyerName ?? '';
         _salePrice.text = order.salePrice.toInputString();
       case OrderDetailSection.profit:
-        _fees.text = order.fees?.toInputString() ?? '';
+        _payout.text = order.payout?.toInputString() ?? '';
       case OrderDetailSection.shipping:
         _tracking.text = order.trackingNumber ?? '';
         _shippingCost.text = order.shippingCost?.toInputString() ?? '';
@@ -135,6 +135,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSectionTitle(title: context.l10n.commonItems),
+        SizedBox(height: SdSpacingConstant.h8),
         _OrderLines(order: order),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSection(
@@ -144,18 +145,20 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
           onEdit: _startEdit,
           onCancel: controller.cancel,
           onSave: () => _save(
-            () => controller.saveProfit(orderId: order.id, fees: _fees.text),
+            () =>
+                controller.saveProfit(orderId: order.id, payout: _payout.text),
           ),
           reading: _ProfitStatement(profit: profit),
-          // The fee is the one stored figure on this statement; every other
-          // line is derived (hard rule 3), so it stays a row while its own
-          // becomes a box in the same place.
+          // The payout is the one stored figure on this statement; every other
+          // line is derived from it (hard rule 3), so the statement keeps its
+          // shape and gains a box rather than swapping a row for one.
           editing: _ProfitStatement(
             profit: profit,
-            feesField: MoneyField(
-              label: context.l10n.orderPlatformFees,
-              controller: _fees,
+            payoutField: MoneyField(
+              label: context.l10n.settlePayout,
+              controller: _payout,
               currency: currency,
+              helperText: context.l10n.settlePayoutHelp,
               textInputAction: TextInputAction.done,
             ),
           ),
@@ -206,6 +209,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSectionTitle(title: context.l10n.orderTimeline),
+        SizedBox(height: SdSpacingConstant.h8),
         _Timeline(order: order),
         SizedBox(height: SdContentPaddingV3.bottomGap),
       ],
@@ -514,13 +518,10 @@ class _OrderSectionTitle extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: SdSpacingConstant.h8),
-    child: Text(
-      title,
-      style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-        color: context.sdTheme3.textPrimary,
-      ),
+  Widget build(BuildContext context) => Text(
+    title,
+    style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+      color: context.sdTheme3.textPrimary,
     ),
   );
 }

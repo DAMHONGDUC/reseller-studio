@@ -32,6 +32,17 @@ outside the class that defines it. A number copied into a sentence goes stale
 silently — the sibling app's prose still claims a gap the code stopped using,
 and nobody noticed because prose does not fail to compile.
 
+**A document created by hand gets a sample in `sample_data/`, in the same turn
+it gains a field.** Owner's rule. `app_config` is typed into the Firebase
+console, so the only record of what a correct one looks like was a code block
+in a doc that nobody diffs — `sample_data/<collection>/<documentId>.json` is
+that record, with every field present including the optional ones.
+`docs/DATA_MODEL.md` stays the authority on what a field *means* and which way
+it fails; the sample only says what a filled-in document looks like. Nothing
+reads these files, and nothing may start to: a fixture a test depends on is a
+file that stops being a reference the first time a test needs it to be
+something else.
+
 **Every document in this repo is written in English, in full.** `CLAUDE.md`,
 everything under `docs/`, every `README.md`. No mixed-language paragraphs and
 no untranslated quotes. The app's user-facing strings are the exception and
@@ -81,6 +92,7 @@ in the left.
 | anything that looks like missing infrastructure — Firebase, signing, icons | `docs/rules/SETUP.md` |
 | asking *why* a rule exists before changing it | `docs/rules/DECISIONS.md` |
 | asking what is already built, or what is left and why | `docs/DONE_WORK.md`, `docs/REMAINING_WORK.md` |
+| a document created by hand in the Firebase console | `sample_data/README.md` |
 | anything in `lib/features/mock_data/` | `lib/features/mock_data/CLAUDE.md` (loads on its own) |
 | anything in `lib/features/workspace/` | `lib/features/workspace/CLAUDE.md` (loads on its own) |
 
@@ -193,6 +205,7 @@ functions/                 # Cloud Functions (TypeScript)
 packages/system_design/    # the design system, its own git repo (submodule)
 test/features/             # mirrors lib/features
 packages/system_design/tool/ # shared melos script bodies (submodule)
+sample_data/               # one JSON file per hand-created Firestore document
 docs/
 ```
 
@@ -379,6 +392,25 @@ behind it.
    corrected, and it will be corrected. `orders.payoutMinor` is the one
    exception because it is a fact the marketplace reported, not a derivation.
 
+   **And never estimate one either.** Owner's rule, and the half this app is
+   built on: a platform's fee is measured, never guessed from a published
+   rate. What the seller records is what the platform actually paid —
+   `orders.payoutMinor` — and the fee falls out of it as
+   `salePrice - refund - payout - shippingCost`, the same statement read
+   backwards. A rate table tops out near 95% on the one platform that already
+   shows the seller the true number, and it goes stale every time a
+   marketplace reprices; an order with no payout renders `—` (hard rule 5)
+   rather than a plausible figure nobody can tell apart from a fact.
+   - **A rate survives in exactly one place: before a sale exists.** Sourcing
+     has nothing to measure — the item is still in the shop — so
+     `Workspace.planningFeeRate` carries a single planning assumption for
+     `PurchaseEvaluation` and the cross-list comparison. It never reaches an
+     `Order`, and there is never a second one per marketplace.
+   - **An order with no payout is work, not a blank.** Payouts gathers them
+     and takes them in bulk (hard rule 16): the app says what needs attention
+     today, and "the platform paid you and nobody wrote it down" is exactly
+     that.
+
 4. **Money is an integer of minor units, never a double.** Use the `Money`
    value type in `core/money/` — it stores minor units with a currency and
    refuses to combine two currencies. `19.99` is not representable in binary
@@ -453,10 +485,17 @@ behind it.
     uses a token happens in a Cloud Function — the app asks the backend, the
     backend asks the platform. Nothing in the app reads or stores one.
     **Marketplace connection is not a feature of this app** (owner's rule):
-    there is no OAuth, no sync, and no `marketplaces/{id}` collection. What the
-    app keeps about a platform is what it charges — see
-    `lib/features/workspace/CLAUDE.md`. Reinstating a connection is a product
-    decision, and this rule is what it would have to be built under.
+    there is no OAuth, no sync, and no client that talks to a platform.
+    Reinstating one is a product decision, and this rule is what it would have
+    to be built under.
+    - **A file the seller exports is not a connection.** `PayoutCsvImport`
+      reads a payout report the seller downloaded and handed over — no token,
+      no account, nothing leaving the device. It is the honest way to collect
+      the figures this app measures rather than guesses (hard rule 3), and it
+      is the only import there is.
+    - **An importer reads the columns it needs and no others.** A marketplace
+      export carries buyer names and addresses; two values are taken from each
+      row and the rest is never held or logged (hard rule 9).
 
 11. **Workspace membership is the only ACL, and nobody edits their own
     membership document.** `firestore.rules` decides everything from
@@ -494,10 +533,35 @@ behind it.
     screen growing is fine; the bottom bar growing is a product decision, not
     a layout one.
 
-14. **Business records are nested under their workspace, never flat.** See
-    `docs/DATA_MODEL.md`. A flat collection makes every rule re-derive
-    ownership from a field and every query carry a `where` clause; one
-    forgotten clause is a leak between two sellers.
+14. **Every table is flat and top-level, modelled the way SQL would model
+    it.** Owner's rule, and it **reverses "business records are nested under
+    their workspace, never flat"**. One collection per entity, keyed by its
+    id, with `workspaceId` and every other relationship stored as a **field**
+    — never as a path segment, never as a subcollection. The reason is the
+    move off Firestore: a document tree has no relational equivalent and has
+    to be reshaped, while a flat collection with a `workspaceId` column
+    already *is* a table, so migrating becomes an export.
+
+    The old rule's argument was not wrong and is now a cost this one accepts
+    knowingly:
+    - **`workspaceId` is the whole security boundary.** A rule cannot inspect
+      the result set of a query, so it must be proven from the query's own
+      filters: every client query carries the filter and `firestore.rules`
+      *requires* it. One forgotten `where` is a leak between two sellers, and
+      nothing structural stops it any more — `WorkspaceCollections` is what
+      does, so no read reaches Firestore around it.
+    - **Every composite index gains `workspaceId` as its first field.** All of
+      them, not some.
+    - **Deleting a workspace becomes a query per table**, written once and
+      enumerating every table it sweeps.
+    - **A child list is a table with a foreign key.** Embed only what SQL
+      would keep in a column: a value object with no identity, or a snapshot
+      frozen at write time (a price as sold, a marketplace name as printed).
+
+    **Every table is migrated.** `docs/DATA_MODEL.md` is the authority on the
+    shape and on where each half of the boundary is enforced;
+    `functions/src/scripts/flattenTables.ts` moves data written before the
+    change.
 
 15. **Soft-delete anything another record points at** — items, sources,
     purchases, categories, locations carry `deletedAt`. Hard-deleting a source

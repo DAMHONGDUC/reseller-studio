@@ -1,7 +1,7 @@
 import { getStorage } from 'firebase-admin/storage';
 import { logger } from 'firebase-functions';
 
-import { db, paths } from '../lib/firestore';
+import { db, paths, rowsOf, workspaceTables } from '../lib/firestore';
 
 /** Storage objects are removed a page at a time; the bucket API takes a prefix. */
 const storagePrefix = (workspaceId: string) => `workspaces/${workspaceId}/`;
@@ -14,22 +14,61 @@ const storagePrefix = (workspaceId: string) => `workspaces/${workspaceId}/`;
  * two copies of a cascade is how one of them ends up forgetting the Storage
  * objects, and the leftovers are invisible until a bucket bill arrives.
  *
- * **Deleting the membership documents is what updates every member's
- * `users/{uid}.workspaceIds`**: `recursiveDelete` fires `onMemberWritten` for
- * each one, so nothing here touches a user document directly. A seller whose
+ * **Deleting the membership rows is what updates every member's
+ * `users/{uid}.workspaceIds`**: each delete fires `onMemberWritten`, so
+ * nothing here touches a user document directly. A seller whose
  * `lastWorkspaceId` pointed at this business falls back to the first they
  * still belong to (hard rule 11b), and to workspace setup when there is none.
+ *
+ * **A sweep per table, because the tables are flat** (hard rule 14). There is
+ * no subtree under `workspaces/{id}` to recurse into any more — the rows live
+ * in top-level tables and are found by their `workspaceId` column, so the
+ * cascade is `workspaceTables` plus a query each. A table missing from that
+ * list is a table whose rows outlive the business.
+ *
+ * **The workspace row goes last.** Every sweep above is authorised by it in
+ * `firestore.rules`; deleting it first would leave anything that retried
+ * unable to prove it may finish.
  *
  * **Idempotent**: every step is a delete, so a retry after a partial run
  * finishes the job rather than failing on what is already gone.
  */
 export async function deleteWorkspaceData(workspaceId: string): Promise<void> {
-  await db().recursiveDelete(db().doc(paths.workspace(workspaceId)));
+  for (const table of workspaceTables) {
+    await deleteRowsIn(workspaceId, table);
+  }
+
+  await db().doc(paths.workspace(workspaceId)).delete();
 
   await Promise.all([
     deleteWorkspaceFiles(workspaceId),
     deleteWorkspaceInvites(workspaceId),
   ]);
+}
+
+/**
+ * Every row one workspace owns in one table, a page at a time.
+ *
+ * **Paged rather than read whole.** A seller with thousands of items would
+ * otherwise load them all into memory to delete them, and a batch caps at 500
+ * writes anyway.
+ */
+async function deleteRowsIn(workspaceId: string, table: string): Promise<void> {
+  const pageSize = 400;
+
+  for (;;) {
+    const page = await rowsOf(workspaceId, table).limit(pageSize).get();
+
+    if (page.empty) return;
+
+    const batch = db().batch();
+
+    page.docs.forEach((doc) => batch.delete(doc.ref));
+
+    await batch.commit();
+
+    if (page.size < pageSize) return;
+  }
 }
 
 /**

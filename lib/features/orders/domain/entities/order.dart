@@ -58,7 +58,6 @@ class Order {
     this.marketplace = Marketplace.other,
     this.marketplaceRecordId,
     this.marketplaceNameSnapshot,
-    this.fees,
     this.shippingCost,
     this.refund,
     this.payout,
@@ -91,11 +90,6 @@ class Order {
   final Money salePrice;
 
   final DateTime orderedAt;
-
-  /// The platform's commission. Null until the integration reports it — and
-  /// `Marketplace.estimatedFeeRate` is only ever a planning estimate, never
-  /// written here.
-  final Money? fees;
 
   final Money? shippingCost;
   final Money? refund;
@@ -143,18 +137,49 @@ class Order {
     return costs.cast<Money>().reduce((Money a, Money b) => a + b);
   }
 
+  /// What the platform kept, measured — never estimated (hard rule 3).
+  ///
+  /// It is the remainder of what the buyer paid that never arrived —
+  /// `salePrice - refund - payout - shippingCost`, which is
+  /// `PayoutReconciliation.expected` solved for the fee, so the two can never
+  /// disagree.
+  ///
+  /// **Null until [payout] is in**, which is what makes this order's profit
+  /// `—` rather than a plausible number (hard rule 5), and what puts the order
+  /// in the Payouts queue.
+  ///
+  /// A label bought through the platform is already inside [payout], so it is
+  /// subtracted back out here; one bought elsewhere was never deducted, and
+  /// the fee line then reads low by that amount while the profit total stays
+  /// exact — the shipping line carries it either way.
+  Money? get platformFees {
+    final Money? net = payout;
+
+    if (net == null) return null;
+
+    final Money zero = Money.zero(salePrice.currency);
+
+    return salePrice - (refund ?? zero) - net - (shippingCost ?? zero);
+  }
+
+  /// Whether the platform's cut is still unknown — the order is work.
+  bool get needsPayout => platformFees == null;
+
   /// The full profit statement for this order.
   ///
   /// [otherExpenses] is anything from the Expenses feature attributed to this
   /// sale — passed in rather than looked up, because an entity does not reach
   /// into a repository.
+  ///
+  /// **An unknown fee stays unknown**: the breakdown carries a null and every
+  /// figure built on it reads `—`.
   ProfitBreakdown profit({Money? otherExpenses}) {
     final Money zero = Money.zero(salePrice.currency);
 
     return ProfitBreakdown(
       revenue: salePrice - (refund ?? zero),
       cogs: costOfGoods,
-      fees: fees ?? zero,
+      fees: platformFees,
       shipping: shippingCost ?? zero,
       otherExpenses: otherExpenses ?? zero,
     );
@@ -189,7 +214,6 @@ class Order {
     OrderStatus? status,
     Money? salePrice,
     DateTime? orderedAt,
-    Money? fees,
     Money? shippingCost,
     Money? refund,
     Money? payout,
@@ -197,7 +221,7 @@ class Order {
     String? trackingNumber,
     String? carrier,
     DateTime? shipByDate,
-    bool clearFees = false,
+    bool clearPayout = false,
     bool clearShippingCost = false,
     bool clearBuyerName = false,
     bool clearTrackingNumber = false,
@@ -218,10 +242,9 @@ class Order {
     lines: lines,
     salePrice: salePrice ?? this.salePrice,
     orderedAt: orderedAt ?? this.orderedAt,
-    fees: clearFees ? null : fees ?? this.fees,
     shippingCost: clearShippingCost ? null : shippingCost ?? this.shippingCost,
     refund: refund ?? this.refund,
-    payout: payout ?? this.payout,
+    payout: clearPayout ? null : payout ?? this.payout,
     externalOrderId: externalOrderId,
     buyerName: clearBuyerName ? null : buyerName ?? this.buyerName,
     trackingNumber: clearTrackingNumber

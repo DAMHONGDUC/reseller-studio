@@ -68,12 +68,7 @@ final class OrderTransition {
     );
   }
 
-  static Order settle(
-    Order order, {
-    required DateTime at,
-    Money? fees,
-    Money? payout,
-  }) {
+  static Order settle(Order order, {required DateTime at, Money? payout}) {
     _require(order, <OrderStatus>{
       OrderStatus.toShip,
       OrderStatus.shipped,
@@ -83,7 +78,11 @@ final class OrderTransition {
       OrderStatus.refunded,
     }, 'settle');
 
-    return order.copyWith(fees: fees, payout: payout, settledAt: at);
+    return order.copyWith(
+      payout: payout,
+      clearPayout: payout == null,
+      settledAt: at,
+    );
   }
 
   static void _require(Order order, Set<OrderStatus> allowed, String action) {

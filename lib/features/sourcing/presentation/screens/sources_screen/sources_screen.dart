@@ -65,7 +65,7 @@ class SourcesScreen extends ConsumerWidget {
 
     return AppAddFabScaffold(
       appBar: SdAppBarV3(title: context.l10n.analyticsSources),
-      addLabel: 'Add a source',
+      addLabel: context.l10n.homeQuickAddSource,
       onAdd: () => _add(context, ref),
       body: switch (source) {
         AsyncLoading<List<Source>>() when !source.hasValue =>

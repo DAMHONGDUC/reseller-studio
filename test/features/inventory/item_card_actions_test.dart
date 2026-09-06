@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/widgets/app_row_chevron.dart';
+import 'package:reseller_studio/core/widgets/item_card.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
-import 'package:reseller_studio/features/inventory/presentation/widgets/item_card.dart';
 
 import '../../support/pump_app.dart';
 

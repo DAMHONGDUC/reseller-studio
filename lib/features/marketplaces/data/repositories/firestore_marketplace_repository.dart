@@ -21,7 +21,7 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
 
   @override
   Stream<List<Marketplace>> watchMarketplaces() => FirestoreStream.collection(
-    _context.collections.marketplaces.orderBy('createdAt'),
+    _context.collections.marketplaces.query.orderBy('createdAt'),
     MarketplaceDto.toEntity,
     operation: 'load marketplaces',
   );
@@ -39,10 +39,7 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
         SdLogger.info(
           LogTagConstant.marketplace,
           'Marketplace saved',
-          <String, Object>{
-            'marketplaceId': marketplace.id,
-            'feePercent': marketplace.feeRate * 100,
-          },
+          <String, Object>{'marketplaceId': marketplace.id},
         );
       });
 

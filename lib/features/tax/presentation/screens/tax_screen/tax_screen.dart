@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../reports/domain/services/bookkeeping_gaps.dart';
+import '../../../../reports/presentation/controllers/report_controller.dart';
+import '../../../../reports/providers.dart';
+import '../../../../subscription/domain/enums/plan_feature.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../domain/entities/tax_summary.dart';
 import '../../../domain/entities/tax_year.dart';
 import '../../../domain/enums/tax_jurisdiction.dart';
 import '../../../providers.dart';
 
+part 'tax_screen_export.dart';
 part 'tax_screen_lines.dart';
 part 'tax_screen_year_strip.dart';
 
@@ -37,7 +48,7 @@ class TaxScreen extends ConsumerWidget {
     return SdScaffoldV3(
       appBar: SdAppBarV3(
         title: context.l10n.moreTax,
-        subtitle: _authority(jurisdiction),
+        subtitle: _authority(context, jurisdiction),
       ),
       body: ListView(
         padding: SdContentPaddingV3.screen(context),
@@ -96,6 +107,8 @@ class TaxScreen extends ConsumerWidget {
           _Lines(summary: summary),
           SizedBox(height: SdContentPaddingV3.sectionGap),
           _MileageCard(summary: summary, jurisdiction: jurisdiction),
+          SizedBox(height: SdContentPaddingV3.sectionGap),
+          const _ExportPack(),
           SizedBox(height: SdSpacingConstant.h16),
           Text(
             context.l10n.taxTheseAreYourOwnRecordsGrouped,
@@ -109,10 +122,10 @@ class TaxScreen extends ConsumerWidget {
     );
   }
 
-  static String _authority(TaxJurisdiction jurisdiction) =>
+  static String _authority(BuildContext context, TaxJurisdiction jurisdiction) =>
       switch (jurisdiction) {
-        TaxJurisdiction.us => 'Schedule C lines, calendar year',
-        TaxJurisdiction.uk => 'SA103 lines, 6 April to 5 April',
+        TaxJurisdiction.us => context.l10n.taxAuthorityUs,
+        TaxJurisdiction.uk => context.l10n.taxAuthorityUk,
       };
 
   /// The period spelled out, because "2026/27" means nothing until you see

@@ -30,10 +30,12 @@ void main() {
     // money back yet).
     //   revenue  = 6800+9500+3500+8900+11000+4200 = 43900
     //   cogs     = 1200+3000+3200+2200+4100+900   = 14600
-    //   fees     = 901+903+350+1780+1458+557      =  5949
+    // The cut is measured from the payout, so only the three settled orders
+    // contribute one: sale - payout - shipping.
+    //   fees     = 901+903+350                    =  2154
     //   shipping = 1240+1580+890+0+0+720          =  4430
     //   overheads (expenses with no orderId)      = 17769
-    //   profit   = 43900-14600-5949-4430-17769    =  1152
+    //   profit   = 43900-14600-2154-4430-17769    =  4947
     test('revenue and profit', () async {
       final ProviderContainer container = mockContainer();
 
@@ -42,20 +44,24 @@ void main() {
       final AnalyticsSummary summary = container.read(analyticsSummaryProvider);
 
       expect(summary.revenue, const Money(43900, 'USD'));
-      expect(summary.netProfit, const Money(1152, 'USD'));
+      expect(summary.netProfit, const Money(4947, 'USD'));
+      expect(summary.ordersMissingPayout, 3);
       expect(summary.orderCount, 6);
       expect(summary.unitsSold, 6);
     });
 
-    test('profit is flagged partial when a sold item had no cost', () async {
+    test('profit is partial while any payout is unrecorded', () async {
       final ProviderContainer container = mockContainer();
 
       await warmUp(container);
 
-      // Every sold item in the seed has a cost, so this run is complete.
-      // The flag exists for the case that is not, and Home renders
-      // "partial — some costs missing" when it is false.
-      expect(container.read(analyticsSummaryProvider).isProfitComplete, isTrue);
+      // Every sold item in the seed has a cost, but three of the six have not
+      // been paid out yet — so the platform's cut is measured over half the
+      // book and Home says so rather than presenting it as the whole truth.
+      expect(
+        container.read(analyticsSummaryProvider).isProfitComplete,
+        isFalse,
+      );
     });
 
     test(
@@ -333,7 +339,7 @@ void main() {
       expect(find.text('Net profit'), findsOneWidget);
       expect(find.text('− Cost of goods'), findsOneWidget);
       expect(find.text(r'$439.00'), findsOneWidget);
-      expect(find.text(r'$11.52'), findsOneWidget);
+      expect(find.text(r'$49.47'), findsOneWidget);
     });
 
     testWidgets('Settings shows the mock switch, on, with the dataset counts', (

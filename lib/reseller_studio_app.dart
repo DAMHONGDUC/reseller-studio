@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/app_config/presentation/widgets/force_update_gate.dart';
 import 'features/notifications/providers.dart';
 import 'features/settings/presentation/controllers/theme_mode_controller.dart';
 import 'l10n/gen/app_localizations.dart';
@@ -88,7 +89,10 @@ class ResellerStudioApp extends ConsumerWidget {
               // there is still one place the style is decided, and it unwinds
               // with the route rather than leaking like `SystemChrome` does.
               value: AppTheme.statusBarStyle(Theme.of(context).brightness),
-              child: child ?? const SizedBox.shrink(),
+              // Above every route rather than on one: a build too old to run
+              // is about the binary, so the sheet is raised over whatever the
+              // seller was looking at.
+              child: ForceUpdateGate(child: child ?? const SizedBox.shrink()),
             ),
       ),
     );

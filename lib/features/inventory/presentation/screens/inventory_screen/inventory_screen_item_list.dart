@@ -11,26 +11,24 @@ class _ItemList extends ConsumerWidget {
     final DateTime now = ref.watch(clockProvider).now();
     // Grouped once here rather than watched per card: a family subscription
     // on every row rebuilds the whole list on any listing write.
-    final Map<String, List<Listing>> listings = <String, List<Listing>>{};
-
-    for (final Listing listing
-        in ref.watch(listingsProvider).value ?? const <Listing>[]) {
-      listings.putIfAbsent(listing.itemId, () => <Listing>[]).add(listing);
-    }
+    final Map<String, List<Listing>> listings = ListingsByItem.group(
+      ref.watch(listingsProvider).value ?? const <Listing>[],
+    );
     final Set<String> selected = ref.watch(inventorySelectionProvider);
     final bool isSelecting = selected.isNotEmpty;
 
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(
-        SdContentPaddingV3.horizontal,
-        0,
-        SdContentPaddingV3.horizontal,
-        // Clears the floating tab bar AND the FAB stacked above it —
-        // otherwise the last row sits under "Quick Add" and cannot be tapped.
-        // The same arithmetic every other create screen uses, rather than a
-        // second copy of it here: this list is a sliver, so it takes the
-        // number instead of the whole `EdgeInsets`.
-        AppAddFabScaffold.listPadding(context, floatingNav: true).bottom,
+      // The gutter is the screen's now — one for every sliver below the
+      // chrome. What is left here is the clearance only this list needs:
+      // the floating tab bar AND the FAB stacked above it, or the last row
+      // sits under "Quick Add" and cannot be tapped. The same arithmetic
+      // every other create screen uses, rather than a second copy of it: this
+      // list is a sliver, so it takes the number instead of the `EdgeInsets`.
+      padding: EdgeInsets.only(
+        bottom: AppAddFabScaffold.listPadding(
+          context,
+          floatingNav: true,
+        ).bottom,
       ),
       sliver: SliverList.separated(
         itemCount: items.length,

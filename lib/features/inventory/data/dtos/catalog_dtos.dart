@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/storage_location.dart';
 
@@ -10,7 +11,7 @@ final class ItemCategoryDto {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return ItemCategory(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       parentId: FirestoreMapper.stringOrNull(data['parentId']),
@@ -41,7 +42,7 @@ final class StorageLocationDto {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return StorageLocation(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       kind:
           FirestoreMapper.enumOrNull(LocationKind.values, data['kind']) ??

@@ -54,6 +54,27 @@ class OrderActionsController extends Notifier<bool> {
     );
   }
 
+  /// Mark a whole post-office run shipped, with one carrier for all of it.
+  ///
+  /// **No tracking number, and that is the point.** A tracking number belongs
+  /// to one parcel, so asking for one here would put the seller back into
+  /// twelve sheets — which is the thing this replaces. The carrier is the
+  /// half that really is the same for the run, and anything per-parcel is
+  /// added afterwards on the order itself.
+  ///
+  /// Sequential rather than a `Future.wait`: a mid-run failure must leave the
+  /// orders before it shipped and the queue honest about the rest.
+  Future<void> markManyShipped(List<Order> orders, {String? carrier}) async {
+    SdLogger.action(LogTagConstant.order, 'Ship orders', <String, Object>{
+      'count': orders.length,
+      'hasCarrier': carrier != null,
+    });
+
+    for (final Order order in orders) {
+      await markShipped(order, carrier: carrier);
+    }
+  }
+
   Future<void> markDelivered(Order order) => _save(
     'Deliver order',
     OrderTransition.deliver(order, at: DateTime.now()),
@@ -65,17 +86,40 @@ class OrderActionsController extends Notifier<bool> {
   /// **The one stored figure that is not derived** (hard rule 3): it is a fact
   /// the platform reported, and it is what the seller reconciles their bank
   /// against.
-  Future<void> recordSettlement(Order order, {Money? fees, Money? payout}) =>
-      _save(
-        'Record settlement',
-        OrderTransition.settle(
-          order,
-          at: DateTime.now(),
-          fees: fees,
-          payout: payout,
-        ),
-        <String, Object>{'hasFees': fees != null, 'hasPayout': payout != null},
-      );
+  Future<void> recordSettlement(Order order, {Money? payout}) => _save(
+    'Record settlement',
+    OrderTransition.settle(order, at: DateTime.now(), payout: payout),
+    <String, Object>{'hasPayout': payout != null},
+  );
+
+  /// Record a run of payouts in one sitting.
+  ///
+  /// **The screen this serves is the answer to the payout-first model's one
+  /// real cost** — the seller has to type a figure the app used to guess. One
+  /// at a time through the order detail is the version nobody finishes, so
+  /// this takes a whole marketplace's deposit at once (hard rule 16).
+  ///
+  /// Sequential rather than a `Future.wait`, the same reason `markManyShipped`
+  /// is: a mid-run failure must leave the orders before it recorded and the
+  /// queue honest about the rest.
+  Future<void> recordManySettlements(
+    List<Order> orders,
+    Map<String, Money> payoutsByOrderId,
+  ) async {
+    SdLogger.action(
+      LogTagConstant.order,
+      'Record settlements',
+      <String, Object>{'count': payoutsByOrderId.length},
+    );
+
+    for (final Order order in orders) {
+      final Money? payout = payoutsByOrderId[order.id];
+
+      if (payout == null) continue;
+
+      await recordSettlement(order, payout: payout);
+    }
+  }
 
   Future<void> requestReturn(Order order) {
     AppAnalytics.instance.returnOpened();

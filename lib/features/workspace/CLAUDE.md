@@ -84,17 +84,37 @@ before the new business has every default record.
   leaves an unreachable workspace rather than a reachable business with a
   partial default list.
 
+## Two screens, and they are not the same job
+
+Owner's rule, and it **replaces "More → Business opens the business the seller
+is currently standing in"**. There are now two:
+
+- **`WorkspacesScreen` (More → Businesses)** manages the *list*: every
+  business the seller belongs to, the plan's ceiling on how many, and the one
+  action that spends the next slot. It names no record, so its row on More is
+  a plain `const` destination — `MoreConstant.sectionsFor` no longer takes a
+  workspace id, and the current business is one tap away, marked with a badge.
+- **`WorkspaceDetailScreen`** edits *one* business.
+
+**The switcher sheet stays a switcher.** It opens from Home's title mid-task
+and closes the moment a business is picked — the wrong surface for a plan
+meter, an empty state or a list somebody is auditing.
+
+**Both list surfaces use one interaction, deliberately.** Tapping a row
+switches to that business; the pencil beside it opens the detail screen. Two
+gestures that do different things must not swap places between the sheet and
+the screen.
+
 ## One screen edits a business, and two places open it
 
 Owner's rule. `WorkspaceDetailScreen` is where a business's name, country,
 currency, business type and thresholds are changed, and it is reached from
-both places a seller sees a business:
+both places a seller sees a list of businesses:
 
 - **the switcher sheet**, where every row carries an edit affordance beside
   it — so the business you want to correct is editable from the list you were
   already looking at, without switching to it first;
-- **More → Business**, its own row above Marketplaces, which opens the
-  business the seller is currently standing in.
+- **the Businesses screen**, the same affordance on the same kind of row.
 
 **Settings does not show the business at all any more.** Owner's rule, and it
 replaces the rule that used to stand here — that Settings held the facts and
@@ -103,9 +123,6 @@ account, and the developer block. A business is a record, records are managed
 from More, and a seller looking for their business had to know it was filed
 under a screen about preferences.
 
-- **The row is built from the resolved workspace id, not from a const route.**
-  `MoreConstant.sectionsFor` takes the id and drops the row when there is
-  none — the screen still takes an explicit id, which is the point below.
 - **Settings no longer edits a field in place** either. It used to open a
   picker per row and write on the tap; two screens writing the same document
   is the state where one of them quietly stops matching.
@@ -128,3 +145,34 @@ under a screen about preferences.
   card's — it scrolled off the end of the form until the pinned-action rule in
   `docs/rules/SCREENS.md` was widened. Save stays lowest, so the button under
   a resting thumb is never the destructive one.
+
+## Emptying a business is not deleting it, and they are different code paths
+
+The developer block in More → Settings has two opposite buttons, and the rule
+is that neither one is a version of the other:
+
+- **Seed demo data** fills the open workspace (`DemoDataSeeder`, in
+  `lib/features/mock_data/`).
+- **Delete all data** empties it (`WorkspacePurgeRepository`). The business
+  survives, so this is not `deleteWorkspace` with a flag — that one ends the
+  record this one leaves standing, is owner-only, and is a Cloud Function.
+- **Two tables survive the sweep, and the list says which**:
+  `WorkspaceCollections.recordTableNames` is `tableNames` minus `members` (the
+  ACL, hard rule 11 — emptying it locks every seller out of a business that
+  still exists) and `activity` (append-only, hard rule 12 — `firestore.rules`
+  refuses the delete, so including it would fail the sweep on its first row).
+  It is **derived** from `tableNames`, so a table added there is swept without
+  anyone remembering a second list.
+- **A client sweep, not a callable**, unlike deleting the business: the rules
+  already let a member delete a row in every table it touches, so the Admin
+  SDK would buy nothing. It is paged, 400 rows at a time, under the batch cap.
+- **It hard-deletes, deliberately against hard rule 15.** A soft delete keeps
+  a row joinable for whatever points at it, and nothing points at anything
+  once the sweep finishes — a workspace full of `deletedAt` rows is not the
+  empty workspace this exists to reproduce.
+- **Dev mode gates it twice**, the section and the card, the same as the
+  mock-data switch: this one deletes, so one guard being forgotten must not be
+  enough.
+- Its strings are hardcoded English, the developer-UI exception to hard rule 7
+  that `_DemoSeedCard` and `_MockSummary` already take.
+- `test/features/workspace/delete_all_data_test.dart` pins what survives.

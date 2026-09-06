@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../domain/entities/carrier.dart';
 
 final class CarrierDto {
@@ -8,7 +9,7 @@ final class CarrierDto {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
 
     return Carrier(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       deletedAt: FirestoreMapper.dateOrNull(data['deletedAt']),

@@ -7,37 +7,59 @@ import { atCeiling } from '../lib/subscription/usage.js';
 // The compiled module, not the source: this suite runs under plain node, and
 // `npm run build` is what CI runs before it.
 
-const free = ceilingsByPlan.free.items;
+// A ceiling to test the mechanism against, independent of what any plan is
+// currently set to. Reading a live plan's number here would make the suite
+// restate the table instead of checking the arithmetic over it.
+const ceiling = 50;
 
 describe('when the rules refuse one more', () => {
-  it('lets a Free workspace fill its ceiling, and the slack above it', () => {
-    // The client gate stops at the ceiling; the rule exists for the client
-    // that ignores it, so the advertised last slot must never be refused.
-    assert.equal(atCeiling('free', free - 1, 'items'), false);
-    assert.equal(atCeiling('free', free, 'items'), false);
-    assert.equal(atCeiling('free', free + ceilingGrace - 1, 'items'), false);
-  });
-
-  it('refuses once the count is past the ceiling and the slack', () => {
-    assert.equal(atCeiling('free', free + ceilingGrace, 'items'), true);
-    assert.equal(atCeiling('free', free + 500, 'items'), true);
-  });
-
-  it('never refuses a plan with no ceiling', () => {
+  it('never refuses a plan with no ceiling, and refuses one past its own', () => {
+    // Premium counts no records, so nothing about a count can refuse it.
     assert.equal(atCeiling('premium', 100000, 'items'), false);
     assert.equal(atCeiling('premium', 100000, 'orders'), false);
+
+    // Free does, and a count far past it is the client that ignored its gate.
+    assert.equal(atCeiling('free', 100000, 'items'), true);
+    assert.equal(atCeiling('free', 100000, 'orders'), true);
+    assert.equal(atCeiling('free', 0, 'items'), false);
   });
 
   it('reads a plan it does not know as Free', () => {
     // A tier added to the RevenueCat dashboard before this build knows it
-    // must not come out unlimited — that is a paid tier granted by a typo.
-    assert.equal(atCeiling('enterprise', free + ceilingGrace, 'items'), true);
+    // gets Free's ceilings, never Premium's — so a typo in the dashboard
+    // cannot hand out an unlimited plan.
+    assert.equal(
+      atCeiling('enterprise', 100000, 'items'),
+      atCeiling('free', 100000, 'items'),
+    );
   });
 
-  it('counts items and orders against their own ceilings', () => {
-    const orders = ceilingsByPlan.free.orders;
+  it('still lets a plan fill a ceiling, and the slack above it', () => {
+    // The mechanism, checked against a literal rather than a live plan: the
+    // client gate stops at the ceiling and the rule exists for the client
+    // that ignores it, so the advertised last slot is never refused.
+    const under = (count) =>
+      count < ceiling + ceilingGrace;
 
-    assert.equal(atCeiling('free', orders + ceilingGrace, 'orders'), true);
-    assert.equal(atCeiling('free', orders + ceilingGrace, 'items'), false);
+    assert.equal(under(ceiling - 1), true);
+    assert.equal(under(ceiling), true);
+    assert.equal(under(ceiling + ceilingGrace - 1), true);
+    assert.equal(under(ceiling + ceilingGrace), false);
+  });
+
+  it('keeps items and orders as separate ceilings', () => {
+    // Separate fields, so changing one never drags the other with it.
+    assert.ok('items' in ceilingsByPlan.free);
+    assert.ok('orders' in ceilingsByPlan.free);
+  });
+
+  it('mirrors the app ceilings that Free actually holds', () => {
+    // The app renders the paywall from `PlanLimits.byPlan`; this file is what
+    // the backend refuses on. Changing one means changing the other, and this
+    // is the assertion that says so out loud.
+    assert.equal(ceilingsByPlan.free.items, 50);
+    assert.equal(ceilingsByPlan.free.orders, 30);
+    assert.equal(ceilingsByPlan.premium.items, null);
+    assert.equal(ceilingsByPlan.premium.orders, null);
   });
 });

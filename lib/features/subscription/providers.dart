@@ -9,6 +9,7 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../app_config/providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
@@ -20,6 +21,7 @@ import '../workspace/providers.dart';
 import 'domain/entities/plan_limits.dart';
 import 'domain/entities/plan_offering.dart';
 import 'domain/entities/subscription_status.dart';
+import 'domain/enums/plan_allowance.dart';
 import 'domain/enums/plan_feature.dart';
 import 'domain/enums/seller_plan.dart';
 import 'domain/services/plan_gate.dart';
@@ -53,9 +55,23 @@ final FutureProvider<List<PlanOffering>> planOfferingsProvider =
 /// direction is deliberate: showing a paying seller the free tier for a
 /// moment is a cosmetic bug, whereas defaulting to Premium would hand the
 /// whole app away on every cold start.
+///
+/// **With monetisation switched off it answers Premium for everyone**, and
+/// that is the whole of the kill switch: every ceiling, capability and block
+/// in the app already asks this one question, so turning the plan system off
+/// is one answer changing rather than a flag threaded through forty call
+/// sites. `subscriptionStatusProvider` stays the honest record of what the
+/// seller actually bought — read that, never this, to say so on screen.
+///
+/// **An account `app_config` names is Premium without having bought it**, the
+/// same one-answer trick aimed at one person rather than everybody: the
+/// owner, a tester, a seller being made whole after a billing failure.
 final Provider<SellerPlan> currentPlanProvider = Provider<SellerPlan>((
   Ref ref,
 ) {
+  if (!ref.watch(premiumEnabledProvider)) return SellerPlan.premium;
+  if (ref.watch(premiumGrantedByEmailProvider)) return SellerPlan.premium;
+
   return ref.watch(subscriptionStatusProvider).value?.plan ?? SellerPlan.free;
 });
 
@@ -104,6 +120,23 @@ final Provider<int> countedWorkspacesProvider = Provider<int>((Ref ref) {
   final List<Workspace> workspaces = ref.watch(workspacesProvider);
 
   return workspaces.length;
+});
+
+/// How many of one allowance are in use, whichever allowance is asked for.
+///
+/// **The three counters above, reachable by enum**, so a screen that walks
+/// `PlanAllowance.values` never has to name them one at a time.
+// See `itemProvider` for why a family's type is inferred rather than written.
+// ignore: type_annotate_public_apis
+final countedAllowanceProvider = Provider.family<int, PlanAllowance>((
+  Ref ref,
+  PlanAllowance allowance,
+) {
+  return switch (allowance) {
+    PlanAllowance.items => ref.watch(countedItemsProvider),
+    PlanAllowance.orders => ref.watch(countedOrdersProvider),
+    PlanAllowance.workspaces => ref.watch(countedWorkspacesProvider),
+  };
 });
 
 /// Whether one more item may be created, and why not when it may not.

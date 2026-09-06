@@ -5,7 +5,6 @@ class MarketplaceSeed {
   const MarketplaceSeed({
     required this.id,
     required this.name,
-    required this.feeRate,
     required this.hue,
   });
 
@@ -15,7 +14,6 @@ class MarketplaceSeed {
   final String id;
 
   final String name;
-  final double feeRate;
 
   /// A different hue each, so the colour tags mean something on the first
   /// screen a new seller opens rather than after they have configured five
@@ -35,42 +33,10 @@ class MarketplaceSeed {
 /// tier corrects it in the marketplace's own screen.
 final class MarketplaceConstant {
   static const List<MarketplaceSeed> defaults = <MarketplaceSeed>[
-    MarketplaceSeed(
-      id: 'ebay',
-      name: 'eBay',
-      feeRate: 0.1325,
-      hue: AppTagHue.blue,
-    ),
-    MarketplaceSeed(
-      id: 'etsy',
-      name: 'Etsy',
-      feeRate: 0.095,
-      hue: AppTagHue.amber,
-    ),
-    MarketplaceSeed(
-      id: 'depop',
-      name: 'Depop',
-      feeRate: 0.10,
-      hue: AppTagHue.red,
-    ),
-    MarketplaceSeed(
-      id: 'poshmark',
-      name: 'Poshmark',
-      feeRate: 0.20,
-      hue: AppTagHue.violet,
-    ),
-    MarketplaceSeed(
-      id: 'vinted',
-      name: 'Vinted',
-      feeRate: 0,
-      hue: AppTagHue.teal,
-    ),
+    MarketplaceSeed(id: 'ebay', name: 'eBay', hue: AppTagHue.blue),
+    MarketplaceSeed(id: 'etsy', name: 'Etsy', hue: AppTagHue.amber),
+    MarketplaceSeed(id: 'depop', name: 'Depop', hue: AppTagHue.red),
+    MarketplaceSeed(id: 'poshmark', name: 'Poshmark', hue: AppTagHue.violet),
+    MarketplaceSeed(id: 'vinted', name: 'Vinted', hue: AppTagHue.teal),
   ];
-
-  /// A rate is a fraction of the sale price, so anything outside this is a
-  /// typo rather than a fee — 100% of a sale is already absurd, and negative
-  /// is not a fee at all.
-  static const double maxFeeRate = 1;
-
-  static bool isValidFeeRate(double rate) => rate >= 0 && rate <= maxFeeRate;
 }

@@ -25,7 +25,6 @@ void main() {
     final Marketplace marketplace = Marketplace(
       id: 'm-1',
       name: 'Car boot',
-      feeRate: 0,
       createdAt: DateTime(2026),
     );
 

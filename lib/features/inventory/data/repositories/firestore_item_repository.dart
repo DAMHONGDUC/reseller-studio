@@ -24,7 +24,7 @@ class FirestoreItemRepository implements ItemRepository {
 
   @override
   Stream<List<Item>> watchItems() => FirestoreStream.collection(
-    _context.collections.items.orderBy('createdAt', descending: true),
+    _context.collections.items.query.orderBy('createdAt', descending: true),
     _toEntity,
     operation: 'load inventory',
   ).map(_live);
@@ -51,7 +51,7 @@ class FirestoreItemRepository implements ItemRepository {
   @override
   Stream<List<Item>> watchItemsForPurchase(String purchaseId) =>
       FirestoreStream.collection(
-        _context.collections.items
+        _context.collections.items.query
             .where('purchaseId', isEqualTo: purchaseId)
             .orderBy('createdAt', descending: true),
         _toEntity,

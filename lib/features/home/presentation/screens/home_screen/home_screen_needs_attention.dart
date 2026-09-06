@@ -1,9 +1,12 @@
 part of 'home_screen.dart';
 
-/// The four things that can be waiting on a seller, each with its count.
+/// The things that can be waiting on a seller, each with its count.
 ///
-/// The four the plan names (§6): orders to ship, offers waiting, items to
-/// list, stale inventory.
+/// The four the plan names (§6) — orders to ship, offers waiting, items to
+/// list, stale inventory — and one the plan does not: money a marketplace
+/// should have paid by now. That row is here because it is the only one that
+/// hands the seller money back rather than work, and a payout that never
+/// arrives is invisible until somebody goes looking for it.
 ///
 /// A block renders **only when it has something in it**. A permanent list of
 /// zeroes trains the eye to skip the whole section, which defeats the one
@@ -40,6 +43,8 @@ class _NeedsAttention extends ConsumerWidget {
     final List<Offer> offers = ref.watch(pendingOffersProvider);
     final List<Item> stale = ref.watch(staleItemsProvider);
     final List<Item> unlisted = ref.watch(unlistedItemsProvider);
+    final List<Order> unpaid = ref.watch(ordersAwaitingPayoutListProvider);
+    final int overduePayouts = ref.watch(overduePayoutsProvider).length;
     final DateTime now = ref.watch(clockProvider).now();
 
     final int overdue = pending
@@ -73,6 +78,29 @@ class _NeedsAttention extends ConsumerWidget {
           detail: _closingDetail(context, offers, now),
           tint: context.sdTheme3.info,
           onTap: () => context.push(AppRoutes.offers),
+        ),
+      // Third: it is money already earned, so it outranks stock decisions
+      // but not the two rows with somebody else's clock running on them.
+      //
+      // **Every sale still owed a figure, not only the late ones.** Nothing is
+      // estimated any more (hard rule 3), so each of these is a profit the app
+      // cannot show — the count is the work, and being overdue is what makes
+      // one of them urgent rather than what makes it exist.
+      if (unpaid.isNotEmpty)
+        _AttentionRow(
+          icon: AppIconConstant.payments,
+          label: context.l10n.homePayoutsToRecord,
+          count: unpaid.length,
+          detail: overduePayouts > 0
+              ? context.l10n.homePayoutOverdueDetail(
+                  overduePayouts,
+                  PayoutReconciliation.overdueAfterDays,
+                )
+              : context.l10n.homePayoutsToRecordDetail,
+          tint: overduePayouts > 0
+              ? context.sdTheme3.warning
+              : context.sdTheme3.info,
+          onTap: () => context.push(AppRoutes.payouts),
         ),
       if (unlisted.isNotEmpty)
         _AttentionRow(

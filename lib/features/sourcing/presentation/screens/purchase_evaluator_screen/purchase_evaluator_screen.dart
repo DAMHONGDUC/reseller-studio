@@ -14,7 +14,6 @@ import '../../../../../core/widgets/picker_field.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../inventory/providers.dart';
 import '../../../../marketplaces/domain/enums/marketplace.dart';
-import '../../../../marketplaces/domain/services/marketplace_fee_policy.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../orders/providers.dart';
 import '../../../../pricing/domain/services/profit_calculator.dart';
@@ -35,7 +34,13 @@ import '../../../domain/services/sold_before_lookup.dart';
 /// shown rather than clamped: a negative maximum means the fees and postage
 /// already exceed the sale price, so the item is not worth taking for free.
 class PurchaseEvaluatorScreen extends ConsumerStatefulWidget {
-  const PurchaseEvaluatorScreen({super.key});
+  const PurchaseEvaluatorScreen({this.initialCode, super.key});
+
+  /// A code the seller already scanned somewhere else, usually on the
+  /// Inventory scanner finding nothing — which is exactly the moment this
+  /// screen is for: something in their hand that the business does not own
+  /// yet. Null when the screen was opened from Sourcing.
+  final String? initialCode;
 
   @override
   ConsumerState<PurchaseEvaluatorScreen> createState() =>
@@ -73,6 +78,18 @@ class _PurchaseEvaluatorScreenState
 
     if (code == null || !mounted) return;
 
+    _applyCode(code, announceMiss: true);
+  }
+
+  /// Answer [code] out of the seller's own records and fill the sale price in.
+  ///
+  /// **Shared with the code this screen was opened on**, so arriving from the
+  /// scanner and scanning again here cannot answer the same code differently.
+  ///
+  /// [announceMiss] is false on arrival: a snackbar firing as a screen opens
+  /// reads as an error, and "no history" is an ordinary answer for something
+  /// the seller has never bought before.
+  void _applyCode(String code, {required bool announceMiss}) {
     final SoldBefore? found = SoldBeforeLookup.find(
       code: code,
       items: ref.read(itemsProvider).value ?? const <Item>[],
@@ -81,7 +98,10 @@ class _PurchaseEvaluatorScreenState
 
     if (found == null) {
       setState(() => _soldBefore = null);
-      SdSnackBarUtilsV3.info(context, context.l10n.sourcingScanNoHistory);
+
+      if (announceMiss) {
+        SdSnackBarUtilsV3.info(context, context.l10n.sourcingScanNoHistory);
+      }
 
       return;
     }
@@ -91,6 +111,21 @@ class _PurchaseEvaluatorScreenState
       _sale.text = found.salePrice.toInputString();
       _saleFromHistory = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final String? code = widget.initialCode;
+
+    if (code == null || code.isEmpty) return;
+
+    // After the first frame: the lookup reads providers and calls `setState`,
+    // and neither is legal while the widget is still being built.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _applyCode(code, announceMiss: false),
+    );
   }
 
   @override
@@ -109,15 +144,11 @@ class _PurchaseEvaluatorScreenState
     final Money? sale = Money.tryParse(_sale.text, currency);
     final Money shipping = Money.tryParse(_shipping.text, currency) ?? zero;
 
-    // The fee is estimated from the platform's published rate. It is a
-    // planning number and is never written to an order — the real fee arrives
-    // from the marketplace when the sale settles.
-    final Map<String, double> feeRates = ref.read(marketplaceFeeRatesProvider);
-    final Money fees =
-        sale?.applyRate(
-          MarketplaceFeePolicy.rateFor(_marketplace, overrides: feeRates),
-        ) ??
-        zero;
+    // The business's own planning rate — the last estimate left in the app
+    // (hard rule 3). Nothing has sold, so there is no payout to measure, and
+    // this figure is never written to an order.
+    final double feeRate = ref.read(planningFeeRateProvider);
+    final Money fees = sale?.applyRate(feeRate) ?? zero;
 
     final PurchaseEvaluation? evaluation = sale == null
         ? null
@@ -143,6 +174,10 @@ class _PurchaseEvaluatorScreenState
                 _Verdict(evaluation: evaluation, marketplace: _marketplace),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
                 _SoldBeforeCard(found: _soldBefore),
+                // The gap belongs to the card under it, and exists only when
+                // the history card above does.
+                if (_soldBefore != null)
+                  SizedBox(height: SdSpacingConstant.h16),
                 SdCardV3(
                   child: Column(
                     children: <Widget>[
@@ -169,28 +204,23 @@ class _PurchaseEvaluatorScreenState
                       PickerField(
                         label: context.l10n.commonMarketplace,
                         icon: AppIconConstant.storefront,
-                        value:
-                            '${_marketplace.displayName} · '
-                            '${(MarketplaceFeePolicy.rateFor(_marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% fee',
+                        value: _marketplace.displayName,
                         onTap: () async {
-                          final Marketplace?
-                          picked = await OptionPickerSheet.show<Marketplace>(
-                            context,
-                            title: context.l10n.commonMarketplace,
-                            selected: _marketplace,
-                            options: Marketplace.values
-                                .map(
-                                  (
-                                    Marketplace marketplace,
-                                  ) => PickerOption<Marketplace>(
-                                    value: marketplace,
-                                    label: marketplace.displayName,
-                                    caption:
-                                        '${(MarketplaceFeePolicy.rateFor(marketplace, overrides: ref.watch(marketplaceFeeRatesProvider)) * 100).toStringAsFixed(1)}% estimated fee',
-                                  ),
-                                )
-                                .toList(),
-                          );
+                          final Marketplace? picked =
+                              await OptionPickerSheet.show<Marketplace>(
+                                context,
+                                title: context.l10n.commonMarketplace,
+                                selected: _marketplace,
+                                options: Marketplace.values
+                                    .map(
+                                      (Marketplace marketplace) =>
+                                          PickerOption<Marketplace>(
+                                            value: marketplace,
+                                            label: marketplace.displayName,
+                                          ),
+                                    )
+                                    .toList(),
+                              );
 
                           if (picked == null) return;
 
@@ -351,45 +381,36 @@ class _SoldBeforeCard extends StatelessWidget {
 
     if (sale == null) return const SizedBox.shrink();
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: SdSpacingConstant.h16),
-      child: SdCardV3(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              context.l10n.sourcingSoldBefore,
-              style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-                color: context.sdTheme3.textPrimary,
-              ),
+    return SdCardV3(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            context.l10n.sourcingSoldBefore,
+            style: context.textTheme3.titleSmall!.semiBold3.copyWith(
+              color: context.sdTheme3.textPrimary,
             ),
-            SizedBox(height: SdSpacingConstant.h4),
-            Text(
-              context.l10n.sourcingSoldOnceFor(
-                sale.title,
-                context.money(sale.salePrice),
-                DateTimeUtils.mediumDate(
-                  sale.soldAt,
-                  locale: context.localeTag,
-                ),
-              ),
-              style: context.textTheme3.bodyMedium!.copyWith(
-                color: context.sdTheme3.textPrimary,
-              ),
+          ),
+          SizedBox(height: SdSpacingConstant.h4),
+          Text(
+            context.l10n.sourcingSoldOnceFor(
+              sale.title,
+              context.money(sale.salePrice),
+              DateTimeUtils.mediumDate(sale.soldAt, locale: context.localeTag),
             ),
-            SizedBox(height: SdSpacingConstant.h4),
-            Text(
-              context.l10n.sourcingSoldTimes(
-                sale.timesSold,
-                DateTimeUtils.mediumDate(
-                  sale.soldAt,
-                  locale: context.localeTag,
-                ),
-              ),
-              style: context.textTheme3.bodySmall!.faint3(context),
+            style: context.textTheme3.bodyMedium!.copyWith(
+              color: context.sdTheme3.textPrimary,
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: SdSpacingConstant.h4),
+          Text(
+            context.l10n.sourcingSoldTimes(
+              sale.timesSold,
+              DateTimeUtils.mediumDate(sale.soldAt, locale: context.localeTag),
+            ),
+            style: context.textTheme3.bodySmall!.faint3(context),
+          ),
+        ],
       ),
     );
   }

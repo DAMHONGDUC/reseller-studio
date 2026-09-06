@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/firestore/firestore_mapper.dart';
+import '../../../../core/firestore/workspace_collections.dart';
 import '../../../../core/money/money.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../orders/domain/enums/order_status.dart';
@@ -17,7 +18,7 @@ final class OfferDto {
         FirestoreMapper.stringOrNull(data['currency']) ?? fallbackCurrency;
 
     return Offer(
-      id: doc.id,
+      id: WorkspaceTable.localId(doc.id),
       itemId: FirestoreMapper.stringOrNull(data['itemId']) ?? '',
       itemTitle: FirestoreMapper.stringOrNull(data['itemTitle']) ?? '',
       marketplace:

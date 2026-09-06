@@ -112,6 +112,7 @@ enum QuickActionOpen {
 /// Every create action in the app.
 enum QuickActionKind {
   quickAddItem,
+  intakeSession,
   addItem,
   scan,
   recordSale,
@@ -120,6 +121,7 @@ enum QuickActionKind {
   addSource,
   addCategory,
   addLocation,
+  addWorkspace,
   addMarketplace,
   addCarrier,
   inviteTeammate,
@@ -176,6 +178,11 @@ final class QuickActionConstant {
           route: AppRoutes.quickAdd,
         ),
         QuickAction(
+          kind: QuickActionKind.intakeSession,
+          icon: AppIconConstant.storefront,
+          route: AppRoutes.intake,
+        ),
+        QuickAction(
           kind: QuickActionKind.scan,
           icon: AppIconConstant.barcodeScanner,
           route: AppRoutes.scanner,
@@ -226,6 +233,11 @@ final class QuickActionConstant {
       kind: QuickActionSectionKind.business,
       actions: <QuickAction>[
         QuickAction(
+          kind: QuickActionKind.addWorkspace,
+          icon: AppIconConstant.storefront,
+          route: AppRoutes.workspaces,
+        ),
+        QuickAction(
           kind: QuickActionKind.addMarketplace,
           icon: AppIconConstant.hub,
           route: AppRoutes.marketplaces,
@@ -270,6 +282,7 @@ final class QuickActionLabel {
   static String of(BuildContext context, QuickActionKind kind) =>
       switch (kind) {
         QuickActionKind.quickAddItem => context.l10n.quickAddTitle,
+        QuickActionKind.intakeSession => context.l10n.quickActionIntakeSession,
         QuickActionKind.addItem => context.l10n.inventoryAddItem,
         QuickActionKind.scan => context.l10n.inventoryScan,
         QuickActionKind.recordSale => context.l10n.recordSaleTitle,
@@ -278,6 +291,7 @@ final class QuickActionLabel {
         QuickActionKind.addSource => context.l10n.homeQuickAddSource,
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
+        QuickActionKind.addWorkspace => context.l10n.workspaceAddTitle,
         QuickActionKind.addMarketplace => context.l10n.marketplaceAdd,
         QuickActionKind.addCarrier => context.l10n.carrierAdd,
         QuickActionKind.inviteTeammate => context.l10n.teamInvite,

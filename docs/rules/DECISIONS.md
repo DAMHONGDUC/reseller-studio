@@ -301,3 +301,94 @@ The mechanism is in `docs/rules/DESIGN_SYSTEM.md` — notably why the capsule
 gets its own `LiquidGlassLayer` rather than joining the bar's blend group,
 which is the one thing that looks like a free simplification and silently
 deletes the capsule.
+
+## Dev mode is granted by email, so the mock branch stops being tree-shaken
+
+The earlier rule is in `lib/features/mock_data/CLAUDE.md`: every repository
+provider tests `DevFlags.isDebugOrProfile` **first**, which is `const` false in
+release, so the mock branch folds away at compile time and the in-memory
+repositories and their seed leave the shipped binary rather than merely going
+unreachable inside it. That is a stronger property than a runtime check, and
+nothing about the argument for it was wrong.
+
+Owner's rule adds `dev_mode_emails` to `app_config`, and a list of email
+addresses is a **release-build** grant by definition — a debug build already
+has dev mode, so a list that only worked there would grant nothing. The branch
+therefore has to survive compilation, and the seed now ships.
+
+What replaces the compiler as the guard is `devModeEnabledProvider`: true in
+every debug and profile build, and in a release build only when the config
+names the signed-in account. `DataModeController` still refuses to return
+`mock` without it, and the mock-data card in Settings still hides itself — two
+checks rather than one, because the thing on the other side is a fake business
+shown to a real seller.
+
+`DevFlags.mockDataDefault` and `DevFlags.verboseLogging` keep their `const`
+guards. A *default* that turns itself on in a shipped build is not what an
+email list was asked to buy.
+
+**The config repository is the one thing mock mode no longer swaps.** Dev mode
+is now read out of `app_config`, so mocking the repository that supplies it
+would make the config depend on the switch the config decides, and Riverpod
+answers a circular dependency by throwing. Nothing is lost: the in-memory
+implementation returned `AppConfig.fallback`, which is exactly what a build
+with no Firebase already gets.
+
+## The block list is a UI gate, and it is deliberately not a permission
+
+`blocked_emails` sends an account to `/blocked` and gives it nothing but a
+sign-out button. It does **not** revoke anything: the account still holds a
+valid Firebase token, and `firestore.rules` does not know the list exists.
+
+Making it a real permission means either putting the list where the rules can
+read it — a document every client would then have to be allowed to read to
+enforce it, which is the leak below — or disabling the account in the Firebase
+console, which is the actual answer and takes ten seconds. The list is for the
+case that is not an emergency: an account that should stop using the app, told
+so plainly, without the confusing half-broken session that revoking a token
+mid-flight produces.
+
+**The three lists are readable by every signed-in account, and that is a known
+cost.** `app_config/current` allows any signed-in read, a rule cannot filter
+fields, and the client has to be able to check its own address — so a seller
+who reads the document sees the owner's testers and, more awkwardly, who has
+been blocked. Owner's call, taken over storing SHA-256 hashes instead, because
+a document nobody can read in the console is a document nobody maintains. Keep
+the lists short, and use the Firebase console for anything that must not be
+public.
+
+## The forced update is a sheet, and the block is one field per store
+
+Two changes to the same feature, both owner's rules, and both reverse what was
+written a commit earlier.
+
+**The ceiling is per platform.** `minimum_build` and `update_url` were one
+pair for the whole product. A build number is only meaningful next to the
+store that issued it: `41` on the App Store and `41` on Google Play are
+different binaries, reviewed at different times, released in whichever order
+the queues allowed. One ceiling for both either stops a build that shipped or
+lets an old one through, and the store link was always going to be two links.
+So `force_update.ios` and `force_update.android` each carry
+`enable_force_update`, `build_number`, `build_name` and `store_link`, and the
+app reads only its own. They are nested under one field rather than loose at
+the top level: two platform names in the root of the document read as a config
+about platforms, when what they hold is one feature configured per store.
+
+**`enable_force_update` exists so the numbers can be kept current without
+blocking anybody.** Without it, `build_number` would be both the record of
+what shipped and the trigger, so routine maintenance would be indistinguishable
+from an emergency. The switch is checked first: raising the build alone forces
+nothing.
+
+**The UI is a bottom sheet nothing dismisses, and `/update-required` is
+deleted.** The screen was a route the redirect sent every location to, above
+every other gate. What that bought was a guarantee nothing could be behind it;
+what it cost was a route, a redirect branch, a `refreshListenable`
+subscription, and a dead end to unwind when the config was corrected. The sheet
+gets the same guarantee from `SdBottomSheetExitV3.blocked` — no close button,
+no grab handle, no barrier tap, no back gesture — and `ForceUpdateGate` raises
+it from above the router, so it covers signed-out screens, deep links and
+mid-form states alike without any of them knowing.
+
+The gate is what closes it too: a build number typed one digit too high is
+corrected in the console, and the seller is released without a release.

@@ -52,6 +52,71 @@ opens.
   there and what they wanted for it — so the subtitle counts the marketplaces
   (`Not listed` when there are none) and the trailing figure is
   `Item.expectedPrice` (`lib/features/inventory/CLAUDE.md`).
+- **The sheet scrolls; it does not grow.** A bundle of three carries a split
+  line each, and with the fee estimate under Sold on the column overflowed —
+  `RenderFlex overflowed by 16 pixels`, which is content the seller cannot
+  reach rather than a cosmetic complaint. The body is `Flexible` over a
+  `SingleChildScrollView`, so it is content-sized when short and scrolls when
+  long, rather than taking a fixed `heightFactor` that would leave a one-item
+  sale mostly dead space.
+- **The sheet asks what landed in the bank, and never what the fee was** —
+  owner's rule, and it replaced a fee box with an estimate card beside it.
+  Every platform shows the seller what they actually received; no platform
+  shows them a number this app could have guessed better. So the sheet takes
+  the sale price and **Net received**, and the fee is what falls out of the
+  two (hard rule 3).
+  - **Net received is optional and opens empty.** A seller marking something
+    sold on their phone in a queue does not have the payout yet, and a
+    pre-filled guess is indistinguishable from a fact the moment it is saved —
+    which is the failure the whole rule exists to prevent.
+  - **Empty is not zero and not an estimate**: the order's profit reads `—`
+    until the figure arrives (hard rule 5), and the order joins the Payouts
+    queue as work.
+  - **No fee box, no estimate card, no fee explainer.** `FeeExplainerSheet`
+    existed only because two fees shared a word; with the estimate gone there
+    is one fee, and it is measured.
+
+- **A sale with no payout is a queue entry, not a blank.** Owner's rule, and
+  it is what makes the payout-first model payable. Nothing is estimated any
+  more (hard rule 3), so an unrecorded payout is a profit figure the app cannot
+  show anywhere — Analytics included.
+  - `ordersAwaitingPayoutListProvider` is the queue, **oldest first**: that one
+    is the most likely to have been missed.
+  - **Payouts pins the action that opens it**, and `RecordPayoutsScreen` takes
+    the whole run in one sitting — a box per sale, one Save (hard rule 16).
+    One-at-a-time through the order detail is the version nobody finishes.
+  - **Each box says what the figure implies the platform kept**, recomputed as
+    it is typed. The seller is checking a subtraction, not copying a number
+    blind, and a payout larger than the sale is a typo they can only see
+    against the sale price on the same row.
+  - **Home counts every sale awaiting a figure, not only the late ones.**
+    Overdue is what makes one urgent, not what makes it exist, so it is the
+    row's detail rather than its trigger.
+
+- **The queue fills from the platform's own export, and reads two columns of
+  it.** `PayoutCsvImport` is the fast path through the work above — a payout
+  report copies hundreds of figures at once, where typing them is what the
+  seller gives up by not being guessed at.
+  - **Columns are found by name, never by position.** eBay, Etsy and a
+    spreadsheet somebody keeps by hand put the two useful values in different
+    places, and a fixed index turns a reordered export into silently wrong
+    money. The header aliases are the service's own list.
+  - **The payout is the platform's earnings figure, not its net-of-cost one.**
+    eBay's `Order earnings` is what it paid; `Net order earnings` subtracts
+    what the seller paid for the item, which this app derives itself and must
+    not take twice.
+  - **Only orders still awaiting a figure are matched.** A file covers a whole
+    period and names orders settled weeks ago; rewriting one would overwrite a
+    figure the seller may have corrected by hand.
+  - **Nothing is written until the seller has seen what matched**, and the
+    summary names the two columns it read. Money written from a column nobody
+    saw chosen is money nobody can check — the same failure as an estimated
+    fee, arriving through a different door.
+  - **Text is pasted, not a file picked.** A file picker is a third-party
+    plugin and adding one is the owner's call (root `CLAUDE.md`); paste works
+    with what already ships. Swapping it later changes this screen and nothing
+    else.
+
 - **The marketplace picker offers only the platforms that item is on.** A list
   of every marketplace the business sells on makes the seller find the one
   this jacket was live at, and a mis-pick writes an order against a platform
@@ -66,6 +131,16 @@ opens.
   - The join is `MarketplaceMatching`: a listing names a `Marketplace` *enum*
     and an order names a marketplace *record*, and nothing stores a key
     between them.
+- **The box opens on that platform's own price, not only after a re-pick** —
+  owner's rule, and it was broken: the sheet seeded its controller in a field
+  initialiser, where `listingsForItemProvider` has not emitted yet, so every
+  sale opened on `Item.expectedPrice` and only showed the listed price once
+  the seller re-picked the marketplace they were already on.
+  - **It seeds through `FormSeed`** (`docs/rules/SCREENS.md`), once, after the
+    listings arrive — the same fix the item form uses for the same reason.
+  - **One read of `listingsProvider`, grouped by item**, rather than a family
+    read per item: the seed and the picker have to answer from the same data,
+    and two live reads resolve at different times, which is what the bug was.
 - **Picking a platform fills the sale price with what that platform is
   asking** — owner's rule, and it overwrites a figure the seller had already
   typed. That is the point: the box is what *this* marketplace is asking, and
@@ -81,17 +156,106 @@ opens.
 - `test/features/orders/record_sale_test.dart` pins the row, both halves of
   the picker, and the price following it.
 
-## An order always names an item
+## Nothing is hidden from the sale picker; what cannot be sold is disabled
 
-`OrderLine.itemId` is non-null, so there is no walk-in sale — nothing sells
-that inventory has never heard of. `RecordSaleScreen` therefore lists what is
-on hand and nothing else, and a workspace with no items sends the seller to
-Inventory rather than offering a form that cannot be completed.
+Owner's rule, and it is hard rule 2's shape one level up — the same one the
+item actions sheet already follows: **the rows that would be refused are
+shown, not hidden.**
 
-Multi-line orders, and lines that belong to no item, are a product decision
-that has not been made. Both would change the entity, every screen that taps
-through to an item, and what "profit" means for an order — raise it before
-building either.
+- **The picker draws the inventory card, not a list row** — owner's rule. A
+  seller picking a jacket recognises it by its photo, its tags and what it
+  cost, which is the whole reason Inventory's list is cards and not rows; a
+  chooser that strips all of that asks them to identify stock by its title
+  alone. The card moved to `core/widgets/` to make this legal rather than
+  being copied (`lib/features/inventory/CLAUDE.md`).
+  - **It arrives with two slots empty.** No actions button and no marketplace
+    arrow: this screen's tap is the sale, and a second verb on the row would
+    take the seller out of the flow they came for.
+  - **A blocked row carries its reason where the card carries its warnings** —
+    a tag beside the update date, the same place and the same marker a
+    contradiction uses, so a seller learns one shape for "this row is trying
+    to tell you something". The tag is short on purpose: the reason in full is
+    what the tap opens.
+  - **It is not drawn twice.** An item on the shelf with a count of zero is
+    both a contradiction and a reason it cannot be sold, and the two sentences
+    say the same thing; the card keeps its own warning and drops the picker's
+    (`lib/features/inventory/CLAUDE.md`).
+- **The picker lists every item the business has**, not only what is on the
+  shelf. A seller looking for a jacket that is already marked sold used to
+  find an empty search and no explanation — the row was filtered out, so the
+  screen said the item does not exist rather than that it cannot be sold.
+- **A row that cannot be sold still takes a tap; the tap explains.** Owner's
+  rule, and it replaced a greyed-out card. A dead row tells a seller they did
+  something wrong and nothing else — worse than the filtered-out row it
+  replaced, because now they can see the thing and still cannot use it. So the
+  card is drawn at full strength, carries the reason on its warning line, and
+  a tap (or a long-press, which would otherwise start a bundle it cannot join)
+  opens `CannotSellSheet`.
+  - **The sheet names the reason and points at the fix.** The sentences are
+    `ItemBlockPresenter.messages` — the same ones the actions sheet shows,
+    because it is the same `ItemTransition.check(item, sold)` deciding — and
+    the primary action opens the item, where the status and the count are both
+    edited.
+  - **A sheet rather than a snackbar**, unlike the actions sheet's refusal: a
+    snackbar over a list the seller is scanning is gone before they have
+    finished reading it, and this one has somewhere to send them.
+- **`ItemBlockPresenter` is imported across the feature boundary on purpose.**
+  It is a root-level presenter, the tier `item_label.dart` sits at, and the
+  alternative is Orders writing its own sentence for Inventory's block enum —
+  two answers to "why can this not be sold", which is exactly what the
+  presenter exists to stop.
+- **The bundle is still built from sellable items only.** A disabled row
+  cannot be ticked, and `recordSaleSelectionItemsProvider` still reads
+  `sellableItemsProvider`, so an item that goes off the shelf mid-selection
+  drops out of the run rather than being sold twice.
+- **The empty state now means an empty business.** With nothing filtered out,
+  the only way the list is empty is that there are no items at all — which is
+  what "Nothing to sell" already said, and the way on is still Inventory.
+- **Source order is kept**, blocked rows included: re-sorting the refused ones
+  to the bottom would list items in an order Inventory does not.
+
+## An order always names an item, and may name several
+
+`OrderLine.itemId` is non-null, so there is still no walk-in sale — nothing
+sells that inventory has never heard of. `RecordSaleScreen` therefore lists
+what is on hand and nothing else, and a workspace with no items sends the
+seller to Inventory rather than offering a form that cannot be completed.
+
+**Multi-line orders are now built; lines that belong to no item are still
+not.** The owner approved the first half only, and the two halves are
+independent: a bundle is several of the seller's own items, while a line with
+no item is a sale the app cannot cost, cannot move stock for and cannot
+attribute to a source. Raise that one before building it.
+
+### A bundle is one payment, split by judgement
+
+- **One order, one line per item.** Poshmark bundles and Depop's "2 for £15"
+  are everyday, and writing them as several orders with invented prices
+  destroys the per-item ROI that Sourcing exists to measure.
+- **`Order.salePrice` is what the buyer paid**; `BundleAllocation` decides each
+  line's share. By `expectedPrice` when every item has one, evenly when any
+  does not — weighting only the priced ones would load the bundle onto them
+  and report the rest as nearly free.
+- **The parts always sum to the total, exactly.** Money is integer minor units,
+  so a proportional split leaves a remainder; it is handed to the largest
+  parts rather than dropped, because an order whose lines do not add up to the
+  payment is a reconciliation nobody can close.
+- **The split is shown before the sale, not discovered after it.** The sheet
+  lists each item's share as the total is typed, and says which of the two
+  rules produced it.
+- **The picker offers the union of the items' platforms**, not the
+  intersection. A bundle is things the buyer happened to take together and
+  they are rarely all live on the same platform, so an intersection would
+  usually be empty — the empty picker `marketplacesForItemProvider` exists to
+  prevent. None listed anywhere still falls back to the full list.
+- **A bundle is built on `RecordSaleScreen` and nowhere else.** Long-press
+  starts a selection, the same gesture Inventory uses; an item's own action
+  sheet has already chosen one item, so it passes a list of one.
+- **`recordSale` takes a list and commits once.** Every item is checked before
+  any is written, so a bundle whose third item has already sold leaves the
+  first two alone.
+- `test/features/orders/bundle_allocation_test.dart` and
+  `bundle_sale_test.dart` pin the split, the totals and the selection.
 
 ## The create button obeys the app-wide create rules
 

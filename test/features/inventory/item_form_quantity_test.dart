@@ -7,9 +7,10 @@ import 'package:reseller_studio/features/inventory/providers.dart';
 
 import '../../support/pump_app.dart';
 
-/// **Quantity is what decides whether a record is sold** — owner's rule. The
-/// form is the other half of it: a sold row given stock again is a seller
-/// saying they have the thing.
+/// **Quantity and status are independent** — owner's rule. The form writes
+/// exactly what it was given: a count that moves no state, and a state that
+/// leaves the count alone. What cannot both be true is drawn as an alert tag
+/// (`item_warning_test.dart`), never corrected behind the seller.
 void main() {
   Future<Item> saved(ProviderContainer container, String id) async {
     // The repository writes to a broadcast stream, so the list has to be read
@@ -22,7 +23,7 @@ void main() {
         .firstWhere((Item item) => item.id == id);
   }
 
-  test('putting stock behind a sold item puts it back on the shelf', () async {
+  test('putting stock behind a sold item leaves it sold', () async {
     final ProviderContainer container = mockContainer();
 
     await warmUp(container);
@@ -38,13 +39,12 @@ void main() {
     form.seed(sold);
     await form.submit(title: sold.title, quantity: '5');
 
-    final Item restocked = await saved(container, 'itm-1');
+    final Item edited = await saved(container, 'itm-1');
 
-    expect(restocked.status, ItemStatus.inStock);
-    expect(restocked.quantity, 5);
-    // The sale is undone with it: a row on the shelf carrying a sold date is
-    // one every export reads as sold.
-    expect(restocked.soldAt, isNull);
+    // A count is one answer, not two: the row says something that cannot be
+    // true, and the screen says so with a tag rather than picking a status.
+    expect(edited.quantity, 5);
+    expect(edited.status, ItemStatus.sold);
   });
 
   test('the seller can put a draft on the shelf from the form', () async {
@@ -86,7 +86,7 @@ void main() {
     expect((await saved(container, 'itm-1')).status, ItemStatus.archived);
   });
 
-  test('sold can be set by hand, and takes the count with it', () async {
+  test('sold can be set by hand, and leaves the count alone', () async {
     final ProviderContainer container = mockContainer();
 
     await warmUp(container);
@@ -102,10 +102,11 @@ void main() {
 
     final Item sold = await saved(container, 'itm-11');
 
-    // Sold means sold out however it was reached, so the count goes with the
-    // status — otherwise the card would offer two left of something gone.
+    // The status is what the seller picked and the count is what they typed:
+    // the app writes both as given, and `ItemConsistency` is what points out
+    // that they disagree.
     expect(sold.status, ItemStatus.sold);
-    expect(sold.quantity, 0);
+    expect(sold.quantity, 2);
     expect(sold.soldAt, isNotNull);
   });
 

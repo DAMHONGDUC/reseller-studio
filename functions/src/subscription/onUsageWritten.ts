@@ -1,9 +1,10 @@
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 
+import { workspaceOf } from '../lib/firestore';
 import { refreshUsage } from './usage';
 
 /**
- * Keep `workspaces/{id}/usage/current` in step with what the workspace holds.
+ * Keep `usage/{workspaceId}` in step with what the workspace holds.
  *
  * **This is what makes the Free ceilings a boundary rather than a UI
  * decision** (plan §27). `firestore.rules` cannot aggregate a collection, so
@@ -18,10 +19,12 @@ import { refreshUsage } from './usage';
  * Listings are not counted — no plan limits them.
  */
 function trigger(collection: string) {
-  return onDocumentWritten(
-    `workspaces/{workspaceId}/${collection}/{entityId}`,
-    (event) => refreshUsage(event.params.workspaceId),
-  );
+  return onDocumentWritten(`${collection}/{entityId}`, (event) => {
+    // Flat tables: the workspace is a column now, not a path parameter.
+    const workspaceId = workspaceOf(event.data);
+
+    return workspaceId === null ? undefined : refreshUsage(workspaceId);
+  });
 }
 
 export const onItemUsageWritten = trigger('items');

@@ -8,21 +8,24 @@ part of 'home_screen.dart';
 class _HomePremiumBanner extends ConsumerWidget {
   const _HomePremiumBanner();
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  /// Whether this draws anything, so the row beneath it knows whether it
+  /// needs a gap. One predicate, read here and at the call site.
+  static bool shows(WidgetRef ref) {
+    if (!ref.watch(premiumEnabledProvider)) return false;
+
     final SellerPlan? plan = ref.watch(subscriptionStatusProvider).value?.plan;
 
-    if (plan == null || plan == SellerPlan.premium) {
-      return const SizedBox.shrink();
-    }
+    return plan != null && plan != SellerPlan.premium;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!shows(ref)) return const SizedBox.shrink();
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        SdContentPaddingV3.horizontal,
-        0,
-        SdContentPaddingV3.horizontal,
-        SdContentPaddingV3.listItemGap,
-      ),
+      // Gutter only: the gap under it belongs to the shortcut row below, which
+      // Home places with [shows] (`docs/rules/DESIGN_SYSTEM.md`).
+      padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
       child: SdCardV3(
         padding: SdContentPaddingV3.row,
         onTap: () => context.push(AppRoutes.paywall),

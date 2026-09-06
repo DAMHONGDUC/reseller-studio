@@ -231,6 +231,7 @@ void main() {
       'purchases_screen': '/more/sourcing/purchases/new',
       'inventory_screen': '/inventory/quick-add',
       'orders_screen': '/orders/record-sale',
+      'workspaces_screen': '/more/businesses',
       'marketplaces_screen': '/more/marketplaces',
       'carriers_screen': '/more/carriers',
       'team_screen': '/more/team',

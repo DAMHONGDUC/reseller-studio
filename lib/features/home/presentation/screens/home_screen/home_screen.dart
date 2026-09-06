@@ -19,10 +19,12 @@ import '../../../../../core/widgets/notification_bell.dart';
 import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
+import '../../../../app_config/providers.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../offers/domain/entities/offer.dart';
 import '../../../../offers/providers.dart';
 import '../../../../orders/domain/entities/order.dart';
+import '../../../../orders/domain/services/payout_reconciliation.dart';
 import '../../../../orders/providers.dart';
 import '../../../../subscription/domain/enums/seller_plan.dart';
 import '../../../../subscription/providers.dart';
@@ -131,6 +133,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           const _HomePremiumBanner(),
+          if (_HomePremiumBanner.shows(ref))
+            SizedBox(height: SdContentPaddingV3.listItemGap),
           _HomeShortcuts(onQuickAction: _toQuickAction),
           const _GettingStarted(),
           SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),

@@ -16,7 +16,7 @@ class FirestoreCarrierRepository implements CarrierRepository {
 
   @override
   Stream<List<Carrier>> watchCarriers() => FirestoreStream.collection(
-    _context.collections.carriers.orderBy('createdAt'),
+    _context.collections.carriers.query.orderBy('createdAt'),
     CarrierDto.toEntity,
     operation: 'load carriers',
   );

@@ -109,6 +109,9 @@ final class AppIconConstant {
   /// Download or export content.
   static const IconData download = Symbols.download_rounded;
 
+  /// Bring content in from a file the user supplies.
+  static const IconData upload = Symbols.upload_rounded;
+
   /// Edit an existing record.
   static const IconData edit = Symbols.edit_rounded;
 
@@ -281,6 +284,9 @@ final class AppIconConstant {
 
   /// Represent a listing or sale tag.
   static const IconData sell = Symbols.sell_rounded;
+
+  /// A build too old to run, on the forced-update screen.
+  static const IconData systemUpdate = Symbols.system_update_rounded;
 
   /// Open application settings.
   static const IconData settings = Symbols.settings_rounded;

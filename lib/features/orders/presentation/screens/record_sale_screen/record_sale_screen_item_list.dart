@@ -2,10 +2,12 @@ part of 'record_sale_screen.dart';
 
 /// The rows to pick from.
 ///
-/// **`AppListRow`, not the inventory card.** This is a chooser, the same job
-/// the Search screen does with the same widget — the card belongs to the
-/// screens that own the records, and reaching into Inventory's presentation
-/// layer for it is what the dependency rule forbids.
+/// **The inventory card, not a list row** — owner's rule. A seller picking a
+/// jacket recognises it by its photo, its tags and what it cost, which is why
+/// Inventory's list is cards; a chooser that strips all of that asks them to
+/// identify stock by its title alone. The card lives in `core/widgets/` so
+/// both features can draw it without either reaching into the other's
+/// `presentation/`.
 class _SaleItemList extends ConsumerWidget {
   const _SaleItemList({required this.items});
 
@@ -13,80 +15,114 @@ class _SaleItemList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Read once for the whole list, never per row: a family watch on every
-    // row is one subscription each and a rebuild storm on any listing write.
-    final List<Listing> listings =
-        ref.watch(listingsProvider).value ?? const <Listing>[];
+    // Grouped once for the whole list, never watched per row: a family watch
+    // on every row is one subscription each and a rebuild storm on any
+    // listing write.
+    final Map<String, List<Listing>> listings = ListingsByItem.group(
+      ref.watch(listingsProvider).value ?? const <Listing>[],
+    );
+    final Set<String> selected = ref.watch(recordSaleSelectionProvider);
+    // One instant for the whole build, so every row agrees about what stale
+    // means — the same reason Inventory's list passes it down.
+    final DateTime now = ref.watch(clockProvider).now();
 
-    return ListView(
+    return ListView.separated(
       padding: SdContentPaddingV3.screen(context),
-      children: <Widget>[
-        AppListCard(
-          children: items
-              .map(
-                (Item item) => _SaleItemRow(
-                  item: item,
-                  marketplaceCount: ListingMarketplaces.countFor(
-                    listings,
-                    item.id,
-                  ),
-                ),
-              )
-              .toList(growable: false),
-        ),
-      ],
+      itemCount: items.length,
+      separatorBuilder: (BuildContext context, int index) =>
+          SizedBox(height: SdContentPaddingV3.listItemGap),
+      itemBuilder: (BuildContext context, int index) => _SaleItemRow(
+        item: items[index],
+        listings: listings[items[index].id] ?? const <Listing>[],
+        now: now,
+        isSelected: selected.contains(items[index].id),
+        isSelecting: selected.isNotEmpty,
+      ),
     );
   }
 }
 
 /// One item to sell.
 ///
-/// **No price on the row, a marketplace count and the expected price
-/// instead** — owner's rule. What it is live at is a different number on every
-/// platform, and the one this row used to print was the highest of them: a
-/// figure the seller was about to be asked to confirm and would rarely see
-/// again. What decides which row to tap is where the thing is listed and what
-/// the seller wanted for it.
-class _SaleItemRow extends StatelessWidget {
-  const _SaleItemRow({required this.item, required this.marketplaceCount});
+/// **A row that cannot be sold still takes the tap** — owner's rule. It
+/// carries the reason on its warning line and opens `CannotSellSheet` when
+/// tapped: a greyed card says the seller did something wrong and offers
+/// nothing, which is worse than the filtered-out row it replaced.
+class _SaleItemRow extends ConsumerWidget {
+  const _SaleItemRow({
+    required this.item,
+    required this.listings,
+    required this.now,
+    required this.isSelected,
+    required this.isSelecting,
+  });
 
   final Item item;
 
-  /// Distinct marketplaces carrying it — zero for an item on none, which is
-  /// a fact rather than a missing figure.
-  final int marketplaceCount;
+  /// This item's live listings, for the card's marketplace count.
+  final List<Listing> listings;
 
-  /// Where it is, what it is called on the shelf, and how many platforms
-  /// carry it. The SKU earns its place because two items can carry the same
-  /// title and only one of them sold.
-  String _subtitle(BuildContext context) => <String>[
-    item.status.label(context),
-    ?item.sku,
-    marketplaceCount == 0
-        ? context.l10n.inventoryNotListed
-        : context.l10n.inventoryMarketCount(marketplaceCount),
-  ].join(' · ');
+  final DateTime now;
+
+  /// Whether this row is part of the bundle being built.
+  final bool isSelected;
+
+  /// Whether a bundle is being built at all. Once it is, a tap adds and
+  /// removes rather than opening the sheet — otherwise the seller's second
+  /// tap would sell one item instead of joining it to the others.
+  final bool isSelecting;
 
   /// Picking an item opens the sheet; a recorded sale closes this screen so
   /// the seller lands back on Orders with the new order under them.
   Future<void> _pick(BuildContext context) async {
-    final bool? recorded = await MarkSoldSheet.show(context, item);
+    final bool? recorded = await MarkSoldSheet.show(context, <Item>[item]);
 
     if (!context.mounted || !(recorded ?? false)) return;
 
     context.pop();
   }
 
+  /// A tap or a long-press on a row that cannot be sold — both explain rather
+  /// than doing nothing, since a long-press would otherwise start a bundle
+  /// this item cannot join.
+  Future<void> _explain(BuildContext context, ItemTransitionCheck check) =>
+      CannotSellSheet.show(context, item: item, blocks: check.blocks);
+
   @override
-  Widget build(BuildContext context) => AppListRow(
-    title: item.title,
-    subtitle: _subtitle(context),
-    icon: AppIconConstant.inventory,
-    // What the seller expects for it — `—` when nobody entered one, never a
-    // zero (hard rule 5).
-    trailingText: context.money(item.expectedPrice),
-    onTap: () => _pick(context),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    // The same check the actions sheet runs, so one place decides what may be
+    // sold and one set of sentences says why not.
+    final ItemTransitionCheck check = ItemTransition.check(
+      item,
+      ItemStatus.sold,
+    );
+
+    return ItemCard(
+      item: item,
+      listings: listings,
+      now: now,
+      isSelected: isSelected,
+      isSelecting: isSelecting,
+      // Short, because it is a tag beside the date: the reason in full is what
+      // the tap opens (`CannotSellSheet`).
+      notice: check.isAllowed ? null : context.l10n.recordSaleCannotSell,
+      // Neither the actions button nor the marketplace arrow is wired: this
+      // screen's tap is the sale, and a second verb on the row would take the
+      // seller out of the flow they came for.
+      onTap: switch ((check.isAllowed, isSelecting)) {
+        (false, _) => () => _explain(context, check),
+        (true, true) =>
+          () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id),
+        (true, false) => () => _pick(context),
+      },
+      // Long-press starts the bundle, the same gesture Inventory's selection
+      // uses. A tick box in every row would be permanent chrome for something
+      // most sales are not.
+      onLongPress: check.isAllowed
+          ? () => ref.read(recordSaleSelectionProvider.notifier).toggle(item.id)
+          : () => _explain(context, check),
+    );
+  }
 }
 
 /// Nothing to sell, told apart from nothing matching the search.

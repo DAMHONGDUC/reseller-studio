@@ -153,9 +153,8 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
               isRequired: true,
               helperText: _AfterFees.of(
                 context,
-                widget.marketplace,
                 state.prices[widget.marketplace],
-                ref.watch(marketplaceFeeRatesProvider),
+                ref.watch(planningFeeRateProvider),
               ),
               onChanged: (String value) => ref
                   .read(crossListControllerProvider.notifier)
@@ -173,18 +172,13 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
 
 /// What the platform takes and what is left, as the price field's helper.
 ///
-/// **Estimates, and the panel says so** — `Marketplace.estimatedFeeRate` is a
-/// planning figure; real fees vary by category, seller tier and country, and
-/// the actual number arrives on the order. It is under the field because the
-/// decision being made is "is this price worth this platform's cut", and a
+/// **A planning figure, and the only one left in the app** (hard rule 3).
+/// Nothing has sold yet, so there is no payout to measure — this is the
+/// business's own `Workspace.planningFeeRate`. It is under the field because
+/// the decision being made is "is this price worth a platform's cut", and a
 /// seller who cannot see the cut is choosing blind.
 final class _AfterFees {
-  static String of(
-    BuildContext context,
-    Marketplace marketplace,
-    Money? price,
-    Map<String, double> feeRates,
-  ) {
+  static String of(BuildContext context, Money? price, double feeRate) {
     if (price == null) {
       // `—`, never a zero: nobody has typed a price, so nothing is known
       // about the fee either (hard rule 5).
@@ -194,9 +188,7 @@ final class _AfterFees {
       );
     }
 
-    final Money fee = price.applyRate(
-      MarketplaceFeePolicy.rateFor(marketplace, overrides: feeRates),
-    );
+    final Money fee = price.applyRate(feeRate);
 
     return context.l10n.crossListAfterFees(
       context.money(fee),

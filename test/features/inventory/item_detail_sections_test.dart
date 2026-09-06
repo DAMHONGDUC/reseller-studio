@@ -40,9 +40,9 @@ void main() {
   ) async {
     await pumpDetail(tester);
 
-    // Overview, Pricing, Listings and Provenance are above the fold;
-    // Description and Notes are built as the list reaches them.
-    expect(find.text('Edit'), findsNWidgets(4));
+    // Overview, Quantity, Status, Pricing and Listings are above the fold;
+    // Provenance, Description and Notes are built as the list reaches them.
+    expect(find.text('Edit'), findsNWidgets(5));
 
     await tester.scrollUntilVisible(
       find.text('Notes'),
@@ -87,12 +87,20 @@ void main() {
     // Owner's rule: the money on this screen reads in one run.
     await pumpDetail(tester);
 
-    final double pricing = tester.getTopLeft(find.text('Pricing')).dy;
-    final double listings = tester.getTopLeft(find.text('Listings')).dy;
-    final double provenance = tester.getTopLeft(find.text('Provenance')).dy;
+    expect(
+      tester.getTopLeft(find.text('Pricing')).dy,
+      lessThan(tester.getTopLeft(find.text('Listings')).dy),
+    );
 
-    expect(pricing, lessThan(listings));
-    expect(listings, lessThan(provenance));
+    // Provenance is below the fold now that the count and the status have
+    // sections of their own, so it has to be scrolled to before it can be
+    // measured against the section above it.
+    await revealText(tester, 'Provenance');
+
+    expect(
+      tester.getTopLeft(find.text('Listings')).dy,
+      lessThan(tester.getTopLeft(find.text('Provenance')).dy),
+    );
   });
 
   testWidgets('Listings sends Edit to Marketplaces management', (

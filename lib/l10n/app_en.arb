@@ -80,6 +80,10 @@
   "@emptyValuePlaceholder": {
     "description": "Shown instead of a number when there is not enough data to compute it — profit with no cost entered, ROI with no sale. Never render 0 here: 0 is a claim, — is an absence. See the master plan §15."
   },
+  "quickAddSaveAndAnother": "Save and add another",
+  "@quickAddSaveAndAnother": {
+    "description": "Writes the item and keeps the empty box, for a seller holding several things."
+  },
   "quickAddTitle": "Quick Add",
   "@quickAddTitle": {
     "description": "Screen title for the fastest create path, and the label on the Inventory FAB that opens it."
@@ -112,9 +116,9 @@
   "@itemBlockMissingSalePrice": {
     "description": "Why an item cannot move to Sold."
   },
-  "itemBlockWrongStatus": "This item cannot move there from where it is",
+  "itemBlockWrongStatus": "This item has already left inventory",
   "@itemBlockWrongStatus": {
-    "description": "Why a transition is refused because the item's current status is not a valid starting point."
+    "description": "Why a transition is refused because the item's current status is not a valid starting point. In practice this block is only ever raised for a sold or archived item, so it says which rather than 'cannot move there'."
   },
   "itemUpdatedAt": "Updated {date}",
   "@itemUpdatedAt": {
@@ -134,10 +138,23 @@
     "description": "Detail row label: when the record last changed. Read-only."
   },
   "itemStatus": "Status",
+  "itemWarningEmptyShelfTag": "None on the shelf",
+  "@itemWarningEmptyShelfTag": {
+    "description": "The inventory row's warning tag, beside the update date. Short — the sentence that explains it is on the detail screen."
+  },
+  "itemWarningEmptyShelf": "Warning: none on the shelf but status is {status} — please update",
+  "@itemWarningEmptyShelf": {
+    "description": "Consistency warning on the item row and the detail screen: the item is on hand but its count is zero. Names both halves so the seller knows which two facts disagree.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "@itemStatus": {
     "description": "Field label on the item form for the item's state."
   },
-  "itemBlockNoQuantity": "Nothing left in stock to move",
+  "itemBlockNoQuantity": "There is none of this left on the shelf",
   "@itemBlockNoQuantity": {
     "description": "Why a transition is refused because quantity is zero."
   },
@@ -204,6 +221,40 @@
   "onboardingProfitBody": "Fees, shipping and cost come off automatically, so you know your real profit and where to source next.",
   "@onboardingProfitBody": {
     "description": "Intro page 3 body. Profit is derived, never stored (hard rule 3), which is why it stays right when a fee is corrected."
+  },
+  "updateRequiredTitle": "Time to update",
+  "@updateRequiredTitle": {
+    "description": "Title of the screen shown when the build is too old to run."
+  },
+  "updateRequiredBody": "This version of Reseller Studio is no longer supported. Update to keep your business in sync.",
+  "@updateRequiredBody": {
+    "description": "Body of the forced-update screen."
+  },
+  "updateRequiredVersion": "Version {version} is available.",
+  "@updateRequiredVersion": {
+    "description": "Names the store's current version on the forced-update sheet.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.4.0"
+      }
+    }
+  },
+  "updateRequiredAction": "Update now",
+  "@updateRequiredAction": {
+    "description": "Opens the store listing from the forced-update screen."
+  },
+  "updateRequiredFailed": "Could not open the store. Search for Reseller Studio to update.",
+  "@updateRequiredFailed": {
+    "description": "Shown when the store link would not open."
+  },
+  "accountBlockedTitle": "Account unavailable",
+  "@accountBlockedTitle": {
+    "description": "Title of the screen shown when the config blocks this account."
+  },
+  "accountBlockedBody": "This account cannot use Reseller Studio. Contact support if you think this is a mistake.",
+  "@accountBlockedBody": {
+    "description": "Body of the blocked-account screen."
   },
   "onboardingSkip": "Skip",
   "@onboardingSkip": {
@@ -843,6 +894,14 @@
     "description": "The seller's own stock code. Not translated — SKU is the term resellers use in every language."
   },
   "commonQuantity": "Quantity",
+  "itemQuantityDecrement": "−1",
+  "@itemQuantityDecrement": {
+    "description": "Stepper button beside the quantity box: one fewer. The character is a minus sign, not a hyphen."
+  },
+  "itemQuantityIncrement": "+1",
+  "@itemQuantityIncrement": {
+    "description": "Stepper button beside the quantity box: one more."
+  },
   "@commonQuantity": {
     "description": "How many of an item are on hand."
   },
@@ -1193,29 +1252,9 @@
   "@itemActionMarkSold": {
     "description": "Records a sale. Creates the order too — profit is derived from orders."
   },
-  "itemActionRestock": "Restock",
-  "@itemActionRestock": {
-    "description": "Adds stock to an item and puts it back in stock."
-  },
   "itemActionMakeInStock": "Make it in stock",
   "@itemActionMakeInStock": {
     "description": "Moves a draft onto the shelf, ready to sell."
-  },
-  "restockHowMany": "How many arrived",
-  "@restockHowMany": {
-    "description": "Field label in the restock sheet — what is added to the count, not the new total."
-  },
-  "restockOnShelfNow": "On the shelf now",
-  "@restockOnShelfNow": {
-    "description": "Restock sheet: how many the item has before anything is added."
-  },
-  "restockNewTotal": "New total",
-  "@restockNewTotal": {
-    "description": "Restock sheet: what the count becomes once the arrivals are added. An em dash until the box holds a usable number."
-  },
-  "restockCountRequired": "Enter how many arrived",
-  "@restockCountRequired": {
-    "description": "Shown when the restock box is empty or not a positive number."
   },
   "itemActionArchive": "Archive",
   "@itemActionArchive": {
@@ -1798,6 +1837,324 @@
       }
     }
   },
+  "intakeTitle": "Intake session",
+  "@intakeTitle": {
+    "description": "Title of the batch intake screen — one buying trip, many items."
+  },
+  "intakeItemTitle": "What is it?",
+  "@intakeItemTitle": {
+    "description": "The one required field on an intake line, same rule as Quick Add."
+  },
+  "intakeItemCost": "What you paid (optional)",
+  "@intakeItemCost": {
+    "description": "The per-item cost on an intake line. Optional, like everywhere else."
+  },
+  "intakeCostHelper": "The one number nobody remembers a week later. Leave it blank and profit stays unknown.",
+  "@intakeCostHelper": {
+    "description": "Says why the cost box is worth filling in at this exact moment."
+  },
+  "intakeAdd": "Add and keep going",
+  "@intakeAdd": {
+    "description": "Writes the line and returns the cursor to the title box."
+  },
+  "intakeReceiptTotal": "Receipt total (optional)",
+  "@intakeReceiptTotal": {
+    "description": "What actually left the pocket. May differ from the item costs — a box lot apportioned across eleven things is the case."
+  },
+  "intakeReceiptTotalHelper": "What the receipt says, if it differs from the costs above.",
+  "@intakeReceiptTotalHelper": {
+    "description": "Explains that the receipt total and the item costs are allowed to disagree."
+  },
+  "intakeFinished": "Trip saved.",
+  "@intakeFinished": {
+    "description": "Confirmation after the purchase and its items are written."
+  },
+  "intakeTakenIn": "{count, plural, =1{1 item taken in} other{{count} items taken in}}",
+  "@intakeTakenIn": {
+    "description": "Header over the list of what has gone in during this session.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "intakeFinish": "{count, plural, =1{Finish — 1 item, {total}} other{Finish — {count} items, {total}}}",
+  "@intakeFinish": {
+    "description": "The pinned button: how many went in and what they cost.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "quickActionIntakeSession": "Intake session",
+  "@quickActionIntakeSession": {
+    "description": "Quick Action row opening the batch intake screen."
+  },
+  "scannerEvaluate": "Should I buy it?",
+  "@scannerEvaluate": {
+    "description": "Third action when a scanned code matches nothing: the seller does not own it yet and is deciding whether to."
+  },
+  "booksTitle": "Close the books",
+  "@booksTitle": {
+    "description": "Title of the screen listing everywhere the figures are still guessing."
+  },
+  "booksClearTitle": "Nothing is guessing",
+  "@booksClearTitle": {
+    "description": "Empty state when every figure is entered."
+  },
+  "booksClearBody": "Every sale has its real fee and its cost, every payout has landed, and every buying trip has a receipt.",
+  "@booksClearBody": {
+    "description": "Says what a clear result actually means, so the seller knows what was checked."
+  },
+  "booksIntro": "{count, plural, =1{1 record still needs a figure before your books are exact.} other{{count} records still need a figure before your books are exact.}}",
+  "@booksIntro": {
+    "description": "Count of outstanding bookkeeping work at the top of the screen.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksEstimatedFees": "Fee is still an estimate",
+  "@booksEstimatedFees": {
+    "description": "Group header for sales with no reported platform fee."
+  },
+  "booksEstimatedFeesBody": "Profit uses the platform’s published rate until you enter what it actually took.",
+  "@booksEstimatedFeesBody": {
+    "description": "What an estimated fee costs the seller in accuracy."
+  },
+  "booksUnknownCost": "Cost was never entered",
+  "@booksUnknownCost": {
+    "description": "Group header for sales whose item cost is missing."
+  },
+  "booksUnknownCostBody": "Profit for these cannot be worked out at all, so it shows as a dash.",
+  "@booksUnknownCostBody": {
+    "description": "Why a missing cost is worse than an estimated fee."
+  },
+  "booksUnpaidPayouts": "Payout has not arrived",
+  "@booksUnpaidPayouts": {
+    "description": "Group header for sales a marketplace has not settled."
+  },
+  "booksUnpaidPayoutsBody": "The marketplace should have paid for these by now.",
+  "@booksUnpaidPayoutsBody": {
+    "description": "Why an unpaid payout belongs on this screen."
+  },
+  "booksNoReceipt": "Buying trip with no receipt",
+  "@booksNoReceipt": {
+    "description": "Group header for purchases with no document attached."
+  },
+  "booksNoReceiptBody": "An expense with nothing filed against it is the one an accountant disallows.",
+  "@booksNoReceiptBody": {
+    "description": "Why a missing receipt matters."
+  },
+  "booksAndMore": "{count, plural, =1{1 more} other{{count} more}}",
+  "@booksAndMore": {
+    "description": "Last row of a group, counting what is not listed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksPurchaseItems": "{count, plural, =1{1 item} other{{count} items}}",
+  "@booksPurchaseItems": {
+    "description": "How many items a buying trip brought in, on its row.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemActionList": "List on…",
+  "@itemActionList": {
+    "description": "Bulk bar action opening the sheet that puts a whole selection up."
+  },
+  "bulkListTitle": "List {count} items",
+  "@bulkListTitle": {
+    "description": "Title of the bulk listing sheet.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkListMarketplaces": "Where to list them",
+  "@bulkListMarketplaces": {
+    "description": "Label above the marketplace chips."
+  },
+  "bulkListPrice": "At what price",
+  "@bulkListPrice": {
+    "description": "Label above the uplift chips."
+  },
+  "bulkListAtExpected": "Expected price",
+  "@bulkListAtExpected": {
+    "description": "The uplift chip meaning no change: each item goes up at its own expected price."
+  },
+  "bulkListUplift": "Expected {percent}",
+  "@bulkListUplift": {
+    "description": "An uplift chip, for example Expected +10 percent.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "bulkListPickOne": "Pick at least one marketplace.",
+  "@bulkListPickOne": {
+    "description": "Shown until a platform is chosen."
+  },
+  "bulkListSummary": "{listings} listings across {items} items. {skipped} skipped.",
+  "@bulkListSummary": {
+    "description": "Says what will be written and what will not, before the seller commits.",
+    "placeholders": {
+      "listings": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkListPublish": "List them",
+  "@bulkListPublish": {
+    "description": "The sheet's confirm button."
+  },
+  "bulkListDone": "{listings} listings created across {items} items.",
+  "@bulkListDone": {
+    "description": "Confirmation after a bulk listing run.",
+    "placeholders": {
+      "listings": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
+  "offerLeaves": "Leaves {amount} after fees, before postage",
+  "@offerLeaves": {
+    "description": "What accepting an offer would actually leave the seller. Renders an em dash when the item cost was never entered.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "offerBelowFloor": "Below your floor of {amount}",
+  "@offerBelowFloor": {
+    "description": "Shown instead of the profit line when the offer is under the minimum price the seller set on the item.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsSoldOfBought": "Sold of bought",
+  "@analyticsSoldOfBought": {
+    "description": "Caption under the item count on a source breakdown, saying what the two numbers are."
+  },
+  "taxAuthorityUs": "Schedule C lines, calendar year",
+  "@taxAuthorityUs": {
+    "description": "Subtitle of the Tax screen for a US business."
+  },
+  "taxAuthorityUk": "SA103 lines, 6 April to 5 April",
+  "@taxAuthorityUk": {
+    "description": "Subtitle of the Tax screen for a UK business."
+  },
+  "taxPackTitle": "Hand it over",
+  "@taxPackTitle": {
+    "description": "Section on the Tax screen that exports the whole year in one action."
+  },
+  "taxPackChecked": "{count, plural, =0{No sales in this year yet} =1{1 sale checked} other{{count} sales checked}}",
+  "@taxPackChecked": {
+    "description": "How many sales the pack covers. The half of the assurance line that gives the other half meaning.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taxPackExact": "Every fee and cost is a figure you entered.",
+  "@taxPackExact": {
+    "description": "Shown when nothing in the year is still an estimate."
+  },
+  "taxPackApproximate": "{fees} still use the platform's published fee rate; {costs} have no cost recorded.",
+  "@taxPackApproximate": {
+    "description": "Says exactly how the pack is approximate, so the accountant does not have to ask.",
+    "placeholders": {
+      "fees": {
+        "type": "int"
+      },
+      "costs": {
+        "type": "int"
+      }
+    }
+  },
+  "taxPackFixFirst": "Fix these first",
+  "@taxPackFixFirst": {
+    "description": "Opens Close the books from the Tax screen."
+  },
+  "taxPackExport": "Export the pack",
+  "@taxPackExport": {
+    "description": "Shares the summary, the sales, the expenses and the note as one set of files."
+  },
+  "recordSaleSellBundle": "{count, plural, =1{Sell 1 item} other{Sell {count} items as one order}}",
+  "@recordSaleSellBundle": {
+    "description": "Pinned action that records everything ticked as a single bundle order.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markSoldBundleTitle": "Record a sale of {count} items",
+  "@markSoldBundleTitle": {
+    "description": "Title of the record-sale sheet when several items sold together as one order.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markSoldSplitByExpected": "Split across the items by what you expected for each",
+  "@markSoldSplitByExpected": {
+    "description": "Says how a bundle price was divided when every item has an expected price."
+  },
+  "markSoldSplitEvenly": "Split evenly — one of these has no expected price",
+  "@markSoldSplitEvenly": {
+    "description": "Says how a bundle price was divided when an item has no expected price to weight by."
+  },
+  "payoutsLockedOwed": "{count, plural, =1{{amount} is late from 1 sale} other{{amount} is late across {count} sales}}",
+  "@payoutsLockedOwed": {
+    "description": "The figure a Free seller still sees on the payouts screen. The amount is the whole argument for paying.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "payoutsLockedNothingOwed": "Every marketplace has paid up",
+  "@payoutsLockedNothingOwed": {
+    "description": "Shown to a Free seller when no payout is late, so the locked screen still answers the question."
+  },
+  "payoutsLockedBody": "Premium breaks this down by marketplace and by order, so you know which sale to quote when you chase it.",
+  "@payoutsLockedBody": {
+    "description": "Says exactly what Premium adds here rather than that the screen is locked."
+  },
+  "payoutsLockedUnlock": "See which sales",
+  "@payoutsLockedUnlock": {
+    "description": "Opens the paywall from the payouts screen."
+  },
   "orderPlatformFees": "Platform fees",
   "@orderPlatformFees": {
     "description": "What the marketplace took, on the profit statement."
@@ -1893,10 +2250,6 @@
   "settleTitle": "Fees and payout",
   "@settleTitle": {
     "description": "Sheet title."
-  },
-  "settleFeesHelp": "What the marketplace took",
-  "@settleFeesHelp": {
-    "description": "Helper under the fees field."
   },
   "settlePayout": "Payout",
   "@settlePayout": {
@@ -2076,6 +2429,38 @@
     "description": "Empty state body."
   },
   "shippingQueueShip": "Ship",
+  "shippingSelectedCount": "{count} selected",
+  "@shippingSelectedCount": {
+    "description": "How many parcels are ticked for one post-office run.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "shippingBulkShip": "Mark shipped",
+  "@shippingBulkShip": {
+    "description": "Ships every ticked parcel at once."
+  },
+  "shippingBulkCarrierTitle": "{count, plural, =1{Carrier for 1 parcel} other{Carrier for {count} parcels}}",
+  "@shippingBulkCarrierTitle": {
+    "description": "Asked once for a whole run — the carrier is the half that really is the same for all of it.",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "shippingBulkDone": "{count, plural, =1{1 parcel shipped} other{{count} parcels shipped}}",
+  "@shippingBulkDone": {
+    "description": "Confirms a whole run left the queue.",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "@shippingQueueShip": {
     "description": "The per-row action, so posting a parcel is one tap rather than two."
   },
@@ -2346,6 +2731,24 @@
     "description": "Shown on the sourcing screens."
   },
   "sourcingNewSource": "New source",
+  "purchasesNoSource": "No source",
+  "@purchasesNoSource": {
+    "description": "A purchase row whose buying trip was never tied to a shop."
+  },
+  "purchasesItemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@purchasesItemCount": {
+    "description": "How many items came out of one purchase.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "purchasesNoneFromSource": "Nothing recorded from this source yet.",
+  "@purchasesNoneFromSource": {
+    "description": "Purchases, opened on a source that has no buying trips on it."
+  },
   "@sourcingNewSource": {
     "description": "Shown on the sourcing screens."
   },
@@ -2712,15 +3115,6 @@
   "@itemQuantityShort": {
     "description": "Label of the inventory row's quantity cell — how many are still on hand. Short because it shares a band with three amounts."
   },
-  "itemQuantityTimes": "×{quantity}",
-  "@itemQuantityTimes": {
-    "description": "How many of an item. The × is a multiplication sign, not the letter x.",
-    "placeholders": {
-      "quantity": {
-        "type": "int"
-      }
-    }
-  },
   "reportsAsOf": "As of {date}",
   "@reportsAsOf": {
     "description": "When the figures on the Reports screen were taken. The date arrives formatted for the locale.",
@@ -2735,18 +3129,6 @@
     "description": "App bar title on the tax screen. The label is a tax year, which is not a calendar year in every country.",
     "placeholders": {
       "year": {
-        "type": "String"
-      }
-    }
-  },
-  "marketplacesEstimatedFeeLine": "{rate}% {label}",
-  "@marketplacesEstimatedFeeLine": {
-    "description": "A marketplace's estimated fee rate. Replaces composing the number and the words at the call site.",
-    "placeholders": {
-      "rate": {
-        "type": "String"
-      },
-      "label": {
         "type": "String"
       }
     }
@@ -3007,10 +3389,6 @@
       }
     }
   },
-  "payoutsEstimatedNote": "Includes an estimated fee where the platform has not reported one",
-  "@payoutsEstimatedNote": {
-    "description": "Warns that part of the awaiting figure is a guess."
-  },
   "payoutsNothingOutstanding": "Everything is settled",
   "@payoutsNothingOutstanding": {
     "description": "Empty state when no order is missing a payout."
@@ -3022,14 +3400,6 @@
   "payoutsExpected": "Expected",
   "@payoutsExpected": {
     "description": "What an order should pay out: sale price less refund, fees and postage."
-  },
-  "payoutsFeeIsEstimated": "Fee estimated — the platform has not reported one",
-  "@payoutsFeeIsEstimated": {
-    "description": "Caption when the expected figure leans on the marketplace's estimated rate."
-  },
-  "payoutsFeeIsReported": "Fee as the platform reported it",
-  "@payoutsFeeIsReported": {
-    "description": "Caption when the expected figure uses a real reported fee."
   },
   "payoutsOrderedOn": "Ordered {date}",
   "@payoutsOrderedOn": {
@@ -3298,6 +3668,158 @@
   "notificationOfferReceived": "A buyer made an offer",
   "@notificationOfferReceived": {
     "description": "Inbox row for an offer received."
+  },
+  "notificationShipByToday": "{count, plural, =1{1 order has to go out today} other{{count} orders have to go out today}}",
+  "@notificationShipByToday": {
+    "description": "Inbox row for the reminder that comes before the deadline, not after it.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationOfferExpiring": "{count, plural, =1{1 offer expires within hours} other{{count} offers expire within hours}}",
+  "@notificationOfferExpiring": {
+    "description": "Inbox row for offers about to run out.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationPayoutMissing": "{count, plural, =1{1 sale has still not been paid out} other{{count} sales have still not been paid out}}",
+  "@notificationPayoutMissing": {
+    "description": "Inbox row for the payout reconciliation reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationProfitIncomplete": "{count, plural, =1{1 sale still has an estimated fee} other{{count} sales still have an estimated fee}}",
+  "@notificationProfitIncomplete": {
+    "description": "Inbox row for the weekly bookkeeping reminder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationTaxSeason": "Your tax year is closing. Your figures are ready to export.",
+  "@notificationTaxSeason": {
+    "description": "Inbox row for the seasonal tax reminder."
+  },
+  "notificationRestockWinner": "One of your sources sold better than the rest last month.",
+  "@notificationRestockWinner": {
+    "description": "Inbox row for the monthly sourcing note."
+  },
+  "notificationTypeOrderCreated": "New order",
+  "@notificationTypeOrderCreated": {
+    "description": "Notification settings: the name of the new order reminder."
+  },
+  "notificationTypeOrderCreatedBody": "The moment something sells. The one most sellers keep on.",
+  "@notificationTypeOrderCreatedBody": {
+    "description": "Notification settings: what turning the new order reminder off costs."
+  },
+  "notificationTypeOfferReceived": "New offer",
+  "@notificationTypeOfferReceived": {
+    "description": "Notification settings: the name of the new offer reminder."
+  },
+  "notificationTypeOfferReceivedBody": "A buyer asked to pay less. Offers expire, so this one is worth a buzz.",
+  "@notificationTypeOfferReceivedBody": {
+    "description": "Notification settings: what turning the new offer reminder off costs."
+  },
+  "notificationTypeShipByToday": "Going out today",
+  "@notificationTypeShipByToday": {
+    "description": "Notification settings: the name of the going out today reminder."
+  },
+  "notificationTypeShipByTodayBody": "Orders whose deadline is today, while there is still time to post them.",
+  "@notificationTypeShipByTodayBody": {
+    "description": "Notification settings: what turning the going out today reminder off costs."
+  },
+  "notificationTypeShipmentsDue": "Overdue shipments",
+  "@notificationTypeShipmentsDue": {
+    "description": "Notification settings: the name of the overdue shipments reminder."
+  },
+  "notificationTypeShipmentsDueBody": "Orders already past their ship-by date.",
+  "@notificationTypeShipmentsDueBody": {
+    "description": "Notification settings: what turning the overdue shipments reminder off costs."
+  },
+  "notificationTypeOfferExpiring": "Offer about to expire",
+  "@notificationTypeOfferExpiring": {
+    "description": "Notification settings: the name of the offer about to expire reminder."
+  },
+  "notificationTypeOfferExpiringBody": "A few hours left to answer before the platform closes it.",
+  "@notificationTypeOfferExpiringBody": {
+    "description": "Notification settings: what turning the offer about to expire reminder off costs."
+  },
+  "notificationTypePayoutMissing": "Payout not arrived",
+  "@notificationTypePayoutMissing": {
+    "description": "Notification settings: the name of the payout not arrived reminder."
+  },
+  "notificationTypePayoutMissingBody": "Sales a marketplace has still not paid you for.",
+  "@notificationTypePayoutMissingBody": {
+    "description": "Notification settings: what turning the payout not arrived reminder off costs."
+  },
+  "notificationTypeProfitIncomplete": "Fees still estimated",
+  "@notificationTypeProfitIncomplete": {
+    "description": "Notification settings: the name of the books need a number reminder."
+  },
+  "notificationTypeProfitIncompleteBody": "A weekly note about sales whose real platform fee you have not entered yet.",
+  "@notificationTypeProfitIncompleteBody": {
+    "description": "Notification settings: what turning the books need a number reminder off costs."
+  },
+  "notificationTypeTaxSeason": "Tax deadline",
+  "@notificationTypeTaxSeason": {
+    "description": "Notification settings: the name of the tax deadline reminder."
+  },
+  "notificationTypeTaxSeasonBody": "Twice a year, when your figures are due and ready to export.",
+  "@notificationTypeTaxSeasonBody": {
+    "description": "Notification settings: what turning the tax deadline reminder off costs."
+  },
+  "notificationTypeRestockWinner": "Worth buying again",
+  "@notificationTypeRestockWinner": {
+    "description": "Notification settings: the name of the worth buying again reminder."
+  },
+  "notificationTypeRestockWinnerBody": "A monthly note on the source or category that actually sold.",
+  "@notificationTypeRestockWinnerBody": {
+    "description": "Notification settings: what turning the worth buying again reminder off costs."
+  },
+  "notificationTypeStaleInventory": "Listings going stale",
+  "@notificationTypeStaleInventory": {
+    "description": "Notification settings: the name of the listings going stale reminder."
+  },
+  "notificationTypeStaleInventoryBody": "Stock that has been up longer than your own threshold.",
+  "@notificationTypeStaleInventoryBody": {
+    "description": "Notification settings: what turning the listings going stale reminder off costs."
+  },
+  "notificationTypeLowInventory": "Running low",
+  "@notificationTypeLowInventory": {
+    "description": "Notification settings: the name of the running low reminder."
+  },
+  "notificationTypeLowInventoryBody": "Too little left on the shelf to keep selling.",
+  "@notificationTypeLowInventoryBody": {
+    "description": "Notification settings: what turning the running low reminder off costs."
+  },
+  "notificationTypeMemberJoined": "Someone joined",
+  "@notificationTypeMemberJoined": {
+    "description": "Notification settings: the name of the someone joined reminder."
+  },
+  "notificationTypeMemberJoinedBody": "A new person was added to this business.",
+  "@notificationTypeMemberJoinedBody": {
+    "description": "Notification settings: what turning the someone joined reminder off costs."
+  },
+  "notificationSettingsTitle": "Notifications",
+  "@notificationSettingsTitle": {
+    "description": "Title of the screen where each kind of reminder is turned on or off."
+  },
+  "notificationSettingsIntro": "Choose what is worth interrupting you for. Everything you turn off still lands in your inbox.",
+  "@notificationSettingsIntro": {
+    "description": "Explains that muting a type does not lose the notification, only the buzz."
+  },
+  "notificationSettingsFailed": "Could not save that. Try again.",
+  "@notificationSettingsFailed": {
+    "description": "Shown when writing a notification preference failed."
   },
   "notificationShipmentsDue": "{count, plural, =1{1 order is past its ship-by date} other{{count} orders are past their ship-by date}}",
   "@notificationShipmentsDue": {
@@ -4566,6 +5088,22 @@
   "@workspaceDetailTitle": {
     "description": "Title of the screen that edits one business."
   },
+  "workspacesTitle": "Businesses",
+  "@workspacesTitle": {
+    "description": "Screen that lists every business the seller belongs to."
+  },
+  "workspacesCurrent": "Current",
+  "@workspacesCurrent": {
+    "description": "Marks the business the seller is standing in."
+  },
+  "workspacesEmptyTitle": "No businesses yet",
+  "@workspacesEmptyTitle": {
+    "description": "Empty state on the businesses screen."
+  },
+  "workspacesEmptyBody": "Everything you track lives under a business. Create one to start.",
+  "@workspacesEmptyBody": {
+    "description": "Empty state body on the businesses screen."
+  },
   "workspaceEdit": "Edit business",
   "@workspaceEdit": {
     "description": "Opens the business details screen. Also the tooltip on the switcher row."
@@ -4709,6 +5247,22 @@
   "listingsNoMatch": "No listings under this tab.",
   "@listingsNoMatch": {
     "description": "Listings screen, shown when a tab is empty but others are not."
+  },
+  "recordSaleCannotSell": "Cannot sell",
+  "@recordSaleCannotSell": {
+    "description": "The sale picker's warning tag on a row that cannot be sold. Short — tapping the row opens the reason in full."
+  },
+  "recordSaleBlockedTitle": "This item cannot be sold",
+  "@recordSaleBlockedTitle": {
+    "description": "Title of the sheet opened by tapping a sale-picker row that cannot be sold."
+  },
+  "recordSaleBlockedHint": "Its status and how many are on the shelf are both edited on the item itself.",
+  "@recordSaleBlockedHint": {
+    "description": "Under the reasons in the blocked-sale sheet: where the seller fixes it."
+  },
+  "recordSaleOpenItem": "Open item",
+  "@recordSaleOpenItem": {
+    "description": "Primary action of the blocked-sale sheet — opens the item's detail screen."
   },
   "commonGoToInventory": "Go to inventory",
   "@commonGoToInventory": {
@@ -5457,7 +6011,7 @@
   },
   "filterAny": "Any",
   "@filterAny": {
-    "description": "The unfiltered option of a three-state group \u2014 with photos, without photos, or any."
+    "description": "The unfiltered option of a three-state group — with photos, without photos, or any."
   },
   "filterAnyTime": "Any time",
   "@filterAnyTime": {
@@ -5521,7 +6075,7 @@
   },
   "filterCostMissing": "No cost",
   "@filterCostMissing": {
-    "description": "Items with no purchase price \u2014 the rows that make every profit figure read as unknown."
+    "description": "Items with no purchase price — the rows that make every profit figure read as unknown."
   },
   "filterAskingPrice": "Asking price",
   "@filterAskingPrice": {
@@ -5661,6 +6215,184 @@
   },
   "orderSectionOrder": "Order",
   "@orderSectionOrder": {
-    "description": "Order detail section: the sale itself \u2014 price, buyer, date."
+    "description": "Order detail section: the sale itself — price, buyer, date."
+  },
+  "markSoldPayout": "Net received (optional)",
+  "@markSoldPayout": {
+    "description": "Sale sheet: what the platform actually paid, when the seller already knows it."
+  },
+  "markSoldPayoutHelp": "What landed in your account. Leave it empty and add it when the platform pays.",
+  "@markSoldPayoutHelp": {
+    "description": "Helper under the net received box on the sale sheet."
+  },
+  "markSoldImpliedFee": "Platform kept",
+  "@markSoldImpliedFee": {
+    "description": "Label on the card showing sale price minus net received."
+  },
+  "payoutsAwaitingCount": "{count, plural, =1{1 sale still to record} other{{count} sales still to record}}",
+  "@payoutsAwaitingCount": {
+    "description": "Subtitle on a marketplace payout card: how many of its sales have no payout yet.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "settleFeeImplied": "Out of {salePrice} the buyer paid",
+  "@settleFeeImplied": {
+    "description": "Caption under the platform-fee figure on the settlement sheet.",
+    "placeholders": {
+      "salePrice": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutsRecordAll": "{count, plural, =1{Record 1 payout} other{Record {count} payouts}}",
+  "@payoutsRecordAll": {
+    "description": "Pinned action on Payouts opening the bulk entry screen.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "recordPayoutsTitle": "Record payouts",
+  "@recordPayoutsTitle": {
+    "description": "Title of the bulk payout entry screen."
+  },
+  "recordPayoutsIntro": "Copy what each platform actually paid. Until a sale has one, its profit is unknown.",
+  "@recordPayoutsIntro": {
+    "description": "Line above the list on the bulk payout entry screen."
+  },
+  "recordPayoutsRowHint": "Sold {date}",
+  "@recordPayoutsRowHint": {
+    "description": "Helper under an empty payout box: when the sale was made.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recordPayoutsRowKept": "Platform kept {amount}",
+  "@recordPayoutsRowKept": {
+    "description": "Helper under a filled payout box: sale price minus what landed.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recordPayoutsSubmit": "{count, plural, =0{Save} =1{Save 1 payout} other{Save {count} payouts}}",
+  "@recordPayoutsSubmit": {
+    "description": "Pinned action on the bulk payout entry screen.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "recordPayoutsDone": "{count, plural, =1{1 payout recorded} other{{count} payouts recorded}}",
+  "@recordPayoutsDone": {
+    "description": "Snackbar after saving a run of payouts.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "recordPayoutsAllDone": "Every sale is accounted for",
+  "@recordPayoutsAllDone": {
+    "description": "Empty state title when no sale is missing a payout."
+  },
+  "recordPayoutsAllDoneNote": "Nothing here needs a figure. Profit is exact across the whole book.",
+  "@recordPayoutsAllDoneNote": {
+    "description": "Empty state message when no sale is missing a payout."
+  },
+  "homePayoutsToRecord": "Payouts to record",
+  "@homePayoutsToRecord": {
+    "description": "Home attention row: sales whose payout nobody has entered."
+  },
+  "homePayoutsToRecordDetail": "Profit is unknown until each one has a figure",
+  "@homePayoutsToRecordDetail": {
+    "description": "Detail under the payouts row when none is overdue."
+  },
+  "homePayoutOverdueDetail": "{count} waiting more than {days} days",
+  "@homePayoutOverdueDetail": {
+    "description": "Detail under the payouts row when some are past the settlement window.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "workspacePlanningFee": "Assumed platform fee",
+  "@workspacePlanningFee": {
+    "description": "Workspace setting: the planning rate used before a sale exists."
+  },
+  "workspacePlanningFeeHelper": "Used only when working out whether a buy is worth making. Real fees are measured from each payout.",
+  "@workspacePlanningFeeHelper": {
+    "description": "Helper under the assumed platform fee picker."
+  },
+  "importPayoutsTitle": "Import payouts",
+  "@importPayoutsTitle": {
+    "description": "Title of the screen that reads a marketplace payout export."
+  },
+  "importPayoutsAction": "Import from a file",
+  "@importPayoutsAction": {
+    "description": "App bar action on Record payouts opening the import screen."
+  },
+  "importPayoutsIntro": "Export your payout report from the marketplace, open it, copy everything and paste it here. Nothing is saved until you have seen what matched.",
+  "@importPayoutsIntro": {
+    "description": "Line above the paste box on the import screen."
+  },
+  "importPayoutsPasteLabel": "Payout report",
+  "@importPayoutsPasteLabel": {
+    "description": "Label of the box the CSV is pasted into."
+  },
+  "importPayoutsPasteHint": "Order ID,Order earnings…",
+  "@importPayoutsPasteHint": {
+    "description": "Placeholder in the paste box, showing the shape of a CSV."
+  },
+  "importPayoutsUnreadable": "No order number and payout columns found. The file needs a header row naming both — eBay's Earnings report calls them Order ID and Order earnings.",
+  "@importPayoutsUnreadable": {
+    "description": "Shown when the pasted text has no usable columns."
+  },
+  "importPayoutsMatched": "Sales matched",
+  "@importPayoutsMatched": {
+    "description": "Label on the tile counting rows matched to orders awaiting a payout."
+  },
+  "importPayoutsColumns": "Read from {orderIdColumn} and {payoutColumn}",
+  "@importPayoutsColumns": {
+    "description": "Caption naming the two columns the import used.",
+    "placeholders": {
+      "orderIdColumn": {
+        "type": "String"
+      },
+      "payoutColumn": {
+        "type": "String"
+      }
+    }
+  },
+  "importPayoutsLeftOver": "{unmatched} rows name a sale that is not waiting, {skipped} had no amount",
+  "@importPayoutsLeftOver": {
+    "description": "Line under the summary saying what the import left alone.",
+    "placeholders": {
+      "unmatched": {
+        "type": "num",
+        "format": "compact"
+      },
+      "skipped": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
   }
 }

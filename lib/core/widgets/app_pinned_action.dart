@@ -45,14 +45,16 @@ class AppPinnedAction extends StatelessWidget {
   final bool isBusy;
 
   /// A second action stacked **above** the main one, sharing this slot's one
-  /// bottom inset — a destructive verb on the record the screen is about, the
-  /// shape Business details wears.
+  /// bottom inset — a destructive verb on the record the screen is about, or
+  /// a quieter alternative to the primary the way Quick Add's is.
   ///
   /// - lowest is the primary, so the button under the resting thumb is always
   ///   the one the screen is for
-  /// - a widget rather than a second set of label and variant props: there is
-  ///   one of these in the app, and a config surface would outnumber its users
-  /// - it carries its own gap below itself, because it is usually conditional
+  /// - a widget rather than a second set of label and variant props: a config
+  ///   surface would outnumber the screens using it
+  /// - **null when the action does not apply, never an empty widget**: the
+  ///   gap below it belongs to this slot, so a `SizedBox.shrink()` here would
+  ///   leave a hole above the primary
   final Widget? secondary;
 
   @override
@@ -67,6 +69,11 @@ class AppPinnedAction extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ?secondary,
+        // Drawn by the slot, not by the caller: two of the three screens with
+        // a second action had no gap at all and their buttons touched
+        // (`docs/rules/SCREENS.md`).
+        if (secondary != null)
+          SizedBox(height: SdContentPaddingV3.stackedActionsGap),
         SdButtonV3(
           variant: variant,
           label: label,

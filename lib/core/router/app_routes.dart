@@ -67,6 +67,11 @@ final class AppRoutes {
   static const String crossListPath = '/inventory/item/:itemId/cross-list';
   static const String addItem = '/inventory/add';
   static const String quickAdd = '/inventory/quick-add';
+
+  /// A whole buying trip, taken in one line at a time. The batch sibling of
+  /// [quickAdd] — same one required field, but the source and the date are
+  /// asked once for the trip rather than once per item.
+  static const String intake = '/inventory/intake';
   static const String scanner = '/inventory/scanner';
   static const String locations = '/inventory/locations';
 
@@ -105,7 +110,6 @@ final class AppRoutes {
   static const String purchaseDetail = '/more/sourcing/purchases/:purchaseId';
   static const String addPurchase = '/more/sourcing/purchases/new';
   static const String sources = '/more/sourcing/sources';
-  static const String sourceDetail = '/more/sourcing/sources/:sourceId';
 
   /// The calculation a reseller does standing in a shop (plan §11). Its own
   /// route because it is reached mid-hunt, not from a record.
@@ -117,6 +121,19 @@ final class AppRoutes {
   /// rather than inside Orders: it is a weekly reconciliation against a bank
   /// statement, not part of draining today's queue.
   static const String payouts = '/more/payouts';
+
+  /// The queue of sales whose payout nobody has recorded, taken in bulk.
+  /// Under Payouts because it is the work that screen names.
+  static const String recordPayouts = '/more/payouts/record';
+
+  /// The same queue, filled from a marketplace's own export rather than by
+  /// hand. Under Record payouts because it is the faster way to do that job.
+  static const String importPayouts = '/more/payouts/record/import';
+
+  /// Everywhere the figures are still guessing. Under More next to Reports,
+  /// because it is the screen a seller opens before handing anything over.
+  static const String books = '/more/books';
+
   static const String reports = '/more/reports';
   static const String receipts = '/more/receipts';
   static const String tax = '/more/tax';
@@ -128,8 +145,18 @@ final class AppRoutes {
   static const String carriers = '/more/carriers';
   static const String addCarrier = '/more/carriers/new';
   static const String carrierDetailPath = '/more/carriers/:carrierId';
+  /// Every business the seller belongs to, with the plan's ceiling on how
+  /// many. Under More rather than in Settings: a business is a record, and
+  /// records are managed from More.
+  static const String workspaces = '/more/businesses';
+
   static const String team = '/more/team';
   static const String settings = '/more/settings';
+
+  /// Which reminders this person wants. **Under Settings and not in
+  /// `_previewRoutes`**: it reads and writes the signed-in person's own
+  /// document, so unlike theme and language it is not a device preference.
+  static const String notificationSettings = '/more/settings/notifications';
 
   /// The audit log (§23). Under More rather than under Home: it is something
   /// you go and check, not something you are told.
@@ -143,6 +170,13 @@ final class AppRoutes {
   static const String paywall = '/more/paywall';
 
   // --- Global, reachable from anywhere ---
+
+  /// The one route nothing leaves. Reached when `app_config` names the
+  /// signed-in account on its block list — signing out is the only way off it.
+  ///
+  /// The forced update has no route: it is a sheet raised over whatever is on
+  /// screen (`ForceUpdateGate`).
+  static const String blocked = '/blocked';
 
   static const String search = '/search';
 
@@ -161,7 +195,34 @@ final class AppRoutes {
   static String order(String orderId) => '/orders/$orderId';
   static String workspaceDetail(String workspaceId) =>
       '/workspace/$workspaceId';
-  static String source(String sourceId) => '/more/sourcing/sources/$sourceId';
+
+  /// The buy calculator, optionally opened on a code the seller just scanned.
+  ///
+  /// A query parameter rather than a path segment: the screen is perfectly
+  /// usable with no code — that is how it is reached from Sourcing — and a
+  /// segment would make the codeless case a second route.
+  static String evaluate({String? code}) => code == null || code.isEmpty
+      ? purchaseEvaluator
+      : '$purchaseEvaluator?code=${Uri.encodeComponent(code)}';
+
+  /// The item form, optionally opened on a code the seller just scanned.
+  ///
+  /// A query parameter for the same reason [evaluate] takes one: the form is
+  /// how every other screen creates an item, with no code at all, and a path
+  /// segment would make that the second route rather than the first.
+  static String addItemWithCode({String? code}) => code == null || code.isEmpty
+      ? addItem
+      : '$addItem?code=${Uri.encodeComponent(code)}';
+
+  /// Purchases, narrowed to one source.
+  ///
+  /// **A source has no screen of its own, and this is what it means to open
+  /// one**: what was bought there. There was a `/sources/:sourceId` path for a
+  /// while and no route ever answered it, so Analytics' ROI rows bounced the
+  /// seller to Home — a query parameter on a list that exists cannot rot the
+  /// same way.
+  static String purchasesFrom(String sourceId) =>
+      '$purchases?source=${Uri.encodeComponent(sourceId)}';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';
 }

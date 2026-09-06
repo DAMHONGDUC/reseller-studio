@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
+import '../subscription/domain/enums/seller_plan.dart';
 
 /// One row on the More screen.
 ///
@@ -28,7 +29,8 @@ class MoreDestination {
 
 /// What a More row points at.
 enum MoreDestinationKind {
-  business,
+  businesses,
+  books,
   sourcing,
   listings,
   expenses,
@@ -50,7 +52,8 @@ enum MoreDestinationKind {
 final class MoreLabel {
   static String of(BuildContext context, MoreDestinationKind kind) =>
       switch (kind) {
-        MoreDestinationKind.business => context.l10n.workspaceDetailTitle,
+        MoreDestinationKind.businesses => context.l10n.workspacesTitle,
+        MoreDestinationKind.books => context.l10n.booksTitle,
         MoreDestinationKind.sourcing => context.l10n.moreSourcing,
         MoreDestinationKind.listings => context.l10n.moreListings,
         MoreDestinationKind.expenses => context.l10n.moreExpenses,
@@ -67,6 +70,27 @@ final class MoreLabel {
         MoreDestinationKind.subscription => context.l10n.moreSubscription,
         MoreDestinationKind.settings => context.l10n.moreSettings,
       };
+}
+
+/// The value at the end of a More row — what the seller would otherwise have
+/// to open the screen to find out.
+///
+/// **Two rows have one, and the rest return null.** A value on every row would
+/// be a second column of text competing with the labels; these two answer
+/// questions a seller asks before tapping — which plan am I on, and am I
+/// signed in.
+final class MoreValueLabel {
+  static String? of(
+    BuildContext context,
+    MoreDestinationKind kind, {
+    required SellerPlan plan,
+    required bool signedIn,
+  }) => switch (kind) {
+    MoreDestinationKind.subscription => plan.label,
+    MoreDestinationKind.settings =>
+      signedIn ? context.l10n.settingsSignedIn : context.l10n.settingsSignedOut,
+    _ => null,
+  };
 }
 
 /// One titled group on More.
@@ -135,6 +159,12 @@ final class MoreConstant {
       kind: MoreSectionKind.business,
       destinations: <MoreDestination>[
         MoreDestination(
+          kind: MoreDestinationKind.businesses,
+          icon: AppIconConstant.storefront,
+          route: AppRoutes.workspaces,
+          isBuilt: true,
+        ),
+        MoreDestination(
           kind: MoreDestinationKind.marketplaces,
           icon: AppIconConstant.hub,
           route: AppRoutes.marketplaces,
@@ -173,6 +203,12 @@ final class MoreConstant {
           kind: MoreDestinationKind.payouts,
           icon: AppIconConstant.accountBalance,
           route: AppRoutes.payouts,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.books,
+          icon: AppIconConstant.checkCircle,
+          route: AppRoutes.books,
           isBuilt: true,
         ),
         MoreDestination(
@@ -221,14 +257,13 @@ final class MoreConstant {
 
   /// What More lists for this seller.
   ///
-  /// **The business row is built here, not declared above**, because it is the
-  /// one destination that names a record: it opens the business the seller is
-  /// standing in, so it needs [workspaceId] and cannot be a `const` route. No
-  /// workspace, no row — the screen behind it takes an explicit id and has
-  /// nothing to open (`lib/features/workspace/CLAUDE.md`).
+  /// **Every row is a `const` destination now.** The business row used to be
+  /// built here from the resolved workspace id because it opened one record;
+  /// it opens the list instead, which names none
+  /// (`lib/features/workspace/CLAUDE.md`).
   static List<MoreSection> sectionsFor({
     required bool signedIn,
-    String? workspaceId,
+    bool premiumEnabled = true,
   }) {
     if (!signedIn) {
       final MoreDestination settings = destinations.firstWhere(
@@ -244,25 +279,21 @@ final class MoreConstant {
       ];
     }
 
-    if (workspaceId == null) return sections;
+    if (premiumEnabled) return sections;
 
+    // Nothing is for sale, so a row that opens a plan screen is a row that
+    // leads to an empty promise.
     return <MoreSection>[
       for (final MoreSection section in sections)
-        if (section.kind == MoreSectionKind.business)
-          MoreSection(
-            kind: section.kind,
-            destinations: <MoreDestination>[
-              MoreDestination(
-                kind: MoreDestinationKind.business,
-                icon: AppIconConstant.business,
-                route: AppRoutes.workspaceDetail(workspaceId),
-                isBuilt: true,
-              ),
-              ...section.destinations,
-            ],
-          )
-        else
-          section,
+        MoreSection(
+          kind: section.kind,
+          destinations: section.destinations
+              .where(
+                (MoreDestination destination) =>
+                    destination.kind != MoreDestinationKind.subscription,
+              )
+              .toList(growable: false),
+        ),
     ];
   }
 }

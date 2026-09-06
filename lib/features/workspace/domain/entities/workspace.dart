@@ -1,5 +1,6 @@
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../../pricing/domain/services/profit_calculator.dart';
+import '../../workspace_constant.dart';
 
 /// A business. **Every business record in Firestore lives under one** (hard
 /// rule 14), so this is the root of everything the app reads or writes.
@@ -20,7 +21,7 @@ class Workspace {
     this.logoUrl,
     this.staleThresholdDays = StaleInventoryPolicy.defaultThresholdDays,
     this.lowStockThreshold = LowStockPolicy.defaultThreshold,
-    this.marketplaceFeeRates = const <String, double>{},
+    this.planningFeeRate = WorkspaceConstant.defaultPlanningFeeRate,
   });
 
   final String id;
@@ -45,13 +46,12 @@ class Workspace {
   final String? businessType;
   final String? logoUrl;
 
-  /// The platform commissions this business has corrected, keyed by
-  /// `Marketplace.name`.
+  /// What a platform is assumed to take when this business is deciding
+  /// whether to buy something.
   ///
-  /// **Only the corrections** — a platform absent here uses its published
-  /// rate. See `MarketplaceFeePolicy`, which is the only thing that should
-  /// read this map.
-  final Map<String, double> marketplaceFeeRates;
+  /// **The only fee rate left in the app, and it never reaches an `Order`**
+  /// (hard rule 3). See `WorkspaceConstant.planningFeeRateChoices`.
+  final double planningFeeRate;
 
   /// How long a listing sits before this workspace calls it stale. Per
   /// workspace because the right answer differs wildly: fast fashion goes
@@ -83,7 +83,7 @@ class Workspace {
     String? logoUrl,
     int? staleThresholdDays,
     int? lowStockThreshold,
-    Map<String, double>? marketplaceFeeRates,
+    double? planningFeeRate,
   }) => Workspace(
     id: id,
     name: name ?? this.name,
@@ -96,7 +96,7 @@ class Workspace {
     logoUrl: logoUrl ?? this.logoUrl,
     staleThresholdDays: staleThresholdDays ?? this.staleThresholdDays,
     lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
-    marketplaceFeeRates: marketplaceFeeRates ?? this.marketplaceFeeRates,
+    planningFeeRate: planningFeeRate ?? this.planningFeeRate,
   );
 }
 

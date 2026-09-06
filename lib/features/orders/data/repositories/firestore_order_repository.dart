@@ -23,7 +23,7 @@ class FirestoreOrderRepository implements OrderRepository {
 
   @override
   Stream<List<Order>> watchOrders() => FirestoreStream.collection(
-    _context.collections.orders.orderBy('orderedAt', descending: true),
+    _context.collections.orders.query.orderBy('orderedAt', descending: true),
     _toEntity,
     operation: 'load orders',
   );
@@ -64,56 +64,82 @@ class FirestoreOrderRepository implements OrderRepository {
   });
 
   @override
-  Future<void> recordSale(Order order, Item item) => FailureMapper.guard(
+  Future<void> recordSale(Order order, List<Item> items) => FailureMapper.guard(
     'record sale',
     () async {
       final DocumentReference<Map<String, Object?>> orderRef = _context
           .collections
           .orders
           .doc(order.id);
-      final DocumentReference<Map<String, Object?>> itemRef = _context
-          .collections
-          .items
-          .doc(item.id);
+      final Map<String, DocumentReference<Map<String, Object?>>> itemRefs =
+          <String, DocumentReference<Map<String, Object?>>>{
+            for (final Item item in items)
+              item.id: _context.collections.items.doc(item.id),
+          };
+
+      // What each line was allocated, so an item's asking price is seeded
+      // from its own share of a bundle rather than from the whole payment.
+      final Map<String, int> linePrice = <String, int>{
+        for (final OrderLine line in order.lines)
+          line.itemId: line.unitPrice.minor,
+      };
 
       await orderRef.firestore.runTransaction((Transaction transaction) async {
-        final DocumentSnapshot<Map<String, Object?>> itemDoc = await transaction
-            .get(itemRef);
-        final Map<String, Object?> data =
-            itemDoc.data() ?? const <String, Object?>{};
-        final int quantity = data['quantity'] is int
-            ? data['quantity']! as int
-            : item.quantity;
-        final String status = data['status'] is String
-            ? data['status']! as String
-            : item.status.name;
+        final Map<String, Map<String, Object?>> read =
+            <String, Map<String, Object?>>{};
 
-        if (!itemDoc.exists ||
-            quantity <= 0 ||
-            status == 'sold' ||
-            status == 'archived') {
-          throw StateError('Item ${item.id} is no longer sellable');
+        // **Every read before any write.** Firestore requires it, and it is
+        // also the behaviour a bundle needs: a third item that has already
+        // sold must leave the first two untouched.
+        for (final Item item in items) {
+          final DocumentSnapshot<Map<String, Object?>> doc = await transaction
+              .get(itemRefs[item.id]!);
+          final Map<String, Object?> data =
+              doc.data() ?? const <String, Object?>{};
+          final int quantity = data['quantity'] is int
+              ? data['quantity']! as int
+              : item.quantity;
+          final String status = data['status'] is String
+              ? data['status']! as String
+              : item.status.name;
+
+          if (!doc.exists ||
+              quantity <= 0 ||
+              status == 'sold' ||
+              status == 'archived') {
+            throw StateError('Item ${item.id} is no longer sellable');
+          }
+
+          read[item.id] = data;
         }
 
-        final int left = quantity - 1;
         transaction.set(
           orderRef,
           OrderDto.toMap(order, createdBy: _context.uid),
           SetOptions(merge: true),
         );
-        transaction.update(itemRef, <String, Object?>{
-          'quantity': left,
-          'status': left == 0 ? 'sold' : 'inStock',
-          if (left == 0) 'soldAt': Timestamp.fromDate(order.orderedAt),
-          if (data['askingPriceMinor'] == null)
-            'askingPriceMinor': order.salePrice.minor,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+
+        for (final Item item in items) {
+          final Map<String, Object?> data = read[item.id]!;
+          final int quantity = data['quantity'] is int
+              ? data['quantity']! as int
+              : item.quantity;
+          final int left = quantity - 1;
+
+          transaction.update(itemRefs[item.id]!, <String, Object?>{
+            'quantity': left,
+            'status': left == 0 ? 'sold' : 'inStock',
+            if (left == 0) 'soldAt': Timestamp.fromDate(order.orderedAt),
+            if (data['askingPriceMinor'] == null)
+              'askingPriceMinor': linePrice[item.id] ?? order.salePrice.minor,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
       });
 
       SdLogger.info(LogTagConstant.order, 'Sale committed', <String, Object>{
         'orderId': order.id,
-        'itemId': item.id,
+        'items': items.length,
       });
     },
   );

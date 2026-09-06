@@ -8,6 +8,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/app_notification.dart';
@@ -68,6 +69,14 @@ class NotificationsScreen extends ConsumerWidget {
               tooltip: context.l10n.notificationsMarkAllRead,
               onPressed: () => _markAllRead(context, ref, notifications),
             ),
+          // Where a seller looks the moment a reminder annoys them, which is
+          // the moment they would otherwise reach for the OS switch and lose
+          // every other reminder with it.
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.tune,
+            tooltip: context.l10n.notificationSettingsTitle,
+            onPressed: () => context.push(AppRoutes.notificationSettings),
+          ),
           SizedBox(width: SdSpacingConstant.w8),
         ],
       ),

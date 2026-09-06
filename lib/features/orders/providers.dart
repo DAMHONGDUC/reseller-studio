@@ -5,6 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
 import '../../core/constants/log_tag_constant.dart';
+import '../../core/money/money.dart';
+import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/services/item_search.dart';
@@ -217,9 +219,30 @@ final Provider<List<MarketplacePayout>> marketplacePayoutsProvider =
     Provider<List<MarketplacePayout>>((Ref ref) {
       return PayoutReconciliation.byMarketplace(
         ref.watch(ordersProvider).value ?? const <Order>[],
-        feeRates: ref.watch(marketplaceFeeRatesProvider),
       );
     });
+
+/// Sales a marketplace should have paid for by now.
+///
+/// **Overdue rather than merely outstanding.** A payout three days old is a
+/// platform working normally; a row of them two weeks old is money nobody is
+/// looking for, and only the second is worth a place on Home.
+final Provider<List<Order>> overduePayoutsProvider = Provider<List<Order>>((
+  Ref ref,
+) {
+  return PayoutReconciliation.overdue(
+    ref.watch(ordersProvider).value ?? const <Order>[],
+    ref.watch(clockProvider).now(),
+  );
+});
+
+/// What those sales should have paid, summed. Null when there are none.
+final Provider<Money?> overduePayoutTotalProvider = Provider<Money?>((Ref ref) {
+  return PayoutReconciliation.overdueTotal(
+    ref.watch(ordersProvider).value ?? const <Order>[],
+    ref.watch(clockProvider).now(),
+  );
+});
 
 /// How many orders across every marketplace are still missing a payout.
 ///
@@ -232,6 +255,23 @@ final Provider<int> ordersAwaitingPayoutProvider = Provider<int>((Ref ref) {
         0,
         (int running, MarketplacePayout row) => running + row.awaiting.length,
       );
+});
+
+/// Every sale whose payout nobody has recorded, oldest first.
+///
+/// **The work the payout-first model creates, gathered in one place.** A sale
+/// with no payout has no fee and therefore no profit (hard rule 3), so this is
+/// not a tidy-up list — it is the difference between Analytics reading `—` and
+/// reading a number. Oldest first because that is the one most likely to have
+/// been missed.
+final Provider<List<Order>>
+ordersAwaitingPayoutListProvider = Provider<List<Order>>((Ref ref) {
+  final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
+
+  return orders
+      .where((Order order) => order.status.countsAsRevenue && order.needsPayout)
+      .toList()
+    ..sort((Order a, Order b) => a.orderedAt.compareTo(b.orderedAt));
 });
 
 /// The one way an order is written — see `lib/features/orders/CLAUDE.md`.
@@ -267,8 +307,76 @@ recordSaleQueryProvider = NotifierProvider<RecordSaleQueryController, String>(
 final Provider<List<Item>> recordSaleItemsProvider = Provider<List<Item>>((
   Ref ref,
 ) {
-  final List<Item> items = ref.watch(sellableItemsProvider);
+  // **Everything the business has, not only what is on the shelf** — owner's
+  // rule (`lib/features/orders/CLAUDE.md`). A row that cannot be sold is
+  // disabled with the reason under it; filtering it out said the item did not
+  // exist.
+  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
   final String query = ref.watch(recordSaleQueryProvider);
 
   return items.where((Item item) => ItemSearch.matches(item, query)).toList();
 });
+
+/// Which parcels the seller is about to post in one go.
+///
+/// **The shared `SelectionController` in `core/state/`**, the way Inventory
+/// and Listings tick rows — one behaviour, so a third screen cannot invent a
+/// fourth meaning for "clear".
+class ShippingSelectionController extends SelectionController {}
+
+final NotifierProvider<ShippingSelectionController, Set<String>>
+shippingSelectionProvider =
+    NotifierProvider<ShippingSelectionController, Set<String>>(
+      ShippingSelectionController.new,
+    );
+
+/// The ticked orders themselves, in queue order.
+///
+/// Read from the queue rather than from every order: one shipped on another
+/// device mid-selection drops out of the run instead of being shipped twice.
+final Provider<List<Order>> selectedShippingOrdersProvider =
+    Provider<List<Order>>((Ref ref) {
+      final Set<String> selected = ref.watch(shippingSelectionProvider);
+
+      return ref
+          .watch(ordersNeedingActionProvider)
+          .where((Order order) => selected.contains(order.id))
+          .toList();
+    });
+
+/// Which items a bundle sale is being built from.
+///
+/// **Its own controller rather than the screen's `State`.** It survives the
+/// keyboard opening and the shell rebuilding the branch — a set held in the
+/// widget resets under the seller mid-selection, which is the bug
+/// `CrossListController` was given the same treatment for.
+class RecordSaleSelectionController extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => <String>{};
+
+  void toggle(String itemId) => state = state.contains(itemId)
+      ? (<String>{...state}..remove(itemId))
+      : <String>{...state, itemId};
+
+  void clear() => state = <String>{};
+}
+
+final NotifierProvider<RecordSaleSelectionController, Set<String>>
+recordSaleSelectionProvider =
+    NotifierProvider<RecordSaleSelectionController, Set<String>>(
+      RecordSaleSelectionController.new,
+    );
+
+/// The selected items themselves, in the order the shelf lists them.
+///
+/// Filtered against what is still sellable: an item sold on another device
+/// mid-selection must not join the bundle.
+final Provider<List<Item>> recordSaleSelectionItemsProvider =
+    Provider<List<Item>>((Ref ref) {
+      final Set<String> selected = ref.watch(recordSaleSelectionProvider);
+
+      return ref
+          .watch(sellableItemsProvider)
+          .where((Item item) => selected.contains(item.id))
+          .toList();
+    });

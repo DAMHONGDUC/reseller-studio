@@ -36,10 +36,10 @@ async function seed() {
     };
 
     for (const [uid, role] of Object.entries(roles)) {
-      await db.doc(`workspaces/${WORKSPACE}/members/${uid}`).set({ uid, role });
+      await db.doc(`members/${WORKSPACE}_${uid}`).set({ uid, role, workspaceId: WORKSPACE });
     }
 
-    await db.doc(`workspaces/${WORKSPACE}/items/item-1`).set({ title: 'Jacket' });
+    await db.doc(`items/${WORKSPACE}_item-1`).set({ title: 'Jacket', workspaceId: WORKSPACE });
 
     // One notification, written the way a Cloud Function writes it.
     await db.doc(`users/${MEMBER}/notifications/n-1`).set({
@@ -71,24 +71,48 @@ after(async () => {
 describe('membership is the only ACL', () => {
   it('lets every role read the business, viewer included', async () => {
     for (const uid of [OWNER, ADMIN, MEMBER, VIEWER]) {
-      await assertSucceeds(as(uid).doc(`workspaces/${WORKSPACE}/items/item-1`).get());
+      await assertSucceeds(as(uid).doc(`items/${WORKSPACE}_item-1`).get());
     }
   });
 
   it('refuses a non-member, signed in or not', async () => {
-    await assertFails(as(OUTSIDER).doc(`workspaces/${WORKSPACE}/items/item-1`).get());
-    await assertFails(anonymous().doc(`workspaces/${WORKSPACE}/items/item-1`).get());
+    await assertFails(as(OUTSIDER).doc(`items/${WORKSPACE}_item-1`).get());
+    await assertFails(anonymous().doc(`items/${WORKSPACE}_item-1`).get());
   });
 
   it('refuses a viewer every write — that is what viewer means', async () => {
     await assertFails(
-      as(VIEWER).doc(`workspaces/${WORKSPACE}/items/item-2`).set({ title: 'New' }),
+      as(VIEWER).doc(`items/${WORKSPACE}_item-2`).set({ title: 'New', workspaceId: WORKSPACE }),
     );
   });
 
   it('lets a member write business records', async () => {
     await assertSucceeds(
-      as(MEMBER).doc(`workspaces/${WORKSPACE}/items/item-3`).set({ title: 'New' }),
+      as(MEMBER).doc(`items/${WORKSPACE}_item-3`).set({ title: 'New', workspaceId: WORKSPACE }),
+    );
+  });
+});
+
+describe('a row cannot be moved into another business', () => {
+  // The cost hard rule 14 accepts: ownership is a column now, so an update
+  // that rewrites it is a record planted in somebody else's account. The rule
+  // checks the stored row and the incoming one, which is the only reason this
+  // fails (`docs/rules/BACKEND.md`).
+  it('refuses an update that rewrites workspaceId', async () => {
+    await assertFails(
+      as(MEMBER)
+        .doc(`items/${WORKSPACE}_item-1`)
+        .update({ workspaceId: 'ws-somebody-else' }),
+    );
+  });
+
+  // And the query half: a read without the filter picks up rows the caller
+  // cannot see, fails on them, and takes the whole query down rather than
+  // returning a subset.
+  it('refuses a query with no workspace filter', async () => {
+    await assertFails(as(MEMBER).collection('items').get());
+    await assertSucceeds(
+      as(MEMBER).collection('items').where('workspaceId', '==', WORKSPACE).get(),
     );
   });
 });
@@ -99,19 +123,19 @@ describe('nobody edits their own membership document', () => {
   // rewrote.
   it('refuses a member promoting themselves', async () => {
     await assertFails(
-      as(MEMBER).doc(`workspaces/${WORKSPACE}/members/${MEMBER}`).update({ role: 'owner' }),
+      as(MEMBER).doc(`members/${WORKSPACE}_${MEMBER}`).update({ role: 'owner' }),
     );
   });
 
   it('refuses even the owner editing their own', async () => {
     await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/members/${OWNER}`).update({ role: 'admin' }),
+      as(OWNER).doc(`members/${WORKSPACE}_${OWNER}`).update({ role: 'admin' }),
     );
   });
 
   it('lets an admin change somebody else', async () => {
     await assertSucceeds(
-      as(ADMIN).doc(`workspaces/${WORKSPACE}/members/${MEMBER}`).update({ role: 'viewer' }),
+      as(ADMIN).doc(`members/${WORKSPACE}_${MEMBER}`).update({ role: 'viewer' }),
     );
   });
 });
@@ -132,7 +156,7 @@ describe('creating a workspace', () => {
   // could never be written and the workspace would be unreadable forever.
   it('lets its owner write the first membership, as owner and nothing else', async () => {
     await assertSucceeds(
-      as(OUTSIDER).doc(`workspaces/ws-new/members/${OUTSIDER}`).set({ role: 'owner' }),
+      as(OUTSIDER).doc(`members/ws-new_${OUTSIDER}`).set({ role: 'owner', workspaceId: 'ws-new' }),
     );
   });
 
@@ -145,13 +169,13 @@ describe('creating a workspace', () => {
     });
 
     await assertFails(
-      as(OUTSIDER).doc(`workspaces/ws-second/members/${OUTSIDER}`).set({ role: 'member' }),
+      as(OUTSIDER).doc(`members/ws-second_${OUTSIDER}`).set({ role: 'member', workspaceId: 'ws-second' }),
     );
   });
 
   it('refuses somebody the workspace does not name as owner', async () => {
     await assertFails(
-      as(MEMBER).doc(`workspaces/ws-second/members/${MEMBER}`).set({ role: 'owner' }),
+      as(MEMBER).doc(`members/ws-second_${MEMBER}`).set({ role: 'owner', workspaceId: 'ws-second' }),
     );
   });
 
@@ -171,13 +195,13 @@ describe('what only a Cloud Function may write', () => {
     // Hard rule 12: an entry a client can write can name any actor it likes,
     // which makes the whole log worthless.
     await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/activity/a-1`).set({ actorId: OWNER }),
+      as(OWNER).doc(`activity/${WORKSPACE}_a-1`).set({ actorId: OWNER }),
     );
   });
 
   it('lets a member maintain seller-owned marketplace records', async () => {
     await assertSucceeds(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/marketplaces/ebay`).set({
+      as(OWNER).doc(`marketplaces/${WORKSPACE}_ebay`).set({
         name: 'eBay',
         feeRate: 0.1325,
       }),
@@ -186,7 +210,7 @@ describe('what only a Cloud Function may write', () => {
 
   it('lets a member maintain business-owned carrier records', async () => {
     await assertSucceeds(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/carriers/usps`).set({
+      as(OWNER).doc(`carriers/${WORKSPACE}_usps`).set({
         name: 'USPS',
       }),
     );
@@ -194,7 +218,7 @@ describe('what only a Cloud Function may write', () => {
 
   it('refuses a client granting itself a plan', async () => {
     await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/subscription/current`).set({ plan: 'premium' }),
+      as(OWNER).doc(`subscription/${WORKSPACE}_current`).set({ plan: 'premium' }),
     );
   });
 });
@@ -212,12 +236,12 @@ describe('the Free ceilings are a boundary, not a UI decision', () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       await context
         .firestore()
-        .doc(`workspaces/${WORKSPACE}/usage/current`)
+        .doc(`usage/${WORKSPACE}_current`)
         .set({ items: 3, orders: 1, itemsAtCeiling: false, ordersAtCeiling: false });
     });
 
     await assertSucceeds(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-under`).set({ title: 'Jacket' }),
+      as(OWNER).doc(`items/${WORKSPACE}_item-under`).set({ title: 'Jacket' }),
     );
   });
 
@@ -225,15 +249,15 @@ describe('the Free ceilings are a boundary, not a UI decision', () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       await context
         .firestore()
-        .doc(`workspaces/${WORKSPACE}/usage/current`)
+        .doc(`usage/${WORKSPACE}_current`)
         .set({ items: 60, orders: 40, itemsAtCeiling: true, ordersAtCeiling: true });
     });
 
     await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-over`).set({ title: 'Jacket' }),
+      as(OWNER).doc(`items/${WORKSPACE}_item-over`).set({ title: 'Jacket' }),
     );
     await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/orders/order-over`).set({ total: 1 }),
+      as(OWNER).doc(`orders/${WORKSPACE}_order-over`).set({ total: 1 }),
     );
   });
 
@@ -242,30 +266,30 @@ describe('the Free ceilings are a boundary, not a UI decision', () => {
     // makes in the app. Deleting is how a seller gets back under the ceiling,
     // so refusing it would be a trap with no way out.
     await assertSucceeds(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-1`).update({ title: 'Edited' }),
+      as(OWNER).doc(`items/${WORKSPACE}_item-1`).update({ title: 'Edited' }),
     );
     await assertSucceeds(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-3`).delete(),
+      as(OWNER).doc(`items/${WORKSPACE}_item-3`).delete(),
     );
   });
 
   it('fails open when the flag is missing, malformed or the document is gone', async () => {
     for (const usage of [{ items: 60 }, { itemsAtCeiling: 'yes' }, null]) {
       await testEnv.withSecurityRulesDisabled(async (context) => {
-        const reference = context.firestore().doc(`workspaces/${WORKSPACE}/usage/current`);
+        const reference = context.firestore().doc(`usage/${WORKSPACE}_current`);
 
         await (usage === null ? reference.delete() : reference.set(usage));
       });
 
       await assertSucceeds(
-        as(OWNER).doc(`workspaces/${WORKSPACE}/items/item-open`).set({ title: 'Jacket' }),
+        as(OWNER).doc(`items/${WORKSPACE}_item-open`).set({ title: 'Jacket' }),
       );
     }
   });
 
   it('refuses a client clearing its own ceiling flag', async () => {
     await assertFails(
-      as(OWNER).doc(`workspaces/${WORKSPACE}/usage/current`).set({ itemsAtCeiling: false }),
+      as(OWNER).doc(`usage/${WORKSPACE}_current`).set({ itemsAtCeiling: false }),
     );
   });
 });

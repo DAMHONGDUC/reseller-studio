@@ -11,7 +11,22 @@ enum PlanFeature {
   automation,
   team,
   multipleWorkspaces,
-  advancedPermissions;
+  advancedPermissions,
+
+  /// A year's summary, sales and expenses handed over in one action, with the
+  /// line saying how complete it is.
+  ///
+  /// **The capability Premium is really sold on.** It has a deadline the
+  /// seller cannot move, its alternative is a weekend of spreadsheet work or
+  /// an accountant's fee, and it is worth exactly nothing until a year of
+  /// records exists — which is why the ceiling that used to stop them at
+  /// fifty items was blocking the reason to buy.
+  taxExport,
+
+  /// What each marketplace still owes, and which sales it has sat on.
+  ///
+  /// The only capability that hands money back rather than asking for work.
+  payoutReconciliation;
 
   /// The cheapest plan that includes this.
   ///
@@ -24,6 +39,8 @@ enum PlanFeature {
     PlanFeature.automation ||
     PlanFeature.team ||
     PlanFeature.multipleWorkspaces ||
-    PlanFeature.advancedPermissions => SellerPlan.premium,
+    PlanFeature.advancedPermissions ||
+    PlanFeature.taxExport ||
+    PlanFeature.payoutReconciliation => SellerPlan.premium,
   };
 }

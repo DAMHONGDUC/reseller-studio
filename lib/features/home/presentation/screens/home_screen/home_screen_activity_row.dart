@@ -59,6 +59,8 @@ class _ActivityRow extends StatelessWidget {
                 style: context.textTheme3.bodyMedium!.semiBold3.tabular3
                     .copyWith(color: context.sdTheme3.textPrimary),
               ),
+              // A dash rather than an approximation: the payout is not in
+              // yet, so this sale's profit is unknown (hard rule 5).
               Text(
                 context.money(profit),
                 style: context.textTheme3.bodySmall!.tabular3.copyWith(

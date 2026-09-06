@@ -32,41 +32,32 @@ void main() {
     ],
     salePrice: Money(sale, 'USD'),
     orderedAt: orderedAt ?? DateTime(2026, 8, 1),
-    fees: fees == null ? null : Money(fees, 'USD'),
     shippingCost: shipping == null ? null : Money(shipping, 'USD'),
     refund: refund == null ? null : Money(refund, 'USD'),
     payout: payout == null ? null : Money(payout, 'USD'),
   );
 
   group('what one order should pay out', () {
-    test('a reported fee and postage come off the sale price', () {
+    test('a recorded payout is the forecast', () {
       expect(
-        PayoutReconciliation.expected(
-          order('ord-1', fees: 1200, shipping: 800),
-        ).minor,
+        PayoutReconciliation.expected(order('ord-1', payout: 8000))!.minor,
         8000,
       );
-      expect(
-        PayoutReconciliation.isEstimated(order('ord-1', fees: 1200)),
-        isFalse,
-      );
     });
 
-    test('an unreported fee falls back to the estimate, never to zero', () {
-      final Order unreported = order('ord-2');
-
-      // Zero would claim the platform worked for free, which overstates every
-      // figure built on it.
-      expect(PayoutReconciliation.expected(unreported).minor, lessThan(10000));
-      expect(PayoutReconciliation.isEstimated(unreported), isTrue);
+    test('nothing is forecast for an order with no payout', () {
+      // The app stopped guessing a fee (hard rule 3), so there is nothing to
+      // forecast from — the order is work rather than a number.
+      expect(PayoutReconciliation.expected(order('ord-2')), isNull);
     });
 
-    test('a refund comes off before the platform cut', () {
+    test('the fee a payout implies takes the refund and postage out', () {
       expect(
-        PayoutReconciliation.expected(
-          order('ord-3', fees: 1000, refund: 2000),
+        PayoutReconciliation.feeImpliedBy(
+          order('ord-3', refund: 2000, shipping: 800),
+          Money(6000, 'USD'),
         ).minor,
-        7000,
+        1200,
       );
     });
   });
@@ -74,26 +65,23 @@ void main() {
   group('what a marketplace still owes', () {
     test('orders split into settled and awaiting', () {
       final List<MarketplacePayout> rows = PayoutReconciliation.byMarketplace(
-        <Order>[
-          order('ord-1', fees: 1000, payout: 9000),
-          order('ord-2', fees: 1000),
-        ],
+        <Order>[order('ord-1', payout: 9000), order('ord-2')],
       );
 
       expect(rows, hasLength(1));
       expect(rows.single.settled.map((Order o) => o.id), <String>['ord-1']);
       expect(rows.single.awaiting.map((Order o) => o.id), <String>['ord-2']);
       expect(rows.single.settledTotal!.minor, 9000);
-      expect(rows.single.awaitingTotal!.minor, 9000);
-      expect(rows.single.awaitingIsEstimated, isFalse);
     });
 
-    test('one unreported fee marks the whole awaiting figure an estimate', () {
+    test('an awaiting order contributes a count, not an amount', () {
       final List<MarketplacePayout> rows = PayoutReconciliation.byMarketplace(
-        <Order>[order('ord-1', fees: 1000), order('ord-2')],
+        <Order>[order('ord-1')],
       );
 
-      expect(rows.single.awaitingIsEstimated, isTrue);
+      // Nothing is estimated any more, so there is no figure to total.
+      expect(rows.single.awaiting, hasLength(1));
+      expect(rows.single.awaitingTotal, isNull);
     });
 
     test('an order that earned nothing is not owed', () {

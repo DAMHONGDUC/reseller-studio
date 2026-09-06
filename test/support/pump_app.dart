@@ -15,6 +15,8 @@ import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
+import 'package:reseller_studio/features/marketplaces/providers.dart';
 import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
 import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
 import 'package:reseller_studio/features/mock_data/providers.dart';
@@ -22,6 +24,8 @@ import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/offers/providers.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart';
+import 'package:reseller_studio/features/sourcing/providers.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:reseller_studio/reseller_studio_app.dart';
 
@@ -227,7 +231,42 @@ Future<void> warmUp(ProviderContainer container) async {
     (AsyncValue<List<Offer>>? previous, AsyncValue<List<Offer>> next) {},
     fireImmediately: true,
   );
+  container.listen<AsyncValue<List<Purchase>>>(
+    purchasesProvider,
+    (AsyncValue<List<Purchase>>? previous, AsyncValue<List<Purchase>> next) {},
+    fireImmediately: true,
+  );
+  container.listen<AsyncValue<List<Marketplace>>>(
+    marketplacesProvider,
+    (
+      AsyncValue<List<Marketplace>>? previous,
+      AsyncValue<List<Marketplace>> next,
+    ) {},
+    fireImmediately: true,
+  );
 
   // The generators yield their first value on a microtask.
   await Future<void>.delayed(Duration.zero);
+}
+
+/// Scrolls [text] into view, then returns the finder for it.
+///
+/// **Extracted on its second copy.** The sale picker draws the inventory card,
+/// so three or four rows fill a phone screen and a `tap` on the fifth finds
+/// nothing — a test that fails on layout rather than on what it is asserting.
+///
+/// **The list is the last scrollable, never the first.** A search field owns
+/// one of its own and it comes first in the tree; dragging that scrolls
+/// nothing and disposes itself mid-drag, which surfaces as `No element`.
+Future<Finder> revealText(WidgetTester tester, String text) async {
+  final Finder target = find.text(text);
+
+  await tester.scrollUntilVisible(
+    target,
+    200,
+    scrollable: find.byType(Scrollable).last,
+  );
+  await tester.pumpAndSettle();
+
+  return target;
 }

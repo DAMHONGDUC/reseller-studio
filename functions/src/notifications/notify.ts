@@ -2,7 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { logger } from 'firebase-functions';
 
-import { db, paths } from '../lib/firestore';
+import { db, paths, rowsOf } from '../lib/firestore';
 
 /**
  * What a notification is about. The list is plan §22, and the app renders the
@@ -11,7 +11,13 @@ import { db, paths } from '../lib/firestore';
 export type NotificationType =
   | 'orderCreated'
   | 'offerReceived'
+  | 'shipByToday'
   | 'shipmentsDue'
+  | 'offerExpiring'
+  | 'payoutMissing'
+  | 'profitIncomplete'
+  | 'taxSeason'
+  | 'restockWinner'
   | 'staleInventory'
   | 'lowInventory'
   | 'memberJoined';
@@ -71,6 +77,14 @@ export interface Notification {
  * **`dedupeKey` is the document id**, so a retried trigger and a digest that
  * runs twice in a day both land on one row rather than three (hard rule: a
  * function that is only correct the first time double-charges).
+ *
+ * **A mute silences the push and nothing else.** The inbox row is still
+ * written for everybody, because the row *is* the notification and the push is
+ * a copy of it — dropping the row would make a muted type disappear rather
+ * than go quiet, and there would be nothing to come back and read. The mute is
+ * per person rather than per business (two people sharing a shop do not want
+ * the same reminders) and it is applied here rather than at each caller, so a
+ * new notification type cannot forget to check it.
  */
 export async function notifyWorkspace(options: {
   dedupeKey: string;
@@ -78,22 +92,50 @@ export async function notifyWorkspace(options: {
   exceptUid?: string | null;
 }): Promise<void> {
   const { dedupeKey, notification, exceptUid } = options;
-  const members = await db().collection(paths.members(notification.workspaceId)).get();
-  const recipients = members.docs
+  const members = await rowsOf(notification.workspaceId, paths.members).get();
+  const addressed = members.docs
     .map((doc) => doc.id)
     .filter((uid) => uid !== exceptUid);
 
-  if (recipients.length === 0) return;
+  if (addressed.length === 0) return;
 
-  await Promise.all(recipients.map((uid) => writeInbox(uid, dedupeKey, notification)));
-  await Promise.all(recipients.map((uid) => push(uid, notification)));
-  await Promise.all(recipients.map((uid) => prune(uid)));
+  const audible = await listening(addressed, notification.type);
+
+  await Promise.all(addressed.map((uid) => writeInbox(uid, dedupeKey, notification)));
+  await Promise.all(audible.map((uid) => push(uid, notification)));
+  await Promise.all(addressed.map((uid) => prune(uid)));
 
   logger.info('notification delivered', {
     type: notification.type,
     workspaceId: notification.workspaceId,
-    recipients: recipients.length,
+    recipients: addressed.length,
+    muted: addressed.length - audible.length,
   });
+}
+
+/**
+ * Which of [uids] still want their phone to buzz for [type].
+ *
+ * **Absent means on.** A person who has never opened the notification settings
+ * has no preferences field at all, and defaulting that to off would silently
+ * mute everybody who upgraded into this build.
+ *
+ * One `getAll` rather than a read per recipient, and a failure falls back to
+ * sending: a preferences lookup that breaks must not swallow the order a
+ * seller needs to ship.
+ */
+async function listening(uids: string[], type: NotificationType): Promise<string[]> {
+  try {
+    const docs = await db().getAll(...uids.map((uid) => db().doc(paths.user(uid))));
+
+    return docs
+      .filter((doc) => (doc.get('notificationPrefs') ?? {})[type] !== false)
+      .map((doc) => doc.id);
+  } catch (error) {
+    logger.error('notification preferences unreadable', { type, error });
+
+    return uids;
+  }
 }
 
 /**
