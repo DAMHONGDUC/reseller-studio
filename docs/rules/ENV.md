@@ -154,20 +154,24 @@ as a fresh install.**
   nothing and knows nothing about storage: reading, recording and wiping
   arrive as `SdFreshInstallPolicy` callbacks, which is what keeps a widget
   package free of `shared_preferences` and Firebase.
-- **`SdFreshInstall` runs the wipe** (design system, `core/common/`, pure
-  Dart). It reads and records the env name through an `SdFreshInstallStore`
-  the host implements, runs an ordered list of `SdFreshInstallStep`s, and
-  clears the store last — every app of ours wipes to the same shape, and only
-  the plugin behind the store and the SDKs with a session to drop differ. Each
-  step guards itself and nothing throws: this runs before `runApp`, where a
-  throw is not an error screen but an app that never starts.
+- **`SdFreshInstall` owns the env record** (design system, `core/common/`,
+  pure Dart): it reads and writes the env name through an `SdFreshInstallStore`
+  the host implements, and asks for the wipe when the two differ.
+- **`SdDeviceWipe` is the wipe, and it is written once.** Owner's rule. A
+  reinstall (`SdReinstallGuard`) and an environment change detect completely
+  different things and then do the same list of vendor calls in the same
+  order, so the list lives in one class and both call it. Each
+  `SdDeviceWipeStep` guards itself and nothing throws: this runs before
+  `runApp`, where a throw is not an error screen but an app that never starts.
+  `SdDeviceWipeFailure.halt` is the one way a step stops the wipe, and this
+  case uses none.
 - **`AppFreshInstall` is the half that touches the device**
   (`lib/core/bootstrap/`): `shared_preferences` behind the store, and two
   steps — sign out of Firebase and Google, then `terminate` and
   `clearPersistence` on Firestore. Both carry a `when` that is false in a
-  build with no Firebase config. Clearing preferences is `SdFreshInstall`'s
-  own last step and takes the onboarding flag with it, because that is what a
-  fresh install is.
+  build with no Firebase config. Clearing preferences is appended by
+  `SdFreshInstall` as the last step and takes the onboarding flag with it,
+  because that is what a fresh install is.
 - **The child is held back until the check finishes.** `clearPersistence`
   throws `failed-precondition` while the Firestore client is running, and a
   first screen building alongside the wipe would race its own sign-out.
