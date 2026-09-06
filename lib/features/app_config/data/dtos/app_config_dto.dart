@@ -19,6 +19,7 @@ final class AppConfigDto {
   static const String document = 'current';
 
   static const String _premiumEnabled = 'premium_enabled';
+  static const String _forceUpdate = 'force_update';
   static const String _ios = 'ios';
   static const String _android = 'android';
   static const String _storeLink = 'store_link';
@@ -32,13 +33,21 @@ final class AppConfigDto {
   static AppConfig toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
     final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
     final Object? enabled = data[_premiumEnabled];
+    final Object? update = data[_forceUpdate];
+    final Map<String, Object?> stores = update is Map<String, Object?>
+        ? update
+        : <String, Object?>{};
 
     return AppConfig(
       premiumEnabled: enabled is bool
           ? enabled
           : AppConfig.fallback.premiumEnabled,
-      ios: _policy(data[_ios]),
-      android: _policy(data[_android]),
+      // The two stores are nested under one field rather than sitting at the
+      // top level: a document with `ios` and `android` loose in it reads as a
+      // config about platforms, when what it holds is one feature that happens
+      // to be configured per store.
+      ios: _policy(stores[_ios]),
+      android: _policy(stores[_android]),
       premiumEmails: _emails(data[_premiumEmails]),
       devModeEmails: _emails(data[_devModeEmails]),
       blockedEmails: _emails(data[_blockedEmails]),
