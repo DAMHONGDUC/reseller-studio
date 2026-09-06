@@ -5,13 +5,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/misc.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_design/index.dart';
 
 import '../analytics/app_analytics.dart';
 import '../config/app_env.dart';
 import '../constants/log_tag_constant.dart';
 import '../logging/firebase_crash_reporter.dart';
+import '../providers/shared_preferences_provider.dart';
 
 /// This app's startup steps — the SDKs, and nothing about how they are run.
 ///
@@ -28,12 +32,20 @@ import '../logging/firebase_crash_reporter.dart';
 /// **The fresh-install wipe is deliberately not a step.** `SplashScreen` runs
 /// it, because before `runApp` the only thing on screen is the platform launch
 /// image and a wipe that takes a second looks like a hang.
+///
+/// **Preferences are the one exception to that, and they have to be.** They
+/// decide how the app *looks* — `themeModeProvider` reads them — and the theme
+/// is set on `MaterialApp`, above the splash, so there is no screen that could
+/// be shown while they load: the app would paint a guess and correct it a
+/// frame later, which is a white flash on a seller who chose dark. They are a
+/// local plugin call, not a network round trip, so this costs milliseconds.
 final class AppBootstrap {
   /// Starts the app.
   static Future<void> init(Widget Function() builder) => SdBootstrap.run(
     logTag: LogTagConstant.bootstrap,
     builder: builder,
     steps: <SdBootstrapStep>[
+      SdBootstrapStep(name: 'Preferences', run: _loadPreferences),
       SdBootstrapStep(name: 'Firebase', run: _initializeFirebase),
       SdBootstrapStep(name: 'Google Sign-In', run: _initializeGoogleSignIn),
       SdBootstrapStep(name: 'Billing', run: _initializeBilling),
@@ -41,6 +53,31 @@ final class AppBootstrap {
       SdBootstrapStep(name: 'Environment', run: _logEnvironment),
     ],
   );
+
+  /// What `main.dart` hands the `ProviderScope`, so the first frame already
+  /// knows what the device was told to look like.
+  ///
+  /// Empty when the plugin refused: the app still starts, `themeModeProvider`
+  /// follows the device, and the cost is the flash this exists to remove.
+  static List<Override> get overrides {
+    final SharedPreferences? loaded = _preferences;
+
+    if (loaded == null) return const <Override>[];
+
+    // A synchronous return, so the provider is `AsyncData` on its first read
+    // rather than one microtask of `AsyncLoading` — which is the frame the
+    // flash happened in.
+    return <Override>[
+      sharedPreferencesProvider.overrideWith(
+        (Ref ref) => loaded,
+      ),
+    ];
+  }
+
+  static SharedPreferences? _preferences;
+
+  static Future<void> _loadPreferences() async =>
+      _preferences = await SharedPreferences.getInstance();
 
   /// Let the app draw under the system bars.
   ///

@@ -10,5 +10,12 @@ import 'reseller_studio_app.dart';
 /// added here instead would throw *outside* that zone, where nothing is
 /// watching.
 void main() {
-  AppBootstrap.init(() => const ProviderScope(child: ResellerStudioApp()));
+  AppBootstrap.init(
+    () => ProviderScope(
+      // The preferences the bootstrap already loaded, so the first frame is
+      // drawn in the theme the seller chose rather than corrected into it.
+      overrides: AppBootstrap.overrides,
+      child: const ResellerStudioApp(),
+    ),
+  );
 }
