@@ -57,6 +57,12 @@ out because Settings is; what it changes is not.
   only thing that drives every live write path in one run, which makes it the
   fastest way to find out whether `data/` actually works against Firestore.
   `test/features/mock_data/demo_data_seeder_test.dart`.
+- **Delete all data is the button beside it and does not live here.** It
+  empties the open workspace instead of filling it, and the sweep belongs to
+  `workspace/` because what it must not delete is the membership and the audit
+  log — see `lib/features/workspace/CLAUDE.md`. In mock mode it clears the
+  in-memory store, which is how the empty screens are looked at with no
+  backend at all.
 
 Delete this feature when the real data layer is trusted — but note that
 `DemoDataSeeder` outlives the switch: it is about filling a real workspace,
