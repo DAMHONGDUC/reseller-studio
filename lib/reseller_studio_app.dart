@@ -8,9 +8,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:system_design/index.dart';
 
 import 'core/config/app_env.dart';
-import 'core/fresh_install/fresh_install_gate.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/splash_screen.dart';
 import 'features/app_config/presentation/widgets/force_update_gate.dart';
 import 'features/app_config/providers.dart';
 import 'features/notifications/providers.dart';
@@ -103,10 +103,11 @@ class ResellerStudioApp extends ConsumerWidget {
                 // there is still one place the style is decided, and it unwinds
                 // with the route rather than leaking like `SystemChrome` does.
                 value: AppTheme.statusBarStyle(Theme.of(context).brightness),
-                // The fresh-install gate is outermost: it must finish before
-                // `ForceUpdateGate` reads `app_config`, because that read
-                // starts the Firestore client the wipe has to terminate.
-                child: FreshInstallGate(
+                // The splash is outermost: it runs the fresh-install wipe,
+                // and that must finish before `ForceUpdateGate` reads
+                // `app_config` — that read starts the Firestore client the
+                // wipe has to terminate.
+                child: SplashScreen(
                   // Above every route rather than on one: a build too old to
                   // run is about the binary, so the sheet is raised over
                   // whatever the seller was looking at.

@@ -25,10 +25,9 @@ import '../logging/firebase_crash_reporter.dart';
 /// not show an error screen — it stops the app from starting at all — so each
 /// one is written to leave the app usable when it fails.
 ///
-/// **The fresh-install wipe is deliberately not a step.** It runs behind the
-/// app's own splash screen (`FreshInstallGate`), because before `runApp` the
-/// only thing on screen is the platform launch image and a wipe that takes a
-/// second looks like a hang.
+/// **The fresh-install wipe is deliberately not a step.** `SplashScreen` runs
+/// it, because before `runApp` the only thing on screen is the platform launch
+/// image and a wipe that takes a second looks like a hang.
 final class AppBootstrap {
   /// Starts the app.
   static Future<void> init(Widget Function() builder) => SdBootstrap.run(

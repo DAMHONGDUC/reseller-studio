@@ -52,8 +52,8 @@ final class AppFreshInstall implements SdFreshInstallHost {
 
   /// **`terminate` first, and this only works before anything reads.**
   /// `clearPersistence` throws `failed-precondition` while the client is
-  /// running, which is why `FreshInstallGate` sits above everything that opens
-  /// a stream.
+  /// running, which is why `SplashScreen` sits above everything that opens a
+  /// stream.
   @override
   Future<void> clearCache() async {
     await FirebaseFirestore.instance.terminate();
