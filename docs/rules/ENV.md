@@ -174,11 +174,12 @@ as a fresh install.**
 
 ## The build tag is drawn from the flavour, never from `kDebugMode`
 
-`SdDevWrapper` stamps `DEV · 1.0.0 (8)` down the left edge of everything the
-app draws — env name from `AppEnv.flavor.name`, version and build number from
-`packageInfoProvider`. It wraps `MaterialApp` rather than sitting inside one,
-so it brings its own `Directionality` and hardcodes its two colours: a tag
-drawn from the app's palette disappears the moment that palette is the bug.
+`SdDevWrapper` stamps `DEV · 1.0.0 (8)` down the right edge of everything
+the app draws, hung from the top-right corner — env name from
+`AppEnv.flavor.name`, version and build number from `packageInfoProvider`.
+It wraps `MaterialApp` rather than sitting inside one, so it brings its own
+`Directionality` and hardcodes its two colours: a tag drawn from the app's
+palette disappears the moment that palette is the bug.
 
 `visible: !AppEnv.flavor.isProd`. A TestFlight build of the dev flavour is a
 release binary and is exactly the one nobody can otherwise tell apart from the
