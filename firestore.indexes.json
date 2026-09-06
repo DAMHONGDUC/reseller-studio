@@ -1,6 +1,138 @@
 {
   "indexes": [
     {
+      "//": "The whole audit log, newest first \u2014 the Activity screen (plan \u00a723).",
+      "collectionGroup": "activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The audit log for one entity \u2014 the Activity block on an item or order detail (plan \u00a723).",
+      "collectionGroup": "activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "entityId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The carriers a business ships with, in the order they were added \u2014 the shipping picker.",
+      "collectionGroup": "carriers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The category taxonomy, alphabetical \u2014 the Categories screen and the item form's picker.",
+      "collectionGroup": "categories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "name",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Expenses by category over a period \u2014 the Expenses screen and the profit calculation's 'other expenses' line.",
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The Expenses screen, newest first \u2014 and the 'other expenses' line of the profit calculation.",
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Inventory's own list, newest first \u2014 the unfiltered view every other tab narrows.",
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Items from one purchase \u2014 the Source \u2192 Purchase \u2192 Item chain the whole product is built on (plan \u00a74).",
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "purchaseId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "//": "Inventory, filtered by status and newest first. The screen's default view and its four status tabs (plan \u00a77) are all this one index.",
       "collectionGroup": "items",
       "queryScope": "COLLECTION",
@@ -39,16 +171,12 @@
       ]
     },
     {
-      "//": "Items from one purchase \u2014 the Source \u2192 Purchase \u2192 Item chain the whole product is built on (plan \u00a74).",
-      "collectionGroup": "items",
+      "//": "Every live listing, newest first \u2014 cross-listing and the stale-listing check read it.",
+      "collectionGroup": "listings",
       "queryScope": "COLLECTION",
       "fields": [
         {
           "fieldPath": "workspaceId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "purchaseId",
           "order": "ASCENDING"
         },
         {
@@ -58,8 +186,91 @@
       ]
     },
     {
-      "//": "Payouts a platform still owes: shipped or delivered orders with no reported payout, oldest first. Backs the daily payoutMissing reminder, the one that hands the seller money back.",
-      "collectionGroup": "orders",
+      "//": "Every listing for one item \u2014 what the cross-listing screen and the item detail's Listings block read.",
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "itemId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Listings by marketplace and status \u2014 the Listings screen's All | Draft | Active | Paused | Ended (plan \u00a712).",
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "marketplaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Storage locations, alphabetical \u2014 the Locations screen and the item form's picker.",
+      "collectionGroup": "locations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "name",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The marketplaces a business sells on, in the order they were added \u2014 every marketplace picker.",
+      "collectionGroup": "marketplaces",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Every offer, newest first \u2014 the Offers screen and Home's Needs Attention block.",
+      "collectionGroup": "offers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Pending offers, expiring soonest first. Home's Needs Attention shows the ones about to lapse.",
+      "collectionGroup": "offers",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -71,12 +282,42 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "payoutMinor",
+          "fieldPath": "expiresAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Revenue and profit by marketplace over a period \u2014 Analytics \u00a79's Marketplace section.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "shippedAt",
+          "fieldPath": "marketplaceId",
           "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "orderedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The Orders tab, newest first \u2014 and what Home and Analytics fold over.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "orderedAt",
+          "order": "DESCENDING"
         }
       ]
     },
@@ -138,6 +379,29 @@
       ]
     },
     {
+      "//": "Payouts a platform still owes: shipped or delivered orders with no reported payout, oldest first. Backs the daily payoutMissing reminder, the one that hands the seller money back.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "payoutMinor",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shippedAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "//": "The shipping queue: unshipped orders, oldest first. Oldest first on purpose \u2014 the order that has waited longest is the one at risk of a late-shipment penalty.",
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
@@ -157,8 +421,8 @@
       ]
     },
     {
-      "//": "Revenue and profit by marketplace over a period \u2014 Analytics \u00a79's Marketplace section.",
-      "collectionGroup": "orders",
+      "//": "Purchases, newest first \u2014 the Sourcing screen's own list.",
+      "collectionGroup": "purchases",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -166,87 +430,7 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "marketplaceId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "orderedAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "//": "Listings by marketplace and status \u2014 the Listings screen's All | Draft | Active | Paused | Ended (plan \u00a712).",
-      "collectionGroup": "listings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "workspaceId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "marketplaceId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "//": "Every listing for one item \u2014 what the cross-listing screen and the item detail's Listings block read.",
-      "collectionGroup": "listings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "workspaceId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "itemId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "//": "Pending offers, expiring soonest first. Home's Needs Attention shows the ones about to lapse.",
-      "collectionGroup": "offers",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "workspaceId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "expiresAt",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "//": "Expenses by category over a period \u2014 the Expenses screen and the profit calculation's 'other expenses' line.",
-      "collectionGroup": "expenses",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "workspaceId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "categoryId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "date",
+          "fieldPath": "purchaseDate",
           "order": "DESCENDING"
         }
       ]
@@ -271,8 +455,8 @@
       ]
     },
     {
-      "//": "The audit log for one entity \u2014 the Activity block on an item or order detail (plan \u00a723).",
-      "collectionGroup": "activity",
+      "//": "Where a business buys, alphabetical \u2014 the Sources screen and the purchase form's picker.",
+      "collectionGroup": "sources",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -280,12 +464,8 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "entityId",
+          "fieldPath": "name",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
         }
       ]
     }
