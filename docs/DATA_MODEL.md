@@ -153,6 +153,11 @@ client and written by none. **It is not a business record**, so it is not
 nested under a workspace — nothing in it belongs to a seller, and two
 businesses on the same build read the same answer.
 
+**It is the one public read in `firestore.rules`**, because the forced update
+is read before anyone has signed in. That makes the three email lists below
+world-readable, which is the boundary on what may be added here —
+`docs/rules/BACKEND.md` carries the rule.
+
 | Field | Type | Meaning |
 |---|---|---|
 | `premium_enabled` | bool | Whether the plan system applies at all |

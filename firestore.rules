@@ -301,12 +301,16 @@ service cloud.firestore {
     // it belongs to a seller, so it is deliberately not nested under a
     // workspace (hard rule 14 governs records that are).
     //
-    // Readable by anyone signed in; written by nobody with an app. The
-    // premium kill switch lives here, and a client that could write it could
-    // switch its own paywall off — the same reason the subscription document
-    // above is `if false`.
+    // Readable without an account, because the forced update is about the
+    // binary rather than the seller: `ForceUpdateGate` wraps the app above
+    // the router, so the read happens before anyone has signed in and
+    // `signedIn()` denied it on every cold start.
+    //
+    // Written by nobody with an app. The premium kill switch lives here, and
+    // a client that could write it could switch its own paywall off — the
+    // same reason the subscription document above is `if false`.
     match /app_config/{docId} {
-      allow read: if signedIn();
+      allow read: if true;
       allow write: if false;
     }
 

@@ -41,6 +41,8 @@ async function seed() {
 
     await db.doc(`items/${WORKSPACE}_item-1`).set({ title: 'Jacket', workspaceId: WORKSPACE });
 
+    await db.doc('app_config/current').set({ premium_enabled: true });
+
     // One notification, written the way a Cloud Function writes it.
     await db.doc(`users/${MEMBER}/notifications/n-1`).set({
       type: 'orderCreated',
@@ -331,6 +333,17 @@ describe('devices and the notification inbox', () => {
 
   it("refuses reading another person's inbox", async () => {
     await assertFails(as(OWNER).doc(`users/${MEMBER}/notifications/n-1`).get());
+  });
+});
+
+describe('app config needs no account', () => {
+  it('lets a signed-out client read it', async () => {
+    await assertSucceeds(anonymous().doc('app_config/current').get());
+  });
+
+  it('refuses every client the write, signed in or not', async () => {
+    await assertFails(anonymous().doc('app_config/current').set({ premium_enabled: false }));
+    await assertFails(as(OWNER).doc('app_config/current').set({ premium_enabled: false }));
   });
 });
 
