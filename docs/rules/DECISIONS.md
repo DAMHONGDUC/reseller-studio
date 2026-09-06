@@ -368,8 +368,11 @@ store that issued it: `41` on the App Store and `41` on Google Play are
 different binaries, reviewed at different times, released in whichever order
 the queues allowed. One ceiling for both either stops a build that shipped or
 lets an old one through, and the store link was always going to be two links.
-So `ios` and `android` each carry `enable_force_update`, `build_number`,
-`build_name` and `store_link`, and the app reads only its own.
+So `force_update.ios` and `force_update.android` each carry
+`enable_force_update`, `build_number`, `build_name` and `store_link`, and the
+app reads only its own. They are nested under one field rather than loose at
+the top level: two platform names in the root of the document read as a config
+about platforms, when what they hold is one feature configured per store.
 
 **`enable_force_update` exists so the numbers can be kept current without
 blocking anybody.** Without it, `build_number` would be both the record of

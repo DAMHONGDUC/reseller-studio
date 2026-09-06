@@ -156,8 +156,7 @@ businesses on the same build read the same answer.
 | Field | Type | Meaning |
 |---|---|---|
 | `premium_enabled` | bool | Whether the plan system applies at all |
-| `ios` | map | What the App Store says about the running build |
-| `android` | map | What Google Play says about the running build |
+| `force_update` | map | One block per store — `ios` and `android` |
 | `premium_emails` | string[] | Accounts handed Premium without buying it |
 | `dev_mode_emails` | string[] | Accounts that get the developer affordances in a release build |
 | `blocked_emails` | string[] | Accounts refused the app |
@@ -168,8 +167,13 @@ included, and the Subscription row and the Home upgrade banner are not drawn.
 
 ## The forced update
 
-`ios` and `android` are the same four fields, and there is **one block per
-store** because the two are never in step: `41` on the App Store and `41` on
+`force_update` holds one block per store, `ios` and `android`, each the same
+four fields. They are nested under one field rather than sitting loose at the
+top level: a document with `ios` and `android` in it reads as a config *about
+platforms*, when what it holds is one feature that happens to be configured per
+store.
+
+There is one block per store because the two are never in step: `41` on the App Store and `41` on
 Google Play are different binaries reviewed at different times, so a single
 ceiling for both either stops a release that shipped or lets an old one
 through. The app reads the block for the platform it is running on and never
@@ -212,7 +216,7 @@ each the safe one for what it controls:
 | Field | Falls back to | Why that way |
 |---|---|---|
 | `premium_enabled` | on | Defaulting off hands the paid half of the app to everyone the first time Firestore is slow |
-| `ios` / `android` | forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
+| `force_update` | forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
 | every email list | empty | Nobody is refused the app over a read that failed, and nobody is handed a grant the owner did not type |
 
 The forced-update and blocked gates also have **no loading state**: until an
@@ -262,17 +266,19 @@ The whole document, with every field filled in:
 ```json
 {
   "premium_enabled": true,
-  "ios": {
-    "store_link": "https://apps.apple.com/app/id0000000000",
-    "build_name": "1.4.0",
-    "build_number": 41,
-    "enable_force_update": false
-  },
-  "android": {
-    "store_link": "https://play.google.com/store/apps/details?id=com.example.app",
-    "build_name": "1.4.0",
-    "build_number": 41,
-    "enable_force_update": false
+  "force_update": {
+    "ios": {
+      "store_link": "https://apps.apple.com/app/id0000000000",
+      "build_name": "1.4.0",
+      "build_number": 41,
+      "enable_force_update": false
+    },
+    "android": {
+      "store_link": "https://play.google.com/store/apps/details?id=com.example.app",
+      "build_name": "1.4.0",
+      "build_number": 41,
+      "enable_force_update": false
+    }
   },
   "premium_emails": ["owner@example.com", "tester@example.com"],
   "dev_mode_emails": ["owner@example.com"],
