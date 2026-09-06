@@ -639,6 +639,22 @@ feature's own `CLAUDE.md`.
   where the only thing on screen is the platform launch image — so work a
   seller could be shown a splash for belongs behind `SplashScreen`, the way the
   fresh-install wipe does it, not in the steps.
+- **Preferences are the one exception, and the reason is the first frame.**
+  `SharedPreferences` is loaded as a bootstrap step and handed to the
+  `ProviderScope` as `AppBootstrap.overrides`, so `sharedPreferencesProvider`
+  is `AsyncData` on its very first read. Anything that decides how the app
+  *looks* is read above the splash — `themeMode` is set on `MaterialApp` — so
+  there is no screen that could be shown while it loads: the app paints a
+  guess and corrects it a frame later. A seller who chose dark on a light
+  phone saw white first. Local plugin call, milliseconds; a network round trip
+  would still not belong here.
+- **A provider that decides where the app lands says "loading" while it is
+  loading, retained value or not.** Riverpod carries the previous value
+  forward across a rebuild, so `isLoading && !hasValue` reads as "resolved" at
+  exactly the moment a dependency changed — which is how sign-in sent every
+  returning seller to the create-business form for a frame.
+  `workspaceStatusProvider` is the one this was found in;
+  `test/features/workspace/workspace_status_test.dart` pins the transition.
 
 ### Extraction and placement
 
