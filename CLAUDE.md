@@ -637,8 +637,8 @@ feature's own `CLAUDE.md`.
   **Firebase goes first** so Crashlytics is up before anything else can fail.
 - **Nothing slow goes in that list.** Every step runs **before `runApp`**,
   where the only thing on screen is the platform launch image — so work a
-  seller could be shown a splash for belongs in a widget above the app, the way
-  `FreshInstallGate` does it, not in the steps.
+  seller could be shown a splash for belongs behind `SplashScreen`, the way the
+  fresh-install wipe does it, not in the steps.
 
 ### Extraction and placement
 

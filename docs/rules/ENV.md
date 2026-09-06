@@ -155,19 +155,23 @@ as a fresh install.**
   them: both were asking whether the state on this device belongs to the app
   now running. `packages/system_design/WIDGET_RULES.md` holds the decision
   table.
-- **`FreshInstallGate` runs it behind the app's own splash screen**
-  (`lib/core/fresh_install/`), and it is deliberately not a bootstrap step.
-  Before `runApp` the only thing on screen is the platform launch image, so a
-  wipe that takes a second looks like a hang; here the app is up and themed and
-  shows the same `SplashScreen` a returning seller already sees while auth
-  resolves.
-- **The gate sits above `ForceUpdateGate`, and that ordering is the point.**
-  `clearPersistence` throws `failed-precondition` once the Firestore client is
-  running, and `ForceUpdateGate`'s `app_config` read is what starts it on the
-  first frame — so nothing below the gate may build until the check returns.
+- **`SplashScreen` runs it, and it is deliberately not a bootstrap step.**
+  Owner's rule: the seller should see the splash loading *while* the wipe
+  happens. Before `runApp` the only thing on screen is the platform launch
+  image, so a wipe that takes a second looks like a hang; here the app is up
+  and themed and shows the same screen a returning seller already sees while
+  auth resolves. One screen covers both reasons the app is not ready yet.
+- **That is why the screen takes a `child`.** It is mounted twice: once around
+  the whole app, where it holds the child back until the check returns, and
+  once as the router's `/splash` route with no child, already inside the tree
+  the first one gated.
+- **The outer one sits above `ForceUpdateGate`, and that ordering is the
+  point.** `clearPersistence` throws `failed-precondition` once the Firestore
+  client is running, and `ForceUpdateGate`'s `app_config` read is what starts
+  it on the first frame — so nothing below may build until the check returns.
   Letting the first screen build alongside would also race the sign-out against
   the screens reading that session.
-  `test/core/fresh_install/fresh_install_gate_test.dart` pins both states.
+  `test/core/widgets/splash_screen_test.dart` pins all three states.
 - **`AppFreshInstall` is the half that touches the device**, and it is an
   `SdFreshInstallHost`: `isBackendReady`, `signOut` (Google then Firebase), and
   `clearCache` (`terminate` then `clearPersistence`). Nothing else — the order
