@@ -105,9 +105,18 @@ Every step that can fail cheaply runs before the twenty-five minute one.
 3. CI only: `setup_ci` → `match(readonly: true)` → entitlement check → manual
    signing → write `ExportOptions.plist`.
 4. Build, through `packages/system_design/tool/build-ipa.sh`.
-5. Upload, not waiting for processing — nothing in the lane reads the result
-   and macOS minutes bill at 10x. A changelog is the exception: it is the only
-   thing on the build that says dev or prod, and attaching one costs the wait.
+5. Upload, **always carrying a release note**. Owner's rule: no build reaches
+   TestFlight blank. `RELEASE_NOTES` — or `notes:` — is used when the release
+   was given one, and the lane composes `<flavour> - <version> (<build>)`
+   otherwise: `dev - 1.0.0 (20)`, `prod - 1.0.0 (21)`.
+   - **The default is composed in the lane, never in `release.sh`.** The build
+     number is settled at step 2, inside the lane; the shell's `pubspec.yaml`
+     still holds the previous one, so a note written before the lane runs names
+     a build that is not the one uploaded.
+   - **The wait is the price and it is paid on every release now.** App Store
+     Connect takes a changelog only once processing has finished, so
+     `skip_waiting_for_build_processing` is off — nothing else in the lane
+     reads the result, and macOS minutes bill at 10x.
 6. dSYMs, best effort — the build is already up, and a symbol failure must not
    take the build-number commit down with it.
 7. **Commit the build number, after the upload.** A bump commit with no build
