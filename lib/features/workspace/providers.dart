@@ -136,9 +136,14 @@ final Provider<WorkspaceStatus> workspaceStatusProvider =
     Provider<WorkspaceStatus>((Ref ref) {
       final AsyncValue<UserProfile?> profile = ref.watch(userProfileProvider);
 
-      if (profile.isLoading && !profile.hasValue) {
-        return WorkspaceStatus.loading;
-      }
+      // **Loading, whether or not a previous value is being kept.** Signing in
+      // rebuilds `userProfileProvider` for the new uid, and Riverpod carries
+      // the signed-out state — `AsyncData(null)` — forward as the previous
+      // value while the real profile loads. Asking `!hasValue` therefore said
+      // "not loading" at exactly that moment, read the retained null as "no
+      // workspace", and sent every returning seller to the create-business
+      // form for a frame before Home.
+      if (profile.isLoading) return WorkspaceStatus.loading;
 
       // A failed profile read is treated as "no workspace" rather than
       // "loading": the user gets a screen they can act on instead of a splash
