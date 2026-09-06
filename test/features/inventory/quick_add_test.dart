@@ -7,9 +7,6 @@ import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart
 import 'package:reseller_studio/features/inventory/presentation/controllers/quick_add_controller.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
-import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
-import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
 import 'package:system_design/index.dart';
@@ -20,17 +17,7 @@ void main() {
   group('QuickAddController', () {
     late ProviderContainer container;
 
-    setUp(() {
-      container = ProviderContainer(
-        overrides: [
-          dataModeProvider.overrideWith(_AlwaysMock.new),
-          mockStoreProvider.overrideWith(
-            (Ref ref) => MockStore(MockDataset.seed(now: testNow)),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-    });
+    setUp(() => container = mockContainer());
 
     test('creates an item from a title alone', () async {
       final QuickAddController controller = container.read(
@@ -175,9 +162,4 @@ void main() {
       expect(find.textContaining('items. Upgrade'), findsOneWidget);
     });
   });
-}
-
-class _AlwaysMock extends DataModeController {
-  @override
-  DataMode build() => DataMode.mock;
 }

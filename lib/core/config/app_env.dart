@@ -97,10 +97,6 @@ final class AppEnv {
   // that class ANDs each one with `!kReleaseMode`, which is what makes a
   // shipped binary immune to a mis-edited prod.json.
 
-  /// Whether mock data starts on. Only a *default* — `DataModeController`
-  /// persists the user's own choice on top of it.
-  static const bool mockDataDefault = bool.fromEnvironment('MOCK_DATA_DEFAULT');
-
   /// Turns on `AppLogger.debug` output. Off even in debug builds unless
   /// asked for, so the console stays a story of what the app did rather than
   /// a firehose.

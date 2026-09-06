@@ -3,7 +3,7 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
-import '../../../mock_data/providers.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../../notifications/providers.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../workspace/providers.dart';

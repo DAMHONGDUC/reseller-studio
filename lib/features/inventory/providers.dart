@@ -6,9 +6,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
 import '../../core/constants/log_tag_constant.dart';
+import '../../core/providers/repository_providers.dart';
 import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
-import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/item.dart';

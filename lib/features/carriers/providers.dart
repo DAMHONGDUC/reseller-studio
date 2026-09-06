@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../mock_data/providers.dart';
+import '../../core/providers/repository_providers.dart';
 import '../workspace/providers.dart';
 import 'carrier_constant.dart';
 import 'domain/entities/carrier.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
@@ -8,7 +9,6 @@ import 'package:reseller_studio/features/marketplaces/domain/entities/marketplac
     as record;
 import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:reseller_studio/features/marketplaces/providers.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 
 import '../../support/pump_app.dart';
 

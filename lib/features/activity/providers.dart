@@ -10,10 +10,10 @@ import 'data/repositories/firestore_activity_repository.dart';
 import 'domain/entities/activity_entry.dart';
 import 'domain/repositories/activity_repository.dart';
 
-/// **No mock branch, unlike every other repository provider.**
+/// **No fake, unlike every other repository.**
 ///
 /// The audit log has exactly one writer — Cloud Functions triggers — so there
-/// is nothing for an in-memory version to be a stand-in for. Mock mode gets
+/// is nothing for an in-memory version to be a stand-in for. A test gets
 /// the same empty list a live workspace does until the functions are deployed,
 /// and the screen says so rather than inventing a history nobody performed.
 final Provider<ActivityRepository?> activityRepositoryProvider =

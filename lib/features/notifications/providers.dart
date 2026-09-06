@@ -34,7 +34,7 @@ final Provider<UserCollections?> userCollectionsProvider =
 /// **No mock branch, and that is the same call the audit log made.**
 ///
 /// The inbox has exactly one writer — Cloud Functions — so there is nothing
-/// for an in-memory version to stand in for. Mock mode gets the same empty
+/// for an in-memory version to stand in for. A test gets the same empty
 /// inbox a new account does, and the screen says so rather than inventing
 /// notifications nobody was sent.
 final Provider<NotificationRepository?> notificationRepositoryProvider =
@@ -117,22 +117,20 @@ notificationPreferencesRepositoryProvider =
 /// **Signed out resolves to everything on, not to nothing.** The value is
 /// read to decide what a switch shows; an empty answer would render every
 /// reminder as muted, which is the opposite of the truth.
-final StreamProvider<NotificationPreferences>
-notificationPreferencesProvider = StreamProvider<NotificationPreferences>((
-  Ref ref,
-) {
-  final NotificationPreferencesRepository? repository = ref.watch(
-    notificationPreferencesRepositoryProvider,
-  );
+final StreamProvider<NotificationPreferences> notificationPreferencesProvider =
+    StreamProvider<NotificationPreferences>((Ref ref) {
+      final NotificationPreferencesRepository? repository = ref.watch(
+        notificationPreferencesRepositoryProvider,
+      );
 
-  if (repository == null) {
-    return Stream<NotificationPreferences>.value(
-      const NotificationPreferences.everything(),
-    );
-  }
+      if (repository == null) {
+        return Stream<NotificationPreferences>.value(
+          const NotificationPreferences.everything(),
+        );
+      }
 
-  return repository.watch();
-});
+      return repository.watch();
+    });
 
 final NotifierProvider<NotificationPreferencesController, bool>
 notificationPreferencesControllerProvider =

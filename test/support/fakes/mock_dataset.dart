@@ -1,22 +1,23 @@
-import '../../../core/money/money.dart';
-import '../../carriers/carrier_constant.dart';
-import '../../carriers/domain/entities/carrier.dart';
-import '../../expenses/domain/entities/expense.dart';
-import '../../inventory/domain/entities/item.dart';
-import '../../inventory/domain/entities/item_category.dart';
-import '../../inventory/domain/entities/storage_location.dart';
-import '../../inventory/domain/enums/item_status.dart';
-import '../../listings/domain/entities/listing.dart';
-import '../../listings/domain/enums/listing_status.dart';
-import '../../marketplaces/domain/entities/marketplace.dart';
-import '../../marketplaces/domain/enums/marketplace.dart' as legacy;
-import '../../marketplaces/marketplace_constant.dart';
-import '../../offers/domain/entities/offer.dart';
-import '../../orders/domain/entities/order.dart';
-import '../../orders/domain/enums/order_status.dart';
-import '../../sourcing/domain/entities/purchase.dart';
-import '../../sourcing/domain/entities/source.dart';
-import '../../workspace/domain/entities/workspace.dart';
+import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/features/carriers/carrier_constant.dart';
+import 'package:reseller_studio/features/carriers/domain/entities/carrier.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item_category.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/storage_location.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
+import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart'
+    as legacy;
+import 'package:reseller_studio/features/marketplaces/marketplace_constant.dart';
+import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/source.dart';
+import 'package:reseller_studio/features/workspace/domain/entities/workspace.dart';
 
 /// A believable reseller's business, generated in memory.
 ///

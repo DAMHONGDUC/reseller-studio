@@ -29,7 +29,6 @@ void main() {
       const Set<String> read = <String>{
         'FLAVOR',
         'APP_DISPLAY_NAME',
-        'MOCK_DATA_DEFAULT',
         'VERBOSE_LOGGING',
         'FIREBASE_PROJECT_ID',
         'FIREBASE_APP_ID_IOS',
@@ -49,13 +48,12 @@ void main() {
       expect(readTemplate().keys.toSet(), read);
     });
 
-    test('the development switches are declared, whatever they are set to', () {
+    test('the development switch is declared, whatever it is set to', () {
       // Their *values* are not asserted any more: one template seeds both
       // flavours, so there is no checked-in prod file to hold to `false`.
       // What stops a switch reaching a store build is `DevFlags` ANDing each
       // one with `!kReleaseMode` — pinned by the `DevFlags guards AppEnv`
       // group below, which is the guarantee that actually ships.
-      expect(readTemplate().containsKey('MOCK_DATA_DEFAULT'), isTrue);
       expect(readTemplate().containsKey('VERBOSE_LOGGING'), isTrue);
     });
 
@@ -102,23 +100,17 @@ void main() {
   });
 
   group('DevFlags guards AppEnv', () {
-    test('is off by default, whatever the env file could say', () {
-      expect(DevFlags.mockDataDefault, isFalse);
-    });
-
     test('every flag is const-evaluable, so release can shed the branches', () {
       // These only compile if the values fold at compile time, which is what
       // lets the tree-shaker delete the branch entirely.
-      const bool mock = DevFlags.mockDataDefault;
       const bool verbose = DevFlags.verboseLogging;
 
-      expect(<bool>[mock, verbose], everyElement(isFalse));
+      expect(verbose, isFalse);
     });
 
     test('no flag can be true in a release build, however it was defined', () {
       // Restated here so that removing a `!kReleaseMode` fails a test rather
       // than silently arming a config file against a store build.
-      expect(DevFlags.mockDataDefault && !DevFlags.isDebugOrProfile, isFalse);
       expect(DevFlags.verboseLogging && !DevFlags.isDebugOrProfile, isFalse);
     });
   });

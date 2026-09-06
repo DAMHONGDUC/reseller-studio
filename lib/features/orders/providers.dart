@@ -6,12 +6,12 @@ import 'package:system_design/common.dart';
 
 import '../../core/constants/log_tag_constant.dart';
 import '../../core/money/money.dart';
+import '../../core/providers/repository_providers.dart';
 import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/services/item_search.dart';
 import '../inventory/providers.dart';
-import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
 import 'domain/entities/order_filter_criteria.dart';

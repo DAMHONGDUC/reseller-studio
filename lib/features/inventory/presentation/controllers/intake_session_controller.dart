@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
-import '../../../mock_data/providers.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
 import '../../../sourcing/domain/repositories/sourcing_repository.dart';
 import '../../domain/entities/item.dart';

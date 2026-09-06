@@ -23,7 +23,7 @@ enum FileFolder {
 /// typo away from a file nobody can read.
 ///
 /// Returns a URL the app can render. In live mode that is an https download
-/// URL; in mock mode it is the local file's own path, which is why every
+/// URL; with the test uploader it is the local file's own path, which is why every
 /// photo in the app renders through `AppPhoto` rather than `Image.network`.
 abstract interface class FileUploader {
   Future<String> upload({

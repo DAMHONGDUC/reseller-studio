@@ -1,38 +1,38 @@
 import 'dart:async';
 
-import '../../app_config/domain/entities/app_config.dart';
-import '../../app_config/domain/repositories/app_config_repository.dart';
-import '../../carriers/domain/entities/carrier.dart';
-import '../../carriers/domain/repositories/carrier_repository.dart';
-import '../../expenses/domain/entities/expense.dart';
-import '../../expenses/domain/repositories/expense_repository.dart';
-import '../../inventory/domain/entities/item.dart';
-import '../../inventory/domain/entities/item_category.dart';
-import '../../inventory/domain/entities/storage_location.dart';
-import '../../inventory/domain/enums/item_status.dart';
-import '../../inventory/domain/repositories/catalog_repository.dart';
-import '../../inventory/domain/repositories/item_repository.dart';
-import '../../listings/domain/entities/listing.dart';
-import '../../listings/domain/repositories/listing_repository.dart';
-import '../../marketplaces/domain/entities/marketplace.dart';
-import '../../marketplaces/domain/repositories/marketplace_repository.dart';
-import '../../offers/domain/entities/offer.dart';
-import '../../offers/domain/repositories/offer_repository.dart';
-import '../../orders/domain/entities/order.dart';
-import '../../orders/domain/repositories/order_repository.dart';
-import '../../sourcing/domain/entities/purchase.dart';
-import '../../sourcing/domain/entities/source.dart';
-import '../../sourcing/domain/repositories/sourcing_repository.dart';
-import '../../subscription/domain/entities/plan_intro_offer.dart';
-import '../../subscription/domain/entities/plan_offering.dart';
-import '../../subscription/domain/entities/subscription_status.dart';
-import '../../subscription/domain/enums/seller_plan.dart';
-import '../../subscription/domain/repositories/subscription_repository.dart';
-import '../../workspace/domain/entities/user_profile.dart';
-import '../../workspace/domain/entities/workspace.dart';
-import '../../workspace/domain/repositories/workspace_purge_repository.dart';
-import '../../workspace/domain/repositories/workspace_repository.dart';
-import '../domain/mock_dataset.dart';
+import 'package:reseller_studio/features/app_config/domain/entities/app_config.dart';
+import 'package:reseller_studio/features/app_config/domain/repositories/app_config_repository.dart';
+import 'package:reseller_studio/features/carriers/domain/entities/carrier.dart';
+import 'package:reseller_studio/features/carriers/domain/repositories/carrier_repository.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/expenses/domain/repositories/expense_repository.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item_category.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/storage_location.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/domain/repositories/catalog_repository.dart';
+import 'package:reseller_studio/features/inventory/domain/repositories/item_repository.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/repositories/listing_repository.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
+import 'package:reseller_studio/features/marketplaces/domain/repositories/marketplace_repository.dart';
+import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
+import 'package:reseller_studio/features/offers/domain/repositories/offer_repository.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/repositories/order_repository.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/source.dart';
+import 'package:reseller_studio/features/sourcing/domain/repositories/sourcing_repository.dart';
+import 'package:reseller_studio/features/subscription/domain/entities/plan_intro_offer.dart';
+import 'package:reseller_studio/features/subscription/domain/entities/plan_offering.dart';
+import 'package:reseller_studio/features/subscription/domain/entities/subscription_status.dart';
+import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
+import 'package:reseller_studio/features/subscription/domain/repositories/subscription_repository.dart';
+import 'package:reseller_studio/features/workspace/domain/entities/user_profile.dart';
+import 'package:reseller_studio/features/workspace/domain/entities/workspace.dart';
+import 'package:reseller_studio/features/workspace/domain/repositories/workspace_purge_repository.dart';
+import 'package:reseller_studio/features/workspace/domain/repositories/workspace_repository.dart';
+import 'mock_dataset.dart';
 
 /// The mutable world behind every in-memory repository.
 ///
@@ -421,8 +421,9 @@ class InMemoryListingRepository implements ListingRepository {
   // Newest first, the way the real query reads them back.
   @override
   Stream<List<Listing>> watchListings() => _store.watch(
-    () => List<Listing>.of(_store.listings)
-      ..sort((Listing a, Listing b) => b.createdAt.compareTo(a.createdAt)),
+    () =>
+        List<Listing>.of(_store.listings)
+          ..sort((Listing a, Listing b) => b.createdAt.compareTo(a.createdAt)),
   );
 
   @override

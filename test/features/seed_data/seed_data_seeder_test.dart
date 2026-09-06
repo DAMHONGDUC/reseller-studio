@@ -1,32 +1,35 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
-import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
-import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
-import 'package:reseller_studio/features/mock_data/domain/services/demo_data_seeder.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/seed_data/domain/seed_dataset.dart';
+import 'package:reseller_studio/features/seed_data/domain/services/seed_data_seeder.dart';
 
+import '../../support/fakes/in_memory_repositories.dart';
+import '../../support/fakes/mock_dataset.dart';
 import '../../support/pump_app.dart';
 
 /// **The seeder has to write every collection, and twice must equal once.**
 ///
-/// It is what a demo account gets filled from, and it is also the only thing
-/// that drives every live write path in one run — so a collection it silently
-/// skips is a screen that is empty in front of an audience, and a row it
-/// duplicates is a business whose totals stop adding up.
+/// It is what a developer fills a real workspace from, and it is the only
+/// thing that drives every live write path in one run — so a collection it
+/// silently skips is a screen that is empty in front of an audience, and a row
+/// it duplicates is a business whose totals stop adding up.
 ///
 /// Run against the in-memory repositories rather than Firestore: the seeder
 /// only knows the domain interfaces, so this pins its contract without a
 /// backend. What it cannot prove is that Firestore accepts the documents —
 /// that needs a real project.
 void main() {
-  late MockDataset seed;
+  late SeedDataset seed;
   late MockStore store;
-  late DemoDataSeeder seeder;
+  late SeedDataSeeder seeder;
 
   setUp(() {
-    seed = MockDataset.seed(now: testNow);
-    // Emptied rather than constructed empty: `MockDataset`'s own constructor
-    // is private, and a public "empty" factory would exist only for this test.
-    store = MockStore(seed)
+    seed = SeedDataset.build(now: testNow);
+    // Emptied rather than constructed empty: the store's dataset is only
+    // scaffolding here, and a public "empty" factory would exist for this
+    // test alone.
+    store = MockStore(MockDataset.seed(now: testNow))
       ..items.clear()
       ..listings.clear()
       ..orders.clear()
@@ -39,7 +42,7 @@ void main() {
 
     addTearDown(store.dispose);
 
-    seeder = DemoDataSeeder(
+    seeder = SeedDataSeeder(
       items: InMemoryItemRepository(store),
       listings: InMemoryListingRepository(store),
       orders: InMemoryOrderRepository(store),
@@ -50,6 +53,22 @@ void main() {
       sources: InMemorySourceRepository(store),
       purchases: InMemoryPurchaseRepository(store),
     );
+  });
+
+  test('is three of everything', () {
+    // Owner's rule, and the whole size of the seed. A collection that grows
+    // past three is one nobody can check by eye any more.
+    expect(<int>[
+      seed.items.length,
+      seed.orders.length,
+      seed.listings.length,
+      seed.offers.length,
+      seed.expenses.length,
+      seed.categories.length,
+      seed.locations.length,
+      seed.sources.length,
+      seed.purchases.length,
+    ], everyElement(3));
   });
 
   test('fills every collection of an empty business', () async {
@@ -64,7 +83,7 @@ void main() {
     expect(store.locations, hasLength(seed.locations.length));
     expect(store.sources, hasLength(seed.sources.length));
     expect(store.purchases, hasLength(seed.purchases.length));
-    expect(written, greaterThan(0));
+    expect(written, seed.documentCount);
   });
 
   test('seeding twice replaces rather than doubles', () async {
@@ -76,7 +95,7 @@ void main() {
     expect(store.orders, hasLength(seed.orders.length));
   });
 
-  test('keeps the dates the seed placed, so the demo looks lived-in', () async {
+  test('keeps the dates the seed placed, so it looks lived-in', () async {
     await seeder.seed(seed);
 
     final Item seeded = seed.items.firstWhere(
@@ -87,8 +106,23 @@ void main() {
     );
 
     // A row stamped "now" on the way in would empty Home's Needs Attention
-    // block, which is the screen worth demoing.
+    // block, which is the screen worth looking at.
     expect(stored.listedAt, seeded.listedAt);
     expect(stored.createdAt, seeded.createdAt);
+  });
+
+  test('keeps the two rows the screens are judged on', () {
+    // Hard rule 5 needs an item with no cost to render `—` off, and hard rule
+    // 3 needs an order with no payout for Payouts to have work in it. A seed
+    // where everything is filled in exercises neither.
+    final Item uncosted = seed.items.firstWhere(
+      (Item item) => item.id == SeedDatasetConstant.uncostedItemId,
+    );
+    final Order unpaid = seed.orders.firstWhere(
+      (Order order) => order.id == SeedDatasetConstant.unpaidOrderId,
+    );
+
+    expect(uncosted.purchasePrice, isNull);
+    expect(unpaid.payout, isNull);
   });
 }

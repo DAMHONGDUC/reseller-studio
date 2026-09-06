@@ -2,14 +2,14 @@ part of 'settings_screen.dart';
 
 /// Fills the open workspace with the demo business.
 ///
-/// **Hidden without dev mode**, like the mock-data switch above it and for
+/// **Hidden without dev mode**, like the delete card beside it and for
 /// the same reason: it writes tens of documents into a real workspace.
 ///
 /// Strings are hardcoded English on purpose: this is developer UI that never
 /// reaches a seller, and putting it through ARB would mean translating it at
-/// release (hard rule 7's exception, the same one `_MockSummary` takes).
-class _DemoSeedCard extends ConsumerWidget {
-  const _DemoSeedCard();
+/// release (hard rule 7's exception, which the Developer block takes).
+class _SeedDataCard extends ConsumerWidget {
+  const _SeedDataCard();
 
   /// Asks first. It writes tens of documents into a real workspace, and
   /// running it against the wrong business is not something a snackbar undoes.
@@ -31,7 +31,7 @@ class _DemoSeedCard extends ConsumerWidget {
   Future<void> _seed(BuildContext context, WidgetRef ref) async {
     try {
       final int written = await ref
-          .read(demoSeedControllerProvider.notifier)
+          .read(seedDataControllerProvider.notifier)
           .seed();
 
       if (!context.mounted) return;
@@ -52,7 +52,7 @@ class _DemoSeedCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (!ref.watch(devModeEnabledProvider)) return const SizedBox.shrink();
 
-    final bool running = ref.watch(demoSeedControllerProvider);
+    final bool running = ref.watch(seedDataControllerProvider);
     final bool hasWorkspace = ref.watch(hasWorkspaceProvider);
 
     return SdCardV3(

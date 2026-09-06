@@ -12,18 +12,15 @@ import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../app_config/providers.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
-import '../../../../mock_data/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../controllers/delete_all_data_controller.dart';
-import '../../controllers/demo_seed_controller.dart';
+import '../../controllers/seed_data_controller.dart';
 import '../../controllers/theme_mode_controller.dart';
 
 part 'settings_screen_account_card.dart';
 part 'settings_screen_appearance_card.dart';
 part 'settings_screen_delete_all_data_card.dart';
-part 'settings_screen_demo_seed_card.dart';
-part 'settings_screen_mock_data_card.dart';
-part 'settings_screen_mock_summary.dart';
+part 'settings_screen_seed_data_card.dart';
 
 /// Settings (plan §25).
 ///
@@ -90,14 +87,7 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
             ),
-            child: const _MockDataCard(),
-          ),
-          SizedBox(height: SdSpacingConstant.h12),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
-            ),
-            child: const _DemoSeedCard(),
+            child: const _SeedDataCard(),
           ),
           SizedBox(height: SdSpacingConstant.h12),
           Padding(

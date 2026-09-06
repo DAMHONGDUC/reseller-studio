@@ -12,11 +12,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/firestore/workspace_collections.dart';
 import '../../core/firestore/workspace_context.dart';
-import '../app_config/providers.dart';
 import '../auth/providers.dart';
 import '../listings/domain/enums/listing_status.dart';
-import '../mock_data/data/in_memory_repositories.dart';
-import '../mock_data/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import 'data/repositories/firestore_team_repository.dart';
 import 'data/repositories/firestore_workspace_repository.dart';
@@ -35,12 +32,6 @@ final Provider<FirebaseFirestore> firebaseFirestoreProvider =
 
 final Provider<WorkspaceRepository> workspaceRepositoryProvider =
     Provider<WorkspaceRepository>((Ref ref) {
-      // Mock first, exactly like every business repository: put the Firestore
-      // branch first and a demo run reaches for a backend that is not there.
-      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-        return InMemoryWorkspaceRepository(ref.watch(mockStoreProvider));
-      }
-
       return FirestoreWorkspaceRepository(
         ref.watch(firebaseFirestoreProvider),
         ref.watch(firebaseFunctionsProvider),
@@ -49,17 +40,12 @@ final Provider<WorkspaceRepository> workspaceRepositoryProvider =
 
 /// Inviting, accepting, removing and changing a role.
 ///
-/// **No mock branch, the same call the audit log and the inbox made.** Every
-/// write is a Cloud Function and an invitation is addressed to an email
-/// account; the demo has neither, so there is nothing for an in-memory
-/// version to stand in for. Null there and when signed out, and the Team
-/// screen draws no add button rather than offering one that cannot work.
+/// **Null when signed out**, because every write is a Cloud Function and an
+/// invitation is addressed to an email account — neither of which exists
+/// without one. The Team screen draws no add button rather than offering one
+/// that cannot work.
 final Provider<TeamRepository?> teamRepositoryProvider =
     Provider<TeamRepository?>((Ref ref) {
-      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-        return null;
-      }
-
       if (ref.watch(currentUidProvider) == null) return null;
 
       return FirestoreTeamRepository(
@@ -88,16 +74,13 @@ final StreamProvider<List<PendingInvite>> pendingInvitesProvider =
 /// The signed-in person's own record — name, email, and which workspaces they
 /// belong to.
 ///
-/// Not read in mock mode: there is no account, and the mock dataset carries
-/// its own workspace.
+/// Null without an account, which is what `workspaceStatusProvider` reads to
+/// decide between the splash and the setup form.
 final StreamProvider<UserProfile?> userProfileProvider =
     StreamProvider<UserProfile?>((Ref ref) {
       final String? uid = ref.watch(currentUidProvider);
 
-      if (uid == null ||
-          (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock)) {
-        return Stream<UserProfile?>.value(null);
-      }
+      if (uid == null) return Stream<UserProfile?>.value(null);
 
       return ref.watch(workspaceRepositoryProvider).watchProfile(uid);
     });
@@ -106,10 +89,6 @@ final StreamProvider<UserProfile?> userProfileProvider =
 final Provider<String?> currentWorkspaceIdProvider = Provider<String?>((
   Ref ref,
 ) {
-  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-    return ref.watch(mockStoreProvider).dataset.workspace.id;
-  }
-
   return ref.watch(userProfileProvider).value?.resolvedWorkspaceId;
 });
 
@@ -129,15 +108,6 @@ final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>(
 final Provider<Workspace?> currentWorkspaceProvider = Provider<Workspace?>((
   Ref ref,
 ) {
-  // Both modes go through the same stream on purpose. Reading the seed
-  // directly was simpler and made the demo the one place a workspace could
-  // not be edited — the repository is what Settings writes through.
-  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-    final Workspace seed = ref.watch(mockStoreProvider).dataset.workspace;
-
-    return ref.watch(liveWorkspaceProvider(seed.id)).value ?? seed;
-  }
-
   final String? id = ref.watch(currentWorkspaceIdProvider);
 
   if (id == null) return null;
@@ -164,10 +134,6 @@ enum WorkspaceStatus {
 
 final Provider<WorkspaceStatus> workspaceStatusProvider =
     Provider<WorkspaceStatus>((Ref ref) {
-      if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-        return WorkspaceStatus.ready;
-      }
-
       final AsyncValue<UserProfile?> profile = ref.watch(userProfileProvider);
 
       if (profile.isLoading && !profile.hasValue) {
@@ -226,10 +192,6 @@ workspaceSwitchControllerProvider =
 final Provider<List<Workspace>> workspacesProvider = Provider<List<Workspace>>((
   Ref ref,
 ) {
-  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-    return <Workspace>[ref.watch(mockStoreProvider).dataset.workspace];
-  }
-
   final List<String> ids =
       ref.watch(userProfileProvider).value?.workspaceIds ?? const <String>[];
 
@@ -240,17 +202,9 @@ final Provider<List<Workspace>> workspacesProvider = Provider<List<Workspace>>((
 });
 
 /// Whether there is anything to read from at all.
-///
-/// Mirrors the branching in every repository provider on purpose: mock mode
-/// answers yes without a context, because the in-memory repositories never
-/// look at one.
-final Provider<bool> hasWorkspaceProvider = Provider<bool>((Ref ref) {
-  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-    return true;
-  }
-
-  return ref.watch(workspaceContextProvider) != null;
-});
+final Provider<bool> hasWorkspaceProvider = Provider<bool>(
+  (Ref ref) => ref.watch(workspaceContextProvider) != null,
+);
 
 /// Keeps a business stream empty instead of exploding when there is no
 /// workspace behind it.
@@ -294,10 +248,6 @@ final Provider<Duration> staleThresholdProvider = Provider<Duration>((Ref ref) {
 final Provider<List<Member>> workspaceMembersProvider = Provider<List<Member>>((
   Ref ref,
 ) {
-  if (ref.watch(devModeEnabledProvider) && ref.watch(dataModeProvider).isMock) {
-    return ref.watch(mockStoreProvider).dataset.members;
-  }
-
   final String? id = ref.watch(currentWorkspaceIdProvider);
 
   if (id == null) return const <Member>[];
@@ -313,7 +263,7 @@ final liveMembersProvider = StreamProvider.family<List<Member>, String>(
 );
 
 /// The signed-in person's role in the workspace on screen, or null when it
-/// cannot be told — signed out, or a demo with no account.
+/// cannot be told — signed out, or a workspace whose members have not loaded.
 final Provider<MemberRole?> currentMemberRoleProvider = Provider<MemberRole?>((
   Ref ref,
 ) {
@@ -335,10 +285,10 @@ final Provider<MemberRole?> currentMemberRoleProvider = Provider<MemberRole?>((
 /// **An affordance, never a permission.** `firestore.rules` decides who may
 /// write (hard rule 11) and is unchanged by this; what this stops is drawing
 /// a control that would always fail. A role that cannot be told reads as
-/// allowed on purpose — the demo has no account at all, and hiding the
-/// controls there would hide the feature from the only mode it can be
-/// demonstrated in. A viewer who gets through anyway is refused by rules and
-/// sees the message hard rule 6 allows.
+/// allowed on purpose: the members list arrives a frame after the workspace,
+/// and hiding every control until it does makes the screen flicker its way
+/// into being usable. A viewer who gets through anyway is refused by rules
+/// and sees the message hard rule 6 allows.
 final Provider<bool> canEditWorkspaceProvider = Provider<bool>((Ref ref) {
   final MemberRole? role = ref.watch(currentMemberRoleProvider);
 

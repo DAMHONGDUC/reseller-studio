@@ -7,7 +7,7 @@ part of 'settings_screen.dart';
 /// two guards being forgotten must not be enough.
 ///
 /// Strings are hardcoded English on purpose — developer UI that never reaches
-/// a seller, the same exception `_DemoSeedCard` and `_MockSummary` take
+/// a seller, the same exception `_SeedDataCard` takes
 /// (hard rule 7).
 class _DeleteAllDataCard extends ConsumerWidget {
   const _DeleteAllDataCard();

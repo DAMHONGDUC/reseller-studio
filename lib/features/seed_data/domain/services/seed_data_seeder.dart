@@ -15,15 +15,19 @@ import '../../../orders/domain/repositories/order_repository.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
 import '../../../sourcing/domain/entities/source.dart';
 import '../../../sourcing/domain/repositories/sourcing_repository.dart';
-import '../mock_dataset.dart';
+import '../seed_dataset.dart';
 
-/// Writes the demo business into whatever backend the repositories point at.
+/// Writes [SeedDataset] into the open workspace, through the real
+/// repositories.
 ///
-/// **This is not the mock-data switch and does not replace it.** That switch
-/// swaps the repositories for in-memory ones and nothing is ever written; this
-/// takes the same seed and pushes it through the *real* ones, so a freshly
-/// created workspace has something in it. A demo against an empty account
-/// shows five empty tabs, which is the app failing to make its own case.
+/// **It replaced the mock-data switch rather than joining it.** That switch
+/// swapped every repository for an in-memory one and nothing was ever
+/// written, so the app a developer looked at was not the app a seller runs —
+/// and a fake business one stale preference away from being shown as real was
+/// the worst thing it could do. This writes actual documents into an actual
+/// workspace: what is on screen afterwards came back out of Firestore.
+///
+/// It is reached from More → Settings → Developer and nowhere else.
 ///
 /// **Every row keeps the seed's own dates.** The DTOs write `createdAt` from
 /// the entity rather than a server timestamp, which is what makes the seeded
@@ -33,8 +37,8 @@ import '../mock_dataset.dart';
 ///
 /// It is also the only thing that exercises every live write path in one go —
 /// so a failure here is a real bug in `data/`, found before a seller finds it.
-class DemoDataSeeder {
-  const DemoDataSeeder({
+class SeedDataSeeder {
+  const SeedDataSeeder({
     required this.items,
     required this.listings,
     required this.orders,
@@ -67,7 +71,7 @@ class DemoDataSeeder {
   ///
   /// Ids come from the seed, and every write is an upsert on that id, so
   /// running it twice replaces the demo business rather than doubling it.
-  Future<int> seed(MockDataset dataset) async {
+  Future<int> seed(SeedDataset dataset) async {
     int written = 0;
 
     for (final ItemCategory category in dataset.categories) {
@@ -112,8 +116,8 @@ class DemoDataSeeder {
     }
 
     SdLogger.action(
-      LogTagConstant.workspace,
-      'Demo data seeded',
+      LogTagConstant.seedData,
+      'Seed data written',
       <String, Object>{
         'documents': written,
         'items': dataset.items.length,

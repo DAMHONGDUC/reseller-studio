@@ -3,8 +3,8 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../../../core/utils/text_input_utils.dart';
-import '../../../mock_data/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/order.dart';
 

@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/app_config/domain/entities/app_config.dart';
 import 'package:reseller_studio/features/app_config/domain/entities/app_update_policy.dart';
 import 'package:reseller_studio/features/app_config/domain/repositories/app_config_repository.dart';
 import 'package:reseller_studio/features/app_config/providers.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 
 /// The forced update is the one thing in the app that can stop a seller
 /// working, so the cases worth pinning are the ones where it must **not**

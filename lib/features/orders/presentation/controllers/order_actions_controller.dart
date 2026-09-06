@@ -4,7 +4,7 @@ import 'package:system_design/common.dart';
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
-import '../../../mock_data/providers.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/enums/order_status.dart';
 import '../../domain/services/order_transition.dart';

@@ -155,7 +155,7 @@ void main() {
     });
   });
 
-  group('screens render against the mock backend', () {
+  group('screens render against the in-memory backend', () {
     testWidgets('Home shows the workspace and its real figures', (
       WidgetTester tester,
     ) async {
@@ -342,7 +342,7 @@ void main() {
       expect(find.text(r'$49.47'), findsOneWidget);
     });
 
-    testWidgets('Settings shows the mock switch, on, with the dataset counts', (
+    testWidgets('Settings offers seeding and nothing that fakes a business', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const SettingsScreen());
@@ -350,15 +350,15 @@ void main() {
       // Appearance now heads the screen — theme and language are the block
       // that works with no account — so the developer card is below the fold.
       await tester.scrollUntilVisible(
-        find.text('Mock data'),
+        find.text('Seed demo data'),
         SdSpacingConstant.h200,
         scrollable: find.byType(Scrollable).first,
       );
 
-      expect(find.text('Mock data'), findsOneWidget);
-      expect(find.text('Showing a seeded demo business.'), findsOneWidget);
-      expect(find.textContaining('11 items'), findsOneWidget);
-      expect(find.textContaining('6 orders'), findsOneWidget);
+      expect(find.text('Seed demo data'), findsOneWidget);
+      // The mock switch is gone: there is one backend now, and the only way
+      // to fill a workspace is to write to it.
+      expect(find.text('Mock data'), findsNothing);
     });
   });
 }

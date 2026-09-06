@@ -3,8 +3,8 @@ import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../../../core/theme/app_tag_hue.dart';
-import '../../../mock_data/providers.dart';
 import '../../domain/entities/marketplace.dart';
 
 /// What the add/edit marketplace form has collected.

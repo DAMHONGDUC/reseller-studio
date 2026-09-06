@@ -6,10 +6,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/error/app_failure.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/auth/domain/repositories/auth_repository.dart';
 import 'package:reseller_studio/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:reseller_studio/features/notifications/presentation/controllers/push_controller.dart';
 import 'package:reseller_studio/features/notifications/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_offering.dart';

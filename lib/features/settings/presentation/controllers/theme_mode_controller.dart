@@ -5,7 +5,7 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/prefs_key_constant.dart';
-import '../../../mock_data/providers.dart';
+import '../../../../core/providers/shared_preferences_provider.dart';
 
 /// Light, dark, or whatever the device says.
 ///

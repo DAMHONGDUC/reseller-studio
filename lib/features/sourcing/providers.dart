@@ -8,10 +8,10 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/money/money.dart';
+import '../../core/providers/repository_providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
-import '../mock_data/providers.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
 import '../workspace/providers.dart';

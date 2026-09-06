@@ -19,7 +19,7 @@ part 'activity_screen_row.dart';
 /// action.
 ///
 /// **It is empty until the functions are deployed**, in every environment
-/// including mock mode. The empty state is written for the ordinary reason a
+/// including a widget test. The empty state is written for the ordinary reason a
 /// workspace has no history — it is new — rather than for the missing backend,
 /// because a seller should never be shown the app's deployment state.
 class ActivityScreen extends ConsumerWidget {

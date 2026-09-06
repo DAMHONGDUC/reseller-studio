@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/core/widgets/item_card.dart';
 import 'package:reseller_studio/core/widgets/money_field.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -15,7 +16,6 @@ import 'package:reseller_studio/features/listings/presentation/controllers/cross
 import 'package:reseller_studio/features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
 import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';

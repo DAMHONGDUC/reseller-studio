@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/error/app_failure.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/subscription/data/repositories/unconfigured_subscription_repository.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_offering.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/subscription_status.dart';
@@ -252,6 +252,7 @@ void main() {
       overrides: <Override>[
         subscriptionRepositoryProvider.overrideWithValue(_SilentStore()),
       ],
+      replaces: <Object>{subscriptionRepositoryProvider},
     );
 
     expect(find.text('Could not load the plans.'), findsOneWidget);
@@ -270,6 +271,7 @@ void main() {
           UnconfiguredSubscriptionRepository(),
         ),
       ],
+      replaces: <Object>{subscriptionRepositoryProvider},
     );
 
     expect(

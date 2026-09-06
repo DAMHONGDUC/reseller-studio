@@ -3,7 +3,7 @@ import 'package:system_design/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
-import '../../../mock_data/providers.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/storage_location.dart';
 

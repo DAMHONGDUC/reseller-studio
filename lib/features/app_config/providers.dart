@@ -2,7 +2,7 @@
 ///
 /// **Every gate reads [premiumEnabledProvider], never the repository.** The
 /// flag decides whether the plan system applies at all, so a screen asking
-/// Firestore directly would be a screen that behaves differently in mock mode.
+/// Firestore directly would be a second answer to a question one provider owns.
 library;
 
 import 'package:flutter/foundation.dart';
@@ -12,8 +12,8 @@ import 'package:system_design/common.dart';
 
 import '../../core/config/dev_flags.dart';
 import '../../core/constants/log_tag_constant.dart';
+import '../../core/providers/repository_providers.dart';
 import '../auth/providers.dart';
-import '../mock_data/providers.dart';
 import 'domain/entities/app_config.dart';
 import 'domain/entities/app_update_policy.dart';
 import 'domain/enums/app_platform.dart';
@@ -82,13 +82,13 @@ const int _buildUnknown = 1 << 30;
 /// **`defaultTargetPlatform`, not `Platform.isIOS`.** It is overridable in a
 /// test, where `dart:io` reports the host machine and would answer macOS. A
 /// platform the config has no block for answers null, and null forces nothing.
-final Provider<AppPlatform?> currentPlatformProvider = Provider<AppPlatform?>((
-  Ref ref,
-) => switch (defaultTargetPlatform) {
-  TargetPlatform.iOS => AppPlatform.ios,
-  TargetPlatform.android => AppPlatform.android,
-  _ => null,
-});
+final Provider<AppPlatform?> currentPlatformProvider = Provider<AppPlatform?>(
+  (Ref ref) => switch (defaultTargetPlatform) {
+    TargetPlatform.iOS => AppPlatform.ios,
+    TargetPlatform.android => AppPlatform.android,
+    _ => null,
+  },
+);
 
 /// What this platform's store says about the running build.
 ///
@@ -146,17 +146,13 @@ final Provider<bool> premiumGrantedByEmailProvider = Provider<bool>(
 /// Whether the developer affordances are available in this build, to this
 /// account.
 ///
-/// **It replaces `DevFlags.isDebugOrProfile` at every runtime call site, and
-/// that is a deliberate loosening of the guard in
-/// `lib/features/mock_data/CLAUDE.md`.** That rule made the check a `const`
-/// so the in-memory repositories and their seed were tree-shaken out of a
-/// release binary; a list of emails is by definition a release-build grant,
-/// so the branch has to survive compilation and the seed now ships. What
-/// stops a seller reaching it is the config, not the compiler.
+/// **It replaces `DevFlags.isDebugOrProfile` at every runtime call site.** A
+/// list of emails is by definition a release-build grant, so the branch has to
+/// survive compilation and the seeder ships. What stops a seller reaching it
+/// is the config, not the compiler.
 ///
-/// `DevFlags.mockDataDefault` and `DevFlags.verboseLogging` keep their `const`
-/// guards — a *default* that flips itself on in release is not something an
-/// email list was asked to buy.
+/// `DevFlags.verboseLogging` keeps its `const` guard — a *default* that flips
+/// itself on in release is not something an email list was asked to buy.
 ///
 /// why: see `docs/rules/DECISIONS.md` § Dev mode is granted by email
 final Provider<bool> devModeEnabledProvider = Provider<bool>((Ref ref) {

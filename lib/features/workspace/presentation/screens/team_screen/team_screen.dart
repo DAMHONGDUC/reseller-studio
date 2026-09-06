@@ -28,8 +28,8 @@ part 'team_screen_member_row.dart';
 /// server-side answer a client may ask. The invitee sees theirs in the
 /// workspace switcher, which is where a business you could join belongs.
 ///
-/// **The add button is absent in the demo.** Mock mode has no account and no
-/// backend (`lib/features/mock_data/CLAUDE.md`), so there is nobody to invite
+/// **The add button is absent without a backend.** A widget test has no
+/// account and no team repository, so there is nobody to invite
 /// and nothing to invite them to — a button that could only fail is worse
 /// than none.
 class TeamScreen extends ConsumerWidget {

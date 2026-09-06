@@ -4,9 +4,9 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/money/money.dart';
+import '../../core/providers/repository_providers.dart';
 import '../../core/time/app_clock.dart';
 import '../listings/domain/enums/listing_status.dart';
-import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/expense.dart';
 import 'domain/services/recurring_expense_schedule.dart';

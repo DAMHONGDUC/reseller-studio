@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart'
+    as mock_providers;
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart'
     as record;
 import 'package:reseller_studio/features/marketplaces/domain/repositories/marketplace_repository.dart';
@@ -11,8 +13,6 @@ import 'package:reseller_studio/features/marketplaces/presentation/controllers/m
 import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplace_detail_screen/marketplace_detail_screen.dart';
 import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import 'package:reseller_studio/features/marketplaces/providers.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart'
-    as mock_providers;
 
 import '../../support/pump_app.dart';
 
@@ -98,6 +98,7 @@ void main() {
             repository,
           ),
         ],
+        replaces: <Object>{mock_providers.marketplaceRepositoryProvider},
       );
 
       await tester.tap(find.text('Save'));

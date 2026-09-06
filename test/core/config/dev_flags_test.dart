@@ -48,16 +48,14 @@ void main() {
     test('every flag is const-evaluable, so release sheds the branches', () {
       // These only compile if the values fold at compile time, which is what
       // lets the tree-shaker delete the branch and everything only it reached.
-      const bool mock = DevFlags.mockDataDefault;
       const bool verbose = DevFlags.verboseLogging;
 
-      expect(<bool>[mock, verbose], everyElement(isFalse));
+      expect(verbose, isFalse);
     });
 
     test('no flag is true in release, however the env file was written', () {
       // Restated here so removing a `!kReleaseMode` fails a test rather than
       // silently arming a config file against a store build.
-      expect(DevFlags.mockDataDefault && kReleaseMode, isFalse);
       expect(DevFlags.verboseLogging && kReleaseMode, isFalse);
     });
   });

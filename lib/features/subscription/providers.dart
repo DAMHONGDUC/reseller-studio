@@ -3,17 +3,17 @@
 ///
 /// **Every gate reads from here, never from a repository.** A screen that
 /// asked the billing SDK a question directly would be a screen that behaves
-/// differently in mock mode, and the whole point of the gates is that they
+/// differently from the gates, and the whole point of the gates is that they
 /// are the same code in both.
 library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/providers/repository_providers.dart';
 import '../app_config/providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
-import '../mock_data/providers.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
 import '../workspace/domain/entities/workspace.dart';

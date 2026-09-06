@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
 import 'package:reseller_studio/features/workspace/domain/entities/workspace.dart';
 import 'package:reseller_studio/features/workspace/presentation/controllers/workspace_detail_controller.dart';
@@ -24,7 +23,7 @@ void main() {
   /// so the edit looks lost when it was only never observed.
   Future<ProviderContainer> subscribed() async {
     final ProviderContainer container = mockContainer();
-    final String id = container.read(mockStoreProvider).dataset.workspace.id;
+    final String id = container.read(currentWorkspaceIdProvider)!;
 
     container.listen<AsyncValue<Workspace?>>(
       liveWorkspaceProvider(id),

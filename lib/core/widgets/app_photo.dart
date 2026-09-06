@@ -9,9 +9,9 @@ import '../constants/log_tag_constant.dart';
 /// Renders a stored photo, whichever kind of URL it turned out to be.
 ///
 /// **The app has two** — an https download URL in live mode, and a local file
-/// path in mock mode, because there is no bucket to upload to before Firebase
+/// path with the test uploader, because there is no bucket to upload to
 /// exists. Every photo in the app goes through here rather than
-/// `Image.network`, so mock mode shows the picture a seller just took instead
+/// `Image.network`, so a test shows the picture that was picked instead
 /// of a broken-image box.
 ///
 /// A failed load renders the same placeholder as no photo at all: a grey well

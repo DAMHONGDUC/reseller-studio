@@ -17,9 +17,6 @@ import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
 import 'package:reseller_studio/features/marketplaces/providers.dart';
-import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
-import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/offers/providers.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
@@ -28,6 +25,10 @@ import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart'
 import 'package:reseller_studio/features/sourcing/providers.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:reseller_studio/reseller_studio_app.dart';
+
+import 'fakes/fake_overrides.dart';
+import 'fakes/in_memory_repositories.dart';
+import 'fakes/mock_dataset.dart';
 
 /// The instant the seeded dataset is generated against in every test.
 ///
@@ -52,16 +53,6 @@ class FixedClock extends AppClock {
   DateTime now() => instant;
 }
 
-/// Forces mock mode without touching `SharedPreferences`.
-///
-/// Overriding `build` rather than seeding preferences keeps the test
-/// synchronous — the real controller reads an async provider, and a screen
-/// pumped before it resolves would render live mode and throw.
-class _AlwaysMock extends DataModeController {
-  @override
-  DataMode build() => DataMode.mock;
-}
-
 /// Pump a screen the way the app builds it: screenutil installed, the app
 /// theme applied, localizations available, and the mock backend wired.
 ///
@@ -69,14 +60,17 @@ class _AlwaysMock extends DataModeController {
 /// builds — `context.sdTheme3` asserts without the theme extension and
 /// `SdSpacingConstant` throws without screenutil.
 ///
-/// [overrides] are appended after the mock wiring, so a test can replace one
-/// provider — the inbox, say, which has no mock backend to seed — without
-/// rebuilding the scope by hand.
+/// [overrides] are appended after the fake wiring, so a test can replace one
+/// provider — the inbox, say, which has no fake to seed — without rebuilding
+/// the scope by hand. A provider that is ALSO in `FakeOverrides` must be named
+/// in [replaces]: Riverpod throws on two overrides of one provider rather than
+/// letting the later win.
 Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
   List<Override> overrides = const <Override>[],
-}) => _pumpApp(tester, overrides: overrides, home: screen);
+  Set<Object> replaces = const <Object>{},
+}) => _pumpApp(tester, overrides: overrides, replaces: replaces, home: screen);
 
 /// Pump [screen] as a route, so a widget that calls `context.push` has a
 /// router to push into. The returned router is how a test reads where it went.
@@ -88,6 +82,7 @@ Future<GoRouter> pumpRoutedScreen(
   WidgetTester tester,
   Widget screen, {
   List<Override> overrides = const <Override>[],
+  Set<Object> replaces = const <Object>{},
 }) async {
   final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -105,16 +100,22 @@ Future<GoRouter> pumpRoutedScreen(
     ],
   );
 
-  await _pumpApp(tester, overrides: overrides, router: router);
+  await _pumpApp(
+    tester,
+    overrides: overrides,
+    replaces: replaces,
+    router: router,
+  );
 
   return router;
 }
 
-/// The wiring both pumps share: the device surface, the mock backend, the
-/// theme and the localizations.
+/// The wiring both pumps share: the device surface, the in-memory backend,
+/// the theme and the localizations.
 Future<void> _pumpApp(
   WidgetTester tester, {
   required List<Override> overrides,
+  required Set<Object> replaces,
   Widget? home,
   GoRouter? router,
 }) async {
@@ -144,10 +145,10 @@ Future<void> _pumpApp(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        dataModeProvider.overrideWith(_AlwaysMock.new),
         clockProvider.overrideWith((Ref ref) => FixedClock(testNow)),
-        mockStoreProvider.overrideWith(
-          (Ref ref) => MockStore(MockDataset.seed(now: testNow)),
+        ...FakeOverrides.forStore(
+          MockStore(MockDataset.seed(now: testNow)),
+          except: replaces,
         ),
         ...overrides,
       ],
@@ -173,16 +174,20 @@ Future<void> _pumpApp(
   await tester.pumpAndSettle();
 }
 
-/// A container wired to the mock backend, for testing providers without a
-/// widget tree.
-ProviderContainer mockContainer() {
+/// A container wired to the in-memory backend, for testing providers without
+/// a widget tree.
+ProviderContainer mockContainer({
+  List<Override> overrides = const <Override>[],
+  Set<Object> replaces = const <Object>{},
+}) {
   final ProviderContainer container = ProviderContainer(
     overrides: [
-      dataModeProvider.overrideWith(_AlwaysMock.new),
       clockProvider.overrideWith((Ref ref) => FixedClock(testNow)),
-      mockStoreProvider.overrideWith(
-        (Ref ref) => MockStore(MockDataset.seed(now: testNow)),
+      ...FakeOverrides.forStore(
+        MockStore(MockDataset.seed(now: testNow)),
+        except: replaces,
       ),
+      ...overrides,
     ],
   );
 

@@ -59,7 +59,7 @@ class AppConfig {
   final Set<String> premiumEmails;
 
   /// Accounts that get the developer affordances in a **release** build —
-  /// mock data and the demo seed, which are otherwise debug-only.
+  /// seeding and deleting a workspace, which are otherwise debug-only.
   final Set<String> devModeEmails;
 
   /// Accounts refused the app. They are sent to the blocked screen and can do

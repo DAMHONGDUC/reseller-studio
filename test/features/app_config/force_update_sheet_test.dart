@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/app_config/domain/entities/app_config.dart';
 import 'package:reseller_studio/features/app_config/domain/entities/app_update_policy.dart';
 import 'package:reseller_studio/features/app_config/domain/repositories/app_config_repository.dart';
 import 'package:reseller_studio/features/app_config/presentation/widgets/force_update_sheet.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 
 import '../../support/pump_app.dart';
 

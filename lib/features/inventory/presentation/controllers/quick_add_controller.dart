@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
-import '../../../mock_data/providers.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../domain/repositories/item_repository.dart';

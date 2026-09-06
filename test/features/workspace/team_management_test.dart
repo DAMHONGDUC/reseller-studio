@@ -59,7 +59,12 @@ void main() {
   testWidgets('an owner is offered the invite button', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const TeamScreen(), overrides: managing());
+    await pumpScreen(
+      tester,
+      const TeamScreen(),
+      overrides: managing(),
+      replaces: <Object>{teamRepositoryProvider},
+    );
 
     expect(find.text('Invite a teammate'), findsOneWidget);
   });
@@ -80,7 +85,12 @@ void main() {
   testWidgets('your own row opens nothing, a teammate\'s does', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const TeamScreen(), overrides: managing());
+    await pumpScreen(
+      tester,
+      const TeamScreen(),
+      overrides: managing(),
+      replaces: <Object>{teamRepositoryProvider},
+    );
 
     // Hard rule 11: nobody edits their own membership document, and the rules
     // refuse it whatever the UI offers.
@@ -105,7 +115,12 @@ void main() {
   testWidgets('a role describes itself from what it may actually do', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, const TeamScreen(), overrides: managing());
+    await pumpScreen(
+      tester,
+      const TeamScreen(),
+      overrides: managing(),
+      replaces: <Object>{teamRepositoryProvider},
+    );
 
     // Read off `canOwn` / `canAdminister` / `canWrite` rather than written per
     // case, so a role whose powers change cannot keep the old sentence.

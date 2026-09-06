@@ -1,10 +1,10 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/providers/repository_providers.dart';
 import '../../core/theme/app_tag_hue.dart';
 import '../listings/domain/entities/listing.dart';
 import '../listings/domain/services/listing_marketplaces.dart';
 import '../listings/providers.dart';
-import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/marketplace.dart';
 import 'domain/services/marketplace_matching.dart';
@@ -26,7 +26,7 @@ final Provider<List<Marketplace>> defaultMarketplacesProvider =
             name: seed.name,
             // A millisecond apart, never one instant: the list is read back
             // ordered by `createdAt`, and five identical stamps leave the tie
-            // to the document id — the seeded order in mock data and
+            // to the document id — the seeded order and
             // alphabetical order in Firestore, for the same five rows.
             createdAt: createdAt.add(Duration(milliseconds: index)),
             hue: seed.hue,

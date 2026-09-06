@@ -5,13 +5,9 @@
 /// setting. Collecting them here makes a collision visible at review time
 /// rather than at runtime.
 ///
-/// **A key is never typed at a call site.** `prefs.getBool('data_mode_mock')`
+/// **A key is never typed at a call site.** `prefs.getBool('onboarding_seen')`
 /// in a controller is a magic string that no rename can follow.
 final class PrefsKeyConstant {
-  /// Whether mock data is on. Read by `DataModeController`, which guards it
-  /// again in release — a stored `true` never survives into a shipped build.
-  static const String dataModeMock = 'data_mode_mock';
-
   /// Whether the intro flow has been got through once.
   ///
   /// Device-local on purpose: it is about this install, not this account, so

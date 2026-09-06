@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/app_config/domain/entities/app_config.dart';
 import 'package:reseller_studio/features/app_config/domain/repositories/app_config_repository.dart';
 import 'package:reseller_studio/features/app_config/providers.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
 

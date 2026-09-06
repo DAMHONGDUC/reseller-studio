@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/firestore/workspace_collections.dart';
-import 'package:reseller_studio/features/mock_data/data/in_memory_repositories.dart';
-import 'package:reseller_studio/features/mock_data/domain/mock_dataset.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/settings/presentation/controllers/delete_all_data_controller.dart';
 import 'package:reseller_studio/features/workspace/domain/repositories/workspace_purge_repository.dart';
 
+import '../../support/fakes/in_memory_repositories.dart';
+import '../../support/fakes/mock_dataset.dart';
 import '../../support/pump_app.dart';
 
 /// **What a "delete all data" sweep must leave standing.**
@@ -38,9 +38,7 @@ void main() {
       expect(
         WorkspaceCollections.recordTableNames,
         WorkspaceCollections.tableNames
-            .where(
-              (String name) => name != 'members' && name != 'activity',
-            )
+            .where((String name) => name != 'members' && name != 'activity')
             .toList(),
       );
     });

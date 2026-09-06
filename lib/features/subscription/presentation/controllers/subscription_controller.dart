@@ -3,7 +3,7 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
-import '../../../mock_data/providers.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/plan_offering.dart';
 import '../../domain/entities/subscription_status.dart';
 

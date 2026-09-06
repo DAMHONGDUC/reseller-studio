@@ -30,27 +30,10 @@ import 'app_env.dart';
 final class DevFlags {
   /// True in debug and profile builds, false in release.
   ///
-  /// The gate for affordances that are *settings* rather than build flags —
-  /// mock data is toggled from inside the running app, so it cannot be a
-  /// `bool.fromEnvironment` and needs a runtime guard instead. Showing a user
-  /// a fake business as if it were their own is worse than any crash, so the
-  /// stored preference is overridden rather than trusted.
+  /// The floor under `devModeEnabledProvider`, which is what every runtime
+  /// call site reads: a debug build always has the developer affordances, and
+  /// a release build has them only when `app_config` names the account.
   static const bool isDebugOrProfile = !kReleaseMode;
-
-  /// Whether mock data starts switched on. **Off unless the env file asks for
-  /// it** — owner's rule.
-  ///
-  /// It used to follow the auth bypass, on the grounds that a bypassed
-  /// session had no project and would otherwise show an empty app. That
-  /// reasoning is now the argument against it: the app renders its five tabs
-  /// empty before sign-in by design (hard rule 1), so an empty app is a real
-  /// state worth looking at — and a default that quietly replaced it with a
-  /// fake business meant nobody was developing against what a new seller
-  /// actually sees.
-  ///
-  /// Turning it on is `"MOCK_DATA_DEFAULT": true` in the env file, or the
-  /// switch in More → Settings, which is where it is meant to be reached from.
-  static const bool mockDataDefault = AppEnv.mockDataDefault && !kReleaseMode;
 
   /// Fine-grained console output. Debug builds only, whatever the env says.
   static const bool verboseLogging = AppEnv.verboseLogging && !kReleaseMode;

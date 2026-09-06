@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart'
+    as mock_providers;
 import 'package:reseller_studio/features/carriers/domain/entities/carrier.dart';
 import 'package:reseller_studio/features/carriers/domain/repositories/carrier_repository.dart';
 import 'package:reseller_studio/features/carriers/presentation/controllers/carrier_form_controller.dart';
 import 'package:reseller_studio/features/carriers/presentation/screens/carrier_detail_screen/carrier_detail_screen.dart';
 import 'package:reseller_studio/features/carriers/presentation/screens/carriers_screen/carriers_screen.dart';
 import 'package:reseller_studio/features/carriers/providers.dart';
-import 'package:reseller_studio/features/mock_data/providers.dart'
-    as mock_providers;
 
 import '../../support/pump_app.dart';
 

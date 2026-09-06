@@ -7,8 +7,8 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/providers/repository_providers.dart';
 import '../../core/time/app_clock.dart';
-import '../mock_data/providers.dart';
 import '../orders/domain/enums/order_status.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/offer.dart';

@@ -3,9 +3,9 @@ library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/providers/repository_providers.dart';
 import '../../core/state/selection_controller.dart';
 import '../marketplaces/domain/services/marketplace_order.dart';
-import '../mock_data/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/listing.dart';
 
