@@ -138,3 +138,48 @@ staging too.
   reviewer clicks it.
 - They are not secret and belong here for the same reason the Firebase ids
   do: they are public addresses, not credentials.
+
+## Switching flavour on one device wipes it first
+
+Two flavours that share a bundle id share a sandbox, so installing one over
+the other leaves the new binary reading the old one's signed-in session,
+preferences and cached Firestore documents — a dev account writing into the
+real project, or the reverse. Owner's rule: **an environment change is treated
+as a fresh install.**
+
+- **`SdFreshInstallGuard` makes the comparison** (design system, `core/`). It
+  reads the env name the last launch recorded, and when it differs from
+  `AppEnv.flavor.name` it wipes before the app's first frame. It renders
+  nothing and knows nothing about storage: reading, recording and wiping
+  arrive as `SdFreshInstallPolicy` callbacks, which is what keeps a widget
+  package free of `shared_preferences` and Firebase.
+- **`AppFreshInstall` is the half that touches the device**
+  (`lib/core/bootstrap/`): sign out of Firebase and Google, `terminate` then
+  `clearPersistence` on Firestore, then clear every preference — the
+  onboarding flag included, because that is what a fresh install is. Each step
+  guards itself; this runs before `runApp`, where a throw is not an error
+  screen but an app that never starts.
+- **The child is held back until the check finishes.** `clearPersistence`
+  throws `failed-precondition` while the Firestore client is running, and a
+  first screen building alongside the wipe would race its own sign-out.
+- **The record is written after the wipe, never before** — the wipe clears the
+  store the record lives in, so a wipe interrupted half way is repeated on the
+  next launch rather than skipped.
+- **It is mounted through `SdDevWrapper`, and it runs whatever `visible`
+  says.** The tag is about which build a screenshot came from; the guard is
+  about the data underneath it, and the launch that needs cleaning is as often
+  the prod build started over a dev install as the other way round.
+  `packages/system_design/test/core/sd_fresh_install_guard_test.dart` pins
+  both directions and that a prod build with no tag still runs it.
+
+## The build tag is drawn from the flavour, never from `kDebugMode`
+
+`SdDevWrapper` stamps `DEV · 1.0.0 (8)` down the left edge of everything the
+app draws — env name from `AppEnv.flavor.name`, version and build number from
+`packageInfoProvider`. It wraps `MaterialApp` rather than sitting inside one,
+so it brings its own `Directionality` and hardcodes its two colours: a tag
+drawn from the app's palette disappears the moment that palette is the bug.
+
+`visible: !AppEnv.flavor.isProd`. A TestFlight build of the dev flavour is a
+release binary and is exactly the one nobody can otherwise tell apart from the
+real app in a bug report.
