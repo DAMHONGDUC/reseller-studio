@@ -5,6 +5,7 @@
 /// Firestore directly would be a screen that behaves differently in mock mode.
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:system_design/common.dart';
@@ -14,6 +15,8 @@ import '../../core/constants/log_tag_constant.dart';
 import '../auth/providers.dart';
 import '../mock_data/providers.dart';
 import 'domain/entities/app_config.dart';
+import 'domain/entities/app_update_policy.dart';
+import 'domain/enums/app_platform.dart';
 
 final StreamProvider<AppConfig> appConfigProvider = StreamProvider<AppConfig>(
   (Ref ref) => ref.watch(appConfigRepositoryProvider).watch(),
@@ -63,29 +66,50 @@ final FutureProvider<int> appBuildNumberProvider = FutureProvider<int>((
 /// anyone would set, so [forceUpdateProvider] answers `notRequired`.
 const int _buildUnknown = 1 << 30;
 
+/// Which store this binary came from, or null on anything else.
+///
+/// **`defaultTargetPlatform`, not `Platform.isIOS`.** It is overridable in a
+/// test, where `dart:io` reports the host machine and would answer macOS. A
+/// platform the config has no block for answers null, and null forces nothing.
+final Provider<AppPlatform?> currentPlatformProvider = Provider<AppPlatform?>((
+  Ref ref,
+) => switch (defaultTargetPlatform) {
+  TargetPlatform.iOS => AppPlatform.ios,
+  TargetPlatform.android => AppPlatform.android,
+  _ => null,
+});
+
+/// What this platform's store says about the running build.
+///
+/// Everything the sheet renders comes from here — the version to name, the
+/// link to open — so two halves of one prompt cannot come from different
+/// platforms' blocks.
+final Provider<AppUpdatePolicy> currentUpdatePolicyProvider =
+    Provider<AppUpdatePolicy>((Ref ref) {
+      final AppPlatform? platform = ref.watch(currentPlatformProvider);
+
+      if (platform == null) return AppUpdatePolicy.none;
+
+      return ref.watch(_resolvedConfigProvider).updateFor(platform);
+    });
+
 /// Whether this build is too old to run.
 ///
 /// **It has no loading state, and that is the safety property.** Every other
 /// gate in the router may hold the app on the splash while it resolves; this
 /// one must not, because it would then be able to stop the app from starting
 /// over a config read that never arrived. Until something says otherwise the
-/// build is new enough — the screen appears the moment the answer does.
+/// build is new enough — the sheet appears the moment the answer does.
 ///
 /// **It applies signed out too.** A forced update is about the binary, not
-/// about an account, so it sits above every other redirect (hard rule 1's
-/// order is unchanged below it).
+/// about an account, so the sheet is raised over whatever screen the app is
+/// showing rather than being a route anything redirects to.
 final Provider<bool> forceUpdateRequiredProvider = Provider<bool>((Ref ref) {
-  final AppConfig config = ref.watch(_resolvedConfigProvider);
+  final AppUpdatePolicy policy = ref.watch(currentUpdatePolicyProvider);
   final int build = ref.watch(appBuildNumberProvider).value ?? _buildUnknown;
 
-  return config.forcesUpdate(build);
+  return policy.forcesUpdate(build);
 });
-
-/// Where the forced-update screen sends the seller, or null when the config
-/// names nowhere.
-final Provider<String?> updateUrlProvider = Provider<String?>(
-  (Ref ref) => ref.watch(_resolvedConfigProvider).updateUrl,
-);
 
 /// The live config, or the fallback while it has not arrived.
 ///

@@ -171,13 +171,11 @@ final class AppRoutes {
 
   // --- Global, reachable from anywhere ---
 
-  /// The one route nothing leaves. Above every other redirect, because a
-  /// build too old to talk to the backend is not a state an account or a
-  /// workspace can change.
-  static const String updateRequired = '/update-required';
-
-  /// The other route nothing leaves. Reached when `app_config` names the
+  /// The one route nothing leaves. Reached when `app_config` names the
   /// signed-in account on its block list — signing out is the only way off it.
+  ///
+  /// The forced update has no route: it is a sheet raised over whatever is on
+  /// screen (`ForceUpdateGate`).
   static const String blocked = '/blocked';
 
   static const String search = '/search';

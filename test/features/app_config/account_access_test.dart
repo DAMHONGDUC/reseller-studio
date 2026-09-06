@@ -51,7 +51,6 @@ void main() {
     Set<String> blocked = const <String>{},
   }) => AppConfig(
     premiumEnabled: true,
-    minimumBuild: 0,
     premiumEmails: premium,
     devModeEmails: devMode,
     blockedEmails: blocked,

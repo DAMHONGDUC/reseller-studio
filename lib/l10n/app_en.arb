@@ -230,6 +230,16 @@
   "@updateRequiredBody": {
     "description": "Body of the forced-update screen."
   },
+  "updateRequiredVersion": "Version {version} is available.",
+  "@updateRequiredVersion": {
+    "description": "Names the store's current version on the forced-update sheet.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.4.0"
+      }
+    }
+  },
   "updateRequiredAction": "Update now",
   "@updateRequiredAction": {
     "description": "Opens the store listing from the forced-update screen."
