@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -8,77 +6,42 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design/index.dart';
 
 import '../analytics/app_analytics.dart';
 import '../config/app_env.dart';
 import '../constants/log_tag_constant.dart';
 import '../logging/firebase_crash_reporter.dart';
-import 'app_fresh_install.dart';
 
-/// Everything that happens before `runApp`, so `main.dart` stays a list of
-/// what happens rather than how.
+/// This app's startup steps — the SDKs, and nothing about how they are run.
 ///
-/// **Every error path is already funnelled into [AppLogger]**, and the two
-/// framework hooks are installed before anything else can throw:
+/// [SdBootstrap] owns the guarded zone, the ordering, the per-step `try`, the
+/// logging and the three framework error hooks; the design system imports no
+/// vendor SDK, so what actually comes up arrives as [SdBootstrapStep]s. Same
+/// split as `SdCrashReporter` and `SdFreshInstallHost`.
 ///
-/// - `FlutterError.onError` — errors raised inside the widget tree;
-/// - `PlatformDispatcher.instance.onError` — errors from outside it, which is
-///   where an un-awaited `Future` that failed ends up;
-/// - the zone's own handler — anything the other two miss.
+/// **Firebase goes first** so Crashlytics is attached before anything else can
+/// fail. Every step here runs before `runApp`, where an unhandled throw does
+/// not show an error screen — it stops the app from starting at all — so each
+/// one is written to leave the app usable when it fails.
 ///
-/// Miss any one and a whole class of crash reaches production with nobody
-/// watching. Plan §31 asks for exactly this fork: the debug console while
-/// developing, Crashlytics once shipped.
+/// **The fresh-install wipe is deliberately not a step.** It runs behind the
+/// app's own splash screen (`FreshInstallGate`), because before `runApp` the
+/// only thing on screen is the platform launch image and a wipe that takes a
+/// second looks like a hang.
 final class AppBootstrap {
-  /// Starts the app inside a guarded zone.
-  ///
-  /// **Each step guards itself; there is no `try` around the whole method.**
-  /// The concerns are independent, and one `try` around all of them lets the
-  /// first failure skip everything after it — including the crash reporting
-  /// that would have named it.
-  ///
-  /// **Firebase goes first** so Crashlytics is attached before anything else
-  /// can fail. Everything here runs before `runApp`, where an unhandled throw
-  /// does not show an error screen — it stops the app from starting at all —
-  /// so every step needs a fallback that leaves the app usable.
-  ///
-  /// **[AppFreshInstall] runs after Google Sign-In and before everything
-  /// else reads.** It signs out and calls Firestore's `clearPersistence`,
-  /// which throws `failed-precondition` once that client is running — so it
-  /// has to be finished before the first screen can open a stream, and it
-  /// needs the auth SDKs it signs out of to be up.
-  static Future<void> init(Widget Function() builder) async {
-    await runZonedGuarded<Future<void>>(
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
-
-        await _initializeFirebase();
-
-        await _initializeGoogleSignIn();
-
-        await AppFreshInstall.run();
-
-        await _initializeBilling();
-
-        await _goEdgeToEdge();
-
-        _logEnvironment();
-
-        _installErrorHooks();
-
-        runApp(builder());
-      },
-      (Object error, StackTrace stackTrace) {
-        SdLogger.error(
-          LogTagConstant.bootstrap,
-          'Uncaught zone error',
-          error: error,
-          stackTrace: stackTrace,
-        );
-      },
-    );
-  }
+  /// Starts the app.
+  static Future<void> init(Widget Function() builder) => SdBootstrap.run(
+    logTag: LogTagConstant.bootstrap,
+    builder: builder,
+    steps: <SdBootstrapStep>[
+      SdBootstrapStep(name: 'Firebase', run: _initializeFirebase),
+      SdBootstrapStep(name: 'Google Sign-In', run: _initializeGoogleSignIn),
+      SdBootstrapStep(name: 'Billing', run: _initializeBilling),
+      SdBootstrapStep(name: 'Edge-to-edge', run: _goEdgeToEdge),
+      SdBootstrapStep(name: 'Environment', run: _logEnvironment),
+    ],
+  );
 
   /// Let the app draw under the system bars.
   ///
@@ -90,29 +53,16 @@ final class AppBootstrap {
   /// `AppTheme.statusBarStyle`, read through the theme, because a
   /// `SystemChrome` call made once at startup cannot follow a device switching
   /// between light and dark.
-  static Future<void> _goEdgeToEdge() async {
-    try {
-      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-      SdLogger.info(LogTagConstant.bootstrap, 'Edge-to-edge enabled');
-    } catch (error, stackTrace) {
-      // Cosmetic, so it must never stop the app starting — but a silent
-      // failure here is a layout bug nobody can trace back (hard rule 8).
-      SdLogger.error(
-        LogTagConstant.bootstrap,
-        'Failed to enable edge-to-edge',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-  }
+  static Future<void> _goEdgeToEdge() =>
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   /// Bring Firebase up, and attach Crashlytics if it comes up.
   ///
-  /// Swallows its own failure on purpose: the app still starts,
-  /// [CrashReporter] stays a no-op, and the user sees a working (offline) app
-  /// rather than a white screen. A reseller standing in a store with no signal
-  /// is a normal Tuesday, not an error state.
+  /// **A throw here is [SdBootstrap]'s to catch, and it prints the stack
+  /// rather than reporting it** — the reporter is what just failed. The app
+  /// still starts, `SdCrashReporter` stays a no-op, and the seller sees a
+  /// working offline app rather than a white screen. Standing in a store with
+  /// no signal is a normal Tuesday, not an error state.
   static Future<void> _initializeFirebase() async {
     if (!AppEnv.hasFirebaseConfig) {
       // Distinct from a thrown init failure on purpose: "no project
@@ -128,30 +78,17 @@ final class AppBootstrap {
       return;
     }
 
-    try {
-      await Firebase.initializeApp();
+    await Firebase.initializeApp();
 
-      final FirebaseCrashlytics crashlytics = FirebaseCrashlytics.instance;
+    final FirebaseCrashlytics crashlytics = FirebaseCrashlytics.instance;
 
-      // Nothing is collected in debug: a crash while developing is one the
-      // developer is already looking at, and shipping it to the dashboard
-      // buries the real ones from real users.
-      await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
+    // Nothing is collected in debug: a crash while developing is one the
+    // developer is already looking at, and shipping it to the dashboard
+    // buries the real ones from real users.
+    await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
 
-      SdCrashReporter.attach(FirebaseCrashReporter(crashlytics));
-      AppAnalytics.attach(FirebaseAnalytics.instance);
-
-      SdLogger.info(LogTagConstant.bootstrap, 'Firebase initialized');
-    } catch (error, stackTrace) {
-      // Cannot use SdLogger.error's Crashlytics half — that is what just
-      // failed. The console line is the whole report.
-      SdLogger.warning(
-        LogTagConstant.bootstrap,
-        'Firebase failed to initialize — running without backend',
-        <String, String>{'error': error.toString()},
-      );
-      debugPrintStack(stackTrace: stackTrace);
-    }
+    SdCrashReporter.attach(FirebaseCrashReporter(crashlytics));
+    AppAnalytics.attach(FirebaseAnalytics.instance);
   }
 
   /// Configure Google Sign-In before any button can call it.
@@ -161,33 +98,21 @@ final class AppBootstrap {
   /// (`CLAUDE.md` hard rule 1) — so doing it lazily on the first tap would put
   /// a round trip in front of the seller at the worst moment.
   ///
-  /// Guards itself like every other step: a failure here leaves the Google
-  /// button broken and the Apple one working, which is a far better outcome
-  /// than an app that does not start.
+  /// A failure leaves the Google button broken and the Apple one working,
+  /// which is a far better outcome than an app that does not start.
   static Future<void> _initializeGoogleSignIn() async {
-    try {
-      await GoogleSignIn.instance.initialize(
-        // Empty means "read it from the platform config file"
-        // (`GoogleService-Info.plist` / `google-services.json`), which is what
-        // `flutterfire configure` writes. The env keys exist to override that
-        // for a build whose bundle id differs from the Firebase app's.
-        clientId: AppEnv.googleSignInClientIdIos.isEmpty
-            ? null
-            : AppEnv.googleSignInClientIdIos,
-        serverClientId: AppEnv.googleSignInServerClientId.isEmpty
-            ? null
-            : AppEnv.googleSignInServerClientId,
-      );
-
-      SdLogger.info(LogTagConstant.bootstrap, 'Google Sign-In initialized');
-    } catch (error, stackTrace) {
-      SdLogger.error(
-        LogTagConstant.bootstrap,
-        'Google Sign-In failed to initialize',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
+    await GoogleSignIn.instance.initialize(
+      // Empty means "read it from the platform config file"
+      // (`GoogleService-Info.plist` / `google-services.json`), which is what
+      // `flutterfire configure` writes. The env keys exist to override that
+      // for a build whose bundle id differs from the Firebase app's.
+      clientId: AppEnv.googleSignInClientIdIos.isEmpty
+          ? null
+          : AppEnv.googleSignInClientIdIos,
+      serverClientId: AppEnv.googleSignInServerClientId.isEmpty
+          ? null
+          : AppEnv.googleSignInServerClientId,
+    );
   }
 
   /// Configure RevenueCat, if this build has a key for it.
@@ -215,30 +140,16 @@ final class AppBootstrap {
       return;
     }
 
-    try {
-      await Purchases.configure(PurchasesConfiguration(key));
+    await Purchases.configure(PurchasesConfiguration(key));
 
-      SdLogger.info(LogTagConstant.bootstrap, 'Billing initialized');
-
-      // A key alone is not enough to sell anything: the repository needs the
-      // entitlement and the offering too, and without them the paywall is
-      // empty while this step still reads as a success.
-      if (AppEnv.missingBillingKeys.isNotEmpty) {
-        SdLogger.warning(
-          LogTagConstant.bootstrap,
-          'Billing configuration incomplete — the paywall will list nothing',
-          <String, List<String>>{'missingKeys': AppEnv.missingBillingKeys},
-        );
-      }
-    } catch (error, stackTrace) {
-      // The app must still start: a seller who cannot reach RevenueCat keeps
-      // the free tier, which is worse than what they paid for but is not a
-      // reason to show them nothing.
-      SdLogger.error(
+    // A key alone is not enough to sell anything: the repository needs the
+    // entitlement and the offering too, and without them the paywall is empty
+    // while this step still reads as a success.
+    if (AppEnv.missingBillingKeys.isNotEmpty) {
+      SdLogger.warning(
         LogTagConstant.bootstrap,
-        'Billing failed to initialize — falling back to Free',
-        error: error,
-        stackTrace: stackTrace,
+        'Billing configuration incomplete — the paywall will list nothing',
+        <String, List<String>>{'missingKeys': AppEnv.missingBillingKeys},
       );
     }
   }
@@ -246,7 +157,7 @@ final class AppBootstrap {
   /// Log which configuration this build is running on.
   ///
   /// **Names keys, never values** — hard rule 9.
-  static void _logEnvironment() {
+  static Future<void> _logEnvironment() async {
     SdLogger.info(LogTagConstant.bootstrap, 'Environment', <String, String>{
       'config': AppEnv.summary,
     });
@@ -261,31 +172,5 @@ final class AppBootstrap {
         <String, String>{'keys': AppEnv.missingReleaseKeys.join(', ')},
       );
     }
-  }
-
-  /// Route the framework's two error channels into [AppLogger].
-  static void _installErrorHooks() {
-    FlutterError.onError = (FlutterErrorDetails details) {
-      SdLogger.error(
-        LogTagConstant.bootstrap,
-        'Flutter framework error',
-        error: details.exception,
-        stackTrace: details.stack,
-      );
-    };
-
-    PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-      SdLogger.error(
-        LogTagConstant.bootstrap,
-        'Uncaught platform error',
-        error: error,
-        stackTrace: stack,
-      );
-
-      // True means "handled" — the process stays alive. It is already
-      // reported, and killing the app would lose the user's unsaved work over
-      // an error they may never have noticed.
-      return true;
-    };
   }
 }
