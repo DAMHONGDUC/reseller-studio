@@ -113,8 +113,14 @@ Every step that can fail cheaply runs before the twenty-five minute one.
      number is settled at step 2, inside the lane; the shell's `pubspec.yaml`
      still holds the previous one, so a note written before the lane runs names
      a build that is not the one uploaded.
+   - **The note is passed as `localized_build_info`, never as `changelog`.**
+     They reach the same field, but `changelog` only PATCHES the build
+     localizations that already exist — and a build uploaded by this lane has
+     none, so every note sent that way was dropped in silence, builds 2 to 10
+     included. Naming the locale is what makes pilot create the localization.
+     `RELEASE_NOTE_LOCALE` is the app's primary locale in App Store Connect.
    - **The wait is the price and it is paid on every release now.** App Store
-     Connect takes a changelog only once processing has finished, so
+     Connect takes a note only once processing has finished, so
      `skip_waiting_for_build_processing` is off — nothing else in the lane
      reads the result, and macOS minutes bill at 10x.
 6. dSYMs, best effort — the build is already up, and a symbol failure must not
