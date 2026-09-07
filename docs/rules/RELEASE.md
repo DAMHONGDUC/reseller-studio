@@ -202,6 +202,13 @@ every "profile doesn't include the … entitlement".
   **One target today. Adding an extension means adding it to `sd_ios_app` in
   `ios/fastlane/Fastfile` and to the Matchfile** — the lane builds the plist
   from that list — and nothing will remind you.
+- **An unreachable github.com is an SPM failure, not a build failure.** Every
+  Swift package resolves from GitHub at the start of the archive, and when the
+  network cannot reach it xcodebuild says `Couldn't fetch updates from remote
+  repositories:` — with the reason on the next line, which flutter drops. Forty
+  seconds, no cause named. `packages/system_design/tool/build-ipa.sh` checks
+  reachability first and says so in ten. Nothing in the tree fixes it: connect
+  to a VPN and run the release again.
 - **Delete the empty auth variable.** Actions sets every `${{ secrets.X }}` a
   workflow names, empty string included, and `match` reads *both* auth
   variables from the environment regardless of what the call site passes —
