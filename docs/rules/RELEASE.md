@@ -92,6 +92,33 @@ afterwards matches exactly one file and it is the one just built, and reads the
 version out of `pubspec.yaml` rather than accepting a `--build-number` flag —
 see `docs/rules/COMMANDS.md`.
 
+## The lanes are the design system's; this app only declares itself
+
+`ios/fastlane/Fastfile` is an `import` of
+`packages/system_design/tool/fastlane/Fastfile` and one `sd_ios_app(...)` call.
+It defines no lane, no helper and no constant. **Never re-implement a lane
+here.** Every app embedding this design system releases through one pipeline,
+and a lane copied into an app is one that stops getting the next fix — the
+duplicate `beta` this repo carried had already drifted on three points before
+it was removed: it never pushed the bump, it never recorded the design system's
+commit, and it had no `upload` at all while `packages/system_design/tool/upload-ipa.sh`
+was calling for one.
+
+What belongs to the app is what the pipeline cannot know: the team, the bundle
+ids, the Xcode targets and their entitlement files. They arrive through
+`sd_ios_app`, whose `targets:` is **ordered** — the first is the app itself and
+the id every upload, config check and TestFlight query uses; the rest are
+extensions, which need profiles and export entries but are never uploaded.
+
+Four lanes come with it:
+
+| Lane | What it is |
+|---|---|
+| `beta` | the release: check, settle the number, sign, build, upload, symbols, commit |
+| `upload` | the IPA already on disk, no rebuild — for a build that shipped and an upload that did not |
+| `preflight` | everything `beta` does except the build, in three minutes (`melos run pre-build`) |
+| `certificates` | mint or renew the certificate and profiles, **local only** |
+
 ## The beta lane's order is the design
 
 Every step that can fail cheaply runs before the twenty-five minute one.
@@ -134,12 +161,19 @@ Every step that can fail cheaply runs before the twenty-five minute one.
 7. **Commit the build number, after the upload.** A bump commit with no build
    is a gap in the numbering; a build whose number is in no commit is the thing
    this ordering exists to prevent.
+   - **Committed and pushed by the lane, and only on CI** (`bump && is_ci`).
+     The workflow no longer pushes a step of its own. A local `bump:true` run
+     rewrites `pubspec.yaml` and leaves it for you — `release.sh` says so when
+     it finishes.
+   - **The design system's gitlink goes in the same commit**, and its short sha
+     and subject go in the message. The workflow follows the submodule's `main`
+     rather than the commit the parent pins, so without that line the IPA on
+     TestFlight would contain UI the app repo never wrote down.
 
-`pre-build` is everything a release depends on except the build — three minutes
-instead of twenty-eight, and every credential failure ever met surfaces in it.
-**It is a lane, not a shared script, and `release-*` does not run it**: the
-chain the design system ships names no app, so this is the step to run by hand
-before starting one.
+`melos run pre-build` is the `preflight` lane — everything a release depends on
+except the build, three minutes instead of twenty-eight, and every credential
+failure ever met surfaces in it. **`release-*` does not run it**: it is the
+step to run by hand before starting a release.
 **`flavor:` is optional there and is skipped rather than defaulted**:
 defaulting to prod would fail a rehearsal on a dev machine over the one
 question it was not asked.
@@ -165,8 +199,9 @@ every "profile doesn't include the … entitlement".
   manual signing an extension gets no profile and `exportArchive` fails after
   the full build. The lane writes the plist itself with every id in it, and
   `packages/system_design/tool/build-ipa.sh` drops its own `--export-method` when a caller passes one.
-  **One target today. Adding an extension means adding its id to the Matchfile
-  and to that plist**, and nothing will remind you.
+  **One target today. Adding an extension means adding it to `sd_ios_app` in
+  `ios/fastlane/Fastfile` and to the Matchfile** — the lane builds the plist
+  from that list — and nothing will remind you.
 - **Delete the empty auth variable.** Actions sets every `${{ secrets.X }}` a
   workflow names, empty string included, and `match` reads *both* auth
   variables from the environment regardless of what the call site passes —
