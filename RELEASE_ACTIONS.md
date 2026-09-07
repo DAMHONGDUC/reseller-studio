@@ -48,6 +48,7 @@ same entitlement.
 | Offering | Must match `AppEnv.revenueCatOffering` |
 | Products | Monthly and yearly subscriptions attached to the offering |
 | Client keys | Use the four `REVENUECAT_*` build-time fields read by `AppEnv` |
+| Secret Manager | Enable `secretmanager.googleapis.com` on the Firebase project before deploying — `revenueCatWebhook` declares a secret, so the whole Functions deploy fails without it |
 | Webhook | Store its authorization token in Secret Manager and point RevenueCat to `revenueCatWebhook` |
 | Identity | Firebase UID must be passed to RevenueCat after sign-in |
 
