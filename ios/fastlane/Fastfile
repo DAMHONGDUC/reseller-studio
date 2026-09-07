@@ -17,6 +17,9 @@ default_platform(:ios)
 REPO_ROOT = File.expand_path("../..", __dir__)
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 TEAM_ID = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+# The app's primary locale in App Store Connect. A build note is stored per
+# locale, so this is the one it is written under.
+RELEASE_NOTE_LOCALE = "en-US"
 
 platform :ios do
   # ---------------------------------------------------------------------------
@@ -84,14 +87,20 @@ platform :ios do
     ipa = Dir[File.join(REPO_ROOT, "build/ios/ipa/*.ipa")].first
     UI.user_error!("no .ipa in build/ios/ipa") if ipa.nil?
 
-    # 5. Upload. App Store Connect takes a changelog only once processing has
+    # 5. Upload. App Store Connect takes a note only once processing has
     #    finished, and every build carries one — so the wait is paid on every
     #    release, at 10x macOS minutes, on purpose.
+    #
+    #    `localized_build_info`, never `changelog`. They reach the same field,
+    #    but `changelog` only PATCHES the build localizations that already
+    #    exist — and a build uploaded by this lane has none, so every note
+    #    written that way was dropped without a word. Naming the locale is what
+    #    makes pilot CREATE the localization instead.
     upload_to_testflight(
       api_key: key,
       ipa: ipa,
       skip_waiting_for_build_processing: false,
-      changelog: notes,
+      localized_build_info: { RELEASE_NOTE_LOCALE => { whats_new: notes } },
       distribute_external: false,
       skip_submission: true
     )
