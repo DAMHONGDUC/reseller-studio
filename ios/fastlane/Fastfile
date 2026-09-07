@@ -14,12 +14,13 @@ require "shellwords"
 
 default_platform(:ios)
 
+# The TestFlight note lives in the design system, so every app that ships
+# through this tooling writes the same one. Nothing else is imported.
+import "../../packages/system_design/tool/fastlane/Fastfile"
+
 REPO_ROOT = File.expand_path("../..", __dir__)
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 TEAM_ID = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
-# The app's primary locale in App Store Connect. A build note is stored per
-# locale, so this is the one it is written under.
-RELEASE_NOTE_LOCALE = "en-US"
 
 platform :ios do
   # ---------------------------------------------------------------------------
@@ -44,12 +45,6 @@ platform :ios do
     #    `bump` a used number is a hard error here rather than after
     #    twenty-five minutes.
     build_number = settle_build_number(bump: options[:bump].to_s == "true", api_key: key)
-
-    # Composed here and nowhere else: the number is only settled one line up,
-    # so a note written by the caller before the lane ran would name the
-    # previous build. Never blank — a build with no note says nothing about
-    # which environment it came from.
-    notes = default_release_note(flavor, build_number) if notes.empty?
 
     # 3. Signing. CI only — a laptop already has the certificate in its
     #    keychain and Xcode's automatic signing handles the rest.
@@ -87,22 +82,20 @@ platform :ios do
     ipa = Dir[File.join(REPO_ROOT, "build/ios/ipa/*.ipa")].first
     UI.user_error!("no .ipa in build/ios/ipa") if ipa.nil?
 
-    # 5. Upload. App Store Connect takes a note only once processing has
-    #    finished, and every build carries one — so the wait is paid on every
-    #    release, at 10x macOS minutes, on purpose.
-    #
-    #    `localized_build_info`, never `changelog`. They reach the same field,
-    #    but `changelog` only PATCHES the build localizations that already
-    #    exist — and a build uploaded by this lane has none, so every note
-    #    written that way was dropped without a word. Naming the locale is what
-    #    makes pilot CREATE the localization instead.
-    upload_to_testflight(
+    # 5. Upload, with the note the design system composes. The build number is
+    #    only settled at step 2, so a note written before the lane ran would
+    #    name the previous build — which is why the facts go over, not a
+    #    finished string. The wait it pays for is on every release, at 10x
+    #    macOS minutes, on purpose.
+    version, = pubspec_version
+
+    sd_upload_to_testflight(
       api_key: key,
       ipa: ipa,
-      skip_waiting_for_build_processing: false,
-      localized_build_info: { RELEASE_NOTE_LOCALE => { whats_new: notes } },
-      distribute_external: false,
-      skip_submission: true
+      flavor: flavor,
+      version: version,
+      build_number: build_number,
+      notes: notes
     )
 
     # 6. dSYMs, best effort. The build is already up; a symbol failure must not
@@ -173,14 +166,6 @@ platform :ios do
 
   def ci?
     is_ci
-  end
-
-  # `dev - 1.0.0 (20)` — the flavour, the version and the build, which together
-  # are everything the TestFlight list does not already show.
-  def default_release_note(flavor, build_number)
-    version, = pubspec_version
-
-    "#{flavor} - #{version} (#{build_number})"
   end
 
   def require_flavor(options)
