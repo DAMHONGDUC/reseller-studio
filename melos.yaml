@@ -29,11 +29,10 @@ ide:
 # `_common.sh` is sourced and `_clean.sh` is called by set-up; neither is ever
 # named here.
 #
-# **A check that names this app is not a shared script.** The design system is
-# embedded by more than one app, so bundle ids, entitlements and store rules
-# cannot live in its tool folder — they belong to the app, which is why
-# `pre-build` is a fastlane lane in `ios/fastlane/Fastfile` and the only entry
-# below that is not `sh <shared script>`.
+# **The fastlane entries are the exception, and they are still shared.**
+# `preflight` and `upload` run lanes the design system owns; what names this app
+# — the bundle ids, the team, the entitlements — is the `sd_ios_app` call in
+# `ios/fastlane/Fastfile` and nothing else lives there.
 #
 # Each script is one line on purpose. Melos echoes the whole `run:` body
 # before AND after every run, with no flag to turn it off, so a multi-line
@@ -71,8 +70,8 @@ scripts:
     run: sh packages/system_design/tool/test.sh
 
   pre-build:
-    description: The app's own gate — config, signing and the build number.
-    run: cd ios && bundle exec fastlane pre_build
+    description: The release gate — config, signing and the build number. No build.
+    run: cd ios && bundle exec fastlane preflight
 
   build-ipa-dev:
     description: The IPA, dev config attached. The only place an archive is made.
@@ -89,6 +88,14 @@ scripts:
   deploy-firebase-prod:
     description: Rules, indexes and functions to the prod alias. Confirms first.
     run: sh packages/system_design/tool/deploy-firebase.sh prod
+
+  upload-dev:
+    description: Upload the IPA already built, dev. For a build that did not reach TestFlight.
+    run: sh packages/system_design/tool/upload-ipa.sh dev
+
+  upload-prod:
+    description: Upload the IPA already built, prod. For a build that did not reach TestFlight.
+    run: sh packages/system_design/tool/upload-ipa.sh prod
 
   release-dev:
     description: Set up, dev config, dev Firebase, then TestFlight.

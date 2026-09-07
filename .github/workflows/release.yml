@@ -22,8 +22,9 @@ jobs:
   testflight:
     name: Build and upload
     runs-on: macos-15
-    # The bump commit is pushed back, so the job needs write access to
-    # contents. Nothing else here writes anything.
+    # The lane commits the bumped pubspec.yaml and the design system's gitlink
+    # and pushes them itself, after the upload — so the job needs write access
+    # to contents. Nothing else here writes anything.
     permissions:
       contents: write
     # macOS bills at 10x. This is set against the bill, not against the build.
@@ -140,10 +141,6 @@ jobs:
           # backtick would run.
           RELEASE_NOTES: ${{ inputs.notes }}
         run: bundle exec fastlane beta flavor:${{ inputs.flavor }} bump:${{ inputs.bump }}
-
-      - name: Push the build number
-        if: ${{ inputs.bump }}
-        run: git push
 
       # If TestFlight later rejects the binary, the exact one that went out is
       # still here.
