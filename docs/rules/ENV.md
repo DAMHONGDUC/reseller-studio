@@ -29,6 +29,14 @@ authority on both**, and this file does not repeat it.
   the values a developer fills in, so the key list lived twice and went stale
   in one copy — which is exactly how the RevenueCat keys ended up misspelled in
   the template while `AppEnv` read the right names.
+- **It is also what tells the build there is config to attach.**
+  `packages/system_design/tool/build-ipa.sh` passes
+  `--dart-define-from-file=env/<flavour>.json` only when a template exists —
+  the shared tooling serves apps that compile every value in, and a template is
+  how this one says it is not one of them. **Deleting or renaming it does not
+  fail a build; it ships an IPA with empty config** that dies at launch on
+  `[core/no-app]`, naming nothing to do with the missing flag. Both names are
+  accepted, `env/<flavour>.example.json` first and this one after.
 - **It is also the one file under `env/` a session may read or write** — root
   `CLAUDE.md` carries that rule and the reason.
 - **Adding a key means adding it to the template and to `AppEnv`.**
