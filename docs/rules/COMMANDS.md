@@ -192,7 +192,18 @@ Its contract, in order:
 6. **`--project` on every deploy; never `firebase use` first.** `use` leaves
    the developer's shell pointed at whatever the script deployed last, so their
    next bare `firebase deploy` goes there silently.
-7. **Rules and indexes deploy together** — a missing composite index fails at
+7. **Set the Artifact Registry cleanup policy before deploying, and keep the
+   retention at what the script passes to `--days`.** Owner's rule, and it is
+   fixed for every project and every region — never raised for one of them.
+   Without a policy the CLI asks for one *after* a successful deploy, so a run
+   with no terminal to answer exits non-zero with the functions already live;
+   with a per-project retention, the same command means a different thing
+   depending on where it was pointed. The step is allowed to fail, because a
+   project's first-ever deploy has no repository to set it on yet.
+   **Never pass `--force` to `firebase deploy` to silence that prompt** — on
+   `deploy` the flag also deletes functions missing from the source without
+   asking, which is a far larger thing than the warning it would suppress.
+8. **Rules and indexes deploy together** — a missing composite index fails at
    runtime, not at build. Storage goes with them: the app uploads item photos,
    receipts and the workspace logo.
 
