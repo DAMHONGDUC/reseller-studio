@@ -10,7 +10,7 @@ void main() {
       multiLine: true,
     ).allMatches(melos);
 
-    expect(commands, hasLength(13));
+    expect(commands, hasLength(15));
 
     for (final RegExpMatch command in commands) {
       final String path = command.group(1)!;
@@ -44,9 +44,8 @@ void main() {
     expect(prepareEnv, greaterThanOrEqualTo(0));
     expect(deploy, greaterThan(prepareEnv));
 
-    // `pre-build` is among them: a gate full of this app's bundle ids and
-    // entitlements cannot live in a folder every app embedding the design
-    // system shares.
+    // A command is a shared script or a fastlane lane — never a loose `.sh`
+    // this app keeps on the side, which is what these names used to be.
     for (final String name in <String>[
       'run',
       'test-rules',
@@ -60,24 +59,36 @@ void main() {
     }
   });
 
-  test('pre-build is the app-owned fastlane lane', () {
+  test('the preflight gate is a shared fastlane lane melos calls', () {
     final String melos = File('melos.yaml').readAsStringSync();
-    final String fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+    final String app = File('ios/fastlane/Fastfile').readAsStringSync();
+    final String shared = File(
+      'packages/system_design/tool/fastlane/Fastfile',
+    ).readAsStringSync();
 
-    expect(melos, contains('run: cd ios && bundle exec fastlane pre_build'));
-    expect(fastfile, contains('lane :pre_build'));
+    expect(melos, contains('run: cd ios && bundle exec fastlane preflight'));
+    expect(shared, contains('lane :preflight'));
+
+    // A lane copied here is one that stops getting the next fix — the app
+    // Fastfile imports the pipeline and declares only what it is aiming at.
+    expect(
+      app,
+      contains('import "../../packages/system_design/tool/fastlane/Fastfile"'),
+    );
+    expect(app, isNot(contains('lane :')));
   });
 
   test('beta names an export plist only when it wrote one', () {
-    final String fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+    final String fastfile = File(
+      'packages/system_design/tool/fastlane/Fastfile',
+    ).readAsStringSync();
 
     // An empty `--export-options-plist=` counts as given to build-ipa.sh, so
     // it drops its own `--export-method` and the export dies on a path of "".
     expect(
       fastfile,
       contains(
-        'build_args << "--export-options-plist=#{export_options}".shellescape '
-        'if export_options',
+        'command << "--export-options-plist=#{export_plist}" if export_plist',
       ),
     );
     expect(fastfile, isNot(contains('export_flag')));
