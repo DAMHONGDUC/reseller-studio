@@ -134,4 +134,30 @@ void main() {
     expect(offer(container, 'off-1').counterAmount, counter);
     expect(ordersIn(container), hasLength(6));
   });
+
+  test('every pending offer in the seed can actually be accepted', () async {
+    final ProviderContainer container = await withOffers();
+    final List<Offer> pending = offersIn(
+      container,
+    ).where((Offer row) => row.status == OfferStatus.pending).toList();
+
+    expect(pending, isNotEmpty);
+
+    // An offer on something already sold is a row Needs Attention shows and
+    // the app then refuses — so the fixture must not contain one, and nor
+    // must anything that seeds a real workspace from it.
+    for (final Offer row in pending) {
+      final Item? item = await container
+          .read(itemRepositoryProvider)
+          .findById(row.itemId);
+
+      expect(item, isNotNull, reason: '${row.id} names a missing item');
+      expect(
+        item!.status,
+        isNot(ItemStatus.sold),
+        reason: '${row.id} is on an item that has already sold',
+      );
+      expect(item.quantity, greaterThan(0), reason: '${row.id} has none left');
+    }
+  });
 }

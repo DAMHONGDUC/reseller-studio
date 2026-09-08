@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
 import 'package:reseller_studio/features/seed_data/domain/seed_dataset.dart';
 import 'package:reseller_studio/features/seed_data/domain/services/seed_data_seeder.dart';
 
@@ -149,5 +151,30 @@ void main() {
 
     expect(uncosted.purchasePrice, isNull);
     expect(unpaid.payout, isNull);
+  });
+
+  test('no pending offer sits on something already sold', () {
+    // An offer on a sold item is a Needs Attention row the app then refuses
+    // to accept — the one shape of demo data that argues against the product
+    // it is demonstrating.
+    for (final Offer offer in seed.offers) {
+      if (offer.status != OfferStatus.pending) continue;
+
+      final Item item = seed.items.firstWhere(
+        (Item row) => row.id == offer.itemId,
+        orElse: () => throw StateError('${offer.id} names a missing item'),
+      );
+
+      expect(
+        item.status,
+        isNot(ItemStatus.sold),
+        reason: '${offer.id} is on an item the seed also marks sold',
+      );
+      expect(
+        item.quantity,
+        greaterThan(0),
+        reason: '${offer.id} has none left',
+      );
+    }
   });
 }

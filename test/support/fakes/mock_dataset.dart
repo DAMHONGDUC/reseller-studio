@@ -661,16 +661,28 @@ class MockDataset {
       ),
     ];
 
+    // The item both eBay offers are on: in stock, with an asking price, so
+    // the amounts below read as offers against something rather than
+    // against nothing.
+    final Item offeredItem = items.firstWhere(
+      (Item item) => item.id == 'itm-6',
+    );
+
     // Two pending offers, because Needs Attention has to have something in
     // it and an expiring offer is the most time-sensitive thing in the app.
     // One is a lowball worth declining; the other is close enough to accept.
+    //
+    // **Every one of them sits on an item that is still on the shelf.** An
+    // offer on something already sold cannot be accepted at all, so it is a
+    // row the fixture offers that the app then refuses.
     final List<Offer> offers = <Offer>[
       Offer(
         id: 'off-1',
-        itemId: items.first.id,
-        itemTitle: items.first.title,
+        itemId: offeredItem.id,
+        itemTitle: offeredItem.title,
         marketplace: legacy.Marketplace.ebay,
-        amount: money(2200),
+        // Against an ask of 9000: close enough to be worth taking.
+        amount: money(8200),
         status: OfferStatus.pending,
         createdAt: daysAgo(1),
         expiresAt: now.add(const Duration(hours: 20)),
@@ -690,8 +702,8 @@ class MockDataset {
       ),
       Offer(
         id: 'off-3',
-        itemId: items.first.id,
-        itemTitle: items.first.title,
+        itemId: offeredItem.id,
+        itemTitle: offeredItem.title,
         marketplace: legacy.Marketplace.ebay,
         amount: money(1500),
         status: OfferStatus.declined,
