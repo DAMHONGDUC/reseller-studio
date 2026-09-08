@@ -34,15 +34,19 @@ class _RefusingBilling implements SubscriptionRepository {
   Stream<SubscriptionStatus> watchStatus() =>
       Stream<SubscriptionStatus>.value(SubscriptionStatus.free);
 
+  // `Future.error` rather than `throw`: the field is an `Object`, and a throw
+  // of one is what `only_throw_errors` is for.
   @override
-  Future<List<PlanOffering>> offerings() async => throw failure;
+  Future<List<PlanOffering>> offerings() =>
+      Future<List<PlanOffering>>.error(failure);
 
   @override
-  Future<SubscriptionStatus> purchase(PlanOffering offering) async =>
-      throw failure;
+  Future<SubscriptionStatus> purchase(PlanOffering offering) =>
+      Future<SubscriptionStatus>.error(failure);
 
   @override
-  Future<SubscriptionStatus> restore() async => throw failure;
+  Future<SubscriptionStatus> restore() =>
+      Future<SubscriptionStatus>.error(failure);
 
   @override
   Future<void> identify(String uid) async {}

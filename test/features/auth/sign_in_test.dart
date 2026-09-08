@@ -35,7 +35,11 @@ class _FakeAuth implements AuthRepository {
   Future<SignInResult> _answer(Object? outcome) async {
     if (outcome is SignInResult) return outcome;
 
-    throw outcome ?? const AppFailure(AppFailureKind.unknown);
+    // `Future.error` rather than `throw`: the field is an `Object?`, and a
+    // throw of one is what `only_throw_errors` is for.
+    return Future<SignInResult>.error(
+      outcome ?? const AppFailure(AppFailureKind.unknown),
+    );
   }
 
   @override
