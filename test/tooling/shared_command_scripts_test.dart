@@ -66,7 +66,7 @@ void main() {
       'packages/system_design/tool/fastlane/Fastfile',
     ).readAsStringSync();
 
-    expect(melos, contains('run: cd ios && bundle exec fastlane preflight'));
+    expect(melos, contains('bundle exec fastlane preflight'));
     expect(shared, contains('lane :preflight'));
 
     // A lane copied here is one that stops getting the next fix — the app
@@ -130,5 +130,32 @@ void main() {
     // The probe this replaced answered a different question: an HTTP GET to
     // github.com succeeded while the git fetch behind SPM timed out on 443.
     expect(build, isNot(contains('curl')));
+  });
+
+  test('nothing reaches fastlane without a UTF-8 locale', () {
+    final String melos = File('melos.yaml').readAsStringSync();
+    final String common = File(
+      'packages/system_design/tool/_common.sh',
+    ).readAsStringSync();
+
+    // Ruby fixes `Encoding.default_external` at startup, and fastlane reads
+    // the shared Fastfile with it — so under `LANG=C` the lane dies on the
+    // first em dash, with syntax errors naming lines that are fine.
+    expect(common, contains('ensure_utf8_locale()'));
+
+    for (final String script in <String>['release.sh', 'upload-ipa.sh']) {
+      expect(
+        File('packages/system_design/tool/$script').readAsStringSync(),
+        contains('ensure_utf8_locale'),
+        reason: '$script hands a lane whatever locale the caller had',
+      );
+    }
+
+    // The melos entry runs the lane directly, so it carries its own guard.
+    final int guard = melos.indexOf('export LANG=en_US.UTF-8');
+    final int lane = melos.indexOf('bundle exec fastlane preflight');
+
+    expect(guard, greaterThanOrEqualTo(0));
+    expect(lane, greaterThan(guard));
   });
 }

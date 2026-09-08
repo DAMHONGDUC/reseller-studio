@@ -71,7 +71,11 @@ scripts:
 
   pre-build:
     description: The release gate — config, signing and the build number. No build.
-    run: cd ios && bundle exec fastlane preflight
+    # Ruby fixes its external encoding from the locale at startup, and fastlane
+    # reads the shared Fastfile with it — so under `LANG=C` the lane dies on the
+    # first em dash. Inline because the fastlane entries go straight to the lane;
+    # the scripts call `ensure_utf8_locale` for the same reason.
+    run: cd ios && case "${LANG:-}" in *UTF-8 | *utf8) ;; *) export LANG=en_US.UTF-8 ;; esac && bundle exec fastlane preflight
 
   build-ipa-dev:
     description: The IPA, dev config attached. The only place an archive is made.
