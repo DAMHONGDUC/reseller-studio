@@ -56,6 +56,11 @@ whether the new behaviour is right, and a diff makes them compile it in their
 head first. Name a symbol or a file only as the address of the change, never
 as the body of it.
 
+**And the pair is a table.** Owner's rule: two columns, before and after, one
+behaviour per cell, the effect on the line below. Side by side is what makes
+the halves comparable — stacked prose makes the reader carry the first half in
+their head while reading the second.
+
 **An explanation goes straight to the point.** Answer the question that was
 asked, then stop. Don't re-establish what the owner already knows, don't pad
 with background they did not ask for, and don't narrate the options that were
