@@ -48,10 +48,13 @@ everything under `docs/`, every `README.md`. No mixed-language paragraphs and
 no untranslated quotes. The app's user-facing strings are the exception and
 the opposite: those live in ARB files and ship in both locales (hard rule 7).
 
-**Explaining a change means showing before and after.** Not prose about what
-changed — the old code and the new one, side by side, then what the difference
-does. A description of a diff is the reader taking your word for it; the diff
-is the reader checking.
+**Explaining a change means showing before and after — of the behaviour, not
+of the code.** Owner's rule. The two halves are what the app did and what it
+will do: the rule that was in force, the number the seller saw, the screen
+that was blocked. A patch is not an explanation — the owner is deciding
+whether the new behaviour is right, and a diff makes them compile it in their
+head first. Name a symbol or a file only as the address of the change, never
+as the body of it.
 
 **An explanation goes straight to the point.** Answer the question that was
 asked, then stop. Don't re-establish what the owner already knows, don't pad
