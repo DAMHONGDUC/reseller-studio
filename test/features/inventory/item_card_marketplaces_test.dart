@@ -6,7 +6,6 @@ import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';

@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
-import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_limits.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
