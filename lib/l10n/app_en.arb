@@ -1104,6 +1104,20 @@
   "@sourcingApportionAction": {
     "description": "Writes each linked item a share of the receipt total."
   },
+  "sourcingApportionConfirmTitle": "Overwrite the costs already entered?",
+  "@sourcingApportionConfirmTitle": {
+    "description": "Asked before a receipt is spread over items that already carry a cost."
+  },
+  "sourcingApportionConfirmBody": "{count} of these items already have a cost. Spreading the receipt replaces every one of them.",
+  "@sourcingApportionConfirmBody": {
+    "description": "Says exactly what the spread is about to overwrite.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
   "sourcingApportionHelp": "Shares are by expected price where every item has one, evenly otherwise, and always add up to the receipt.",
   "@sourcingApportionHelp": {
     "description": "Says how the split is decided, because the seller is about to have it written onto their items."

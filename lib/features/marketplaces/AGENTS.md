@@ -71,12 +71,15 @@ an item's detail screen and another on the screen that prices them. A query
 answers "which marketplaces", never "in what order", and a list left in
 document order is a different list on the next screen.
 
-- **`MarketplaceOrder.sort` owns the order of anything keyed by the legacy
-  `Marketplace` enum**, and the enum's declaration order is that order — it is
-  what the cross-list screen already drew, so nothing changed shape.
+- **A listing names the seller's own marketplace record, so there is no enum
+  order left to sort by.** `listingsForItemProvider` orders by the name the
+  listing froze at publish time — stable, and the same on every screen.
 - **It is applied at the provider, not at the screens.** `listingsForItemProvider`
   hands its listings back ordered, so the detail screen, the cross-list screen
   and anything added later cannot each answer this differently.
+- **`MarketplaceOrder.sort` survives for the enum that is left** — the closed
+  list the sourcing calculator prices against — and nothing in Listings uses
+  it any more.
 - **The records the business owns are ordered by `createdAt`** — the order the
   seller was given them in, then added to. The defaults are stamped a
   millisecond apart for that reason: five identical stamps leave the tie to the

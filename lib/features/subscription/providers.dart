@@ -127,7 +127,11 @@ final Provider<int> countedOrdersProvider = Provider<int>((Ref ref) {
       .now()
       .subtract(PlanLimits.orderWindow);
 
-  return orders.where((Order order) => order.orderedAt.isAfter(since)).length;
+  // Inclusive at the edge, because `refreshUsage` uses `>=` — an order landing
+  // exactly on the boundary must not be counted by one side and not the other.
+  return orders
+      .where((Order order) => !order.orderedAt.isBefore(since))
+      .length;
 });
 
 final Provider<int> countedWorkspacesProvider = Provider<int>((Ref ref) {

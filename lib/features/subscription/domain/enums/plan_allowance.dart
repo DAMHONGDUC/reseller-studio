@@ -33,9 +33,11 @@ extension PlanAllowanceDisplay on PlanAllowance {
   /// everywhere the seller can read it.
   String get label => switch (this) {
     PlanAllowance.items => 'Items created',
-    // The window is the whole point of this one: "30/30" with no period
-    // reads as a wall rather than as this month's trading.
-    PlanAllowance.orders => 'Orders · last 30 days',
+    // The window is the whole point of this one: "30/30" with no period reads
+    // as a wall rather than as this month's trading. Read from the limits
+    // table rather than typed, so the two cannot disagree.
+    PlanAllowance.orders =>
+      'Orders · last ${PlanLimits.orderWindow.inDays} days',
     PlanAllowance.workspaces => 'Businesses',
   };
 

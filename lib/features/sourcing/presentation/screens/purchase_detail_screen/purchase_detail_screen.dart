@@ -163,6 +163,39 @@ class _ApportionButton extends ConsumerWidget {
   final List<Item> items;
 
   Future<void> _apportion(BuildContext context, WidgetRef ref) async {
+    // **Asked first when it would overwrite a cost somebody typed.** The
+    // spread is a judgement, and a seller who costed three items by hand is
+    // the one person who knows the split is already right.
+    final int costed = items
+        .where((Item item) => item.purchasePrice != null)
+        .length;
+
+    if (costed > 0) {
+      bool confirmed = false;
+
+      await showSdDialogV3(
+        context,
+        SdDialogV3(
+          title: context.l10n.sourcingApportionConfirmTitle,
+          message: context.l10n.sourcingApportionConfirmBody(costed),
+          icon: AppIconConstant.function,
+          actions: <SdDialogActionV3>[
+            SdDialogActionV3(
+              label: context.l10n.sourcingApportionAction,
+              isPrimary: true,
+              onPressed: () => confirmed = true,
+            ),
+            SdDialogActionV3(
+              label: context.l10n.actionCancel,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      );
+
+      if (!confirmed || !context.mounted) return;
+    }
+
     try {
       await ref
           .read(sourcingControllerProvider.notifier)

@@ -80,7 +80,8 @@ final class SubscriptionLabels {
       // Says the window, because the wall is temporary and a seller who does
       // not know that reads it as the end of the road.
       PlanBlock.orderLimit =>
-        '$planName records ${limits.orders} orders every 30 days. '
+        '$planName records ${limits.orders} orders every '
+            '${PlanLimits.orderWindow.inDays} days. '
             'The oldest one drops out soon — or upgrade now.',
       PlanBlock.workspaceLimit =>
         '$planName includes ${limits.workspaces} business. Upgrade to create more.',
