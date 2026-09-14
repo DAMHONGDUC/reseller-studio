@@ -890,6 +890,12 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
     headings only when the list is long enough to need them.
   - Say what changed and what it affects. Cut the reasoning that already
     lives in the commit messages or in `docs/rules/`.
+- **"Prepare for PR" is a fixed sequence.** Owner's rule, and it is three
+  steps in order, each reported: run the **full** test suite, not the part
+  that was touched; re-read the whole branch diff and fix what it turns up —
+  dead code, a stale comment, a boundary that disagrees with its mirror — and
+  only then hand over a title and description. A branch is reviewed whole, so
+  it is checked whole first.
 - **A PR description lists the features that branch built, and nothing else.**
   Owner's rule, and it **replaces "blockers go at the top"**. No deploy steps,
   no migration order, no caveats, no test counts, no diff stats, no
