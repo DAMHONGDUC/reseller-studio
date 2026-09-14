@@ -83,5 +83,10 @@ export {
   onOrderUsageWritten,
 } from './subscription/onUsageWritten';
 
+// The order ceiling is a rolling window, so it goes stale without a write —
+// and for a blocked workspace that write is the one being refused. This is
+// what stops that being a deadlock.
+export { refreshUsageDaily } from './subscription/refreshUsageDaily';
+
 // Marketplace OAuth and sync are dropped, not pending — see CLAUDE.md
 // hard rule 10 and docs/REMAINING_WORK.md.

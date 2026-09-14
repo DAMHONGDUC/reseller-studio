@@ -159,7 +159,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Upgrade to continue'), findsOneWidget);
-      expect(find.textContaining('items. Upgrade'), findsOneWidget);
+      // The ceiling names itself and says it is a lifetime one, because the
+      // item allowance no longer gives a slot back when something sells.
+      expect(find.textContaining('items in total'), findsOneWidget);
     });
   });
 }

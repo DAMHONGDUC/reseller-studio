@@ -125,8 +125,8 @@ export const seatsByPlan: Record<string, number | null> = {
 };
 
 /**
- * Items on hand and orders per plan — the ceilings `PlanLimits.byPlan` states
- * for the app.
+ * Items created and orders per window, per plan — the ceilings
+ * `PlanLimits.byPlan` states for the app.
  *
  * A deliberate duplicate for the same reason `seatsByPlan` is one: the app
  * needs the numbers to render the paywall, and the backend needs them where a
@@ -138,11 +138,24 @@ export const ceilingsByPlan: Record<string, { items: number | null; orders: numb
   // **Free counts records, and these two numbers are the mirror.** They must
   // equal `PlanLimits.byPlan[SellerPlan.free]` in the app; a plan with nothing
   // to count also has nothing to show, which is why the ceilings came back.
-  // Premium still sells the answers — `PlanFeature.taxExport`,
-  // `payoutReconciliation`, `advancedAnalytics`, `team`.
+  // Premium still sells the answers — `PlanFeature.taxExport` and
+  // `payoutReconciliation`.
+  //
+  // **The two are counted differently, and that is deliberate**: items are
+  // every row ever created and kept, orders are only those inside
+  // `orderWindowDays`. `countedItemsProvider` and `countedOrdersProvider` in
+  // the app spell the same two rules.
   free: { items: 50, orders: 30 },
   premium: { items: null, orders: null },
 };
+
+/**
+ * How far back the order ceiling looks, mirroring `PlanLimits.orderWindow`.
+ *
+ * A lifetime count walls a seller in at their thirty-first sale with no way to
+ * free a slot; a window gives the slot back on its own.
+ */
+export const orderWindowDays = 30;
 
 /**
  * How far past a ceiling the *rules* let a client go before refusing.
