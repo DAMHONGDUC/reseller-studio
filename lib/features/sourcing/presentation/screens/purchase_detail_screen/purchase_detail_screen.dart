@@ -111,9 +111,24 @@ class PurchaseDetailScreen extends ConsumerWidget {
           SizedBox(height: SdSpacingConstant.h8),
           if (items.isEmpty)
             SdCardV3(
-              child: Text(
-                context.l10n.sourcingNothingIsLinkedToThisPurchase,
-                style: context.textTheme3.bodyMedium!.muted3(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    context.l10n.sourcingNothingIsLinkedToThisPurchase,
+                    style: context.textTheme3.bodyMedium!.muted3(context),
+                  ),
+                  SizedBox(height: SdSpacingConstant.h12),
+                  // The way in, at the moment the seller is looking at the
+                  // receipt: the intake flow is what files items under it, and
+                  // it was reachable only from a sixteen-row list on Home.
+                  SdButtonV3(
+                    variant: SdButtonVariantV3.secondary,
+                    label: context.l10n.sourcingTakeItemsIn,
+                    expand: true,
+                    onPressed: () => context.push(AppRoutes.intake),
+                  ),
+                ],
               ),
             )
           else

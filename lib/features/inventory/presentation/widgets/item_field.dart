@@ -8,6 +8,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/utils/text_input_utils.dart';
+import '../../../../core/widgets/name_prompt_sheet.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../core/widgets/picker_field.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
@@ -18,6 +19,13 @@ import '../../domain/entities/storage_location.dart';
 import '../../domain/enums/item_status.dart';
 import '../../item_label.dart';
 import '../../providers.dart';
+import '../controllers/catalog_controller.dart';
+
+/// The picker row that creates a record instead of choosing one.
+///
+/// A sentinel rather than a nullable option: the pickers answer with an id,
+/// and `null` already means "dismissed".
+const String _createNew = '__create_new__';
 
 /// The fields that ask an item's non-typed questions.
 ///
@@ -215,27 +223,50 @@ class ItemCategoryField extends ConsumerWidget {
       placeholder: categories.isEmpty
           ? context.l10n.itemCategoryEmptyHint
           : null,
-      onTap: categories.isEmpty
-          ? () => SdSnackBarUtilsV3.info(
-              context,
-              context.l10n.itemAddCategoryFirst,
-            )
-          : () async {
+      // **Never a dead end.** A business with no categories used to be told to
+      // go and make one in another screen, mid-form, losing what was typed.
+      onTap: () async {
               final String? picked = await OptionPickerSheet.show<String>(
                 context,
                 title: context.l10n.commonCategory,
                 selected: selected,
-                options: categories
-                    .map(
-                      (ItemCategory category) => PickerOption<String>(
-                        value: category.id,
-                        label: category.name,
-                      ),
-                    )
-                    .toList(),
+                options: <PickerOption<String>>[
+                  ...categories.map(
+                    (ItemCategory category) => PickerOption<String>(
+                      value: category.id,
+                      label: category.name,
+                    ),
+                  ),
+                  PickerOption<String>(
+                    value: _createNew,
+                    label: context.l10n.commonCreateNew,
+                    icon: AppIconConstant.addBox,
+                  ),
+                ],
               );
 
               if (picked == null) return;
+
+              if (picked == _createNew) {
+                if (!context.mounted) return;
+
+                final String? name = await NamePromptSheet.show(
+                  context,
+                  title: context.l10n.categoriesAddTitle,
+                  label: context.l10n.commonName,
+                  submitLabel: context.l10n.actionSave,
+                );
+
+                if (name == null) return;
+
+                final String? created = await ref
+                    .read(catalogControllerProvider.notifier)
+                    .saveCategory(name: name);
+
+                if (created != null) onSelected(created);
+
+                return;
+              }
 
               onSelected(picked);
             },
@@ -266,28 +297,51 @@ class ItemLocationField extends ConsumerWidget {
       placeholder: locations.isEmpty
           ? context.l10n.itemLocationEmptyHint
           : null,
-      onTap: locations.isEmpty
-          ? () => SdSnackBarUtilsV3.info(
-              context,
-              context.l10n.itemAddLocationFirst,
-            )
-          : () async {
+      // Same reason as the category picker: an empty list is a thing to fix
+      // here, not an errand somewhere else.
+      onTap: () async {
               final String? picked = await OptionPickerSheet.show<String>(
                 context,
                 title: context.l10n.commonLocation,
                 selected: selected,
-                options: locations
-                    .map(
-                      (StorageLocation location) => PickerOption<String>(
-                        value: location.id,
-                        label: paths[location.id] ?? location.name,
-                        caption: LocationKindLabel.of(context, location.kind),
-                      ),
-                    )
-                    .toList(),
+                options: <PickerOption<String>>[
+                  ...locations.map(
+                    (StorageLocation location) => PickerOption<String>(
+                      value: location.id,
+                      label: paths[location.id] ?? location.name,
+                      caption: LocationKindLabel.of(context, location.kind),
+                    ),
+                  ),
+                  PickerOption<String>(
+                    value: _createNew,
+                    label: context.l10n.commonCreateNew,
+                    icon: AppIconConstant.addBox,
+                  ),
+                ],
               );
 
               if (picked == null) return;
+
+              if (picked == _createNew) {
+                if (!context.mounted) return;
+
+                final String? name = await NamePromptSheet.show(
+                  context,
+                  title: context.l10n.locationsAddTitle,
+                  label: context.l10n.commonName,
+                  submitLabel: context.l10n.actionSave,
+                );
+
+                if (name == null) return;
+
+                final String? created = await ref
+                    .read(catalogControllerProvider.notifier)
+                    .saveLocation(name: name, kind: LocationKind.shelf);
+
+                if (created != null) onSelected(created);
+
+                return;
+              }
 
               onSelected(picked);
             },

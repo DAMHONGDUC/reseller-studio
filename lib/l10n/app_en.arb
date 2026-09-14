@@ -92,9 +92,9 @@
   "@quickAddNameLabel": {
     "description": "Label for the only field Quick Add requires — the item title. Phrased as a question because a seller is looking at the object while they type."
   },
-  "quickAddNameHint": "Nike Air Max 90, size 10",
+  "quickAddNameHint": "What you would call it on the listing",
   "@quickAddNameHint": {
-    "description": "Placeholder in the Quick Add title field. A concrete example, not the word 'Title'."
+    "description": "Placeholder in the Quick Add title field. Deliberately not a worked example from one trade — a sneaker title told a seller of handmade goods nothing."
   },
   "quickAddHelp": "A title is all it takes. Price, photos and the rest can wait.",
   "@quickAddHelp": {
@@ -857,6 +857,18 @@
       }
     }
   },
+  "commonCreateNew": "Create new",
+  "@commonCreateNew": {
+    "description": "The row in a picker that makes a record instead of choosing one."
+  },
+  "categoriesAddTitle": "New category",
+  "@categoriesAddTitle": {
+    "description": "Title of the sheet that names a category being created inline."
+  },
+  "locationsAddTitle": "New location",
+  "@locationsAddTitle": {
+    "description": "Title of the sheet that names a storage location being created inline."
+  },
   "commonName": "Name",
   "@commonName": {
     "description": "Field label for the name of a category, location or source."
@@ -1049,6 +1061,18 @@
         "type": "int"
       }
     }
+  },
+  "inventoryAddTitle": "Add stock",
+  "@inventoryAddTitle": {
+    "description": "The Inventory create button, which asks which way the seller is taking stock in."
+  },
+  "inventoryAddQuickCaption": "One item, a title, done",
+  "@inventoryAddQuickCaption": {
+    "description": "Caption for Quick Add on the Inventory add sheet."
+  },
+  "inventoryAddIntakeCaption": "A whole trip, with what you paid",
+  "@inventoryAddIntakeCaption": {
+    "description": "Caption for the intake session on the Inventory add sheet — the flow that ties items to a purchase."
   },
   "itemPurchase": "Buying trip (optional)",
   "@itemPurchase": {
@@ -1363,6 +1387,10 @@
   "importPayoutsNoneMatched": "None of these rows name a sale you have recorded. Open the order and fill in its order number on the platform, then paste again.",
   "@importPayoutsNoneMatched": {
     "description": "Shown when a readable file matched nothing, because the fix is on the order rather than in the file."
+  },
+  "markSoldBeforeListed": "That date is before the item was listed. Saved anyway — check it if it was not a pre-order.",
+  "@markSoldBeforeListed": {
+    "description": "Shown when a sale date precedes the listing date, which makes every days-to-sell figure meaningless."
   },
   "markSoldBuyer": "Buyer (optional)",
   "@markSoldBuyer": {
@@ -2742,7 +2770,11 @@
   "@sourcingApportioned": {
     "description": "Shown on the sourcing screens."
   },
-  "sourcingNothingIsLinkedToThisPurchase": "Nothing is linked to this purchase yet. Add items and set their purchase on the item form.",
+  "sourcingTakeItemsIn": "Take items in for this trip",
+  "@sourcingTakeItemsIn": {
+    "description": "Opens the intake flow from a purchase with nothing filed under it."
+  },
+  "sourcingNothingIsLinkedToThisPurchase": "Nothing is filed under this purchase yet. Take the items in here, or pick this trip on an item you already have.",
   "@sourcingNothingIsLinkedToThisPurchase": {
     "description": "Shown on the sourcing screens."
   },

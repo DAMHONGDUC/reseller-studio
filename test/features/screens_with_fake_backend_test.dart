@@ -300,12 +300,14 @@ void main() {
       );
     });
 
-    testWidgets('Quick Add sheds its label only while the list is moving', (
+    testWidgets('Add stock sheds its label only while the list is moving', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const InventoryScreen());
 
-      expect(find.text('Quick Add'), findsOneWidget);
+      // The button asks which way stock is coming in — quickly, or as a
+      // buying trip — so its label is the question, not one of the answers.
+      expect(find.text('Add stock'), findsOneWidget);
 
       // Held, not flicked: the button expands again the moment a scroll
       // ends, so a completed drag would prove nothing.
@@ -322,12 +324,12 @@ void main() {
       await gesture.moveBy(const Offset(0, -260));
       await tester.pumpAndSettle();
 
-      expect(find.text('Quick Add'), findsNothing);
+      expect(find.text('Add stock'), findsNothing);
 
       await gesture.up();
       await tester.pumpAndSettle();
 
-      expect(find.text('Quick Add'), findsOneWidget);
+      expect(find.text('Add stock'), findsOneWidget);
     });
 
     testWidgets('Analytics renders the profit statement', (

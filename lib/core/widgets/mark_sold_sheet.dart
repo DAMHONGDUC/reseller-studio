@@ -316,6 +316,24 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
                   if (picked == null) return;
 
                   setState(() => _soldAt = picked);
+
+                  // Says it once, at the moment it can still be corrected: a
+                  // sale dated before the item went up is what produced an
+                  // average "days to sell" below zero, and the seller is the
+                  // only one who knows which of the two dates is wrong.
+                  final DateTime? listed = widget.items
+                      .map((Item item) => item.listedAt)
+                      .nonNulls
+                      .firstOrNull;
+
+                  if (listed != null && picked.isBefore(listed)) {
+                    if (!context.mounted) return;
+
+                    SdSnackBarUtilsV3.info(
+                      context,
+                      context.l10n.markSoldBeforeListed,
+                    );
+                  }
                 },
               ),
               // How the one payment lands on each line. A bundle price is a
