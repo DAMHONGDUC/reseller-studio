@@ -1070,29 +1070,29 @@
   "@inventoryAddQuickCaption": {
     "description": "Caption for Quick Add on the Inventory add sheet."
   },
-  "inventoryAddIntakeCaption": "A whole trip, with what you paid",
+  "inventoryAddIntakeCaption": "Stock or materials, with what you paid",
   "@inventoryAddIntakeCaption": {
     "description": "Caption for the intake session on the Inventory add sheet — the flow that ties items to a purchase."
   },
-  "itemPurchase": "Buying trip (optional)",
+  "itemPurchase": "Purchase (optional)",
   "@itemPurchase": {
     "description": "Which purchase this item came off. Optional like every create field (hard rule 2)."
   },
-  "itemPurchaseEmptyHint": "No buying trips recorded yet",
+  "itemPurchaseEmptyHint": "No purchases recorded yet",
   "@itemPurchaseEmptyHint": {
     "description": "Placeholder on the buying-trip picker when the business has none."
   },
-  "itemAddPurchaseFirst": "Record a buying trip first, under More \u2192 Sourcing.",
+  "itemAddPurchaseFirst": "Record a purchase first, under More \u2192 Sourcing.",
   "@itemAddPurchaseFirst": {
-    "description": "Says where a buying trip is created, so the picker is never a dead end."
+    "description": "Says where a purchase is created, so the picker is never a dead end."
   },
-  "bulkAssignPurchase": "File under a trip",
+  "bulkAssignPurchase": "File under a purchase",
   "@bulkAssignPurchase": {
-    "description": "Bulk action: file the selected items under one buying trip."
+    "description": "Bulk action: file the selected items under one purchase — a box lot bought to resell, or the materials a maker turned into stock."
   },
   "bulkAssignPurchaseTitle": "File {count} items under",
   "@bulkAssignPurchaseTitle": {
-    "description": "Title of the picker that chooses which buying trip the selection belongs to.",
+    "description": "Title of the picker that chooses which purchase the selection belongs to.",
     "placeholders": {
       "count": {
         "type": "num",
@@ -1939,9 +1939,9 @@
       }
     }
   },
-  "intakeTitle": "Intake session",
+  "intakeTitle": "Take stock in",
   "@intakeTitle": {
-    "description": "Title of the batch intake screen — one buying trip, many items."
+    "description": "Title of the batch intake screen — one purchase, many items. Neutral between a reseller's box lot and a maker's materials."
   },
   "intakeItemTitle": "What is it?",
   "@intakeItemTitle": {
@@ -1967,7 +1967,7 @@
   "@intakeReceiptTotalHelper": {
     "description": "Explains that the receipt total and the item costs are allowed to disagree."
   },
-  "intakeFinished": "Trip saved.",
+  "intakeFinished": "Purchase saved.",
   "@intakeFinished": {
     "description": "Confirmation after the purchase and its items are written."
   },
@@ -1992,7 +1992,7 @@
       }
     }
   },
-  "quickActionIntakeSession": "Intake session",
+  "quickActionIntakeSession": "Take stock in",
   "@quickActionIntakeSession": {
     "description": "Quick Action row opening the batch intake screen."
   },
@@ -2008,7 +2008,7 @@
   "@booksClearTitle": {
     "description": "Empty state when every figure is entered."
   },
-  "booksClearBody": "Every sale has its real fee and its cost, every payout has landed, and every buying trip has a receipt.",
+  "booksClearBody": "Every sale has its real fee and its cost, every payout has landed, and every purchase has a receipt.",
   "@booksClearBody": {
     "description": "Says what a clear result actually means, so the seller knows what was checked."
   },
@@ -2045,7 +2045,7 @@
   "@booksUnpaidPayoutsBody": {
     "description": "Why an unpaid payout belongs on this screen."
   },
-  "booksNoReceipt": "Buying trip with no receipt",
+  "booksNoReceipt": "Purchase with no receipt",
   "@booksNoReceipt": {
     "description": "Group header for purchases with no document attached."
   },
@@ -2064,7 +2064,7 @@
   },
   "booksPurchaseItems": "{count, plural, =1{1 item} other{{count} items}}",
   "@booksPurchaseItems": {
-    "description": "How many items a buying trip brought in, on its row.",
+    "description": "How many items a purchase brought in, on its row.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2784,7 +2784,7 @@
   "@sourcingApportioned": {
     "description": "Shown on the sourcing screens."
   },
-  "sourcingTakeItemsIn": "Take items in for this trip",
+  "sourcingTakeItemsIn": "Take items in for this purchase",
   "@sourcingTakeItemsIn": {
     "description": "Opens the intake flow from a purchase with nothing filed under it."
   },
