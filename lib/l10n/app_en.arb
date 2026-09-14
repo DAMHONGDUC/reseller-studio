@@ -1050,6 +1050,50 @@
       }
     }
   },
+  "itemPurchase": "Buying trip (optional)",
+  "@itemPurchase": {
+    "description": "Which purchase this item came off. Optional like every create field (hard rule 2)."
+  },
+  "itemPurchaseEmptyHint": "No buying trips recorded yet",
+  "@itemPurchaseEmptyHint": {
+    "description": "Placeholder on the buying-trip picker when the business has none."
+  },
+  "itemAddPurchaseFirst": "Record a buying trip first, under More \u2192 Sourcing.",
+  "@itemAddPurchaseFirst": {
+    "description": "Says where a buying trip is created, so the picker is never a dead end."
+  },
+  "bulkAssignPurchase": "File under a trip",
+  "@bulkAssignPurchase": {
+    "description": "Bulk action: file the selected items under one buying trip."
+  },
+  "bulkAssignPurchaseTitle": "File {count} items under",
+  "@bulkAssignPurchaseTitle": {
+    "description": "Title of the picker that chooses which buying trip the selection belongs to.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "sourcingApportionAction": "Spread this receipt across the items",
+  "@sourcingApportionAction": {
+    "description": "Writes each linked item a share of the receipt total."
+  },
+  "sourcingApportionHelp": "Shares are by expected price where every item has one, evenly otherwise, and always add up to the receipt.",
+  "@sourcingApportionHelp": {
+    "description": "Says how the split is decided, because the seller is about to have it written onto their items."
+  },
+  "sourcingApportionDone": "Cost written onto {count} items",
+  "@sourcingApportionDone": {
+    "description": "Confirmation after a receipt is spread across the items filed under it.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
   "itemCost": "Cost",
   "@itemCost": {
     "description": "What the seller paid. Null renders as an em dash, never zero."

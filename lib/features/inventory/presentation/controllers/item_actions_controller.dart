@@ -12,6 +12,7 @@ import '../../../listings/domain/repositories/listing_repository.dart';
 import '../../../listings/domain/services/bulk_listing_plan.dart';
 import '../../../listings/providers.dart';
 import '../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../sourcing/domain/entities/purchase.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../domain/repositories/item_repository.dart';
@@ -297,6 +298,22 @@ class ItemActionsController extends Notifier<bool> {
       state = false;
     }
   }
+
+  /// File items under the buying trip they came off.
+  ///
+  /// **The trip's source and date travel with it**, for the reason
+  /// `ItemFormController.selectPurchase` gives: they are facts about the
+  /// purchase, and a second copy of them is a second answer.
+  Future<void> assignPurchase(List<Item> items, Purchase purchase) => _bulk(
+    'Assign items to purchase',
+    items,
+    <String, Object>{'purchaseId': purchase.id},
+    (Item item) => item.copyWith(
+      purchaseId: purchase.id,
+      sourceId: purchase.sourceId ?? item.sourceId,
+      purchaseDate: purchase.purchaseDate,
+    ),
+  );
 
   /// Put items on a shelf.
   Future<void> move(List<Item> items, String locationId) => _bulk(

@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -12,6 +13,7 @@ import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../domain/entities/purchase.dart';
 import '../../../providers.dart';
+import '../../controllers/sourcing_controller.dart';
 
 /// One buying trip, and everything bought on it (plan §11).
 ///
@@ -86,6 +88,10 @@ class PurchaseDetailScreen extends ConsumerWidget {
             SizedBox(height: SdSpacingConstant.h12),
             _ApportionmentNote(gap: purchase.totalCost! - apportioned),
           ],
+          if (purchase.totalCost != null && items.isNotEmpty) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h12),
+            _ApportionButton(total: purchase.totalCost!, items: items),
+          ],
           if (purchase.notes != null) ...<Widget>[
             SizedBox(height: SdContentPaddingV3.sectionGap),
             SdCardV3(
@@ -125,6 +131,65 @@ class PurchaseDetailScreen extends ConsumerWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Writes each linked item its share of the receipt.
+///
+/// **The one place a cost is apportioned rather than measured**, and it says
+/// so: the receipt stays the fact, and this is the seller deciding which item
+/// carried how much of it. A box lot of twelve is otherwise twelve trips to
+/// twelve item forms, which is why nobody did it.
+class _ApportionButton extends ConsumerWidget {
+  const _ApportionButton({required this.total, required this.items});
+
+  final Money total;
+  final List<Item> items;
+
+  Future<void> _apportion(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref
+          .read(sourcingControllerProvider.notifier)
+          .apportion(items, total);
+
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.success(
+        context,
+        context.l10n.sourcingApportionDone(items.length),
+      );
+    } catch (error) {
+      // Already logged by the controller.
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool isBusy = ref.watch(sourcingControllerProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SdButtonV3(
+          variant: SdButtonVariantV3.secondary,
+          label: context.l10n.sourcingApportionAction,
+          busy: isBusy,
+          expand: true,
+          onPressed: isBusy ? null : () => _apportion(context, ref),
+        ),
+        SizedBox(height: SdSpacingConstant.h6),
+        Text(
+          context.l10n.sourcingApportionHelp,
+          style: context.textTheme3.bodySmall!.faint3(context),
+        ),
+      ],
     );
   }
 }

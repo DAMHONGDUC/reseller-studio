@@ -14,6 +14,8 @@ import '../../../../core/providers/shared_preferences_provider.dart';
 import '../../../../core/storage/file_uploader.dart';
 import '../../../../core/utils/text_input_utils.dart';
 import '../../../listings/domain/entities/listing.dart';
+import '../../../sourcing/domain/entities/purchase.dart';
+import '../../../sourcing/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/entities/item_category.dart';
@@ -254,6 +256,24 @@ class ItemFormController extends Notifier<ItemFormState> {
   void selectLocation(String? id) => state = state.copyWith(locationId: id);
 
   void selectSource(String? id) => state = state.copyWith(sourceId: id);
+
+  /// Point the item at a buying trip, and take the trip's own facts with it.
+  ///
+  /// The source and the date belong to the purchase, so re-asking for them
+  /// here is two more chances to disagree with the record just chosen.
+  void selectPurchase(String? id) {
+    final List<Purchase> purchases =
+        ref.read(purchasesProvider).value ?? const <Purchase>[];
+    final Purchase? purchase = purchases
+        .where((Purchase row) => row.id == id)
+        .firstOrNull;
+
+    state = state.copyWith(
+      purchaseId: id,
+      sourceId: purchase?.sourceId ?? state.sourceId,
+      purchaseDate: purchase?.purchaseDate ?? state.purchaseDate,
+    );
+  }
 
   void selectPurchaseDate(DateTime date) =>
       state = state.copyWith(purchaseDate: date);

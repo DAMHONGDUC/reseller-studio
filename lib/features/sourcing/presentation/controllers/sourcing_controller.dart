@@ -8,7 +8,9 @@ import '../../../../core/money/money.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../../core/storage/document_picker.dart';
 import '../../../../core/storage/file_uploader.dart';
+import '../../../inventory/domain/entities/item.dart';
 import '../../../listings/domain/enums/listing_status.dart';
+import '../../../orders/domain/services/bundle_allocation.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/purchase.dart';
 import '../../domain/entities/source.dart';
@@ -188,6 +190,59 @@ class SourcingController extends Notifier<bool> {
         error: error,
         stackTrace: stackTrace,
         data: <String, Object>{'recordId': recordId},
+      );
+
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Spread what a receipt says across the items filed under it.
+  ///
+  /// **By expected price where every item has one, evenly otherwise** — the
+  /// same judgement `BundleAllocation` makes for a bundle sale, and the shares
+  /// add back up to the receipt exactly. It is an apportionment, never a
+  /// measurement: the receipt total stays the fact the seller paid, and this
+  /// is them saying which item carried how much of it.
+  ///
+  /// It lives here rather than on Inventory's actions controller because a
+  /// screen may not reach into another feature's `presentation/`, and the
+  /// decision being made is the purchase's.
+  Future<void> apportion(List<Item> items, Money total) async {
+    if (items.isEmpty) return;
+
+    final List<Money> shares = BundleAllocation.across(total, <Money?>[
+      for (final Item item in items) item.expectedPrice,
+    ]);
+
+    state = true;
+    SdLogger.action(
+      LogTagConstant.sourcing,
+      'Apportion purchase across items',
+      <String, Object>{'items': items.length, 'totalMinor': total.minor},
+    );
+
+    try {
+      await ref
+          .read(itemRepositoryProvider)
+          .saveAll(<Item>[
+            for (int i = 0; i < items.length; i++)
+              items[i].copyWith(purchasePrice: shares[i]),
+          ]);
+
+      SdLogger.info(
+        LogTagConstant.sourcing,
+        'Purchase apportioned',
+        <String, Object>{'items': items.length, 'totalMinor': total.minor},
+      );
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.sourcing,
+        'Failed to apportion purchase',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'items': items.length},
       );
 
       rethrow;
