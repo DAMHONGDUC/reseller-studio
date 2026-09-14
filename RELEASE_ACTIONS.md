@@ -12,7 +12,7 @@ release — `release-dev` and `release-prod` do not run it for you.
 | 2 | Configure Google Sign-In | iOS, Android and web OAuth clients work on store-signed devices |
 | 3 | Configure Sign in with Apple | App ID capability, Services ID and key are active in Firebase |
 | 4 | Create `.firebaserc` aliases | `dev` and `prod` resolve to the intended projects |
-| 5 | Deploy backend | Rules, indexes, Storage rules and Functions are live |
+| 5 | Deploy backend | Rules, indexes, Storage rules and Functions are live — including `refreshUsageDaily`, without which a workspace that hits the order ceiling stays blocked after its 30-day window has emptied |
 | 6 | Configure APNs and Scheduler | Push delivery and `dailyDigest` work |
 | 7 | Configure RevenueCat | One Premium entitlement and offering expose monthly/yearly products |
 | 8 | Host legal pages | Privacy and Terms URLs open from Paywall and About |
