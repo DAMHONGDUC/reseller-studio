@@ -44,6 +44,36 @@ class _ListingBulkBar extends ConsumerWidget implements PreferredSizeWidget {
     );
   }
 
+  /// Take the seller's word that these are now posted on the platform.
+  Future<void> _markLive(BuildContext context, WidgetRef ref) async {
+    final List<Listing> listings = ref.read(selectedListingsProvider);
+
+    try {
+      await ref
+          .read(listingActionsControllerProvider.notifier)
+          .markLive(listings);
+
+      if (!context.mounted) return;
+
+      ref.read(listingSelectionProvider.notifier).clear();
+      SdSnackBarUtilsV3.success(
+        context,
+        context.l10n.listingStatusChanged(
+          listings.length,
+          ListingStatusLabel.of(context, ListingStatus.active),
+        ),
+      );
+    } catch (error) {
+      // Already logged by the controller.
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
+    }
+  }
+
   Future<void> _setStatus(
     BuildContext context,
     WidgetRef ref,
@@ -126,11 +156,22 @@ class _ListingBulkBar extends ConsumerWidget implements PreferredSizeWidget {
                 ],
               ),
               SizedBox(height: SdSpacingConstant.h8),
+              // Its own full-width row above the rest: posting is the state
+              // change this screen exists to record, and everything under it
+              // is what happens to a listing afterwards.
+              SdButtonV3(
+                variant: SdButtonVariantV3.primary,
+                label: context.l10n.listingMarkLive,
+                size: SdButtonSizeV3.small,
+                expand: true,
+                onPressed: isBusy ? null : () => _markLive(context, ref),
+              ),
+              SizedBox(height: SdSpacingConstant.h8),
               Row(
                 children: <Widget>[
                   Expanded(
                     child: SdButtonV3(
-                      variant: SdButtonVariantV3.primary,
+                      variant: SdButtonVariantV3.secondary,
                       label: context.l10n.itemActionReprice,
                       size: SdButtonSizeV3.small,
                       expand: true,

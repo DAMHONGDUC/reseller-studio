@@ -29,12 +29,6 @@ final class SubscriptionLabels {
   /// "Businesses" rather than "workspaces": that is what the app calls one
   /// everywhere the seller can read it.
   static String feature(PlanFeature feature) => switch (feature) {
-    PlanFeature.advancedAnalytics => 'Advanced analytics',
-    PlanFeature.reports => 'CSV reports',
-    PlanFeature.automation => 'Automation',
-    PlanFeature.team => 'Team members',
-    PlanFeature.multipleWorkspaces => 'Multiple businesses',
-    PlanFeature.advancedPermissions => 'Roles & permissions',
     PlanFeature.taxExport => 'Tax pack export',
     PlanFeature.payoutReconciliation => 'Payout chasing',
   };

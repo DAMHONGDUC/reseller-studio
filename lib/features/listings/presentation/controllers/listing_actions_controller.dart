@@ -33,6 +33,28 @@ class ListingActionsController extends Notifier<bool> {
     (Listing listing) => listing.copyWith(price: price),
   );
 
+  /// Mark listings as posted on the platform.
+  ///
+  /// **The app cannot publish, so the seller says when they have** — owner's
+  /// rule, and the reason `crossList` writes a draft in the first place: no
+  /// integration exists, and claiming a listing is live on eBay would be a
+  /// statement the app cannot back up. What it can do is take the seller's
+  /// word for it, which is what this is.
+  ///
+  /// It stamps `publishedAt` when there is none, because that is the clock
+  /// `daysLive` counts from — without it a listing goes live and immediately
+  /// reads as having been live for no time at all, forever.
+  Future<void> markLive(List<Listing> listings) => _bulk(
+    'Mark listings live',
+    listings,
+    const <String, Object>{},
+    // A recorded instant rather than a derived one, so it is the wall clock.
+    (Listing listing) => listing.copyWith(
+      status: ListingStatus.active,
+      publishedAt: listing.publishedAt ?? DateTime.now(),
+    ),
+  );
+
   /// Move listings to a status.
   ///
   /// **`sold` is not reachable from here.** A listing sells because an order

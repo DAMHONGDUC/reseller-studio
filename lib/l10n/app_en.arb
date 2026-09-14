@@ -4114,6 +4114,10 @@
       }
     }
   },
+  "listingMarkLive": "I have posted these",
+  "@listingMarkLive": {
+    "description": "Bulk action: the seller confirms the listings are now live on the platform. The app cannot publish, so it takes their word."
+  },
   "listingPause": "Pause",
   "@listingPause": {
     "description": "Bulk action that hides listings without ending them."

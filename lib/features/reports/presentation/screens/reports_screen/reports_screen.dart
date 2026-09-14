@@ -12,6 +12,10 @@ import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_stat_tile_row.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
+import '../../../../subscription/domain/enums/plan_feature.dart';
+import '../../../../subscription/domain/services/plan_gate.dart';
+import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
+import '../../../../subscription/providers.dart';
 import '../../../../tax/providers.dart';
 import '../../controllers/report_controller.dart';
 
@@ -32,6 +36,19 @@ class ReportsScreen extends ConsumerWidget {
     WidgetRef ref,
     ReportKind kind,
   ) async {
+    // The seller's own rows stay free — sales, stock, costs. The year's
+    // summary is the tax pack's, and is sold with it.
+    if (kind == ReportKind.tax &&
+        !ref.read(hasFeatureProvider(PlanFeature.taxExport))) {
+      await PlanBlockSheet.show(
+        context,
+        block: PlanBlock.featureLocked,
+        plan: ref.read(currentPlanProvider),
+      );
+
+      return;
+    }
+
     try {
       await ref.read(reportControllerProvider.notifier).export(kind);
     } catch (error) {
@@ -126,12 +143,19 @@ class ReportsScreen extends ConsumerWidget {
               // The one export scoped to a period: a return is filed for one
               // year, so it follows the year picked on the Tax screen rather
               // than exporting everything.
+              //
+              // **And the one behind the same gate as the tax pack.** It is
+              // the pack's own summary, so leaving it open here sold Premium
+              // a capability a Free seller could take one screen over.
               AppListRow(
                 title: context.l10n.reportsTaxSummary,
                 subtitle: context.l10n.reportsTaxSummaryNote(
                   ref.watch(selectedTaxYearProvider).label,
                 ),
                 icon: AppIconConstant.receiptLong,
+                trailing: ref.watch(hasFeatureProvider(PlanFeature.taxExport))
+                    ? null
+                    : const SdIconV3(AppIconConstant.lock),
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.tax),
