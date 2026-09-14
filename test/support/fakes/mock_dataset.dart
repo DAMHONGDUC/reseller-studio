@@ -351,7 +351,8 @@ class MockDataset {
       Listing(
         id: 'lst-1',
         itemId: 'itm-4',
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         title: 'Vintage Levi\'s 501 Redline Selvedge Denim 34x32 USA Made',
         price: money(18500),
         status: ListingStatus.active,
@@ -365,7 +366,8 @@ class MockDataset {
       Listing(
         id: 'lst-2',
         itemId: 'itm-4',
-        marketplace: legacy.Marketplace.depop,
+        marketplaceId: 'depop',
+        marketplaceName: 'Depop',
         title: 'vintage levis 501 redline selvedge 34x32',
         price: money(17500),
         status: ListingStatus.active,
@@ -376,7 +378,8 @@ class MockDataset {
       Listing(
         id: 'lst-3',
         itemId: 'itm-5',
-        marketplace: legacy.Marketplace.etsy,
+        marketplaceId: 'etsy',
+        marketplaceName: 'Etsy',
         title: 'Fire-King Jadeite Mugs Set of 4 Restaurant Ware',
         price: money(7200),
         status: ListingStatus.active,
@@ -388,7 +391,8 @@ class MockDataset {
       Listing(
         id: 'lst-4',
         itemId: 'itm-6',
-        marketplace: legacy.Marketplace.poshmark,
+        marketplaceId: 'poshmark',
+        marketplaceName: 'Poshmark',
         title: 'Carhartt Detroit Jacket Women\'s M Brown Duck',
         price: money(8900),
         status: ListingStatus.active,
@@ -401,7 +405,8 @@ class MockDataset {
       Listing(
         id: 'lst-5',
         itemId: 'itm-7',
-        marketplace: legacy.Marketplace.mercari,
+        marketplaceId: 'mercari',
+        marketplaceName: 'Mercari',
         title: 'Sony WH-1000XM3 Wireless Headphones',
         price: money(11000),
         status: ListingStatus.error,
@@ -411,7 +416,8 @@ class MockDataset {
       Listing(
         id: 'lst-6',
         itemId: 'itm-8',
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         title: 'Le Creuset 5.5qt Round Dutch Oven Flame Orange',
         price: money(14500),
         status: ListingStatus.draft,
@@ -423,7 +429,8 @@ class MockDataset {
       Order(
         id: 'ord-1',
         status: OrderStatus.delivered,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceRecordId: 'ebay',
+        marketplaceNameSnapshot: 'eBay',
         salePrice: money(6800),
         shippingCost: money(1240),
         payout: money(4659),
@@ -447,7 +454,8 @@ class MockDataset {
       Order(
         id: 'ord-2',
         status: OrderStatus.delivered,
-        marketplace: legacy.Marketplace.etsy,
+        marketplaceRecordId: 'etsy',
+        marketplaceNameSnapshot: 'Etsy',
         salePrice: money(9500),
         shippingCost: money(1580),
         payout: money(7017),
@@ -470,7 +478,8 @@ class MockDataset {
       Order(
         id: 'ord-3',
         status: OrderStatus.delivered,
-        marketplace: legacy.Marketplace.mercari,
+        marketplaceRecordId: 'mercari',
+        marketplaceNameSnapshot: 'Mercari',
         salePrice: money(3500),
         shippingCost: money(890),
         payout: money(2260),
@@ -493,7 +502,8 @@ class MockDataset {
       Order(
         id: 'ord-4',
         status: OrderStatus.toShip,
-        marketplace: legacy.Marketplace.poshmark,
+        marketplaceRecordId: 'poshmark',
+        marketplaceNameSnapshot: 'Poshmark',
         salePrice: money(8900),
         orderedAt: daysAgo(2),
         shipByDate: now.add(const Duration(days: 1)),
@@ -512,7 +522,8 @@ class MockDataset {
       Order(
         id: 'ord-5',
         status: OrderStatus.toShip,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceRecordId: 'ebay',
+        marketplaceNameSnapshot: 'eBay',
         salePrice: money(11000),
         orderedAt: daysAgo(5),
         shipByDate: daysAgo(1),
@@ -531,7 +542,8 @@ class MockDataset {
       Order(
         id: 'ord-6',
         status: OrderStatus.returnRequested,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceRecordId: 'ebay',
+        marketplaceNameSnapshot: 'eBay',
         salePrice: money(4200),
         shippingCost: money(720),
         orderedAt: daysAgo(16),

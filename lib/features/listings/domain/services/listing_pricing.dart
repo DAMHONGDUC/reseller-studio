@@ -33,14 +33,12 @@ final class ListingPricing {
   /// duplicate is a repair case, and the older record is the one every other
   /// screen is already showing.
   ///
-  /// Strings rather than the enum so a caller holding the marketplace
-  /// *records* can read this without importing a second type called
-  /// `Marketplace` — `MarketplaceMatching.valueFor` is what looks one up.
+  /// Keyed by the marketplace record's id, which is what a listing carries.
   static Map<String, Money> byMarketplace(List<Listing> listings) {
     final Map<String, Money> prices = <String, Money>{};
 
     for (final Listing listing in listings) {
-      prices.putIfAbsent(listing.marketplace.name, () => listing.price);
+      prices.putIfAbsent(listing.marketplaceId, () => listing.price);
     }
 
     return prices;

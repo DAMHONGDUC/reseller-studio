@@ -11,7 +11,8 @@ import '../../../listings/domain/enums/listing_status.dart';
 import '../../../listings/domain/repositories/listing_repository.dart';
 import '../../../listings/domain/services/bulk_listing_plan.dart';
 import '../../../listings/providers.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../marketplaces/domain/entities/marketplace.dart';
+import '../../../marketplaces/providers.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
@@ -82,7 +83,7 @@ class ItemActionsController extends Notifier<bool> {
   /// passing one anyway would create a second listing on the same platform.
   Future<void> crossList(
     Item item, {
-    required Map<Marketplace, Money> prices,
+    required Map<String, Money> prices,
     List<Listing> reprice = const <Listing>[],
   }) async {
     final ListingRepository listings = ref.read(listingRepositoryProvider);
@@ -94,12 +95,12 @@ class ItemActionsController extends Notifier<bool> {
     SdLogger.action(LogTagConstant.listing, 'Cross-list item', <String, Object>{
       'itemId': item.id,
       'prices': <String, int>{
-        for (final MapEntry<Marketplace, Money> entry in prices.entries)
-          entry.key.name: entry.value.minor,
+        for (final MapEntry<String, Money> entry in prices.entries)
+          entry.key: entry.value.minor,
       },
       'repriced': <String, int>{
         for (final Listing listing in reprice)
-          listing.marketplace.name: listing.price.minor,
+          listing.marketplaceId: listing.price.minor,
       },
     });
 
@@ -115,11 +116,14 @@ class ItemActionsController extends Notifier<bool> {
         // eBay price pressed one button, and half of that landing is a state
         // nobody can read back.
         ...reprice,
-        for (final MapEntry<Marketplace, Money> entry in prices.entries)
+        for (final MapEntry<String, Money> entry in prices.entries)
           Listing(
             id: _uuid.v4(),
             itemId: item.id,
-            marketplace: entry.key,
+            marketplaceId: entry.key,
+            // Frozen here, at the one moment the record is in hand: renaming
+            // the marketplace later must not rewrite what was posted today.
+            marketplaceName: _marketplaceName(entry.key),
             // Per-marketplace titles are the point of the entity, but they
             // diverge when a seller optimises one — not at creation, where a
             // second box per platform would be four boxes for one intent.
@@ -160,7 +164,7 @@ class ItemActionsController extends Notifier<bool> {
         stackTrace: stackTrace,
         data: <String, Object>{
           'itemId': item.id,
-          'marketplaces': prices.keys.map((Marketplace m) => m.name).toList(),
+          'marketplaces': prices.keys.toList(),
         },
       );
 
@@ -199,11 +203,12 @@ class ItemActionsController extends Notifier<bool> {
     try {
       await listings.saveAll(<Listing>[
         for (final BulkListingLine line in plan.lines)
-          for (final MapEntry<Marketplace, Money> entry in line.prices.entries)
+          for (final MapEntry<String, Money> entry in line.prices.entries)
             Listing(
               id: _uuid.v4(),
               itemId: line.item.id,
-              marketplace: entry.key,
+              marketplaceId: entry.key,
+              marketplaceName: _marketplaceName(entry.key),
               title: line.item.title,
               price: entry.value,
               // Draft, like every other listing this app writes: nothing is
@@ -314,6 +319,19 @@ class ItemActionsController extends Notifier<bool> {
       purchaseDate: purchase.purchaseDate,
     ),
   );
+
+  /// What the marketplace record is called right now, or its id when the
+  /// seller has already deleted it.
+  String _marketplaceName(String marketplaceId) {
+    final List<Marketplace> records =
+        ref.read(marketplacesProvider).value ?? const <Marketplace>[];
+
+    return records
+            .where((Marketplace record) => record.id == marketplaceId)
+            .firstOrNull
+            ?.name ??
+        marketplaceId;
+  }
 
   /// Put items on a shelf.
   Future<void> move(List<Item> items, String locationId) => _bulk(

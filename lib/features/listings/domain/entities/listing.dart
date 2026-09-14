@@ -1,5 +1,4 @@
 import '../../../../core/money/money.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../enums/listing_status.dart';
 
 /// One item, live on one marketplace.
@@ -12,7 +11,8 @@ class Listing {
   const Listing({
     required this.id,
     required this.itemId,
-    required this.marketplace,
+    required this.marketplaceId,
+    required this.marketplaceName,
     required this.title,
     required this.price,
     required this.status,
@@ -30,7 +30,23 @@ class Listing {
 
   final String id;
   final String itemId;
-  final Marketplace marketplace;
+
+  /// The seller's own marketplace record, by id.
+  ///
+  /// **A record, not a fixed enum** — owner's rule. The Marketplaces screen
+  /// lets a business rename, delete and add platforms, and a listing screen
+  /// that walked a hardcoded list offered Shopify to everyone while refusing
+  /// Vinted, which every new business is created with. Orders have spoken in
+  /// records since they were flattened; this is Listings catching up.
+  final String marketplaceId;
+
+  /// What that record was called when the listing was made.
+  ///
+  /// **Frozen at write time, the same way an order line freezes its price**
+  /// (hard rule 14): renaming a marketplace tomorrow must not rewrite what
+  /// the seller posted today, and a deleted record must still have a name in
+  /// the list it appears in.
+  final String marketplaceName;
 
   /// Per-marketplace, because the platforms reward different titles and
   /// enforce different lengths. Defaults to the item's title; diverges the
@@ -76,6 +92,8 @@ class Listing {
     List<String>? photoUrls,
     String? externalListingId,
     String? externalUrl,
+    String? marketplaceId,
+    String? marketplaceName,
     DateTime? publishedAt,
     DateTime? endedAt,
     int? viewCount,
@@ -84,7 +102,8 @@ class Listing {
   }) => Listing(
     id: id,
     itemId: itemId,
-    marketplace: marketplace,
+    marketplaceId: marketplaceId ?? this.marketplaceId,
+    marketplaceName: marketplaceName ?? this.marketplaceName,
     title: title ?? this.title,
     price: price ?? this.price,
     status: status ?? this.status,

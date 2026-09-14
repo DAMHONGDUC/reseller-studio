@@ -27,7 +27,9 @@ void main() {
       Listing(
         id: 'ebay',
         itemId: item.id,
-        marketplace: Marketplace.ebay,
+        marketplaceId: 'ebay',
+
+        marketplaceName: 'eBay',
         title: item.title,
         price: const Money(4512, 'USD'),
         status: ListingStatus.active,
@@ -36,7 +38,9 @@ void main() {
       Listing(
         id: 'etsy',
         itemId: item.id,
-        marketplace: Marketplace.etsy,
+        marketplaceId: 'etsy',
+
+        marketplaceName: 'Etsy',
         title: item.title,
         price: const Money(4099, 'USD'),
         status: ListingStatus.active,

@@ -177,7 +177,8 @@ class SeedDataset {
       Listing(
         id: 'seed-lst-1',
         itemId: SeedDatasetConstant.uncostedItemId,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         title: "Vintage Levi's 501 Redline Selvedge Denim 34x32 USA Made",
         price: money(18500),
         status: ListingStatus.active,
@@ -191,7 +192,8 @@ class SeedDataset {
       Listing(
         id: 'seed-lst-2',
         itemId: SeedDatasetConstant.uncostedItemId,
-        marketplace: legacy.Marketplace.depop,
+        marketplaceId: 'depop',
+        marketplaceName: 'Depop',
         title: 'vintage levis 501 redline selvedge 34x32',
         price: money(17500),
         status: ListingStatus.active,
@@ -203,7 +205,8 @@ class SeedDataset {
       Listing(
         id: 'seed-lst-3',
         itemId: SeedDatasetConstant.uncostedItemId,
-        marketplace: legacy.Marketplace.etsy,
+        marketplaceId: 'etsy',
+        marketplaceName: 'Etsy',
         title: 'Vintage Levi 501 Redline Selvedge 34x32',
         price: money(18000),
         status: ListingStatus.error,
@@ -216,7 +219,8 @@ class SeedDataset {
       Order(
         id: 'seed-ord-1',
         status: OrderStatus.delivered,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceRecordId: 'ebay',
+        marketplaceNameSnapshot: 'eBay',
         salePrice: money(6800),
         shippingCost: money(1240),
         payout: money(4659),
@@ -265,7 +269,8 @@ class SeedDataset {
       Order(
         id: SeedDatasetConstant.unpaidOrderId,
         status: OrderStatus.toShip,
-        marketplace: legacy.Marketplace.depop,
+        marketplaceRecordId: 'depop',
+        marketplaceNameSnapshot: 'Depop',
         salePrice: money(17500),
         orderedAt: daysAgo(1),
         shipByDate: now.add(const Duration(days: 1)),

@@ -42,7 +42,7 @@ class FirestoreListingRepository implements ListingRepository {
 
         SdLogger.info(LogTagConstant.listing, 'Listing saved', <String, Object>{
           'listingId': listing.id,
-          'marketplace': listing.marketplace.name,
+          'marketplace': listing.marketplaceId,
           'status': listing.status.name,
         });
       });

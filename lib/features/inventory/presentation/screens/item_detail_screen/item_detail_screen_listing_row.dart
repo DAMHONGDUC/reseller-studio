@@ -15,7 +15,7 @@ class _ListingRow extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: Text(
-                listing.marketplace.displayName,
+                listing.marketplaceName,
                 style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
                   color: context.sdTheme3.textPrimary,
                 ),

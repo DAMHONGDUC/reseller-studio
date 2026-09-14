@@ -5,7 +5,6 @@ import 'package:reseller_studio/features/listings/domain/enums/listing_status.da
 import 'package:reseller_studio/features/listings/domain/services/listing_marketplaces.dart';
 import 'package:reseller_studio/features/listings/domain/services/listing_pricing.dart';
 import 'package:reseller_studio/features/listings/domain/services/listings_by_item.dart';
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 
 /// What "the price of a cross-listed item" means, in one place.
 ///
@@ -16,13 +15,14 @@ void main() {
   Listing listing({
     required String id,
     required String itemId,
-    required Marketplace marketplace,
+    required String marketplaceId,
     required Money price,
     ListingStatus status = ListingStatus.active,
   }) => Listing(
     id: id,
     itemId: itemId,
-    marketplace: marketplace,
+    marketplaceId: marketplaceId,
+    marketplaceName: marketplaceId,
     title: 'A listing',
     price: price,
     status: status,
@@ -36,13 +36,13 @@ void main() {
           listing(
             id: 'a',
             itemId: 'itm-1',
-            marketplace: Marketplace.ebay,
+            marketplaceId: 'ebay',
             price: const Money(2500, 'USD'),
           ),
           listing(
             id: 'b',
             itemId: 'itm-1',
-            marketplace: Marketplace.depop,
+            marketplaceId: 'depop',
             price: const Money(2500, 'USD'),
           ),
         ]),
@@ -58,13 +58,13 @@ void main() {
           listing(
             id: 'a',
             itemId: 'itm-1',
-            marketplace: Marketplace.ebay,
+            marketplaceId: 'ebay',
             price: const Money(2500, 'USD'),
           ),
           listing(
             id: 'b',
             itemId: 'itm-1',
-            marketplace: Marketplace.depop,
+            marketplaceId: 'depop',
             price: const Money(2200, 'USD'),
           ),
         ]),
@@ -83,13 +83,13 @@ void main() {
         listing(
           id: 'a',
           itemId: 'itm-1',
-          marketplace: Marketplace.ebay,
+          marketplaceId: 'ebay',
           price: const Money(2500, 'USD'),
         ),
         listing(
           id: 'b',
           itemId: 'itm-1',
-          marketplace: Marketplace.depop,
+          marketplaceId: 'depop',
           price: const Money(2200, 'USD'),
         ),
       ]);
@@ -106,13 +106,13 @@ void main() {
           listing(
             id: 'a',
             itemId: 'itm-1',
-            marketplace: Marketplace.ebay,
+            marketplaceId: 'ebay',
             price: const Money(2500, 'USD'),
           ),
           listing(
             id: 'b',
             itemId: 'itm-1',
-            marketplace: Marketplace.ebay,
+            marketplaceId: 'ebay',
             price: const Money(1900, 'USD'),
           ),
         ])['ebay'],
@@ -128,13 +128,13 @@ void main() {
           listing(
             id: 'a',
             itemId: 'itm-1',
-            marketplace: Marketplace.ebay,
+            marketplaceId: 'ebay',
             price: const Money(2500, 'USD'),
           ),
           listing(
             id: 'b',
             itemId: 'itm-1',
-            marketplace: Marketplace.depop,
+            marketplaceId: 'depop',
             price: const Money(3100, 'USD'),
           ),
         ]),
@@ -150,13 +150,13 @@ void main() {
           listing(
             id: 'a',
             itemId: 'itm-1',
-            marketplace: Marketplace.ebay,
+            marketplaceId: 'ebay',
             price: const Money(2500, 'USD'),
           ),
           listing(
             id: 'b',
             itemId: 'itm-1',
-            marketplace: Marketplace.depop,
+            marketplaceId: 'depop',
             price: const Money(9900, 'GBP'),
           ),
         ]),
@@ -174,20 +174,20 @@ void main() {
       listing(
         id: 'a',
         itemId: 'itm-1',
-        marketplace: Marketplace.ebay,
+        marketplaceId: 'ebay',
         price: const Money(2500, 'USD'),
       ),
       listing(
         id: 'b',
         itemId: 'itm-1',
-        marketplace: Marketplace.depop,
+        marketplaceId: 'depop',
         price: const Money(2200, 'USD'),
         status: ListingStatus.draft,
       ),
       listing(
         id: 'c',
         itemId: 'itm-2',
-        marketplace: Marketplace.ebay,
+        marketplaceId: 'ebay',
         price: const Money(800, 'USD'),
       ),
     ];
@@ -195,9 +195,9 @@ void main() {
     test('a draft counts, because publishing writes drafts', () {
       // A live-only count would answer zero for every item in the app.
       expect(ListingMarketplaces.countFor(all, 'itm-1'), 2);
-      expect(ListingMarketplaces.forItem(all, 'itm-1'), <Marketplace>{
-        Marketplace.ebay,
-        Marketplace.depop,
+      expect(ListingMarketplaces.forItem(all, 'itm-1'), <String>{
+        'ebay',
+        'depop',
       });
     });
 

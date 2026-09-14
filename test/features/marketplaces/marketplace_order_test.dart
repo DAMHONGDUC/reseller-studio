@@ -18,15 +18,17 @@ import '../../support/pump_app.dart';
 /// unordered, so the same two marketplaces read one way on an item's detail
 /// screen and the other way on the screen that prices them.
 void main() {
-  Listing listing(String id, Marketplace marketplace) => Listing(
-    id: id,
-    itemId: 'itm-order',
-    marketplace: marketplace,
-    title: 'Wool coat',
-    price: const Money(4500, 'USD'),
-    status: ListingStatus.active,
-    createdAt: testNow,
-  );
+  Listing listing(String id, String marketplaceId, String marketplaceName) =>
+      Listing(
+        id: id,
+        itemId: 'itm-order',
+        marketplaceId: marketplaceId,
+        marketplaceName: marketplaceName,
+        title: 'Wool coat',
+        price: const Money(4500, 'USD'),
+        status: ListingStatus.active,
+        createdAt: testNow,
+      );
 
   test('an item’s listings arrive in the marketplaces’ own order', () async {
     final ProviderContainer container = mockContainer();
@@ -34,9 +36,9 @@ void main() {
     // Written back to front, which is exactly what a document order may hand
     // back and what nothing downstream may depend on.
     await container.read(listingRepositoryProvider).saveAll(<Listing>[
-      listing('l-3', Marketplace.poshmark),
-      listing('l-2', Marketplace.depop),
-      listing('l-1', Marketplace.ebay),
+      listing('l-3', 'poshmark', 'Poshmark'),
+      listing('l-2', 'depop', 'Depop'),
+      listing('l-1', 'ebay', 'eBay'),
     ]);
 
     container.listen<AsyncValue<List<Listing>>>(
@@ -51,9 +53,11 @@ void main() {
       container
           .read(listingsForItemProvider('itm-order'))
           .value!
-          .map((Listing row) => row.marketplace)
+          .map((Listing row) => row.marketplaceName)
           .toList(),
-      <Marketplace>[Marketplace.ebay, Marketplace.depop, Marketplace.poshmark],
+      // By the frozen name now: a listing names a record the seller can
+      // rename or delete, so there is no enum order left to sort by.
+      <String>['Depop', 'Poshmark', 'eBay'],
     );
   });
 

@@ -97,7 +97,7 @@ void main() {
     final ProviderContainer container = mockContainer();
     final List<Listing> before = await listingsFor(container, 'itm-4');
     final Listing ebay = before.firstWhere(
-      (Listing listing) => listing.marketplace.name == 'ebay',
+      (Listing listing) => listing.marketplaceId == 'ebay',
     );
     final ItemFormController controller = container.read(
       itemFormControllerProvider.notifier,

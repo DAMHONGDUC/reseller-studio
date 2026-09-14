@@ -23,13 +23,14 @@ void main() {
   );
 
   Listing listingOn(
-    Marketplace marketplace,
+    String marketplaceId,
     int minorUnits, {
     String suffix = '',
   }) => Listing(
-    id: 'lst-${marketplace.name}$suffix',
+    id: 'lst-$marketplaceId$suffix',
     itemId: item.id,
-    marketplace: marketplace,
+    marketplaceId: marketplaceId,
+    marketplaceName: marketplaceId,
     title: item.title,
     price: Money(minorUnits, 'USD'),
     status: ListingStatus.active,
@@ -47,10 +48,10 @@ void main() {
         item: item,
         now: testNow,
         listings: <Listing>[
-          listingOn(Marketplace.ebay, 4500),
-          listingOn(Marketplace.ebay, 4200, suffix: '-duplicate'),
-          listingOn(Marketplace.depop, 4000),
-          listingOn(Marketplace.poshmark, 5000),
+          listingOn('ebay', 4500),
+          listingOn('ebay', 4200, suffix: '-duplicate'),
+          listingOn('depop', 4000),
+          listingOn('poshmark', 5000),
         ],
       ),
     );
@@ -102,7 +103,7 @@ void main() {
       ItemCard(
         item: item,
         now: testNow,
-        listings: <Listing>[listingOn(Marketplace.ebay, 4500)],
+        listings: <Listing>[listingOn('ebay', 4500)],
       ),
     );
 

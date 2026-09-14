@@ -138,13 +138,13 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
   /// seller's action item, not the kind of internal error hard rule 6 forbids.
   static String _subtitle(BuildContext context, Listing listing, DateTime now) {
     if (listing.lastError != null) {
-      return '${listing.marketplace.displayName} · ${listing.lastError}';
+      return '${listing.marketplaceName} · ${listing.lastError}';
     }
 
     final int? days = listing.daysLive(now);
 
     return <String>[
-      listing.marketplace.displayName,
+      listing.marketplaceName,
       ListingStatusLabel.of(context, listing.status),
       if (days != null) context.l10n.listingDaysLive(days),
       if (listing.viewCount != null)

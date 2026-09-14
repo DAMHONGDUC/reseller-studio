@@ -137,7 +137,7 @@ searchResultsProvider = Provider<List<SearchHit>>((Ref ref) {
           id: listing.itemId,
           title: listing.title,
           status: listing.status,
-          detail: listing.marketplace.displayName,
+          detail: listing.marketplaceName,
         ),
       );
     }
