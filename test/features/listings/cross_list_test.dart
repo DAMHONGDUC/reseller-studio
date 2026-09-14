@@ -206,6 +206,19 @@ void main() {
       expect(find.text('Already on'), findsNWidgets(2));
     });
 
+    testWidgets('it offers the business its own marketplaces', (
+      WidgetTester tester,
+    ) async {
+      // **The reason this screen stopped walking a hardcoded enum.** Vinted
+      // is one of the five records every business is created with and the
+      // enum never had it, so it could not be listed on; Shopify and Mercari
+      // were offered to sellers who do not have them.
+      await pumpScreen(tester, const CrossListScreen(itemId: 'itm-11'));
+
+      expect(find.text('Vinted'), findsOneWidget);
+      expect(find.text('Shopify'), findsNothing);
+    });
+
     testWidgets('no asking price box sits above the marketplaces', (
       WidgetTester tester,
     ) async {
