@@ -9,8 +9,6 @@ import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart'
-    as legacy;
 import 'package:reseller_studio/features/marketplaces/marketplace_constant.dart';
 import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
@@ -692,7 +690,8 @@ class MockDataset {
         id: 'off-1',
         itemId: offeredItem.id,
         itemTitle: offeredItem.title,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         // Against an ask of 9000: close enough to be worth taking.
         amount: money(8200),
         status: OfferStatus.pending,
@@ -705,7 +704,8 @@ class MockDataset {
         id: 'off-2',
         itemId: items.last.id,
         itemTitle: items.last.title,
-        marketplace: legacy.Marketplace.depop,
+        marketplaceId: 'depop',
+        marketplaceName: 'Depop',
         amount: money(900),
         status: OfferStatus.pending,
         createdAt: daysAgo(3),
@@ -716,7 +716,8 @@ class MockDataset {
         id: 'off-3',
         itemId: offeredItem.id,
         itemTitle: offeredItem.title,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         amount: money(1500),
         status: OfferStatus.declined,
         createdAt: daysAgo(12),

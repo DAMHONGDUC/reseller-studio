@@ -36,10 +36,10 @@ class ReportsScreen extends ConsumerWidget {
     WidgetRef ref,
     ReportKind kind,
   ) async {
-    // The seller's own rows stay free — sales, stock, costs. The year's
-    // summary is the tax pack's, and is sold with it.
-    if (kind == ReportKind.tax &&
-        !ref.read(hasFeatureProvider(PlanFeature.taxExport))) {
+    // **Every export is paid** — owner's rule. Reading the figures on screen
+    // stays free; handing them to a spreadsheet or an accountant is the
+    // capability, and it is one capability rather than one per button.
+    if (!ref.read(hasFeatureProvider(PlanFeature.export))) {
       await PlanBlockSheet.show(
         context,
         block: PlanBlock.featureLocked,
@@ -67,6 +67,11 @@ class ReportsScreen extends ConsumerWidget {
     final AnalyticsSummary summary = ref.watch(analyticsSummaryProvider);
     final bool isBusy = ref.watch(reportControllerProvider);
     final DateTime now = ref.watch(clockProvider).now();
+    // The same mark on every row, because the gate is the same one: reading
+    // the figures is free, taking them out of the app is the capability.
+    final Widget? locked = ref.watch(hasFeatureProvider(PlanFeature.export))
+        ? null
+        : const SdIconV3(AppIconConstant.lock);
 
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.moreReports),
@@ -120,6 +125,7 @@ class ReportsScreen extends ConsumerWidget {
                 title: context.l10n.analyticsSales,
                 subtitle: context.l10n.reportsOneRowPerItemSoldWith,
                 icon: AppIconConstant.pointOfSale,
+                trailing: locked,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.sales),
@@ -128,6 +134,7 @@ class ReportsScreen extends ConsumerWidget {
                 title: context.l10n.workflowInventory,
                 subtitle: context.l10n.reportsEverythingYouHoldWithCostAnd,
                 icon: AppIconConstant.inventory,
+                trailing: locked,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.inventory),
@@ -136,6 +143,7 @@ class ReportsScreen extends ConsumerWidget {
                 title: context.l10n.commonExpenses,
                 subtitle: context.l10n.reportsEveryCostByCategoryAndDate,
                 icon: AppIconConstant.receipt,
+                trailing: locked,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.expenses),
@@ -153,9 +161,7 @@ class ReportsScreen extends ConsumerWidget {
                   ref.watch(selectedTaxYearProvider).label,
                 ),
                 icon: AppIconConstant.receiptLong,
-                trailing: ref.watch(hasFeatureProvider(PlanFeature.taxExport))
-                    ? null
-                    : const SdIconV3(AppIconConstant.lock),
+                trailing: locked,
                 onTap: isBusy
                     ? null
                     : () => _export(context, ref, ReportKind.tax),

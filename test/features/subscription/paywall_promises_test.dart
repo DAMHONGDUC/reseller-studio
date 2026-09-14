@@ -18,8 +18,8 @@ void main() {
   /// Where each capability is refused. Kept in the test rather than the enum
   /// because it is an assertion about the app, not a fact about the plan.
   const Map<PlanFeature, String> gatedAt = <PlanFeature, String>{
-    PlanFeature.taxExport:
-        'tax_screen_export.dart, and the tax summary row on Reports',
+    PlanFeature.export:
+        'tax_screen_export.dart, and every row on the Reports screen',
     PlanFeature.payoutReconciliation: 'payouts_screen.dart',
   };
 

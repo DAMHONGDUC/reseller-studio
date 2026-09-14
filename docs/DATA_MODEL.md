@@ -102,7 +102,7 @@ the relationship chain supports workflows and analytics, not item validity.
 | `categories/{id}` | `name`, `parentId`, `description`, `deletedAt` | Seller-owned hierarchy with editable defaults |
 | `locations/{id}` | Warehouse/shelf/bin identity and `deletedAt` | Seller-owned storage hierarchy |
 | `listings/{id}` | Item, `marketplaceId` + `marketplaceName`, price, status, external IDs/URL | One record per item per marketplace; the marketplace is the seller's own record, not a fixed platform; external fields remain null without integration |
-| `offers/{id}` | Listing/order references, amount, status and timestamps | Offer state drives accept/decline/counter workflows |
+| `offers/{id}` | Listing/order references, `marketplaceId` + `marketplaceName`, amount, status and timestamps | Offer state drives accept/decline/counter workflows; the marketplace is the seller's own record, as on a listing |
 | `marketplaces/{id}` | `name`, `hue`, `deletedAt` | Seller-owned; carries no fee rate — a platform's cut is measured per order |
 | `carriers/{id}` | `name`, `deletedAt` | Business-owned shipping choices |
 | `orders/{id}` | Prices/costs, status, marketplace snapshot, lifecycle timestamps, `lines` | Order facts and embedded immutable sale-time lines |
@@ -120,6 +120,7 @@ the relationship chain supports workflows and analytics, not item validity.
 | Member `displayName`, `email` | Team cannot read another user's private profile document |
 | Order `marketplaceName` | Marketplace rename/delete must not rewrite sale history |
 | Listing `marketplaceName` | The same, for what was posted: a listing keeps the name the platform had when it went up |
+| Offer `marketplaceName` | The same again, for an offer: the platform it arrived on keeps the name it had then |
 | Item `purchaseId` | Sourcing joins a receipt to what it bought; apportioning a purchase writes each item's share of it |
 | Order line title, price and cost | Repricing an item must not rewrite an existing sale |
 | Notification `title`, `body` | Push delivery needs text; the app renders inbox copy from `type` and `count` |

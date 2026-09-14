@@ -58,9 +58,8 @@ void main() {
     // The offered amount, never the asking price: recording anything else
     // would overstate revenue.
     expect(created.salePrice, pending.amount);
-    // The order records the marketplace by id and keeps the name it sold
-    // under; the legacy enum on the entity is not where that lives.
-    expect(created.marketplaceId, pending.marketplace.name);
+    // The order and the offer name the same marketplace record.
+    expect(created.marketplaceId, pending.marketplaceId);
     expect(offer(container, 'off-2').status, OfferStatus.accepted);
     expect(container.read(offerActionsControllerProvider), isFalse);
   });
@@ -93,7 +92,8 @@ void main() {
       id: source.id,
       itemId: 'no-such-item',
       itemTitle: source.itemTitle,
-      marketplace: source.marketplace,
+      marketplaceId: source.marketplaceId,
+      marketplaceName: source.marketplaceName,
       amount: source.amount,
       status: source.status,
       createdAt: source.createdAt,

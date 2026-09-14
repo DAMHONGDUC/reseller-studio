@@ -37,10 +37,11 @@ class PlanLimits {
   /// fill, so a Free seller was never told what they were on.
   ///
   /// **Premium still sells the answers**, not permission to keep typing:
-  /// `PlanFeature.taxExport`, `payoutReconciliation`, `advancedAnalytics`,
-  /// `team`. The counts are what makes the plan visible; the capabilities are
-  /// what makes it worth paying for. One business stays a Free ceiling because
-  /// a second one is a second business, not a bigger one.
+  /// `PlanFeature.export` and `payoutReconciliation` — every way of taking
+  /// the figures out of the app, and chasing what a platform owes. The counts
+  /// are what makes the plan visible; the capabilities are what makes it worth
+  /// paying for. One business stays a Free ceiling because a second one is a
+  /// second business, not a bigger one.
   static const Map<SellerPlan, PlanLimits> byPlan = <SellerPlan, PlanLimits>{
     SellerPlan.free: PlanLimits(items: 50, orders: 30, workspaces: 1),
     SellerPlan.premium: PlanLimits(items: null, orders: null, workspaces: null),

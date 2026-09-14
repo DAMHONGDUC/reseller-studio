@@ -3038,6 +3038,10 @@
   "@subscriptionPlans": {
     "description": "Shown on the subscription screens."
   },
+  "subscriptionUsage": "What you have used",
+  "@subscriptionUsage": {
+    "description": "Heading over the plan's allowances on the subscription screen, repeated from the list screens so the decision to pay can be made here."
+  },
   "subscriptionViewPremiumPlans": "View Premium plans",
   "@subscriptionViewPremiumPlans": {
     "description": "Button on subscription management that opens the paywall."

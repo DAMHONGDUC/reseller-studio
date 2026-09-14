@@ -9,6 +9,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
+import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../domain/entities/subscription_status.dart';
 import '../../../domain/enums/seller_plan.dart';
 import '../../../providers.dart';
@@ -51,6 +52,17 @@ class SubscriptionScreen extends ConsumerWidget {
                 SizedBox(height: SdContentPaddingV3.topGap),
                 _CurrentPlanCard(plan: plan, status: status),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
+                // **Every ceiling, in one place.** Each list screen already
+                // shows its own — items on Inventory, orders on Orders,
+                // businesses on Businesses — and a seller deciding whether to
+                // pay is on this screen, where they can see none of them.
+                // Owner's rule: the lists keep theirs, and this repeats the
+                // set once as an overview.
+                if (PlanLimitMeters.cappedIn(ref).isNotEmpty) ...<Widget>[
+                  SdSectionHeaderV3(title: context.l10n.subscriptionUsage),
+                  const PlanLimitMeters(),
+                  SizedBox(height: SdContentPaddingV3.sectionGap),
+                ],
                 if (status != null && status.source != SubscriptionSource.none)
                   AppListCard(
                     children: <Widget>[

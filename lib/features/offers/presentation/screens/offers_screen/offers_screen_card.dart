@@ -98,11 +98,7 @@ class _OfferCard extends ConsumerWidget {
             .where(
               (Listing row) =>
                   row.itemId == offer.itemId &&
-                  // An offer names a platform from the closed enum; a listing
-                  // names the seller's own record. The enum value's name is
-                  // the id a seeded record carries, which is the join.
-                  row.marketplaceId.toLowerCase() ==
-                      offer.marketplace.name.toLowerCase(),
+                  row.marketplaceId == offer.marketplaceId,
             )
             .firstOrNull
             ?.price;
@@ -159,7 +155,7 @@ class _OfferCard extends ConsumerWidget {
                 SizedBox(height: SdSpacingConstant.h6),
                 Text(
                   <String>[
-                    offer.marketplace.displayName,
+                    offer.marketplaceName,
                     if (listed != null)
                       context.l10n.offerAsking(context.money(listed)),
                     if (discount != null)

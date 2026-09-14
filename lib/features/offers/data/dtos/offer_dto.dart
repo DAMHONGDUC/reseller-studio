@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/workspace_collections.dart';
 import '../../../../core/money/money.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../orders/domain/enums/order_status.dart';
 import '../../domain/entities/offer.dart';
 
@@ -21,12 +20,14 @@ final class OfferDto {
       id: WorkspaceTable.localId(doc.id),
       itemId: FirestoreMapper.stringOrNull(data['itemId']) ?? '',
       itemTitle: FirestoreMapper.stringOrNull(data['itemTitle']) ?? '',
-      marketplace:
-          FirestoreMapper.enumOrNull(
-            Marketplace.values,
-            data['marketplaceId'],
-          ) ??
-          Marketplace.other,
+      // Rows written before marketplaces were records already held the id as
+      // a string; the name beside it is new and falls back to that id.
+      marketplaceId:
+          FirestoreMapper.stringOrNull(data['marketplaceId']) ?? 'other',
+      marketplaceName:
+          FirestoreMapper.stringOrNull(data['marketplaceName']) ??
+          FirestoreMapper.stringOrNull(data['marketplaceId']) ??
+          'Other',
       amount:
           FirestoreMapper.moneyOrNull(data['amountMinor'], currency) ??
           Money.zero(currency),
@@ -50,7 +51,8 @@ final class OfferDto {
       FirestoreMapper.pruned(<String, Object?>{
         'itemId': offer.itemId,
         'itemTitle': offer.itemTitle,
-        'marketplaceId': offer.marketplace.name,
+        'marketplaceId': offer.marketplaceId,
+        'marketplaceName': offer.marketplaceName,
         'currency': offer.amount.currency,
         'amountMinor': offer.amount.minor,
         'status': offer.status.name,

@@ -29,7 +29,7 @@ final class SubscriptionLabels {
   /// "Businesses" rather than "workspaces": that is what the app calls one
   /// everywhere the seller can read it.
   static String feature(PlanFeature feature) => switch (feature) {
-    PlanFeature.taxExport => 'Tax pack export',
+    PlanFeature.export => 'Exports and tax pack',
     PlanFeature.payoutReconciliation => 'Payout chasing',
   };
 

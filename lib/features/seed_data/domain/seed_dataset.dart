@@ -6,7 +6,6 @@ import '../../inventory/domain/entities/storage_location.dart';
 import '../../inventory/domain/enums/item_status.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/enums/listing_status.dart';
-import '../../marketplaces/domain/enums/marketplace.dart' as legacy;
 import '../../offers/domain/entities/offer.dart';
 import '../../orders/domain/entities/order.dart';
 import '../../orders/domain/enums/order_status.dart';
@@ -245,7 +244,8 @@ class SeedDataset {
       Order(
         id: 'seed-ord-2',
         status: OrderStatus.delivered,
-        marketplace: legacy.Marketplace.mercari,
+        marketplaceRecordId: 'mercari',
+        marketplaceNameSnapshot: 'Mercari',
         salePrice: money(2400),
         shippingCost: money(980),
         payout: money(1876),
@@ -367,7 +367,8 @@ class SeedDataset {
         id: 'seed-off-1',
         itemId: SeedDatasetConstant.uncostedItemId,
         itemTitle: 'Vintage Levi 501 — 34x32, redline selvedge',
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         amount: money(16500),
         status: OfferStatus.pending,
         createdAt: daysAgo(1),
@@ -379,7 +380,8 @@ class SeedDataset {
         id: 'seed-off-2',
         itemId: SeedDatasetConstant.uncostedItemId,
         itemTitle: 'Vintage Levi 501 — 34x32, redline selvedge',
-        marketplace: legacy.Marketplace.depop,
+        marketplaceId: 'depop',
+        marketplaceName: 'Depop',
         amount: money(9000),
         status: OfferStatus.pending,
         createdAt: daysAgo(3),
@@ -390,7 +392,8 @@ class SeedDataset {
         id: 'seed-off-3',
         itemId: 'seed-itm-1',
         itemTitle: 'Patagonia Synchilla fleece — mens L',
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         amount: money(1500),
         status: OfferStatus.declined,
         createdAt: daysAgo(12),
