@@ -18,6 +18,7 @@ class _OrderBody extends ConsumerStatefulWidget {
 
 class _OrderBodyState extends ConsumerState<_OrderBody> {
   final TextEditingController _buyer = TextEditingController();
+  final TextEditingController _externalOrderId = TextEditingController();
   final TextEditingController _salePrice = TextEditingController();
   final TextEditingController _payout = TextEditingController();
   final TextEditingController _tracking = TextEditingController();
@@ -26,6 +27,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
   @override
   void dispose() {
     _buyer.dispose();
+    _externalOrderId.dispose();
     _salePrice.dispose();
     _payout.dispose();
     _tracking.dispose();
@@ -41,6 +43,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
     switch (section) {
       case OrderDetailSection.order:
         _buyer.text = order.buyerName ?? '';
+        _externalOrderId.text = order.externalOrderId ?? '';
         _salePrice.text = order.salePrice.toInputString();
       case OrderDetailSection.profit:
         _payout.text = order.payout?.toInputString() ?? '';
@@ -104,6 +107,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
               orderId: order.id,
               buyerName: _buyer.text,
               salePrice: _salePrice.text,
+              externalOrderId: _externalOrderId.text,
             ),
           ),
           reading: _StatusCard(
@@ -122,6 +126,14 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
               SdTextFieldV3(
                 label: context.l10n.markSoldBuyer,
                 controller: _buyer,
+                textInputAction: TextInputAction.next,
+              ),
+              SizedBox(height: SdSpacingConstant.h16),
+              SdTextFieldV3(
+                label: context.l10n.orderExternalId,
+                controller: _externalOrderId,
+                hint: context.l10n.orderExternalIdHint,
+                helperText: context.l10n.orderExternalIdHelp,
                 textInputAction: TextInputAction.done,
               ),
               SizedBox(height: SdSpacingConstant.h16),

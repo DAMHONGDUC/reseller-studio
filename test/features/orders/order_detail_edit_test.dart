@@ -110,6 +110,7 @@ void main() {
       orderId: 'ord-1',
       buyerName: 'Someone',
       salePrice: 'not a number',
+      externalOrderId: '',
     );
 
     // A sale with no price is not a sale.

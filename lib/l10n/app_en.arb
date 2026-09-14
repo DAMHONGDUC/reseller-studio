@@ -1304,6 +1304,22 @@
   "@markSoldDate": {
     "description": "When it sold."
   },
+  "orderExternalId": "Order number on the platform (optional)",
+  "@orderExternalId": {
+    "description": "The marketplace's own order number, typed by the seller. It is what a pasted payout report is matched against."
+  },
+  "orderExternalIdHint": "11-12874-59921",
+  "@orderExternalIdHint": {
+    "description": "Example of a marketplace order number."
+  },
+  "orderExternalIdHelp": "Copy it from the platform. Without it, a payout report cannot find this sale.",
+  "@orderExternalIdHelp": {
+    "description": "Says what the order number buys the seller, which is the only reason to type one."
+  },
+  "importPayoutsNoneMatched": "None of these rows name a sale you have recorded. Open the order and fill in its order number on the platform, then paste again.",
+  "@importPayoutsNoneMatched": {
+    "description": "Shown when a readable file matched nothing, because the fix is on the order rather than in the file."
+  },
   "markSoldBuyer": "Buyer (optional)",
   "@markSoldBuyer": {
     "description": "The buyer's name. Optional, and never sent to analytics."
