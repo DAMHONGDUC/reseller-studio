@@ -220,10 +220,8 @@ class _ApportionmentNote extends StatelessWidget {
     return SdCardV3(
       child: Text(
         isUnder
-            ? '${context.money(gap)} of this receipt is not on any item yet. '
-                  'Profit on the unassigned part cannot be worked out.'
-            : 'The items add up to ${context.money(-gap)} more than the '
-                  'receipt. One of the costs is probably wrong.',
+            ? context.l10n.sourcingReceiptUnassigned(context.money(gap))
+            : context.l10n.sourcingReceiptOverAssigned(context.money(-gap)),
         style: context.textTheme3.bodySmall!.copyWith(
           color: context.sdTheme3.warning,
         ),

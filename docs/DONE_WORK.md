@@ -19,14 +19,14 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Search | Items, orders, listings and sources | None |
 | Workspace and team | Create, switch, delete, invite, role and member management | Team actions require deployed Functions |
 | Notifications | Inbox, unread state, FCM registration, event pushes, per-workspace-timezone digest, twelve types with a switch each | Functions, APNs and Scheduler |
-| Subscription | Free/Premium gates on capabilities rather than record counts, monthly/yearly paywall, restore, management screen | RevenueCat and webhook setup |
+| Subscription | Free ceilings — items for the life of the business, orders over a rolling 30 days, one business — plus two gated capabilities (tax pack, payout chasing), monthly/yearly paywall, restore, management screen | RevenueCat and webhook setup |
 | Settings | Account, workspace, theme, developer block: mock-data switch, seed demo data, delete all data | None |
 
 ## Platform foundations
 
 | Foundation | State |
 |---|---|
-| Money | Integer minor units; derived profit, margin and ROI; an unreported platform fee is estimated and labelled, never zeroed |
+| Money | Integer minor units; derived profit, margin and ROI; an unreported platform fee leaves the order's profit blank — never estimated, never zeroed (hard rule 3) |
 | Missing values | Render as `—`, never `0` |
 | Errors | Mapped to `AppFailure`; technical messages stay out of UI |
 | Localization | English ARB complete; Vietnamese pass deferred to release |

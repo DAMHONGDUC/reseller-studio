@@ -1979,13 +1979,13 @@
       }
     }
   },
-  "booksEstimatedFees": "Fee is still an estimate",
+  "booksEstimatedFees": "The platform’s cut is not in yet",
   "@booksEstimatedFees": {
-    "description": "Group header for sales with no reported platform fee."
+    "description": "Group header for sales with no reported platform fee. The app never estimates a fee (hard rule 3), so the copy must not say it does."
   },
-  "booksEstimatedFeesBody": "Profit uses the platform’s published rate until you enter what it actually took.",
+  "booksEstimatedFeesBody": "Profit on these sales is left blank until you enter what the platform actually paid. Nothing here is guessed from a published rate.",
   "@booksEstimatedFeesBody": {
-    "description": "What an estimated fee costs the seller in accuracy."
+    "description": "Says what an unrecorded payout costs the seller — a blank, never a guess."
   },
   "booksUnknownCost": "Cost was never entered",
   "@booksUnknownCost": {
@@ -2203,9 +2203,9 @@
       }
     }
   },
-  "payoutsLockedNothingOwed": "Every marketplace has paid up",
+  "payoutsLockedNothingOwed": "Nothing is late yet",
   "@payoutsLockedNothingOwed": {
-    "description": "Shown to a Free seller when no payout is late, so the locked screen still answers the question."
+    "description": "Shown to a Free seller when no payout is overdue. Deliberately not 'everyone has paid up': sales can still be waiting, they are just not late."
   },
   "payoutsLockedBody": "Premium breaks this down by marketplace and by order, so you know which sale to quote when you chase it.",
   "@payoutsLockedBody": {
@@ -2745,6 +2745,24 @@
   "sourcingNothingIsLinkedToThisPurchase": "Nothing is linked to this purchase yet. Add items and set their purchase on the item form.",
   "@sourcingNothingIsLinkedToThisPurchase": {
     "description": "Shown on the sourcing screens."
+  },
+  "sourcingReceiptUnassigned": "{amount} of this receipt is not on any item yet. Profit on the unassigned part cannot be worked out.",
+  "@sourcingReceiptUnassigned": {
+    "description": "Shown when the item costs add up to less than the receipt.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingReceiptOverAssigned": "The items add up to {amount} more than the receipt. One of the costs is probably wrong.",
+  "@sourcingReceiptOverAssigned": {
+    "description": "Shown when the item costs add up to more than the receipt.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "sourcingEveryPennyOfThisReceiptIs": "Every penny of this receipt is on an item.",
   "@sourcingEveryPennyOfThisReceiptIs": {
@@ -3907,7 +3925,7 @@
   "@notificationSomethingHappened": {
     "description": "Fallback row for a notification type this build does not know."
   },
-  "crossListTitle": "Marketplaces management",
+  "crossListTitle": "List on marketplaces",
   "@crossListTitle": {
     "description": "Title of the cross-listing screen."
   },
