@@ -387,3 +387,31 @@ mid-form states alike without any of them knowing.
 
 The gate is what closes it too: a build number typed one digit too high is
 corrected in the console, and the seller is released without a release.
+
+## Materials a seller turns into stock are a purchase, not an expense category
+
+Owner's decision, taken when the app was walked through as a handmade-goods
+seller rather than a reseller of finished items.
+
+A maker buys $80 of clay and glaze and turns it into twelve mugs. Two ways to
+record that, and only one of them can be right:
+
+- **A — the materials are a buying trip.** The $80 is a purchase, the twelve
+  mugs are filed under it, and *Spread this receipt across the items* writes
+  each mug its share. Three mugs sold in March cost $20.01 of goods; the other
+  $60 sits in inventory value until those mugs sell.
+- **B — the materials are an expense.** The $80 is an `ExpenseCategory`
+  deduction in March. March's profit absorbs all of it, the nine unsold mugs
+  carry a cost of zero, and every later sale of one reads as pure profit.
+
+**A was chosen.** Per-item profit and inventory value both come out right, and
+it matches what both launch jurisdictions ask for: stock that has not sold yet
+is not yet a deduction. B also breaks the tax summary, because the same $80
+would be claimed in the year it was bought *and* again as cost of goods when
+the mug sells.
+
+The consequence worth stating: **there is no materials expense category, and
+adding one would be a second way to record the same money.** A maker uses the
+same Sourcing flow a reseller does — the "buying trip" wording is the only
+thing that reads oddly, and renaming it is a copy change rather than a model
+one.
