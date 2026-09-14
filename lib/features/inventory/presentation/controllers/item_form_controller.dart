@@ -15,6 +15,7 @@ import '../../../../core/storage/file_uploader.dart';
 import '../../../../core/utils/text_input_utils.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
+import '../../../sourcing/domain/services/purchase_item_count.dart';
 import '../../../sourcing/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
@@ -189,6 +190,43 @@ class ItemFormController extends Notifier<ItemFormState> {
   /// Only on a create: correcting one old item's bin is not a decision about
   /// the next twenty. Failing to write is not worth failing a save over, so
   /// it is logged and swallowed (hard rule 8).
+  /// Keep the purchase's item count in step when one is filed under it.
+  ///
+  /// The same reason `ItemActionsController` does it for a batch: the count is
+  /// denormalised onto the purchase because two screens show it beside the
+  /// receipt total, and nothing else recomputes it.
+  Future<void> _recountPurchase(String? purchaseId) async {
+    if (purchaseId == null) return;
+
+    final List<Purchase> purchases =
+        ref.read(purchasesProvider).value ?? const <Purchase>[];
+    final Purchase? purchase = purchases
+        .where((Purchase row) => row.id == purchaseId)
+        .firstOrNull;
+
+    if (purchase == null) return;
+
+    final Purchase? recounted = PurchaseItemCount.recounted(
+      purchase,
+      ref.read(itemsProvider).value ?? const <Item>[],
+    );
+
+    if (recounted == null) return;
+
+    try {
+      await ref.read(purchaseRepositoryProvider).save(recounted);
+    } catch (error, stackTrace) {
+      // The item is saved either way — the count is a display figure.
+      SdLogger.error(
+        LogTagConstant.item,
+        'Failed to recount purchase',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'purchaseId': purchaseId},
+      );
+    }
+  }
+
   Future<void> _rememberFiling() async {
     final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
 
@@ -454,6 +492,7 @@ class ItemFormController extends Notifier<ItemFormState> {
 
       await ref.read(itemRepositoryProvider).save(moved);
       await _saveListingPrices(id);
+      await _recountPurchase(moved.purchaseId);
 
       SdLogger.info(LogTagConstant.item, 'Item form saved', <String, Object>{
         'itemId': id,

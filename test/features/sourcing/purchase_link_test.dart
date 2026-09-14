@@ -79,6 +79,36 @@ void main() {
     );
   });
 
+  test('filing a batch brings the purchase\'s item count with it', () async {
+    final ProviderContainer container = mockContainer();
+
+    await warmUp(container);
+
+    final Purchase purchase = purchaseOf(container);
+    final List<Item> unfiled = container
+        .read(itemsProvider)
+        .value!
+        .where((Item item) => item.purchaseId == null)
+        .take(2)
+        .toList();
+
+    await container
+        .read(itemActionsControllerProvider.notifier)
+        .assignPurchase(unfiled, purchase);
+
+    final Purchase after = container
+        .read(purchasesProvider)
+        .value!
+        .firstWhere((Purchase row) => row.id == purchase.id);
+
+    expect(
+      after.itemCount,
+      itemsOf(container, purchase.id).length,
+      reason: 'the count Books and Purchases read is denormalised, so filing '
+          'items has to keep it in step — it used to read 0 beside twelve',
+    );
+  });
+
   test('the receipt spreads across the items and adds back up', () async {
     final ProviderContainer container = mockContainer();
 
