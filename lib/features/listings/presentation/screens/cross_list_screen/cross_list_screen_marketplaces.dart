@@ -22,6 +22,14 @@ class _Marketplaces extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // **The business's own marketplaces, not a fixed list.** A seller who
+    // deleted Poshmark should not be offered it, and one who added Amazon
+    // Handmade must be — which a hardcoded enum could never do, while
+    // offering Shopify to everyone and Vinted, a default record, to nobody.
+    final List<Marketplace> marketplaces = ref.watch(
+      activeMarketplacesProvider,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -36,12 +44,12 @@ class _Marketplaces extends ConsumerWidget {
           padding: EdgeInsets.zero,
           child: Column(
             children: <Widget>[
-              for (int i = 0; i < Marketplace.values.length; i++) ...<Widget>[
+              for (int i = 0; i < marketplaces.length; i++) ...<Widget>[
                 _MarketplaceRow(
-                  marketplace: Marketplace.values[i],
+                  marketplace: marketplaces[i],
                   currency: currency,
                 ),
-                if (i != Marketplace.values.length - 1) const SdDividerV3(),
+                if (i != marketplaces.length - 1) const SdDividerV3(),
               ],
             ],
           ),
@@ -83,11 +91,13 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
   /// the state, so the text is filled in from what the toggle just produced
   /// rather than from a second copy of the seeding rule.
   void _toggle() {
-    ref.read(crossListControllerProvider.notifier).toggle(widget.marketplace);
+    ref
+        .read(crossListControllerProvider.notifier)
+        .toggle(widget.marketplace.id);
 
     final Money? seeded = ref
         .read(crossListControllerProvider)
-        .prices[widget.marketplace];
+        .prices[widget.marketplace.id];
 
     _price.text = seeded?.toInputString() ?? '';
   }
@@ -103,8 +113,8 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
   @override
   Widget build(BuildContext context) {
     final CrossListState state = ref.watch(crossListControllerProvider);
-    final Listing? live = state.existing[widget.marketplace];
-    final bool isSelected = state.selected.contains(widget.marketplace);
+    final Listing? live = state.existing[widget.marketplace.id];
+    final bool isSelected = state.selected.contains(widget.marketplace.id);
     // A live platform is ticked and cannot be unticked: the circle says what
     // is true, and a second listing on the same platform is not a thing to
     // offer. Its price is still the seller's to change.
@@ -133,7 +143,7 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
                 SizedBox(width: SdSpacingConstant.w12),
                 Expanded(
                   child: Text(
-                    widget.marketplace.displayName,
+                    widget.marketplace.name,
                     style: context.textTheme3.bodyMedium!.copyWith(
                       color: context.sdTheme3.textPrimary,
                     ),
@@ -153,13 +163,13 @@ class _MarketplaceRowState extends ConsumerState<_MarketplaceRow> {
               isRequired: true,
               helperText: _AfterFees.of(
                 context,
-                state.prices[widget.marketplace],
+                state.prices[widget.marketplace.id],
                 ref.watch(planningFeeRateProvider),
               ),
               onChanged: (String value) => ref
                   .read(crossListControllerProvider.notifier)
                   .setPriceFor(
-                    widget.marketplace,
+                    widget.marketplace.id,
                     Money.tryParse(value, widget.currency),
                   ),
             ),

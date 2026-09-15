@@ -74,7 +74,7 @@ class _MarketplacePriceFieldState
 
   @override
   Widget build(BuildContext context) => MoneyField(
-    label: widget.listing.marketplace.displayName,
+    label: widget.listing.marketplaceName,
     controller: _price,
     currency: widget.currency,
     textInputAction: TextInputAction.next,

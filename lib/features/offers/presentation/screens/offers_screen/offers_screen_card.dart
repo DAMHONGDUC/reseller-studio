@@ -98,7 +98,7 @@ class _OfferCard extends ConsumerWidget {
             .where(
               (Listing row) =>
                   row.itemId == offer.itemId &&
-                  row.marketplace == offer.marketplace,
+                  row.marketplaceId == offer.marketplaceId,
             )
             .firstOrNull
             ?.price;
@@ -155,7 +155,7 @@ class _OfferCard extends ConsumerWidget {
                 SizedBox(height: SdSpacingConstant.h6),
                 Text(
                   <String>[
-                    offer.marketplace.displayName,
+                    offer.marketplaceName,
                     if (listed != null)
                       context.l10n.offerAsking(context.money(listed)),
                     if (discount != null)

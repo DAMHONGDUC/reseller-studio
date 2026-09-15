@@ -1,9 +1,11 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
 import 'package:reseller_studio/features/listings/presentation/controllers/listing_actions_controller.dart';
+import 'package:reseller_studio/features/listings/presentation/screens/listings_screen/listings_screen.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
 
 import '../../support/pump_app.dart';
@@ -115,5 +117,20 @@ void main() {
       listingsIn(container).firstWhere((Listing l) => l.id == first.id).status,
       first.status,
     );
+  });
+
+  testWidgets('leaving Listings never writes to a disposed provider', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const ListingsScreen());
+    await tester.pumpAndSettle();
+
+    // The screen used to clear the selection from `dispose` on a microtask.
+    // A Riverpod 3 provider disposes with its last listener, so that write
+    // always landed on a notifier that was already gone.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
   });
 }

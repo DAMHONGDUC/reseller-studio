@@ -83,6 +83,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Upgrade to continue'), findsOneWidget);
-    expect(find.textContaining('orders. Upgrade'), findsOneWidget);
+    // The ceiling names its window, because the wall is temporary: the
+    // oldest sale drops out of the 30 days and the slot comes back.
+    expect(find.textContaining('orders every 30 days'), findsOneWidget);
   });
 }

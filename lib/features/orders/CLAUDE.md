@@ -128,9 +128,10 @@ opens.
   - The fallback lives in `marketplacesForItemProvider`, not at the call site,
     so the sheet and anything that opens it next cannot disagree about what an
     unlisted item may be sold on.
-  - The join is `MarketplaceMatching`: a listing names a `Marketplace` *enum*
-    and an order names a marketplace *record*, and nothing stores a key
-    between them.
+  - **The join is the record id**, since listings started naming the seller's
+    own marketplaces: a listing, an order and an offer all carry
+    `marketplaceId`. `MarketplaceMatching` is what resolves a key to the
+    record itself, for the screens that need the record and not the id.
 - **The box opens on that platform's own price, not only after a re-pick** —
   owner's rule, and it was broken: the sheet seeded its controller in a field
   initialiser, where `listingsForItemProvider` has not emitted yet, so every
@@ -150,8 +151,8 @@ opens.
   - **A platform the item is not on falls back to `Item.expectedPrice`** —
     the one number that is true either way. The sheet opens on the same rule,
     seeded from the marketplace it opens on.
-  - The price map is `ListingPricing.byMarketplace` and the lookup is
-    `MarketplaceMatching.valueFor`, so the enum-to-record key rule is written
+  - The price map is `ListingPricing.byMarketplace`, keyed by record id, and
+    the lookup is `MarketplaceMatching.valueFor`, so the key rule is written
     once and the sheet does not know it.
 - `test/features/orders/record_sale_test.dart` pins the row, both halves of
   the picker, and the price following it.

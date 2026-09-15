@@ -1,10 +1,23 @@
 import { logger } from 'firebase-functions';
 
-import { ceilingGrace, ceilingsByPlan, db, paths, planFor, rowsOf } from '../lib/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 
-/** What the workspace is holding, and whether the rules should refuse more. */
+import {
+  ceilingGrace,
+  ceilingsByPlan,
+  db,
+  orderWindowDays,
+  paths,
+  planFor,
+  rowsOf,
+} from '../lib/firestore';
+
+/** What the workspace has used, and whether the rules should refuse more. */
 export interface WorkspaceUsage {
+  /** Items ever created and kept. */
   items: number;
+
+  /** Orders inside `orderWindowDays`, not orders ever recorded. */
   orders: number;
   itemsAtCeiling: boolean;
   ordersAtCeiling: boolean;
@@ -37,35 +50,38 @@ export function atCeiling(plan: string, count: number, kind: 'items' | 'orders')
  *
  * The item arithmetic mirrors `countedItemsProvider` in the app: stock on
  * hand, not everything ever typed in. Sold and archived rows are subtracted,
- * and so are soft-deleted ones — a row that is both is subtracted twice,
- * which under-counts, which lets a seller through. That is the direction this
- * has to fail (`docs/rules/BACKEND.md`).
+ * The arithmetic mirrors `countedItemsProvider` and `countedOrdersProvider`
+ * in the app, and the two rules are deliberately different: **items** are
+ * every row ever created and kept — sold and archived still hold their slot,
+ * only a deleted row gives one back — while **orders** are those inside
+ * `orderWindowDays`, so a month-old sale returns its slot on its own.
+ *
+ * Soft-deleted items are subtracted, which can only under-count, which lets a
+ * seller through. That is the direction this has to fail
+ * (`docs/rules/BACKEND.md`).
  */
 export async function refreshUsage(workspaceId: string): Promise<WorkspaceUsage> {
   const plan = await planFor(workspaceId);
   const items = rowsOf(workspaceId, 'items');
   const orders = rowsOf(workspaceId, 'orders');
 
-  const [total, sold, archived, deleted, orderCount] = await Promise.all([
+  const since = Timestamp.fromMillis(
+    Date.now() - orderWindowDays * 24 * 60 * 60 * 1000,
+  );
+
+  const [total, deleted, recentOrders] = await Promise.all([
     items.count().get(),
-    items.where('status', '==', 'sold').count().get(),
-    items.where('status', '==', 'archived').count().get(),
     items.where('deletedAt', '!=', null).count().get(),
-    orders.count().get(),
+    orders.where('orderedAt', '>=', since).count().get(),
   ]);
 
-  const onHand = Math.max(
-    0,
-    total.data().count -
-      sold.data().count -
-      archived.data().count -
-      deleted.data().count,
-  );
+  const created = Math.max(0, total.data().count - deleted.data().count);
+  const inWindow = recentOrders.data().count;
   const usage: WorkspaceUsage = {
-    items: onHand,
-    orders: orderCount.data().count,
-    itemsAtCeiling: atCeiling(plan, onHand, 'items'),
-    ordersAtCeiling: atCeiling(plan, orderCount.data().count, 'orders'),
+    items: created,
+    orders: inWindow,
+    itemsAtCeiling: atCeiling(plan, created, 'items'),
+    ordersAtCeiling: atCeiling(plan, inWindow, 'orders'),
   };
 
   await db().doc(paths.usage(workspaceId)).set(usage);

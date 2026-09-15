@@ -274,6 +274,13 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                 _FormSection(
                   title: context.l10n.itemFormWhereFrom,
                   children: <Widget>[
+                    ItemPurchaseField(
+                      selected: state.purchaseId,
+                      onSelected: ref
+                          .read(itemFormControllerProvider.notifier)
+                          .selectPurchase,
+                    ),
+                    SizedBox(height: SdSpacingConstant.h16),
                     ItemSourceField(
                       selected: state.sourceId,
                       onSelected: ref

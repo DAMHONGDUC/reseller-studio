@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/money/money.dart';
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/offers/domain/services/offer_evaluation.dart';
 import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
@@ -19,7 +18,8 @@ void main() {
     id: 'off-1',
     itemId: 'itm-1',
     itemTitle: 'Cord jacket',
-    marketplace: Marketplace.depop,
+    marketplaceId: 'depop',
+    marketplaceName: 'Depop',
     amount: amount,
     status: OfferStatus.pending,
     createdAt: DateTime(2026, 6, 1),

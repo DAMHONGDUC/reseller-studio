@@ -1,5 +1,4 @@
 import '../../../../core/money/money.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../../orders/domain/enums/order_status.dart';
 
 /// A buyer asking to pay less than the asking price (plan §8).
@@ -16,7 +15,8 @@ class Offer {
     required this.id,
     required this.itemId,
     required this.itemTitle,
-    required this.marketplace,
+    required this.marketplaceId,
+    required this.marketplaceName,
     required this.amount,
     required this.status,
     required this.createdAt,
@@ -35,7 +35,13 @@ class Offer {
   /// an offer still reads correctly after the item is archived.
   final String itemTitle;
 
-  final Marketplace marketplace;
+  /// The seller's own marketplace record, by id — the same join a listing
+  /// makes, so an offer can name a platform the business added itself.
+  final String marketplaceId;
+
+  /// What that record was called when the offer arrived, frozen for the same
+  /// reason a listing freezes it: a rename must not rewrite history.
+  final String marketplaceName;
 
   /// What the buyer offered.
   final Money amount;
@@ -96,7 +102,8 @@ class Offer {
     id: id,
     itemId: itemId,
     itemTitle: itemTitle,
-    marketplace: marketplace,
+    marketplaceId: marketplaceId,
+    marketplaceName: marketplaceName,
     amount: amount,
     status: status ?? this.status,
     createdAt: createdAt,

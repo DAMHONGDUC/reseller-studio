@@ -92,9 +92,9 @@
   "@quickAddNameLabel": {
     "description": "Label for the only field Quick Add requires — the item title. Phrased as a question because a seller is looking at the object while they type."
   },
-  "quickAddNameHint": "Nike Air Max 90, size 10",
+  "quickAddNameHint": "What you would call it on the listing",
   "@quickAddNameHint": {
-    "description": "Placeholder in the Quick Add title field. A concrete example, not the word 'Title'."
+    "description": "Placeholder in the Quick Add title field. Deliberately not a worked example from one trade — a sneaker title told a seller of handmade goods nothing."
   },
   "quickAddHelp": "A title is all it takes. Price, photos and the rest can wait.",
   "@quickAddHelp": {
@@ -857,6 +857,18 @@
       }
     }
   },
+  "commonCreateNew": "Create new",
+  "@commonCreateNew": {
+    "description": "The row in a picker that makes a record instead of choosing one."
+  },
+  "categoriesAddTitle": "New category",
+  "@categoriesAddTitle": {
+    "description": "Title of the sheet that names a category being created inline."
+  },
+  "locationsAddTitle": "New location",
+  "@locationsAddTitle": {
+    "description": "Title of the sheet that names a storage location being created inline."
+  },
   "commonName": "Name",
   "@commonName": {
     "description": "Field label for the name of a category, location or source."
@@ -1047,6 +1059,76 @@
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "inventoryAddTitle": "Add stock",
+  "@inventoryAddTitle": {
+    "description": "The Inventory create button, which asks which way the seller is taking stock in."
+  },
+  "inventoryAddQuickCaption": "One item, a title, done",
+  "@inventoryAddQuickCaption": {
+    "description": "Caption for Quick Add on the Inventory add sheet."
+  },
+  "inventoryAddIntakeCaption": "Stock or materials, with what you paid",
+  "@inventoryAddIntakeCaption": {
+    "description": "Caption for the intake session on the Inventory add sheet — the flow that ties items to a purchase."
+  },
+  "itemPurchase": "Purchase (optional)",
+  "@itemPurchase": {
+    "description": "Which purchase this item came off. Optional like every create field (hard rule 2)."
+  },
+  "itemPurchaseEmptyHint": "No purchases recorded yet",
+  "@itemPurchaseEmptyHint": {
+    "description": "Placeholder on the buying-trip picker when the business has none."
+  },
+  "itemAddPurchaseFirst": "Record a purchase first, under More \u2192 Sourcing.",
+  "@itemAddPurchaseFirst": {
+    "description": "Says where a purchase is created, so the picker is never a dead end."
+  },
+  "bulkAssignPurchase": "File under a purchase",
+  "@bulkAssignPurchase": {
+    "description": "Bulk action: file the selected items under one purchase — a box lot bought to resell, or the materials a maker turned into stock."
+  },
+  "bulkAssignPurchaseTitle": "File {count} items under",
+  "@bulkAssignPurchaseTitle": {
+    "description": "Title of the picker that chooses which purchase the selection belongs to.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "sourcingApportionAction": "Spread this receipt across the items",
+  "@sourcingApportionAction": {
+    "description": "Writes each linked item a share of the receipt total."
+  },
+  "sourcingApportionConfirmTitle": "Overwrite the costs already entered?",
+  "@sourcingApportionConfirmTitle": {
+    "description": "Asked before a receipt is spread over items that already carry a cost."
+  },
+  "sourcingApportionConfirmBody": "{count} of these items already have a cost. Spreading the receipt replaces every one of them.",
+  "@sourcingApportionConfirmBody": {
+    "description": "Says exactly what the spread is about to overwrite.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "sourcingApportionHelp": "Shares are by expected price where every item has one, evenly otherwise, and always add up to the receipt.",
+  "@sourcingApportionHelp": {
+    "description": "Says how the split is decided, because the seller is about to have it written onto their items."
+  },
+  "sourcingApportionDone": "Cost written onto {count} items",
+  "@sourcingApportionDone": {
+    "description": "Confirmation after a receipt is spread across the items filed under it.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
       }
     }
   },
@@ -1303,6 +1385,26 @@
   "markSoldDate": "Sale date",
   "@markSoldDate": {
     "description": "When it sold."
+  },
+  "orderExternalId": "Order number on the platform (optional)",
+  "@orderExternalId": {
+    "description": "The marketplace's own order number, typed by the seller. It is what a pasted payout report is matched against."
+  },
+  "orderExternalIdHint": "11-12874-59921",
+  "@orderExternalIdHint": {
+    "description": "Example of a marketplace order number."
+  },
+  "orderExternalIdHelp": "Copy it from the platform. Without it, a payout report cannot find this sale.",
+  "@orderExternalIdHelp": {
+    "description": "Says what the order number buys the seller, which is the only reason to type one."
+  },
+  "importPayoutsNoneMatched": "None of these rows name a sale you have recorded. Open the order and fill in its order number on the platform, then paste again.",
+  "@importPayoutsNoneMatched": {
+    "description": "Shown when a readable file matched nothing, because the fix is on the order rather than in the file."
+  },
+  "markSoldBeforeListed": "That date is before the item was listed. Saved anyway — check it if it was not a pre-order.",
+  "@markSoldBeforeListed": {
+    "description": "Shown when a sale date precedes the listing date, which makes every days-to-sell figure meaningless."
   },
   "markSoldBuyer": "Buyer (optional)",
   "@markSoldBuyer": {
@@ -1837,9 +1939,9 @@
       }
     }
   },
-  "intakeTitle": "Intake session",
+  "intakeTitle": "Take stock in",
   "@intakeTitle": {
-    "description": "Title of the batch intake screen — one buying trip, many items."
+    "description": "Title of the batch intake screen — one purchase, many items. Neutral between a reseller's box lot and a maker's materials."
   },
   "intakeItemTitle": "What is it?",
   "@intakeItemTitle": {
@@ -1865,7 +1967,7 @@
   "@intakeReceiptTotalHelper": {
     "description": "Explains that the receipt total and the item costs are allowed to disagree."
   },
-  "intakeFinished": "Trip saved.",
+  "intakeFinished": "Purchase saved.",
   "@intakeFinished": {
     "description": "Confirmation after the purchase and its items are written."
   },
@@ -1890,7 +1992,7 @@
       }
     }
   },
-  "quickActionIntakeSession": "Intake session",
+  "quickActionIntakeSession": "Take stock in",
   "@quickActionIntakeSession": {
     "description": "Quick Action row opening the batch intake screen."
   },
@@ -1906,7 +2008,7 @@
   "@booksClearTitle": {
     "description": "Empty state when every figure is entered."
   },
-  "booksClearBody": "Every sale has its real fee and its cost, every payout has landed, and every buying trip has a receipt.",
+  "booksClearBody": "Every sale has its real fee and its cost, every payout has landed, and every purchase has a receipt.",
   "@booksClearBody": {
     "description": "Says what a clear result actually means, so the seller knows what was checked."
   },
@@ -1919,13 +2021,13 @@
       }
     }
   },
-  "booksEstimatedFees": "Fee is still an estimate",
+  "booksEstimatedFees": "The platform’s cut is not in yet",
   "@booksEstimatedFees": {
-    "description": "Group header for sales with no reported platform fee."
+    "description": "Group header for sales with no reported platform fee. The app never estimates a fee (hard rule 3), so the copy must not say it does."
   },
-  "booksEstimatedFeesBody": "Profit uses the platform’s published rate until you enter what it actually took.",
+  "booksEstimatedFeesBody": "Profit on these sales is left blank until you enter what the platform actually paid. Nothing here is guessed from a published rate.",
   "@booksEstimatedFeesBody": {
-    "description": "What an estimated fee costs the seller in accuracy."
+    "description": "Says what an unrecorded payout costs the seller — a blank, never a guess."
   },
   "booksUnknownCost": "Cost was never entered",
   "@booksUnknownCost": {
@@ -1943,7 +2045,7 @@
   "@booksUnpaidPayoutsBody": {
     "description": "Why an unpaid payout belongs on this screen."
   },
-  "booksNoReceipt": "Buying trip with no receipt",
+  "booksNoReceipt": "Purchase with no receipt",
   "@booksNoReceipt": {
     "description": "Group header for purchases with no document attached."
   },
@@ -1962,7 +2064,7 @@
   },
   "booksPurchaseItems": "{count, plural, =1{1 item} other{{count} items}}",
   "@booksPurchaseItems": {
-    "description": "How many items a buying trip brought in, on its row.",
+    "description": "How many items a purchase brought in, on its row.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2143,9 +2245,9 @@
       }
     }
   },
-  "payoutsLockedNothingOwed": "Every marketplace has paid up",
+  "payoutsLockedNothingOwed": "Nothing is late yet",
   "@payoutsLockedNothingOwed": {
-    "description": "Shown to a Free seller when no payout is late, so the locked screen still answers the question."
+    "description": "Shown to a Free seller when no payout is overdue. Deliberately not 'everyone has paid up': sales can still be waiting, they are just not late."
   },
   "payoutsLockedBody": "Premium breaks this down by marketplace and by order, so you know which sale to quote when you chase it.",
   "@payoutsLockedBody": {
@@ -2682,9 +2784,31 @@
   "@sourcingApportioned": {
     "description": "Shown on the sourcing screens."
   },
-  "sourcingNothingIsLinkedToThisPurchase": "Nothing is linked to this purchase yet. Add items and set their purchase on the item form.",
+  "sourcingTakeItemsIn": "Take items in for this purchase",
+  "@sourcingTakeItemsIn": {
+    "description": "Opens the intake flow from a purchase with nothing filed under it."
+  },
+  "sourcingNothingIsLinkedToThisPurchase": "Nothing is filed under this purchase yet. Take the items in here, or pick this trip on an item you already have.",
   "@sourcingNothingIsLinkedToThisPurchase": {
     "description": "Shown on the sourcing screens."
+  },
+  "sourcingReceiptUnassigned": "{amount} of this receipt is not on any item yet. Profit on the unassigned part cannot be worked out.",
+  "@sourcingReceiptUnassigned": {
+    "description": "Shown when the item costs add up to less than the receipt.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcingReceiptOverAssigned": "The items add up to {amount} more than the receipt. One of the costs is probably wrong.",
+  "@sourcingReceiptOverAssigned": {
+    "description": "Shown when the item costs add up to more than the receipt.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "sourcingEveryPennyOfThisReceiptIs": "Every penny of this receipt is on an item.",
   "@sourcingEveryPennyOfThisReceiptIs": {
@@ -2927,6 +3051,10 @@
   "subscriptionPlans": "Plans",
   "@subscriptionPlans": {
     "description": "Shown on the subscription screens."
+  },
+  "subscriptionUsage": "What you have used",
+  "@subscriptionUsage": {
+    "description": "Heading over the plan's allowances on the subscription screen, repeated from the list screens so the decision to pay can be made here."
   },
   "subscriptionViewPremiumPlans": "View Premium plans",
   "@subscriptionViewPremiumPlans": {
@@ -3847,7 +3975,7 @@
   "@notificationSomethingHappened": {
     "description": "Fallback row for a notification type this build does not know."
   },
-  "crossListTitle": "Marketplaces management",
+  "crossListTitle": "List on marketplaces",
   "@crossListTitle": {
     "description": "Title of the cross-listing screen."
   },
@@ -4053,6 +4181,10 @@
         "type": "int"
       }
     }
+  },
+  "listingMarkLive": "I have posted these",
+  "@listingMarkLive": {
+    "description": "Bulk action: the seller confirms the listings are now live on the platform. The app cannot publish, so it takes their word."
   },
   "listingPause": "Pause",
   "@listingPause": {

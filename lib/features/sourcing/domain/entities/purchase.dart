@@ -50,4 +50,20 @@ class Purchase {
   final DateTime? deletedAt;
 
   bool get isDeleted => deletedAt != null;
+
+  /// A copy with a different item count.
+  ///
+  /// The only field anything recomputes — `PurchaseItemCount` owns the rule,
+  /// and everything else on a purchase is typed by the seller.
+  Purchase copyWith({int? itemCount}) => Purchase(
+    id: id,
+    purchaseDate: purchaseDate,
+    createdAt: createdAt,
+    sourceId: sourceId,
+    totalCost: totalCost,
+    receiptUrl: receiptUrl,
+    notes: notes,
+    itemCount: itemCount ?? this.itemCount,
+    deletedAt: deletedAt,
+  );
 }

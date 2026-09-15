@@ -20,7 +20,7 @@ final class SubscriptionLabels {
   static String name(SellerPlan plan) => plan.label;
 
   static String tagline(SellerPlan plan) => switch (plan) {
-    SellerPlan.free => 'Run the whole shelf, however big it gets',
+    SellerPlan.free => 'Fifty items and thirty sales a month, free',
     SellerPlan.premium => 'The answers: tax, payouts, and what to buy next',
   };
 
@@ -29,13 +29,7 @@ final class SubscriptionLabels {
   /// "Businesses" rather than "workspaces": that is what the app calls one
   /// everywhere the seller can read it.
   static String feature(PlanFeature feature) => switch (feature) {
-    PlanFeature.advancedAnalytics => 'Advanced analytics',
-    PlanFeature.reports => 'CSV reports',
-    PlanFeature.automation => 'Automation',
-    PlanFeature.team => 'Team members',
-    PlanFeature.multipleWorkspaces => 'Multiple businesses',
-    PlanFeature.advancedPermissions => 'Roles & permissions',
-    PlanFeature.taxExport => 'Tax pack export',
+    PlanFeature.export => 'Exports and tax pack',
     PlanFeature.payoutReconciliation => 'Payout chasing',
   };
 
@@ -81,9 +75,14 @@ final class SubscriptionLabels {
     return switch (block) {
       PlanBlock.none => '',
       PlanBlock.itemLimit =>
-        '$planName holds ${limits.items} items. Upgrade to add more.',
+        '$planName holds ${limits.items} items in total. '
+            'Upgrade to add more.',
+      // Says the window, because the wall is temporary and a seller who does
+      // not know that reads it as the end of the road.
       PlanBlock.orderLimit =>
-        '$planName holds ${limits.orders} orders. Upgrade to record more.',
+        '$planName records ${limits.orders} orders every '
+            '${PlanLimits.orderWindow.inDays} days. '
+            'The oldest one drops out soon — or upgrade now.',
       PlanBlock.workspaceLimit =>
         '$planName includes ${limits.workspaces} business. Upgrade to create more.',
       PlanBlock.featureLocked => 'This is part of a higher plan.',

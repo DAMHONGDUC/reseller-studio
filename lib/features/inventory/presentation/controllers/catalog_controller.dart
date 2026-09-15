@@ -22,7 +22,8 @@ class CatalogController extends Notifier<bool> {
   @override
   bool build() => false;
 
-  Future<void> saveCategory({
+  /// Returns the record's id, so a caller creating one inline can select it.
+  Future<String?> saveCategory({
     required String name,
     String? id,
     String? parentId,
@@ -30,7 +31,7 @@ class CatalogController extends Notifier<bool> {
     final String trimmed = name.trim();
     final String categoryId = id ?? _uuid.v4();
 
-    if (trimmed.isEmpty) return;
+    if (trimmed.isEmpty) return null;
 
     state = true;
     SdLogger.action(LogTagConstant.catalog, 'Save category', <String, Object>{
@@ -49,6 +50,8 @@ class CatalogController extends Notifier<bool> {
               parentId: parentId,
             ),
           );
+
+      return categoryId;
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.catalog,
@@ -87,7 +90,8 @@ class CatalogController extends Notifier<bool> {
     }
   }
 
-  Future<void> saveLocation({
+  /// Returns the record's id, so a caller creating one inline can select it.
+  Future<String?> saveLocation({
     required String name,
     required LocationKind kind,
     String? id,
@@ -97,7 +101,7 @@ class CatalogController extends Notifier<bool> {
     final String trimmed = name.trim();
     final String locationId = id ?? _uuid.v4();
 
-    if (trimmed.isEmpty) return;
+    if (trimmed.isEmpty) return null;
 
     state = true;
     SdLogger.action(LogTagConstant.catalog, 'Save location', <String, Object>{
@@ -119,6 +123,8 @@ class CatalogController extends Notifier<bool> {
               barcode: barcode?.trim().isEmpty ?? true ? null : barcode!.trim(),
             ),
           );
+
+      return locationId;
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.catalog,

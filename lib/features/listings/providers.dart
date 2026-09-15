@@ -5,7 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/providers/repository_providers.dart';
 import '../../core/state/selection_controller.dart';
-import '../marketplaces/domain/services/marketplace_order.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/listing.dart';
 
@@ -34,11 +33,16 @@ final listingsForItemProvider = StreamProvider.family<List<Listing>, String>((
     () => ref
         .watch(listingRepositoryProvider)
         .watchListingsForItem(itemId)
+        // By the name the listing froze, so two screens showing the same
+        // item agree on the order — a listing names a record the seller can
+        // rename or delete, so there is no canonical enum order left to sort
+        // by.
         .map(
-          (List<Listing> listings) => MarketplaceOrder.sort(
-            listings,
-            (Listing listing) => listing.marketplace,
-          ),
+          (List<Listing> listings) =>
+              <Listing>[...listings]..sort(
+                (Listing a, Listing b) =>
+                    a.marketplaceName.compareTo(b.marketplaceName),
+              ),
         ),
   );
 });

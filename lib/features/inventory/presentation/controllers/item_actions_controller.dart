@@ -11,11 +11,15 @@ import '../../../listings/domain/enums/listing_status.dart';
 import '../../../listings/domain/repositories/listing_repository.dart';
 import '../../../listings/domain/services/bulk_listing_plan.dart';
 import '../../../listings/providers.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../marketplaces/domain/entities/marketplace.dart';
+import '../../../marketplaces/providers.dart';
+import '../../../sourcing/domain/entities/purchase.dart';
+import '../../../sourcing/domain/services/purchase_item_count.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/enums/item_status.dart';
 import '../../domain/repositories/item_repository.dart';
 import '../../domain/services/item_transition.dart';
+import '../../providers.dart';
 
 /// Everything a seller does *to* an item once it exists: list it, reprice it,
 /// move it, archive it — one at a time or forty at once.
@@ -81,7 +85,7 @@ class ItemActionsController extends Notifier<bool> {
   /// passing one anyway would create a second listing on the same platform.
   Future<void> crossList(
     Item item, {
-    required Map<Marketplace, Money> prices,
+    required Map<String, Money> prices,
     List<Listing> reprice = const <Listing>[],
   }) async {
     final ListingRepository listings = ref.read(listingRepositoryProvider);
@@ -93,12 +97,12 @@ class ItemActionsController extends Notifier<bool> {
     SdLogger.action(LogTagConstant.listing, 'Cross-list item', <String, Object>{
       'itemId': item.id,
       'prices': <String, int>{
-        for (final MapEntry<Marketplace, Money> entry in prices.entries)
-          entry.key.name: entry.value.minor,
+        for (final MapEntry<String, Money> entry in prices.entries)
+          entry.key: entry.value.minor,
       },
       'repriced': <String, int>{
         for (final Listing listing in reprice)
-          listing.marketplace.name: listing.price.minor,
+          listing.marketplaceId: listing.price.minor,
       },
     });
 
@@ -114,11 +118,14 @@ class ItemActionsController extends Notifier<bool> {
         // eBay price pressed one button, and half of that landing is a state
         // nobody can read back.
         ...reprice,
-        for (final MapEntry<Marketplace, Money> entry in prices.entries)
+        for (final MapEntry<String, Money> entry in prices.entries)
           Listing(
             id: _uuid.v4(),
             itemId: item.id,
-            marketplace: entry.key,
+            marketplaceId: entry.key,
+            // Frozen here, at the one moment the record is in hand: renaming
+            // the marketplace later must not rewrite what was posted today.
+            marketplaceName: _marketplaceName(entry.key),
             // Per-marketplace titles are the point of the entity, but they
             // diverge when a seller optimises one — not at creation, where a
             // second box per platform would be four boxes for one intent.
@@ -159,7 +166,7 @@ class ItemActionsController extends Notifier<bool> {
         stackTrace: stackTrace,
         data: <String, Object>{
           'itemId': item.id,
-          'marketplaces': prices.keys.map((Marketplace m) => m.name).toList(),
+          'marketplaces': prices.keys.toList(),
         },
       );
 
@@ -198,11 +205,12 @@ class ItemActionsController extends Notifier<bool> {
     try {
       await listings.saveAll(<Listing>[
         for (final BulkListingLine line in plan.lines)
-          for (final MapEntry<Marketplace, Money> entry in line.prices.entries)
+          for (final MapEntry<String, Money> entry in line.prices.entries)
             Listing(
               id: _uuid.v4(),
               itemId: line.item.id,
-              marketplace: entry.key,
+              marketplaceId: entry.key,
+              marketplaceName: _marketplaceName(entry.key),
               title: line.item.title,
               price: entry.value,
               // Draft, like every other listing this app writes: nothing is
@@ -296,6 +304,66 @@ class ItemActionsController extends Notifier<bool> {
     } finally {
       state = false;
     }
+  }
+
+  /// File items under the purchase they came off.
+  ///
+  /// **The purchase's source and date travel with it**, for the reason
+  /// `ItemFormController.selectPurchase` gives: they are facts about the
+  /// purchase, and a second copy of them is a second answer.
+  Future<void> assignPurchase(List<Item> items, Purchase purchase) async {
+    await _bulk(
+      'Assign items to purchase',
+      items,
+      <String, Object>{'purchaseId': purchase.id},
+      (Item item) => item.copyWith(
+        purchaseId: purchase.id,
+        sourceId: purchase.sourceId ?? item.sourceId,
+        purchaseDate: purchase.purchaseDate,
+      ),
+    );
+
+    await _recountPurchase(purchase);
+  }
+
+  /// Bring the purchase's denormalised item count back in line.
+  ///
+  /// The Purchases list and Books show it beside the receipt total, and
+  /// neither can count a collection — so filing items without this leaves a
+  /// row reading "0 items" next to twelve of them.
+  Future<void> _recountPurchase(Purchase purchase) async {
+    final List<Item> items =
+        ref.read(itemsProvider).value ?? const <Item>[];
+    final Purchase? recounted = PurchaseItemCount.recounted(purchase, items);
+
+    if (recounted == null) return;
+
+    try {
+      await ref.read(purchaseRepositoryProvider).save(recounted);
+    } catch (error, stackTrace) {
+      // The items are filed either way; the count is a display figure, so a
+      // failure here must not undo the filing the seller asked for.
+      SdLogger.error(
+        LogTagConstant.item,
+        'Failed to recount purchase',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'purchaseId': purchase.id},
+      );
+    }
+  }
+
+  /// What the marketplace record is called right now, or its id when the
+  /// seller has already deleted it.
+  String _marketplaceName(String marketplaceId) {
+    final List<Marketplace> records =
+        ref.read(marketplacesProvider).value ?? const <Marketplace>[];
+
+    return records
+            .where((Marketplace record) => record.id == marketplaceId)
+            .firstOrNull
+            ?.name ??
+        marketplaceId;
   }
 
   /// Put items on a shelf.

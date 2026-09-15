@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { ceilingGrace, ceilingsByPlan } from '../lib/lib/firestore.js';
+import {
+  ceilingGrace,
+  ceilingsByPlan,
+  orderWindowDays,
+} from '../lib/lib/firestore.js';
 import { atCeiling } from '../lib/subscription/usage.js';
 
 // The compiled module, not the source: this suite runs under plain node, and
@@ -61,5 +65,13 @@ describe('when the rules refuse one more', () => {
     assert.equal(ceilingsByPlan.free.orders, 30);
     assert.equal(ceilingsByPlan.premium.items, null);
     assert.equal(ceilingsByPlan.premium.orders, null);
+  });
+
+  it('mirrors the window the app counts orders over', () => {
+    // The orders ceiling is a rate, not a total: 30 orders every 30 days.
+    // `PlanLimits.orderWindow` says the same thing in the app, and a backend
+    // counting a lifetime while the client counts a month would refuse
+    // exactly the write the client had just offered.
+    assert.equal(orderWindowDays, 30);
   });
 });

@@ -108,12 +108,26 @@ class InventoryMetrics {
     // Days from listing to sale, over the sold items that recorded both. An
     // item sold straight off the shelf never had a listing date and cannot
     // answer this — including it as zero would flatter the average.
+    //
+    // **A sale dated before the listing is dropped, not clamped.** The sale
+    // date is a box the seller types, and one mistyped year turned the
+    // average into "-181 days" — a figure that is not wrong by a little, it
+    // is not a duration at all. Zero would be a claim that it sold the same
+    // day, which is the other way of being wrong.
     final List<int> daysToSell = sold
-        .where((Item item) => item.listedAt != null && item.soldAt != null)
+        .where(
+          (Item item) =>
+              item.listedAt != null &&
+              item.soldAt != null &&
+              !item.soldAt!.isBefore(item.listedAt!),
+        )
         .map((Item item) => item.soldAt!.difference(item.listedAt!).inDays)
         .toList();
 
+    // Same guard, for the same reason: a row created "tomorrow" — a clock
+    // skew, an imported date — must not drag the average below zero.
     final List<int> ages = onHand
+        .where((Item item) => !item.createdAt.isAfter(now))
         .map((Item item) => now.difference(item.createdAt).inDays)
         .toList();
 

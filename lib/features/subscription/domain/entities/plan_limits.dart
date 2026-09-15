@@ -14,10 +14,12 @@ class PlanLimits {
     required this.workspaces,
   });
 
-  /// Items on hand. Nothing is deleted when a seller downgrades — see
-  /// `PlanGate`, which blocks the next *create* and never the existing rows.
+  /// Items ever created and kept. Nothing is deleted when a seller
+  /// downgrades — see `PlanGate`, which blocks the next *create* and never
+  /// the existing rows.
   final int? items;
 
+  /// Orders inside [orderWindow], not orders ever recorded.
   final int? orders;
   final int? workspaces;
 
@@ -35,14 +37,24 @@ class PlanLimits {
   /// fill, so a Free seller was never told what they were on.
   ///
   /// **Premium still sells the answers**, not permission to keep typing:
-  /// `PlanFeature.taxExport`, `payoutReconciliation`, `advancedAnalytics`,
-  /// `team`. The counts are what makes the plan visible; the capabilities are
-  /// what makes it worth paying for. One business stays a Free ceiling because
-  /// a second one is a second business, not a bigger one.
+  /// `PlanFeature.export` and `payoutReconciliation` — every way of taking
+  /// the figures out of the app, and chasing what a platform owes. The counts
+  /// are what makes the plan visible; the capabilities are what makes it worth
+  /// paying for. One business stays a Free ceiling because a second one is a
+  /// second business, not a bigger one.
   static const Map<SellerPlan, PlanLimits> byPlan = <SellerPlan, PlanLimits>{
     SellerPlan.free: PlanLimits(items: 50, orders: 30, workspaces: 1),
     SellerPlan.premium: PlanLimits(items: null, orders: null, workspaces: null),
   };
+
+  /// How far back the order ceiling looks.
+  ///
+  /// **The orders allowance is a rate, not a total** — owner's rule. It lives
+  /// here because the ceiling and the window it applies to are one statement,
+  /// and `functions/src/lib/firestore.ts` mirrors both: a client counting a
+  /// month while the backend counts a lifetime is a client that offers what
+  /// the rules refuse.
+  static const Duration orderWindow = Duration(days: 30);
 
   /// Never null: every plan has a row, and a missing one is a programming
   /// error rather than a reason to let the app through ungated.

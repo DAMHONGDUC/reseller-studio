@@ -48,10 +48,18 @@ everything under `docs/`, every `README.md`. No mixed-language paragraphs and
 no untranslated quotes. The app's user-facing strings are the exception and
 the opposite: those live in ARB files and ship in both locales (hard rule 7).
 
-**Explaining a change means showing before and after.** Not prose about what
-changed — the old code and the new one, side by side, then what the difference
-does. A description of a diff is the reader taking your word for it; the diff
-is the reader checking.
+**Explaining a change means showing before and after — of the behaviour, not
+of the code.** Owner's rule. The two halves are what the app did and what it
+will do: the rule that was in force, the number the seller saw, the screen
+that was blocked. A patch is not an explanation — the owner is deciding
+whether the new behaviour is right, and a diff makes them compile it in their
+head first. Name a symbol or a file only as the address of the change, never
+as the body of it.
+
+**And the pair is a table.** Owner's rule: two columns, before and after, one
+behaviour per cell, the effect on the line below. Side by side is what makes
+the halves comparable — stacked prose makes the reader carry the first half in
+their head while reading the second.
 
 **An explanation goes straight to the point.** Answer the question that was
 asked, then stop. Don't re-establish what the owner already knows, don't pad
@@ -882,6 +890,12 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
     headings only when the list is long enough to need them.
   - Say what changed and what it affects. Cut the reasoning that already
     lives in the commit messages or in `docs/rules/`.
+- **"Prepare for PR" is a fixed sequence.** Owner's rule, and it is three
+  steps in order, each reported: run the **full** test suite, not the part
+  that was touched; re-read the whole branch diff and fix what it turns up —
+  dead code, a stale comment, a boundary that disagrees with its mirror — and
+  only then hand over a title and description. A branch is reviewed whole, so
+  it is checked whole first.
 - **A PR description lists the features that branch built, and nothing else.**
   Owner's rule, and it **replaces "blockers go at the top"**. No deploy steps,
   no migration order, no caveats, no test counts, no diff stats, no

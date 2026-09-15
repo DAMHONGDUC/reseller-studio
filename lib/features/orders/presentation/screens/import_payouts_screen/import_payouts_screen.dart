@@ -180,6 +180,16 @@ class _ReadSummary extends StatelessWidget {
               ? SdStatToneV3.profit
               : SdStatToneV3.neutral,
         ),
+        // A readable file that matched nothing is not a bad file — it is a
+        // set of orders with no platform order number on them, and the fix is
+        // on the order rather than in the file.
+        if (match.matchedCount == 0 && read.rows.isNotEmpty) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h8),
+          Text(
+            context.l10n.importPayoutsNoneMatched,
+            style: context.textTheme3.bodySmall!.muted3(context),
+          ),
+        ],
         // Only when there is something to say: a clean file must not carry a
         // row of zeroes explaining what did not go wrong.
         if (match.unmatched.isNotEmpty || read.skipped > 0) ...<Widget>[

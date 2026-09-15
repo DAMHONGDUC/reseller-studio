@@ -10,9 +10,9 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/providers/repository_providers.dart';
+import '../../core/time/app_clock.dart';
 import '../app_config/providers.dart';
 import '../inventory/domain/entities/item.dart';
-import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
@@ -93,27 +93,45 @@ final hasFeatureProvider = Provider.family<bool, PlanFeature>((
 
 /// Items that count against the plan's ceiling.
 ///
-/// **Sold and archived rows do not count.** The limit is about how much stock
-/// a seller is holding, not how much they have ever typed in — counting
-/// history would mean a Free seller who runs the app properly for a year is
-/// locked out by their own success at selling.
+/// **Every item ever created counts, sold and archived included** — owner's
+/// rule, and it is the ceiling being a lifetime one rather than a stock level.
+/// Deleting a row is the only thing that gives a slot back, which is honest:
+/// a deleted row is gone from every screen too. The stream already drops
+/// soft-deleted rows, so the length is exactly "what this business has
+/// created and kept".
+///
+/// **`refreshUsage` in Functions counts the same set**, because the rules read
+/// its verdict: two spellings of one ceiling is a client that offers what the
+/// backend refuses.
 final Provider<int> countedItemsProvider = Provider<int>((Ref ref) {
   final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
 
-  return items
-      .where(
-        (Item item) =>
-            !item.isDeleted &&
-            item.status != ItemStatus.sold &&
-            item.status != ItemStatus.archived,
-      )
-      .length;
+  return items.where((Item item) => !item.isDeleted).length;
 });
 
+/// Orders inside the plan's rolling window.
+///
+/// **A month's trading, not a lifetime's** — owner's rule. Counting every
+/// order ever recorded walled a seller in at their thirty-first sale with no
+/// way to free a slot, which punished exactly the seller who used the app
+/// properly. The window moves with the clock, so a sale that falls out of it
+/// returns its slot without anyone doing anything.
+///
+/// Read through `clockProvider` because it is a derived figure, not a recorded
+/// one: a test pins the boundary rather than hoping the suite runs on the
+/// right day.
 final Provider<int> countedOrdersProvider = Provider<int>((Ref ref) {
   final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
+  final DateTime since = ref
+      .watch(clockProvider)
+      .now()
+      .subtract(PlanLimits.orderWindow);
 
-  return orders.length;
+  // Inclusive at the edge, because `refreshUsage` uses `>=` — an order landing
+  // exactly on the boundary must not be counted by one side and not the other.
+  return orders
+      .where((Order order) => !order.orderedAt.isBefore(since))
+      .length;
 });
 
 final Provider<int> countedWorkspacesProvider = Provider<int>((Ref ref) {

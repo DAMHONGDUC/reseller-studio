@@ -15,7 +15,6 @@ import 'package:reseller_studio/features/listings/domain/enums/listing_status.da
 import 'package:reseller_studio/features/listings/presentation/controllers/cross_list_controller.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
@@ -99,18 +98,18 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            prices: const <Marketplace, Money>{
-              Marketplace.ebay: Money(4500, 'USD'),
-              Marketplace.depop: Money(4500, 'USD'),
+            prices: const <String, Money>{
+              'ebay': Money(4500, 'USD'),
+              'depop': Money(4500, 'USD'),
             },
           );
 
       final List<Listing> listings = await listingsFor(container, 'x-1');
 
       expect(listings, hasLength(2));
-      expect(listings.map((Listing l) => l.marketplace).toSet(), <Marketplace>{
-        Marketplace.ebay,
-        Marketplace.depop,
+      expect(listings.map((Listing l) => l.marketplaceId).toSet(), <String>{
+        'ebay',
+        'depop',
       });
       // Draft, not active: nothing is integrated, so nothing may claim to be
       // live on eBay.
@@ -133,8 +132,8 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            prices: const <Marketplace, Money>{
-              Marketplace.etsy: Money(3000, 'USD'),
+            prices: const <String, Money>{
+              'etsy': Money(3000, 'USD'),
             },
           );
 
@@ -166,8 +165,8 @@ void main() {
             .read(itemActionsControllerProvider.notifier)
             .crossList(
               coat,
-              prices: const <Marketplace, Money>{
-                Marketplace.poshmark: Money(4000, 'USD'),
+              prices: const <String, Money>{
+                'poshmark': Money(4000, 'USD'),
               },
             );
 
@@ -190,7 +189,7 @@ void main() {
       await container.read(itemRepositoryProvider).save(coat);
       await container
           .read(itemActionsControllerProvider.notifier)
-          .crossList(coat, prices: const <Marketplace, Money>{});
+          .crossList(coat, prices: const <String, Money>{});
 
       expect(await listingsFor(container, 'x-4'), isEmpty);
     });
@@ -205,6 +204,19 @@ void main() {
       await pumpScreen(tester, const CrossListScreen(itemId: 'itm-4'));
 
       expect(find.text('Already on'), findsNWidgets(2));
+    });
+
+    testWidgets('it offers the business its own marketplaces', (
+      WidgetTester tester,
+    ) async {
+      // **The reason this screen stopped walking a hardcoded enum.** Vinted
+      // is one of the five records every business is created with and the
+      // enum never had it, so it could not be listed on; Shopify and Mercari
+      // were offered to sellers who do not have them.
+      await pumpScreen(tester, const CrossListScreen(itemId: 'itm-11'));
+
+      expect(find.text('Vinted'), findsOneWidget);
+      expect(find.text('Shopify'), findsNothing);
     });
 
     testWidgets('no asking price box sits above the marketplaces', (
@@ -344,22 +356,22 @@ void main() {
 
   group('a price per marketplace', () {
     CrossListState state({
-      Set<Marketplace> selected = const <Marketplace>{},
+      Set<String> selected = const <String>{},
       Money? price,
-      Map<Marketplace, Money> prices = const <Marketplace, Money>{},
+      Map<String, Money> prices = const <String, Money>{},
     }) => CrossListState(selected: selected, price: price, prices: prices);
 
     test('a row not ticked yet reads the inherited seed', () {
       final CrossListState current = state(
         price: const Money(4500, 'USD'),
-        selected: <Marketplace>{Marketplace.depop},
-        prices: const <Marketplace, Money>{
-          Marketplace.depop: Money(4000, 'USD'),
+        selected: <String>{'depop'},
+        prices: const <String, Money>{
+          'depop': Money(4000, 'USD'),
         },
       );
 
-      expect(current.priceFor(Marketplace.ebay), const Money(4500, 'USD'));
-      expect(current.priceFor(Marketplace.depop), const Money(4000, 'USD'));
+      expect(current.priceFor('ebay'), const Money(4500, 'USD'));
+      expect(current.priceFor('depop'), const Money(4000, 'USD'));
     });
 
     test('a ticked row with an emptied field holds publish closed', () {
@@ -367,17 +379,17 @@ void main() {
       // just deleted.
       expect(
         state(
-          selected: <Marketplace>{Marketplace.depop},
+          selected: <String>{'depop'},
           price: const Money(4500, 'USD'),
         ).canPublish,
         isFalse,
       );
       expect(
         state(
-          selected: <Marketplace>{Marketplace.depop},
+          selected: <String>{'depop'},
           price: const Money(4500, 'USD'),
-          prices: const <Marketplace, Money>{
-            Marketplace.depop: Money(4000, 'USD'),
+          prices: const <String, Money>{
+            'depop': Money(4000, 'USD'),
           },
         ).canPublish,
         isTrue,
@@ -391,11 +403,11 @@ void main() {
       );
 
       controller.inheritPrice(const Money(4500, 'USD'));
-      controller.toggle(Marketplace.etsy);
+      controller.toggle('etsy');
 
       // The common case — one number everywhere — must still be no typing.
       expect(
-        container.read(crossListControllerProvider).prices[Marketplace.etsy],
+        container.read(crossListControllerProvider).prices['etsy'],
         const Money(4500, 'USD'),
       );
     });
@@ -407,14 +419,14 @@ void main() {
       );
 
       controller.inheritPrice(const Money(4500, 'USD'));
-      controller.toggle(Marketplace.etsy);
-      controller.setPriceFor(Marketplace.etsy, const Money(2500, 'USD'));
-      controller.toggle(Marketplace.etsy);
-      controller.toggle(Marketplace.etsy);
+      controller.toggle('etsy');
+      controller.setPriceFor('etsy', const Money(2500, 'USD'));
+      controller.toggle('etsy');
+      controller.toggle('etsy');
 
       // Back on the inherited seed, not on the 2500 nobody chose this time.
       expect(
-        container.read(crossListControllerProvider).prices[Marketplace.etsy],
+        container.read(crossListControllerProvider).prices['etsy'],
         const Money(4500, 'USD'),
       );
     });
@@ -428,20 +440,20 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            prices: const <Marketplace, Money>{
-              Marketplace.ebay: Money(4500, 'USD'),
-              Marketplace.depop: Money(4000, 'USD'),
+            prices: const <String, Money>{
+              'ebay': Money(4500, 'USD'),
+              'depop': Money(4000, 'USD'),
             },
           );
 
-      final Map<Marketplace, Money> written = <Marketplace, Money>{
+      final Map<String, Money> written = <String, Money>{
         for (final Listing listing in await listingsFor(container, 'x-5'))
-          listing.marketplace: listing.price,
+          listing.marketplaceId: listing.price,
       };
 
-      expect(written, <Marketplace, Money>{
-        Marketplace.ebay: const Money(4500, 'USD'),
-        Marketplace.depop: const Money(4000, 'USD'),
+      expect(written, <String, Money>{
+        'ebay': const Money(4500, 'USD'),
+        'depop': const Money(4000, 'USD'),
       });
     });
 
@@ -454,9 +466,9 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            prices: const <Marketplace, Money>{
-              Marketplace.ebay: Money(4500, 'USD'),
-              Marketplace.depop: Money(4000, 'USD'),
+            prices: const <String, Money>{
+              'ebay': Money(4500, 'USD'),
+              'depop': Money(4000, 'USD'),
             },
           );
 
@@ -468,13 +480,13 @@ void main() {
       // Every price is a marketplace's own — the item carries none, so the
       // two numbers survive as two rather than being averaged into one.
       expect(
-        <Marketplace, Money>{
+        <String, Money>{
           for (final Listing listing in saved)
-            listing.marketplace: listing.price,
+            listing.marketplaceId: listing.price,
         },
-        const <Marketplace, Money>{
-          Marketplace.ebay: Money(4500, 'USD'),
-          Marketplace.depop: Money(4000, 'USD'),
+        const <String, Money>{
+          'ebay': Money(4500, 'USD'),
+          'depop': Money(4000, 'USD'),
         },
       );
     });

@@ -3,6 +3,7 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';
+import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/user_collections.dart';
 import '../../domain/entities/notification_preferences.dart';
 import '../../domain/enums/notification_type.dart';
@@ -21,12 +22,22 @@ class FirestoreNotificationPreferencesRepository
 
   final UserCollections _collections;
 
+  /// Through [FirestoreStream] like every other stream in `data/`: a raw
+  /// `.snapshots()` lets a revoked permission arrive on the stream as a
+  /// `FirebaseException`, unmapped and unlogged (hard rules 6 and 8).
+  ///
+  /// A user document that does not exist yet is not a failure — it is a
+  /// seller who has never changed a preference, so everything is on.
   @override
-  Stream<NotificationPreferences> watch() => _collections.user
-      .snapshots()
-      .map(
+  Stream<NotificationPreferences> watch() =>
+      FirestoreStream.document<NotificationPreferences>(
+        _collections.user,
         (DocumentSnapshot<Map<String, Object?>> snapshot) =>
             _read(snapshot.data()?[_field]),
+        operation: 'load notification preferences',
+      ).map(
+        (NotificationPreferences? preferences) =>
+            preferences ?? const NotificationPreferences.everything(),
       );
 
   @override

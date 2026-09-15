@@ -80,6 +80,14 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
 
   final TextEditingController _buyer = TextEditingController();
 
+  /// The platform's own order number.
+  ///
+  /// **Optional, and the only thing `PayoutCsvImport` can match on.** An
+  /// order without one can never be reconciled from a payout file, so the box
+  /// sits here rather than only on the order afterwards — this is the moment
+  /// the seller has the number in front of them.
+  final TextEditingController _externalOrderId = TextEditingController();
+
   /// What the platform paid, when the seller already knows it.
   ///
   /// **Left empty on purpose and optional.** Most sales are recorded before
@@ -157,6 +165,7 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
   void dispose() {
     _price.dispose();
     _buyer.dispose();
+    _externalOrderId.dispose();
     _payout.dispose();
     super.dispose();
   }
@@ -184,6 +193,9 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
             marketplaceName: marketplace.name,
             soldAt: _soldAt,
             buyerName: _buyer.text.trim().isEmpty ? null : _buyer.text.trim(),
+            externalOrderId: _externalOrderId.text.trim().isEmpty
+                ? null
+                : _externalOrderId.text.trim(),
             payout: Money.tryParse(_payout.text, currency),
           );
 
@@ -304,6 +316,24 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
                   if (picked == null) return;
 
                   setState(() => _soldAt = picked);
+
+                  // Says it once, at the moment it can still be corrected: a
+                  // sale dated before the item went up is what produced an
+                  // average "days to sell" below zero, and the seller is the
+                  // only one who knows which of the two dates is wrong.
+                  final DateTime? listed = widget.items
+                      .map((Item item) => item.listedAt)
+                      .nonNulls
+                      .firstOrNull;
+
+                  if (listed != null && picked.isBefore(listed)) {
+                    if (!context.mounted) return;
+
+                    SdSnackBarUtilsV3.info(
+                      context,
+                      context.l10n.markSoldBeforeListed,
+                    );
+                  }
                 },
               ),
               // How the one payment lands on each line. A bundle price is a
@@ -334,6 +364,14 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
                   payout: Money.tryParse(_payout.text, currency)!,
                 ),
               ],
+              SizedBox(height: SdSpacingConstant.h16),
+              SdTextFieldV3(
+                label: context.l10n.orderExternalId,
+                controller: _externalOrderId,
+                hint: context.l10n.orderExternalIdHint,
+                helperText: context.l10n.orderExternalIdHelp,
+                textInputAction: TextInputAction.next,
+              ),
               SizedBox(height: SdSpacingConstant.h16),
               SdTextFieldV3(
                 label: context.l10n.markSoldBuyer,

@@ -1,7 +1,6 @@
 import '../../../../core/money/money.dart';
 import '../../../inventory/domain/entities/item.dart';
 import '../../../inventory/domain/services/item_transition.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../entities/listing.dart';
 
 /// One item and the platforms it is about to go up on.
@@ -12,7 +11,9 @@ class BulkListingLine {
 
   /// What this item will be listed at on each platform. Never empty — an item
   /// with nothing left to list is not a line.
-  final Map<Marketplace, Money> prices;
+  /// Priced by marketplace record id — a listing names the seller's own
+  /// record, not a fixed platform.
+  final Map<String, Money> prices;
 }
 
 /// What listing forty items at once would actually do.
@@ -70,7 +71,7 @@ class BulkListingPlan {
 
   bool get isEmpty => lines.isEmpty;
 
-  /// Work out what listing [items] on [marketplaces] would write.
+  /// Work out what listing [items] on [marketplaceIds] would write.
   ///
   /// [uplift] is a fraction added to each item's expected price — `0.1` puts
   /// everything up 10%, which is what a seller does for a platform that takes
@@ -80,11 +81,11 @@ class BulkListingPlan {
   /// already on is left alone rather than listed twice.
   factory BulkListingPlan.from({
     required List<Item> items,
-    required Set<Marketplace> marketplaces,
+    required Set<String> marketplaceIds,
     required List<Listing> listings,
     double uplift = 0,
   }) {
-    final Map<String, Set<Marketplace>> live = <String, Set<Marketplace>>{};
+    final Map<String, Set<String>> live = <String, Set<String>>{};
     final List<BulkListingLine> lines = <BulkListingLine>[];
     final List<Item> withoutPrice = <Item>[];
     final List<Item> notListable = <Item>[];
@@ -92,8 +93,8 @@ class BulkListingPlan {
 
     for (final Listing listing in listings) {
       live
-          .putIfAbsent(listing.itemId, () => <Marketplace>{})
-          .add(listing.marketplace);
+          .putIfAbsent(listing.itemId, () => <String>{})
+          .add(listing.marketplaceId);
     }
 
     for (final Item item in items) {
@@ -111,12 +112,11 @@ class BulkListingPlan {
         continue;
       }
 
-      final Set<Marketplace> already =
-          live[item.id] ?? const <Marketplace>{};
-      final Map<Marketplace, Money> prices = <Marketplace, Money>{
-        for (final Marketplace marketplace in marketplaces)
-          if (!already.contains(marketplace))
-            marketplace: expected.applyRate(1 + uplift),
+      final Set<String> already = live[item.id] ?? const <String>{};
+      final Map<String, Money> prices = <String, Money>{
+        for (final String marketplaceId in marketplaceIds)
+          if (!already.contains(marketplaceId))
+            marketplaceId: expected.applyRate(1 + uplift),
       };
 
       if (prices.isEmpty) {

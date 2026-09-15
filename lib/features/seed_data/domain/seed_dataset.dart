@@ -6,7 +6,6 @@ import '../../inventory/domain/entities/storage_location.dart';
 import '../../inventory/domain/enums/item_status.dart';
 import '../../listings/domain/entities/listing.dart';
 import '../../listings/domain/enums/listing_status.dart';
-import '../../marketplaces/domain/enums/marketplace.dart' as legacy;
 import '../../offers/domain/entities/offer.dart';
 import '../../orders/domain/entities/order.dart';
 import '../../orders/domain/enums/order_status.dart';
@@ -177,7 +176,8 @@ class SeedDataset {
       Listing(
         id: 'seed-lst-1',
         itemId: SeedDatasetConstant.uncostedItemId,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         title: "Vintage Levi's 501 Redline Selvedge Denim 34x32 USA Made",
         price: money(18500),
         status: ListingStatus.active,
@@ -191,7 +191,8 @@ class SeedDataset {
       Listing(
         id: 'seed-lst-2',
         itemId: SeedDatasetConstant.uncostedItemId,
-        marketplace: legacy.Marketplace.depop,
+        marketplaceId: 'depop',
+        marketplaceName: 'Depop',
         title: 'vintage levis 501 redline selvedge 34x32',
         price: money(17500),
         status: ListingStatus.active,
@@ -203,7 +204,8 @@ class SeedDataset {
       Listing(
         id: 'seed-lst-3',
         itemId: SeedDatasetConstant.uncostedItemId,
-        marketplace: legacy.Marketplace.etsy,
+        marketplaceId: 'etsy',
+        marketplaceName: 'Etsy',
         title: 'Vintage Levi 501 Redline Selvedge 34x32',
         price: money(18000),
         status: ListingStatus.error,
@@ -216,7 +218,8 @@ class SeedDataset {
       Order(
         id: 'seed-ord-1',
         status: OrderStatus.delivered,
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceRecordId: 'ebay',
+        marketplaceNameSnapshot: 'eBay',
         salePrice: money(6800),
         shippingCost: money(1240),
         payout: money(4659),
@@ -241,7 +244,8 @@ class SeedDataset {
       Order(
         id: 'seed-ord-2',
         status: OrderStatus.delivered,
-        marketplace: legacy.Marketplace.mercari,
+        marketplaceRecordId: 'mercari',
+        marketplaceNameSnapshot: 'Mercari',
         salePrice: money(2400),
         shippingCost: money(980),
         payout: money(1876),
@@ -265,7 +269,8 @@ class SeedDataset {
       Order(
         id: SeedDatasetConstant.unpaidOrderId,
         status: OrderStatus.toShip,
-        marketplace: legacy.Marketplace.depop,
+        marketplaceRecordId: 'depop',
+        marketplaceNameSnapshot: 'Depop',
         salePrice: money(17500),
         orderedAt: daysAgo(1),
         shipByDate: now.add(const Duration(days: 1)),
@@ -362,7 +367,8 @@ class SeedDataset {
         id: 'seed-off-1',
         itemId: SeedDatasetConstant.uncostedItemId,
         itemTitle: 'Vintage Levi 501 — 34x32, redline selvedge',
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         amount: money(16500),
         status: OfferStatus.pending,
         createdAt: daysAgo(1),
@@ -374,7 +380,8 @@ class SeedDataset {
         id: 'seed-off-2',
         itemId: SeedDatasetConstant.uncostedItemId,
         itemTitle: 'Vintage Levi 501 — 34x32, redline selvedge',
-        marketplace: legacy.Marketplace.depop,
+        marketplaceId: 'depop',
+        marketplaceName: 'Depop',
         amount: money(9000),
         status: OfferStatus.pending,
         createdAt: daysAgo(3),
@@ -385,7 +392,8 @@ class SeedDataset {
         id: 'seed-off-3',
         itemId: 'seed-itm-1',
         itemTitle: 'Patagonia Synchilla fleece — mens L',
-        marketplace: legacy.Marketplace.ebay,
+        marketplaceId: 'ebay',
+        marketplaceName: 'eBay',
         amount: money(1500),
         status: OfferStatus.declined,
         createdAt: daysAgo(12),

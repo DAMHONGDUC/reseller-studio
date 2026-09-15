@@ -81,10 +81,12 @@ class OrderDetailEditController extends Notifier<OrderDetailEditState> {
     required String orderId,
     required String buyerName,
     required String salePrice,
+    required String externalOrderId,
   }) {
     final String currency = ref.read(workspaceCurrencyProvider);
     final Money? price = Money.tryParse(salePrice, currency);
     final String? buyer = TextInputUtils.orNull(buyerName);
+    final String? external = TextInputUtils.orNull(externalOrderId);
     final DateTime? orderedAt = state.orderedAt;
 
     return _write(orderId, OrderDetailSection.order, (Order current) {
@@ -95,6 +97,8 @@ class OrderDetailEditController extends Notifier<OrderDetailEditState> {
         orderedAt: orderedAt,
         buyerName: buyer,
         clearBuyerName: buyer == null,
+        externalOrderId: external,
+        clearExternalOrderId: external == null,
       );
     });
   }

@@ -8,20 +8,34 @@ any action that can be blocked by an entitlement.
 - **The paid product is Premium, offered monthly and yearly.** Owner's rule.
   Monthly and yearly are billing periods for the same entitlement, not two
   feature tiers; choosing either unlocks the same product capabilities.
-- **Free counts no records. Premium sells the answers.** Owner's rule, and it
-  replaced a ceiling of 50 items and 30 orders.
-  - The ceiling blocked the wrong thing. Every figure this app is bought for —
-    sell-through, ROI by source, payout reconciliation, the tax pack — is
-    meaningless at forty items, so the seller was stopped at exactly the point
-    their data was about to start being worth something. They left before
-    seeing the reason to pay.
-  - **What Premium buys is a capability, never permission to keep typing.**
-    `PlanFeature.taxExport`, `payoutReconciliation`, `advancedAnalytics`,
-    `reports`, `team`, `multipleWorkspaces`, `advancedPermissions`. Adding one
-    means adding it to that enum, which fails to compile until
-    `requiredPlan` answers for it.
-  - **Businesses stay a count**, and it is the one Free ceiling left: a second
-    business is a second business, not a bigger one.
+- **Free counts records, and the two counts are counted differently.** Owner's
+  rule.
+  - **Items are a lifetime total**: every row ever created and kept holds its
+    slot, and only deleting one gives a slot back.
+  - **Orders are a rate**: those inside `PlanLimits.orderWindow`, so a sale
+    that falls out of the window returns its slot on its own. A lifetime count
+    walled a seller in at their thirty-first sale with no action that could
+    free one — it punished the seller who used the app properly.
+  - **Businesses stay a standing count of one**: a second business is a second
+    business, not a bigger one.
+  - **`functions/src/subscription/usage.ts` counts the same two sets**, and a
+    scheduled recount clears a window that emptied with no write. A client
+    counting a month while the backend counts a lifetime offers what the rules
+    refuse.
+- **Every capability on the paywall is refused somewhere.** Owner's rule.
+  `PlanFeature` holds `export` — every CSV and the tax pack — and
+  `payoutReconciliation`. Six values that nothing gated were removed:
+  advanced analytics, CSV reports, automation, team, multiple businesses and
+  roles. Two of them had no code at all, one was free one screen over, and one
+  was the workspace ceiling sold a second time under another name.
+  `test/features/subscription/paywall_promises_test.dart` fails when a value
+  has no gate named against it.
+- **Every export is paid, and it is one capability.** Owner's rule. Reading a
+  figure on screen is free; handing the records to a spreadsheet or an
+  accountant is what Premium sells — `PlanFeature.export` covers the tax pack
+  and all four CSVs, because "may this seller take their figures out" has one
+  answer. Two names for that rule is how the tax summary came to be free on
+  Reports while the identical tax pack was sold on Tax.
   - The numbers still live only in `PlanLimits.byPlan`, with the one
     deliberate mirror in `functions/src/lib/firestore.ts`. Documents and UI
     copy read those fields and never repeat a value — the paywall's allowance

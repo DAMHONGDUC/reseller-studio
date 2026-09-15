@@ -88,13 +88,9 @@ void main() {
 
   test('Premium is what buys the answers, not permission to type', () {
     // The paid line is a capability now. Every one of these is what a seller
-    // opens the app at year end or on payout day to do.
-    for (final PlanFeature capability in <PlanFeature>[
-      PlanFeature.taxExport,
-      PlanFeature.payoutReconciliation,
-      PlanFeature.advancedAnalytics,
-      PlanFeature.team,
-    ]) {
+    // opens the app at year end or on payout day to do — and every one of
+    // them is refused somewhere, which `paywall_promises_test.dart` pins.
+    for (final PlanFeature capability in PlanFeature.values) {
       expect(PlanGate.has(SellerPlan.free, capability), isFalse);
       expect(PlanGate.has(SellerPlan.premium, capability), isTrue);
     }

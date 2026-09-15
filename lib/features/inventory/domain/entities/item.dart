@@ -155,6 +155,7 @@ class Item {
     Money? purchasePrice,
     Money? expectedPrice,
     Money? minimumPrice,
+    String? purchaseId,
     String? sourceId,
     String? categoryId,
     String? locationId,
@@ -190,7 +191,7 @@ class Item {
         ? null
         : expectedPrice ?? this.expectedPrice,
     minimumPrice: clearMinimumPrice ? null : minimumPrice ?? this.minimumPrice,
-    purchaseId: purchaseId,
+    purchaseId: purchaseId ?? this.purchaseId,
     sourceId: sourceId ?? this.sourceId,
     categoryId: categoryId ?? this.categoryId,
     locationId: locationId ?? this.locationId,

@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -12,6 +13,7 @@ import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../domain/entities/purchase.dart';
 import '../../../providers.dart';
+import '../../controllers/sourcing_controller.dart';
 
 /// One buying trip, and everything bought on it (plan §11).
 ///
@@ -86,6 +88,10 @@ class PurchaseDetailScreen extends ConsumerWidget {
             SizedBox(height: SdSpacingConstant.h12),
             _ApportionmentNote(gap: purchase.totalCost! - apportioned),
           ],
+          if (purchase.totalCost != null && items.isNotEmpty) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h12),
+            _ApportionButton(total: purchase.totalCost!, items: items),
+          ],
           if (purchase.notes != null) ...<Widget>[
             SizedBox(height: SdContentPaddingV3.sectionGap),
             SdCardV3(
@@ -105,9 +111,24 @@ class PurchaseDetailScreen extends ConsumerWidget {
           SizedBox(height: SdSpacingConstant.h8),
           if (items.isEmpty)
             SdCardV3(
-              child: Text(
-                context.l10n.sourcingNothingIsLinkedToThisPurchase,
-                style: context.textTheme3.bodyMedium!.muted3(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    context.l10n.sourcingNothingIsLinkedToThisPurchase,
+                    style: context.textTheme3.bodyMedium!.muted3(context),
+                  ),
+                  SizedBox(height: SdSpacingConstant.h12),
+                  // The way in, at the moment the seller is looking at the
+                  // receipt: the intake flow is what files items under it, and
+                  // it was reachable only from a sixteen-row list on Home.
+                  SdButtonV3(
+                    variant: SdButtonVariantV3.secondary,
+                    label: context.l10n.sourcingTakeItemsIn,
+                    expand: true,
+                    onPressed: () => context.push(AppRoutes.intake),
+                  ),
+                ],
               ),
             )
           else
@@ -125,6 +146,98 @@ class PurchaseDetailScreen extends ConsumerWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Writes each linked item its share of the receipt.
+///
+/// **The one place a cost is apportioned rather than measured**, and it says
+/// so: the receipt stays the fact, and this is the seller deciding which item
+/// carried how much of it. A box lot of twelve is otherwise twelve trips to
+/// twelve item forms, which is why nobody did it.
+class _ApportionButton extends ConsumerWidget {
+  const _ApportionButton({required this.total, required this.items});
+
+  final Money total;
+  final List<Item> items;
+
+  Future<void> _apportion(BuildContext context, WidgetRef ref) async {
+    // **Asked first when it would overwrite a cost somebody typed.** The
+    // spread is a judgement, and a seller who costed three items by hand is
+    // the one person who knows the split is already right.
+    final int costed = items
+        .where((Item item) => item.purchasePrice != null)
+        .length;
+
+    if (costed > 0) {
+      bool confirmed = false;
+
+      await showSdDialogV3(
+        context,
+        SdDialogV3(
+          title: context.l10n.sourcingApportionConfirmTitle,
+          message: context.l10n.sourcingApportionConfirmBody(costed),
+          icon: AppIconConstant.function,
+          actions: <SdDialogActionV3>[
+            SdDialogActionV3(
+              label: context.l10n.sourcingApportionAction,
+              isPrimary: true,
+              onPressed: () => confirmed = true,
+            ),
+            SdDialogActionV3(
+              label: context.l10n.actionCancel,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      );
+
+      if (!confirmed || !context.mounted) return;
+    }
+
+    try {
+      await ref
+          .read(sourcingControllerProvider.notifier)
+          .apportion(items, total);
+
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.success(
+        context,
+        context.l10n.sourcingApportionDone(items.length),
+      );
+    } catch (error) {
+      // Already logged by the controller.
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool isBusy = ref.watch(sourcingControllerProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SdButtonV3(
+          variant: SdButtonVariantV3.secondary,
+          label: context.l10n.sourcingApportionAction,
+          busy: isBusy,
+          expand: true,
+          onPressed: isBusy ? null : () => _apportion(context, ref),
+        ),
+        SizedBox(height: SdSpacingConstant.h6),
+        Text(
+          context.l10n.sourcingApportionHelp,
+          style: context.textTheme3.bodySmall!.faint3(context),
+        ),
+      ],
     );
   }
 }
@@ -155,10 +268,8 @@ class _ApportionmentNote extends StatelessWidget {
     return SdCardV3(
       child: Text(
         isUnder
-            ? '${context.money(gap)} of this receipt is not on any item yet. '
-                  'Profit on the unassigned part cannot be worked out.'
-            : 'The items add up to ${context.money(-gap)} more than the '
-                  'receipt. One of the costs is probably wrong.',
+            ? context.l10n.sourcingReceiptUnassigned(context.money(gap))
+            : context.l10n.sourcingReceiptOverAssigned(context.money(-gap)),
         style: context.textTheme3.bodySmall!.copyWith(
           color: context.sdTheme3.warning,
         ),

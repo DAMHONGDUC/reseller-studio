@@ -7,7 +7,8 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../listings/domain/services/bulk_listing_plan.dart';
 import '../../../listings/providers.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
+import '../../../marketplaces/domain/entities/marketplace.dart';
+import '../../../marketplaces/providers.dart';
 import '../../domain/entities/item.dart';
 import '../controllers/item_actions_controller.dart';
 
@@ -51,13 +52,15 @@ class _BulkListSheetState extends ConsumerState<BulkListSheet> {
   /// the end of a listing session, and typing a percentage is a form.
   static const List<double> _uplifts = <double>[0, 0.05, 0.1, 0.15];
 
-  final Set<Marketplace> _selected = <Marketplace>{};
+  /// Ticked marketplaces, by record id — the business's own platforms, not a
+  /// fixed list every seller gets the same copy of.
+  final Set<String> _selected = <String>{};
 
   double _uplift = 0;
 
   BulkListingPlan _plan() => BulkListingPlan.from(
     items: widget.items,
-    marketplaces: _selected,
+    marketplaceIds: _selected,
     listings: ref.read(listingsProvider).value ?? const <Listing>[],
     uplift: _uplift,
   );
@@ -111,14 +114,16 @@ class _BulkListSheetState extends ConsumerState<BulkListSheet> {
             spacing: SdSpacingConstant.w8,
             runSpacing: SdSpacingConstant.h8,
             children: <Widget>[
-              for (final Marketplace marketplace in Marketplace.values)
+              for (final Marketplace marketplace in ref.watch(
+                activeMarketplacesProvider,
+              ))
                 SdFilterChipV3(
-                  label: marketplace.displayName,
-                  selected: _selected.contains(marketplace),
+                  label: marketplace.name,
+                  selected: _selected.contains(marketplace.id),
                   onSelected: () => setState(
-                    () => _selected.contains(marketplace)
-                        ? _selected.remove(marketplace)
-                        : _selected.add(marketplace),
+                    () => _selected.contains(marketplace.id)
+                        ? _selected.remove(marketplace.id)
+                        : _selected.add(marketplace.id),
                   ),
                 ),
             ],

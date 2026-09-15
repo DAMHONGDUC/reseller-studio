@@ -10,6 +10,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
+import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
@@ -20,6 +21,8 @@ import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/services/listings_by_item.dart';
 import '../../../../listings/providers.dart';
+import '../../../../sourcing/domain/entities/purchase.dart';
+import '../../../../sourcing/providers.dart';
 import '../../../../subscription/domain/enums/plan_allowance.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -105,6 +108,35 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     );
   }
 
+  /// Two ways to take stock in, asked at the button rather than buried.
+  ///
+  /// **The buying trip is the only flow that ties items to a receipt**, and it
+  /// lived in Quick Action's sixteen-row list while Getting Started sent every
+  /// new seller to Quick Add — which is why a lot of twelve arrived as twelve
+  /// items belonging to no purchase.
+  Future<void> _openAdd() async {
+    final String? picked = await OptionPickerSheet.show<String>(
+      context,
+      title: context.l10n.inventoryAddTitle,
+      options: <PickerOption<String>>[
+        PickerOption<String>(
+          value: AppRoutes.quickAdd,
+          label: context.l10n.quickAddTitle,
+          caption: context.l10n.inventoryAddQuickCaption,
+        ),
+        PickerOption<String>(
+          value: AppRoutes.intake,
+          label: context.l10n.quickActionIntakeSession,
+          caption: context.l10n.inventoryAddIntakeCaption,
+        ),
+      ],
+    );
+
+    if (picked == null || !mounted) return;
+
+    await _add(picked);
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Item> items = ref.watch(visibleItemsProvider);
@@ -116,8 +148,8 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     ).isNotEmpty;
 
     return AppAddFabScaffold(
-      addLabel: context.l10n.quickAddTitle,
-      onAdd: () => _add(AppRoutes.quickAdd),
+      addLabel: context.l10n.inventoryAddTitle,
+      onAdd: _openAdd,
       floatingNav: true,
       showAdd: !isSelecting,
       bottomNavigationBar: isSelecting ? const _BulkActionBar() : null,

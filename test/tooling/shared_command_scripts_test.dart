@@ -10,7 +10,7 @@ void main() {
       multiLine: true,
     ).allMatches(melos);
 
-    expect(commands, hasLength(13));
+    expect(commands, hasLength(15));
 
     for (final RegExpMatch command in commands) {
       final String path = command.group(1)!;
@@ -44,9 +44,8 @@ void main() {
     expect(prepareEnv, greaterThanOrEqualTo(0));
     expect(deploy, greaterThan(prepareEnv));
 
-    // `pre-build` is among them: a gate full of this app's bundle ids and
-    // entitlements cannot live in a folder every app embedding the design
-    // system shares.
+    // A command is a shared script or a fastlane lane — never a loose `.sh`
+    // this app keeps on the side, which is what these names used to be.
     for (final String name in <String>[
       'run',
       'test-rules',
@@ -60,24 +59,36 @@ void main() {
     }
   });
 
-  test('pre-build is the app-owned fastlane lane', () {
+  test('the preflight gate is a shared fastlane lane melos calls', () {
     final String melos = File('melos.yaml').readAsStringSync();
-    final String fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+    final String app = File('ios/fastlane/Fastfile').readAsStringSync();
+    final String shared = File(
+      'packages/system_design/tool/fastlane/Fastfile',
+    ).readAsStringSync();
 
-    expect(melos, contains('run: cd ios && bundle exec fastlane pre_build'));
-    expect(fastfile, contains('lane :pre_build'));
+    expect(melos, contains('bundle exec fastlane preflight'));
+    expect(shared, contains('lane :preflight'));
+
+    // A lane copied here is one that stops getting the next fix — the app
+    // Fastfile imports the pipeline and declares only what it is aiming at.
+    expect(
+      app,
+      contains('import "../../packages/system_design/tool/fastlane/Fastfile"'),
+    );
+    expect(app, isNot(contains('lane :')));
   });
 
   test('beta names an export plist only when it wrote one', () {
-    final String fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+    final String fastfile = File(
+      'packages/system_design/tool/fastlane/Fastfile',
+    ).readAsStringSync();
 
     // An empty `--export-options-plist=` counts as given to build-ipa.sh, so
     // it drops its own `--export-method` and the export dies on a path of "".
     expect(
       fastfile,
       contains(
-        'build_args << "--export-options-plist=#{export_options}".shellescape '
-        'if export_options',
+        'command << "--export-options-plist=#{export_plist}" if export_plist',
       ),
     );
     expect(fastfile, isNot(contains('export_flag')));
@@ -119,5 +130,32 @@ void main() {
     // The probe this replaced answered a different question: an HTTP GET to
     // github.com succeeded while the git fetch behind SPM timed out on 443.
     expect(build, isNot(contains('curl')));
+  });
+
+  test('nothing reaches fastlane without a UTF-8 locale', () {
+    final String melos = File('melos.yaml').readAsStringSync();
+    final String common = File(
+      'packages/system_design/tool/_common.sh',
+    ).readAsStringSync();
+
+    // Ruby fixes `Encoding.default_external` at startup, and fastlane reads
+    // the shared Fastfile with it — so under `LANG=C` the lane dies on the
+    // first em dash, with syntax errors naming lines that are fine.
+    expect(common, contains('ensure_utf8_locale()'));
+
+    for (final String script in <String>['release.sh', 'upload-ipa.sh']) {
+      expect(
+        File('packages/system_design/tool/$script').readAsStringSync(),
+        contains('ensure_utf8_locale'),
+        reason: '$script hands a lane whatever locale the caller had',
+      );
+    }
+
+    // The melos entry runs the lane directly, so it carries its own guard.
+    final int guard = melos.indexOf('export LANG=en_US.UTF-8');
+    final int lane = melos.indexOf('bundle exec fastlane preflight');
+
+    expect(guard, greaterThanOrEqualTo(0));
+    expect(lane, greaterThan(guard));
   });
 }

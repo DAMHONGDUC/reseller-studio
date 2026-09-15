@@ -218,9 +218,11 @@ class Order {
     Money? refund,
     Money? payout,
     String? buyerName,
+    String? externalOrderId,
     String? trackingNumber,
     String? carrier,
     DateTime? shipByDate,
+    bool clearExternalOrderId = false,
     bool clearPayout = false,
     bool clearShippingCost = false,
     bool clearBuyerName = false,
@@ -245,7 +247,9 @@ class Order {
     shippingCost: clearShippingCost ? null : shippingCost ?? this.shippingCost,
     refund: refund ?? this.refund,
     payout: clearPayout ? null : payout ?? this.payout,
-    externalOrderId: externalOrderId,
+    externalOrderId: clearExternalOrderId
+        ? null
+        : externalOrderId ?? this.externalOrderId,
     buyerName: clearBuyerName ? null : buyerName ?? this.buyerName,
     trackingNumber: clearTrackingNumber
         ? null

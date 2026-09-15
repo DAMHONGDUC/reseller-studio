@@ -37,7 +37,7 @@ class OfferActionsController extends Notifier<bool> {
     SdLogger.action(LogTagConstant.offer, 'Accept offer', <String, Object>{
       'offerId': offer.id,
       'amountMinor': offer.amount.minor,
-      'marketplace': offer.marketplace.name,
+      'marketplace': offer.marketplaceId,
     });
 
     try {
@@ -64,7 +64,8 @@ class OfferActionsController extends Notifier<bool> {
             // An accepted offer is always for the one item it was made on.
             <Item>[item],
             salePrice: offer.amount,
-            marketplace: offer.marketplace,
+            marketplaceId: offer.marketplaceId,
+            marketplaceName: offer.marketplaceName,
             soldAt: DateTime.now(),
             buyerName: offer.buyerName,
           );

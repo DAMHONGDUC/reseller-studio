@@ -141,10 +141,21 @@ final class Money implements Comparable<Money> {
   /// **`compactSimpleCurrency`, not `compactCurrency`.** The latter renders
   /// the ISO code verbatim — `USD439` — because it treats `name` as the
   /// symbol to print. The `simple` variant looks the code up and prints `$439`.
-  String formatCompact({String? locale}) => NumberFormat.compactSimpleCurrency(
-    locale: locale,
-    name: currency,
-  ).format(major);
+  ///
+  /// **And no decimals below a thousand.** The compact formatter shortens
+  /// anything with a magnitude — `$1.2K` — but hands back the full `$60.00`
+  /// under it, which is two characters more than a quarter-width tile holds:
+  /// Home's Stock tile read `$60....`. A tile is a glance, so the pennies go.
+  String formatCompact({String? locale}) {
+    final NumberFormat formatter = NumberFormat.compactSimpleCurrency(
+      locale: locale,
+      name: currency,
+    );
+
+    if (major.abs() < 1000) formatter.maximumFractionDigits = 0;
+
+    return formatter.format(major);
+  }
 
   Money _checked(Money other) {
     if (other.currency != currency) {

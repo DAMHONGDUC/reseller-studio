@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/workspace_collections.dart';
 import '../../../../core/money/money.dart';
-import '../../../marketplaces/domain/enums/marketplace.dart';
 import '../../domain/entities/listing.dart';
 import '../../domain/enums/listing_status.dart';
 
@@ -24,12 +23,17 @@ final class ListingDto {
     return Listing(
       id: WorkspaceTable.localId(doc.id),
       itemId: FirestoreMapper.stringOrNull(data['itemId']) ?? '',
-      marketplace:
-          FirestoreMapper.enumOrNull(
-            Marketplace.values,
-            data['marketplaceId'],
-          ) ??
-          Marketplace.other,
+      // **Rows written before marketplaces were records need no migration**:
+      // the field already held the platform's id as a string, and the ids a
+      // business is created with are those same words. What is new is the
+      // name beside it, and a row without one falls back to the id — which is
+      // what the marketplace was called then anyway.
+      marketplaceId:
+          FirestoreMapper.stringOrNull(data['marketplaceId']) ?? 'other',
+      marketplaceName:
+          FirestoreMapper.stringOrNull(data['marketplaceName']) ??
+          FirestoreMapper.stringOrNull(data['marketplaceId']) ??
+          'Other',
       title: FirestoreMapper.stringOrNull(data['title']) ?? '',
       price:
           FirestoreMapper.moneyOrNull(data['priceMinor'], currency) ??
@@ -57,7 +61,8 @@ final class ListingDto {
     required String createdBy,
   }) => FirestoreMapper.pruned(<String, Object?>{
     'itemId': listing.itemId,
-    'marketplaceId': listing.marketplace.name,
+    'marketplaceId': listing.marketplaceId,
+    'marketplaceName': listing.marketplaceName,
     'title': listing.title,
     'currency': listing.price.currency,
     'priceMinor': listing.price.minor,

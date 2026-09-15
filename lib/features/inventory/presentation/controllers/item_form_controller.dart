@@ -14,6 +14,9 @@ import '../../../../core/providers/shared_preferences_provider.dart';
 import '../../../../core/storage/file_uploader.dart';
 import '../../../../core/utils/text_input_utils.dart';
 import '../../../listings/domain/entities/listing.dart';
+import '../../../sourcing/domain/entities/purchase.dart';
+import '../../../sourcing/domain/services/purchase_item_count.dart';
+import '../../../sourcing/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/entities/item_category.dart';
@@ -187,6 +190,43 @@ class ItemFormController extends Notifier<ItemFormState> {
   /// Only on a create: correcting one old item's bin is not a decision about
   /// the next twenty. Failing to write is not worth failing a save over, so
   /// it is logged and swallowed (hard rule 8).
+  /// Keep the purchase's item count in step when one is filed under it.
+  ///
+  /// The same reason `ItemActionsController` does it for a batch: the count is
+  /// denormalised onto the purchase because two screens show it beside the
+  /// receipt total, and nothing else recomputes it.
+  Future<void> _recountPurchase(String? purchaseId) async {
+    if (purchaseId == null) return;
+
+    final List<Purchase> purchases =
+        ref.read(purchasesProvider).value ?? const <Purchase>[];
+    final Purchase? purchase = purchases
+        .where((Purchase row) => row.id == purchaseId)
+        .firstOrNull;
+
+    if (purchase == null) return;
+
+    final Purchase? recounted = PurchaseItemCount.recounted(
+      purchase,
+      ref.read(itemsProvider).value ?? const <Item>[],
+    );
+
+    if (recounted == null) return;
+
+    try {
+      await ref.read(purchaseRepositoryProvider).save(recounted);
+    } catch (error, stackTrace) {
+      // The item is saved either way — the count is a display figure.
+      SdLogger.error(
+        LogTagConstant.item,
+        'Failed to recount purchase',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'purchaseId': purchaseId},
+      );
+    }
+  }
+
   Future<void> _rememberFiling() async {
     final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
 
@@ -254,6 +294,24 @@ class ItemFormController extends Notifier<ItemFormState> {
   void selectLocation(String? id) => state = state.copyWith(locationId: id);
 
   void selectSource(String? id) => state = state.copyWith(sourceId: id);
+
+  /// Point the item at a buying trip, and take the trip's own facts with it.
+  ///
+  /// The source and the date belong to the purchase, so re-asking for them
+  /// here is two more chances to disagree with the record just chosen.
+  void selectPurchase(String? id) {
+    final List<Purchase> purchases =
+        ref.read(purchasesProvider).value ?? const <Purchase>[];
+    final Purchase? purchase = purchases
+        .where((Purchase row) => row.id == id)
+        .firstOrNull;
+
+    state = state.copyWith(
+      purchaseId: id,
+      sourceId: purchase?.sourceId ?? state.sourceId,
+      purchaseDate: purchase?.purchaseDate ?? state.purchaseDate,
+    );
+  }
 
   void selectPurchaseDate(DateTime date) =>
       state = state.copyWith(purchaseDate: date);
@@ -434,6 +492,7 @@ class ItemFormController extends Notifier<ItemFormState> {
 
       await ref.read(itemRepositoryProvider).save(moved);
       await _saveListingPrices(id);
+      await _recountPurchase(moved.purchaseId);
 
       SdLogger.info(LogTagConstant.item, 'Item form saved', <String, Object>{
         'itemId': id,

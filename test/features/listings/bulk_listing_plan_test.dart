@@ -5,7 +5,6 @@ import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
 import 'package:reseller_studio/features/listings/domain/services/bulk_listing_plan.dart';
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 
 /// Listing day is a batch, and a batch action has to say what it will not do.
 ///
@@ -34,11 +33,11 @@ void main() {
     expectedPrice: expected,
   );
 
-  Listing listingOf({required String itemId, required Marketplace on}) =>
-      Listing(
-        id: 'lst-$itemId-${on.name}',
+  Listing listingOf({required String itemId, required String on}) => Listing(
+        id: 'lst-$itemId-$on',
         itemId: itemId,
-        marketplace: on,
+        marketplaceId: on,
+        marketplaceName: on,
         title: 'Item $itemId',
         price: gbpOf(4500),
         status: ListingStatus.draft,
@@ -47,12 +46,12 @@ void main() {
 
   BulkListingPlan planFor(
     List<Item> items, {
-    Set<Marketplace> on = const <Marketplace>{Marketplace.ebay},
+    Set<String> on = const <String>{'ebay'},
     List<Listing> listings = const <Listing>[],
     double uplift = 0,
   }) => BulkListingPlan.from(
     items: items,
-    marketplaces: on,
+    marketplaceIds: on,
     listings: listings,
     uplift: uplift,
   );
@@ -64,8 +63,8 @@ void main() {
       itemOf(id: 'b', expected: gbpOf(1200)),
     ]);
 
-    expect(plan.lines.first.prices[Marketplace.ebay], gbpOf(4500));
-    expect(plan.lines.last.prices[Marketplace.ebay], gbpOf(1200));
+    expect(plan.lines.first.prices['ebay'], gbpOf(4500));
+    expect(plan.lines.last.prices['ebay'], gbpOf(1200));
     expect(plan.listingCount, 2);
   });
 
@@ -74,7 +73,7 @@ void main() {
       itemOf(id: 'a', expected: gbpOf(4500)),
     ], uplift: 0.1);
 
-    expect(plan.lines.single.prices[Marketplace.ebay], gbpOf(4950));
+    expect(plan.lines.single.prices['ebay'], gbpOf(4950));
   });
 
   test('an item with no expected price is skipped, never listed at zero', () {
@@ -101,18 +100,18 @@ void main() {
   test('a platform the item is already on is left alone', () {
     final BulkListingPlan plan = planFor(
       <Item>[itemOf(id: 'a', expected: gbpOf(4500))],
-      on: <Marketplace>{Marketplace.ebay, Marketplace.depop},
-      listings: <Listing>[listingOf(itemId: 'a', on: Marketplace.ebay)],
+      on: <String>{'ebay', 'depop'},
+      listings: <Listing>[listingOf(itemId: 'a', on: 'ebay')],
     );
 
     // Listing it twice on the same platform is the bug this prevents.
-    expect(plan.lines.single.prices.keys, <Marketplace>[Marketplace.depop]);
+    expect(plan.lines.single.prices.keys, <String>['depop']);
   });
 
   test('an item already on every platform picked is skipped, not empty', () {
     final BulkListingPlan plan = planFor(
       <Item>[itemOf(id: 'a', expected: gbpOf(4500))],
-      listings: <Listing>[listingOf(itemId: 'a', on: Marketplace.ebay)],
+      listings: <Listing>[listingOf(itemId: 'a', on: 'ebay')],
     );
 
     expect(plan.alreadyListed.map((Item i) => i.id), <String>['a']);
@@ -128,7 +127,7 @@ void main() {
         itemOf(id: 'a', expected: gbpOf(4500)),
         itemOf(id: 'b', expected: gbpOf(4500)),
       ],
-      on: <Marketplace>{Marketplace.ebay, Marketplace.depop, Marketplace.etsy},
+      on: <String>{'ebay', 'depop', 'etsy'},
     );
 
     expect(plan.itemCount, 2);

@@ -7,7 +7,6 @@ import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
-import 'package:reseller_studio/features/marketplaces/domain/enums/marketplace.dart';
 
 import '../../support/pump_app.dart';
 
@@ -27,7 +26,9 @@ void main() {
       Listing(
         id: 'ebay',
         itemId: item.id,
-        marketplace: Marketplace.ebay,
+        marketplaceId: 'ebay',
+
+        marketplaceName: 'eBay',
         title: item.title,
         price: const Money(4512, 'USD'),
         status: ListingStatus.active,
@@ -36,7 +37,9 @@ void main() {
       Listing(
         id: 'etsy',
         itemId: item.id,
-        marketplace: Marketplace.etsy,
+        marketplaceId: 'etsy',
+
+        marketplaceName: 'Etsy',
         title: item.title,
         price: const Money(4099, 'USD'),
         status: ListingStatus.active,

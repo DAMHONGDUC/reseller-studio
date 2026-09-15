@@ -52,6 +52,7 @@ class RecordSaleController extends Notifier<bool> {
     required DateTime soldAt,
     String? buyerName,
     Money? payout,
+    String? externalOrderId,
   }) async {
     final OrderRepository orders = ref.read(orderRepositoryProvider);
     final String orderId = _uuid.v4();
@@ -96,6 +97,10 @@ class RecordSaleController extends Notifier<bool> {
         salePrice: salePrice,
         orderedAt: soldAt,
         buyerName: buyerName,
+        // The platform's own order number, when the seller copied it across.
+        // It is what `PayoutCsvImport` matches a payout row against, so an
+        // order without one can never be reconciled from a file.
+        externalOrderId: externalOrderId,
         // Null when the seller does not have it yet — most sales are recorded
         // before the platform pays. The order then reads `—` for profit and
         // joins the Payouts queue rather than carrying a guess.

@@ -63,6 +63,64 @@ class _BulkActionBar extends ConsumerWidget {
     ref.read(inventorySelectionProvider.notifier).clear();
   }
 
+  /// File the selection under a buying trip.
+  ///
+  /// Bulk because a trip arrives as a box of forty, and filing them one at a
+  /// time on each item form is the work this screen exists to remove
+  /// (hard rule 16).
+  Future<void> _assignPurchase(BuildContext context, WidgetRef ref) async {
+    final List<Purchase> purchases =
+        ref.read(purchasesProvider).value ?? const <Purchase>[];
+    final List<Item> items = ref.read(selectedItemsProvider);
+    final Map<String, String> sources = ref.read(sourceNamesProvider);
+
+    if (purchases.isEmpty) {
+      SdSnackBarUtilsV3.info(context, context.l10n.itemAddPurchaseFirst);
+
+      return;
+    }
+
+    final String? picked = await OptionPickerSheet.show<String>(
+      context,
+      title: context.l10n.bulkAssignPurchaseTitle(items.length),
+      options: purchases
+          .map(
+            (Purchase purchase) => PickerOption<String>(
+              value: purchase.id,
+              label: DateTimeUtils.mediumDate(
+                purchase.purchaseDate,
+                locale: context.localeTag,
+              ),
+              caption: sources[purchase.sourceId],
+            ),
+          )
+          .toList(),
+    );
+
+    if (picked == null || !context.mounted) return;
+
+    try {
+      await ref
+          .read(itemActionsControllerProvider.notifier)
+          .assignPurchase(
+            items,
+            purchases.firstWhere((Purchase row) => row.id == picked),
+          );
+
+      if (!context.mounted) return;
+
+      ref.read(inventorySelectionProvider.notifier).clear();
+    } catch (error) {
+      // Already logged by the controller.
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
+    }
+  }
+
   Future<void> _move(BuildContext context, WidgetRef ref) async {
     final List<StorageLocation> locations =
         ref.read(locationsProvider).value ?? const <StorageLocation>[];
@@ -193,6 +251,17 @@ class _BulkActionBar extends ConsumerWidget {
                   ),
                 ),
               ],
+            ),
+            SizedBox(height: SdSpacingConstant.h8),
+            // Its own row rather than a fourth in the one above: the comment
+            // there holds — four small buttons in a row makes every one of
+            // them the narrowest thing on the bar.
+            SdButtonV3(
+              variant: SdButtonVariantV3.outlined,
+              label: context.l10n.bulkAssignPurchase,
+              size: SdButtonSizeV3.small,
+              expand: true,
+              onPressed: () => _assignPurchase(context, ref),
             ),
           ],
         ),
