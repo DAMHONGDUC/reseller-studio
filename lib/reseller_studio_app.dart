@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -12,6 +11,7 @@ import 'core/bootstrap/app_startup_failure.dart';
 import 'core/config/app_env.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/app_screen_util.dart';
 import 'core/widgets/splash_screen.dart';
 import 'core/widgets/startup_error_screen.dart';
 import 'features/app_config/presentation/widgets/force_update_gate.dart';
@@ -22,28 +22,15 @@ import 'l10n/gen/app_localizations.dart';
 
 /// The app widget.
 ///
-/// **`ScreenUtilInit` sits above `MaterialApp` and is not optional.** Every
+/// **[AppScreenUtil] sits above `MaterialApp` and is not optional.** Every
 /// dimension in the design system resolves through `SdSpacingConstant`, whose
-/// getters call screenutil at *runtime* — so without this in the tree, the
-/// first `SdSpacingConstant.w16` a widget reads throws. A widget test that
-/// pumps `ResellerStudioApp` gets it for free; one that pumps a bare `MaterialApp`
-/// must install it by hand.
-///
-/// **It must be given `builder:`, never `child:`, and this is not a style
-/// preference.** `AppTheme.light` reads `SdSpacingConstant.sp*` to build its
-/// `TextTheme`, so the theme is itself a screenutil consumer. Passed as
-/// `child:` it would be constructed as an argument — evaluated by *this*
-/// build method, before `ScreenUtilInit` has initialized anything — and throw
-/// `ScreenUtil not initialized`. `builder:` defers construction until after
-/// init. `test/core/theme/app_theme_test.dart` fails if this is changed back.
-///
-/// [designSize] is the canvas every spacing number was chosen against. Change
-/// it and every dimension in both the app and the design system rescales at
-/// once, which is a thing to do deliberately and never to fix one screen.
+/// getters call screenutil at *runtime* — so without it in the tree, the
+/// first `SdSpacingConstant.w16` a widget reads throws. It also carries the
+/// clamp that stops a tablet scaling every token; that widget's own doc has
+/// the rest.
 class ResellerStudioApp extends ConsumerWidget {
   const ResellerStudioApp({super.key});
 
-  /// iPhone 14 / 15 logical size — the device the layouts were drawn for.
   /// The locales a build offers, and it is deliberately **not**
   /// [AppLocalizations.supportedLocales].
   ///
@@ -56,8 +43,6 @@ class ResellerStudioApp extends ConsumerWidget {
   /// The vi keys stay in the ARB (hard rule 7). This list grows again in the
   /// one translation pass at release.
   static const List<Locale> shippingLocales = <Locale>[Locale('en')];
-
-  static const Size designSize = Size(390, 844);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -77,10 +62,8 @@ class ResellerStudioApp extends ConsumerWidget {
     // has to change.
     ref.watch(pushControllerProvider);
 
-    return ScreenUtilInit(
-      designSize: designSize,
-      minTextAdapt: true,
-      builder: (BuildContext context, Widget? child) => SdDevWrapper(
+    return AppScreenUtil(
+      builder: (BuildContext context) => SdDevWrapper(
         envName: AppEnv.flavor.name,
         buildName: packageInfo?.version ?? '',
         buildNumber: packageInfo?.buildNumber ?? '',
@@ -147,10 +130,8 @@ class _StartupErrorApp extends StatelessWidget {
   final AppStartupFailure failure;
 
   @override
-  Widget build(BuildContext context) => ScreenUtilInit(
-    designSize: ResellerStudioApp.designSize,
-    minTextAdapt: true,
-    builder: (BuildContext context, Widget? child) => MaterialApp(
+  Widget build(BuildContext context) => AppScreenUtil(
+    builder: (BuildContext context) => MaterialApp(
       debugShowCheckedModeBanner: false,
       onGenerateTitle: (BuildContext context) =>
           AppLocalizations.of(context).appTitle,

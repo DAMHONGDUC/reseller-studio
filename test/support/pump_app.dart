@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,6 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/time/app_clock.dart';
+import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
 import 'package:reseller_studio/features/expenses/providers.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
@@ -24,7 +24,6 @@ import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart';
 import 'package:reseller_studio/features/sourcing/providers.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
-import 'package:reseller_studio/reseller_studio_app.dart';
 
 import 'fakes/fake_overrides.dart';
 import 'fakes/in_memory_repositories.dart';
@@ -152,9 +151,8 @@ Future<void> _pumpApp(
         ),
         ...overrides,
       ],
-      child: ScreenUtilInit(
-        designSize: ResellerStudioApp.designSize,
-        builder: (BuildContext context, Widget? _) => router == null
+      child: AppScreenUtil(
+        builder: (BuildContext context) => router == null
             ? MaterialApp(
                 theme: AppTheme.light,
                 localizationsDelegates: delegates,

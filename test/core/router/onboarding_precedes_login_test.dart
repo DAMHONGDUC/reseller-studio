@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/router/app_router.dart';
 import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
+import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
 import 'package:reseller_studio/features/workspace/providers.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
-import 'package:reseller_studio/reseller_studio_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// **The intro never becomes a way into the app** (hard rule 1).
@@ -71,9 +70,8 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: ScreenUtilInit(
-          designSize: ResellerStudioApp.designSize,
-          builder: (BuildContext context, Widget? _) => MaterialApp.router(
+        child: AppScreenUtil(
+          builder: (BuildContext context) => MaterialApp.router(
             theme: AppTheme.light,
             routerConfig: router,
             localizationsDelegates: const <LocalizationsDelegate<Object>>[

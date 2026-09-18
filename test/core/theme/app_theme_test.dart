@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/theme/app_colors.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
-import 'package:reseller_studio/reseller_studio_app.dart';
+import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:system_design/index.dart';
 
 /// The two things that silently break the whole UI, tested here because
@@ -31,9 +30,8 @@ void main() {
     Widget child, {
     ThemeData Function()? theme,
   }) => tester.pumpWidget(
-    ScreenUtilInit(
-      designSize: ResellerStudioApp.designSize,
-      builder: (BuildContext context, Widget? _) => MaterialApp(
+    AppScreenUtil(
+      builder: (BuildContext context) => MaterialApp(
         theme: theme == null ? AppTheme.light : theme(),
         home: child,
       ),
