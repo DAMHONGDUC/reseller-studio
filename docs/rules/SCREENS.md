@@ -274,12 +274,20 @@ when the answer it is waiting for has already landed.
 - **It is a hold, never a delay.** The work runs the whole time; what waits is
   only the route change. Nothing is scheduled behind it and no call is slowed
   down to make room for it.
+- **It only keeps the seller on the splash; it never sends them there.** A
+  hold left standing while the app is on Home costs nothing, which is what
+  makes it safe to arm early.
 - **It re-arms whenever the app starts deciding again**, which is what covers
   sign-in. `appIsResolvingProvider` is the signal, and it mirrors the
   redirect's own splash conditions — change one and change the other.
-- **A hold already running is left alone.** A second question arriving
-  mid-swing does not restart the clock, or a seller whose workspace and
-  profile land a moment apart waits twice.
+- **The clock belongs to `SplashScreen`, not to the hold.** What is being
+  waited for is the animation being *seen*, so it starts when the screen
+  appears and is cancelled when it goes — nothing counts down while the
+  loading view is not up, and a test that never shows it is left with no timer
+  running.
+- **A hold already standing is left alone.** A second question arriving
+  mid-swing does not restart it, or a seller whose profile and workspace land
+  a moment apart waits twice.
 - The animation itself is `SdLoadingV3Page`, which is the page-sized half of
   the one loading indicator (`DESIGN_SYSTEM.md`).
 
