@@ -38,12 +38,19 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
   /// cannot do from the client at all.
   final FirebaseFunctions _functions;
 
+  /// **Confirmed, not merely cached** — this is the document the router
+  /// branches on. Firestore answers a listener from its cache first, and a
+  /// device that has never held this profile answers "no such document",
+  /// which `workspaceStatusProvider` can only read as "no business yet". That
+  /// is what sent a returning seller to the create-business form for half a
+  /// second after every sign-in.
   @override
-  Stream<UserProfile?> watchProfile(String uid) => FirestoreStream.document(
-    _users.doc(uid),
-    UserProfileDto.toEntity,
-    operation: 'load profile',
-  );
+  Stream<UserProfile?> watchProfile(String uid) =>
+      FirestoreStream.confirmedDocument(
+        _users.doc(uid),
+        UserProfileDto.toEntity,
+        operation: 'load profile',
+      );
 
   @override
   Stream<Workspace?> watchWorkspace(String workspaceId) =>
