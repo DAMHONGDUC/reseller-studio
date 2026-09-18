@@ -454,6 +454,12 @@ one that opens a sheet of verbs.
 Ported from BaroEase's `SdContentPaddingV2`, which v3 was copied from. Read
 this before adding any inset, gap or padding anywhere.
 
+**A value that changes with the width of the window is in
+`docs/rules/RESPONSIVE.md`, not here** — the gutter, the content cap and the
+clamp on screenutil's scale. They are still `SdContentPaddingV3` fields and
+still obey the one law below; that file only says when the width changes the
+answer.
+
 ### The one law
 
 **No widget and no screen holds spacing logic — `SdContentPaddingV3` does.**

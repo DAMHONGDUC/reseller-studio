@@ -14,6 +14,10 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
 
 ## The frame
 
+- **A screen wider than a phone caps and centres its body** — that rule and
+  everything else that changes with the width of the window is in
+  `docs/rules/RESPONSIVE.md`. Nothing on this page is width-dependent unless
+  it says so.
 - **A screen never constructs an `AppBar`.** It passes `SdAppBarV3` to
   `SdScaffoldV3`, or it uses `SdSearchHeaderV3` when its search box is the
   point. One widget owns the bar so two screens cannot drift into two.
