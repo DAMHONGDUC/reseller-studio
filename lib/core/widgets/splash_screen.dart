@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../fresh_install/app_fresh_install.dart';
+import '../router/splash_hold.dart';
 
 /// What the app shows while it is not ready yet — and, while it is showing,
 /// the thing that makes it ready.
@@ -30,7 +33,7 @@ import '../fresh_install/app_fresh_install.dart';
 /// above `ForceUpdateGate` and its `app_config` read. Letting the first screen
 /// build alongside would also race the sign-out against the screens reading
 /// that session.
-class SplashScreen extends ConsumerWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({this.child, super.key});
 
   /// What to show once the device is known to belong to this build.
@@ -41,8 +44,42 @@ class SplashScreen extends ConsumerWidget {
   final Widget? child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final Widget? ready = child;
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  /// How long the loading animation has left to run.
+  ///
+  /// **The route's copy of this screen owns it, and the wrapper's does not.**
+  /// This class does two jobs — it is the `/splash` route, and it is the gate
+  /// above the whole app that runs the fresh-install wipe — and only the first
+  /// is a screen the router can be held on. Started here rather than in
+  /// [SplashHoldController] so nothing is counting down while the animation is
+  /// not on screen.
+  Timer? _hold;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.child == null) {
+      _hold = Timer(
+        SplashHoldController.minimum,
+        () => ref.read(splashHoldProvider.notifier).release(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _hold?.cancel();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget? ready = widget.child;
     final AsyncValue<SdFreshInstallOutcome> check = ref.watch(
       freshInstallProvider,
     );

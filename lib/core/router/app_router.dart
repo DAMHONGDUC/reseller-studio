@@ -71,6 +71,7 @@ import '../widgets/splash_screen.dart';
 import 'app_bottom_sheet_page.dart';
 import 'app_navigator_key.dart';
 import 'app_routes.dart';
+import 'splash_hold.dart';
 
 /// The app's router.
 ///
@@ -83,6 +84,8 @@ import 'app_routes.dart';
 /// - the config blocks this account → [AppRoutes.blocked], above everything:
 ///   it is decided by who is signed in, so nothing an onboarding flag or a
 ///   workspace says can change it;
+/// - already on the splash with the loading animation owed time → stay
+///   ([splashHoldProvider]). Below the block above, which cannot wait;
 /// - onboarding or auth state still unknown → [AppRoutes.splash]; showing the
 ///   login form here would flash it at a returning user before their session
 ///   resolves, and showing the intro would flash it at one who finished it
@@ -124,6 +127,13 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       // redirect of its own.
       if (blocked) {
         return location == AppRoutes.blocked ? null : AppRoutes.blocked;
+      }
+
+      // **The loading screen is left when it is done being watched, not when
+      // the answer lands** — owner's rule, held by [splashHoldProvider]. Below
+      // the block above, which is about who is signed in and cannot wait.
+      if (location == AppRoutes.splash && ref.read(splashHoldProvider)) {
+        return null;
       }
 
       if (signedIn == null || onboarding == OnboardingStatus.loading) {
@@ -178,8 +188,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
     routes: <RouteBase>[
       GoRoute(
         path: AppRoutes.splash,
-        builder: (BuildContext context, GoRouterState state) =>
-            const SplashScreen(),
+        // **No transition, and it is not a style choice.** The signed-out
+        // shell renders at `/home` (hard rule 1), so signing in leaves the
+        // shell for this route and comes back to it — and go_router gives
+        // `StatefulShellRoute` one `GlobalKey` for the life of the router. An
+        // animated page keeps the outgoing shell mounted while the next one
+        // is built, which is two widgets holding one global key.
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            const NoTransitionPage<void>(child: SplashScreen()),
       ),
       GoRoute(
         path: AppRoutes.blocked,
@@ -707,12 +723,17 @@ class _RouterRefreshListenable extends ChangeNotifier {
       _notifyIfChanged<OnboardingStatus>,
     );
     _blocked = _listen<bool>(ref, accountBlockedProvider);
+    // Inline for the same reason as onboarding: a `NotifierProvider` is not a
+    // `Provider<T>`. Without it the redirect never re-runs when the hold
+    // expires and the app sits on the loading screen.
+    _splashHold = ref.listen<bool>(splashHoldProvider, _notifyIfChanged<bool>);
   }
 
   late final ProviderSubscription<bool?> _signedIn;
   late final ProviderSubscription<WorkspaceStatus> _workspace;
   late final ProviderSubscription<OnboardingStatus> _onboarding;
   late final ProviderSubscription<bool> _blocked;
+  late final ProviderSubscription<bool> _splashHold;
 
   /// Typed on `Provider<T>` rather than the more general
   /// `ProviderListenable<T>` that `ref.listen` accepts: Riverpod 3 declares
@@ -733,6 +754,7 @@ class _RouterRefreshListenable extends ChangeNotifier {
     _workspace.close();
     _onboarding.close();
     _blocked.close();
+    _splashHold.close();
     super.dispose();
   }
 }
