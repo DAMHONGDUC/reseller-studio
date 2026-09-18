@@ -50,7 +50,6 @@ void main() {
     Set<String> devMode = const <String>{},
     Set<String> blocked = const <String>{},
   }) => AppConfig(
-    premiumEnabled: true,
     premiumEmails: premium,
     devModeEmails: devMode,
     blockedEmails: blocked,

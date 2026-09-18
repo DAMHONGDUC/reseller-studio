@@ -9,7 +9,6 @@ import 'app_update_policy.dart';
 /// by nobody in the app.
 class AppConfig {
   const AppConfig({
-    required this.premiumEnabled,
     this.ios = AppUpdatePolicy.none,
     this.android = AppUpdatePolicy.none,
     this.premiumEmails = const <String>{},
@@ -19,30 +18,17 @@ class AppConfig {
 
   /// What a client falls back to.
   ///
-  /// **The flags fall back in opposite directions, and each is the safe one
-  /// for what it controls.**
+  /// **Everything falls back to the safe direction for what it controls.**
   ///
-  /// - Monetisation falls back **on**. A failed read, a cold start with no
-  ///   signal, a document nobody has created: defaulting the other way hands
-  ///   the paid half of the app to everyone the first time Firestore is slow.
   /// - The forced update falls back to **not forcing** ([AppUpdatePolicy.none]
   ///   on both platforms). A wrong answer here locks every seller out of an
   ///   app they cannot fix from their side, and there is no way to ship them
-  ///   out of it — where a paywall shown by mistake is cosmetic and
-  ///   self-corrects on the next snapshot.
-  /// - Every email list falls back **empty**, which is the same direction as
-  ///   the update flag read three ways: nobody is blocked out of the app,
-  ///   nobody is handed a grant the owner did not type, and a config that
-  ///   failed to load cannot be the reason an account is refused.
-  static const AppConfig fallback = AppConfig(premiumEnabled: true);
-
-  /// Whether the plan system applies at all.
-  ///
-  /// False turns monetisation off for **everyone**: no ceiling blocks a
-  /// create, every capability is included, and nothing offers a purchase. It
-  /// is one flag rather than a per-feature list because half-priced is not a
-  /// state this product has.
-  final bool premiumEnabled;
+  ///   out of it.
+  /// - Every email list falls back **empty**, which is the same direction read
+  ///   three ways: nobody is blocked out of the app, nobody is handed a grant
+  ///   the owner did not type, and a config that failed to load cannot be the
+  ///   reason an account is refused.
+  static const AppConfig fallback = AppConfig();
 
   /// What the App Store says about the running build.
   final AppUpdatePolicy ios;
@@ -101,7 +87,6 @@ class AppConfig {
   /// (hard rule 9) — the count is what a reader needs to know the config
   /// arrived.
   Map<String, Object?> toLogData() => <String, Object?>{
-    'premiumEnabled': premiumEnabled,
     'ios': ios.toLogData(),
     'android': android.toLogData(),
     'premiumEmails': premiumEmails.length,

@@ -261,10 +261,7 @@ final class MoreConstant {
   /// built here from the resolved workspace id because it opened one record;
   /// it opens the list instead, which names none
   /// (`lib/features/workspace/CLAUDE.md`).
-  static List<MoreSection> sectionsFor({
-    required bool signedIn,
-    bool premiumEnabled = true,
-  }) {
+  static List<MoreSection> sectionsFor({required bool signedIn}) {
     if (!signedIn) {
       final MoreDestination settings = destinations.firstWhere(
         (MoreDestination destination) =>
@@ -279,21 +276,6 @@ final class MoreConstant {
       ];
     }
 
-    if (premiumEnabled) return sections;
-
-    // Nothing is for sale, so a row that opens a plan screen is a row that
-    // leads to an empty promise.
-    return <MoreSection>[
-      for (final MoreSection section in sections)
-        MoreSection(
-          kind: section.kind,
-          destinations: section.destinations
-              .where(
-                (MoreDestination destination) =>
-                    destination.kind != MoreDestinationKind.subscription,
-              )
-              .toList(growable: false),
-        ),
-    ];
+    return sections;
   }
 }

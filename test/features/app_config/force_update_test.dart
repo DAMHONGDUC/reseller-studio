@@ -51,7 +51,6 @@ void main() {
 
   AppConfig iosConfig({required bool enabled, required int buildNumber}) =>
       AppConfig(
-        premiumEnabled: true,
         ios: AppUpdatePolicy(
           forceUpdateEnabled: enabled,
           buildNumber: buildNumber,
@@ -119,7 +118,6 @@ void main() {
     // A build number is only meaningful next to the store that issued it, so
     // an iOS block must not stop an Android build on the same number.
     final AppConfig config = AppConfig(
-      premiumEnabled: true,
       ios: const AppUpdatePolicy(forceUpdateEnabled: true, buildNumber: 41),
       android: AppUpdatePolicy.none,
     );

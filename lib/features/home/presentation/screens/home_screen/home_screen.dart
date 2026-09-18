@@ -19,7 +19,6 @@ import '../../../../../core/widgets/notification_bell.dart';
 import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
-import '../../../../app_config/providers.dart';
 import '../../../../inventory/domain/entities/item.dart';
 import '../../../../offers/domain/entities/offer.dart';
 import '../../../../offers/providers.dart';

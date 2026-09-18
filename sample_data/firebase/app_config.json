@@ -1,7 +1,6 @@
 {
   "current": {
     "blocked_emails": [],
-    "premium_enabled": true,
     "force_update": {
       "android": {
         "enable_force_update": false,

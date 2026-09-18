@@ -1,7 +1,6 @@
 /// Riverpod wiring for `app_config` — the product's own switches.
 ///
-/// **Every gate reads [premiumEnabledProvider], never the repository.** The
-/// flag decides whether the plan system applies at all, so a screen asking
+/// **Every gate reads a provider here, never the repository.** A screen asking
 /// Firestore directly would be a second answer to a question one provider owns.
 library;
 
@@ -20,15 +19,6 @@ import 'domain/enums/app_platform.dart';
 
 final StreamProvider<AppConfig> appConfigProvider = StreamProvider<AppConfig>(
   (Ref ref) => ref.watch(appConfigRepositoryProvider).watch(),
-);
-
-/// Whether the plan system applies at all.
-///
-/// **Falls back to on while loading, erroring, or with no document**, which is
-/// the whole of [AppConfig.fallback]'s reasoning: the other direction gives
-/// the paid half of the app away on every cold start.
-final Provider<bool> premiumEnabledProvider = Provider<bool>(
-  (Ref ref) => ref.watch(_resolvedConfigProvider).premiumEnabled,
 );
 
 /// The build number this binary was compiled as — the `+7` of `1.0.0+7`.

@@ -56,20 +56,16 @@ final FutureProvider<List<PlanOffering>> planOfferingsProvider =
 /// moment is a cosmetic bug, whereas defaulting to Premium would hand the
 /// whole app away on every cold start.
 ///
-/// **With monetisation switched off it answers Premium for everyone**, and
-/// that is the whole of the kill switch: every ceiling, capability and block
-/// in the app already asks this one question, so turning the plan system off
-/// is one answer changing rather than a flag threaded through forty call
-/// sites. `subscriptionStatusProvider` stays the honest record of what the
-/// seller actually bought — read that, never this, to say so on screen.
-///
-/// **An account `app_config` names is Premium without having bought it**, the
-/// same one-answer trick aimed at one person rather than everybody: the
-/// owner, a tester, a seller being made whole after a billing failure.
+/// **An account `app_config` names is Premium without having bought it** —
+/// every ceiling, capability and block in the app already asks this one
+/// question, so a grant is one answer changing rather than a flag threaded
+/// through forty call sites. It is aimed at one person rather than everybody:
+/// the owner, a tester, a seller being made whole after a billing failure.
+/// `subscriptionStatusProvider` stays the honest record of what the seller
+/// actually bought — read that, never this, to say so on screen.
 final Provider<SellerPlan> currentPlanProvider = Provider<SellerPlan>((
   Ref ref,
 ) {
-  if (!ref.watch(premiumEnabledProvider)) return SellerPlan.premium;
   if (ref.watch(premiumGrantedByEmailProvider)) return SellerPlan.premium;
 
   return ref.watch(subscriptionStatusProvider).value?.plan ?? SellerPlan.free;

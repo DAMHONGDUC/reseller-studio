@@ -51,7 +51,6 @@ void main() {
         appConfigRepositoryProvider.overrideWithValue(
           const _FixedConfig(
             AppConfig(
-              premiumEnabled: true,
               // Both stores carry the same block, so the test does not depend
               // on which platform the test binding reports.
               ios: _policy,
