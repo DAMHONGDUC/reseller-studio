@@ -441,3 +441,55 @@ for: telling is not refusing, and the app still starts — onto
 exception is a debug affordance (hard rule 6), gated on
 `DevFlags.isDebugOrProfile`, which is `const` — so the release binary carries
 `null` there and the detail row is not in it at all.
+
+## A cache miss is not an answer the router may act on
+
+Explains `ConfirmedStream` and why `watchProfile` alone uses
+`FirestoreStream.confirmedDocument`.
+
+Firestore serves a listener from its cache first. On a device that has never
+held the signed-in person's profile — a fresh install, a new phone, the first
+sign-in after a reinstall — that first snapshot says `exists: false`, and
+nothing in it distinguishes "this account has no profile" from "this device
+has not been told yet". `workspaceStatusProvider` could only read it as *no
+business*, so the router sent a returning seller to the create-business form
+and corrected itself a round trip later. The seller saw a form they had
+already filled in, for about half a second, after every sign-in.
+
+The fix is the same shape as hard rule 5: **unknown is not zero.** The profile
+stream now carries a server-confirmed answer first, and until it arrives the
+status stays `loading`, which is the screen that already exists for it.
+
+Two things are deliberately narrow:
+
+- **Only the profile.** Every other document keeps the cache-first behaviour,
+  because a list that renders an empty state for one frame is a screen
+  correcting itself, not an app sending someone somewhere they did not ask to
+  go.
+- **Only the first answer.** Once a confirmed one has arrived the gate is open
+  for the life of the stream — later unconfirmed snapshots are the app's own
+  writes echoing back, and holding those would make every edit feel like a
+  network wait.
+
+The cost is offline: nothing is ever confirmed there, so the wait is bounded
+by `ConfirmedStream.grace` and the held answer is released when it expires.
+
+## The page loader is a newton's cradle, and it costs a dependency
+
+Explains `loading_animation_widget` in `packages/system_design/pubspec.yaml`,
+approved by the owner, who named both the package and the animation.
+
+The v3 loading indicator was a `CircularProgressIndicator` at both of its
+sizes. A ring filling an empty screen reads as *stuck* — it is the same
+picture at second one and second ten — and the screen it fills most often is
+the one a seller waits on after signing in.
+
+So the two sizes now draw differently, and it is still one look rather than
+two: a wait the seller is watching is the cradle, a wait inside something they
+are already looking at (a button, a row) stays the ring. The cradle scales
+everything off its box, so at the inline size its dots would be under two
+points — a smudge, not an animation.
+
+The package is a drawing library: no service, no account, no network, and
+nothing it can log. That is why it is a dependency of the design system rather
+than of the app — it has a look, so it belongs to a generation.
