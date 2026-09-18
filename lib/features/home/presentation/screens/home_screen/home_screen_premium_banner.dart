@@ -10,10 +10,16 @@ class _HomePremiumBanner extends ConsumerWidget {
 
   /// Whether this draws anything, so the row beneath it knows whether it
   /// needs a gap. One predicate, read here and at the call site.
+  ///
+  /// **It asks `currentPlanProvider`, never the purchase record.** A seller
+  /// `app_config` grants Premium to has bought nothing, so reading
+  /// `subscriptionStatus` offered them an upgrade they already have.
   static bool shows(WidgetRef ref) {
-    final SellerPlan? plan = ref.watch(subscriptionStatusProvider).value?.plan;
+    if (ref.watch(currentPlanProvider) == SellerPlan.premium) return false;
 
-    return plan != null && plan != SellerPlan.premium;
+    // The plan answers Free until the entitlement lands, so a paying seller
+    // would see an upgrade flash on every cold start without this.
+    return ref.watch(subscriptionStatusProvider).hasValue;
   }
 
   @override
