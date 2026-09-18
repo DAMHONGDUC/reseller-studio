@@ -265,6 +265,24 @@ check is to reopen the sheet and read every group.
   `test/features/orders/order_filter_sheet_test.dart` hold the count, the two
   places it renders, and Reset.
 
+## The loading screen is watched, not glimpsed
+
+Owner's rule. The splash stays up for `SplashHoldController.minimum` every
+time it comes up — the cold start and the moment after sign-in alike — even
+when the answer it is waiting for has already landed.
+
+- **It is a hold, never a delay.** The work runs the whole time; what waits is
+  only the route change. Nothing is scheduled behind it and no call is slowed
+  down to make room for it.
+- **It re-arms whenever the app starts deciding again**, which is what covers
+  sign-in. `appIsResolvingProvider` is the signal, and it mirrors the
+  redirect's own splash conditions — change one and change the other.
+- **A hold already running is left alone.** A second question arriving
+  mid-swing does not restart the clock, or a seller whose workspace and
+  profile land a moment apart waits twice.
+- The animation itself is `SdLoadingV3Page`, which is the page-sized half of
+  the one loading indicator (`DESIGN_SYSTEM.md`).
+
 ## Empty states
 
 - **An empty state still scrolls**, or the one screen a seller most wants to

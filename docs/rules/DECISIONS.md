@@ -493,3 +493,32 @@ points — a smudge, not an animation.
 The package is a drawing library: no service, no account, no network, and
 nothing it can log. That is why it is a dependency of the design system rather
 than of the app — it has a look, so it belongs to a generation.
+
+## The splash route has no transition, and that is a bug fix
+
+Explains the `NoTransitionPage` on `AppRoutes.splash` in `app_router.dart`.
+
+The signed-out shell renders at `/home` (hard rule 1), so signing in *leaves*
+the tab shell for the splash and comes back to it a moment later. go_router
+gives `StatefulShellRoute` **one `GlobalKey` for the life of the router** — the
+same key on every `StatefulNavigationShell` it builds.
+
+An animated page keeps the outgoing route mounted until its transition
+finishes. So the old shell was still on screen when the next one was built,
+which is two widgets holding one global key:
+
+```text
+Duplicate GlobalKey detected in widget tree.
+- [LabeledGlobalKey<StatefulNavigationShellState>]
+```
+
+It fired on the first frame of Home and truncated the tab that lost. A splash
+is a state rather than a destination, so removing its transition costs nothing
+and closes the window: the shell page is gone in the same frame it is left.
+
+**`SplashHoldController.minimum` hides this rather than fixing it.** Two
+seconds is far longer than any page transition, so the hold alone makes the
+overlap impossible — which is exactly why the transition fix has to stand on
+its own. Shorten the hold one day and the error comes back;
+`test/core/router/sign_in_lands_once_test.dart` pins the transition with the
+hold overridden away, so it cannot.
