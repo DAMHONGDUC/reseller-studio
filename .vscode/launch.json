@@ -18,36 +18,21 @@
         "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
     },
     {
-      "name": "Reseller Studio (dev)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "toolArgs": [
-        "--dart-define-from-file",
-        "env/dev.json"
-      ]
+      "name": "prod-17-pro-max",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": ["--dart-define-from-file=env/prod.json"],
+        "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
     },
-    {
-      "name": "Reseller Studio (prod config)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "toolArgs": [
-        "--dart-define-from-file",
-        "env/prod.json"
-      ]
+     {
+      "name": "prod-17-pro-max",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": ["--dart-define-from-file=env/prod.json"],
+        "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
     },
-    {
-      "name": "Reseller Studio (dev, profile)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "flutterMode": "profile",
-      "toolArgs": [
-        "--dart-define-from-file",
-        "env/dev.json"
-      ]
-    }
 
   ]
 }
