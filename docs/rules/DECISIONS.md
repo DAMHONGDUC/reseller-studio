@@ -415,3 +415,29 @@ adding one would be a second way to record the same money.** A maker uses the
 same Sourcing flow a reseller does — the "buying trip" wording is the only
 thing that reads oddly, and renaming it is a copy change rather than a model
 one.
+
+## Only a duplicate Firebase app stops the launch
+
+Explains `StartupFailurePolicy` in `lib/core/bootstrap/app_startup_failure.dart`,
+and why it is a list of named failures rather than "the Firebase step threw".
+
+`SdBootstrap` guards every step and always calls `runApp`, on the argument
+that an app which will not open is worse than almost anything it could be
+missing. That argument holds for nearly everything this app brings up: no
+Firebase config is an offline build, a broken Google Sign-In leaves Apple
+working, a missing RevenueCat key reads every seller as Free, and a Firebase
+that could not be reached is a seller standing in a store with no signal.
+All of those open the app.
+
+`[core/duplicate-app]` is the one that does not. It means `initializeApp` ran
+twice, so the process is holding an instance this build never configured —
+auth, Firestore and Crashlytics all hang off it, and opening five tabs onto
+it would show the seller their business as a guess. So the seller is told,
+from inside the app, which is exactly what `SdBootstrap.onStepFailed` exists
+for: telling is not refusing, and the app still starts — onto
+`StartupErrorScreen` instead of the router.
+
+**What the seller sees is the two localized lines and nothing else.** The
+exception is a debug affordance (hard rule 6), gated on
+`DevFlags.isDebugOrProfile`, which is `const` — so the release binary carries
+`null` there and the detail row is not in it at all.
