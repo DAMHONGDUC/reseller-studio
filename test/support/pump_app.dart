@@ -29,6 +29,23 @@ import 'fakes/fake_overrides.dart';
 import 'fakes/in_memory_repositories.dart';
 import 'fakes/mock_dataset.dart';
 
+/// The windows a test can pump into.
+///
+/// **[phone] is every test's default and must stay so.** The responsive rules
+/// are a no-op at phone width by design (`docs/rules/RESPONSIVE.md`), so a
+/// test written before tablets keeps asserting exactly what it asserted —
+/// and a test that names a tablet is deliberately asking about the rules.
+final class TestSurface {
+  /// iPhone 15 — the canvas the layouts were drawn for.
+  static const Size phone = Size(393, 852);
+
+  /// iPad 11", held upright.
+  static const Size tabletPortrait = Size(820, 1180);
+
+  /// The same iPad, on its side.
+  static const Size tabletLandscape = Size(1180, 820);
+}
+
 /// The instant the seeded dataset is generated against in every test.
 ///
 /// Pinned so assertions about counts are stable: the seed places rows
@@ -69,7 +86,14 @@ Future<void> pumpScreen(
   Widget screen, {
   List<Override> overrides = const <Override>[],
   Set<Object> replaces = const <Object>{},
-}) => _pumpApp(tester, overrides: overrides, replaces: replaces, home: screen);
+  Size surface = TestSurface.phone,
+}) => _pumpApp(
+  tester,
+  overrides: overrides,
+  replaces: replaces,
+  home: screen,
+  surface: surface,
+);
 
 /// Pump [screen] as a route, so a widget that calls `context.push` has a
 /// router to push into. The returned router is how a test reads where it went.
@@ -82,6 +106,7 @@ Future<GoRouter> pumpRoutedScreen(
   Widget screen, {
   List<Override> overrides = const <Override>[],
   Set<Object> replaces = const <Object>{},
+  Size surface = TestSurface.phone,
 }) async {
   final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -104,6 +129,7 @@ Future<GoRouter> pumpRoutedScreen(
     overrides: overrides,
     replaces: replaces,
     router: router,
+    surface: surface,
   );
 
   return router;
@@ -117,13 +143,14 @@ Future<void> _pumpApp(
   required Set<Object> replaces,
   Widget? home,
   GoRouter? router,
+  Size surface = TestSurface.phone,
 }) async {
   // The default test surface is 800×600 — wider and much shorter than any
   // phone, which makes rows that are fine on device overflow here and hides
-  // real overflows behind fake ones. Pin it to the device the layouts were
-  // drawn for (iPhone 15, @3x).
-  tester.view.physicalSize = const Size(1179, 2556);
+  // real overflows behind fake ones. Pin it to the window the test asked for,
+  // which is the device the layouts were drawn for unless it said otherwise.
   tester.view.devicePixelRatio = 3;
+  tester.view.physicalSize = surface * 3;
 
   // **The default test view has no notch**, so every inset bug costs exactly
   // 0 pixels here and a widget test cannot see it. Give it the device's real

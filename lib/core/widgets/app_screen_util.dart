@@ -44,6 +44,7 @@ class AppScreenUtil extends StatelessWidget {
           base: designSize,
         ),
         minTextAdapt: true,
+        splitScreenMode: true,
         builder: (BuildContext context, Widget? _) => builder(context),
       ),
     ),

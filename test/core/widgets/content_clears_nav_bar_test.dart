@@ -17,6 +17,11 @@ import '../../support/pump_app.dart';
 /// Asserted by scrolling each list to its end and measuring the last row —
 /// the case that only appears once a list is long enough to reach the bottom,
 /// which is why eyeballing the top of a screen never catches it.
+///
+/// **The screens are pumped inside `SdFloatingBarScopeV3`**, because the
+/// clearance is owed to the chrome rather than to the screen: on a tablet the
+/// nav stands at the leading edge and the same screens correctly pay nothing
+/// at the bottom (`docs/rules/RESPONSIVE.md`).
 void main() {
   /// The y the nav bar's footprint begins at.
   double barTop(WidgetTester tester, BuildContext context) =>
@@ -69,7 +74,16 @@ void main() {
     testWidgets('$name — the last row stops clear of the nav bar', (
       WidgetTester tester,
     ) async {
-      await pumpScreen(tester, screen);
+      // Inside the pill's scope, because that is where these five screens
+      // live: a tab screen pumped bare is told there is no bar below it and
+      // correctly reclaims the inset this test is about.
+      await pumpScreen(
+        tester,
+        SdFloatingBarScopeV3(
+          edge: SdFloatingBarEdgeV3.bottom,
+          child: screen,
+        ),
+      );
       await toEnd(tester);
 
       final BuildContext context = tester.element(verticalList(tester).first);
