@@ -7,10 +7,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:system_design/index.dart';
 
+import 'core/bootstrap/app_bootstrap.dart';
+import 'core/bootstrap/app_startup_failure.dart';
 import 'core/config/app_env.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/splash_screen.dart';
+import 'core/widgets/startup_error_screen.dart';
 import 'features/app_config/presentation/widgets/force_update_gate.dart';
 import 'features/app_config/providers.dart';
 import 'features/notifications/providers.dart';
@@ -58,6 +61,13 @@ class ResellerStudioApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppStartupFailure? failure = AppBootstrap.startupFailure;
+
+    // Read before anything is watched. The router's own providers reach for
+    // the SDK that just failed, so building it would trade one screen the
+    // seller can read for an exception they cannot.
+    if (failure != null) return _StartupErrorApp(failure: failure);
+
     final GoRouter router = ref.watch(routerProvider);
     final PackageInfo? packageInfo = ref.watch(packageInfoProvider).value;
 
@@ -120,4 +130,40 @@ class ResellerStudioApp extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// The whole app when it could not start: the same theme and the same strings,
+/// with [StartupErrorScreen] where the router would be.
+///
+/// **A separate `MaterialApp`, not a route.** The router is the thing that
+/// cannot be built here, and the theme and the locales still have to be, so
+/// this is the shortest path from `runApp` to a sentence the seller can read.
+/// `themeMode` is deliberately not read: preferences are themselves a startup
+/// step, so this screen follows the device rather than a value that may never
+/// have loaded.
+class _StartupErrorApp extends StatelessWidget {
+  const _StartupErrorApp({required this.failure});
+
+  final AppStartupFailure failure;
+
+  @override
+  Widget build(BuildContext context) => ScreenUtilInit(
+    designSize: ResellerStudioApp.designSize,
+    minTextAdapt: true,
+    builder: (BuildContext context, Widget? child) => MaterialApp(
+      debugShowCheckedModeBanner: false,
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context).appTitle,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      localizationsDelegates: const <LocalizationsDelegate<Object>>[
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: ResellerStudioApp.shippingLocales,
+      home: StartupErrorScreen(failure: failure),
+    ),
+  );
 }

@@ -48,6 +48,14 @@
   "@errorGenericMessage": {
     "description": "Body under errorGenericTitle."
   },
+  "errorStartupTitle": "Reseller Studio couldn't start",
+  "@errorStartupTitle": {
+    "description": "Shown instead of the app when a startup step failed in a way the app cannot open past — see AppStartupFailure."
+  },
+  "errorStartupMessage": "Close the app completely and open it again. If it keeps happening, reinstall it.",
+  "@errorStartupMessage": {
+    "description": "Body under errorStartupTitle. The only recovery a seller can perform themselves, since nothing in the app is running yet."
+  },
   "errorOfflineTitle": "You're offline",
   "@errorOfflineTitle": {
     "description": "Shown when a write cannot reach Firestore and is queued locally."
