@@ -5,7 +5,6 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
-import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../../auth/providers.dart';
 import '../../../../subscription/domain/enums/seller_plan.dart';
 import '../../../../subscription/providers.dart';
@@ -53,23 +52,6 @@ class MoreScreen extends ConsumerWidget {
               first: index == 0,
               plan: plan,
               signedIn: signedIn,
-            ),
-          // Signed out there is no business to count against a ceiling, and
-          // saying "0 of 1" about one nobody has named is the claim hard
-          // rule 1 keeps the other tabs from making.
-          if (signedIn)
-            // More's list is `fullBleed` — every section pads itself, so this
-            // one does too.
-            Padding(
-              // The meter is what sits under the last section, so the gap
-              // above it is its own — never that section's bottom padding.
-              padding: EdgeInsets.fromLTRB(
-                SdContentPaddingV3.horizontal,
-                SdContentPaddingV3.sectionGap,
-                SdContentPaddingV3.horizontal,
-                0,
-              ),
-              child: const PlanLimitMeters(),
             ),
         ],
       ),
