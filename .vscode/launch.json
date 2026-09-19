@@ -18,12 +18,12 @@
         "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
     },
     {
-      "name": "prod-17-pro-max",
+      "name": "prod-17-pro",
         "request": "launch",
         "type": "dart",
         "program": "lib/main.dart",
         "args": ["--dart-define-from-file=env/prod.json"],
-        "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
+        "deviceId": "EA48B046-909E-4708-BAA2-9F5875EC8386"
     },
      {
       "name": "prod-17-pro-max",
@@ -33,6 +33,13 @@
         "args": ["--dart-define-from-file=env/prod.json"],
         "deviceId": "A1435826-B732-4BE8-A6BC-E360A720E0D5"
     },
-
+{
+      "name": "dev-ipad-11-pro",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": ["--dart-define-from-file=env/dev.json"],
+        "deviceId": "1EB39384-08EA-4A01-B4C6-07F621FA49A5"
+    },
   ]
 }
