@@ -22,7 +22,8 @@ import '../extensions/context_extensions.dart';
 /// its root rather than doing nothing.
 ///
 /// **Which chrome is up is decided here and nowhere else.** A phone gets the
-/// floating pill; anything wider gets the rail standing in its own column
+/// floating pill; anything wider gets the labelled panel standing in its own
+/// column
 /// (`docs/rules/RESPONSIVE.md`). The five destinations and their order are
 /// the same either way — hard rule 13 fixes the list, not the edge it sits
 /// on — and no screen learns which one it is beside: the chrome publishes
@@ -31,7 +32,7 @@ import '../extensions/context_extensions.dart';
 /// **The bar floats and the body runs underneath it** — `extendBody`, plus
 /// every tab screen padding by `SdContentPaddingV3.floatingBarInset`. Without
 /// both, the glass has nothing moving behind it to refract and the last row
-/// of every list hides under the bar. The rail is the opposite and takes a
+/// of every list hides under the bar. The panel is the opposite and takes a
 /// real column, so nothing passes behind it and nothing pads for it.
 ///
 /// **Screen views for the five tabs are logged here and nowhere else.**
@@ -133,7 +134,7 @@ class _AppShellState extends State<AppShell> {
         selectedIndex: selectedIndex,
         onSelected: select,
       ),
-      SdBreakpoint.medium || SdBreakpoint.expanded => SdNavigationRailV3(
+      SdBreakpoint.medium || SdBreakpoint.expanded => SdNavPanelV3(
         body: widget.shell,
         destinations: destinations,
         selectedIndex: selectedIndex,

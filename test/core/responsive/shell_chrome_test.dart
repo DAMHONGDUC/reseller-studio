@@ -68,7 +68,7 @@ void main() {
     await pumpShell(tester, TestSurface.phone);
 
     expect(find.byType(SdGlassNavBarV3), findsOneWidget);
-    expect(find.byType(SdNavigationRailV3), findsNothing);
+    expect(find.byType(SdNavPanelV3), findsNothing);
   });
 
   testWidgets('a tablet stands the nav up, either way it is held', (
@@ -80,7 +80,7 @@ void main() {
     ]) {
       await pumpShell(tester, tablet);
 
-      expect(find.byType(SdNavigationRailV3), findsOneWidget, reason: '$tablet');
+      expect(find.byType(SdNavPanelV3), findsOneWidget, reason: '$tablet');
       expect(find.byType(SdGlassNavBarV3), findsNothing, reason: '$tablet');
     }
   });
@@ -98,7 +98,7 @@ void main() {
 
     for (final (Size surface, Type chrome) in <(Size, Type)>[
       (TestSurface.phone, SdGlassNavBarV3),
-      (TestSurface.tabletLandscape, SdNavigationRailV3),
+      (TestSurface.tabletLandscape, SdNavPanelV3),
     ]) {
       await pumpShell(tester, surface);
 

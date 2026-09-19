@@ -41,7 +41,7 @@ void main() {
   Future<void> pumpChrome(
     WidgetTester tester, {
     required Size surface,
-    required bool rail,
+    required bool panel,
   }) async {
     const List<SdNavDestinationV3> destinations = <SdNavDestinationV3>[
       SdNavDestinationV3(icon: Icons.home, label: 'Home'),
@@ -59,8 +59,8 @@ void main() {
       AppScreenUtil(
         builder: (BuildContext context) => MaterialApp(
           theme: AppTheme.light,
-          home: rail
-              ? SdNavigationRailV3(
+          home: panel
+              ? SdNavPanelV3(
                   destinations: destinations,
                   selectedIndex: 0,
                   onSelected: (_) {},
@@ -85,19 +85,23 @@ void main() {
       await pumpChrome(
         tester,
         surface: TestSurface.tabletPortrait,
-        rail: true,
+        panel: true,
       );
 
-      final Rect window = tester.getRect(find.byType(SdNavigationRailV3).last);
-      final Rect rail = tester.getRect(
-        find.byKey(SdNavigationRailV3.railSurfaceKey),
+      final Rect window = tester.getRect(find.byType(SdNavPanelV3).last);
+      final Rect panel = tester.getRect(
+        find.byKey(SdNavPanelV3.panelSurfaceKey),
       );
       final Rect card = tester.getRect(find.byKey(cardKey));
       final double margin = SdContentPaddingV3.tabletMargin;
 
       // Edge to nav, nav to content, content to the far edge.
-      expect(rail.left, closeTo(margin, 0.5), reason: 'edge to nav');
-      expect(card.left - rail.right, closeTo(margin, 0.5), reason: 'nav to content');
+      expect(panel.left, closeTo(margin, 0.5), reason: 'edge to nav');
+      expect(
+        card.left - panel.right,
+        closeTo(margin, 0.5),
+        reason: 'nav to content',
+      );
       expect(
         window.right - card.right,
         closeTo(margin, 0.5),
@@ -108,7 +112,7 @@ void main() {
     testWidgets('a phone pays the gutter and nothing more', (
       WidgetTester tester,
     ) async {
-      await pumpChrome(tester, surface: TestSurface.phone, rail: false);
+      await pumpChrome(tester, surface: TestSurface.phone, panel: false);
 
       final Rect card = tester.getRect(find.byKey(cardKey));
 
@@ -122,7 +126,7 @@ void main() {
       await pumpChrome(
         tester,
         surface: TestSurface.tabletLandscape,
-        rail: true,
+        panel: true,
       );
 
       final Rect bar = tester.getRect(find.byType(AppBar).first);
@@ -140,7 +144,7 @@ void main() {
       await pumpChrome(
         tester,
         surface: TestSurface.tabletPortrait,
-        rail: true,
+        panel: true,
       );
 
       final Rect card = tester.getRect(find.byKey(cardKey));
@@ -160,35 +164,60 @@ void main() {
     });
   });
 
-  group('the rail', () {
-    testWidgets('is one thickness however the tablet is held', (
+  group('what the panel leaves', () {
+    testWidgets('the content column never reads narrower than a phone', (
+      WidgetTester tester,
+    ) async {
+      await pumpChrome(tester, surface: TestSurface.phone, panel: false);
+
+      final double onPhone = tester.getRect(find.byKey(cardKey)).width;
+
+      // The panel is wide and a tablet held upright is not, so this is the
+      // trade the panel is made against — and the direction it must never go.
+      for (final Size tablet in <Size>[
+        TestSurface.tabletPortrait,
+        TestSurface.tabletLandscape,
+      ]) {
+        await pumpChrome(tester, surface: tablet, panel: true);
+
+        expect(
+          tester.getRect(find.byKey(cardKey)).width,
+          greaterThan(onPhone),
+          reason: '$tablet leaves less room than a phone',
+        );
+      }
+    });
+  });
+
+  group('the panel', () {
+    testWidgets('is one width however the tablet is held', (
       WidgetTester tester,
     ) async {
       await pumpChrome(
         tester,
         surface: TestSurface.tabletPortrait,
-        rail: true,
+        panel: true,
       );
 
       final Rect portrait = tester.getRect(
-        find.byKey(SdNavigationRailV3.selectedCapsuleKey),
+        find.byKey(SdNavPanelV3.selectedCapsuleKey),
       );
 
       await pumpChrome(
         tester,
         surface: TestSurface.tabletLandscape,
-        rail: true,
+        panel: true,
       );
 
       final Rect landscape = tester.getRect(
-        find.byKey(SdNavigationRailV3.selectedCapsuleKey),
+        find.byKey(SdNavPanelV3.selectedCapsuleKey),
       );
 
       expect(landscape.width, closeTo(portrait.width, 0.5));
       expect(
         portrait.height,
         greaterThan(landscape.height),
-        reason: 'the shorter window gets the shorter cell',
+        reason: 'the shorter window gets the shorter row',
       );
     });
 
@@ -205,7 +234,7 @@ void main() {
         AppScreenUtil(
           builder: (BuildContext context) => MaterialApp(
             theme: AppTheme.light,
-            home: SdNavigationRailV3(
+            home: SdNavPanelV3(
               destinations: const <SdNavDestinationV3>[
                 SdNavDestinationV3(icon: Icons.home, label: 'Home'),
                 SdNavDestinationV3(icon: Icons.inventory_2, label: 'Inventory'),
@@ -238,10 +267,10 @@ void main() {
   });
 
   group('the bottom inset', () {
-    testWidgets('is reserved under the pill and reclaimed under the rail', (
+    testWidgets('is reserved under the pill and reclaimed under the panel', (
       WidgetTester tester,
     ) async {
-      await pumpChrome(tester, surface: TestSurface.phone, rail: false);
+      await pumpChrome(tester, surface: TestSurface.phone, panel: false);
 
       final double underPill = SdContentPaddingV3.bottom(
         bodyContext,
@@ -260,7 +289,7 @@ void main() {
       await pumpChrome(
         tester,
         surface: TestSurface.tabletPortrait,
-        rail: true,
+        panel: true,
       );
 
       expect(
