@@ -69,7 +69,7 @@ void main() {
 
     expect(find.byType(SdGlassNavBarV3), findsOneWidget);
     expect(find.byType(SdNavPanelV3), findsNothing);
-    expect(find.byKey(SdNavPanelV3.toggleKey), findsNothing);
+    expect(find.byKey(SdNavPanelToggleV3.toggleKey), findsNothing);
   });
 
   testWidgets('a tablet stands the nav up, either way it is held', (
@@ -132,7 +132,7 @@ void main() {
 
     final Element more = tester.element(find.text('Settings').first);
     for (final bool expanded in <bool>[false, true, false]) {
-      await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+      await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
       await tester.pumpAndSettle();
       final SdNavPanelV3 panel = tester.widget(find.byType(SdNavPanelV3));
       expect(panel.isExpanded, expanded);
@@ -141,7 +141,7 @@ void main() {
       expect(find.byType(SdNavCellV3), findsNWidgets(expanded ? 5 : 0));
       expect(tester.takeException(), isNull);
     }
-    await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+    await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
     await tester.pumpAndSettle();
     for (final (int index, String label) in <(int, String)>[
       (0, 'Home'),

@@ -47,6 +47,7 @@ void main() {
     Brightness brightness = Brightness.light,
     double textScale = 1,
     bool disableAnimations = false,
+    double topInset = 0,
   }) async {
     const List<SdNavDestinationV3> destinations = <SdNavDestinationV3>[
       SdNavDestinationV3(icon: Icons.home, label: 'Home'),
@@ -58,6 +59,8 @@ void main() {
 
     tester.view.devicePixelRatio = 3;
     tester.view.physicalSize = surface * 3;
+    tester.view.padding = FakeViewPadding(top: topInset * 3);
+    tester.view.viewPadding = FakeViewPadding(top: topInset * 3);
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
@@ -104,7 +107,7 @@ void main() {
     await pumpChrome(tester, surface: TestSurface.tabletPortrait, panel: true);
     final panel = find.byKey(SdNavPanelV3.panelRegionKey);
     final content = find.byKey(SdNavPanelV3.contentRegionKey);
-    final toggle = find.byKey(SdNavPanelV3.toggleKey);
+    final toggle = find.byKey(SdNavPanelToggleV3.toggleKey);
     final openWidth = tester.getSize(panel).width;
     final closeIcon = tester
         .widget<SdIconV3>(
@@ -123,7 +126,8 @@ void main() {
           find.descendant(of: toggle, matching: find.byType(SdIconV3)),
         )
         .icon;
-    expect(openIcon, isNot(closeIcon));
+    expect(openIcon, closeIcon);
+    expect(find.byTooltip('Expand navigation'), findsOneWidget);
     await tester.tap(toggle);
     await tester.pump();
     await tester.pump(SdMotionV3.normal ~/ 2);
@@ -154,12 +158,118 @@ void main() {
     );
     final panel = find.byKey(SdNavPanelV3.panelRegionKey);
     final openWidth = tester.getSize(panel).width;
-    await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+    await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
     await tester.pump();
     expect(tester.getSize(panel).width, 0);
-    await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+    await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
     await tester.pump();
     expect(tester.getSize(panel).width, openWidth);
+  });
+
+  testWidgets('collapsed, the reopen control is the app bar\'s leading', (
+    WidgetTester tester,
+  ) async {
+    const double topInset = 24;
+
+    await pumpChrome(
+      tester,
+      surface: TestSurface.tabletPortrait,
+      panel: true,
+      expanded: false,
+      topInset: topInset,
+    );
+
+    final Finder toggle = find.byKey(SdNavPanelToggleV3.toggleKey);
+    final Finder appBar = find.byType(AppBar);
+
+    // Inside the bar, not in a strip above it — so the bar still pays the
+    // status bar and the content starts exactly where it would with no
+    // sidebar at all.
+    expect(find.descendant(of: appBar, matching: toggle), findsOneWidget);
+    expect(tester.getSize(appBar).height, SdAppBarV3.toolbarHeight + topInset);
+    expect(
+      tester.getSize(toggle).shortestSide,
+      greaterThanOrEqualTo(kMinInteractiveDimension),
+    );
+    expect(
+      tester.getRect(toggle).left,
+      lessThan(tester.getRect(appBar).left + SdNavPanelToggleV3.slot),
+    );
+
+    // Reopening hands it back to the sidebar, and the bar has no leading
+    // again — one control, never two.
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(SdNavPanelToggleV3.toggleKey), findsOneWidget);
+    expect(
+      find.descendant(
+        of: appBar,
+        matching: find.byKey(SdNavPanelToggleV3.toggleKey),
+      ),
+      findsNothing,
+    );
+    expect(tester.getSize(appBar).height, SdAppBarV3.toolbarHeight + topInset);
+  });
+
+  testWidgets('a screen wearing the search header hosts it too', (
+    WidgetTester tester,
+  ) async {
+    final TextEditingController controller = TextEditingController();
+
+    addTearDown(controller.dispose);
+    tester.view.devicePixelRatio = 3;
+    tester.view.physicalSize = TestSurface.tabletPortrait * 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      AppScreenUtil(
+        builder: (BuildContext context) => MaterialApp(
+          theme: AppTheme.light,
+          home: SdNavPanelV3(
+            isExpanded: false,
+            onExpansionChanged: (_) {},
+            expandLabel: 'Expand navigation',
+            collapseLabel: 'Collapse navigation',
+            destinations: const <SdNavDestinationV3>[
+              SdNavDestinationV3(icon: Icons.home, label: 'Home'),
+              SdNavDestinationV3(icon: Icons.inventory_2, label: 'Inventory'),
+            ],
+            selectedIndex: 1,
+            onSelected: (_) {},
+            // Inventory's shape: the header is a sliver and the screen wears
+            // no `SdAppBarV3`, so this is the tab that would be stranded if
+            // only the bar adopted the control.
+            body: SdScaffoldV3(
+              body: CustomScrollView(
+                slivers: <Widget>[
+                  SdSearchHeaderV3(
+                    title: 'Inventory',
+                    controller: controller,
+                    hint: 'Search',
+                    clearTooltip: 'Clear',
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 2000)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final Rect toggle = tester.getRect(
+      find.byKey(SdNavPanelToggleV3.toggleKey),
+    );
+
+    expect(find.byTooltip('Expand navigation'), findsOneWidget);
+    // The title starts past the control rather than under it.
+    expect(
+      tester.getRect(find.text('Inventory')).left,
+      greaterThan(toggle.right),
+    );
+    expect(tester.takeException(), isNull);
   });
 
   group('the margin', () {
@@ -216,7 +326,7 @@ void main() {
           );
           expect(tester.takeException(), isNull);
 
-          await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+          await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
           await tester.pumpAndSettle();
         }
         await tester.pumpWidget(const SizedBox.shrink());
@@ -319,7 +429,7 @@ void main() {
 
         expect(find.byTooltip('Expand navigation'), findsOneWidget);
         expect(find.byType(SdNavCellV3), findsNothing);
-        await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+        await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
         await tester.pumpAndSettle();
         expect(find.bySemanticsLabel('Inventory'), findsOneWidget);
         expect(find.text('Inventory'), findsOneWidget);
@@ -331,10 +441,10 @@ void main() {
           isTrue,
         );
         expect(
-          tester.getSize(find.byKey(SdNavPanelV3.toggleKey)).shortestSide,
+          tester.getSize(find.byKey(SdNavPanelToggleV3.toggleKey)).shortestSide,
           greaterThanOrEqualTo(48),
         );
-        await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+        await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
         await tester.pumpAndSettle();
         expect(find.byTooltip('Expand navigation'), findsOneWidget);
         expect(find.byType(SdNavCellV3), findsNothing);
