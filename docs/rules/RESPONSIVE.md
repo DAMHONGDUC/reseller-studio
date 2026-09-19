@@ -61,7 +61,7 @@ adds a second column on top of inflated tokens is two problems stacked.
   | Width | The hardware it is really about | What the app does |
   |---|---|---|
   | `compact` | every phone, and a narrow split view | exactly what ships today, unchanged |
-  | `medium` | tablet portrait | nav moves to the leading edge |
+  | `medium` | tablet portrait | the nav becomes a labelled panel at the leading edge |
   | `expanded` | tablet landscape | the same, and where a second column would go if one ever does |
 
 ## Tokens scale on a phone and stop at the clamp
@@ -127,40 +127,56 @@ in the middle of it. Each panel carries its own ceiling on
 rather than one shared constant** — they are different things that happen to
 measure alike today.
 
-## The nav moves to the leading edge
+## The nav becomes a panel
 
-- **The rail replaces the floating bar from `medium` up.** The shell picks the
-  chrome; nothing else in the app knows which one is up.
-- **This does not touch hard rule 13.** The list is still the same five tabs
-  in the same order; what changes is the edge they sit on.
-- **The cell is shared, the chrome is not.** The glyph cell and the
-  destination value type are one widget used by both, so everything about
-  being a destination — fill, timing, semantics, tap target — lives once and a
-  tab cannot read as one control on a phone and a different one on a tablet.
+**A phone gets the glyph-only pill; a tablet gets a labelled panel standing in
+its own column.** Owner's rule, and it **reverses "glyph-only is what keeps
+the pill and the panel one control"** — which this file said until the panel
+was drawn. The argument it replaces was about consistency between two chromes;
+the argument that won is about the device: a tablet has room for the word, and
+a glyph a seller has to decode is a glyph they decode every time.
 
-  | | pill (phone) | rail (tablet) |
+- **The shell picks the chrome and nothing else in the app knows which one is
+  up.** A screen never asks; it reads its insets, and the chrome publishes
+  what it occupies through `SdFloatingBarScopeV3`.
+- **This does not touch hard rule 13.** The panel carries **exactly the five
+  tabs, in the same order, and nothing else** — no workspace header, no More
+  destinations hoisted up beside them. What changes is the edge and the
+  labelling, not the list. A panel that grew a sixth row would be the bottom
+  bar growing by another name.
+- **Always visible, and it does not collapse.** A toggle is a second state to
+  remember per device, a second default to argue about per orientation, and a
+  control that hides the thing it is for. The panel is either the chrome or it
+  is not.
+- **The cell is shared, the chrome is not.** One `SdNavCellV3` draws a
+  destination in both chromes and owns everything about being one — the glyph,
+  the fill it animates to, the timing, the semantics, the tap target. What
+  differs is a shape it is told to take, which is an enum rather than a pair
+  of booleans.
+
+  | | pill (phone) | panel (tablet) |
   |---|---|---|
   | layout | floats; the body scrolls behind the glass | a real column |
-  | thickness | a vertical measure | a **horizontal** measure |
+  | cell | glyph alone, equal segments across | glyph and label, a row each down |
+  | its measure | height is vertical, cells divide the width | **width is horizontal**, row height is vertical |
   | inner margin | — | none — the gap to content is the content's own `pageMargin` |
   | adjacent-tab swipe | yes | no |
   | what it publishes | `bottom` | `leading` |
 
 - **A real column, not a floating strip.** A phone has no width to give away
-  and a tablet does; a rail in its own column means no screen has to pad a
+  and a tablet does; the panel in its own column means no screen has to pad a
   side for it.
 - **No swipe.** An adjacent-tab swipe is a thumb gesture on a one-handed
   device. At tablet width a horizontal drag is a chart being panned or a row
-  being dismissed, and taking it breaks both.
-- **No inner margin on the rail.** The gap to the content is the content's to
+  being dismissed, and taking it would break both.
+- **No inner margin on the panel.** The gap to the content is the content's to
   leave. An inner margin stacks on `pageMargin` and makes one of the three
   gaps bigger than the other two — exactly the bug the margin rule closes.
-- **A standing rail's thickness is a horizontal dimension.** Put it on the
-  vertical ladder and screenutil punishes you: a landscape tablet's height
-  ratio is below 1 while its width ratio is at the clamp, so one control comes
-  out at two thicknesses depending on how the tablet is held. Cell **length**
-  is the opposite and stays vertical, so the short window gets the shorter
-  rail — which is correct.
+- **The panel's width is a horizontal dimension and its row height a vertical
+  one.** Put either on the wrong ladder and screenutil punishes you: a
+  landscape tablet's height ratio sits below its width ratio, so the control
+  would come out at two sizes depending on how the tablet is held. One
+  measure per axis, always the axis it is actually measured along.
 - **The bottom inset is reclaimed, and the flag is what asks.** Tab screens
   pad their bottom to clear the floating pill; with the nav down the side
   there is nothing on the bottom edge and that padding is dead space.
@@ -170,6 +186,10 @@ measure alike today.
 - **The scope answers presence and edge only.** It must not import
   `SdContentPaddingV3`: padding is what asks the question, so the answer
   cannot depend on it. Every caller computes its own distance.
+- **The one thing to keep measuring is what the panel leaves.** It is wide,
+  and a tablet held upright is not: the content column is what the panel is
+  traded against, and if it ever reads narrower than a phone's the trade has
+  gone the wrong way.
 
 ## Do not reflexively widen the grids
 
@@ -216,7 +236,5 @@ assumed from the fact that there is room.
   comes — an existing list of sections split in two — and the second is a
   router change rather than a layout one, because the detail has to render
   inline. Neither is in this generation.
-- **No labels on the rail.** Glyph-only is what keeps the pill and the rail
-  one control; labelling one of them splits them.
 - **There is no desktop width.** The app ships to phones and tablets; a
   breakpoint for a window nothing runs in is a branch no one tests.
