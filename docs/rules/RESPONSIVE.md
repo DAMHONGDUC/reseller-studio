@@ -102,6 +102,13 @@ navigation labels for more working space without changing destinations.
   for collapse is to hide the panel and give the content the full width, with
   a visible reopen control. The owner has not separately confirmed that
   collapsed presentation after revising the expanded share.
+- **Collapsed, the reopen control is the screen's own leading control.**
+  Owner's rule. The panel draws nothing at all and publishes
+  `SdNavPanelScopeV3` instead; whichever chrome the screen already wears takes
+  the menu — `SdAppBarV3` in its `leading` slot, `SdSearchHeaderV3` in the
+  matching place, because Inventory wears no app bar and would otherwise be
+  the one tab with no way back. A screen never places the control itself: a
+  screen that could place it is one that could forget to.
 - **Content is horizontally centred in its available region**: beside the
   panel when open, across the window when closed. Screen gutters remain
   symmetric inside the content; `pageMargin` adds no outside gap in the shell.
@@ -113,10 +120,11 @@ navigation labels for more working space without changing destinations.
   `SdMotionV3.normal` and `SdMotionV3.emphasized`; reduced motion skips it.
   Preserve the owner-selected menu icon; localized tooltips and expanded
   semantics distinguish its action.
-- **Collapsed content starts directly below the reopen control.** Owner's
-  correction: avoid the excessive empty strip under the icon. The control
-  consumes the top safe inset, so the nested content must not reserve it
-  again. Preserve bottom and side safe insets and the control's tap target.
+- **Collapsed content starts where it would with no sidebar at all**, which
+  is what moving the control into the chrome bought: there is no strip above
+  the screen, so the top safe inset has one owner in both states — the
+  screen's own chrome — and nothing has to be told not to reserve it twice.
+  The control keeps its tap target and its localized tooltip.
 - Phone widths keep `SdBottomNavigationV3` without a panel toggle.
 - Outside the shell, `SdContentPaddingV3.pageMargin` still wraps the whole
   scaffold. Pushed routes remain centred in their own available window;
