@@ -90,22 +90,27 @@ adds a second column on top of inflated tokens is two problems stacked.
 panel width and the earlier ban on collapsing. The seller can trade visible
 navigation labels for more working space without changing destinations.
 
-- Expanded uses `SdNavPanelV3.expandedPanelFlex` beside
-  `SdNavPanelV3.expandedContentFlex`; collapsed uses
-  `SdNavPanelV3.collapsedPanelFlex` beside
-  `SdNavPanelV3.collapsedContentFlex`. These fields define the owner's exact
-  screen-width shares and replace the old fixed-width geometry.
-- Expanded cells use `SdNavCellShapeV3.row`; collapsed cells use
-  `SdNavCellShapeV3.glyph`. Accessible labels remain available in both states.
-- **Content is horizontally centred in the region to the right of the
-  panel**, as confirmed by the owner. Its screen margins are symmetric and
-  are inside that region; they do not change either column's share.
+- **The expanded sidebar occupies the share defined by
+  `SdNavPanelV3.expandedPanelFlex` beside
+  `SdNavPanelV3.expandedContentFlex`.** The owner's revised share supersedes
+  the previous expanded and collapsed proportions.
+- **Its surface spans the full shell height and meets the content directly.**
+  Owner's correction: use the joined sidebar/content composition of iPad
+  Settings, not a detached glass capsule. No outer panel margin, rounded outer
+  surface, or gap between the panel and the content scaffold.
+- Expanded destinations use `SdNavCellShapeV3.row`. Implementation default
+  for collapse is to hide the panel and give the content the full width, with
+  a visible reopen control. The owner has not separately confirmed that
+  collapsed presentation after revising the expanded share.
+- **Content is horizontally centred in its available region**: beside the
+  panel when open, across the window when closed. Screen gutters remain
+  symmetric inside the content; `pageMargin` adds no outside gap in the shell.
 - The toggle is separate from the destinations. Hard rule 13 applies to both
   states; there is no business header and no destination promoted from More.
 - The default is expanded. Toggling keeps the selected tab and its state.
 - Phone widths keep `SdBottomNavigationV3` without a panel toggle.
-- `SdContentPaddingV3.pageMargin` still wraps the whole scaffold, including
-  the app bar. Pushed routes remain centred in their own available window;
+- Outside the shell, `SdContentPaddingV3.pageMargin` still wraps the whole
+  scaffold. Pushed routes remain centred in their own available window;
   their width no longer promises to match both shell expansion states.
 
 ## Portrait policy
