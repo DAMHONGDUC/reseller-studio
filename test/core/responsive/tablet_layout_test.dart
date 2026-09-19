@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
@@ -42,6 +43,9 @@ void main() {
     WidgetTester tester, {
     required Size surface,
     required bool panel,
+    bool expanded = true,
+    Brightness brightness = Brightness.light,
+    double textScale = 1,
   }) async {
     const List<SdNavDestinationV3> destinations = <SdNavDestinationV3>[
       SdNavDestinationV3(icon: Icons.home, label: 'Home'),
@@ -58,13 +62,27 @@ void main() {
     await tester.pumpWidget(
       AppScreenUtil(
         builder: (BuildContext context) => MaterialApp(
-          theme: AppTheme.light,
+          theme: brightness == Brightness.dark ? AppTheme.dark : AppTheme.light,
+          builder: (BuildContext context, Widget? child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
+          ),
           home: panel
-              ? SdNavPanelV3(
-                  destinations: destinations,
-                  selectedIndex: 0,
-                  onSelected: (_) {},
-                  body: screen(),
+              ? StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) =>
+                      SdNavPanelV3(
+                        isExpanded: expanded,
+                        onExpansionChanged: (bool value) =>
+                            setState(() => expanded = value),
+                        expandLabel: 'Expand navigation',
+                        collapseLabel: 'Collapse navigation',
+                        destinations: destinations,
+                        selectedIndex: 0,
+                        onSelected: (_) {},
+                        body: screen(),
+                      ),
                 )
               : SdBottomNavigationV3(
                   destinations: destinations,
@@ -79,34 +97,64 @@ void main() {
   }
 
   group('the margin', () {
-    testWidgets('the three gaps on a tablet are one number', (
+    testWidgets('both states use exact shares and centred content', (
       WidgetTester tester,
     ) async {
-      await pumpChrome(
-        tester,
-        surface: TestSurface.tabletPortrait,
-        panel: true,
-      );
+      for (final Size surface in <Size>[
+        const Size(600, 960),
+        TestSurface.tabletPortrait,
+        TestSurface.tabletLandscape,
+      ]) {
+        await pumpChrome(tester, surface: surface, panel: true);
 
-      final Rect window = tester.getRect(find.byType(SdNavPanelV3).last);
-      final Rect panel = tester.getRect(
-        find.byKey(SdNavPanelV3.panelSurfaceKey),
-      );
-      final Rect card = tester.getRect(find.byKey(cardKey));
-      final double margin = SdContentPaddingV3.tabletMargin;
+        for (final bool expanded in <bool>[true, false, true]) {
+          final Rect panel = tester.getRect(
+            find.byKey(SdNavPanelV3.panelRegionKey),
+          );
+          final Rect content = tester.getRect(
+            find.byKey(SdNavPanelV3.contentRegionKey),
+          );
+          final Rect card = tester.getRect(find.byKey(cardKey));
 
-      // Edge to nav, nav to content, content to the far edge.
-      expect(panel.left, closeTo(margin, 0.5), reason: 'edge to nav');
-      expect(
-        card.left - panel.right,
-        closeTo(margin, 0.5),
-        reason: 'nav to content',
-      );
-      expect(
-        window.right - card.right,
-        closeTo(margin, 0.5),
-        reason: 'content to the far edge',
-      );
+          expect(
+            panel.width,
+            closeTo(surface.width * (expanded ? 1 / 5 : 0), 0.01),
+          );
+          expect(
+            content.width,
+            closeTo(surface.width * (expanded ? 4 / 5 : 1), 0.01),
+          );
+          if (expanded) {
+            final Rect surfaceRect = tester.getRect(
+              find.byKey(SdNavPanelV3.panelSurfaceKey),
+            );
+            final Rect appBar = tester.getRect(find.byType(AppBar).first);
+            expect(surfaceRect, panel);
+            expect(surfaceRect.height, closeTo(surface.height, 0.01));
+            expect(appBar.left, closeTo(surfaceRect.right, 0.01));
+          } else {
+            expect(find.byKey(SdNavPanelV3.panelSurfaceKey), findsNothing);
+          }
+          expect(panel.left, 0);
+          expect(content.left, closeTo(panel.right, 0.01));
+          expect(content.right, closeTo(surface.width, 0.01));
+          expect(card.center.dx, closeTo(content.center.dx, 0.01));
+          expect(
+            card.left - content.left,
+            closeTo(content.right - card.right, 0.01),
+          );
+          expect(find.byType(SdNavCellV3), findsNWidgets(expanded ? 5 : 0));
+          expect(
+            find.text('Inventory'),
+            expanded ? findsOneWidget : findsNothing,
+          );
+          expect(tester.takeException(), isNull);
+
+          await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+          await tester.pumpAndSettle();
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
     });
 
     testWidgets('a phone pays the gutter and nothing more', (
@@ -138,7 +186,7 @@ void main() {
       expect(bar.right - card.right, closeTo(gutter, 0.5));
     });
 
-    testWidgets('a route with no chrome lands on the same content width', (
+    testWidgets('a route with no chrome stays centred in the full window', (
       WidgetTester tester,
     ) async {
       await pumpChrome(
@@ -146,9 +194,6 @@ void main() {
         surface: TestSurface.tabletPortrait,
         panel: true,
       );
-
-      final Rect card = tester.getRect(find.byKey(cardKey));
-      final double withRail = card.width;
 
       // The same screen with nothing published above it — a sibling of the
       // shell rather than a child of a branch.
@@ -160,7 +205,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(tester.getRect(find.byKey(cardKey)).width, closeTo(withRail, 1));
+      expect(
+        tester.getRect(find.byKey(cardKey)).center.dx,
+        closeTo(TestSurface.tabletPortrait.width / 2, 0.01),
+      );
     });
   });
 
@@ -190,36 +238,44 @@ void main() {
   });
 
   group('the panel', () {
-    testWidgets('is one width however the tablet is held', (
-      WidgetTester tester,
-    ) async {
-      await pumpChrome(
-        tester,
-        surface: TestSurface.tabletPortrait,
-        panel: true,
-      );
+    testWidgets(
+      'reopen control stays accessible in dark theme with large text',
+      (WidgetTester tester) async {
+        final SemanticsHandle semantics = tester.ensureSemantics();
+        await pumpChrome(
+          tester,
+          surface: TestSurface.tabletPortrait,
+          panel: true,
+          expanded: false,
+          brightness: Brightness.dark,
+          textScale: 2,
+        );
 
-      final Rect portrait = tester.getRect(
-        find.byKey(SdNavPanelV3.selectedCapsuleKey),
-      );
-
-      await pumpChrome(
-        tester,
-        surface: TestSurface.tabletLandscape,
-        panel: true,
-      );
-
-      final Rect landscape = tester.getRect(
-        find.byKey(SdNavPanelV3.selectedCapsuleKey),
-      );
-
-      expect(landscape.width, closeTo(portrait.width, 0.5));
-      expect(
-        portrait.height,
-        greaterThan(landscape.height),
-        reason: 'the shorter window gets the shorter row',
-      );
-    });
+        expect(find.byTooltip('Expand navigation'), findsOneWidget);
+        expect(find.byType(SdNavCellV3), findsNothing);
+        await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+        await tester.pumpAndSettle();
+        expect(find.bySemanticsLabel('Inventory'), findsOneWidget);
+        expect(find.text('Inventory'), findsOneWidget);
+        expect(
+          tester
+              .getSemantics(find.bySemanticsLabel('Inventory'))
+              .getSemanticsData()
+              .hasAction(SemanticsAction.tap),
+          isTrue,
+        );
+        expect(
+          tester.getSize(find.byKey(SdNavPanelV3.toggleKey)).shortestSide,
+          greaterThanOrEqualTo(48),
+        );
+        await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+        await tester.pumpAndSettle();
+        expect(find.byTooltip('Expand navigation'), findsOneWidget);
+        expect(find.byType(SdNavCellV3), findsNothing);
+        expect(tester.takeException(), isNull);
+        semantics.dispose();
+      },
+    );
 
     testWidgets('every destination still switches', (
       WidgetTester tester,
@@ -235,6 +291,10 @@ void main() {
           builder: (BuildContext context) => MaterialApp(
             theme: AppTheme.light,
             home: SdNavPanelV3(
+              isExpanded: true,
+              onExpansionChanged: (_) {},
+              expandLabel: 'Expand navigation',
+              collapseLabel: 'Collapse navigation',
               destinations: const <SdNavDestinationV3>[
                 SdNavDestinationV3(icon: Icons.home, label: 'Home'),
                 SdNavDestinationV3(icon: Icons.inventory_2, label: 'Inventory'),

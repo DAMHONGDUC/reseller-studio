@@ -1,4 +1,8 @@
 {
+  "navExpand": "Expand navigation",
+  "@navExpand": {"description": "Tooltip for expanding the tablet navigation panel."},
+  "navCollapse": "Collapse navigation",
+  "@navCollapse": {"description": "Tooltip for collapsing the tablet navigation panel."},
   "@@locale": "en",
   "appTitle": "Reseller Studio",
   "@appTitle": {

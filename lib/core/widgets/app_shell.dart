@@ -51,6 +51,17 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
+  bool _panelExpanded = true;
+
+  void _setPanelExpanded(bool expanded) {
+    setState(() => _panelExpanded = expanded);
+    SdLogger.action(
+      LogTagConstant.navigation,
+      'Navigation panel changed',
+      <String, Object>{'expanded': expanded},
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -135,6 +146,10 @@ class _AppShellState extends State<AppShell> {
         onSelected: select,
       ),
       SdBreakpoint.medium || SdBreakpoint.expanded => SdNavPanelV3(
+        isExpanded: _panelExpanded,
+        onExpansionChanged: _setPanelExpanded,
+        expandLabel: context.l10n.navExpand,
+        collapseLabel: context.l10n.navCollapse,
         body: widget.shell,
         destinations: destinations,
         selectedIndex: selectedIndex,

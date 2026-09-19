@@ -56,6 +56,7 @@ final class AppBootstrap {
       SdBootstrapStep(name: 'Firebase', run: _initializeFirebase),
       SdBootstrapStep(name: 'Google Sign-In', run: _initializeGoogleSignIn),
       SdBootstrapStep(name: 'Billing', run: _initializeBilling),
+      SdBootstrapStep(name: 'Portrait orientation', run: lockPortrait),
       SdBootstrapStep(name: 'Edge-to-edge', run: _goEdgeToEdge),
       SdBootstrapStep(name: 'Environment', run: _logEnvironment),
     ],
@@ -105,9 +106,7 @@ final class AppBootstrap {
     // rather than one microtask of `AsyncLoading` — which is the frame the
     // flash happened in.
     return <Override>[
-      sharedPreferencesProvider.overrideWith(
-        (Ref ref) => loaded,
-      ),
+      sharedPreferencesProvider.overrideWith((Ref ref) => loaded),
     ];
   }
 
@@ -115,6 +114,12 @@ final class AppBootstrap {
 
   static Future<void> _loadPreferences() async =>
       _preferences = await SharedPreferences.getInstance();
+
+  /// Kept public for the platform-channel test; startup is its only caller.
+  @visibleForTesting
+  static Future<void> lockPortrait() => SystemChrome.setPreferredOrientations(
+    const <DeviceOrientation>[DeviceOrientation.portraitUp],
+  );
 
   /// Let the app draw under the system bars.
   ///

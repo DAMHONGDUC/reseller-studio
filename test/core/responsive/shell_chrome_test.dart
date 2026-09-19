@@ -69,6 +69,7 @@ void main() {
 
     expect(find.byType(SdGlassNavBarV3), findsOneWidget);
     expect(find.byType(SdNavPanelV3), findsNothing);
+    expect(find.byKey(SdNavPanelV3.toggleKey), findsNothing);
   });
 
   testWidgets('a tablet stands the nav up, either way it is held', (
@@ -115,6 +116,55 @@ void main() {
           .toList();
 
       expect(labels, tabs, reason: '$chrome at $surface');
+    }
+  });
+  testWidgets('toggle keeps the selected branch and all five destinations', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester, TestSurface.tabletPortrait);
+    await tester.tap(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is SdNavCellV3 && widget.destination.label == 'More',
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final Element more = tester.element(find.text('Settings').first);
+    for (final bool expanded in <bool>[false, true, false]) {
+      await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+      await tester.pumpAndSettle();
+      final SdNavPanelV3 panel = tester.widget(find.byType(SdNavPanelV3));
+      expect(panel.isExpanded, expanded);
+      expect(panel.selectedIndex, 4);
+      expect(tester.element(find.text('Settings').first), same(more));
+      expect(find.byType(SdNavCellV3), findsNWidgets(expanded ? 5 : 0));
+      expect(tester.takeException(), isNull);
+    }
+    await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+    await tester.pumpAndSettle();
+    for (final (int index, String label) in <(int, String)>[
+      (0, 'Home'),
+      (1, 'Inventory'),
+      (2, 'Orders'),
+      (3, 'Analytics'),
+      (4, 'More'),
+    ]) {
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is SdNavCellV3 && widget.destination.label == label,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<SdNavPanelV3>(find.byType(SdNavPanelV3)).selectedIndex,
+        index,
+      );
+      expect(
+        tester.widget<SdNavPanelV3>(find.byType(SdNavPanelV3)).isExpanded,
+        isTrue,
+      );
     }
   });
 }

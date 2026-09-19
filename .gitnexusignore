@@ -1,0 +1,12 @@
+env/
+env_assets/
+**/GoogleService-Info.plist
+**/google-services.json
+lib/firebase_options.dart
+.firebaserc
+functions/.env*
+ios/fastlane/.env*
+**/*.p8
+**/*.p12
+**/*.keystore
+**/*.jks
