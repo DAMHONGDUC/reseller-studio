@@ -46,6 +46,7 @@ void main() {
     bool expanded = true,
     Brightness brightness = Brightness.light,
     double textScale = 1,
+    bool disableAnimations = false,
   }) async {
     const List<SdNavDestinationV3> destinations = <SdNavDestinationV3>[
       SdNavDestinationV3(icon: Icons.home, label: 'Home'),
@@ -64,9 +65,10 @@ void main() {
         builder: (BuildContext context) => MaterialApp(
           theme: brightness == Brightness.dark ? AppTheme.dark : AppTheme.light,
           builder: (BuildContext context, Widget? child) => MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: TextScaler.linear(textScale)),
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(textScale),
+              disableAnimations: disableAnimations,
+            ),
             child: child!,
           ),
           home: panel
@@ -95,6 +97,70 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  testWidgets('sidebar animates both ways and reverses without overflow', (
+    tester,
+  ) async {
+    await pumpChrome(tester, surface: TestSurface.tabletPortrait, panel: true);
+    final panel = find.byKey(SdNavPanelV3.panelRegionKey);
+    final content = find.byKey(SdNavPanelV3.contentRegionKey);
+    final toggle = find.byKey(SdNavPanelV3.toggleKey);
+    final openWidth = tester.getSize(panel).width;
+    final closeIcon = tester
+        .widget<SdIconV3>(
+          find.descendant(of: toggle, matching: find.byType(SdIconV3)),
+        )
+        .icon;
+    await tester.tap(toggle);
+    await tester.pump();
+    await tester.pump(SdMotionV3.normal ~/ 2);
+    final middle = tester.getSize(panel).width;
+    expect(middle, greaterThan(0));
+    expect(middle, lessThan(openWidth));
+    expect(tester.getRect(content).left, tester.getRect(panel).right);
+    final openIcon = tester
+        .widget<SdIconV3>(
+          find.descendant(of: toggle, matching: find.byType(SdIconV3)),
+        )
+        .icon;
+    expect(openIcon, isNot(closeIcon));
+    await tester.tap(toggle);
+    await tester.pump();
+    await tester.pump(SdMotionV3.normal ~/ 2);
+    expect(tester.getSize(panel).width, greaterThan(middle));
+    expect(tester.getSize(panel).width, lessThan(openWidth));
+    expect(tester.takeException(), isNull);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(panel).width, openWidth);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(panel).width, 0);
+    await tester.tap(toggle);
+    await tester.pump();
+    await tester.pump(SdMotionV3.normal ~/ 2);
+    expect(tester.getSize(panel).width, inExclusiveRange(0, openWidth));
+    expect(tester.takeException(), isNull);
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('reduced motion changes sidebar width immediately', (
+    tester,
+  ) async {
+    await pumpChrome(
+      tester,
+      surface: TestSurface.tabletPortrait,
+      panel: true,
+      disableAnimations: true,
+    );
+    final panel = find.byKey(SdNavPanelV3.panelRegionKey);
+    final openWidth = tester.getSize(panel).width;
+    await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+    await tester.pump();
+    expect(tester.getSize(panel).width, 0);
+    await tester.tap(find.byKey(SdNavPanelV3.toggleKey));
+    await tester.pump();
+    expect(tester.getSize(panel).width, openWidth);
+  });
 
   group('the margin', () {
     testWidgets('both states use exact shares and centred content', (
