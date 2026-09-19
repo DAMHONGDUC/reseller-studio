@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/router/app_bottom_sheet_page.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
-import 'package:reseller_studio/reseller_studio_app.dart';
+import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 
 void main() {
   testWidgets('the paywall page creates a modal bottom-sheet route', (
@@ -12,9 +11,8 @@ void main() {
     late BuildContext routeContext;
 
     await tester.pumpWidget(
-      ScreenUtilInit(
-        designSize: ResellerStudioApp.designSize,
-        builder: (BuildContext context, Widget? child) => MaterialApp(
+      AppScreenUtil(
+        builder: (BuildContext context) => MaterialApp(
           theme: AppTheme.light,
           home: Builder(
             builder: (BuildContext context) {

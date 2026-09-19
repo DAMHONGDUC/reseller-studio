@@ -91,6 +91,7 @@ in the left.
 |---|---|
 | `packages/system_design/`, or any screen or widget rendering `Sd*` v3 components | `docs/rules/DESIGN_SYSTEM.md` |
 | a screen's app bar, status bar, scrolling list, empty state or search mode | `docs/rules/SCREENS.md` |
+| a layout that has to survive a window wider than a phone — the shell, a body's width, a list's column count | `docs/rules/RESPONSIVE.md` |
 | `firestore.rules`, `firestore.indexes.json`, `functions/`, or a `data/` method that queries or calls out | `docs/rules/BACKEND.md` |
 | a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
 | `env_assets/`, `packages/system_design/tool/prepare-env.sh`, `packages/system_design/tool/build-ipa.sh`, `ios/fastlane/`, the release workflow | `docs/rules/RELEASE.md` |

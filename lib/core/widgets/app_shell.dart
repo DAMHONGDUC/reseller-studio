@@ -21,12 +21,19 @@ import '../extensions/context_extensions.dart';
 /// exactly where they were. That is why tapping the current tab pops it to
 /// its root rather than doing nothing.
 ///
+/// **Which chrome is up is decided here and nowhere else.** A phone gets the
+/// floating pill; anything wider gets the labelled panel standing in its own
+/// column
+/// (`docs/rules/RESPONSIVE.md`). The five destinations and their order are
+/// the same either way — hard rule 13 fixes the list, not the edge it sits
+/// on — and no screen learns which one it is beside: the chrome publishes
+/// that through `SdFloatingBarScopeV3` and `SdContentPaddingV3` reads it.
+///
 /// **The bar floats and the body runs underneath it** — `extendBody`, plus
 /// every tab screen padding by `SdContentPaddingV3.floatingBarInset`. Without
 /// both, the glass has nothing moving behind it to refract and the last row
-/// of every list hides under the bar. The body is wrapped in
-/// `SdFloatingBarScopeV3` for the one thing that cannot pad itself: a
-/// snackbar, which renders into the root overlay above the whole app.
+/// of every list hides under the bar. The panel is the opposite and takes a
+/// real column, so nothing passes behind it and nothing pads for it.
 ///
 /// **Screen views for the five tabs are logged here and nowhere else.**
 /// Switching a branch pushes no route, so a navigator observer sees nothing
@@ -44,6 +51,17 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
+  bool _panelExpanded = true;
+
+  void _setPanelExpanded(bool expanded) {
+    setState(() => _panelExpanded = expanded);
+    SdLogger.action(
+      LogTagConstant.navigation,
+      'Navigation panel changed',
+      <String, Object>{'expanded': expanded},
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -84,9 +102,8 @@ class _AppShellState extends State<AppShell> {
   }
 
   @override
-  Widget build(BuildContext context) => SdBottomNavigationV3(
-    body: widget.shell,
-    destinations: <SdNavDestinationV3>[
+  Widget build(BuildContext context) {
+    final List<SdNavDestinationV3> destinations = <SdNavDestinationV3>[
       SdNavDestinationV3(
         icon: AppIconConstant.home,
         selectedIcon: AppIconConstant.home,
@@ -112,12 +129,32 @@ class _AppShellState extends State<AppShell> {
         selectedIcon: AppIconConstant.menu,
         label: context.l10n.navMore,
       ),
-    ],
-    selectedIndex: widget.shell.currentIndex,
-    onSelected: (int index) => widget.shell.goBranch(
+    ];
+    final int selectedIndex = widget.shell.currentIndex;
+
+    void select(int index) => widget.shell.goBranch(
       index,
       // Re-tapping the active tab pops that branch to its root.
-      initialLocation: index == widget.shell.currentIndex,
-    ),
-  );
+      initialLocation: index == selectedIndex,
+    );
+
+    return switch (context.sdBreakpoint3) {
+      SdBreakpoint.compact => SdBottomNavigationV3(
+        body: widget.shell,
+        destinations: destinations,
+        selectedIndex: selectedIndex,
+        onSelected: select,
+      ),
+      SdBreakpoint.medium || SdBreakpoint.expanded => SdNavPanelV3(
+        isExpanded: _panelExpanded,
+        onExpansionChanged: _setPanelExpanded,
+        expandLabel: context.l10n.navExpand,
+        collapseLabel: context.l10n.navCollapse,
+        body: widget.shell,
+        destinations: destinations,
+        selectedIndex: selectedIndex,
+        onSelected: select,
+      ),
+    };
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'confirmed_stream.dart';
 import 'firestore_stream_reporter.dart';
 
 /// Turning Firestore's snapshot streams into streams of entities.
@@ -39,17 +40,49 @@ final class FirestoreStream {
   ///
   /// Null rather than an error: the row may have been deleted by a teammate
   /// while the screen was open, which is not a failure.
+  ///
+  /// **A cache miss is reported as "does not exist", and for a screen that is
+  /// right** — it renders an empty state a moment before the real row arrives.
+  /// A document the app *routes* on cannot afford that guess: see
+  /// [confirmedDocument].
   static Stream<T?> document<T>(
     DocumentReference<Map<String, Object?>> reference,
     T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity, {
     required String operation,
-  }) {
+  }) => _entities(reference.snapshots(), toEntity, operation);
+
+  /// The same, for a document whose *absence* changes where the app sends the
+  /// seller.
+  ///
+  /// The first answer it carries is one the server confirmed, so a listener
+  /// opened on a document this device has never cached stays silent rather
+  /// than reporting nothing there. Whoever is watching sees "still loading",
+  /// which is the truth. See [ConfirmedDocumentStream] for what it costs
+  /// offline.
+  static Stream<T?> confirmedDocument<T>(
+    DocumentReference<Map<String, Object?>> reference,
+    T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity, {
+    required String operation,
+  }) => _entities(
+    ConfirmedStream.of(
+      reference.snapshots(),
+      isUnconfirmed: (DocumentSnapshot<Map<String, Object?>> doc) =>
+          doc.metadata.isFromCache,
+    ),
+    toEntity,
+    operation,
+  );
+
+  static Stream<T?> _entities<T>(
+    Stream<DocumentSnapshot<Map<String, Object?>>> snapshots,
+    T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity,
+    String operation,
+  ) {
     final FirestoreStreamReporter reporter = FirestoreStreamReporter(
       operation,
     );
 
-    return reference
-        .snapshots()
+    return snapshots
         .map((DocumentSnapshot<Map<String, Object?>> doc) {
           reporter.recovered();
 

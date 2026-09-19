@@ -163,15 +163,10 @@ world-readable, which is the boundary on what may be added here —
 
 | Field | Type | Meaning |
 |---|---|---|
-| `premium_enabled` | bool | Whether the plan system applies at all |
 | `force_update` | map | One block per store — `ios` and `android` |
 | `premium_emails` | string[] | Accounts handed Premium without buying it |
 | `dev_mode_emails` | string[] | Accounts that get the developer affordances in a release build |
 | `blocked_emails` | string[] | Accounts refused the app |
-
-`premium_enabled: false` turns monetisation off for everyone: `currentPlanProvider`
-answers Premium, so no ceiling blocks a create and every capability is
-included, and the Subscription row and the Home upgrade banner are not drawn.
 
 ## The forced update
 
@@ -218,12 +213,11 @@ carries why.
 
 **A missing document, a missing field, a mistyped value or a failed read all
 resolve to `AppConfig.fallback`.** The document is edited by hand, so a typo
-is the likely failure — and the fields fall back in **opposite** directions,
-each the safe one for what it controls:
+is the likely failure — and each field falls back in the safe direction for
+what it controls:
 
 | Field | Falls back to | Why that way |
 |---|---|---|
-| `premium_enabled` | on | Defaulting off hands the paid half of the app to everyone the first time Firestore is slow |
 | `force_update` | forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
 | every email list | empty | Nobody is refused the app over a read that failed, and nobody is handed a grant the owner did not type |
 
@@ -273,7 +267,6 @@ The whole document, with every field filled in:
 
 ```json
 {
-  "premium_enabled": true,
   "force_update": {
     "ios": {
       "store_link": "https://apps.apple.com/app/id0000000000",

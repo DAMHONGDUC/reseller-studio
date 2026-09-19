@@ -415,3 +415,110 @@ adding one would be a second way to record the same money.** A maker uses the
 same Sourcing flow a reseller does — the "buying trip" wording is the only
 thing that reads oddly, and renaming it is a copy change rather than a model
 one.
+
+## Only a duplicate Firebase app stops the launch
+
+Explains `StartupFailurePolicy` in `lib/core/bootstrap/app_startup_failure.dart`,
+and why it is a list of named failures rather than "the Firebase step threw".
+
+`SdBootstrap` guards every step and always calls `runApp`, on the argument
+that an app which will not open is worse than almost anything it could be
+missing. That argument holds for nearly everything this app brings up: no
+Firebase config is an offline build, a broken Google Sign-In leaves Apple
+working, a missing RevenueCat key reads every seller as Free, and a Firebase
+that could not be reached is a seller standing in a store with no signal.
+All of those open the app.
+
+`[core/duplicate-app]` is the one that does not. It means `initializeApp` ran
+twice, so the process is holding an instance this build never configured —
+auth, Firestore and Crashlytics all hang off it, and opening five tabs onto
+it would show the seller their business as a guess. So the seller is told,
+from inside the app, which is exactly what `SdBootstrap.onStepFailed` exists
+for: telling is not refusing, and the app still starts — onto
+`StartupErrorScreen` instead of the router.
+
+**What the seller sees is the two localized lines and nothing else.** The
+exception is a debug affordance (hard rule 6), gated on
+`DevFlags.isDebugOrProfile`, which is `const` — so the release binary carries
+`null` there and the detail row is not in it at all.
+
+## A cache miss is not an answer the router may act on
+
+Explains `ConfirmedStream` and why `watchProfile` alone uses
+`FirestoreStream.confirmedDocument`.
+
+Firestore serves a listener from its cache first. On a device that has never
+held the signed-in person's profile — a fresh install, a new phone, the first
+sign-in after a reinstall — that first snapshot says `exists: false`, and
+nothing in it distinguishes "this account has no profile" from "this device
+has not been told yet". `workspaceStatusProvider` could only read it as *no
+business*, so the router sent a returning seller to the create-business form
+and corrected itself a round trip later. The seller saw a form they had
+already filled in, for about half a second, after every sign-in.
+
+The fix is the same shape as hard rule 5: **unknown is not zero.** The profile
+stream now carries a server-confirmed answer first, and until it arrives the
+status stays `loading`, which is the screen that already exists for it.
+
+Two things are deliberately narrow:
+
+- **Only the profile.** Every other document keeps the cache-first behaviour,
+  because a list that renders an empty state for one frame is a screen
+  correcting itself, not an app sending someone somewhere they did not ask to
+  go.
+- **Only the first answer.** Once a confirmed one has arrived the gate is open
+  for the life of the stream — later unconfirmed snapshots are the app's own
+  writes echoing back, and holding those would make every edit feel like a
+  network wait.
+
+The cost is offline: nothing is ever confirmed there, so the wait is bounded
+by `ConfirmedStream.grace` and the held answer is released when it expires.
+
+## The page loader is a newton's cradle, and it costs a dependency
+
+Explains `loading_animation_widget` in `packages/system_design/pubspec.yaml`,
+approved by the owner, who named both the package and the animation.
+
+The v3 loading indicator was a `CircularProgressIndicator` at both of its
+sizes. A ring filling an empty screen reads as *stuck* — it is the same
+picture at second one and second ten — and the screen it fills most often is
+the one a seller waits on after signing in.
+
+So the two sizes now draw differently, and it is still one look rather than
+two: a wait the seller is watching is the cradle, a wait inside something they
+are already looking at (a button, a row) stays the ring. The cradle scales
+everything off its box, so at the inline size its dots would be under two
+points — a smudge, not an animation.
+
+The package is a drawing library: no service, no account, no network, and
+nothing it can log. That is why it is a dependency of the design system rather
+than of the app — it has a look, so it belongs to a generation.
+
+## The splash route has no transition, and that is a bug fix
+
+Explains the `NoTransitionPage` on `AppRoutes.splash` in `app_router.dart`.
+
+The signed-out shell renders at `/home` (hard rule 1), so signing in *leaves*
+the tab shell for the splash and comes back to it a moment later. go_router
+gives `StatefulShellRoute` **one `GlobalKey` for the life of the router** — the
+same key on every `StatefulNavigationShell` it builds.
+
+An animated page keeps the outgoing route mounted until its transition
+finishes. So the old shell was still on screen when the next one was built,
+which is two widgets holding one global key:
+
+```text
+Duplicate GlobalKey detected in widget tree.
+- [LabeledGlobalKey<StatefulNavigationShellState>]
+```
+
+It fired on the first frame of Home and truncated the tab that lost. A splash
+is a state rather than a destination, so removing its transition costs nothing
+and closes the window: the shell page is gone in the same frame it is left.
+
+**`SplashHoldController.minimum` hides this rather than fixing it.** Two
+seconds is far longer than any page transition, so the hold alone makes the
+overlap impossible — which is exactly why the transition fix has to stand on
+its own. Shorten the hold one day and the error comes back;
+`test/core/router/sign_in_lands_once_test.dart` pins the transition with the
+hold overridden away, so it cannot.

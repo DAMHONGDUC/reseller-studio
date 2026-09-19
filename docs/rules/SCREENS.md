@@ -14,6 +14,10 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
 
 ## The frame
 
+- **A screen wider than a phone caps and centres its body** — that rule and
+  everything else that changes with the width of the window is in
+  `docs/rules/RESPONSIVE.md`. Nothing on this page is width-dependent unless
+  it says so.
 - **A screen never constructs an `AppBar`.** It passes `SdAppBarV3` to
   `SdScaffoldV3`, or it uses `SdSearchHeaderV3` when its search box is the
   point. One widget owns the bar so two screens cannot drift into two.
@@ -264,6 +268,32 @@ check is to reopen the sheet and read every group.
 - `test/features/inventory/inventory_filter_sheet_test.dart` and
   `test/features/orders/order_filter_sheet_test.dart` hold the count, the two
   places it renders, and Reset.
+
+## The loading screen is watched, not glimpsed
+
+Owner's rule. The splash stays up for `SplashHoldController.minimum` every
+time it comes up — the cold start and the moment after sign-in alike — even
+when the answer it is waiting for has already landed.
+
+- **It is a hold, never a delay.** The work runs the whole time; what waits is
+  only the route change. Nothing is scheduled behind it and no call is slowed
+  down to make room for it.
+- **It only keeps the seller on the splash; it never sends them there.** A
+  hold left standing while the app is on Home costs nothing, which is what
+  makes it safe to arm early.
+- **It re-arms whenever the app starts deciding again**, which is what covers
+  sign-in. `appIsResolvingProvider` is the signal, and it mirrors the
+  redirect's own splash conditions — change one and change the other.
+- **The clock belongs to `SplashScreen`, not to the hold.** What is being
+  waited for is the animation being *seen*, so it starts when the screen
+  appears and is cancelled when it goes — nothing counts down while the
+  loading view is not up, and a test that never shows it is left with no timer
+  running.
+- **A hold already standing is left alone.** A second question arriving
+  mid-swing does not restart it, or a seller whose profile and workspace land
+  a moment apart waits twice.
+- The animation itself is `SdLoadingV3Page`, which is the page-sized half of
+  the one loading indicator (`DESIGN_SYSTEM.md`).
 
 ## Empty states
 

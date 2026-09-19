@@ -288,7 +288,7 @@ void main() {
     expect(
       decoration.color,
       context.colorScheme3.primary.withValues(
-        alpha: SdGlassNavBarV3.selectedThumbOpacity,
+        alpha: SdGlassV3.selectedThumbOpacity,
       ),
     );
   });
@@ -300,7 +300,7 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(SdGlassNavBarV3));
 
-    expect(SdGlassNavBarV3.barSettings(context).chromaticAberration, 0);
+    expect(SdGlassV3.settings(context).chromaticAberration, 0);
   });
 
   testWidgets('the bar sits in the depth band of a sheet', (

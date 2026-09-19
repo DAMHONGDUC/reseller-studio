@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/fresh_install/app_fresh_install.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
+import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:reseller_studio/core/widgets/splash_screen.dart';
 import 'package:system_design/index.dart';
 
@@ -33,9 +33,8 @@ Future<void> _pumpSplash(
 }) => tester.pumpWidget(
   ProviderScope(
     overrides: <Override>[freshInstallProvider.overrideWith(check)],
-    child: ScreenUtilInit(
-      designSize: const Size(390, 844),
-      builder: (BuildContext context, Widget? _) => MaterialApp(
+    child: AppScreenUtil(
+      builder: (BuildContext context) => MaterialApp(
         theme: AppTheme.light,
         home: SplashScreen(child: child),
       ),

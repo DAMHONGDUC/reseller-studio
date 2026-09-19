@@ -16,6 +16,7 @@ import '../config/app_env.dart';
 import '../constants/log_tag_constant.dart';
 import '../logging/firebase_crash_reporter.dart';
 import '../providers/shared_preferences_provider.dart';
+import 'app_startup_failure.dart';
 
 /// This app's startup steps — the SDKs, and nothing about how they are run.
 ///
@@ -33,6 +34,12 @@ import '../providers/shared_preferences_provider.dart';
 /// it, because before `runApp` the only thing on screen is the platform launch
 /// image and a wipe that takes a second looks like a hang.
 ///
+/// **A step that fails does not stop the launch, and one of them still can
+/// end it.** `SdBootstrap` guards each step and always calls `runApp`, so the
+/// app opens whatever went wrong; [onStepFailed] is where this app decides
+/// whether what it opens into is the router or `StartupErrorScreen`.
+/// [StartupFailurePolicy] holds that judgement.
+///
 /// **Preferences are the one exception to that, and they have to be.** They
 /// decide how the app *looks* — `themeModeProvider` reads them — and the theme
 /// is set on `MaterialApp`, above the splash, so there is no screen that could
@@ -49,10 +56,41 @@ final class AppBootstrap {
       SdBootstrapStep(name: 'Firebase', run: _initializeFirebase),
       SdBootstrapStep(name: 'Google Sign-In', run: _initializeGoogleSignIn),
       SdBootstrapStep(name: 'Billing', run: _initializeBilling),
+      SdBootstrapStep(name: 'Portrait orientation', run: lockPortrait),
       SdBootstrapStep(name: 'Edge-to-edge', run: _goEdgeToEdge),
       SdBootstrapStep(name: 'Environment', run: _logEnvironment),
     ],
+    onStepFailed: _recordFailure,
   );
+
+  /// The failure the app cannot open past, or null on a normal launch.
+  ///
+  /// Read by `ResellerStudioApp` before it builds anything else, so nothing
+  /// downstream has to know a step failed.
+  static AppStartupFailure? get startupFailure => _startupFailure;
+
+  static AppStartupFailure? _startupFailure;
+
+  /// Keep the first fatal failure, and let every other one through.
+  ///
+  /// `SdBootstrap` has already logged the throw itself; the line below is the
+  /// separate fact that the app is about to show an error screen instead of
+  /// the router, which is what somebody reading the console is looking for.
+  ///
+  /// **The first, not the last**: a step that fails because Firebase did is a
+  /// consequence, and naming it would send the reader to the wrong SDK.
+  static void _recordFailure(SdBootstrapStep step, Object error) {
+    if (_startupFailure != null || !StartupFailurePolicy.isFatal(error)) return;
+
+    _startupFailure = AppStartupFailure(step: step.name, error: error);
+
+    SdLogger.error(
+      LogTagConstant.bootstrap,
+      'Fatal startup failure — the app opens on the error screen',
+      error: error,
+      data: <String, String>{'step': step.name},
+    );
+  }
 
   /// What `main.dart` hands the `ProviderScope`, so the first frame already
   /// knows what the device was told to look like.
@@ -68,9 +106,7 @@ final class AppBootstrap {
     // rather than one microtask of `AsyncLoading` — which is the frame the
     // flash happened in.
     return <Override>[
-      sharedPreferencesProvider.overrideWith(
-        (Ref ref) => loaded,
-      ),
+      sharedPreferencesProvider.overrideWith((Ref ref) => loaded),
     ];
   }
 
@@ -78,6 +114,12 @@ final class AppBootstrap {
 
   static Future<void> _loadPreferences() async =>
       _preferences = await SharedPreferences.getInstance();
+
+  /// Kept public for the platform-channel test; startup is its only caller.
+  @visibleForTesting
+  static Future<void> lockPortrait() => SystemChrome.setPreferredOrientations(
+    const <DeviceOrientation>[DeviceOrientation.portraitUp],
+  );
 
   /// Let the app draw under the system bars.
   ///
@@ -99,6 +141,10 @@ final class AppBootstrap {
   /// still starts, `SdCrashReporter` stays a no-op, and the seller sees a
   /// working offline app rather than a white screen. Standing in a store with
   /// no signal is a normal Tuesday, not an error state.
+  ///
+  /// **The one throw that is not survivable is a duplicate app**, because the
+  /// app would then be running on an instance this build never configured.
+  /// [StartupFailurePolicy] names it and the seller gets the error screen.
   static Future<void> _initializeFirebase() async {
     if (!AppEnv.hasFirebaseConfig) {
       // Distinct from a thrown init failure on purpose: "no project

@@ -45,6 +45,7 @@ void main() {
       SdScaffoldV3(
         extendBody: true,
         body: SdFloatingBarScopeV3(
+          edge: SdFloatingBarEdgeV3.bottom,
           child: _ContextProbe(
             onContext: (BuildContext context) => screenContext = context,
           ),
