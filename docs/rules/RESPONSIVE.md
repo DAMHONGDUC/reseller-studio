@@ -111,8 +111,12 @@ navigation labels for more working space without changing destinations.
 - **Expansion and collapse animate the joined panel and content widths.**
   Owner's rule: the transition should show where the working space moves. Use
   `SdMotionV3.normal` and `SdMotionV3.emphasized`; reduced motion skips it.
-  The toggle uses distinct directional sidebar icons for opening and closing,
-  replacing the previous shared icon so its next action is visible.
+  Preserve the owner-selected menu icon; localized tooltips and expanded
+  semantics distinguish its action.
+- **Collapsed content starts directly below the reopen control.** Owner's
+  correction: avoid the excessive empty strip under the icon. The control
+  consumes the top safe inset, so the nested content must not reserve it
+  again. Preserve bottom and side safe insets and the control's tap target.
 - Phone widths keep `SdBottomNavigationV3` without a panel toggle.
 - Outside the shell, `SdContentPaddingV3.pageMargin` still wraps the whole
   scaffold. Pushed routes remain centred in their own available window;
