@@ -98,10 +98,9 @@ navigation labels for more working space without changing destinations.
   Owner's correction: use the joined sidebar/content composition of iPad
   Settings, not a detached glass capsule. No outer panel margin, rounded outer
   surface, or gap between the panel and the content scaffold.
-- Expanded destinations use `SdNavCellShapeV3.row`. Implementation default
-  for collapse is to hide the panel and give the content the full width, with
-  a visible reopen control. The owner has not separately confirmed that
-  collapsed presentation after revising the expanded share.
+- Expanded destinations use `SdNavCellShapeV3.row`. Collapsed, the panel is
+  hidden outright and the content takes the full window — there is no narrow
+  rail.
 - **Collapsed, the reopen control is the screen's own leading control.**
   Owner's rule. The panel draws nothing at all and publishes
   `SdNavPanelScopeV3` instead; whichever chrome the screen already wears takes
