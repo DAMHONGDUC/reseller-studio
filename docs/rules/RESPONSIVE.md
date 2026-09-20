@@ -108,9 +108,9 @@ navigation labels for more working space without changing destinations.
   matching place, because Inventory wears no app bar and would otherwise be
   the one tab with no way back. A screen never places the control itself: a
   screen that could place it is one that could forget to.
-- **Content is horizontally centred in its available region**: beside the
-  panel when open, across the window when closed. Screen gutters remain
-  symmetric inside the content; `pageMargin` adds no outside gap in the shell.
+- **Content fills its available region**: beside the panel when open, across
+  the window when closed. The screen's own gutter is the only inset either
+  side, and it is symmetric.
 - The toggle is separate from the destinations. Hard rule 13 applies to both
   states; there is no business header and no destination promoted from More.
 - The default is expanded. Toggling keeps the selected tab and its state.
@@ -125,9 +125,13 @@ navigation labels for more working space without changing destinations.
   screen's own chrome — and nothing has to be told not to reserve it twice.
   The control keeps its tap target and its localized tooltip.
 - Phone widths keep `SdBottomNavigationV3` without a panel toggle.
-- Outside the shell, `SdContentPaddingV3.pageMargin` still wraps the whole
-  scaffold. Pushed routes remain centred in their own available window;
-  their width no longer promises to match both shell expansion states.
+- **A pushed route fills the window, and no page carries an outer margin at
+  any width.** Owner's rule, replacing the tablet page margin: a route that is
+  a sibling of the shell has no panel beside it and nothing to leave room for,
+  so a margin there is a strip the shape of a chrome that is not there. It
+  once existed to land a detail on the same width as the tab screen it was
+  opened from; a collapsible panel has no single width for it to match, and
+  the gutter inside each screen is the whole of the inset.
 
 ## Portrait policy
 
@@ -141,11 +145,11 @@ orientation override where the target SDK permits it. Operating-system
 restrictions can override these requests; wider-window tests remain defensive
 coverage, not a landscape product mode.
 
-### Pages take margins; panels keep ceilings
+### Pages take gutters; panels keep ceilings
 
 | Kind | Rule | What it is |
 |---|---|---|
-| page — fills the window | `pageMargin`, content fills what is left | every screen |
+| page — fills the window | its own gutter, nothing outside it | every screen |
 | panel — floats over a page | a max width, centred | a sheet, a dialog, the paywall, onboarding |
 
 A sheet spanning a landscape tablet is a slab with a column of controls lost
@@ -179,8 +183,8 @@ assumed from the fact that there is room.
 ## Tests
 
 `test/core/responsive/tablet_layout_test.dart` measures rendered panel and
-content regions in both expansion states, symmetric content margins, the
-shared app-bar edges, destination semantics and switching, and phone bottom
+content regions in both expansion states, symmetric content gutters, a pushed
+route reaching both window edges, the shared app-bar edges, destination semantics and switching, and phone bottom
 navigation. Shell tests verify the real router retains the selected tab and
 state through toggles. Orientation tests verify Flutter's platform request
 and the matching native declarations.
