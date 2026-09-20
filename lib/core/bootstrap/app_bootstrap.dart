@@ -142,11 +142,10 @@ final class AppBootstrap {
   /// working offline app rather than a white screen. Standing in a store with
   /// no signal is a normal Tuesday, not an error state.
   ///
-  /// **Two throws here are not survivable, and neither is about the network.**
-  /// A duplicate app leaves the process on an instance this build never
-  /// configured; a [FlavorConfigMismatch] leaves it on a project this build
-  /// was never meant to touch. Both get the error screen rather than five
-  /// tabs onto the wrong backend — [StartupFailurePolicy] names them.
+  /// **One throw here is not survivable, and it is not about the network.** A
+  /// [FlavorConfigMismatch] leaves the app on a project this build was never
+  /// meant to touch, so it gets the error screen rather than five tabs onto
+  /// the wrong backend — [StartupFailurePolicy] names it, and nothing else.
   ///
   /// **The project id is checked before Crashlytics is attached**, so a build
   /// pointed at the wrong project cannot also send its crashes there.

@@ -1,5 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
-
 import '../config/app_env.dart';
 
 /// A startup step that failed in a way the app cannot run past.
@@ -59,27 +57,19 @@ final class FlavorConfigMismatch implements Exception {
 
 /// Which startup failures stop the app, and which ones it opens without.
 ///
-/// The class *is* the policy, so the codes it matches on live here rather than
-/// in a constants file — they are the algorithm, not configuration about it.
+/// The class *is* the policy, so what it matches on lives here rather than in
+/// a constants file — it is the algorithm, not configuration about it.
 final class StartupFailurePolicy {
-  /// Firebase was initialized twice: the SDK refuses the second call, and the
-  /// app is left with an instance nobody in this process configured.
-  ///
-  /// Everything downstream — auth, Firestore, Crashlytics — hangs off that
-  /// instance, so the honest outcome is to say so rather than to open five
-  /// tabs onto a backend this build never set up.
-  static const String _duplicateAppCode = 'duplicate-app';
-
   /// True when [error] leaves the app in a state it cannot open into.
   ///
-  /// Deliberately a list of named failures rather than "anything the Firebase
-  /// step threw": a build that simply could not reach Firebase is a seller
-  /// standing in a store with no signal, and that one gets the app.
+  /// **Exactly one failure qualifies**, and it is deliberately not "anything
+  /// the Firebase step threw": every other way that step fails leaves a usable
+  /// app. No config is an offline build, a project that could not be reached
+  /// is a seller standing in a store with no signal, a broken Google Sign-In
+  /// leaves Apple working. All of those open the app.
   ///
-  /// [FlavorConfigMismatch] is the other kind: nothing is unreachable, and
-  /// that is the problem — the app would work perfectly against the wrong
-  /// project.
-  static bool isFatal(Object error) =>
-      error is FlavorConfigMismatch ||
-      (error is FirebaseException && error.code == _duplicateAppCode);
+  /// [FlavorConfigMismatch] is the other kind, and the only one. Nothing is
+  /// unreachable — that is the problem: the app would work perfectly, against
+  /// the wrong project.
+  static bool isFatal(Object error) => error is FlavorConfigMismatch;
 }
