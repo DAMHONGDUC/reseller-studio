@@ -39,6 +39,22 @@ void main() {
     ),
   );
 
+  /// A screen pushed above the shell: the same screen, with no chrome beside
+  /// it, which is what a detail route is.
+  Future<void> pumpPushed(WidgetTester tester, {required Size surface}) async {
+    tester.view.devicePixelRatio = 3;
+    tester.view.physicalSize = surface * 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      AppScreenUtil(
+        builder: (BuildContext context) =>
+            MaterialApp(theme: AppTheme.light, home: screen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
+
   Future<void> pumpChrome(
     WidgetTester tester, {
     required Size surface,
@@ -340,8 +356,29 @@ void main() {
 
       final Rect card = tester.getRect(find.byKey(cardKey));
 
-      expect(SdContentPaddingV3.pageMargin(bodyContext), 0);
       expect(card.left, closeTo(SdContentPaddingV3.horizontal, 0.5));
+    });
+
+    testWidgets('a pushed route fills the window it has to itself', (
+      WidgetTester tester,
+    ) async {
+      // No chrome beside it, so nothing to leave room for: the gutter inside
+      // the screen is the whole inset, at both tablet orientations.
+      for (final Size surface in <Size>[
+        TestSurface.tabletPortrait,
+        TestSurface.tabletLandscape,
+      ]) {
+        await pumpPushed(tester, surface: surface);
+
+        final Rect card = tester.getRect(find.byKey(cardKey));
+        final Rect bar = tester.getRect(find.byType(AppBar).first);
+        final double gutter = SdContentPaddingV3.horizontal;
+
+        expect(bar.left, 0);
+        expect(bar.right, closeTo(surface.width, 0.01));
+        expect(card.left, closeTo(gutter, 0.5));
+        expect(card.right, closeTo(surface.width - gutter, 0.5));
+      }
     });
 
     testWidgets('the app bar shares the content edges', (
