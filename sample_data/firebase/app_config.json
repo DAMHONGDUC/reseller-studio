@@ -16,6 +16,13 @@
       }
     },
     "premium_emails": [],
-    "dev_mode_emails": []
+    "dev_mode_emails": [],
+    "error_view": {
+      "enable": false,
+      "title": "Reseller Studio is paused",
+      "subtitle_1": "We are moving your data to a faster database.",
+      "subtitle_2": "Nothing has been lost. Try again in about an hour.",
+      "type": "warning"
+    }
   }
 }

@@ -14,6 +14,7 @@ import '../../core/constants/log_tag_constant.dart';
 import '../../core/providers/repository_providers.dart';
 import '../auth/providers.dart';
 import 'domain/entities/app_config.dart';
+import 'domain/entities/app_error_notice.dart';
 import 'domain/entities/app_update_policy.dart';
 import 'domain/enums/app_platform.dart';
 
@@ -164,3 +165,20 @@ final Provider<bool> accountBlockedProvider = Provider<bool>(
       .watch(_resolvedConfigProvider)
       .blocks(ref.watch(currentEmailProvider)),
 );
+
+/// The notice to put in front of the whole app, or null on a normal launch.
+///
+/// **Null rather than a notice with `shows` false**, so a gate reads one
+/// question and cannot get the second half wrong — the two conditions that
+/// make a notice real are asked here, once.
+///
+/// **No loading state, and it defaults to showing nothing.** Same safety
+/// property as the forced update, in the same direction: a config that has
+/// not arrived, failed or was mistyped leaves the app running. The notice
+/// appears the moment the answer does.
+final Provider<AppErrorNotice?> appErrorNoticeProvider =
+    Provider<AppErrorNotice?>((Ref ref) {
+      final AppErrorNotice notice = ref.watch(_resolvedConfigProvider).errorNotice;
+
+      return notice.shows ? notice : null;
+    });

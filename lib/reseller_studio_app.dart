@@ -14,6 +14,7 @@ import 'core/theme/app_theme.dart';
 import 'core/widgets/app_screen_util.dart';
 import 'core/widgets/splash_screen.dart';
 import 'core/widgets/startup_error_screen.dart';
+import 'features/app_config/presentation/widgets/error_notice_gate.dart';
 import 'features/app_config/presentation/widgets/force_update_gate.dart';
 import 'features/app_config/providers.dart';
 import 'features/notifications/providers.dart';
@@ -101,11 +102,16 @@ class ResellerStudioApp extends ConsumerWidget {
                 // `app_config` — that read starts the Firestore client the
                 // wipe has to terminate.
                 child: SplashScreen(
-                  // Above every route rather than on one: a build too old to
-                  // run is about the binary, so the sheet is raised over
-                  // whatever the seller was looking at.
-                  child: ForceUpdateGate(
-                    child: child ?? const SizedBox.shrink(),
+                  // Above the update gate, not below it: a notice replaces
+                  // the app, and an update sheet over a replaced app has
+                  // nothing to open onto.
+                  child: ErrorNoticeGate(
+                    // Above every route rather than on one: a build too old to
+                    // run is about the binary, so the sheet is raised over
+                    // whatever the seller was looking at.
+                    child: ForceUpdateGate(
+                      child: child ?? const SizedBox.shrink(),
+                    ),
                   ),
                 ),
               ),

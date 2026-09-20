@@ -1,4 +1,5 @@
 import '../enums/app_platform.dart';
+import 'app_error_notice.dart';
 import 'app_update_policy.dart';
 
 /// One switch board for the whole product, not for one business.
@@ -14,6 +15,7 @@ class AppConfig {
     this.premiumEmails = const <String>{},
     this.devModeEmails = const <String>{},
     this.blockedEmails = const <String>{},
+    this.errorNotice = AppErrorNotice.none,
   });
 
   /// What a client falls back to.
@@ -28,6 +30,9 @@ class AppConfig {
   ///   three ways: nobody is blocked out of the app, nobody is handed a grant
   ///   the owner did not type, and a config that failed to load cannot be the
   ///   reason an account is refused.
+  /// - The notice falls back to **not showing** ([AppErrorNotice.none]), for
+  ///   the forced update's reason exactly: a wrong answer replaces the app
+  ///   with a screen nobody can leave.
   static const AppConfig fallback = AppConfig();
 
   /// What the App Store says about the running build.
@@ -57,6 +62,14 @@ class AppConfig {
   /// console. This is what stops the app being *used*, not what stops it
   /// reading.
   final Set<String> blockedEmails;
+
+  /// A screen the owner can put in front of the whole app, for the hour
+  /// between a problem and a release that fixes it.
+  ///
+  /// **It is not about an account.** Every seller on every build sees it, the
+  /// same way a forced update is about the binary rather than the person — so
+  /// nothing here is matched against an email.
+  final AppErrorNotice errorNotice;
 
   /// The policy for one store.
   AppUpdatePolicy updateFor(AppPlatform platform) => switch (platform) {
@@ -92,5 +105,6 @@ class AppConfig {
     'premiumEmails': premiumEmails.length,
     'devModeEmails': devModeEmails.length,
     'blockedEmails': blockedEmails.length,
+    'errorNotice': errorNotice.toLogData(),
   };
 }

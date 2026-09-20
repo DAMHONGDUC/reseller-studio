@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../domain/entities/app_config.dart';
+import '../../domain/entities/app_error_notice.dart';
 import '../../domain/entities/app_update_policy.dart';
+import '../../domain/enums/app_notice_type.dart';
 
 /// `app_config/current` — one document, read by every client.
 ///
@@ -27,9 +30,25 @@ final class AppConfigDto {
   static const String _premiumEmails = 'premium_emails';
   static const String _devModeEmails = 'dev_mode_emails';
   static const String _blockedEmails = 'blocked_emails';
+  static const String _errorView = 'error_view';
+  static const String _enable = 'enable';
+  static const String _title = 'title';
+  static const String _subtitle1 = 'subtitle_1';
+  static const String _subtitle2 = 'subtitle_2';
+  static const String _type = 'type';
 
-  static AppConfig toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static AppConfig toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
+      fromData(doc.data() ?? <String, Object?>{});
+
+  /// The document's fields, once the snapshot is out of the way.
+  ///
+  /// **Split from [toEntity] so the parsing can be read at all.**
+  /// `DocumentSnapshot` is sealed, so no test can build one and every shape
+  /// this class defends against — a missing block, a bool that arrived as a
+  /// string — would otherwise be unreachable from a test. Unwrapping is the
+  /// whole of what [toEntity] does on its own.
+  @visibleForTesting
+  static AppConfig fromData(Map<String, Object?> data) {
     final Object? update = data[_forceUpdate];
     final Map<String, Object?> stores = update is Map<String, Object?>
         ? update
@@ -45,8 +64,35 @@ final class AppConfigDto {
       premiumEmails: _emails(data[_premiumEmails]),
       devModeEmails: _emails(data[_devModeEmails]),
       blockedEmails: _emails(data[_blockedEmails]),
+      errorNotice: _notice(data[_errorView]),
     );
   }
+
+  /// The notice block, read the most defensively of anything here because it
+  /// is the field that can replace the whole app.
+  ///
+  /// A missing block, a block of the wrong type, a switch that is not a bool
+  /// and a title that is not a string all land on [AppErrorNotice.none],
+  /// which shows nothing. Only a `true` beside a non-empty title puts a
+  /// screen in front of every seller.
+  static AppErrorNotice _notice(Object? value) {
+    if (value is! Map<String, Object?>) return AppErrorNotice.none;
+
+    final Object? enabled = value[_enable];
+
+    return AppErrorNotice(
+      enabled: enabled is bool ? enabled : AppErrorNotice.none.enabled,
+      title: _line(value[_title]),
+      subtitle1: _line(value[_subtitle1]),
+      subtitle2: _line(value[_subtitle2]),
+      type: AppNoticeType.parse(value[_type]),
+    );
+  }
+
+  /// One line of the notice. Anything that is not a string reads as no line,
+  /// and the surrounding whitespace of a value typed into a console field is
+  /// not the owner's intent.
+  static String _line(Object? value) => value is String ? value.trim() : '';
 
   /// One store's block, read the same defensive way as everything else here:
   /// a missing object, a missing field or a value of the wrong type all land
