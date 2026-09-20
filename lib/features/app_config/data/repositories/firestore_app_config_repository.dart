@@ -8,6 +8,12 @@ import '../dtos/app_config_dto.dart';
 
 /// The one document at `app_config/current`.
 ///
+/// **Every snapshot is logged with the project it came from and whether it
+/// came from the cache.** Those two facts are the whole of "I changed the
+/// document and the app did not notice": either the binary is listening to
+/// the other flavour's project, or the device is serving what it already had.
+/// Both are invisible without saying so.
+///
 /// **It never lets an error reach the app.** Every other stream in `data/`
 /// maps a failure and rethrows it (`FirestoreStream`), because a screen with
 /// no data has something to say. This one has no screen: it decides whether
@@ -28,10 +34,19 @@ class FirestoreAppConfigRepository implements AppConfigRepository {
             ? AppConfigDto.toEntity(doc)
             : AppConfig.fallback;
 
+        // - the project, because a console edit that "did nothing" is most
+        //   often an edit to the other flavour's document
+        // - fromCache, because the alternative answer is a device with no
+        //   route to the server serving what it already had
         SdLogger.info(
           LogTagConstant.appConfig,
           'App config read',
-          <String, Object?>{'exists': doc.exists, ...config.toLogData()},
+          <String, Object?>{
+            'project': _firestore.app.options.projectId,
+            'fromCache': doc.metadata.isFromCache,
+            'exists': doc.exists,
+            ...config.toLogData(),
+          },
         );
 
         return config;
