@@ -142,9 +142,14 @@ final class AppBootstrap {
   /// working offline app rather than a white screen. Standing in a store with
   /// no signal is a normal Tuesday, not an error state.
   ///
-  /// **The one throw that is not survivable is a duplicate app**, because the
-  /// app would then be running on an instance this build never configured.
-  /// [StartupFailurePolicy] names it and the seller gets the error screen.
+  /// **Two throws here are not survivable, and neither is about the network.**
+  /// A duplicate app leaves the process on an instance this build never
+  /// configured; a [FlavorConfigMismatch] leaves it on a project this build
+  /// was never meant to touch. Both get the error screen rather than five
+  /// tabs onto the wrong backend — [StartupFailurePolicy] names them.
+  ///
+  /// **The project id is checked before Crashlytics is attached**, so a build
+  /// pointed at the wrong project cannot also send its crashes there.
   static Future<void> _initializeFirebase() async {
     if (!AppEnv.hasFirebaseConfig) {
       // Distinct from a thrown init failure on purpose: "no project
@@ -161,6 +166,16 @@ final class AppBootstrap {
     }
 
     await Firebase.initializeApp();
+
+    final String nativeProjectId = Firebase.app().options.projectId;
+
+    // The two halves of a build's config, compared where they finally meet.
+    if (nativeProjectId != AppEnv.firebaseProjectId) {
+      throw FlavorConfigMismatch(
+        expected: AppEnv.firebaseProjectId,
+        actual: nativeProjectId,
+      );
+    }
 
     final FirebaseCrashlytics crashlytics = FirebaseCrashlytics.instance;
 

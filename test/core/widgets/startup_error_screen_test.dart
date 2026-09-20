@@ -14,6 +14,14 @@ FirebaseException _duplicateApp() => FirebaseException(
   message: 'A Firebase App named "[DEFAULT]" already exists',
 );
 
+/// The other fatal failure: a dev build holding the production project,
+/// because `prepare-env` was last run for the other flavour. Nothing is
+/// unreachable — the app would work, against the wrong Firestore.
+FlavorConfigMismatch _mismatch() => const FlavorConfigMismatch(
+  expected: 'reseller-studio-dev',
+  actual: 'reseller-studio-prod',
+);
+
 void main() {
   group('StartupFailurePolicy', () {
     test('a duplicate app stops the launch', () {
@@ -29,6 +37,21 @@ void main() {
 
       expect(StartupFailurePolicy.isFatal(offline), isFalse);
       expect(StartupFailurePolicy.isFatal(StateError('billing')), isFalse);
+    });
+
+    test('so does config whose two halves name different projects', () {
+      expect(StartupFailurePolicy.isFatal(_mismatch()), isTrue);
+    });
+
+    test('and it says which project each half named, and what to run', () {
+      final String detail = AppStartupFailure(
+        step: 'Firebase',
+        error: _mismatch(),
+      ).detail;
+
+      expect(detail, contains('reseller-studio-dev'));
+      expect(detail, contains('reseller-studio-prod'));
+      expect(detail, contains('prepare-env'));
     });
   });
 
