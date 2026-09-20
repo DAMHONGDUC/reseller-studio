@@ -22,27 +22,6 @@ dev plist compiles, installs, launches and writes into the wrong Firestore.
 `env_assets/` is where your copies live — **`docs/rules/RELEASE.md` is the
 authority on both**, and this file does not repeat it.
 
-**So the app checks the two halves against each other at startup, and refuses
-to open when they disagree.** The Firebase step compares
-`AppEnv.firebaseProjectId` against `Firebase.app().options.projectId` — the
-project the native SDK actually came up on — and throws `FlavorConfigMismatch`
-when they differ, which `StartupFailurePolicy` treats as fatal, so the seller
-gets `StartupErrorScreen` rather than five tabs onto the wrong Firestore.
-
-- **It is a mismatch, never a missing half.** An empty project id is
-  `hasFirebaseConfig` being false, which is an offline build and a supported
-  state; a plist the SDK could not reach is a seller with no signal. Only two
-  filled-in halves naming different projects are the bug.
-- **Checked before Crashlytics attaches**, so a build pointed at the wrong
-  project does not also send its crashes there.
-- **The detail row names both projects and the command to run, in debug
-  only** (hard rule 6). This can only happen on a developer's machine, and
-  that is exactly where the sentence is worth reading.
-- **The release lane asks the same question earlier and from the files**
-  (`sd_verify_flavor_config`, against `.firebaserc`). Neither replaces the
-  other: the lane catches it before a build exists, this catches the `fvm
-  flutter run` that never went through a lane.
-
 - **`env/env.example.json` is the one checked-in template and it is the key
   list**; `env/dev.json` and `env/prod.json` are gitignored. `melos run set-up`
   copies it into each missing flavour file and **never overwrites** an existing
@@ -72,6 +51,27 @@ gets `StartupErrorScreen` rather than five tabs onto the wrong Firestore.
 - **Every getter has a default**, so a build with no `--dart-define-from-file`
   still compiles. That is what keeps `melos run test` working without a
   flavour.
+
+**So the app checks the two halves against each other at startup, and refuses
+to open when they disagree.** The Firebase step compares
+`AppEnv.firebaseProjectId` against `Firebase.app().options.projectId` — the
+project the native SDK actually came up on — and throws `FlavorConfigMismatch`
+when they differ, which `StartupFailurePolicy` treats as fatal, so the seller
+gets `StartupErrorScreen` rather than five tabs onto the wrong Firestore.
+
+- **It is a mismatch, never a missing half.** An empty project id is
+  `hasFirebaseConfig` being false, which is an offline build and a supported
+  state; a plist the SDK could not reach is a seller with no signal. Only two
+  filled-in halves naming different projects are the bug.
+- **Checked before Crashlytics attaches**, so a build pointed at the wrong
+  project does not also send its crashes there.
+- **The detail row names both projects and the command to run, in debug
+  only** (hard rule 6). This can only happen on a developer's machine, and
+  that is exactly where the sentence is worth reading.
+- **The release lane asks the same question earlier and from the files**
+  (`sd_verify_flavor_config`, against `.firebaserc`). Neither replaces the
+  other: the lane catches it before a build exists, this catches the `fvm
+  flutter run` that never went through a lane.
 
 **A key that belongs to one platform ends in `_IOS` or `_ANDROID`, and the
 suffix goes last.** Owner's rule. `REVENUECAT_API_KEY_IOS`, never
