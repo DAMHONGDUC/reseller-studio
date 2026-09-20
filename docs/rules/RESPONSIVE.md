@@ -4,9 +4,9 @@ Read this before changing any layout that has to survive a window wider than
 a phone: the shell, a screen's frame, a panel, or anything that reads a width.
 
 Spacing values are not in this file. Every dimension named here lives in
-`SdBreakpointConstant` or `SdContentPaddingV3` — `DESIGN_SYSTEM.md` § Spacing
-is the authority on which, and this file only says when a width changes what
-the app does.
+`SdBreakpointConstant`, `SdScreenScale` or `SdContentPaddingV3` —
+`DESIGN_SYSTEM.md` § Spacing is the authority on which, and this file only
+says when a width changes what the app does.
 
 **The one invariant: every rule here is a no-op at phone width.** If applying
 any of it moves a single pixel on an iPhone, something is wrong — and a test
@@ -23,10 +23,13 @@ bug — the canvas is roughly half the window, so every padding, icon, radius
 and font is scaled up by the ratio and a seller with twice the screen gets the
 same six rows, twice as large.
 
-Worse than large: screenutil takes the **smaller** of the two ratios for type
-(`minTextAdapt`), so a tablet in landscape renders the app stretched in one
-axis and shrunk in the other. Nothing overflows and no test fails — every
-number is simply wrong.
+Worse than large: screenutil resolves the four token ladders through
+different ratios, so a window shorter than the design canvas renders the app
+stretched on one axis and shrunk on the other — grown gutters and type beside
+icons and tap targets smaller than the phone's. Nothing overflows and no test
+fails; every number is simply wrong. `minTextAdapt` does not enter into it:
+`ScreenUtilInit` defaults `fontSizeResolver` to the width, and a resolver is
+consulted before the flag.
 
 **So the first rule is about scale, not about columns.** A tablet layout that
 adds a second column on top of inflated tokens is two problems stacked.
@@ -66,9 +69,27 @@ adds a second column on top of inflated tokens is two problems stacked.
 ## Tokens scale on a phone and stop at the clamp
 
 - **The design size stays the phone canvas; what changes is that the scale is
-  clamped at `SdBreakpointConstant.maxTokenScale`.** The canvas is grown to
-  match the window rather than the ratio being allowed to grow, which is why
-  the clamp is a size and not a factor.
+  clamped at `SdScreenScale.maxScale`.** The canvas is grown to match the
+  window rather than the ratio being allowed to grow, which is why the clamp
+  is a size and not a factor.
+- **One class owns the ceiling, and it is not `SdBreakpointConstant`.** A
+  width class is a layout decision taken at a threshold; the scale is a ratio
+  that never steps at one. They were two fields answering "how big is this
+  tablet?" and they gave different answers — the app read one, the sibling app
+  the other.
+- **All four of screenutil's ladders stop at it, not just the width.** `.w`
+  and `.sp` take the width ratio, `.h` the height, and `.r` — every icon,
+  radius and square tap target — the smaller of the two. Floored at a phone's
+  design height, a window shorter than that canvas drove `.r` below 1 and drew
+  icons and tap targets *smaller* than the phone they were scaled up from,
+  under Apple's minimum, beside grown gutters and type. So once the width
+  clamp engages the height follows the same ceiling rather than a phone's
+  floor: past that point the window is a tablet, and a tablet renders one
+  scale.
+- **A framework constant is not on a ladder and will not move.**
+  `kToolbarHeight` is a raw 56 whatever the window is, so anything measuring
+  against the app bar reads `SdAppBarV3.toolbarHeight` — the same number,
+  scaled. The one that did not overlapped the bar it was meant to sit below.
 - **The clamp is above every phone the app ships to**, so a phone resolves
   exactly the dimension it resolved before the clamp existed. That is not a
   happy accident to be re-derived each time the value is touched: it is the
