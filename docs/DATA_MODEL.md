@@ -167,6 +167,47 @@ world-readable, which is the boundary on what may be added here —
 | `premium_emails` | string[] | Accounts handed Premium without buying it |
 | `dev_mode_emails` | string[] | Accounts that get the developer affordances in a release build |
 | `blocked_emails` | string[] | Accounts refused the app |
+| `error_view` | map | A screen shown in place of the whole app |
+
+## The error view
+
+`error_view` is the owner's remote notice: a screen the app is told to show
+instead of itself, for the hour between a problem and a release that fixes it
+— a migration, an outage, a marketplace that stopped answering. The seller
+reads a sentence somebody wrote rather than five tabs of numbers that are
+quietly untrue.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `enable` | bool | The switch. Anything but `true` leaves the app running |
+| `title` | string | The line read first. **Empty shows nothing, switch or no switch** |
+| `subtitle_1` | string | What it means for the seller |
+| `subtitle_2` | string | A second, quieter line — what to do, or when to come back. Empty draws no row |
+| `type` | string | `warning` or `error`. Anything else reads as `error` |
+
+**It is not about an account.** No email is matched, and no seller is exempt:
+every client on every build shows it, the same way a forced update is about
+the binary rather than the person.
+
+**It is the most dangerous field in the document, and every default is chosen
+for that.** A mistake here blanks the app for everyone at once and there is no
+way to ship them out of it — so a missing block, a block of the wrong type, a
+switch that is not a bool and a title that is not a string all read as
+*showing nothing*. Only `true` beside a non-empty title puts a screen in front
+of anybody; `AppErrorNotice.shows` is where those two conditions are asked,
+once.
+
+**A title on its own is deliberately not enough to be blank.** A notice with
+no words is a screen with no way out, which is worse than the state it was
+turned on to explain.
+
+**Its words are world-readable**, like everything else in this document, and
+that is not a cost here: they are written to be shown to every seller. The
+rule about what may be added is unchanged — `docs/rules/BACKEND.md`.
+
+**It outranks the forced update.** `ErrorNoticeGate` sits above
+`ForceUpdateGate` and replaces its child rather than covering it, so with a
+notice up the router is not built at all.
 
 ## The forced update
 
