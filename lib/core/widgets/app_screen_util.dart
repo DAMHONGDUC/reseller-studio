@@ -9,8 +9,15 @@ import 'package:system_design/index.dart';
 /// design system by dividing the window by [designSize], so a second one
 /// built by hand — in the app or in a test — is a tree rendering at a scale
 /// nothing else in the app uses, and it would be the tree that never sees the
-/// bug. `SdBreakpointConstant.designSizeFor` holds the clamp itself; this
-/// widget is what makes it unavoidable.
+/// bug. `SdScreenScale` holds the clamp itself; this widget is what makes it
+/// unavoidable.
+///
+/// **`minTextAdapt` is deliberately not passed.** `ScreenUtilInit` defaults
+/// `fontSizeResolver` to `FontSizeResolvers.width`, and a resolver is
+/// consulted before the flag is — so the flag decided nothing while reading
+/// as though type followed a different ladder from the rest of the app. Type
+/// takes the width ratio, which `SdScreenScale` clamps alongside the other
+/// three.
 ///
 /// **It must give `builder:`, never `child:`.** `AppTheme.light` reads
 /// `SdSpacingConstant.sp*` to build its `TextTheme`, so the theme is itself a
@@ -39,11 +46,10 @@ class AppScreenUtil extends StatelessWidget {
     view: View.of(context),
     child: Builder(
       builder: (BuildContext context) => ScreenUtilInit(
-        designSize: SdBreakpointConstant.designSizeFor(
-          window: MediaQuery.sizeOf(context),
-          base: designSize,
+        designSize: SdScreenScale.designSize(
+          MediaQuery.sizeOf(context),
+          designSize,
         ),
-        minTextAdapt: true,
         splitScreenMode: true,
         builder: (BuildContext context, Widget? _) => builder(context),
       ),
