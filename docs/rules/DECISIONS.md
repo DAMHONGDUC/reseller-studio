@@ -388,6 +388,18 @@ mid-form states alike without any of them knowing.
 The gate is what closes it too: a build number typed one digit too high is
 corrected in the console, and the seller is released without a release.
 
+**And it is drawn, never pushed.** The first build of the sheet used
+`showSdBottomSheetV3`, and a modal sheet is a pageless route hanging off the
+page route below it — so the block raised over the splash went away with the
+splash on the very first redirect, and nothing brought it back because the
+config had not changed. `ForceUpdateGate` renders `ForceUpdateBlock` as its
+own child instead: the barrier, the bottom alignment and the entry animation
+sit in the tree the gate owns, where no navigation can reach them, and the
+block goes up and comes down from the provider alone. That is also why
+`SdBottomSheetExitScopeV3` is public — a blocked sheet **is** the app's state
+rather than something shown over it, so a route is not the only place one can
+be presented from.
+
 ## Materials a seller turns into stock are a purchase, not an expense category
 
 Owner's decision, taken when the app was walked through as a handmade-goods

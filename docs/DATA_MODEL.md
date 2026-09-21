@@ -246,10 +246,10 @@ link must be fixable without shipping a release — which is the one thing a
 forced-update prompt cannot ask for. Null leaves the sheet without a button
 rather than drawing one that does nothing.
 
-**The UI is a bottom sheet nothing dismisses, not a route.** `ForceUpdateGate`
-wraps the whole app and raises it over whatever is on screen; there is no
-`/update-required` path, no redirect and no back stack to unwind when the
-config is corrected. `docs/rules/DECISIONS.md` § The forced update is a sheet
+**The UI is a bottom sheet nothing dismisses, and it is not a route at all.**
+`ForceUpdateGate` wraps the whole app and draws it over whatever is on screen;
+there is no `/update-required` path, no redirect, no modal route and no back
+stack to unwind when the config is corrected. `docs/rules/DECISIONS.md` § The forced update is a sheet
 carries why.
 
 **A missing document, a missing field, a mistyped value or a failed read all
