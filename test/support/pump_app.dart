@@ -101,12 +101,18 @@ Future<void> pumpScreen(
 /// Every other destination is a placeholder: what these tests assert is which
 /// screen a button names, and building the real one would drag its providers
 /// into a test about a tap.
+///
+/// [builder] is `MaterialApp.router`'s own builder — the slot the app mounts
+/// its gates in, above the router's navigator. A test about one of those has
+/// to pump it there, because sitting inside a route is the one place they do
+/// not live.
 Future<GoRouter> pumpRoutedScreen(
   WidgetTester tester,
   Widget screen, {
   List<Override> overrides = const <Override>[],
   Set<Object> replaces = const <Object>{},
   Size surface = TestSurface.phone,
+  TransitionBuilder? builder,
 }) async {
   final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -130,6 +136,7 @@ Future<GoRouter> pumpRoutedScreen(
     replaces: replaces,
     router: router,
     surface: surface,
+    builder: builder,
   );
 
   return router;
@@ -144,6 +151,7 @@ Future<void> _pumpApp(
   Widget? home,
   GoRouter? router,
   Size surface = TestSurface.phone,
+  TransitionBuilder? builder,
 }) async {
   // The default test surface is 800×600 — wider and much shorter than any
   // phone, which makes rows that are fine on device overflow here and hides
@@ -189,6 +197,7 @@ Future<void> _pumpApp(
                 theme: AppTheme.light,
                 localizationsDelegates: delegates,
                 routerConfig: router,
+                builder: builder,
               ),
       ),
     ),

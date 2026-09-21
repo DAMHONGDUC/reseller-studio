@@ -3,20 +3,23 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
-import '../../../../core/router/app_navigator_key.dart';
 import '../../providers.dart';
-import 'force_update_sheet.dart';
+import 'force_update_block.dart';
 
-/// Raises [ForceUpdateSheet] whenever the running build is too old, and takes
-/// it away if the config says otherwise.
+/// Draws [ForceUpdateBlock] over the whole app whenever the running build is
+/// too old, and takes it away if the config says otherwise.
 ///
 /// **It wraps the whole app rather than living on a screen.** The block is
 /// about the binary, not about a route, so every screen — signed out, mid-form,
 /// deep-linked — is covered by one widget instead of each remembering to ask.
 ///
-/// **It shows the sheet on the root navigator's own context**, taken from
-/// [AppNavigatorKey.root]: this widget sits above go_router's navigator, so
-/// its own context has none to push a route onto.
+/// **It draws the block as its own child, never as a route.** A modal sheet is
+/// a pageless route hanging off the page below it, and a go_router redirect
+/// replaces that page — which is how the block that opened over the splash
+/// disappeared on the way to Home and never came back. A widget the gate owns
+/// is one no navigation can remove, and it also means the block goes up and
+/// comes down from the provider alone: no post-frame callback, no `_showing`
+/// flag, and no `pop()` that could take somebody else's route with it.
 class ForceUpdateGate extends ConsumerStatefulWidget {
   const ForceUpdateGate({required this.child, super.key});
 
@@ -27,66 +30,46 @@ class ForceUpdateGate extends ConsumerStatefulWidget {
 }
 
 class _ForceUpdateGateState extends ConsumerState<ForceUpdateGate> {
-  bool _showing = false;
-
   @override
   void initState() {
     super.initState();
 
     // `fireImmediately` because the answer can already be yes on the first
     // frame — a cached config resolves before this widget is built, and a
-    // listener that only fires on *changes* would never open the sheet.
+    // listener that only fires on *changes* would never log the launch that
+    // opened straight onto the block.
     ref.listenManual<bool>(
       forceUpdateRequiredProvider,
-      (bool? previous, bool next) => _sync(next),
+      _log,
       fireImmediately: true,
     );
   }
 
-  /// Deferred to the end of the frame: the navigator does not exist yet during
-  /// the first build, and pushing a route while one is in flight throws.
-  void _sync(bool required) {
-    if (required == _showing) return;
-
-    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      if (!mounted) return;
-
-      required ? _open() : _close();
-    });
-  }
-
-  Future<void> _open() async {
-    final BuildContext? context = AppNavigatorKey.root.currentContext;
-
-    if (_showing || context == null) return;
-
-    _showing = true;
+  /// Both edges, because either one is the answer to "why could nobody use
+  /// the app at 11:40". A launch that is not blocked is not an edge, so the
+  /// first read is compared against `false` rather than against null.
+  void _log(bool? previous, bool next) {
+    if ((previous ?? false) == next) return;
 
     SdLogger.action(
       LogTagConstant.appConfig,
-      'Force update sheet raised',
+      next ? 'Force update block raised' : 'Force update lifted',
       ref.read(currentUpdatePolicyProvider).toLogData(),
     );
-
-    await ForceUpdateSheet.show(context);
-
-    _showing = false;
-  }
-
-  /// The seller is released when the config stops asking — a build number
-  /// typed one digit too high is corrected in the console, not in a release.
-  void _close() {
-    if (!_showing) return;
-
-    SdLogger.action(
-      LogTagConstant.appConfig,
-      'Force update lifted',
-      ref.read(currentUpdatePolicyProvider).toLogData(),
-    );
-
-    AppNavigatorKey.root.currentState?.pop();
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) {
+    final bool required = ref.watch(forceUpdateRequiredProvider);
+
+    // `expand`, so the router's navigator below is given the tight
+    // constraints it would have had without the stack.
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        widget.child,
+        if (required) const ForceUpdateBlock(),
+      ],
+    );
+  }
 }
