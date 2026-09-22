@@ -1,18 +1,26 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-// `Override` is not in the main entrypoint's `show` list; `misc.dart` is
-// where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/local/guest_workspace_service.dart';
+import 'package:reseller_studio/core/local/local_database.dart';
+import 'package:reseller_studio/core/local/local_providers.dart';
 import 'package:reseller_studio/core/router/app_router.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
+import 'package:reseller_studio/features/carriers/domain/entities/carrier.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item_category.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_design/index.dart';
+// `Override` is not in the main entrypoint's `show` list; `misc.dart` is
+// where hooks_riverpod exports it.
 
 import '../../support/pump_app.dart';
 
@@ -21,7 +29,19 @@ import '../../support/pump_app.dart';
 /// The shell renders before sign-in (hard rule 1), so this needs no account —
 /// what is under test is the frame, not what it shows.
 void main() {
-  Future<void> pumpShell(WidgetTester tester, Size surface) async {
+  /// **The sweep sits on More, not Home.** What is under test is the nav
+  /// chrome, which is the same whichever tab is selected — and Home's body
+  /// overflows at tablet width, so leaving the shell on it would make this a
+  /// Home layout test that fails for a reason it does not describe. The
+  /// overflow is real and is its own bug; see `docs/rules/RESPONSIVE.md`.
+  ///
+  /// Before hard rule 1 was reversed this did not arise: the four business
+  /// tabs rendered one centred sign-in prompt, which cannot overflow.
+  Future<void> pumpShell(
+    WidgetTester tester,
+    Size surface, {
+    String route = AppRoutes.more,
+  }) async {
     // Past the intro, or the router holds the app on it and nothing settles.
     SharedPreferences.setMockInitialValues(<String, Object>{
       'onboarding_seen': true,
@@ -33,10 +53,25 @@ void main() {
     tester.view.padding = const FakeViewPadding(top: 177, bottom: 102);
     addTearDown(tester.view.reset);
 
+    // The shell renders the real tabs signed out now (hard rule 1,
+    // `docs/rules/GUEST_MODE.md`), so they read the guest store — which has
+    // to be in memory here, and has to have a business in it, or every
+    // screen renders against a workspace that does not exist.
+    final LocalDatabase db = LocalDatabase.forTesting(NativeDatabase.memory());
+
+    addTearDown(db.close);
+
+    await GuestWorkspaceService(db).ensureExists(
+      marketplaces: const <Marketplace>[],
+      categories: const <ItemCategory>[],
+      carriers: const <Carrier>[],
+    );
+
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         isSignedInProvider.overrideWithValue(false),
         currentUidProvider.overrideWithValue(null),
+        localDatabaseProvider.overrideWithValue(db),
       ],
     );
 
@@ -61,6 +96,9 @@ void main() {
         ),
       ),
     );
+
+    router.go(route);
+
     await tester.pumpAndSettle();
   }
 
