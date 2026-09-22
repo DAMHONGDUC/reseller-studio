@@ -12,9 +12,9 @@ part of 'home_screen.dart';
 /// is deliberately outranked: one of them offers a seller more, the other
 /// tells them what they are about to lose.
 ///
-/// It says nothing until there is something to lose — an empty guest store is
-/// a seller who has not started, and warning them about records they have not
-/// written is noise.
+/// It says nothing until there is something to lose — a seller who has not
+/// started has nothing to warn about, and the marketplaces and categories a
+/// new business is seeded with are not theirs.
 class _HomeGuestBanner extends ConsumerWidget {
   const _HomeGuestBanner();
 
@@ -23,7 +23,9 @@ class _HomeGuestBanner extends ConsumerWidget {
   static bool shows(WidgetRef ref) {
     if (ref.watch(accountKindProvider) == AccountKind.linked) return false;
 
-    return (ref.watch<AsyncValue<int>>(guestRowsOwedProvider).value ?? 0) > 0;
+    // The seller's own rows, never the reference data a new business is
+    // created with — see `guestSellerRowsProvider`.
+    return (ref.watch<AsyncValue<int>>(guestSellerRowsProvider).value ?? 0) > 0;
   }
 
   @override

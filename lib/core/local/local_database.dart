@@ -147,6 +147,28 @@ class LocalDatabase extends _$LocalDatabase {
         localExpenses,
       ];
 
+  /// The tables a guest business is *created* with, written by
+  /// `GuestWorkspaceService` and by nothing else.
+  ///
+  /// **They are records, but they are not the seller's.** Anything asking
+  /// "has this seller entered anything yet?" — the Home warning above all —
+  /// must skip them, or a business created two seconds ago already looks like
+  /// one with something to lose. The drain still pushes them: they are rows,
+  /// and the account needs them.
+  List<TableInfo<LocalRows, LocalRow>> get seededTables =>
+      <TableInfo<LocalRows, LocalRow>>[
+        localMarketplaces,
+        localCarriers,
+        localCategories,
+      ];
+
+  /// What the seller themselves has written.
+  List<TableInfo<LocalRows, LocalRow>> get sellerTables => drainOrder
+      .where(
+        (TableInfo<LocalRows, LocalRow> table) => !seededTables.contains(table),
+      )
+      .toList(growable: false);
+
   /// Every table holding guest records, for a wipe.
   ///
   /// Not `allTables` — that name is the generated database's own, and Drift

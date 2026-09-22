@@ -117,6 +117,28 @@ final Provider<GuestResetService> guestResetServiceProvider =
       ),
     );
 
+/// How many records the **seller** has written, ignoring the reference data a
+/// new business is created with.
+///
+/// **Not [guestRowsOwedProvider].** That one counts everything the drain owes,
+/// which includes the marketplaces, carriers and categories
+/// `GuestWorkspaceService` seeds — so a business thirty seconds old already
+/// answers non-zero, and the Home warning claimed the seller had something to
+/// lose before they had typed a word.
+final FutureProvider<int> guestSellerRowsProvider = FutureProvider<int>((
+  Ref ref,
+) async {
+  final LocalDatabase db = ref.watch(localDatabaseProvider);
+
+  int written = 0;
+
+  for (final TableInfo<LocalRows, LocalRow> table in db.sellerTables) {
+    written += (await LocalTable(db, table).getAll()).length;
+  }
+
+  return written;
+});
+
 /// Whether the device is still holding records nobody has pushed.
 ///
 /// **A count, not a flag.** A drain interrupted half way leaves some rows

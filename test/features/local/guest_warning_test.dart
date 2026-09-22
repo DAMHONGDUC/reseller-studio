@@ -61,10 +61,20 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
+    // **Seeded the way a real device seeds it.** Empty lists here were why
+    // this file passed while the banner shouted at every new install: the
+    // defaults land in drainable tables, so "is anything owed?" answered yes
+    // before the seller had typed a word.
     await GuestWorkspaceService(db).ensureExists(
-      marketplaces: const <Marketplace>[],
-      categories: const <ItemCategory>[],
-      carriers: const <Carrier>[],
+      marketplaces: <Marketplace>[
+        Marketplace(id: 'ebay', name: 'eBay', createdAt: DateTime(2026)),
+      ],
+      categories: <ItemCategory>[
+        ItemCategory(id: 'shoes', name: 'Shoes', createdAt: DateTime(2026)),
+      ],
+      carriers: <Carrier>[
+        Carrier(id: 'usps', name: 'USPS', createdAt: DateTime(2026)),
+      ],
     );
 
     final ProviderContainer container = ProviderContainer(
