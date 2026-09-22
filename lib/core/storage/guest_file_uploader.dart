@@ -23,8 +23,8 @@ import 'file_uploader.dart';
 ///
 /// The drain uploads these at sign-in and rewrites the record, so a path only
 /// lives as long as the account it is waiting for.
-class LocalFileUploader implements FileUploader {
-  const LocalFileUploader();
+class GuestFileUploader implements FileUploader {
+  const GuestFileUploader();
 
   /// The folder every guest file lands under, inside app-private storage.
   static const String rootFolder = 'guest_files';

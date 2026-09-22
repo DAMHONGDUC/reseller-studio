@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../constants/app_icon_constant.dart';
-import '../router/navigation_utils.dart';
 
 /// A scaffold whose create action is the button Inventory has.
 ///
@@ -126,17 +125,6 @@ class _AppAddFabScaffoldState extends ConsumerState<AppAddFabScaffold> {
     return false;
   }
 
-  /// The create action, behind the sign-in gate.
-  ///
-  /// Every screen with a create button routes through here, so a signed-out
-  /// visitor tapping Add on any of the six lands on the same sign-in step
-  /// rather than on six different guesses about what should happen.
-  void _onAdd() {
-    if (!NavigationUtils.requireSignIn(context, ref)) return;
-
-    widget.onAdd();
-  }
-
   @override
   Widget build(BuildContext context) => SdScaffoldV3(
     appBar: widget.appBar,
@@ -158,7 +146,7 @@ class _AppAddFabScaffoldState extends ConsumerState<AppAddFabScaffold> {
                     icon: AppIconConstant.add,
                     label: widget.addLabel,
                     expanded: expanded,
-                    onPressed: _onAdd,
+                    onPressed: widget.onAdd,
                   ),
             ),
           )

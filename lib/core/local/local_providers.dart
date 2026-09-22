@@ -2,11 +2,19 @@
 library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
+import '../../features/carriers/providers.dart';
+import '../../features/inventory/providers.dart';
+import '../../features/marketplaces/providers.dart';
 import '../../features/workspace/data/dtos/workspace_dto.dart';
 import '../../features/workspace/domain/entities/workspace.dart';
+import '../../features/workspace/providers.dart';
 import '../account/account_kind.dart';
 import '../constants/guest_constant.dart';
+import '../fresh_install/app_fresh_install.dart';
+import 'guest_reset_service.dart';
+import 'guest_workspace_service.dart';
 import 'local_database.dart';
 import 'local_table.dart';
 
@@ -52,3 +60,48 @@ final Provider<bool> guestWorkspaceReadyProvider = Provider<bool>((Ref ref) {
 
   return ref.watch(guestWorkspaceProvider).value != null;
 });
+
+/// Creates the guest business, once, behind the splash.
+///
+/// **After the fresh-install check, never before.** A reinstall or an
+/// environment change wipes the device, and a business created above that
+/// would be wiped with it — or worse, survive into the other environment.
+/// Chaining the two here is what orders them.
+///
+/// A `FutureProvider` so it runs once per launch however many times the gate
+/// rebuilds, the same reason `freshInstallProvider` is one.
+final FutureProvider<void> guestBusinessProvider = FutureProvider<void>((
+  Ref ref,
+) async {
+  final SdFreshInstallOutcome outcome = await ref.watch(
+    freshInstallProvider.future,
+  );
+  final LocalDatabase db = ref.watch(localDatabaseProvider);
+
+  // The design system's wipe knows nothing about this app's tables, so the
+  // two outcomes that mean "start over" empty them here. Without it a build
+  // pointed at the other environment opens on the previous one's stock.
+  if (outcome == SdFreshInstallOutcome.reinstall ||
+      outcome == SdFreshInstallOutcome.environmentChanged) {
+    await db.wipe();
+  }
+
+  // Signed in, so the records are Firestore's and there is no guest business
+  // to make. The drain is what creates one in the other direction.
+  if (ref.read(accountKindProvider) == AccountKind.linked) return;
+
+  await GuestWorkspaceService(db).ensureExists(
+    marketplaces: ref.read(defaultMarketplacesProvider),
+    categories: ref.read(defaultItemCategoriesProvider),
+    carriers: ref.read(defaultCarriersProvider),
+  );
+});
+
+/// Wipes the device back to a blank guest, for sign-out.
+final Provider<GuestResetService> guestResetServiceProvider =
+    Provider<GuestResetService>(
+      (Ref ref) => GuestResetService(
+        ref.watch(localDatabaseProvider),
+        ref.watch(firebaseFirestoreProvider),
+      ),
+    );

@@ -61,7 +61,7 @@ import '../local/local_database.dart';
 import '../local/local_providers.dart';
 import '../storage/file_uploader.dart';
 import '../storage/firebase_file_uploader.dart';
-import '../storage/local_file_uploader.dart';
+import '../storage/guest_file_uploader.dart';
 
 /// Thrown when a screen reads a repository in live mode before there is a
 /// workspace to read from.
@@ -201,7 +201,7 @@ final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>(
     name: 'FileUploader',
     // A guest has no bucket and no rules to satisfy, so the file is copied
     // into app-private storage and the record points at the copy.
-    guest: (LocalDatabase db, String _) => const LocalFileUploader(),
+    guest: (LocalDatabase db, String _) => const GuestFileUploader(),
     linked: (WorkspaceContext context) =>
         FirebaseFileUploader(FirebaseStorage.instance, context.workspaceId),
   ),

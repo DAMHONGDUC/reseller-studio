@@ -35,9 +35,10 @@ class NotificationBell extends ConsumerWidget {
       // button — this widget only knows whether there is anything to mark.
       dotColor: unread > 0 ? context.sdTheme3.danger : null,
       onPressed: () {
-        // A signed-out visitor has an empty inbox by definition — the rows
-        // live under their user document, and there is not one.
-        if (!NavigationUtils.requireSignIn(context, ref)) return;
+        // A guest has an empty inbox by definition — the rows live under a
+        // user document, written only by Cloud Functions, and there is no
+        // account for one to belong to.
+        if (!NavigationUtils.requireAccount(context, ref)) return;
 
         context.push(AppRoutes.notifications);
       },

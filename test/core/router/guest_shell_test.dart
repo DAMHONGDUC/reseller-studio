@@ -1,25 +1,35 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/local/guest_workspace_service.dart';
+import 'package:reseller_studio/core/local/local_database.dart';
+import 'package:reseller_studio/core/local/local_providers.dart';
 import 'package:reseller_studio/core/router/app_router.dart';
 import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
-import 'package:reseller_studio/core/widgets/signed_out_view.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
+import 'package:reseller_studio/features/carriers/domain/entities/carrier.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item_category.dart';
+import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_design/index.dart';
 
-/// **Four tabs share one signed-out view; More does not** — owner's rule.
+/// **A guest gets the whole app** — hard rule 1, after
+/// `docs/rules/GUEST_MODE.md` reversed it.
 ///
-/// The rule is easy to erode in either direction: a new tab added without the
-/// wrapper would render a real empty list and tell the seller they have no
-/// orders, and wrapping More would hide the theme and language settings that
-/// deliberately need no account. Both are pinned here.
+/// This replaces `signed_out_shell_test.dart`, which pinned the opposite: four
+/// tabs behind one sign-in prompt and More offering Settings alone. What is
+/// easy to erode now is the other direction — a screen that quietly demands an
+/// account, or a More row that shows a guest something only a server can
+/// write.
 void main() {
+  late LocalDatabase db;
   late ProviderContainer container;
   late GoRouter router;
 
@@ -34,12 +44,21 @@ void main() {
     tester.view.padding = const FakeViewPadding(top: 177, bottom: 102);
     addTearDown(tester.view.reset);
 
+    db = LocalDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+
+    await GuestWorkspaceService(db).ensureExists(
+      marketplaces: const <Marketplace>[],
+      categories: const <ItemCategory>[],
+      carriers: const <Carrier>[],
+    );
+
     container = ProviderContainer(
-      overrides: [
-        // Signed out, and no uid — the state a fresh install sits in before
-        // Firebase is even configured.
+      overrides: <Override>[
+        // Signed out, and no uid — the state a fresh install sits in.
         isSignedInProvider.overrideWithValue(false),
         currentUidProvider.overrideWithValue(null),
+        localDatabaseProvider.overrideWithValue(db),
       ],
     );
 
@@ -72,7 +91,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('the four business tabs share one view with a sign-in button', (
+  testWidgets('the four business tabs render themselves, not a prompt', (
     WidgetTester tester,
   ) async {
     await pumpShell(tester);
@@ -86,27 +105,49 @@ void main() {
       await goTo(tester, route);
 
       expect(
-        find.byType(SignedOutView),
-        findsOneWidget,
-        reason: '$route must not render its own empty state signed out',
+        router.routeInformationProvider.value.uri.path,
+        route,
+        reason: '$route must not bounce a guest',
       );
-      expect(find.text('Sign in'), findsOneWidget, reason: route);
+      expect(find.text('Sign in'), findsNothing, reason: route);
     }
   });
 
-  testWidgets('More stays itself and offers Settings alone', (
+  testWidgets('More hides only what a server would have to write', (
     WidgetTester tester,
   ) async {
     await pumpShell(tester);
     await goTo(tester, AppRoutes.more);
 
-    expect(find.byType(SignedOutView), findsNothing);
-    expect(find.text('Account'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
 
-    // Every other destination is a view onto a business nobody has named.
-    for (final String hidden in <String>['Sourcing', 'Listings', 'Team']) {
-      expect(find.text(hidden), findsNothing, reason: hidden);
+    // Records the guest store holds: a guest may see all of them.
+    for (final String shown in <String>['Sourcing', 'Listings']) {
+      expect(find.text(shown), findsOneWidget, reason: shown);
+    }
+
+    // Team addresses an email account; Activity is the audit log, written
+    // only by Cloud Functions (hard rule 12).
+    expect(find.text('Team'), findsNothing);
+  });
+
+  testWidgets('a create route is reachable without an account', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester);
+
+    for (final String create in <String>[
+      AppRoutes.quickAdd,
+      AppRoutes.addItem,
+      AppRoutes.expenses,
+    ]) {
+      await goTo(tester, create);
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        create,
+        reason: '$create is a guest\'s own record, not an account\'s',
+      );
     }
   });
 
@@ -123,47 +164,5 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(router.routeInformationProvider.value.uri.path, AppRoutes.inventory);
-  });
-
-  testWidgets('no create route is reachable, so no action needs guarding', (
-    WidgetTester tester,
-  ) async {
-    await pumpShell(tester);
-
-    // The reason `NavigationUtils.requireSignIn` never fires today: every
-    // screen with a create button sits behind `AuthedTab` or outside
-    // `_previewRoutes`, so a signed-out visitor cannot reach one to tap it.
-    for (final String create in <String>[
-      AppRoutes.quickAdd,
-      AppRoutes.addItem,
-      AppRoutes.expenses,
-      AppRoutes.search,
-    ]) {
-      await goTo(tester, create);
-
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.home,
-        reason: '$create must not open without an account',
-      );
-    }
-  });
-
-  testWidgets('Settings opens without an account and carries Appearance', (
-    WidgetTester tester,
-  ) async {
-    await pumpShell(tester);
-    await goTo(tester, AppRoutes.settings);
-
-    // Theme and language belong to the device, not to a business — which is
-    // the whole reason this route is reachable signed out.
-    expect(find.text('Appearance'), findsOneWidget);
-    expect(find.text('Theme'), findsOneWidget);
-    expect(find.text('Language'), findsOneWidget);
-
-    // And the account block says what is true rather than offering a sign-out
-    // to somebody who was never signed in.
-    expect(find.text('Not signed in'), findsOneWidget);
-    expect(find.text('Sign out'), findsNothing);
   });
 }

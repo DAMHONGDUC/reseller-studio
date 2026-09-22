@@ -261,21 +261,40 @@ final class MoreConstant {
   /// built here from the resolved workspace id because it opened one record;
   /// it opens the list instead, which names none
   /// (`lib/features/workspace/CLAUDE.md`).
+  /// What a guest cannot be shown, because a server writes it.
+  ///
+  /// **Three rows, not the whole list** — this used to be the other way round
+  /// and left a signed-out seller with Settings alone, which was right when
+  /// there was nothing else to show them (`docs/rules/GUEST_MODE.md` reversed
+  /// it). Everything else is a view onto records the guest store holds.
+  ///
+  /// - **Businesses** is switching between accounts' workspaces; a guest has
+  ///   exactly one and it is not on a server.
+  /// - **Team** addresses an invitation to an email account.
+  /// - **Activity** is the audit log, written only by Cloud Functions
+  ///   (hard rule 12), so a guest's would be permanently empty — and hard
+  ///   rule 5's reasoning says an empty list is a claim.
+  static const Set<MoreDestinationKind> accountOnly = <MoreDestinationKind>{
+    MoreDestinationKind.businesses,
+    MoreDestinationKind.team,
+    MoreDestinationKind.activity,
+  };
+
   static List<MoreSection> sectionsFor({required bool signedIn}) {
-    if (!signedIn) {
-      final MoreDestination settings = destinations.firstWhere(
-        (MoreDestination destination) =>
-            destination.kind == MoreDestinationKind.settings,
-      );
+    if (signedIn) return sections;
 
-      return <MoreSection>[
-        MoreSection(
-          kind: MoreSectionKind.account,
-          destinations: <MoreDestination>[settings],
-        ),
-      ];
-    }
-
-    return sections;
+    return <MoreSection>[
+      for (final MoreSection section in sections)
+        if (section.destinations.any(_availableToGuest))
+          MoreSection(
+            kind: section.kind,
+            destinations: section.destinations
+                .where(_availableToGuest)
+                .toList(growable: false),
+          ),
+    ];
   }
+
+  static bool _availableToGuest(MoreDestination destination) =>
+      !accountOnly.contains(destination.kind);
 }

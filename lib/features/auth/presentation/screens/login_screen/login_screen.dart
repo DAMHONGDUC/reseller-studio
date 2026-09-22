@@ -73,7 +73,7 @@ class LoginScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Only when it was pushed. Sign-in is the front door on a cold start and
     // has nothing to go back to — but it is also pushed over a tab by
-    // `NavigationUtils.requireSignIn`, and there it must be escapable.
+    // `NavigationUtils.requireAccount`, and there it must be escapable.
     final bool canGoBack = Navigator.canPop(context);
 
     return SdScaffoldV3(

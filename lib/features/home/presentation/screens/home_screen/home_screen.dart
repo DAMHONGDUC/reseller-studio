@@ -7,7 +7,6 @@ import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
-import '../../../../../core/router/navigation_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
@@ -117,11 +116,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // Global search is reached from Home because Home is where a
             // seller starts (plan §5's global entry points). It sits outside
             // the shell so it can send them into any tab.
-            onPressed: () {
-              if (!NavigationUtils.requireSignIn(context, ref)) return;
-
-              context.push(AppRoutes.search);
-            },
+            // No account needed: search reads the store this seller already
+            // has, whichever one that is.
+            onPressed: () => context.push(AppRoutes.search),
           ),
           SizedBox(width: SdSpacingConstant.w8),
         ],

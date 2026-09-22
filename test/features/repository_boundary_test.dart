@@ -21,6 +21,16 @@ void main() {
     'FailureMapper.map',
     'FirestoreStream.',
     '.handleError',
+    // A guest repository is delegation and nothing else: every method it has
+    // is one line onto `LocalCollection`, which guards its own
+    // (`docs/rules/GUEST_MODE.md`). The scan follows it there rather than
+    // taking the delegation on trust — `local_collection.dart` is in the
+    // file list below, so the guard moved and the test moved with it.
+    //
+    // No trailing dot: the formatter breaks a long delegation after the field
+    // name, and a marker that needed the dot would silently stop matching the
+    // day a method name got longer.
+    '_collection',
   ];
 
   /// Repositories that deliberately cannot fail, with the reason.
@@ -133,15 +143,19 @@ void main() {
 
   test('every data repository method maps its failures', () {
     final List<File> repositories =
-        Directory('lib/features')
-            .listSync(recursive: true)
-            .whereType<File>()
-            .where(
-              (File file) =>
-                  file.path.contains('/data/repositories/') &&
-                  file.path.endsWith('.dart'),
-            )
-            .toList()
+        <File>[
+            ...Directory('lib/features')
+                .listSync(recursive: true)
+                .whereType<File>()
+                .where(
+                  (File file) =>
+                      file.path.contains('/data/repositories/') &&
+                      file.path.endsWith('.dart'),
+                ),
+            // Not under `data/repositories/`, but it is where every guest
+            // repository's failures actually get mapped.
+            File('lib/core/local/local_collection.dart'),
+          ]
           ..sort((File a, File b) => a.path.compareTo(b.path));
     final List<String> unguarded = <String>[];
 
