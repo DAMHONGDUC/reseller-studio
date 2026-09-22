@@ -25,7 +25,7 @@
     "Everything inside a business is visible to the people you invite to that business. That is what a shared workspace is for, and removing someone removes their access.",
     "We never connect to your marketplace accounts. There is no eBay, Depop or Vinted login in this app, so no marketplace password or token ever reaches us.",
     "We do not track you. No ad network, no attribution SDK, no advertising identifier, nothing shared with a data broker. We ask for no location, no contacts and no health data.",
-    "You can export your records as CSV at any time, and delete a business or your whole account from inside the app."
+    "Exporting your records as CSV is part of Premium. You can delete a business or your whole account from inside the app at any time, on any plan."
   ],
   "collects": [
     {
@@ -189,7 +189,7 @@
       "title": "Using the app without an account",
       "body": [
         "You do not need an account to use {{app}}. Open it and start recording: the whole app works, and everything you enter is written to a database on your phone and **sent nowhere**. We do not receive it, we cannot read it, and no account exists for it to belong to.",
-        "**While you have no account, this phone holds the only copy.** Deleting the app deletes your records, and neither we nor anyone else can restore them — there is nothing on our side to restore from. The app says so on its home screen rather than leaving you to find out, and you can export everything as CSV from Reports at any time.",
+        "**While you have no account, this phone holds the only copy.** Deleting the app deletes your records, and neither we nor anyone else can restore them — there is nothing on our side to restore from. The app says so on its home screen rather than leaving you to find out.",
         "When you decide to sign in, the records already on your phone are uploaded **once** into your account, and the copy on the phone is deleted as each record is confirmed. If your account already has more than one business, the app asks which one they should join rather than choosing for you.",
         "There are exactly two ways in: **Sign in with Apple** and **Google Sign-In**. There is no email-and-password form, no sign-up form and no password reset, which means this app stores no password and there is none for anyone to steal from us.",
         "**Signing out empties the device.** Your records stay in your account and the phone is left blank, so a shared or handed-on phone does not carry your business with it."
@@ -267,7 +267,7 @@
       "id": "export",
       "title": "Exporting your data",
       "body": [
-        "From Reports you can export your sales, inventory, expenses or a year's tax summary as **CSV** — rows an accountant or a spreadsheet can sum, not a picture of your numbers. This works whether or not you have signed in, and it is the way to keep a copy of records that exist only on your phone.",
+        "From Reports you can export your sales, inventory, expenses or a year's tax summary as **CSV** — rows an accountant or a spreadsheet can sum, not a picture of your numbers. Exporting is part of Premium.",
         "The file is written to the app's temporary storage and handed straight to the iOS share sheet, so it goes only where you send it. It is never uploaded to us, and we never see it.",
         "If you would rather have a full copy of everything we hold, email {{email}} and we will send it."
       ]
