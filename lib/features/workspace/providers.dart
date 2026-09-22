@@ -10,6 +10,7 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/account/account_kind.dart';
 import '../../core/firestore/workspace_collections.dart';
 import '../../core/firestore/workspace_context.dart';
 import '../auth/providers.dart';
@@ -207,9 +208,15 @@ final Provider<List<Workspace>> workspacesProvider = Provider<List<Workspace>>((
 });
 
 /// Whether there is anything to read from at all.
-final Provider<bool> hasWorkspaceProvider = Provider<bool>(
-  (Ref ref) => ref.watch(workspaceContextProvider) != null,
-);
+///
+/// **A guest always has one** — the local business, created without asking
+/// (`docs/rules/GUEST_MODE.md`) — so this asks about the Firestore context
+/// only when there is an account behind it.
+final Provider<bool> hasWorkspaceProvider = Provider<bool>((Ref ref) {
+  if (ref.watch(accountKindProvider) == AccountKind.guest) return true;
+
+  return ref.watch(workspaceContextProvider) != null;
+});
 
 /// Keeps a business stream empty instead of exploding when there is no
 /// workspace behind it.
