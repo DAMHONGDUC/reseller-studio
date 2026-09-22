@@ -10,11 +10,19 @@ import '../../workspace_constant.dart';
 
 /// How a [Workspace] is stored.
 final class WorkspaceDto {
-  static Workspace toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static Workspace toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
+      fromMap(
+        WorkspaceTable.localId(doc.id),
+        doc.data() ?? <String, Object?>{},
+      );
 
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static Workspace fromMap(String id, Map<String, Object?> data) {
     return Workspace(
-      id: doc.id,
+      id: id,
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       ownerId: FirestoreMapper.stringOrNull(data['ownerId']) ?? '',
       country: FirestoreMapper.stringOrNull(data['country']) ?? 'US',
@@ -62,13 +70,20 @@ final class WorkspaceDto {
 /// forbid. They go stale when someone renames themselves; the alternative is
 /// either a leak or a fan-out read per member.
 final class MemberDto {
-  static Member toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static Member toEntity(DocumentSnapshot<Map<String, Object?>> doc) => fromMap(
+    WorkspaceTable.localId(doc.id),
+    doc.data() ?? <String, Object?>{},
+  );
 
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static Member fromMap(String id, Map<String, Object?> data) {
     return Member(
       // The document id is `{workspaceId}_{uid}`: a membership is a composite
       // key, because one uid belongs to several businesses.
-      uid: WorkspaceTable.localId(doc.id),
+      uid: id,
       role:
           FirestoreMapper.enumOrNull(MemberRole.values, data['role']) ??
           MemberRole.viewer,
@@ -91,11 +106,19 @@ final class MemberDto {
 
 /// How a [UserProfile] is stored.
 final class UserProfileDto {
-  static UserProfile toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static UserProfile toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
+      fromMap(
+        WorkspaceTable.localId(doc.id),
+        doc.data() ?? <String, Object?>{},
+      );
 
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static UserProfile fromMap(String id, Map<String, Object?> data) {
     return UserProfile(
-      uid: doc.id,
+      uid: id,
       displayName: FirestoreMapper.stringOrNull(data['displayName']),
       email: FirestoreMapper.stringOrNull(data['email']),
       photoUrl: FirestoreMapper.stringOrNull(data['photoUrl']),

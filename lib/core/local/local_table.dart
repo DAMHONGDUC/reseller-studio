@@ -46,27 +46,46 @@ class LocalTable {
           .map(_document)
           .getSingleOrNull();
 
-  Future<List<LocalDocument>> getAll() =>
-      _newestFirst().map(_document).get();
+  Future<List<LocalDocument>> getAll() => _newestFirst().map(_document).get();
 
-  /// Create or replace, keyed on the record's own id.
-  Future<void> put(
-    String id,
-    DateTime createdAt,
-    Map<String, Object?> data,
-  ) => _db
-      .into(_table)
-      .insert(_insertable(id, createdAt, data), mode: InsertMode.insertOrReplace);
+  /// Create, or merge into what is already there.
+  ///
+  /// **Merge, because every Firestore write in this app is
+  /// `SetOptions(merge: true)`.** A local `put` that replaced the record
+  /// instead would drop the fields a partial write leaves out — a soft delete
+  /// sends two keys — and the two stores would disagree about what a save
+  /// means.
+  ///
+  /// [createdAt] seeds the ordering column on a create and is ignored on a
+  /// merge: a record does not change age when it is edited.
+  Future<void> put(String id, DateTime createdAt, Map<String, Object?> data) =>
+      _db.transaction(() async {
+        final LocalRow? existing = await _rowOf(id);
+
+        await _db
+            .into(_table)
+            .insert(
+              _insertable(
+                id,
+                existing == null
+                    ? createdAt
+                    : DateTime.fromMillisecondsSinceEpoch(existing.createdAt),
+                existing == null
+                    ? data
+                    : <String, Object?>{
+                        ...LocalJsonCodec.decode(existing.data),
+                        ...data,
+                      },
+              ),
+              mode: InsertMode.insertOrReplace,
+            );
+      });
 
   /// One transaction for the whole batch — hard rule 16's local half.
   Future<void> putAll(List<LocalDocument> documents, DateTime createdAt) =>
-      _db.batch((Batch batch) {
+      _db.transaction(() async {
         for (final LocalDocument document in documents) {
-          batch.insert(
-            _table,
-            _insertable(document.id, createdAt, document.data),
-            mode: InsertMode.insertOrReplace,
-          );
+          await put(document.id, createdAt, document.data);
         }
       });
 
@@ -75,6 +94,10 @@ class LocalTable {
   /// calls once a row is safely on the server.
   Future<void> remove(String id) =>
       (_db.delete(_table)..where((LocalRows row) => row.id.equals(id))).go();
+
+  Future<LocalRow?> _rowOf(String id) => (_db.select(
+    _table,
+  )..where((LocalRows row) => row.id.equals(id))).getSingleOrNull();
 
   static LocalDocument _document(LocalRow row) =>
       LocalDocument(row.id, LocalJsonCodec.decode(row.data));
@@ -93,11 +116,8 @@ class LocalTable {
   /// every table — and it is the same order the Firestore repositories read
   /// in, which is what stops a list reshuffling at sign-in.
   SimpleSelectStatement<LocalRows, LocalRow> _newestFirst() =>
-      _db.select(_table)
-        ..orderBy(<OrderClauseGenerator<LocalRows>>[
-          (LocalRows row) => OrderingTerm(
-            expression: row.createdAt,
-            mode: OrderingMode.desc,
-          ),
-        ]);
+      _db.select(_table)..orderBy(<OrderClauseGenerator<LocalRows>>[
+        (LocalRows row) =>
+            OrderingTerm(expression: row.createdAt, mode: OrderingMode.desc),
+      ]);
 }

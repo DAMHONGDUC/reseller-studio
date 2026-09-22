@@ -15,11 +15,18 @@ import '../../domain/entities/source.dart';
 /// every purchase pointing at it and destroys the ROI history the Sourcing
 /// feature exists to show.
 final class SourceDto {
-  static Source toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static Source toEntity(DocumentSnapshot<Map<String, Object?>> doc) => fromMap(
+    WorkspaceTable.localId(doc.id),
+    doc.data() ?? <String, Object?>{},
+  );
 
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static Source fromMap(String id, Map<String, Object?> data) {
     return Source(
-      id: WorkspaceTable.localId(doc.id),
+      id: id,
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       type: FirestoreMapper.enumOrNull(SourceType.values, data['type']),
@@ -60,13 +67,26 @@ final class PurchaseDto {
   static Purchase toEntity(
     DocumentSnapshot<Map<String, Object?>> doc, {
     required String fallbackCurrency,
+  }) => fromMap(
+    WorkspaceTable.localId(doc.id),
+    doc.data() ?? <String, Object?>{},
+    fallbackCurrency: fallbackCurrency,
+  );
+
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static Purchase fromMap(
+    String id,
+    Map<String, Object?> data, {
+    required String fallbackCurrency,
   }) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
     final String currency =
         FirestoreMapper.stringOrNull(data['currency']) ?? fallbackCurrency;
 
     return Purchase(
-      id: WorkspaceTable.localId(doc.id),
+      id: id,
       purchaseDate: FirestoreMapper.dateOr(
         data['purchaseDate'],
         DateTime.now(),

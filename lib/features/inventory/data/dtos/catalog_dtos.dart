@@ -7,11 +7,19 @@ import '../../domain/entities/storage_location.dart';
 
 /// How an [ItemCategory] is stored.
 final class ItemCategoryDto {
-  static ItemCategory toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static ItemCategory toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
+      fromMap(
+        WorkspaceTable.localId(doc.id),
+        doc.data() ?? <String, Object?>{},
+      );
 
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static ItemCategory fromMap(String id, Map<String, Object?> data) {
     return ItemCategory(
-      id: WorkspaceTable.localId(doc.id),
+      id: id,
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       parentId: FirestoreMapper.stringOrNull(data['parentId']),
@@ -38,11 +46,19 @@ final class ItemCategoryDto {
 
 /// How a [StorageLocation] is stored.
 final class StorageLocationDto {
-  static StorageLocation toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static StorageLocation toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
+      fromMap(
+        WorkspaceTable.localId(doc.id),
+        doc.data() ?? <String, Object?>{},
+      );
 
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static StorageLocation fromMap(String id, Map<String, Object?> data) {
     return StorageLocation(
-      id: WorkspaceTable.localId(doc.id),
+      id: id,
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       kind:
           FirestoreMapper.enumOrNull(LocationKind.values, data['kind']) ??

@@ -51,6 +51,9 @@ final class LogTagConstant {
   /// Connecting a platform, and correcting what it charges.
   static const String marketplace = 'Marketplace';
   static const String expense = 'Expense';
+
+  /// Shipping carriers — the reference table, not a shipment.
+  static const String carrier = 'Carrier';
   static const String sourcing = 'Sourcing';
   static const String report = 'Report';
   static const String subscription = 'Subscription';
