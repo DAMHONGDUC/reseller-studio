@@ -29,11 +29,18 @@ import '../../support/pump_app.dart';
 /// The shell renders before sign-in (hard rule 1), so this needs no account —
 /// what is under test is the frame, not what it shows.
 void main() {
-  /// **The sweep sits on More, not Home.** What is under test is the nav
-  /// chrome, which is the same whichever tab is selected — and Home's body
-  /// overflows at tablet width, so leaving the shell on it would make this a
-  /// Home layout test that fails for a reason it does not describe. The
-  /// overflow is real and is its own bug; see `docs/rules/RESPONSIVE.md`.
+  /// **The sweep sits on More, not Home** — a harness constraint, not a
+  /// layout rule.
+  ///
+  /// This test pumps a whole new tree per width, each with its own
+  /// `ScreenUtilInit`, and Home's cards overflow by a few points in the frame
+  /// after the second one. **Home itself is fine at tablet width**: pumped on
+  /// its own at 1180x820, and resized from phone to tablet on a mounted tree —
+  /// which is what iPadOS Split View actually does — it reports nothing.
+  ///
+  /// So the overflow belongs to the sweep, and the sweep is about the nav
+  /// chrome, which is identical whichever tab is selected. More is a plain
+  /// list and does not put a layout question in front of a navigation test.
   ///
   /// Before hard rule 1 was reversed this did not arise: the four business
   /// tabs rendered one centred sign-in prompt, which cannot overflow.

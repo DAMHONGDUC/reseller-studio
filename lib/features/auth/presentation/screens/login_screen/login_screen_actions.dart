@@ -11,15 +11,17 @@ part of 'login_screen.dart';
 /// prop, so a sign-in in flight rebuilds these two buttons and not the feature
 /// list above them.
 ///
-/// **Both buttons wear `SdButtonVariantV3.vendor`** — black on a light theme,
-/// white on a dark one, and never the app's indigo. Apple allows its sign-in
-/// button in black, white, or white with an outline and nothing else, so the
-/// old `primary` styling was a rejection waiting at review rather than a
-/// style preference. Google's neutral button is the same shape.
+/// **Both are `SdVendorButtonV3`**, which is the only shape a third-party
+/// sign-in button may wear — black on a light theme, white on a dark one, and
+/// never the app's indigo. Apple allows its button in black, white, or white
+/// with an outline and nothing else, so the old `primary` styling was a
+/// rejection waiting at review rather than a style preference.
 ///
-/// **Both are the same size, and it is `small`** — the pair is read as one
-/// control with two options, so a difference in height between them reads as
-/// a bug rather than as emphasis. Whatever they wear, they wear together.
+/// **One widget for the pair, so they cannot drift apart.** They are read as
+/// one control with two options: a difference in height, mark size or gap
+/// between them reads as a bug rather than as emphasis. That is also why the
+/// mark is sized from the label inside the widget rather than passed in —
+/// see `SdVendorButtonV3`.
 ///
 /// **Both marks are `SimpleIcons` glyphs** (owner's rule, hard rule 1) — a
 /// font, not the vendors' own artwork, so nothing here can fail to load and
@@ -46,24 +48,18 @@ class _LoginActions extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          SdButtonV3(
-            variant: SdButtonVariantV3.vendor,
+          SdVendorButtonV3(
             label: context.l10n.authContinueWithApple,
             icon: SimpleIcons.apple,
-            size: SdButtonSizeV3.small,
-            expand: true,
             busy: state.isBusyWith(AuthProviderKind.apple),
             onPressed: state.isBusy
                 ? null
                 : () => onSignIn(AuthProviderKind.apple),
           ),
           SizedBox(height: SdSpacingConstant.h12),
-          SdButtonV3(
-            variant: SdButtonVariantV3.vendor,
+          SdVendorButtonV3(
             label: context.l10n.authContinueWithGoogle,
             icon: SimpleIcons.google,
-            size: SdButtonSizeV3.small,
-            expand: true,
             busy: state.isBusyWith(AuthProviderKind.google),
             onPressed: state.isBusy
                 ? null
