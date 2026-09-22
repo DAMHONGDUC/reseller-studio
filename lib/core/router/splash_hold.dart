@@ -52,7 +52,12 @@ class SplashHoldController extends Notifier<bool> {
   /// The class *is* the policy, so the number lives with it. Long enough for
   /// the cradle to swing through a full cycle, short enough that a seller
   /// opening the app to check one order does not feel they waited.
-  static const Duration minimum = Duration(seconds: 2);
+  ///
+  /// **One second, down from two** (owner's call): the app now has something
+  /// to show a signed-out seller, so the splash is covering a cold start
+  /// rather than an auth check, and two seconds of it read as a delay the
+  /// app had chosen.
+  static const Duration minimum = Duration(seconds: 1);
 
   /// Held from the first read, which is the router being built — the app opens
   /// on the splash, so the launch's own hold needs no trigger.
