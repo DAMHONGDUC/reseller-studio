@@ -6563,7 +6563,7 @@
   "@homeGuestBannerTitle": {
     "description": "Title of the Home banner warning a signed-out seller that their records exist nowhere else."
   },
-  "homeGuestBannerSubtitle": "Deleting the app deletes them. Sign in to keep them safe, or export them from Reports.",
+  "homeGuestBannerSubtitle": "Deleting the app deletes them. Sign in to keep them safe.",
   "@homeGuestBannerSubtitle": {
     "description": "Subtitle of the Home banner warning a signed-out seller about losing their records."
   }
