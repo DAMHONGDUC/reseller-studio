@@ -121,9 +121,23 @@ loud rather than something the architecture quietly assumes.**
 
 Two things carry it, and neither is optional:
 
-- a standing prompt to sign in, which names what is at risk rather than
-  advertising a feature;
-- a local export, so a seller who will not sign in still has a copy.
+- **A standing prompt on Home** — `_HomeGuestBanner`. It names what is at
+  risk rather than advertising a feature, it is **not dismissible**, and it
+  sits **above the premium banner**: that is the one place in this app an
+  upsell is deliberately outranked, because one of them offers a seller more
+  and the other tells them what they are about to lose. It says nothing until
+  there is something to lose — warning a seller about records they have not
+  written yet is noise.
+- **A local export, which already exists**: Reports writes a CSV through
+  `ReportController` and hands it to the share sheet. It needs no guest
+  version, because it reads the repository providers and those already point
+  at the guest store — one of the things the switch in
+  `RepositoryChoice` buys. More shows Reports to a guest for exactly this
+  reason, and `MoreConstant.accountOnly` is the short list of what it does
+  not.
+
+`test/features/local/guest_warning_test.dart` pins the banner in both
+directions.
 
 ## What a guest does not get
 
