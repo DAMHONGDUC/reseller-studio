@@ -128,18 +128,16 @@ Two things carry it, and neither is optional:
   and the other tells them what they are about to lose. It says nothing until
   there is something to lose — warning a seller about records they have not
   written yet is noise.
-- **A local export — and this is an open question, not a settled rule.**
-  `PlanFeature.export` carries an older owner's rule, *"every export is
-  paid"*, and calls exporting the capability Premium is really sold on. A
-  guest is on Free, so today they cannot take a copy of records that exist
-  nowhere else. **Until that is decided the app promises nothing it cannot
-  do**: the banner offers sign-in and says nothing about exporting, and the
-  privacy policy says exporting is part of Premium.
+- **There is no export for a guest, and that is decided.** Owner's call, and
+  it upholds the older rule `PlanFeature.export` carries — *every export is
+  paid* — against the pressure this feature put on it. Exporting is the
+  capability Premium is really sold on, and a guest is on Free.
 
-  The two ways out, for whoever settles it: let a **guest** export (not a
-  signed-in Free seller), on the grounds that rescuing records that exist in
-  one place is not the capability Premium is sold on; or leave it paid and
-  accept that signing in is a guest's only way to keep a copy.
+  **So signing in is a guest's only way to keep a copy, and nothing may imply
+  otherwise.** The banner offers sign-in and names no other door; the privacy
+  policy says exporting is part of Premium. A later change that unlocks export
+  for a guest is a revenue decision, not a bug fix — it reverses this
+  paragraph, and `PlanFeature.export`'s own rule with it.
 
 `test/features/local/guest_warning_test.dart` pins the banner in both
 directions.
