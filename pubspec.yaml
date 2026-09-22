@@ -39,7 +39,11 @@ dependencies:
   logger: ^2.5.0
   material_symbols_icons: ^4.2960.0
   mobile_scanner: ^7.1.4
+  # Where a guest's photos are copied to. image_picker hands back a temporary
+  # path the OS may delete, so the file has to be moved somewhere app-private
+  # before the record points at it (docs/rules/GUEST_MODE.md).
   package_info_plus: ^10.2.1
+  path_provider: ^2.1.5
   purchases_flutter: ^10.9.0
   share_plus: ^13.2.0
   shared_preferences: ^2.5.5

@@ -61,6 +61,7 @@ import '../local/local_database.dart';
 import '../local/local_providers.dart';
 import '../storage/file_uploader.dart';
 import '../storage/firebase_file_uploader.dart';
+import '../storage/local_file_uploader.dart';
 
 /// Thrown when a screen reads a repository in live mode before there is a
 /// workspace to read from.
@@ -194,15 +195,17 @@ final Provider<PurchaseRepository> purchaseRepositoryProvider =
 /// A widget test keeps the local path rather than uploading — there is no
 /// Firebase project behind it — but that swap lives in `test/support/fakes/`,
 /// not here.
-final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>((
-  Ref ref,
-) {
-  final WorkspaceContext? context = ref.watch(workspaceContextProvider);
-
-  if (context == null) LiveRepositoryGuard.noWorkspace('FileUploader');
-
-  return FirebaseFileUploader(FirebaseStorage.instance, context.workspaceId);
-});
+final Provider<FileUploader> fileUploaderProvider = Provider<FileUploader>(
+  (Ref ref) => RepositoryChoice.between<FileUploader>(
+    ref,
+    name: 'FileUploader',
+    // A guest has no bucket and no rules to satisfy, so the file is copied
+    // into app-private storage and the record points at the copy.
+    guest: (LocalDatabase db, String _) => const LocalFileUploader(),
+    linked: (WorkspaceContext context) =>
+        FirebaseFileUploader(FirebaseStorage.instance, context.workspaceId),
+  ),
+);
 
 final Provider<CategoryRepository> categoryRepositoryProvider =
     Provider<CategoryRepository>(
