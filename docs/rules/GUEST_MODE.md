@@ -156,3 +156,72 @@ and guest mode must not be the thing that breaks it.
 
 Pin it with a test that writes a record against a repository whose remote half
 throws, and asserts the call returns.
+
+## Four decisions, and what each one buys
+
+### Drift's codegen is the one exception, and committed output is what makes it safe
+
+The Tech stack entry bans `riverpod_generator` on the ground that a codegen
+step which must run before the analyzer is honest is **a cost paid on every
+provider edit**. Drift's is paid on every *schema* edit — thirteen tables,
+written once, changed rarely — so the cost curve the original rule objects to
+is not the one this has.
+
+**The generated files are committed**, and that is not a convenience: it is
+the clause that preserves what the original rule was actually protecting. A
+fresh checkout must analyze and test with no build step, so
+`melos run analyze` never depends on codegen having been run. Regenerating is
+a deliberate act after a schema change, never a precondition for reading the
+repo.
+
+### A guest's `createdBy` is a sentinel, and `WorkspaceContext.uid` stays non-null
+
+**Never make the uid nullable to accommodate a guest.** Twenty-one
+repositories take that context, and a nullable uid asks every one of them to
+decide separately what a null means — which is the same failure as an `if` at
+a call site, twenty-one times over.
+
+A guest's uid is a **named constant**, so every signature below the context is
+untouched and no repository learns that guest mode exists. The drain restamps
+`createdBy` to the real uid alongside `workspaceId`: **one restamp mechanism
+for both columns, never two.** Restamping is truthful — the same person
+created the record, they just had no account yet.
+
+The sentinel must never reach Firestore. It cannot in practice —
+`firestore.rules` checks `ownerId == request.auth.uid` when a workspace is
+created — but the drain asserts it anyway, because a row attributed to an
+account that does not exist is not a failure anyone would notice.
+
+### There is no resume table, because the local rows are the queue
+
+The rule above — *drop a row only once the server has confirmed it* — already
+makes the drain resumable. **What is left in the local store is exactly what
+is still owed**, so a kill mid-drain needs no bookkeeping to recover from, and
+bookkeeping is the thing that can disagree with the rows it describes.
+
+One fact does have to survive an interruption: **which workspace the seller
+chose** in the dialog. That is a single row in a single table, holding nothing
+else, living in the Drift database so it dies with the data it describes.
+Putting it in `shared_preferences` would let it outlive a wipe and claim a
+push was half-finished for records that no longer exist.
+
+### Photos: no guest limit, and they drain second
+
+There is no photo count limit for a signed-in seller and there is none for a
+guest either; the device's disk is the only ceiling.
+
+Two things make this cheap, and both are already true:
+
+- **`FileUploader` is called when a photo is picked, not when the item is
+  saved** — the reasoning is in `ItemFormController`, and it means a
+  `LocalFileUploader` that copies into app-private storage and returns the
+  path slots in with **no change to any controller**. The copy is not
+  optional: `image_picker` hands back a temporary path the OS is free to
+  delete.
+- **Rows drain before photos.** Rows are small and finish quickly; a few
+  hundred uploads on a phone connection do not. Nothing waits on either, and
+  an item whose upload has not landed still renders from its local file.
+
+The consequence to build for, rather than to be surprised by: **`photoUrls`
+may hold a local path while signed in**, until that upload lands. Anything
+rendering a photo takes either form — that is not a guest-only concern.

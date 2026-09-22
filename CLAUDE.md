@@ -141,7 +141,9 @@ rate is the bug this rule exists to stop.
 - **State**: Riverpod (`hooks_riverpod` 3.x), hand-written providers. **No
   `riverpod_generator`** — the sibling app (BaroEase) does it this way, and a
   codegen step that must run before the analyzer is honest is a cost paid on
-  every provider edit.
+  every provider edit. **Drift is the one exception**, and its generated files
+  are committed so `melos run analyze` still needs no build step — see
+  `docs/rules/GUEST_MODE.md`.
 - **Navigation**: `go_router`, one `StatefulShellRoute.indexedStack` for the
   five tabs. Every path lives in `lib/core/router/app_routes.dart`.
 - **Backend**: Firebase — Firestore, Storage, Cloud Functions (TypeScript,
