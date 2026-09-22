@@ -1,6 +1,7 @@
 /// Riverpod wiring for the guest store (`docs/rules/GUEST_MODE.md`).
 library;
 
+import 'package:drift/drift.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
@@ -12,10 +13,15 @@ import '../../features/workspace/domain/entities/workspace.dart';
 import '../../features/workspace/providers.dart';
 import '../account/account_kind.dart';
 import '../constants/guest_constant.dart';
+import '../firestore/workspace_collections.dart';
 import '../fresh_install/app_fresh_install.dart';
+import '../providers/repository_providers.dart';
+import 'drain/drain_sink.dart';
+import 'drain/guest_drain_service.dart';
 import 'guest_reset_service.dart';
 import 'guest_workspace_service.dart';
 import 'local_database.dart';
+import 'local_row.dart';
 import 'local_table.dart';
 
 /// The one guest database, open for the life of the app.
@@ -103,5 +109,43 @@ final Provider<GuestResetService> guestResetServiceProvider =
       (Ref ref) => GuestResetService(
         ref.watch(localDatabaseProvider),
         ref.watch(firebaseFirestoreProvider),
+      ),
+    );
+
+/// Whether the device is still holding records nobody has pushed.
+///
+/// **A count, not a flag.** A drain interrupted half way leaves some rows
+/// behind, and the app has to be able to tell "nothing to do" from "seven
+/// items still owed" without a bookkeeping table to lie to it
+/// (`docs/rules/GUEST_MODE.md`).
+final FutureProvider<int> guestRowsOwedProvider = FutureProvider<int>((
+  Ref ref,
+) async {
+  final LocalDatabase db = ref.watch(localDatabaseProvider);
+
+  int owed = 0;
+
+  for (final TableInfo<LocalRows, LocalRow> table in db.drainOrder) {
+    owed += (await LocalTable(db, table).getAll()).length;
+  }
+
+  return owed;
+});
+
+/// Moves the guest store into the account that just signed in.
+final Provider<GuestDrainService> guestDrainServiceProvider =
+    Provider<GuestDrainService>(
+      (Ref ref) => GuestDrainService(
+        ref.watch(localDatabaseProvider),
+        FirestoreDrainSink(
+          WorkspaceCollections(
+            ref.watch(firebaseFirestoreProvider),
+            // Read, not watched: the destination is decided once, when the
+            // seller signs in, and a rebuild must not retarget a drain
+            // already in flight.
+            ref.read(currentWorkspaceIdProvider) ?? GuestConstant.workspaceId,
+          ),
+        ),
+        ref.watch(fileUploaderProvider),
       ),
     );
