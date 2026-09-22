@@ -128,13 +128,18 @@ Two things carry it, and neither is optional:
   and the other tells them what they are about to lose. It says nothing until
   there is something to lose — warning a seller about records they have not
   written yet is noise.
-- **A local export, which already exists**: Reports writes a CSV through
-  `ReportController` and hands it to the share sheet. It needs no guest
-  version, because it reads the repository providers and those already point
-  at the guest store — one of the things the switch in
-  `RepositoryChoice` buys. More shows Reports to a guest for exactly this
-  reason, and `MoreConstant.accountOnly` is the short list of what it does
-  not.
+- **A local export — and this is an open question, not a settled rule.**
+  `PlanFeature.export` carries an older owner's rule, *"every export is
+  paid"*, and calls exporting the capability Premium is really sold on. A
+  guest is on Free, so today they cannot take a copy of records that exist
+  nowhere else. **Until that is decided the app promises nothing it cannot
+  do**: the banner offers sign-in and says nothing about exporting, and the
+  privacy policy says exporting is part of Premium.
+
+  The two ways out, for whoever settles it: let a **guest** export (not a
+  signed-in Free seller), on the grounds that rescuing records that exist in
+  one place is not the capability Premium is sold on; or leave it paid and
+  accept that signing in is a guest's only way to keep a copy.
 
 `test/features/local/guest_warning_test.dart` pins the banner in both
 directions.
