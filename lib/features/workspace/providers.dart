@@ -13,6 +13,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/account/account_kind.dart';
 import '../../core/firestore/workspace_collections.dart';
 import '../../core/firestore/workspace_context.dart';
+import '../../core/local/local_providers.dart';
 import '../auth/providers.dart';
 import '../listings/domain/enums/listing_status.dart';
 import '../pricing/domain/services/profit_calculator.dart';
@@ -109,6 +110,13 @@ final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>(
 final Provider<Workspace?> currentWorkspaceProvider = Provider<Workspace?>((
   Ref ref,
 ) {
+  // A guest's business is the local one, and there is exactly one of it —
+  // no pointer to resolve and nothing to switch between
+  // (`docs/rules/GUEST_MODE.md`).
+  if (ref.watch(accountKindProvider) == AccountKind.guest) {
+    return ref.watch(guestWorkspaceProvider).value;
+  }
+
   final String? id = ref.watch(currentWorkspaceIdProvider);
 
   if (id == null) return null;
