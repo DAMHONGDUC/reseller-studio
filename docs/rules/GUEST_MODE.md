@@ -95,10 +95,17 @@ is that a reseller's records belong to a business and a team rather than to a
 person's own phone, so a device handed to somebody else must not still hold
 them.
 
-Order: sign out of every provider → `terminate()` → `clearPersistence()` →
-empty the Drift database. The Firestore half throws `failed-precondition`
-while any stream is open, so this runs above the app, not inside a screen —
-the same constraint that put the fresh-install wipe in `SplashScreen`.
+Order: sign out of every provider → empty the Drift database → clear
+Firestore's cache. The first two are guaranteed; the third is best effort and
+the failure is expected rather than exceptional, because `clearPersistence`
+throws `failed-precondition` while any listener is open and sign-out happens
+with the app on screen.
+
+**What is left behind when it does throw is a cache nothing can read past**:
+every query in the app carries a `workspaceId` filter (hard rule 14), and the
+next account does not match the last one's. The fresh-install gate clears it
+for real on the next cold start, which is the only place in this app where
+`clearPersistence` is reliably above every open stream.
 
 **A sign-out does not create a new guest session.** The app lands on the login
 screen with an empty local store, and the seller starts a guest session again
