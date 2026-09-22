@@ -19,7 +19,13 @@ class GuestResetService {
   const GuestResetService(this._db, this._firestore);
 
   final LocalDatabase _db;
-  final FirebaseFirestore _firestore;
+
+  /// **Null when Firebase never came up.** Reaching for
+  /// `FirebaseFirestore.instance` on a build with no config throws
+  /// `[core/no-app]` — the same trap `firebaseReadyProvider` exists for on
+  /// the auth side — and sign-out is one of the few things that still works
+  /// on such a build, so it must not be the thing that crashes it.
+  final FirebaseFirestore? _firestore;
 
   /// Empty the device of the account that just left.
   ///
@@ -57,9 +63,13 @@ class GuestResetService {
   /// 14), and the next account does not match the last one's. The cold start
   /// after this clears it for real.
   Future<void> _clearFirestoreCache() async {
+    final FirebaseFirestore? firestore = _firestore;
+
+    if (firestore == null) return;
+
     try {
-      await _firestore.terminate();
-      await _firestore.clearPersistence();
+      await firestore.terminate();
+      await firestore.clearPersistence();
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.logout,

@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // `Override` is not in the main entrypoint's `show` list; `misc.dart` is
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/error/app_failure.dart';
+import 'package:reseller_studio/core/local/local_database.dart';
+import 'package:reseller_studio/core/local/local_providers.dart';
 import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/auth/domain/repositories/auth_repository.dart';
 import 'package:reseller_studio/features/auth/presentation/controllers/auth_controller.dart';
@@ -37,8 +40,7 @@ class _RefusingBilling implements SubscriptionRepository {
   Future<void> identify(String uid) async {}
 
   @override
-  Future<void> forget() async =>
-      throw const AppFailure(AppFailureKind.unknown);
+  Future<void> forget() async => throw const AppFailure(AppFailureKind.unknown);
 }
 
 /// A device that cannot be unregistered — the other cleanup step, failing.
@@ -103,14 +105,20 @@ class _RefusingDelete extends _RecordingAuth {
 /// change was a card sellers tapped twice.
 void main() {
   ProviderContainer containerWith(AuthRepository auth) {
+    // Signing out wipes the guest store (`docs/rules/GUEST_MODE.md`), so the
+    // controller needs one. In memory: the real provider opens a file through
+    // `path_provider`, which has no platform channel behind it here.
+    final LocalDatabase db = LocalDatabase.forTesting(NativeDatabase.memory());
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         authRepositoryProvider.overrideWithValue(auth),
         subscriptionRepositoryProvider.overrideWithValue(_RefusingBilling()),
         pushControllerProvider.overrideWith(_RefusingPush.new),
+        localDatabaseProvider.overrideWithValue(db),
       ],
     );
 
+    addTearDown(db.close);
     addTearDown(container.dispose);
 
     return container;
@@ -142,9 +150,9 @@ void main() {
         .deleteAccount();
 
     expect(
-      container.read(authControllerProvider).isRunning(
-        AccountAction.deleteAccount,
-      ),
+      container
+          .read(authControllerProvider)
+          .isRunning(AccountAction.deleteAccount),
       isTrue,
     );
     expect(

@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
+import '../../features/auth/providers.dart';
 import '../../features/carriers/providers.dart';
 import '../../features/inventory/providers.dart';
 import '../../features/marketplaces/providers.dart';
@@ -108,7 +109,11 @@ final Provider<GuestResetService> guestResetServiceProvider =
     Provider<GuestResetService>(
       (Ref ref) => GuestResetService(
         ref.watch(localDatabaseProvider),
-        ref.watch(firebaseFirestoreProvider),
+        // Checked before the instance is touched, never after: watching it is
+        // itself what throws when there is no Firebase app.
+        ref.watch(firebaseReadyProvider)
+            ? ref.watch(firebaseFirestoreProvider)
+            : null,
       ),
     );
 

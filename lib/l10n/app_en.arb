@@ -1,8 +1,12 @@
 {
   "navExpand": "Expand navigation",
-  "@navExpand": {"description": "Tooltip for expanding the tablet navigation panel."},
+  "@navExpand": {
+    "description": "Tooltip for expanding the tablet navigation panel."
+  },
   "navCollapse": "Collapse navigation",
-  "@navCollapse": {"description": "Tooltip for collapsing the tablet navigation panel."},
+  "@navCollapse": {
+    "description": "Tooltip for collapsing the tablet navigation panel."
+  },
   "@@locale": "en",
   "appTitle": "Reseller Studio",
   "@appTitle": {
@@ -1094,7 +1098,7 @@
   "@itemPurchaseEmptyHint": {
     "description": "Placeholder on the buying-trip picker when the business has none."
   },
-  "itemAddPurchaseFirst": "Record a purchase first, under More \u2192 Sourcing.",
+  "itemAddPurchaseFirst": "Record a purchase first, under More → Sourcing.",
   "@itemAddPurchaseFirst": {
     "description": "Says where a purchase is created, so the picker is never a dead end."
   },
@@ -6538,5 +6542,21 @@
         "format": "compact"
       }
     }
+  },
+  "guestSyncTitle": "Where should these records go?",
+  "@guestSyncTitle": {
+    "description": "Title of the sheet asking which business a guest’s records should be pushed into at sign-in."
+  },
+  "guestSyncBody": "You added records before signing in. Choose the business they belong to.",
+  "@guestSyncBody": {
+    "description": "Body of the sheet asking where a guest’s records should go."
+  },
+  "guestSyncKeepSeparate": "Keep them in a new business",
+  "@guestSyncKeepSeparate": {
+    "description": "Option that creates a new business for the records instead of merging them into an existing one."
+  },
+  "guestSyncRunning": "Moving your records…",
+  "@guestSyncRunning": {
+    "description": "Shown while a guest’s records are being pushed to the account after sign-in."
   }
 }
