@@ -57,17 +57,6 @@ final StreamProvider<Workspace?> guestWorkspaceProvider =
           );
     });
 
-/// Whether the guest business exists yet.
-///
-/// The app is unusable until it does — every repository would be reading an
-/// empty store with no currency behind it — so the splash waits on this the
-/// way it waits on the fresh-install check.
-final Provider<bool> guestWorkspaceReadyProvider = Provider<bool>((Ref ref) {
-  if (ref.watch(accountKindProvider) == AccountKind.linked) return true;
-
-  return ref.watch(guestWorkspaceProvider).value != null;
-});
-
 /// Creates the guest business, once, behind the splash.
 ///
 /// **After the fresh-install check, never before.** A reinstall or an

@@ -145,6 +145,7 @@ final class AppRoutes {
   static const String carriers = '/more/carriers';
   static const String addCarrier = '/more/carriers/new';
   static const String carrierDetailPath = '/more/carriers/:carrierId';
+
   /// Every business the seller belongs to, with the plan's ceiling on how
   /// many. Under More rather than in Settings: a business is a record, and
   /// records are managed from More.
@@ -153,9 +154,10 @@ final class AppRoutes {
   static const String team = '/more/team';
   static const String settings = '/more/settings';
 
-  /// Which reminders this person wants. **Under Settings and not in
-  /// `_previewRoutes`**: it reads and writes the signed-in person's own
-  /// document, so unlike theme and language it is not a device preference.
+  /// Which reminders this person wants. **Under Settings, and one of the few
+  /// things a guest cannot reach**: it reads and writes the signed-in
+  /// person's own document, so unlike theme and language it is not a device
+  /// preference.
   static const String notificationSettings = '/more/settings/notifications';
 
   /// The audit log (§23). Under More rather than under Home: it is something

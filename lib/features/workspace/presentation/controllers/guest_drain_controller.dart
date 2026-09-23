@@ -36,6 +36,16 @@ class GuestDrainController extends Notifier<bool> {
 
     if (owed == 0) return null;
 
+    final String? pending = await ref
+        .read(guestDrainServiceProvider)
+        .pendingDestination();
+
+    // **A drain that was interrupted already has an answer.** Asking again
+    // would put the dialog in front of the seller on every launch until it
+    // finished, and a different answer the second time would split one
+    // business's records across two.
+    if (pending != null) return DrainIntoWorkspace(pending);
+
     return DrainDestination.forAccount(ref.read(workspacesProvider));
   }
 

@@ -31,12 +31,13 @@ part 'login_screen_header.dart';
 /// Apple is not optional beside Google: App Store guideline 4.8 requires it
 /// wherever a third-party sign-in is offered. Both marks come from
 /// `SimpleIcons` (owner's rule); swapping them for the vendors' own artwork is
-/// a submission task, not a build one — `RELEASE_ACTIONS.md` blocker 5.
+/// a submission task, not a build one — `RELEASE_ACTIONS.md` blocker 9, and
+/// `SdVendorButtonV3.leading` is the slot that takes them.
 ///
 /// **On success it asks the router to re-decide, and nothing more.** This
-/// screen is *pushed* over the signed-out shell, and an imperative route sits
-/// on top of whatever the redirect chose — so a seller who signed in from a
-/// tab would keep looking at this form. `NavigationUtils.afterSignIn` names
+/// screen is *pushed* over the app a guest was already using, and an
+/// imperative route sits on top of whatever the redirect chose — so a seller
+/// who signed in from a tab would keep looking at this form. `NavigationUtils.afterSignIn` names
 /// Home; the redirect is still the one thing that turns that into workspace
 /// setup when the account has no business yet.
 class LoginScreen extends ConsumerWidget {

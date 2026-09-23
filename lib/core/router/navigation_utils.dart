@@ -17,11 +17,11 @@ final class NavigationUtils {
   /// it run rather than becoming a second answer to "where does a new account
   /// land".
   ///
-  /// It has to exist because login is *pushed* over the signed-out shell —
-  /// `SignedOutView` and [requireSignIn] both push it — and an imperative
-  /// route sits on top of whatever the redirect chose. Without this, a seller
-  /// who signs in from a tab signs in successfully and keeps looking at the
-  /// login form. `go` is what clears that stack.
+  /// It has to exist because login is *pushed* over the app a guest was
+  /// already using — Settings and [requireAccount] both push it — and an
+  /// imperative route sits on top of whatever the redirect chose. Without
+  /// this, a seller who signs in from a tab signs in successfully and keeps
+  /// looking at the login form. `go` is what clears that stack.
   static void afterSignIn(BuildContext context) {
     SdLogger.action(LogTagConstant.navigation, 'Signed in — routing on');
 

@@ -74,11 +74,7 @@ void main() {
     test('a pushed row is restamped with the real account', () async {
       await items.save(item('a'));
 
-      await drain.run(
-        workspaceId: destination,
-        uid: uid,
-        currency: currency,
-      );
+      await drain.run(workspaceId: destination, uid: uid, currency: currency);
 
       final Map<String, Object?> written = sink.writes.single.data;
 
@@ -93,31 +89,22 @@ void main() {
       );
       await items.save(item('a'));
 
-      await drain.run(
-        workspaceId: destination,
-        uid: uid,
-        currency: currency,
-      );
+      await drain.run(workspaceId: destination, uid: uid, currency: currency);
 
-      expect(
-        sink.writes.map((_Write w) => w.table),
-        <String>['sources', 'items'],
-      );
+      expect(sink.writes.map((_Write w) => w.table), <String>[
+        'sources',
+        'items',
+      ]);
     });
 
     test('a photo on disk is uploaded and the record takes the URL', () async {
       await items.save(item('a', photoUrls: <String>['/tmp/IMG_0001.jpg']));
 
-      await drain.run(
-        workspaceId: destination,
-        uid: uid,
-        currency: currency,
-      );
+      await drain.run(workspaceId: destination, uid: uid, currency: currency);
 
-      expect(
-        sink.writes.single.data['photoUrls'],
-        <String>['https://cdn.example/a'],
-      );
+      expect(sink.writes.single.data['photoUrls'], <String>[
+        'https://cdn.example/a',
+      ]);
     });
 
     test('a row the server refuses stays on the device', () async {
@@ -131,21 +118,44 @@ void main() {
       );
 
       expect(pushed, 1);
+      expect((await items.watchItems().first).map((Item i) => i.id), <String>[
+        'bad',
+      ]);
+    });
+
+    test('a resumed drain is not asked again where to go', () async {
+      // The destination is the one thing left in the rows cannot answer, so
+      // it is the one thing the drain state holds — and reading it back is
+      // what stops the dialog reappearing on every launch until the push
+      // finishes.
+      await items.save(item('a'));
+      sink.refuse.add('a');
+
+      await drain.run(workspaceId: destination, uid: uid, currency: currency);
+
+      final String? pending = await drain.pendingDestination();
+
+      expect(pending, destination);
       expect(
-        (await items.watchItems().first).map((Item i) => i.id),
-        <String>['bad'],
+        DrainDestination.forAccount(const <Workspace>[]),
+        isA<DrainIntoNewWorkspace>(),
+        reason: 'and the fresh answer would have been a different one',
       );
+    });
+
+    test('a finished drain forgets where it was heading', () async {
+      await items.save(item('a'));
+
+      await drain.run(workspaceId: destination, uid: uid, currency: currency);
+
+      expect(await drain.pendingDestination(), isNull);
     });
 
     test('a resumed drain remembers where it was heading', () async {
       await items.save(item('a'));
       sink.refuse.add('a');
 
-      await drain.run(
-        workspaceId: destination,
-        uid: uid,
-        currency: currency,
-      );
+      await drain.run(workspaceId: destination, uid: uid, currency: currency);
 
       expect(await drain.pendingDestination(), destination);
     });
@@ -165,10 +175,18 @@ void main() {
 
     test('a second account drains into its own business', () async {
       await items.save(item('a'));
-      await drain.run(workspaceId: 'ws-first', uid: 'uid-first', currency: currency);
+      await drain.run(
+        workspaceId: 'ws-first',
+        uid: 'uid-first',
+        currency: currency,
+      );
 
       await items.save(item('b'));
-      await drain.run(workspaceId: 'ws-second', uid: 'uid-second', currency: currency);
+      await drain.run(
+        workspaceId: 'ws-second',
+        uid: 'uid-second',
+        currency: currency,
+      );
 
       expect(sink.writes.map((_Write w) => w.id), <String>['a', 'b']);
       expect(sink.writes.last.data['createdBy'], 'uid-second');
@@ -176,17 +194,20 @@ void main() {
   });
 
   group('case 3 — deleted and reinstalled without signing in', () {
-    test('a fresh install has nothing, and that is the accepted cost', () async {
-      await items.saveAll(<Item>[item('a'), item('b')]);
+    test(
+      'a fresh install has nothing, and that is the accepted cost',
+      () async {
+        await items.saveAll(<Item>[item('a'), item('b')]);
 
-      // What a reinstall is, from the app's point of view: the file the guest
-      // store lived in went with the app, so the next launch opens an empty
-      // one. `GuestResetService` is the same wipe, reached deliberately.
-      await const GuestResetServiceStub().reinstall(db);
+        // What a reinstall is, from the app's point of view: the file the guest
+        // store lived in went with the app, so the next launch opens an empty
+        // one. `GuestResetService` is the same wipe, reached deliberately.
+        await const GuestResetServiceStub().reinstall(db);
 
-      expect(await items.watchItems().first, isEmpty);
-      expect(sink.writes, isEmpty, reason: 'nothing was ever sent anywhere');
-    });
+        expect(await items.watchItems().first, isEmpty);
+        expect(sink.writes, isEmpty, reason: 'nothing was ever sent anywhere');
+      },
+    );
   });
 
   group('which business the records land in', () {
