@@ -156,10 +156,16 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         // the local store and their business was created without asking, so
         // there is nothing here to refuse and nothing to set up.
         //
-        // Two routes still bounce, and both name an account rather than a
+        // Three routes still bounce. **The intro is the one that matters**:
+        // finishing it flips the status above to `done`, and without a bounce
+        // the redirect answers "stay" — which leaves the seller on an intro
+        // whose Skip and Next do nothing. The old shell got this for free
+        // because `/onboarding` was outside `_previewRoutes`; unwrapping the
+        // tabs dropped it. The other two name an account rather than a
         // record: workspace setup belongs to a seller who has just signed in,
         // and the splash has nothing left to wait for.
-        if (location == AppRoutes.splash ||
+        if (location == AppRoutes.onboarding ||
+            location == AppRoutes.splash ||
             location == AppRoutes.workspaceSetup) {
           return AppRoutes.home;
         }

@@ -8,6 +8,7 @@ import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
+import 'package:reseller_studio/features/onboarding/providers.dart';
 import 'package:reseller_studio/features/workspace/providers.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +30,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// sits *inside* `if (!signedIn)` in the redirect, so a signed-in seller
 /// cannot reach the intro by construction.
 void main() {
+  late ProviderContainer lastContainer;
+  late GoRouter lastRouter;
+
   Future<String> landingFor(
     WidgetTester tester, {
     required bool signedIn,
@@ -64,6 +68,9 @@ void main() {
     addTearDown(container.dispose);
 
     final GoRouter router = container.read(routerProvider);
+
+    lastContainer = container;
+    lastRouter = router;
 
     if (startAt != null) router.go(startAt);
 
@@ -104,6 +111,29 @@ void main() {
   ) async {
     expect(
       await landingFor(tester, signedIn: false, seenIntro: true),
+      AppRoutes.home,
+    );
+  });
+
+  testWidgets('finishing the intro leaves it — Skip is not a dead button', (
+    WidgetTester tester,
+  ) async {
+    // **The trap this closes.** Finishing flips the status to `done`, and the
+    // signed-out branch used to answer "stay" for every route it did not
+    // name — so the seller was left on an intro whose Skip and Next did
+    // nothing. The old shell got the bounce for free because `/onboarding`
+    // sat outside `_previewRoutes`; unwrapping the tabs dropped it.
+    expect(
+      await landingFor(tester, signedIn: false, seenIntro: false),
+      AppRoutes.onboarding,
+    );
+
+    await lastContainer.read(onboardingStatusProvider.notifier).complete();
+    lastRouter.refresh();
+    await tester.pumpAndSettle();
+
+    expect(
+      lastRouter.routerDelegate.currentConfiguration.uri.path,
       AppRoutes.home,
     );
   });
