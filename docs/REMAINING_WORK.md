@@ -9,7 +9,7 @@ engineering work only.
 | Priority | Work | Why |
 |---|---|---|
 | 1 | Deploy and verify Cloud Functions | Team, notifications, deletion and server-side entitlement depend on them |
-| 2 | Complete the Vietnamese ARB pass | Only English ships until the locale is complete |
+| 2 | Move the strings still hardcoded in Dart into ARB | Seven locales ship; those strings render in English in all of them |
 | 3 | Add listing templates | Last unbuilt listing workflow from plan §12 |
 | 4 | Lock-screen actions for offers | An offer expires in hours; answering needs iOS notification categories, matching Android actions and an FCM payload change, none verifiable without a device |
 

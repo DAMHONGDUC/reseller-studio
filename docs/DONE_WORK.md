@@ -29,7 +29,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Money | Integer minor units; derived profit, margin and ROI; an unreported platform fee leaves the order's profit blank — never estimated, never zeroed (hard rule 3) |
 | Missing values | Render as `—`, never `0` |
 | Errors | Mapped to `AppFailure`; technical messages stay out of UI |
-| Localization | English ARB complete; Vietnamese pass deferred to release |
+| Localization | Seven locales ship — en, es, fr, de, pt, zh, vi — every ARB complete and pinned by a test |
 | Design system | v3, light/dark themes, shared spacing and chrome |
 | Backend | Firestore repositories, rules, indexes and Cloud Functions written |
 | Deep links | `selleros://` registered on iOS and Android |

@@ -78,7 +78,8 @@ binary without Firebase configuration.
 | Privacy forms | Submit the App Store and Play answers from the privacy document |
 | Listing | Description, screenshots, keywords, support URL and age rating |
 | Hardware checks | Auth, push, camera, photo picker, deep links and dark cold start |
-| Billing checks | Monthly purchase, yearly purchase, cancellation state and restore |
+| Billing checks | Monthly purchase, yearly purchase, lifetime purchase, cancellation state and restore |
+| Translations | Native read-through of `es`, `fr`, `de`, `pt`, `zh` and `vi` — every one is unreviewed machine work (hard rule 7) |
 | Data checks | Workspace creation, invite flow, deletion, offline writes and exports |
 
 ## Release command

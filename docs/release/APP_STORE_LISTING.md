@@ -13,7 +13,7 @@ Privacy answers are not repeated here — they live in
 | Name | Reseller Studio |
 | Bundle ID | `app.dd.reseller.studio` |
 | SKU | **[owner]** — free text, suggestion `reseller-studio-ios` |
-| Primary language | English (U.S.) — the only shipping locale (hard rule 7) |
+| Primary language | English (U.S.); six more locales ship (hard rule 7), and a locale with no listing of its own shows this one |
 | Primary category | Business |
 | Secondary category | Productivity |
 | Age rating | 4+ — no user-generated sharing, no ads, no gambling |

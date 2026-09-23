@@ -33,18 +33,22 @@ import 'l10n/gen/app_localizations.dart';
 class ResellerStudioApp extends ConsumerWidget {
   const ResellerStudioApp({super.key});
 
-  /// The locales a build offers, and it is deliberately **not**
-  /// [AppLocalizations.supportedLocales].
+  /// The locales a build offers (hard rule 7), English first so a device in
+  /// any other language falls back to it.
   ///
-  /// `app_vi.arb` holds a few hundred of the app's keys and the generator
-  /// fills the rest from English, so a device set to Vietnamese would render
-  /// a mixed-language app out of translations hard rule 7 calls unreviewed.
-  /// Offering only English is what the Settings row already claims, and the
-  /// launch markets are the United States and the United Kingdom.
-  ///
-  /// The vi keys stay in the ARB (hard rule 7). This list grows again in the
-  /// one translation pass at release.
-  static const List<Locale> shippingLocales = <Locale>[Locale('en')];
+  /// **Written out, not [AppLocalizations.supportedLocales]:** an ARB dropped
+  /// into the folder must not ship on its own. A locale is added here, to
+  /// `CFBundleLocalizations` in `ios/Runner/Info.plist`, and to the test that
+  /// pins both, in the same change.
+  static const List<Locale> shippingLocales = <Locale>[
+    Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('de'),
+    Locale('pt'),
+    Locale('zh'),
+    Locale('vi'),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

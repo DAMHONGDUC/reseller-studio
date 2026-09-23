@@ -7,10 +7,9 @@ part of 'settings_screen.dart';
 /// neither reads a workspace, so refusing to show them until someone signs in
 /// would be refusing for no reason.
 ///
-/// Theme works. Language is listed with its current value and a "Soon" badge:
-/// English is the only locale that ships until release (hard rule 7), and a
-/// picker offering a half-translated Vietnamese would be worse than no picker
-/// — `docs/REMAINING_WORK.md` has the ~114 strings still to reach ARB.
+/// Theme works. Language shows the one the device picked (hard rule 7) with a
+/// "Soon" badge: an in-app override is not built, so the phone's own language
+/// setting is still the only way to change it.
 class _AppearanceCard extends ConsumerWidget {
   const _AppearanceCard();
 
@@ -50,7 +49,7 @@ class _AppearanceCard extends ConsumerWidget {
         ),
         AppListRow(
           title: context.l10n.settingsLanguage,
-          subtitle: context.l10n.settingsLanguageEnglish,
+          subtitle: context.l10n.settingsLanguageName,
           icon: AppIconConstant.language,
           trailing: const _SoonBadge(),
           showChevron: false,

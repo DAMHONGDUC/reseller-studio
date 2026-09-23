@@ -685,9 +685,9 @@
   "@settingsLanguage": {
     "description": "Settings row for the app's language."
   },
-  "settingsLanguageEnglish": "English",
-  "@settingsLanguageEnglish": {
-    "description": "Current language value. Only English ships until release (hard rule 7)."
+  "settingsLanguageName": "English",
+  "@settingsLanguageName": {
+    "description": "The language the app is showing, written in that language. Each locale's own name for itself, never a translation of it."
   },
   "settingsNotYet": "Soon",
   "@settingsNotYet": {
