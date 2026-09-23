@@ -435,32 +435,25 @@ behind it.
    log and Crashlytics only and must never reach a widget. The user sees
    "Something went wrong. Please try again."
 
-7. **Every user-facing string goes through `intl` ARB files.** Two locales
-   ship: `app_en.arb` (template, with `@` descriptions) and `app_vi.arb` —
-   **every new key must be added to BOTH**. Access via `context.l10n`, never
+7. **Every user-facing string goes through `intl` ARB files, and seven
+   locales ship.** Owner's rule, and it **reverses "English only until
+   release, translated in one pass"**. `app_en.arb` is the template (with `@`
+   descriptions); `es`, `fr`, `de`, `pt` (Brazilian), `zh` (Simplified) and
+   `vi` ship beside it. Access via `context.l10n`, never
    `AppLocalizations.of(context)` directly. Tooltips and semantics labels are
    user-facing strings too.
-
-   **Until release, write English only, and do not hand-translate.** Owner's
-   rule. New keys go into `app_en.arb`; `app_vi.arb` is filled in **once, in
-   one pass, at release**, and every other locale with it. The reason is that
-   translating a screen that is about to be redesigned pays for the same
-   string twice, and a half-translated app reads worse than an English one.
-   - **The ARB indirection still applies to every new string** — the rule
-     above is unchanged. What is deferred is the *translation*, never the key.
-     A string hardcoded in a widget now is a string nobody finds at release.
-   - The keys already in `app_vi.arb` stay. Do not delete them and do not add
-     more by hand.
-   - `vi` translations written before this rule are unreviewed machine work.
-     They are on the release checklist in `RELEASE_ACTIONS.md`, not trusted.
-   - **A build offers `ResellerStudioApp.shippingLocales`, never
-     `AppLocalizations.supportedLocales`.** The generator fills a missing key
-     from the template, so a partial `app_vi.arb` does not fail to build — it
-     ships a device set to Vietnamese an app that is two thirds English, out
-     of the very translations the line above says are not trusted. The
-     shipping list is English alone and grows again in the one translation
-     pass at release. `test/core/shipping_locales_test.dart` pins both halves:
-     what ships, and that the vi keys are still there.
+   - **A new key goes into every ARB in the same turn**, translated. The
+     generator fills a missing key from English without failing, so a gap
+     ships as a mixed-language screen nobody notices on an English phone.
+     `test/core/shipping_locales_test.dart` fails on any ARB whose keys or
+     placeholders differ from the template.
+   - **A build offers `ResellerStudioApp.shippingLocales`**, and
+     `ios/Runner/Info.plist` `CFBundleLocalizations` lists the same codes —
+     without it iOS never hands Flutter anything but English.
+   - The translations are machine-made and unreviewed. A native read-through
+     is on the release checklist in `RELEASE_ACTIONS.md`.
+   - Strings still hardcoded in Dart (`docs/REMAINING_WORK.md`) render in
+     English in every locale until they reach ARB.
 
 8. **Every `catch` logs — handling an error is not the same as knowing it
    happened.** Call
