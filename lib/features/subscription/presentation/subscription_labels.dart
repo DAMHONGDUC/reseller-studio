@@ -36,6 +36,7 @@ final class SubscriptionLabels {
   static String period(BillingPeriod period) => switch (period) {
     BillingPeriod.monthly => 'per month',
     BillingPeriod.yearly => 'per year',
+    BillingPeriod.lifetime => 'one-time',
   };
 
   /// What one option card is titled. Deliberately not [period]: a card headed
@@ -43,6 +44,7 @@ final class SubscriptionLabels {
   static String periodName(BillingPeriod period) => switch (period) {
     BillingPeriod.monthly => 'Monthly',
     BillingPeriod.yearly => 'Yearly',
+    BillingPeriod.lifetime => 'Lifetime',
   };
 
   /// The mark on the option the paywall recommends.

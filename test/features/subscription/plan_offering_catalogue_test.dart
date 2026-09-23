@@ -20,19 +20,34 @@ void main() {
       ],
     );
 
-    expect(
-      ordered.map((PlanOffering row) => row.period),
-      <BillingPeriod>[BillingPeriod.yearly, BillingPeriod.monthly],
-    );
+    expect(ordered.map((PlanOffering row) => row.period), <BillingPeriod>[
+      BillingPeriod.yearly,
+      BillingPeriod.monthly,
+    ]);
+  });
+
+  test('lifetime sits last and never takes the recommendation', () {
+    final List<PlanOffering> ordered =
+        PlanOfferingCatalogue.ordered(<PlanOffering>[
+          offering(BillingPeriod.lifetime),
+          offering(BillingPeriod.monthly),
+          offering(BillingPeriod.yearly),
+        ]);
+
+    expect(ordered.map((PlanOffering row) => row.period), <BillingPeriod>[
+      BillingPeriod.yearly,
+      BillingPeriod.monthly,
+      BillingPeriod.lifetime,
+    ]);
+    expect(PlanOfferingCatalogue.isBestValue(ordered.last, ordered), isFalse);
   });
 
   test('a period sold twice renders once', () {
-    final List<PlanOffering> ordered = PlanOfferingCatalogue.ordered(
-      <PlanOffering>[
-        offering(BillingPeriod.yearly, id: 'first'),
-        offering(BillingPeriod.yearly, id: 'second'),
-      ],
-    );
+    final List<PlanOffering> ordered =
+        PlanOfferingCatalogue.ordered(<PlanOffering>[
+          offering(BillingPeriod.yearly, id: 'first'),
+          offering(BillingPeriod.yearly, id: 'second'),
+        ]);
 
     expect(ordered, hasLength(1));
     expect(ordered.single.productId, 'first');
@@ -44,10 +59,7 @@ void main() {
     ];
 
     expect(
-      PlanOfferingCatalogue.selected(
-        monthlyOnly,
-        BillingPeriod.yearly,
-      )?.period,
+      PlanOfferingCatalogue.selected(monthlyOnly, BillingPeriod.yearly)?.period,
       BillingPeriod.monthly,
     );
     expect(

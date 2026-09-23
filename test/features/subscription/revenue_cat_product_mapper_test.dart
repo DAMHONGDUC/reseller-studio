@@ -41,6 +41,47 @@ void main() {
     expect(offering?.period, BillingPeriod.yearly);
   });
 
+  test('a lifetime package becomes a lifetime offering', () {
+    final PlanOffering? offering = RevenueCatProductMapper.offering(
+      Package(
+        r'$rc_lifetime',
+        PackageType.lifetime,
+        const StoreProduct(
+          'premium_lifetime',
+          'Premium',
+          'Premium',
+          199.99,
+          r'$199.99',
+          'USD',
+        ),
+        const PresentedOfferingContext('premium', null, null),
+      ),
+    );
+
+    expect(offering?.period, BillingPeriod.lifetime);
+  });
+
+  test('a custom package with no period is not sold as lifetime', () {
+    // It could be a consumable, and "forever" is a claim the receipt breaks.
+    final PlanOffering? offering = RevenueCatProductMapper.offering(
+      Package(
+        'custom_lifetime',
+        PackageType.custom,
+        const StoreProduct(
+          'premium_lifetime',
+          'Premium',
+          'Premium',
+          199.99,
+          r'$199.99',
+          'USD',
+        ),
+        const PresentedOfferingContext('premium', null, null),
+      ),
+    );
+
+    expect(offering, isNull);
+  });
+
   test('unsupported custom duration is not sold as the wrong period', () {
     final PlanOffering? offering = RevenueCatProductMapper.offering(
       customPackage('premium_weekly', 'P1W'),

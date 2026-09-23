@@ -4,6 +4,9 @@ part of 'paywall_screen.dart';
 /// joining, and that it renews until they cancel (App Store guideline 3.1.2
 /// requires the second in the binary).
 ///
+/// A lifetime option adds a line saying it never renews, shown whatever is
+/// selected so the fine print does not jump between taps.
+///
 /// A trial adds a line naming its length and the price it renews at — the same
 /// guideline, and the half a badge alone does not satisfy. The line keeps its
 /// room on the period that has no trial: the block is bottom-anchored, so a
@@ -36,6 +39,9 @@ class _PaywallDisclosure extends ConsumerWidget {
       ref.watch(paywallSelectionProvider),
     );
     final PlanIntroOffer? trial = selected?.introOffer;
+    final bool sellsLifetime = offerings.any(
+      (PlanOffering offering) => offering.period == BillingPeriod.lifetime,
+    );
     final String? trialTerms = selected != null && trial != null && trial.isFree
         ? _trialTerms(context, selected)
         : null;
@@ -69,6 +75,10 @@ class _PaywallDisclosure extends ConsumerWidget {
         Text(context.l10n.paywallStoreAccountNote, style: style),
         SizedBox(height: SdSpacingConstant.h6),
         Text(context.l10n.subscriptionRenewalTerms, style: style),
+        if (sellsLifetime) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h6),
+          Text(context.l10n.paywallLifetimeTerms, style: style),
+        ],
       ],
     );
   }

@@ -1,8 +1,9 @@
 import '../enums/seller_plan.dart';
 import 'plan_intro_offer.dart';
 
-/// How long one purchase lasts.
-enum BillingPeriod { monthly, yearly }
+/// How long one purchase lasts. [lifetime] is a one-time purchase that never
+/// renews.
+enum BillingPeriod { monthly, yearly, lifetime }
 
 /// One buyable product, as the store described it (plan §27).
 ///

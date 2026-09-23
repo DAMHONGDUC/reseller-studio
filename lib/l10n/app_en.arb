@@ -3442,6 +3442,10 @@
   "@legalCouldNotOpen": {
     "description": "Shown when no browser handled a legal link."
   },
+  "paywallLifetimeTerms": "Lifetime is a one-time purchase. It never renews and is never charged again.",
+  "@paywallLifetimeTerms": {
+    "description": "Fine print on the paywall when a lifetime option is on sale, so the auto-renew line is not read as covering it."
+  },
   "subscriptionRenewalTerms": "Renews automatically at the price shown until you cancel, from your store account's subscription settings.",
   "@subscriptionRenewalTerms": {
     "description": "Auto-renew disclosure on the paywall. App Store guideline 3.1.2 requires it in the binary."

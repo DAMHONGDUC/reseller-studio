@@ -13,10 +13,12 @@ final class PlanOfferingCatalogue {
   /// leaves the seller to work out for themselves.
   static const BillingPeriod recommended = BillingPeriod.yearly;
 
-  /// The order the two options are laid out in, left to right.
+  /// The order the options are laid out in, left to right. Lifetime last:
+  /// it is the largest single charge, never the one the sheet leads with.
   static const List<BillingPeriod> _display = <BillingPeriod>[
     BillingPeriod.yearly,
     BillingPeriod.monthly,
+    BillingPeriod.lifetime,
   ];
 
   /// One offering per period, in [_display] order.

@@ -4,11 +4,14 @@ import '../domain/entities/plan_intro_offer.dart';
 import '../domain/entities/plan_offering.dart';
 import '../domain/enums/seller_plan.dart';
 
-/// Translates RevenueCat packages into the two periods this app sells.
+/// Translates RevenueCat packages into the periods this app sells.
 ///
 /// A RevenueCat package may use a custom dashboard identifier even when its
 /// Store Product is monthly or yearly. The store period is therefore the
 /// fallback when the package type itself does not name the duration.
+///
+/// Lifetime is read from the package type only: a custom package holding a
+/// non-subscription product may be a consumable, not a forever purchase.
 final class RevenueCatProductMapper {
   static PlanOffering? offering(Package package) {
     final BillingPeriod? period = _period(package);
@@ -58,6 +61,8 @@ final class RevenueCatProductMapper {
         return BillingPeriod.monthly;
       case PackageType.annual:
         return BillingPeriod.yearly;
+      case PackageType.lifetime:
+        return BillingPeriod.lifetime;
       default:
         return switch (package.storeProduct.subscriptionPeriod) {
           'P1M' => BillingPeriod.monthly,
