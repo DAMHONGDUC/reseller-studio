@@ -64,9 +64,7 @@ import '../../features/workspace/presentation/screens/workspace_setup_screen/wor
 import '../../features/workspace/presentation/screens/workspaces_screen/workspaces_screen.dart';
 import '../../features/workspace/providers.dart';
 import '../constants/log_tag_constant.dart';
-import '../extensions/context_extensions.dart';
 import '../widgets/app_shell.dart';
-import '../widgets/signed_out_view.dart';
 import '../widgets/splash_screen.dart';
 import 'app_bottom_sheet_page.dart';
 import 'app_navigator_key.dart';
@@ -93,7 +91,10 @@ import 'splash_hold.dart';
 /// - signed out with the intro unfinished → [AppRoutes.onboarding]. It is
 ///   checked before login and never after it: a returning seller who signs
 ///   out must land on the login form, not be re-introduced to the product;
-/// - signed out, anywhere but an auth route → [AppRoutes.login];
+/// - signed out, anywhere at all → stay. **A guest gets the whole app**
+///   (hard rule 1, `docs/rules/GUEST_MODE.md`); the two exceptions are the
+///   splash, which has nothing left to wait for, and workspace setup, which
+///   belongs to an account;
 /// - signed in, workspace still loading → [AppRoutes.splash], for the same
 ///   reason: asking a returning seller to create a second business every time
 ///   they open the app is the most visible way to get this wrong;
@@ -151,10 +152,19 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
           return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
         }
 
-        // Owner's rule: the five tabs render before sign-in, empty. The gate
-        // moved from the route to the action — see `NavigationUtils`. What is
-        // still refused is anything that needs a workspace to mean anything.
-        return _previewRoutes.contains(location) ? null : AppRoutes.home;
+        // **A guest gets the whole app** (hard rule 1). Their records are in
+        // the local store and their business was created without asking, so
+        // there is nothing here to refuse and nothing to set up.
+        //
+        // Two routes still bounce, and both name an account rather than a
+        // record: workspace setup belongs to a seller who has just signed in,
+        // and the splash has nothing left to wait for.
+        if (location == AppRoutes.splash ||
+            location == AppRoutes.workspaceSetup) {
+          return AppRoutes.home;
+        }
+
+        return null;
       }
 
       final WorkspaceStatus workspace = ref.read(workspaceStatusProvider);
@@ -251,10 +261,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.home,
                 builder: (BuildContext context, GoRouterState state) =>
-                    AuthedTab(
-                      title: context.l10n.navHome,
-                      child: const HomeScreen(),
-                    ),
+                    const HomeScreen(),
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -271,10 +278,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.inventory,
                 builder: (BuildContext context, GoRouterState state) =>
-                    AuthedTab(
-                      title: context.l10n.navInventory,
-                      child: const InventoryScreen(),
-                    ),
+                    const InventoryScreen(),
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -337,10 +341,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.orders,
                 builder: (BuildContext context, GoRouterState state) =>
-                    AuthedTab(
-                      title: context.l10n.navOrders,
-                      child: const OrdersScreen(),
-                    ),
+                    const OrdersScreen(),
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -380,10 +381,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.analytics,
                 builder: (BuildContext context, GoRouterState state) =>
-                    AuthedTab(
-                      title: context.l10n.navAnalytics,
-                      child: const AnalyticsScreen(),
-                    ),
+                    const AnalyticsScreen(),
                 routes: <RouteBase>[
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
@@ -680,26 +678,6 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
 /// seller off either one to Home. Which of the two a signed-*out* user belongs
 /// on is decided above, by `OnboardingStatus`.
 const Set<String> _authRoutes = <String>{AppRoutes.onboarding, AppRoutes.login};
-
-/// What a signed-out visitor may sit on — the five tabs, empty, plus the gate
-/// itself (owner's rule; `CLAUDE.md` hard rule 1).
-///
-/// **Deliberately the five tab roots and nothing below them.** A detail route
-/// names a record that a signed-out visitor cannot have, and workspace setup
-/// needs an account to attach the business to; both are bounced to Home rather
-/// than rendered against nothing. Everything reachable *from* a tab is an
-/// action, and actions go through `NavigationUtils.requireSignIn`.
-const Set<String> _previewRoutes = <String>{
-  AppRoutes.login,
-  AppRoutes.home,
-  AppRoutes.inventory,
-  AppRoutes.orders,
-  AppRoutes.analytics,
-  AppRoutes.more,
-  // Settings is the one screen below a tab that works without an account:
-  // theme and language are device preferences, not business data.
-  AppRoutes.settings,
-};
 
 /// Bridges the two providers the redirect reads to go_router's
 /// `refreshListenable`.

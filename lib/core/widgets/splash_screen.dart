@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../fresh_install/app_fresh_install.dart';
+import '../local/local_providers.dart';
 import '../router/splash_hold.dart';
 
 /// What the app shows while it is not ready yet — and, while it is showing,
@@ -83,11 +84,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final AsyncValue<SdFreshInstallOutcome> check = ref.watch(
       freshInstallProvider,
     );
+    // The guest business is created here rather than in a bootstrap step: it
+    // is work a seller can be shown a splash for, and it must run *after* the
+    // wipe above (`docs/rules/GUEST_MODE.md`).
+    final AsyncValue<void> business = ref.watch(guestBusinessProvider);
 
     // Errors resolve to the app, never to an error screen: `SdFreshInstall`
     // catches its own, and a device that could not be checked is the one the
     // seller is holding.
-    if (ready == null || check.isLoading) {
+    if (ready == null || check.isLoading || business.isLoading) {
       return const SdScaffoldV3(body: SdLoadingV3Page());
     }
 

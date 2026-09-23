@@ -49,6 +49,14 @@ final class WorkspaceConstant {
     0.20,
   ];
 
+  /// What a figure is denominated in when the business behind it has not
+  /// loaded.
+  ///
+  /// The same fallback `workspaceCurrencyProvider` uses, spelled once: it is
+  /// only ever reached to *format* an amount that is itself missing, and an
+  /// em dash needs a currency about as much as it needs a font size.
+  static const String fallbackCurrency = 'USD';
+
   /// The middle of the range above, and close to what eBay and the mid-tier
   /// platforms charge — the rate a new business plans with until it says
   /// otherwise.

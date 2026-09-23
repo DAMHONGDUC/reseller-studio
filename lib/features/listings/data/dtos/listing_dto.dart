@@ -15,13 +15,26 @@ final class ListingDto {
   static Listing toEntity(
     DocumentSnapshot<Map<String, Object?>> doc, {
     required String fallbackCurrency,
+  }) => fromMap(
+    WorkspaceTable.localId(doc.id),
+    doc.data() ?? <String, Object?>{},
+    fallbackCurrency: fallbackCurrency,
+  );
+
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static Listing fromMap(
+    String id,
+    Map<String, Object?> data, {
+    required String fallbackCurrency,
   }) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
     final String currency =
         FirestoreMapper.stringOrNull(data['currency']) ?? fallbackCurrency;
 
     return Listing(
-      id: WorkspaceTable.localId(doc.id),
+      id: id,
       itemId: FirestoreMapper.stringOrNull(data['itemId']) ?? '',
       // **Rows written before marketplaces were records need no migration**:
       // the field already held the platform's id as a string, and the ids a

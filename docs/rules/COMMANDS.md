@@ -130,8 +130,17 @@ deletes other projects' caches.
 ### `gen` — the cheap one
 
 Localizations and codegen, and nothing else. It exists so `set-up` never
-becomes the reflex for a one-line change. No `build_runner` step here: this
-repo writes its Riverpod providers by hand.
+becomes the reflex for a one-line change.
+
+**There is one `build_runner` step, and it is Drift's.** Riverpod providers
+are still written by hand — that rule has not moved — but the guest database
+is generated (`docs/rules/GUEST_MODE.md` carries the exception and why it is
+safe). `gen.sh` runs it only when `build_runner` is in `pubspec.yaml`, so the
+script is the same one the sibling app uses.
+
+**Run it after a schema change, never before reading the repo.** The generated
+file is committed, so `analyze` and `test` need no build step — which is the
+clause that keeps the original objection answered.
 
 ### `analyze` — the gate
 
@@ -303,7 +312,8 @@ one CI builds. The **"Reseller Studio (dev)"** VS Code launch configuration
 passes it.
 
 Running before Firebase exists: sign-in cannot succeed, and **there is no
-bypass** (hard rule 1). The app opens on the signed-out shell. **There is no
+bypass** (hard rule 1). The app opens as a guest and the whole of it works,
+against the local store. **There is no
 fake backend to fall back on** — the switch that swapped one in is gone, and
 what fills a workspace is More → Settings → Developer → Seed demo data,
 so a dev run opens the app a new seller would see. Turn the fake business on in

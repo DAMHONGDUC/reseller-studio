@@ -1,30 +1,31 @@
 {
   "name": "Reseller Studio",
-  "tagline": "The operating system for resellers: source, list, sell, ship, profit. Your business records are yours; an account is required and nothing is sold or used for advertising.",
+  "tagline": "The operating system for resellers: source, list, sell, ship, profit. Your business records are yours; you can use the app without an account, and nothing is sold or used for advertising.",
   "icon": "📦",
   "accent": "#3D50DF",
   "platforms": [
     "iOS"
   ],
   "effectiveDate": "2026-08-31",
-  "lastUpdated": "2026-08-31",
+  "lastUpdated": "2026-09-22",
   "contactEmail": "ducdam.dev@gmail.com",
   "controller": "Dam Hong Duc, Ho Chi Minh City, Viet Nam",
   "url": "https://damhongduc.github.io/personal_work_space",
   "storeLinks": {},
   "overview": [
     "This Privacy Policy describes how {{app}} handles information when you use the app. It applies to every version of {{app}} distributed by {{publisher}} on the app stores listed above.",
-    "{{app}} is a business tool for resellers. It keeps the record of what you bought, what you listed, what you sold and what it cost you, and it works out the profit from those facts. Because that record follows you across devices and is shared with the team you invite, {{app}} is a synced product: an account is required, and your business records are stored on our backend rather than only on your phone.",
+    "{{app}} is a business tool for resellers. It keeps the record of what you bought, what you listed, what you sold and what it cost you, and it works out the profit from those facts. You can use it without an account, and while you do, those records stay on your phone and are sent nowhere. Signing in moves them to our backend, which is what lets them follow you across devices and reach a team you invite.",
     "The data controller for {{app}} is Dam Hong Duc, Ho Chi Minh City, Viet Nam, reachable at {{email}}.",
     "If anything here is unclear, email {{email}} before you continue using the app."
   ],
   "summary": [
-    "An account is required. There is no guest mode, and the only ways in are Sign in with Apple and Google Sign-In — we never see or store a password.",
-    "Your inventory, purchases, orders, expenses and photos are stored in our Firebase backend so they sync across your devices and reach the team you invite. They are encrypted in transit and at rest, but this is not end-to-end encryption.",
+    "You can use the app without an account. Until you sign in, your records are stored only on your phone and we never receive them — which also means deleting the app deletes them. Signing in uploads them once to your account; the only ways in are Sign in with Apple and Google Sign-In, and we never see or store a password.",
+    "Once you have signed in, your inventory, purchases, orders, expenses and photos are stored in our Firebase backend so they sync across your devices and reach the team you invite. They are encrypted in transit and at rest, but this is not end-to-end encryption.",
+    "Signing out empties this device. Your records stay in your account; the phone is left blank, so handing it to somebody else does not hand them your business.",
     "Everything inside a business is visible to the people you invite to that business. That is what a shared workspace is for, and removing someone removes their access.",
     "We never connect to your marketplace accounts. There is no eBay, Depop or Vinted login in this app, so no marketplace password or token ever reaches us.",
     "We do not track you. No ad network, no attribution SDK, no advertising identifier, nothing shared with a data broker. We ask for no location, no contacts and no health data.",
-    "You can export your records as CSV at any time, and delete a business or your whole account from inside the app."
+    "Exporting your records as CSV is part of Premium. You can delete a business or your whole account from inside the app at any time, on any plan."
   ],
   "collects": [
     {
@@ -50,7 +51,7 @@
         "Your own categories, storage locations, marketplaces and their fee rates, and carriers",
         "Any free-text note you type on a record"
       ],
-      "purpose": "This is what the app is for. Records are stored in our backend under the business they belong to, so they survive a lost phone, sync to your other devices and reach the team you invite. Profit, margin and ROI are never stored — they are worked out from these facts each time you look at them.",
+      "purpose": "This is what the app is for. Until you sign in these stay on your phone and we never receive them. Once you have an account they are stored in our backend under the business they belong to, so they survive a lost phone, sync to your other devices and reach the team you invite. Profit, margin and ROI are never stored — they are worked out from these facts each time you look at them.",
       "linked": true
     },
     {
@@ -185,17 +186,20 @@
   "sections": [
     {
       "id": "account-required",
-      "title": "An account is required",
+      "title": "Using the app without an account",
       "body": [
-        "Unlike a notes app, {{app}} cannot be used anonymously. A reseller's records are a business record shared across devices and with a team, so every record belongs to an account and a business from the moment it is created.",
+        "You do not need an account to use {{app}}. Open it and start recording: the whole app works, and everything you enter is written to a database on your phone and **sent nowhere**. We do not receive it, we cannot read it, and no account exists for it to belong to.",
+        "**While you have no account, this phone holds the only copy.** Deleting the app deletes your records, and neither we nor anyone else can restore them — there is nothing on our side to restore from. The app says so on its home screen rather than leaving you to find out.",
+        "When you decide to sign in, the records already on your phone are uploaded **once** into your account, and the copy on the phone is deleted as each record is confirmed. If your account already has more than one business, the app asks which one they should join rather than choosing for you.",
         "There are exactly two ways in: **Sign in with Apple** and **Google Sign-In**. There is no email-and-password form, no sign-up form and no password reset, which means this app stores no password and there is none for anyone to steal from us.",
-        "Before you sign in, the app shows an introduction and a sign-in prompt and nothing else. No business data is readable — not because a screen is hiding it, but because our security rules refuse to serve it."
+        "**Signing out empties the device.** Your records stay in your account and the phone is left blank, so a shared or handed-on phone does not carry your business with it."
       ]
     },
     {
       "id": "where-data-lives",
       "title": "Where your records live",
       "body": [
+        "**Before you sign in, they live on your phone and nowhere else** — in a database inside the app's own storage, which no other app can read and which goes when the app goes. Everything below describes what happens after you have an account.",
         "Your business records are stored in **Cloud Firestore** and your photos and receipts in **Firebase Storage**, both operated by Google on our behalf. They are encrypted in transit and encrypted at rest by Google.",
         "This is **not end-to-end encryption**, and we will not tell you it is. Records are stored as ordinary documents, which is what makes search, reports, tax summaries and team access possible. Our backend — and therefore Google's infrastructure, which hosts it — is technically able to read them. We do not read your records, and nothing in the product is built to.",
         "Every record lives under the business it belongs to, and our security rules decide access from your membership of that business alone. Nobody can promote themselves; membership is written by our backend, never by the app.",
@@ -263,7 +267,7 @@
       "id": "export",
       "title": "Exporting your data",
       "body": [
-        "From Reports you can export your sales, inventory, expenses or a year's tax summary as **CSV** — rows an accountant or a spreadsheet can sum, not a picture of your numbers.",
+        "From Reports you can export your sales, inventory, expenses or a year's tax summary as **CSV** — rows an accountant or a spreadsheet can sum, not a picture of your numbers. Exporting is part of Premium.",
         "The file is written to the app's temporary storage and handed straight to the iOS share sheet, so it goes only where you send it. It is never uploaded to us, and we never see it.",
         "If you would rather have a full copy of everything we hold, email {{email}} and we will send it."
       ]
@@ -286,6 +290,7 @@
       "id": "retention",
       "title": "How long we keep things",
       "body": [
+        "**Records you made without an account are kept only by your phone.** They have no retention period on our side because they never reach us, and they are gone the moment the app is deleted.",
         "Your records are kept for as long as your account exists, because that is what a business history is for — a seller looks back at what a source returned two years ago.",
         "Deleting a record inside the app removes it from view immediately. Records that other records point at — an item, a source, a purchase, a category, a location — are marked deleted rather than erased outright, so that deleting a source cannot silently destroy the purchase history that depends on it. They go for good when the business or the account is deleted.",
         "Diagnostics and analytics are retained on our providers' standard schedules, which are measured in months rather than years."

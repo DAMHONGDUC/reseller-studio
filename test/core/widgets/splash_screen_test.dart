@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/fresh_install/app_fresh_install.dart';
+import 'package:reseller_studio/core/local/local_database.dart';
+import 'package:reseller_studio/core/local/local_providers.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:reseller_studio/core/widgets/splash_screen.dart';
@@ -30,9 +33,17 @@ Future<void> _pumpSplash(
   WidgetTester tester,
   Future<SdFreshInstallOutcome> Function(Ref ref) check, {
   Widget? child,
+  LocalDatabase? db,
 }) => tester.pumpWidget(
   ProviderScope(
-    overrides: <Override>[freshInstallProvider.overrideWith(check)],
+    overrides: <Override>[
+      freshInstallProvider.overrideWith(check),
+      // The splash also creates the guest business now
+      // (`docs/rules/GUEST_MODE.md`), so it needs a store. In memory: the
+      // real provider opens a file through `path_provider`, and this test is
+      // about the ordering rather than the database.
+      if (db != null) localDatabaseProvider.overrideWithValue(db),
+    ],
     child: AppScreenUtil(
       builder: (BuildContext context) => MaterialApp(
         theme: AppTheme.light,
@@ -49,6 +60,12 @@ Future<SdFreshInstallOutcome> _done(Ref ref) async =>
     SdFreshInstallOutcome.normalLaunch;
 
 void main() {
+  late LocalDatabase db;
+
+  setUp(() => db = LocalDatabase.forTesting(NativeDatabase.memory()));
+
+  tearDown(() => db.close());
+
   testWidgets('holds the app back while the wipe runs', (
     WidgetTester tester,
   ) async {
@@ -62,7 +79,7 @@ void main() {
   testWidgets('lets the app through once the wipe has finished', (
     WidgetTester tester,
   ) async {
-    await _pumpSplash(tester, _done, child: const _Marker());
+    await _pumpSplash(tester, _done, child: const _Marker(), db: db);
     await tester.pump();
     await tester.pump();
 
@@ -76,7 +93,7 @@ void main() {
     // `/splash` is already inside the tree this screen gates, so there the
     // check has long finished and the screen is covering an unresolved auth
     // state instead.
-    await _pumpSplash(tester, _done);
+    await _pumpSplash(tester, _done, db: db);
     await tester.pump();
     await tester.pump();
 

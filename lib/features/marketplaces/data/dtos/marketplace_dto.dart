@@ -7,11 +7,19 @@ import '../../domain/entities/marketplace.dart';
 
 /// How a [Marketplace] is stored.
 final class MarketplaceDto {
-  static Marketplace toEntity(DocumentSnapshot<Map<String, Object?>> doc) {
-    final Map<String, Object?> data = doc.data() ?? <String, Object?>{};
+  static Marketplace toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
+      fromMap(
+        WorkspaceTable.localId(doc.id),
+        doc.data() ?? <String, Object?>{},
+      );
 
+  /// The map boundary both stores share (`docs/rules/GUEST_MODE.md`).
+  ///
+  /// The guest store keeps this DTO's own map, so one mapping serves
+  /// Firestore and Drift — which is what makes the drain a copy.
+  static Marketplace fromMap(String id, Map<String, Object?> data) {
     return Marketplace(
-      id: WorkspaceTable.localId(doc.id),
+      id: id,
       name: FirestoreMapper.stringOrNull(data['name']) ?? '',
       createdAt: FirestoreMapper.dateOr(data['createdAt'], DateTime.now()),
       // Stored by name, never by index: a reordered enum would otherwise

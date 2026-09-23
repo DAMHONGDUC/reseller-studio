@@ -3,11 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/account/account_kind.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/local/local_providers.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
-import '../../../../../core/router/navigation_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
@@ -40,6 +41,7 @@ part 'home_screen_all_clear.dart';
 part 'home_screen_attention_row.dart';
 part 'home_screen_flow_overview.dart';
 part 'home_screen_getting_started.dart';
+part 'home_screen_guest_banner.dart';
 part 'home_screen_needs_attention.dart';
 part 'home_screen_performance_block.dart';
 part 'home_screen_premium_banner.dart';
@@ -117,11 +119,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // Global search is reached from Home because Home is where a
             // seller starts (plan §5's global entry points). It sits outside
             // the shell so it can send them into any tab.
-            onPressed: () {
-              if (!NavigationUtils.requireSignIn(context, ref)) return;
-
-              context.push(AppRoutes.search);
-            },
+            // No account needed: search reads the store this seller already
+            // has, whichever one that is.
+            onPressed: () => context.push(AppRoutes.search),
           ),
           SizedBox(width: SdSpacingConstant.w8),
         ],
@@ -131,6 +131,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
+          // Above the upsell on purpose: one offers more, the other says what
+          // is about to be lost.
+          const _HomeGuestBanner(),
+          if (_HomeGuestBanner.shows(ref))
+            SizedBox(height: SdContentPaddingV3.listItemGap),
           const _HomePremiumBanner(),
           if (_HomePremiumBanner.shows(ref))
             SizedBox(height: SdContentPaddingV3.listItemGap),

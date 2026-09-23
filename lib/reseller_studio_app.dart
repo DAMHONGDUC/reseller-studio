@@ -19,6 +19,7 @@ import 'features/app_config/presentation/widgets/force_update_gate.dart';
 import 'features/app_config/providers.dart';
 import 'features/notifications/providers.dart';
 import 'features/settings/presentation/controllers/theme_mode_controller.dart';
+import 'features/workspace/presentation/widgets/guest_drain_gate.dart';
 import 'l10n/gen/app_localizations.dart';
 
 /// The app widget.
@@ -110,7 +111,15 @@ class ResellerStudioApp extends ConsumerWidget {
                     // run is about the binary, so the sheet is raised over
                     // whatever the seller was looking at.
                     child: ForceUpdateGate(
-                      child: child ?? const SizedBox.shrink(),
+                      // Innermost of the gates, and above every route rather
+                      // than inside the shell: a seller who signs in with
+                      // records on the device may land on workspace setup
+                      // before the shell exists, and that is exactly the
+                      // moment the drain has to be able to fire
+                      // (`docs/rules/GUEST_MODE.md`).
+                      child: GuestDrainGate(
+                        child: child ?? const SizedBox.shrink(),
+                      ),
                     ),
                   ),
                 ),

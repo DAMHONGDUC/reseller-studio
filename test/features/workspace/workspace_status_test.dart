@@ -1,6 +1,9 @@
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/local/local_database.dart';
+import 'package:reseller_studio/core/local/local_providers.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
 import 'package:reseller_studio/features/workspace/domain/entities/user_profile.dart';
 import 'package:reseller_studio/features/workspace/domain/repositories/workspace_repository.dart';
@@ -21,8 +24,18 @@ UserProfile _profile({List<String> workspaceIds = const <String>['ws-1']}) =>
     );
 
 WorkspaceStatus _statusFor(AsyncValue<UserProfile?> profile) {
+  final LocalDatabase db = LocalDatabase.forTesting(NativeDatabase.memory());
+
+  addTearDown(db.close);
+
+  // The status now asks the guest store whether anything is owed — records on
+  // the device outrank the setup form (`docs/rules/GUEST_MODE.md`). An empty
+  // one answers zero, which is the state every case below is about.
   final ProviderContainer container = ProviderContainer(
-    overrides: <Override>[userProfileProvider.overrideWithValue(profile)],
+    overrides: <Override>[
+      userProfileProvider.overrideWithValue(profile),
+      localDatabaseProvider.overrideWithValue(db),
+    ],
   );
 
   addTearDown(container.dispose);
@@ -53,15 +66,18 @@ void main() {
     // previous value while the real profile loads. Reading it as "no
     // workspace" sent every returning seller to the create-business form.
     String? uid;
+    final LocalDatabase db = LocalDatabase.forTesting(NativeDatabase.memory());
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         currentUidProvider.overrideWith((Ref ref) => uid),
         workspaceRepositoryProvider.overrideWithValue(
           _SilentWorkspaceRepository(),
         ),
+        localDatabaseProvider.overrideWithValue(db),
       ],
     );
 
+    addTearDown(db.close);
     addTearDown(container.dispose);
 
     // Listened to, so the previous value is retained across the rebuild —

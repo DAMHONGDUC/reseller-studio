@@ -10,6 +10,11 @@ dependencies:
   cloud_firestore: ^6.6.0
   cloud_functions: ^6.3.6
   cupertino_icons: ^1.0.8
+  # The guest store. Records written before anyone signs in live here and
+  # nowhere else, until sign-in drains them — see docs/rules/GUEST_MODE.md.
+  # drift_flutter carries the native sqlite3 and the app-private path.
+  drift: ^2.28.2
+  drift_flutter: ^0.2.7
   firebase_analytics: ^12.4.5
   firebase_auth: ^6.5.4
   firebase_core: ^4.11.0
@@ -34,7 +39,11 @@ dependencies:
   logger: ^2.5.0
   material_symbols_icons: ^4.2960.0
   mobile_scanner: ^7.1.4
+  # Where a guest's photos are copied to. image_picker hands back a temporary
+  # path the OS may delete, so the file has to be moved somewhere app-private
+  # before the record points at it (docs/rules/GUEST_MODE.md).
   package_info_plus: ^10.2.1
+  path_provider: ^2.1.5
   purchases_flutter: ^10.9.0
   share_plus: ^13.2.0
   shared_preferences: ^2.5.5
@@ -51,6 +60,10 @@ dependencies:
   uuid: ^4.5.3
 
 dev_dependencies:
+  # The repo's only codegen, and its output is committed so `melos run
+  # analyze` still needs no build step (docs/rules/GUEST_MODE.md).
+  build_runner: ^2.10.0
+  drift_dev: ^2.28.2
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter

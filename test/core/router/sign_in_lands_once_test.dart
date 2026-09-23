@@ -25,7 +25,7 @@ import '../../support/pump_app.dart';
 
 /// **Signing in is one move to Home, not three.**
 ///
-/// The signed-out shell renders at `/home` (hard rule 1), so signing in leaves
+/// A guest renders at `/home` (hard rule 1), so signing in leaves
 /// the shell for the splash and comes back to it — and go_router gives
 /// `StatefulShellRoute` one `GlobalKey` for the life of the router. Left to
 /// animate, the outgoing shell was still mounted when the next one was built,
@@ -135,7 +135,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await pumpApp(tester);
-    // Past the launch's own hold, to the signed-out shell hard rule 1 renders.
+    // Past the launch's own hold, to the guest shell hard rule 1 renders.
     await tester.pump(SplashHoldController.minimum);
     await settle(tester);
 

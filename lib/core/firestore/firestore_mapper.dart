@@ -44,7 +44,11 @@ final class FirestoreMapper {
         );
       }
 
-      return parsed;
+      // **Local, to match `Timestamp.toDate()`.** An ISO string parses to UTC
+      // when it carries a zone, and a date that rendered one way from
+      // Firestore and another from the local store is a bug that only shows
+      // up east of Greenwich.
+      return parsed?.toLocal();
     }
 
     SdLogger.warning(

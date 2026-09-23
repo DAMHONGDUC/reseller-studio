@@ -4,6 +4,15 @@ Authority for what Firestore stores and what each field means. Product behavior
 belongs to `SELLER_OS_FINAL_MASTER_PLAN.md`; access belongs to
 `firestore.rules`.
 
+**Before anyone signs in there is a second store, and it holds these same
+records.** A guest's rows live in a local Drift database and are drained into
+Firestore at sign-in (hard rule 1). It is deliberately not a second data
+model: every row is the **same DTO map** this file describes, JSON-encoded,
+so a field means here exactly what it means there and a field added below
+needs nothing added to the local schema. What the local store keys on, how
+the drain restamps a row, and why there are no sync columns are all in
+`docs/rules/GUEST_MODE.md`.
+
 ## Layout
 
 ```text
@@ -246,10 +255,10 @@ link must be fixable without shipping a release — which is the one thing a
 forced-update prompt cannot ask for. Null leaves the sheet without a button
 rather than drawing one that does nothing.
 
-**The UI is a bottom sheet nothing dismisses, not a route.** `ForceUpdateGate`
-wraps the whole app and raises it over whatever is on screen; there is no
-`/update-required` path, no redirect and no back stack to unwind when the
-config is corrected. `docs/rules/DECISIONS.md` § The forced update is a sheet
+**The UI is a bottom sheet nothing dismisses, and it is not a route at all.**
+`ForceUpdateGate` wraps the whole app and draws it over whatever is on screen;
+there is no `/update-required` path, no redirect, no modal route and no back
+stack to unwind when the config is corrected. `docs/rules/DECISIONS.md` § The forced update is a sheet
 carries why.
 
 **A missing document, a missing field, a mistyped value or a failed read all

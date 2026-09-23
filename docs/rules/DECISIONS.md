@@ -388,6 +388,18 @@ mid-form states alike without any of them knowing.
 The gate is what closes it too: a build number typed one digit too high is
 corrected in the console, and the seller is released without a release.
 
+**And it is drawn, never pushed.** The first build of the sheet used
+`showSdBottomSheetV3`, and a modal sheet is a pageless route hanging off the
+page route below it — so the block raised over the splash went away with the
+splash on the very first redirect, and nothing brought it back because the
+config had not changed. `ForceUpdateGate` renders `ForceUpdateBlock` as its
+own child instead: the barrier, the bottom alignment and the entry animation
+sit in the tree the gate owns, where no navigation can reach them, and the
+block goes up and comes down from the provider alone. That is also why
+`SdBottomSheetExitScopeV3` is public — a blocked sheet **is** the app's state
+rather than something shown over it, so a route is not the only place one can
+be presented from.
+
 ## Materials a seller turns into stock are a purchase, not an expense category
 
 Owner's decision, taken when the app was walked through as a handmade-goods
@@ -507,7 +519,7 @@ than of the app — it has a look, so it belongs to a generation.
 
 Explains the `NoTransitionPage` on `AppRoutes.splash` in `app_router.dart`.
 
-The signed-out shell renders at `/home` (hard rule 1), so signing in *leaves*
+A guest renders at `/home` (hard rule 1), so signing in *leaves*
 the tab shell for the splash and comes back to it a moment later. go_router
 gives `StatefulShellRoute` **one `GlobalKey` for the life of the router** — the
 same key on every `StatefulNavigationShell` it builds.
@@ -531,3 +543,49 @@ overlap impossible — which is exactly why the transition fix has to stand on
 its own. Shorten the hold one day and the error comes back;
 `test/core/router/sign_in_lands_once_test.dart` pins the transition with the
 hold overridden away, so it cannot.
+
+## Why the app stopped requiring an account, and took a local database with it
+
+Owner's call. Explains the current hard rule 1 in the root `CLAUDE.md`, the
+"Two stores, one live at a time" entry under Tech stack, and all of
+`docs/rules/GUEST_MODE.md`. It is recorded here because two long-standing
+rules were reversed at once, and a reversal read as an accident gets quietly
+undone.
+
+**What the old rules said.** Login was mandatory and there was no guest mode
+(plan principle 1); there was no local database, on the stated ground that a
+seller's inventory is "inherently a synced business record shared with a
+team", unlike the sibling app's health data which must survive with no
+account.
+
+**Why that gave way.** The second half of that argument was doing work the
+first half could not support. A business record *ends up* shared, but it does
+not start that way — a seller evaluating the app has nothing to share and
+nobody to share it with, and the sign-in wall stood between them and the one
+thing that would tell them whether the app is worth an account. The app's own
+core principle is that the seller should be told what needs attention today
+and then be able to act fast; a login form is neither.
+
+**Why not anonymous Firebase auth**, which was the cheaper route and was
+considered first. It would have kept every repository, every rule and the
+whole data model untouched, and sign-in would have been
+`linkWithCredential` on the same uid — no migration at all. It was rejected
+because it puts a guest's records on the server, and the owner's requirement
+is that nothing leaves the device until there is an account to attach it to.
+The cost of that decision is a Drift schema and a second implementation of
+every business repository, paid knowingly.
+
+**Why the engine is still small.** The sibling app's data-flow spec carries
+revision counters, tombstones, a write-through watcher, two passes and a
+cursor per collection. None of that ports, because it exists to keep two
+stores live forever. Here one store *replaces* the other: the guest store
+never pulls, never merges, and is drained and dropped at sign-in. Porting
+those columns would be building a sync engine for a problem this shape does
+not have — and `docs/rules/GUEST_MODE.md` says so where the next session will
+look.
+
+**What was accepted, not solved.** Deleting the app deletes a guest's
+business. There is no recovery and the owner chose that over putting the
+records on a server. It is the reason the sign-in prompt and the local export
+in `GUEST_MODE.md` are not optional: the architecture is allowed to make that
+trade only if the product says so out loud.

@@ -3,6 +3,7 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
+import '../../../../core/local/local_providers.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../notifications/providers.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
@@ -103,6 +104,12 @@ class AuthController extends Notifier<AuthFormState> {
       await ref.read(authRepositoryProvider).signOut();
       SdCrashReporter.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
+
+      // **After the session ends, never before.** The wipe is what makes the
+      // app blank rather than showing the next person the last one's stock
+      // (`docs/rules/GUEST_MODE.md`), and running it first would empty a
+      // device that then failed to sign out.
+      await ref.read(guestResetServiceProvider).run();
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.logout,

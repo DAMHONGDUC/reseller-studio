@@ -37,9 +37,9 @@ class PushController extends Notifier<void> {
 
     ref.onDispose(_cancel);
 
-    // No Firebase is a build with no backend at all, and no uid is a
-    // signed-out shell — both render, and neither has an account to register
-    // a device against.
+    // No Firebase is a build with no backend at all, and no uid is a guest —
+    // both render the whole app, and neither has an account to register a
+    // device against.
     if (!ready || uid == null) return;
 
     unawaited(_start());

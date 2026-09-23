@@ -1,12 +1,13 @@
 // `Override` is not in the main entrypoint's `show` list; `misc.dart` is
 // where hooks_riverpod exports it.
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/account/account_kind.dart';
 import 'package:reseller_studio/core/providers/repository_providers.dart';
-import 'package:reseller_studio/core/storage/local_file_uploader.dart';
 import 'package:reseller_studio/features/workspace/domain/entities/workspace.dart';
 import 'package:reseller_studio/features/workspace/providers.dart';
 
 import 'in_memory_repositories.dart';
+import 'passthrough_file_uploader.dart';
 
 /// Points every repository at an in-memory store, for tests.
 ///
@@ -77,7 +78,7 @@ final class FakeOverrides {
       // No upload without a Firebase project behind it: a real one would fail
       // on the first byte.
       fileUploaderProvider: fileUploaderProvider.overrideWithValue(
-        const LocalFileUploader(),
+        const PassthroughFileUploader(),
       ),
       // Team management needs a live backend, and the screen draws no add
       // button rather than offering one that cannot work.
@@ -87,6 +88,13 @@ final class FakeOverrides {
         store.dataset.workspace.id,
       ),
       hasWorkspaceProvider: hasWorkspaceProvider.overrideWithValue(true),
+      // **A widget test is a signed-in seller with a fake backend.** Without
+      // this the account kind resolves to guest, every repository reaches for
+      // the real Drift database, and the first test to pump a screen opens a
+      // file on a device that is not there.
+      accountKindProvider: accountKindProvider.overrideWithValue(
+        AccountKind.linked,
+      ),
       workspaceStatusProvider: workspaceStatusProvider.overrideWithValue(
         WorkspaceStatus.ready,
       ),

@@ -93,6 +93,7 @@ in the left.
 | a screen's app bar, status bar, scrolling list, empty state or search mode | `docs/rules/SCREENS.md` |
 | a layout that has to survive a window wider than a phone — the shell, a body's width, a list's column count | `docs/rules/RESPONSIVE.md` |
 | `firestore.rules`, `firestore.indexes.json`, `functions/`, or a `data/` method that queries or calls out | `docs/rules/BACKEND.md` |
+| auth, the router's redirect, a `data/repositories/` implementation, or the local database | `docs/rules/GUEST_MODE.md` |
 | a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
 | `env_assets/`, `packages/system_design/tool/prepare-env.sh`, `packages/system_design/tool/build-ipa.sh`, `ios/fastlane/`, the release workflow | `docs/rules/RELEASE.md` |
 | running, building, generating or deploying | `docs/rules/COMMANDS.md` |
@@ -140,16 +141,20 @@ rate is the bug this rule exists to stop.
 - **State**: Riverpod (`hooks_riverpod` 3.x), hand-written providers. **No
   `riverpod_generator`** — the sibling app (BaroEase) does it this way, and a
   codegen step that must run before the analyzer is honest is a cost paid on
-  every provider edit.
+  every provider edit. **Drift is the one exception**, and its generated files
+  are committed so `melos run analyze` still needs no build step — see
+  `docs/rules/GUEST_MODE.md`.
 - **Navigation**: `go_router`, one `StatefulShellRoute.indexedStack` for the
   five tabs. Every path lives in `lib/core/router/app_routes.dart`.
 - **Backend**: Firebase — Firestore, Storage, Cloud Functions (TypeScript,
   Node 20), Auth, FCM, Crashlytics, Analytics.
-- **No local database.** Firestore's own offline persistence is the offline
-  story. This is the deliberate difference from BaroEase, which is local-first
-  with Drift: health data must survive with no account, whereas a seller's
-  inventory is inherently a synced business record shared with a team. Do not
-  add Drift here.
+- **Two stores, one live at a time.** A signed-out seller's records live in a
+  local **Drift** database; a signed-in seller's live in Firestore, whose own
+  offline persistence is the local half. Sign-in drains the first into the
+  second and drops it — **Drift is never a cache in front of Firestore**, which
+  is the one way this becomes a sync engine nobody asked for. This reverses
+  the old "No local database" entry; `docs/rules/GUEST_MODE.md` carries the
+  flow and `docs/rules/DECISIONS.md` the reason.
 - **Design system**: `packages/system_design`, a **submodule**, on its **v3**
   generation. See `docs/rules/DESIGN_SYSTEM.md`.
 - **Charts**: `fl_chart`. **Scanning**: `mobile_scanner`. **Photos**:
@@ -271,49 +276,33 @@ behind it.
 
 ## Hard rules
 
-1. **Login is mandatory to _use_ the app. There is no guest mode.** Plan
-   principle 1. While auth state is still resolving the app shows the splash,
-   never the login form: flashing a login screen at a returning user is the
-   most common way this gets it wrong.
+1. **The app works with no account; an account is what makes the records
+   durable and shareable.** Owner's rule, and it **reverses this rule's old
+   form** — "login is mandatory to use the app, there is no guest mode" —
+   along with the signed-out shell that softened it.
+   `docs/rules/GUEST_MODE.md` carries the whole flow; what stays here is the
+   gate itself.
+   - **A signed-out seller gets the whole app, not a reduced one.** Their
+     records live in a local Drift database and go nowhere. Sign-in drains
+     that store into the account and drops it; sign-out wipes the device.
+   - **`AuthedTab`, `SignedOutView`, `_previewRoutes` and
+     `NavigationUtils.requireSignIn` are gone**, and with them the idea that a
+     tab can be too signed-out to render. One guard replaces them, over the
+     handful of things that genuinely need a server — team, plan limits, the
+     audit log, another device. **Never write `if (isGuest)` at a call site**:
+     the old rule's point survives its reversal intact, and no screen decides
+     for itself.
+   - **`firestore.rules` is unchanged and is still the real boundary.** Guest
+     mode is a local store, never a permission, and nothing about it reaches
+     the server.
+   - While auth state is still resolving the app shows the splash, never the
+     login form: flashing a login screen at a returning seller is the most
+     common way this gets it wrong.
 
-   **The shell renders before sign-in, and four of the five tabs show one
-   shared view** — owner's rule, and the one place this hard rule has been
-   rewritten rather than extended:
-   - **Home, Inventory, Orders and Analytics are wrapped in `AuthedTab`** and
-     show `SignedOutView` — a single centred sign-in prompt. **Never let one
-     of them render its own empty state instead.** "You have no orders" is a
-     claim about the seller's business; the truth is that nobody has said
-     whose business to show. Same idea as hard rule 5, one level up.
-   - **More is deliberately not wrapped**, and signed out it lists **Settings
-     alone** — every other destination is a view onto a business that has not
-     been named. Settings is in `_previewRoutes` because theme and language
-     belong to the device, not to an account.
-   - **`NavigationUtils.requireSignIn` is a backstop, not the gate.** Nothing
-     reaches it today: every screen with a create action is behind `AuthedTab`
-     or outside `_previewRoutes`, which
-     `test/core/router/signed_out_shell_test.dart` proves. It stays because
-     the day a tab is unwrapped or a signed-out action is added, one guard is
-     what stops that becoming a hole. **Never write `if (isSignedIn)` at a
-     call site** — the old rule's point holds: no screen decides for itself.
-   - **The router refuses anything that names a record.** A detail route,
-     search and workspace setup all need an account, so a signed-out visitor
-     is bounced to Home.
-   - **No business data is readable, and that is enforced below the UI.**
-     `WorkspaceGuard` keeps every business stream empty without a workspace,
-     so nothing depends on a widget having remembered to hide something.
-   - **`firestore.rules` is unchanged and is still the real boundary.** The
-     signed-out shell is a UI state, never a permission.
-
-   `test/core/router/signed_out_shell_test.dart` pins which tabs are wrapped
-   and what More offers.
-
-   `test/core/router/onboarding_precedes_login_test.dart` pins the order.
-
-   **One screen comes before the gate: the intro flow.** Owner's rule.
-   `/onboarding` runs once per install and then hands over to `/login` — it
-   describes the product and reads nothing, so it is not a way in and does not
-   soften this rule. Three things keep it that way, and a change to any of
-   them is a change to the gate:
+   **The intro flow still comes first.** Owner's rule. `/onboarding` runs once
+   per install and then hands over — it describes the product and reads
+   nothing. Three things keep it that way, and a change to any of them is a
+   change to the gate:
    - it is only ever shown to someone **not signed in**, so a returning seller
      is never re-introduced to a product they already pay for;
    - it navigates nowhere itself — finishing flips
@@ -329,23 +318,22 @@ behind it.
    to "not seen" would flash the intro on every cold start.
    `test/core/router/onboarding_precedes_login_test.dart` pins the order.
 
-   **The development bypass is gone, and nothing replaces it.** It entered
-   the app as a fake signed-in user because the login screen was otherwise a
-   dead end before Firebase existed. The five tabs now render empty without an
-   account, so that reason expired and the flag went with it — `bypassAuth`,
+   **The development bypass is gone, and nothing replaces it.** It entered the
+   app as a fake signed-in user because the login screen was otherwise a dead
+   end before Firebase existed. A guest now puts real rows on screen with no
+   account at all, so the reason expired twice over — `bypassAuth`,
    `bypassUid`, `BYPASS_AUTH` and the `AUTH OFF` banner are all deleted. **Do
-   not reintroduce one.** To put rows on screen, sign in and seed a workspace
-   from More → Settings → Developer.
+   not reintroduce one.**
 
    **A build with no Firebase resolves to signed OUT, never signed in.**
    `firebaseReadyProvider` is checked before anything touches
    `FirebaseAuth.instance`, which throws `[core/no-app]` when
    `Firebase.initializeApp` has not run — and `AppBootstrap` skips that when
    the build carries no config. Without the guard the first read of auth state
-   takes the app down before its first frame; with it, an unconfigured build is
-   simply a signed-out one. `test/core/config/dev_flags_test.dart` holds both
-   halves: no fake uid anywhere, and no path that answers "signed in" without
-   an account.
+   takes the app down before its first frame; with it, an unconfigured build
+   is a guest one and the app still works.
+   `test/core/config/dev_flags_test.dart` holds both halves: no fake uid
+   anywhere, and no path that answers "signed in" without an account.
 
    **There are exactly two ways in: Sign in with Apple and Google Sign-In.**
    Owner's rule, and it narrows plan §26. There is **no email/password**, no
@@ -359,9 +347,10 @@ behind it.
      Shipping Google alone is a review rejection.
    - **Neither works until the owner configures it** — an OAuth client for
      Google, a Services ID and key for Apple. Until then the buttons are the
-     only way in and no account can be created; the app opens on the
-     signed-out shell. See `RELEASE_ACTIONS.md`.
-   - **Both marks are `SimpleIcons` glyphs, passed as `SdButtonV3.icon`** —
+     only way in and no account can be created; the app opens as a guest and
+     works. See `RELEASE_ACTIONS.md`.
+   - **Both marks are `SimpleIcons` glyphs, passed as
+     `SdVendorButtonV3.icon`** —
      owner's rule, restated after Google's own SVG was wired in and taken back
      out. A font cannot fail to load, and that is the point: the buttons once
      drew vendor SVGs from `assets/brand/`, Apple's file has never existed,
@@ -373,9 +362,11 @@ behind it.
      both render and nothing throws.
      **A glyph is a redrawn trademark and does not pass Beta App Review**, so
      the vendors' own artwork goes back before an external build — both at
-     once. `RELEASE_ACTIONS.md` blocker 5 holds both links, and
-     `SdButtonV3.leading` is the slot that takes them.
-   - **Both buttons wear `SdButtonVariantV3.vendor`, never `primary`.** Apple
+     once. `RELEASE_ACTIONS.md` blocker 9 holds both links, and
+     `SdVendorButtonV3.leading` is the slot that takes them — the same square
+     the glyph occupies, so the swap moves no layout.
+   - **Both buttons are `SdVendorButtonV3`, which wears
+     `SdButtonVariantV3.vendor` and never `primary`.** Apple
      allows its sign-in button in black, white, or white with an outline and
      nothing else, so the app's indigo was a rejection sitting on the first
      screen a reviewer opens. The variant's colours are literal black and

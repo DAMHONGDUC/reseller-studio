@@ -10,8 +10,10 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../core/account/account_kind.dart';
 import '../../core/firestore/workspace_collections.dart';
 import '../../core/firestore/workspace_context.dart';
+import '../../core/local/local_providers.dart';
 import '../auth/providers.dart';
 import '../listings/domain/enums/listing_status.dart';
 import '../pricing/domain/services/profit_calculator.dart';
@@ -108,6 +110,13 @@ final liveWorkspaceProvider = StreamProvider.family<Workspace?, String>(
 final Provider<Workspace?> currentWorkspaceProvider = Provider<Workspace?>((
   Ref ref,
 ) {
+  // A guest's business is the local one, and there is exactly one of it —
+  // no pointer to resolve and nothing to switch between
+  // (`docs/rules/GUEST_MODE.md`).
+  if (ref.watch(accountKindProvider) == AccountKind.guest) {
+    return ref.watch(guestWorkspaceProvider).value;
+  }
+
   final String? id = ref.watch(currentWorkspaceIdProvider);
 
   if (id == null) return null;
@@ -145,12 +154,24 @@ final Provider<WorkspaceStatus> workspaceStatusProvider =
       // form for a frame before Home.
       if (profile.isLoading) return WorkspaceStatus.loading;
 
+      if (profile.value?.resolvedWorkspaceId != null) {
+        return WorkspaceStatus.ready;
+      }
+
+      // **Records on the device outrank the setup form.** A seller who used
+      // the app before signing in already named their business by using it,
+      // and `GuestDrainGate` is about to create one from it — putting the
+      // form in front of them first would ask for what they have already
+      // given (`docs/rules/GUEST_MODE.md`). Loading holds the splash for the
+      // moment that takes.
+      if ((ref.watch(guestRowsOwedProvider).value ?? 0) > 0) {
+        return WorkspaceStatus.loading;
+      }
+
       // A failed profile read is treated as "no workspace" rather than
       // "loading": the user gets a screen they can act on instead of a splash
       // that never resolves.
-      return profile.value?.resolvedWorkspaceId == null
-          ? WorkspaceStatus.none
-          : WorkspaceStatus.ready;
+      return WorkspaceStatus.none;
     });
 
 /// What the six business repositories are pointed at, or null when there is
@@ -207,9 +228,15 @@ final Provider<List<Workspace>> workspacesProvider = Provider<List<Workspace>>((
 });
 
 /// Whether there is anything to read from at all.
-final Provider<bool> hasWorkspaceProvider = Provider<bool>(
-  (Ref ref) => ref.watch(workspaceContextProvider) != null,
-);
+///
+/// **A guest always has one** — the local business, created without asking
+/// (`docs/rules/GUEST_MODE.md`) — so this asks about the Firestore context
+/// only when there is an account behind it.
+final Provider<bool> hasWorkspaceProvider = Provider<bool>((Ref ref) {
+  if (ref.watch(accountKindProvider) == AccountKind.guest) return true;
+
+  return ref.watch(workspaceContextProvider) != null;
+});
 
 /// Keeps a business stream empty instead of exploding when there is no
 /// workspace behind it.
@@ -241,7 +268,8 @@ final class WorkspaceGuard {
 /// null in that situation — an em dash needs a currency about as much as it
 /// needs a font size.
 final Provider<String> workspaceCurrencyProvider = Provider<String>((Ref ref) {
-  return ref.watch(currentWorkspaceProvider)?.currency ?? 'USD';
+  return ref.watch(currentWorkspaceProvider)?.currency ??
+      WorkspaceConstant.fallbackCurrency;
 });
 
 /// How long a listing sits before this workspace calls it stale.
