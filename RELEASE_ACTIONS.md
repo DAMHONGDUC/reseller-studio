@@ -15,8 +15,8 @@ release — `release-dev` and `release-prod` do not run it for you.
 | 5 | Deploy backend | Rules, indexes, Storage rules and Functions are live — including `refreshUsageDaily`, without which a workspace that hits the order ceiling stays blocked after its 30-day window has emptied |
 | 6 | Configure APNs and Scheduler | Push delivery and `dailyDigest` work |
 | 7 | Configure RevenueCat | One Premium entitlement and offering expose monthly/yearly products |
-| 8 | Host legal pages | Privacy and Terms URLs open from Paywall and About |
-| 9 | Replace sign-in glyphs | Approved Apple and Google artwork passes external review |
+| 8 | Host legal pages | Privacy and Terms URLs open from Paywall and About. **Re-host after the guest-mode rewrite** — the live text still says the app cannot be used without an account |
+| 9 | Replace sign-in glyphs | Approved Apple and Google artwork passes external review. Both at once, into `SdVendorButtonV3.leading` |
 | 10 | Configure signing and stores | TestFlight/Play upload succeeds |
 | 11 | Configure CI release credentials | Manual release workflow completes without local files |
 
