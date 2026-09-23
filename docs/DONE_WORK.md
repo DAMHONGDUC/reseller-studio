@@ -5,7 +5,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 
 | Area | Included | External dependency |
 |---|---|---|
-| Onboarding and auth | One-time intro, Apple/Google sign-in, signed-out shell, sign-out, account deletion | Firebase and provider setup |
+| Onboarding and auth | One-time intro, Apple/Google sign-in, guest mode with a local store, sign-out, account deletion | Firebase and provider setup |
 | Home | Attention queue, overview, recent activity, Quick Access, Premium banner | Functions for live notifications |
 | Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, categories and locations created inline, buying-trip link, bulk actions including bulk listing and filing under a trip | Firebase Storage for uploads |
 | Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import | None for manual records |

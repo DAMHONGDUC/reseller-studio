@@ -3,11 +3,6 @@
 Read this before touching auth, the router's redirect, any
 `data/repositories/` implementation, or anything under `lib/core/local/`.
 
-> **Status: this is the target, not the current code.** The rule is written
-> before the work it governs, as `CLAUDE.md` requires. Nothing described here
-> is built yet — do not read a paragraph below as a description of a file that
-> exists. It becomes a description as each phase lands.
-
 ## The sentence
 
 **The app works with no account. An account is what makes the records durable
@@ -152,8 +147,9 @@ caller for one to trust:
 - plan limits and usage counting,
 - anything that reads another device.
 
-These are the only places an account is demanded. One guard decides, the way
-`NavigationUtils.requireSignIn` did: **never an `if` at the call site.**
+These are the only places an account is demanded. One guard decides —
+`NavigationUtils.requireAccount`, which replaced `requireSignIn` and inherited
+its point: **never an `if` at the call site.**
 
 ## Things that must not exist
 

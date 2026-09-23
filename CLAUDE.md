@@ -347,9 +347,10 @@ behind it.
      Shipping Google alone is a review rejection.
    - **Neither works until the owner configures it** — an OAuth client for
      Google, a Services ID and key for Apple. Until then the buttons are the
-     only way in and no account can be created; the app opens on the
-     signed-out shell. See `RELEASE_ACTIONS.md`.
-   - **Both marks are `SimpleIcons` glyphs, passed as `SdButtonV3.icon`** —
+     only way in and no account can be created; the app opens as a guest and
+     works. See `RELEASE_ACTIONS.md`.
+   - **Both marks are `SimpleIcons` glyphs, passed as
+     `SdVendorButtonV3.icon`** —
      owner's rule, restated after Google's own SVG was wired in and taken back
      out. A font cannot fail to load, and that is the point: the buttons once
      drew vendor SVGs from `assets/brand/`, Apple's file has never existed,
@@ -361,9 +362,11 @@ behind it.
      both render and nothing throws.
      **A glyph is a redrawn trademark and does not pass Beta App Review**, so
      the vendors' own artwork goes back before an external build — both at
-     once. `RELEASE_ACTIONS.md` blocker 5 holds both links, and
-     `SdButtonV3.leading` is the slot that takes them.
-   - **Both buttons wear `SdButtonVariantV3.vendor`, never `primary`.** Apple
+     once. `RELEASE_ACTIONS.md` blocker 9 holds both links, and
+     `SdVendorButtonV3.leading` is the slot that takes them — the same square
+     the glyph occupies, so the swap moves no layout.
+   - **Both buttons are `SdVendorButtonV3`, which wears
+     `SdButtonVariantV3.vendor` and never `primary`.** Apple
      allows its sign-in button in black, white, or white with an outline and
      nothing else, so the app's indigo was a rejection sitting on the first
      screen a reviewer opens. The variant's colours are literal black and

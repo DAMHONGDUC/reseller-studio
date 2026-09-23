@@ -4,6 +4,15 @@ Authority for what Firestore stores and what each field means. Product behavior
 belongs to `SELLER_OS_FINAL_MASTER_PLAN.md`; access belongs to
 `firestore.rules`.
 
+**Before anyone signs in there is a second store, and it holds these same
+records.** A guest's rows live in a local Drift database and are drained into
+Firestore at sign-in (hard rule 1). It is deliberately not a second data
+model: every row is the **same DTO map** this file describes, JSON-encoded,
+so a field means here exactly what it means there and a field added below
+needs nothing added to the local schema. What the local store keys on, how
+the drain restamps a row, and why there are no sync columns are all in
+`docs/rules/GUEST_MODE.md`.
+
 ## Layout
 
 ```text

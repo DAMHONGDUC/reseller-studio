@@ -519,7 +519,7 @@ than of the app — it has a look, so it belongs to a generation.
 
 Explains the `NoTransitionPage` on `AppRoutes.splash` in `app_router.dart`.
 
-The signed-out shell renders at `/home` (hard rule 1), so signing in *leaves*
+A guest renders at `/home` (hard rule 1), so signing in *leaves*
 the tab shell for the splash and comes back to it a moment later. go_router
 gives `StatefulShellRoute` **one `GlobalKey` for the life of the router** — the
 same key on every `StatefulNavigationShell` it builds.
