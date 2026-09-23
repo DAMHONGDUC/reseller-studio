@@ -5,9 +5,16 @@ any action that can be blocked by an entitlement.
 
 ## Product shape
 
-- **The paid product is Premium, offered monthly and yearly.** Owner's rule.
-  Monthly and yearly are billing periods for the same entitlement, not two
-  feature tiers; choosing either unlocks the same product capabilities.
+- **The paid product is Premium, offered monthly, yearly and lifetime.**
+  Owner's rule. The three are ways of paying for the same entitlement, not
+  three feature tiers; choosing any of them unlocks the same capabilities.
+  - **Lifetime is a one-time purchase, not a subscription.** It never renews,
+    carries no trial and is never the recommended option — yearly keeps
+    "Best value". It is read only from a package RevenueCat types as
+    lifetime: a non-subscription product in a custom package could be a
+    consumable, and selling that as "forever" is a claim the receipt breaks.
+  - **The Premium entitlement must be attached to the lifetime product in
+    RevenueCat.** Without it the purchase succeeds and the seller stays Free.
 - **Free counts records, and the two counts are counted differently.** Owner's
   rule.
   - **Items are a lifetime total**: every row ever created and kept holds its
@@ -84,7 +91,7 @@ any action that can be blocked by an entitlement.
   the product they already own. It stays a banner rather than a fourth shortcut
   because Home's shortcut list is closed.
 - **Buying and managing Premium are separate destinations.** Owner's rule.
-  `PaywallScreen` owns the monthly and yearly purchase actions; it has its own
+  `PaywallScreen` owns the purchase actions for every billing period; it has its own
   route and that route presents it as a bottom sheet. `SubscriptionScreen` is
   a separate full screen for the current plan and store billing
   management, and never doubles as the purchase surface. Premium gates and
@@ -144,6 +151,6 @@ any action that can be blocked by an entitlement.
 - The client gate decides which paywall to show; it is not the security
   boundary. The RevenueCat entitlement mirrored by a Cloud Function is what
   backend enforcement reads, following hard rules 9 and 10.
-- The paywall names the exact limit that was reached and offers both billing
-  periods for Premium. Prices are store-formatted values from RevenueCat and
+- The paywall names the exact limit that was reached and offers every billing
+  period on sale for Premium. Prices are store-formatted values from RevenueCat and
   are never hardcoded or reconstructed in Flutter.
