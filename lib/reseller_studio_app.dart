@@ -18,6 +18,7 @@ import 'features/app_config/presentation/widgets/error_notice_gate.dart';
 import 'features/app_config/presentation/widgets/force_update_gate.dart';
 import 'features/app_config/providers.dart';
 import 'features/notifications/providers.dart';
+import 'features/settings/presentation/controllers/app_locale_controller.dart';
 import 'features/settings/presentation/controllers/theme_mode_controller.dart';
 import 'features/workspace/presentation/widgets/guest_drain_gate.dart';
 import 'l10n/gen/app_localizations.dart';
@@ -94,6 +95,8 @@ class ResellerStudioApp extends ConsumerWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: shippingLocales,
+          // Null follows the device; Settings can pin one (`AppLocaleController`).
+          locale: ref.watch(appLocaleProvider),
           builder: (BuildContext context, Widget? child) =>
               AnnotatedRegion<SystemUiOverlayStyle>(
                 // Covers the routes with no app bar — splash, login, a

@@ -306,6 +306,9 @@ final class AppIconConstant {
   /// Open or represent a summary report.
   static const IconData summarize = Symbols.summarize_rounded;
 
+  /// Reach a person — the support inbox.
+  static const IconData supportAgent = Symbols.support_agent_rounded;
+
   /// Reject or rate an outcome negatively.
   static const IconData thumbDown = Symbols.thumb_down_rounded;
 

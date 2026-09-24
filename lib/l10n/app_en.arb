@@ -524,6 +524,19 @@
   "@moreAbout": {
     "description": "More destination: what the app is and how it works."
   },
+  "moreContactSupport": "Contact support",
+  "@moreContactSupport": {
+    "description": "More row that opens an email to the support address."
+  },
+  "moreContactSupportFailed": "No email app could open. Write to {email}.",
+  "@moreContactSupportFailed": {
+    "description": "Shown when no mail app handled the support link; names the address so the seller can copy it.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "aboutTitle": "About",
   "@aboutTitle": {
     "description": "App bar title of the About screen."
@@ -689,9 +702,9 @@
   "@settingsLanguageName": {
     "description": "The language the app is showing, written in that language. Each locale's own name for itself, never a translation of it."
   },
-  "settingsNotYet": "Soon",
-  "@settingsNotYet": {
-    "description": "Badge on a setting that is listed but not changeable yet."
+  "settingsLanguageSystem": "System default",
+  "@settingsLanguageSystem": {
+    "description": "Language option — follow the device's language."
   },
   "settingsSignedOut": "Not signed in",
   "@settingsSignedOut": {

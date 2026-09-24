@@ -5,7 +5,6 @@ import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/features/more/more_constant.dart';
 import 'package:reseller_studio/features/more/presentation/screens/about_screen/about_screen.dart';
 import 'package:reseller_studio/features/more/workflow_constant.dart';
-import 'package:reseller_studio/features/settings/presentation/screens/settings_screen/settings_screen.dart';
 
 import '../../support/pump_app.dart';
 
@@ -83,29 +82,15 @@ void main() {
     }
   });
 
-  testWidgets('About is reached from Settings, not from the More list', (
-    WidgetTester tester,
-  ) async {
-    // Owner's call: More is a long list already, and "what is this app" is a
-    // question asked once rather than a destination worked from.
+  test('About sits in More, directly below Settings', () {
+    // Owner's call, reversing the old home in Settings.
+    final List<String?> routes = MoreConstant.destinations
+        .map((MoreDestination d) => d.route)
+        .toList();
+
     expect(
-      MoreConstant.destinations.map((MoreDestination d) => d.route),
-      isNot(contains(AppRoutes.about)),
+      routes.indexOf(AppRoutes.about),
+      routes.indexOf(AppRoutes.settings) + 1,
     );
-
-    await pumpScreen(tester, const SettingsScreen());
-
-    final BuildContext context = tester.element(find.byType(SettingsScreen));
-
-    // Below the fold since the workspace block became editable — scrolled to
-    // rather than asserted in place, because where it sits is layout and what
-    // this test is about is that it is there at all.
-    await tester.scrollUntilVisible(
-      find.text(context.l10n.moreAbout),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-
-    expect(find.text(context.l10n.moreAbout), findsOneWidget);
   });
 }

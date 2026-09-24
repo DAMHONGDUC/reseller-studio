@@ -41,6 +41,7 @@ void main() {
         'REVENUECAT_OFFERING',
         'PRIVACY_POLICY_URL',
         'TERMS_OF_SERVICE_URL',
+        'CONTACT_EMAIL_SUPPORT',
         'DEFAULT_CURRENCY',
         'DEFAULT_COUNTRY',
       };

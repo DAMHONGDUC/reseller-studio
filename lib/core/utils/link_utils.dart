@@ -13,6 +13,10 @@ import '../constants/log_tag_constant.dart';
 final class LinkUtils {
   const LinkUtils._();
 
+  /// A `mailto:` link to [address], escaped by `Uri` rather than by hand.
+  static String mailto(String address) =>
+      Uri(scheme: 'mailto', path: address).toString();
+
   /// Hands [url] to the OS. Returns whether anything opened.
   ///
   /// An empty or unparseable [url] is a configuration mistake, not a runtime

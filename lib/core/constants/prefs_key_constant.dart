@@ -44,4 +44,8 @@ final class PrefsKeyConstant {
   /// Light, dark or system. Device-local on purpose — see
   /// `ThemeModeController`.
   static const String themeMode = 'theme_mode';
+
+  /// The in-app language override; absent means follow the device. See
+  /// `AppLocaleController`.
+  static const String appLocale = 'app_locale';
 }

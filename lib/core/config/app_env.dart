@@ -91,6 +91,19 @@ final class AppEnv {
   static bool get hasLegalLinks =>
       privacyPolicyUrl.isNotEmpty || termsOfServiceUrl.isNotEmpty;
 
+  // --- Support ---
+
+  /// Where More's Contact support row writes to.
+  ///
+  /// No default, for the same reason as the policy links: a guessed address
+  /// is mail nobody reads. Empty means the row is not drawn.
+  static const String contactEmailSupport = String.fromEnvironment(
+    'CONTACT_EMAIL_SUPPORT',
+  );
+
+  /// Whether a support address was configured, placeholder excluded.
+  static bool get hasSupportEmail => _isFilled(contactEmailSupport);
+
   // --- Development switches ---
   //
   // Raw, unguarded values. **Read them through `DevFlags`, never directly**:

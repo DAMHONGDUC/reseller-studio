@@ -44,6 +44,8 @@ void main() {
       MoreSectionKind.account: <MoreDestinationKind>[
         MoreDestinationKind.subscription,
         MoreDestinationKind.settings,
+        MoreDestinationKind.about,
+        MoreDestinationKind.contactSupport,
       ],
     });
   });
@@ -58,6 +60,17 @@ void main() {
     // the resolved workspace id.
     expect(business.destinations.first.kind, MoreDestinationKind.businesses);
     expect(business.destinations.first.route, '/more/businesses');
+  });
+
+  test('Contact support is not drawn without a configured address', () {
+    // The suite runs with no env file, so CONTACT_EMAIL_SUPPORT is empty.
+    final Iterable<MoreDestinationKind> kinds =
+        MoreConstant.sectionsFor(signedIn: true)
+            .expand((MoreSection section) => section.destinations)
+            .map((MoreDestination destination) => destination.kind);
+
+    expect(kinds, contains(MoreDestinationKind.about));
+    expect(kinds, isNot(contains(MoreDestinationKind.contactSupport)));
   });
 
   testWidgets('signed-in More renders every section title', (

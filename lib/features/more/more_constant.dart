@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../../core/config/app_env.dart';
 import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
@@ -14,13 +15,15 @@ class MoreDestination {
   const MoreDestination({
     required this.kind,
     required this.icon,
-    required this.route,
+    this.route,
     this.isBuilt = false,
   });
 
   final MoreDestinationKind kind;
   final IconData icon;
-  final String route;
+
+  /// Null for a row that leaves the app instead of pushing a screen.
+  final String? route;
 
   /// False until the destination has a screen. Drives the disabled look and
   /// the "Soon" badge.
@@ -46,6 +49,8 @@ enum MoreDestinationKind {
   tax,
   subscription,
   settings,
+  about,
+  contactSupport,
 }
 
 /// The words for a More row.
@@ -69,6 +74,8 @@ final class MoreLabel {
         MoreDestinationKind.tax => context.l10n.moreTax,
         MoreDestinationKind.subscription => context.l10n.moreSubscription,
         MoreDestinationKind.settings => context.l10n.moreSettings,
+        MoreDestinationKind.about => context.l10n.moreAbout,
+        MoreDestinationKind.contactSupport => context.l10n.moreContactSupport,
       };
 }
 
@@ -247,6 +254,17 @@ final class MoreConstant {
           route: AppRoutes.settings,
           isBuilt: true,
         ),
+        MoreDestination(
+          kind: MoreDestinationKind.about,
+          icon: AppIconConstant.info,
+          route: AppRoutes.about,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.contactSupport,
+          icon: AppIconConstant.supportAgent,
+          isBuilt: true,
+        ),
       ],
     ),
   ];
@@ -280,21 +298,27 @@ final class MoreConstant {
     MoreDestinationKind.activity,
   };
 
-  static List<MoreSection> sectionsFor({required bool signedIn}) {
-    if (signedIn) return sections;
+  static List<MoreSection> sectionsFor({required bool signedIn}) =>
+      <MoreSection>[
+        for (final MoreSection section in sections)
+          if (section.destinations.any(
+            (MoreDestination destination) => _visible(destination, signedIn),
+          ))
+            MoreSection(
+              kind: section.kind,
+              destinations: section.destinations
+                  .where(
+                    (MoreDestination destination) =>
+                        _visible(destination, signedIn),
+                  )
+                  .toList(growable: false),
+            ),
+      ];
 
-    return <MoreSection>[
-      for (final MoreSection section in sections)
-        if (section.destinations.any(_availableToGuest))
-          MoreSection(
-            kind: section.kind,
-            destinations: section.destinations
-                .where(_availableToGuest)
-                .toList(growable: false),
-          ),
-    ];
-  }
-
-  static bool _availableToGuest(MoreDestination destination) =>
-      !accountOnly.contains(destination.kind);
+  /// - A guest loses [accountOnly].
+  /// - Contact support is not drawn with no address configured.
+  static bool _visible(MoreDestination destination, bool signedIn) =>
+      (signedIn || !accountOnly.contains(destination.kind)) &&
+      (destination.kind != MoreDestinationKind.contactSupport ||
+          AppEnv.hasSupportEmail);
 }
