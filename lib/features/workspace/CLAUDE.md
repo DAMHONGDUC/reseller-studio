@@ -118,9 +118,8 @@ both places a seller sees a list of businesses:
 
 **Settings does not show the business at all any more.** Owner's rule, and it
 replaces the rule that used to stand here — that Settings held the facts and
-an Edit row. Settings is now what its name says: the device's theme, the
-account, and the developer block. A business is a record, records are managed
-from More, and a seller looking for their business had to know it was filed
+an Edit row. Settings is now what its name says: the device's theme and the
+account. A business is a record, records are managed from More, and a seller looking for their business had to know it was filed
 under a screen about preferences.
 
 - **Settings no longer edits a field in place** either. It used to open a
@@ -148,7 +147,7 @@ under a screen about preferences.
 
 ## Emptying a business is not deleting it, and they are different code paths
 
-The developer block in More → Settings has two opposite buttons, and the rule
+The Developer section on More has two opposite buttons, and the rule
 is that neither one is a version of the other:
 
 - **Seed demo data** fills the open workspace (`DemoDataSeeder`, in
