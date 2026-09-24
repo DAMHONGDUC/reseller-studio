@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -51,8 +50,6 @@ class QuickAddState {
 ///
 /// The item lands as [ItemStatus.draft] — created, not yet sellable inventory.
 class QuickAddController extends Notifier<QuickAddState> {
-  static const Uuid _uuid = Uuid();
-
   @override
   QuickAddState build() => const QuickAddState();
 
@@ -66,7 +63,7 @@ class QuickAddController extends Notifier<QuickAddState> {
   /// answer anything later.
   Future<String?> submit() async {
     final String title = state.title.trim();
-    final String id = _uuid.v4();
+    final String id = SdId.unique();
     final ItemRepository repository = ref.read(itemRepositoryProvider);
 
     if (title.isEmpty || state.isSaving) return null;

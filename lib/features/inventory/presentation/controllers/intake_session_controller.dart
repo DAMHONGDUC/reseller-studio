@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -99,8 +98,6 @@ class IntakeSessionState {
 ///   happened, and a `purchaseId` stamped on items before it existed would
 ///   dangle.
 class IntakeSessionController extends Notifier<IntakeSessionState> {
-  static const Uuid _uuid = Uuid();
-
   @override
   IntakeSessionState build() =>
       IntakeSessionState(purchaseDate: DateTime.now());
@@ -120,7 +117,7 @@ class IntakeSessionController extends Notifier<IntakeSessionState> {
   /// nothing to write.
   Future<bool> add({required String title, Money? cost}) async {
     final String trimmed = title.trim();
-    final String id = _uuid.v4();
+    final String id = SdId.unique();
     final ItemRepository repository = ref.read(itemRepositoryProvider);
 
     // The same whole of the validation Quick Add has: a title with something
@@ -176,7 +173,7 @@ class IntakeSessionController extends Notifier<IntakeSessionState> {
   /// Close the trip: write the purchase, then point every item at it.
   Future<void> finish({Money? receiptTotal}) async {
     final List<IntakeLine> lines = state.lines;
-    final String purchaseId = _uuid.v4();
+    final String purchaseId = SdId.unique();
     final PurchaseRepository purchases = ref.read(purchaseRepositoryProvider);
     final ItemRepository items = ref.read(itemRepositoryProvider);
 

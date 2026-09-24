@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/callable_constant.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -28,8 +27,6 @@ import '../dtos/workspace_dto.dart';
 /// than exposing a business with only part of its default marketplace list.
 class FirestoreWorkspaceRepository implements WorkspaceRepository {
   const FirestoreWorkspaceRepository(this._firestore, this._functions);
-
-  static const Uuid _uuid = Uuid();
 
   final FirebaseFirestore _firestore;
 
@@ -108,7 +105,7 @@ class FirestoreWorkspaceRepository implements WorkspaceRepository {
     required List<ItemCategory> categories,
     required List<Carrier> carriers,
   }) => FailureMapper.guard('create workspace', () async {
-    final String id = _uuid.v4();
+    final String id = SdId.unique();
     final DateTime now = DateTime.now();
 
     await _workspaces

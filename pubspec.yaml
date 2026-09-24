@@ -1,7 +1,7 @@
 name: reseller_studio
 description: "Reseller Studio — the operating system for resellers: source, list, sell, ship, profit."
 publish_to: 'none'
-version: 1.0.0+32
+version: 1.0.0+34
 
 environment:
   sdk: ^3.12.2
@@ -57,7 +57,6 @@ dependencies:
   # App Store requires a link to. No service behind it — it hands the URL to
   # the OS.
   url_launcher: ^6.3.1
-  uuid: ^4.5.3
 
 dev_dependencies:
   # The repo's only codegen, and its output is committed so `melos run

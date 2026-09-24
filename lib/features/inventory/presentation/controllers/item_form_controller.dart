@@ -2,7 +2,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -145,8 +144,6 @@ class ItemFormState {
 /// attach when the item *moves* — see `ItemTransition`. Adding a required
 /// field here needs explicit approval.
 class ItemFormController extends Notifier<ItemFormState> {
-  static const Uuid _uuid = Uuid();
-
   @override
   ItemFormState build() => const ItemFormState();
 
@@ -329,7 +326,7 @@ class ItemFormController extends Notifier<ItemFormState> {
   /// form that will not submit.
   Future<void> addPhoto({required bool fromCamera}) async {
     final FileUploader uploader = ref.read(fileUploaderProvider);
-    final String recordId = state.itemId ?? _uuid.v4();
+    final String recordId = state.itemId ?? SdId.unique();
 
     state = state.copyWith(isUploadingPhoto: true);
 
@@ -437,7 +434,7 @@ class ItemFormController extends Notifier<ItemFormState> {
   }) async {
     final String trimmed = title.trim();
     final String currency = ref.read(workspaceCurrencyProvider);
-    final String id = state.itemId ?? _uuid.v4();
+    final String id = state.itemId ?? SdId.unique();
     final DateTime now = DateTime.now();
 
     if (trimmed.isEmpty || state.isSaving) return null;

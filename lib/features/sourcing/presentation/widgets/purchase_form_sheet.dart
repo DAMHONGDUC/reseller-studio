@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/constants/date_picker_constant.dart';
@@ -40,7 +39,7 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
 
   /// Minted here so a receipt uploaded before the purchase is saved already
   /// lands under the record it belongs to.
-  final String _purchaseId = const Uuid().v4();
+  final String _purchaseId = SdId.unique();
 
   DateTime _date = DateTime.now();
   String? _sourceId;

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../constants/log_tag_constant.dart';
 import '../error/failure_mapper.dart';
@@ -29,8 +28,6 @@ class GuestFileUploader implements FileUploader {
   /// The folder every guest file lands under, inside app-private storage.
   static const String rootFolder = 'guest_files';
 
-  static const Uuid _uuid = Uuid();
-
   @override
   Future<String> upload({
     required FileFolder folder,
@@ -48,7 +45,7 @@ class GuestFileUploader implements FileUploader {
     // `FirebaseFileUploader` gives: two photos from one phone are both
     // `IMG_0001`, and the second would silently replace the first.
     final String stored =
-        '${destination.path}/${_uuid.v4()}${_extensionOf(filePath)}';
+        '${destination.path}/${SdId.unique()}${_extensionOf(filePath)}';
 
     await File(filePath).copy(stored);
 

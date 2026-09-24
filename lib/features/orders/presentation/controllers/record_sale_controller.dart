@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -25,8 +24,6 @@ import '../../domain/services/bundle_allocation.dart';
 /// importing Inventory's presentation layer, which the dependency rule
 /// forbids — and Offers was already doing it.
 class RecordSaleController extends Notifier<bool> {
-  static const Uuid _uuid = Uuid();
-
   /// True while the write is in flight, so a screen can disable its actions.
   @override
   bool build() => false;
@@ -55,7 +52,7 @@ class RecordSaleController extends Notifier<bool> {
     String? externalOrderId,
   }) async {
     final OrderRepository orders = ref.read(orderRepositoryProvider);
-    final String orderId = _uuid.v4();
+    final String orderId = SdId.unique();
     final String resolvedMarketplaceId =
         marketplaceId ?? marketplace?.name ?? 'other';
     final String resolvedMarketplaceName =

@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/providers/repository_providers.dart';
@@ -38,8 +37,6 @@ class MarketplaceFormState {
 /// an argument to [submit], the way the item form does it: holding it here
 /// would rebuild the form on every keystroke.
 class MarketplaceFormController extends Notifier<MarketplaceFormState> {
-  static const Uuid _uuid = Uuid();
-
   @override
   MarketplaceFormState build() => const MarketplaceFormState();
 
@@ -56,7 +53,7 @@ class MarketplaceFormController extends Notifier<MarketplaceFormState> {
   /// Returns the id written, or null when the name was empty.
   Future<String?> submit({required String name, String? marketplaceId}) async {
     final String trimmed = name.trim();
-    final String id = marketplaceId ?? _uuid.v4();
+    final String id = marketplaceId ?? SdId.unique();
 
     final AppTagHue hue = state.hue;
 

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:system_design/common.dart';
 
 /// One flat table, scoped to one workspace.
 ///
@@ -41,7 +42,7 @@ class WorkspaceTable {
   FirebaseFirestore get firestore => _collection.firestore;
 
   static String documentId(String workspaceId, String id) =>
-      '$workspaceId$idSeparator$id';
+      SdId.owned(workspaceId, id);
 
   /// The record's own id, back out of a document id.
   ///

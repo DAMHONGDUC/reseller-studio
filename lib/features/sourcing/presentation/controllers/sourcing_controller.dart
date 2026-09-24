@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -22,8 +21,6 @@ import '../../domain/entities/source.dart';
 /// answerable, and the reason the Sourcing feature exists at all: without it
 /// the app can say what sold and not where to find more of it.
 class SourcingController extends Notifier<bool> {
-  static const Uuid _uuid = Uuid();
-
   /// True while a write is in flight.
   @override
   bool build() => false;
@@ -41,7 +38,7 @@ class SourcingController extends Notifier<bool> {
     String? notes,
   }) async {
     final String trimmed = name.trim();
-    final String sourceId = id ?? _uuid.v4();
+    final String sourceId = id ?? SdId.unique();
 
     if (trimmed.isEmpty) return null;
 
@@ -123,7 +120,7 @@ class SourcingController extends Notifier<bool> {
     String? receiptUrl,
     int itemCount = 0,
   }) async {
-    final String purchaseId = id ?? _uuid.v4();
+    final String purchaseId = id ?? SdId.unique();
     final String currency = ref.read(workspaceCurrencyProvider);
 
     state = true;

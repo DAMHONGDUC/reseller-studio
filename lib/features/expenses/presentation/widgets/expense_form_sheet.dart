@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/constants/date_picker_constant.dart';
@@ -44,7 +43,7 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
   /// The id is minted here rather than in the controller, so a receipt
   /// uploaded before the expense is saved already lands under the record it
   /// belongs to.
-  final String _expenseId = const Uuid().v4();
+  final String _expenseId = SdId.unique();
 
   ExpenseCategory _category = ExpenseCategory.shipping;
   DateTime _date = DateTime.now();

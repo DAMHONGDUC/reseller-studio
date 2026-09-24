@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/providers/repository_providers.dart';
@@ -16,8 +15,6 @@ import '../../domain/entities/storage_location.dart';
 /// Every method logs what it did with the data and rethrows; the screen turns
 /// the throw into the one message hard rule 6 allows.
 class CatalogController extends Notifier<bool> {
-  static const Uuid _uuid = Uuid();
-
   /// True while a write is in flight.
   @override
   bool build() => false;
@@ -29,7 +26,7 @@ class CatalogController extends Notifier<bool> {
     String? parentId,
   }) async {
     final String trimmed = name.trim();
-    final String categoryId = id ?? _uuid.v4();
+    final String categoryId = id ?? SdId.unique();
 
     if (trimmed.isEmpty) return null;
 
@@ -99,7 +96,7 @@ class CatalogController extends Notifier<bool> {
     String? barcode,
   }) async {
     final String trimmed = name.trim();
-    final String locationId = id ?? _uuid.v4();
+    final String locationId = id ?? SdId.unique();
 
     if (trimmed.isEmpty) return null;
 

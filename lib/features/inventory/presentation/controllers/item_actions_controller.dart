@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -38,8 +37,6 @@ import '../../providers.dart';
 /// is an extra pair of eyes, never a replacement for the screen's error
 /// handling.
 class ItemActionsController extends Notifier<bool> {
-  static const Uuid _uuid = Uuid();
-
   /// True while a write is in flight, so a screen can disable its actions.
   @override
   bool build() => false;
@@ -120,7 +117,7 @@ class ItemActionsController extends Notifier<bool> {
         ...reprice,
         for (final MapEntry<String, Money> entry in prices.entries)
           Listing(
-            id: _uuid.v4(),
+            id: SdId.unique(),
             itemId: item.id,
             marketplaceId: entry.key,
             // Frozen here, at the one moment the record is in hand: renaming
@@ -207,7 +204,7 @@ class ItemActionsController extends Notifier<bool> {
         for (final BulkListingLine line in plan.lines)
           for (final MapEntry<String, Money> entry in line.prices.entries)
             Listing(
-              id: _uuid.v4(),
+              id: SdId.unique(),
               itemId: line.item.id,
               marketplaceId: entry.key,
               marketplaceName: _marketplaceName(entry.key),

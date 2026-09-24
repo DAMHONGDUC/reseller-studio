@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../constants/log_tag_constant.dart';
 import '../error/failure_mapper.dart';
@@ -21,8 +20,6 @@ class FirebaseFileUploader implements FileUploader {
   /// compile.
   const FirebaseFileUploader(this._storage, this._workspaceId);
 
-  static const Uuid _uuid = Uuid();
-
   final FirebaseStorage _storage;
   final String _workspaceId;
 
@@ -35,7 +32,7 @@ class FirebaseFileUploader implements FileUploader {
     final String extension = _extensionOf(filePath);
     final Reference reference = _storage.ref(
       'workspaces/$_workspaceId/${folder.folderName}/$recordId/'
-      '${_uuid.v4()}$extension',
+      '${SdId.unique()}$extension',
     );
 
     await reference.putFile(File(filePath));

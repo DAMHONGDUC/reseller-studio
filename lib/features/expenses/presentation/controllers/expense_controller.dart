@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -23,8 +22,6 @@ import '../../domain/services/recurring_expense_schedule.dart';
 /// the two are counted differently: an overhead reduces the workspace's
 /// profit, an attributed cost reduces that order's.
 class ExpenseController extends Notifier<bool> {
-  static const Uuid _uuid = Uuid();
-
   @override
   bool build() => false;
 
@@ -45,7 +42,7 @@ class ExpenseController extends Notifier<bool> {
     final bool isMileage = category == ExpenseCategory.mileage;
     final Money? typed = Money.tryParse(amount, currency);
     final Money? parsed = typed ?? (isMileage ? Money.zero(currency) : null);
-    final String expenseId = id ?? _uuid.v4();
+    final String expenseId = id ?? SdId.unique();
 
     // A mileage trip is deducted at the authority's published rate per mile,
     // not at what the seller spent, so the money is genuinely optional there
@@ -111,7 +108,7 @@ class ExpenseController extends Notifier<bool> {
   /// attributed to one sale is not something that recurs.
   Future<void> recordNext(RecurringExpense series) async {
     final Expense template = series.latest;
-    final String expenseId = _uuid.v4();
+    final String expenseId = SdId.unique();
 
     state = true;
     SdLogger.action(

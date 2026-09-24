@@ -1,20 +1,17 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/carrier.dart';
 
 class CarrierFormController extends Notifier<bool> {
-  static const Uuid _uuid = Uuid();
-
   @override
   bool build() => false;
 
   Future<String?> submit({required String name, String? carrierId}) async {
     final String trimmed = name.trim();
-    final String id = carrierId ?? _uuid.v4();
+    final String id = carrierId ?? SdId.unique();
 
     if (trimmed.isEmpty || state) return null;
 
