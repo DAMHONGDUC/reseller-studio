@@ -277,7 +277,7 @@ final Provider<AppConfigRepository> appConfigRepositoryProvider =
 /// Empties the open workspace of every business record.
 ///
 /// **Developer-only**, and it is the seeder's opposite number — the card that
-/// reads it lives in the same block of Settings, behind the same grant.
+/// reads it lives in the same Developer section on More, behind the same grant.
 final Provider<WorkspacePurgeRepository> workspacePurgeRepositoryProvider =
     Provider<WorkspacePurgeRepository>((Ref ref) {
       final WorkspaceContext? context = ref.watch(workspaceContextProvider);

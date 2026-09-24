@@ -1,4 +1,4 @@
-part of 'settings_screen.dart';
+part of 'more_screen.dart';
 
 /// Fills the open workspace with the demo business.
 ///

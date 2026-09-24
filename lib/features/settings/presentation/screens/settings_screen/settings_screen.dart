@@ -12,19 +12,13 @@ import '../../../../../core/widgets/app_section.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../../reseller_studio_app.dart';
-import '../../../../app_config/providers.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
-import '../../../../workspace/providers.dart';
 import '../../controllers/app_locale_controller.dart';
-import '../../controllers/delete_all_data_controller.dart';
-import '../../controllers/seed_data_controller.dart';
 import '../../controllers/theme_mode_controller.dart';
 
 part 'settings_screen_account_card.dart';
 part 'settings_screen_appearance_card.dart';
-part 'settings_screen_delete_all_data_card.dart';
-part 'settings_screen_seed_data_card.dart';
 
 /// Settings (plan §25).
 ///
@@ -32,10 +26,6 @@ part 'settings_screen_seed_data_card.dart';
 /// plan lists — theme, notifications, date format, subscription — is either
 /// waiting on a backend or is a preference nobody has asked for yet, and a
 /// screen full of controls that do nothing is worse than a short one.
-///
-/// The Developer block is hidden unless `devModeEnabledProvider` says
-/// otherwise — every debug and profile build, and the release builds whose
-/// signed-in account `app_config` names.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -59,15 +49,6 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
         ),
-        if (ref.watch(devModeEnabledProvider)) ...<Widget>[
-          SdSectionHeaderV3(
-            title: context.l10n.settingsDeveloper,
-            subtitle: context.l10n.settingsDeveloperNote,
-          ),
-          const _SeedDataCard(),
-          SizedBox(height: SdSpacingConstant.h12),
-          const _DeleteAllDataCard(),
-        ],
       ],
     ),
   );

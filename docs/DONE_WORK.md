@@ -20,7 +20,8 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Workspace and team | Create, switch, delete, invite, role and member management | Team actions require deployed Functions |
 | Notifications | Inbox, unread state, FCM registration, event pushes, per-workspace-timezone digest, twelve types with a switch each | Functions, APNs and Scheduler |
 | Subscription | Free ceilings — items for the life of the business, orders over a rolling 30 days, one business — plus two gated capabilities (tax pack, payout chasing), monthly/yearly paywall, restore, management screen | RevenueCat and webhook setup |
-| Settings | Account, workspace, theme, developer block: mock-data switch, seed demo data, delete all data | None |
+| Settings | Account, workspace, theme | None |
+| More → Developer | Seed demo data, delete all data (dev mode only) | None |
 
 ## Platform foundations
 

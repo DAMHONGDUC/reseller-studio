@@ -3,16 +3,25 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../../core/widgets/app_section.dart';
+import '../../../../app_config/providers.dart';
 import '../../../../auth/providers.dart';
 import '../../../../subscription/domain/enums/seller_plan.dart';
 import '../../../../subscription/providers.dart';
+import '../../../../workspace/providers.dart';
 import '../../../more_constant.dart';
+import '../../controllers/delete_all_data_controller.dart';
+import '../../controllers/seed_data_controller.dart';
 
+part 'more_screen_delete_all_data_card.dart';
+part 'more_screen_developer_section.dart';
 part 'more_screen_more_row.dart';
 part 'more_screen_section.dart';
+part 'more_screen_seed_data_card.dart';
 
 /// More — "where do I manage everything else?".
 ///
@@ -54,6 +63,7 @@ class MoreScreen extends ConsumerWidget {
               plan: plan,
               signedIn: signedIn,
             ),
+          const _DeveloperSection(),
         ],
       ),
     );

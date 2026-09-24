@@ -1,8 +1,8 @@
-part of 'settings_screen.dart';
+part of 'more_screen.dart';
 
 /// Empties the open workspace of every business record.
 ///
-/// **Hidden without dev mode**, like the two cards above it, and checked here
+/// **Hidden without dev mode**, like the seed card above it, and checked here
 /// as well as on the section that holds it: this one deletes, so one of the
 /// two guards being forgotten must not be enough.
 ///

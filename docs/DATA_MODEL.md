@@ -287,7 +287,7 @@ Anything that is not a list of non-empty strings reads as no entries.
 | List | What it changes | Where |
 |---|---|---|
 | `premium_emails` | `currentPlanProvider` answers Premium, so every ceiling and capability opens | `premiumGrantedByEmailProvider` |
-| `dev_mode_emails` | Settings' Developer block, mock data and the demo seed appear in a **release** build | `devModeEnabledProvider` |
+| `dev_mode_emails` | More's Developer section, mock data and the demo seed appear in a **release** build | `devModeEnabledProvider` |
 | `blocked_emails` | The account is sent to `/blocked` and can do nothing but sign out | `accountBlockedProvider` |
 
 `premium_emails` is a **grant, never a record of a purchase**: the

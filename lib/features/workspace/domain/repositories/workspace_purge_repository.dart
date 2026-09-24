@@ -1,7 +1,7 @@
 /// Emptying a business without deleting it.
 ///
 /// **Developer-only** — the one caller is the Delete all data card in
-/// More → Settings, behind `devModeEnabledProvider`. It is the other half of
+/// More's Developer section, behind `devModeEnabledProvider`. It is the other half of
 /// `DemoDataSeeder`: the seeder fills a real workspace so the app can be
 /// demonstrated, and this takes it back to the empty state a new seller
 /// actually opens, without the sign-out-and-make-another-business detour.

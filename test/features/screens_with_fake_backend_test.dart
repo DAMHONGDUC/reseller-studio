@@ -10,9 +10,9 @@ import 'package:reseller_studio/features/inventory/presentation/screens/inventor
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/more/presentation/screens/more_screen/more_screen.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
-import 'package:reseller_studio/features/settings/presentation/screens/settings_screen/settings_screen.dart';
 import 'package:system_design/index.dart';
 
 import '../support/pump_app.dart';
@@ -344,13 +344,12 @@ void main() {
       expect(find.text(r'$49.47'), findsOneWidget);
     });
 
-    testWidgets('Settings offers seeding and nothing that fakes a business', (
+    testWidgets('More offers seeding and nothing that fakes a business', (
       WidgetTester tester,
     ) async {
-      await pumpScreen(tester, const SettingsScreen());
+      await pumpScreen(tester, const MoreScreen());
 
-      // Appearance now heads the screen — theme and language are the block
-      // that works with no account — so the developer card is below the fold.
+      // The Developer section is last on More, below the fold.
       await tester.scrollUntilVisible(
         find.text('Seed demo data'),
         SdSpacingConstant.h200,
