@@ -148,7 +148,7 @@ know it was filed under a screen about preferences.
 
 ## Emptying a business is not deleting it, and they are different code paths
 
-The Developer section on More has two opposite buttons, and the rule
+The dev rows at the end of More's General section are two opposite buttons, and the rule
 is that neither one is a version of the other:
 
 - **Seed demo data** fills the open workspace (`DemoDataSeeder`, in

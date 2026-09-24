@@ -315,9 +315,9 @@ Running before Firebase exists: sign-in cannot succeed, and **there is no
 bypass** (hard rule 1). The app opens as a guest and the whole of it works,
 against the local store. **There is no
 fake backend to fall back on** — the switch that swapped one in is gone, and
-what fills a workspace is More → Developer → Seed demo data,
+what fills a workspace is More → General → Seed demo data,
 so a dev run opens the app a new seller would see. Turn the fake business on in
-More → Developer.
+More → General → Seed demo data.
 
 ## Releasing
 

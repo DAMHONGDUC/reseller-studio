@@ -11,18 +11,19 @@ place to look.
   sync status card, above every destination section. Owner's rule: the
   controls a seller changes about the app itself sit together, not spread
   across an Account card, an Appearance card and a row in another section.
-- **General holds**: the account row (who is signed in, or Sign in), Theme,
-  Language, Notifications, then Sign out and Delete account.
+- **General holds**: the account row (who is signed in, or Sign in),
+  Subscription, Theme, Language, Notifications, About, Contact support, Sign
+  out and Delete account — and, in dev mode, Seed demo data and Delete all
+  data last. Owner's rule: there is no separate App or Developer section.
 - **Every row is drawn the way every other More row is** — owner's rule: icon,
   one-line label, the value before the chevron, hairlines between rows, no
   subtitles. A section that looks like a different screen pasted in is one the
   seller reads as a different kind of thing.
-- The Developer section stays last and apart: it is not a setting.
 - Anything that would once have gone "in Settings" becomes a section or a row
   on More. Do not bring the screen back.
 
-## The Developer section
+## The dev rows
 
-Seed demo data and Delete all data, behind `devModeEnabledProvider`. What each
-button does and why neither asks first is in
-`lib/features/workspace/CLAUDE.md`.
+Seed demo data and Delete all data are the last two rows of General, behind
+`devModeEnabledProvider` — checked by the section and again by each row. What
+each does and why neither asks first is in `lib/features/workspace/CLAUDE.md`.
