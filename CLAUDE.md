@@ -698,6 +698,15 @@ feature's own `CLAUDE.md`.
     stays.
   - **`packages/system_design` is out of scope** — it is a separate repo with
     its own `WIDGET_RULES.md`, and its statics are widget-intrinsic.
+- **Every id the app generates goes through `SdId`, never a local `Uuid()`
+  and never a hand-built `'${ownerId}_$id'`.** Owner's rule.
+  `SdId.unique()` is a new record's own id; `SdId.owned(ownerId, id)` is the
+  composite `{ownerId}_{id}` hard rule 14 already spells for a document a
+  workspace or user owns — `WorkspaceTable.documentId` calls it rather than
+  joining the string itself. Every `presentation/controllers/` file that used
+  to declare its own `static const Uuid _uuid = Uuid()` calls `SdId.unique()`
+  instead. One class making every id is what stops a sync failure that traces
+  back to two call sites disagreeing on the separator or the id's shape.
 - **Read-time "now" comes from `clockProvider`, never `DateTime.now()`**
   (`core/time/app_clock.dart`). Anything a screen or a provider *derives* —
   what is overdue, what is stale, whether an offer has expired, how many days
