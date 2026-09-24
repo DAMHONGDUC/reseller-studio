@@ -12,15 +12,27 @@ place to look.
   controls a seller changes about the app itself sit together, not spread
   across an Account card, an Appearance card and a row in another section.
 - **General holds**: the account row (who is signed in, or Sign in),
-  Subscription, Theme, Language, Notifications, About, Contact support, Sign
-  out and Delete account — and, in dev mode, Seed demo data and Delete all
-  data last. Owner's rule: there is no separate App or Developer section.
+  Subscription, Theme, Language, Notifications, About, Contact support — and,
+  in dev mode, Seed demo data and Delete all data last. Owner's rule: there is
+  no separate App or Developer section.
 - **Every row is drawn the way every other More row is** — owner's rule: icon,
   one-line label, the value before the chevron, hairlines between rows, no
   subtitles. A section that looks like a different screen pasted in is one the
   seller reads as a different kind of thing.
 - Anything that would once have gone "in Settings" becomes a section or a row
   on More. Do not bring the screen back.
+
+## The account row never prints who is signed in
+
+Owner's rule, and it narrows the row rule above: the value beside "Account"
+is always `settingsSignedIn` — never the email, never the display name.
+`AccountScreen` (`presentation/screens/account_screen/`, pushed at
+`AppRoutes.account`) is where those two facts actually show, along with Sign
+out and Delete account, which moved there with them — a row on a list screen
+is not where a destructive action belongs once it has its own screen to be
+on. Everything either one needs (the dialogs, the spinner that sits on the
+row that is running, the "no success message, the router replaces the whole
+stack" reasoning) came across with them unchanged.
 
 ## Copy that commits to a line budget is tested, not guessed
 
