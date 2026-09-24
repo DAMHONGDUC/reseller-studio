@@ -87,12 +87,14 @@ Future<void> pumpScreen(
   List<Override> overrides = const <Override>[],
   Set<Object> replaces = const <Object>{},
   Size surface = TestSurface.phone,
+  Locale? locale,
 }) => _pumpApp(
   tester,
   overrides: overrides,
   replaces: replaces,
   home: screen,
   surface: surface,
+  locale: locale,
 );
 
 /// Pump [screen] as a route, so a widget that calls `context.push` has a
@@ -113,6 +115,7 @@ Future<GoRouter> pumpRoutedScreen(
   Set<Object> replaces = const <Object>{},
   Size surface = TestSurface.phone,
   TransitionBuilder? builder,
+  Locale? locale,
 }) async {
   final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -137,6 +140,7 @@ Future<GoRouter> pumpRoutedScreen(
     router: router,
     surface: surface,
     builder: builder,
+    locale: locale,
   );
 
   return router;
@@ -152,6 +156,7 @@ Future<void> _pumpApp(
   GoRouter? router,
   Size surface = TestSurface.phone,
   TransitionBuilder? builder,
+  Locale? locale,
 }) async {
   // The default test surface is 800×600 — wider and much shorter than any
   // phone, which makes rows that are fine on device overflow here and hides
@@ -191,11 +196,13 @@ Future<void> _pumpApp(
             ? MaterialApp(
                 theme: AppTheme.light,
                 localizationsDelegates: delegates,
+                locale: locale,
                 home: home,
               )
             : MaterialApp.router(
                 theme: AppTheme.light,
                 localizationsDelegates: delegates,
+                locale: locale,
                 routerConfig: router,
                 builder: builder,
               ),

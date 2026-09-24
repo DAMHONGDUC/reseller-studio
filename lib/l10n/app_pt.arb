@@ -1464,10 +1464,10 @@
   "syncCheckingTitle": "Verificando a sincronização…",
   "syncCheckingSubtitle": "Comparando este dispositivo com sua conta.",
   "syncSyncingTitle": "Sincronizando alterações…",
-  "syncSyncingSubtitle": "Algumas alterações ainda não chegaram ao servidor. Elas estão seguras neste dispositivo e serão enviadas quando você estiver online.",
+  "syncSyncingSubtitle": "Aguardando o servidor.",
   "syncSyncedTitle": "Todas as alterações sincronizadas",
   "syncSyncedSubtitle": "Tudo neste dispositivo está salvo na sua conta.",
   "syncDeviceOnlyTitle": "Salvo apenas neste dispositivo",
-  "syncDeviceOnlySubtitle": "Entre para fazer backup dos seus registros em uma conta.",
+  "syncDeviceOnlySubtitle": "Entre para fazer backup deles.",
   "moreSectionGeneral": "Geral"
 }

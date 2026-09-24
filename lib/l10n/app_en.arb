@@ -6580,7 +6580,7 @@
   "@syncSyncingTitle": {
     "description": "Title of the More sync card when some writes have not reached the server."
   },
-  "syncSyncingSubtitle": "Some changes haven't reached the server yet. They're safe on this device and upload when you're online.",
+  "syncSyncingSubtitle": "Waiting to reach the server.",
   "@syncSyncingSubtitle": {
     "description": "Subtitle of the More sync card when some writes have not reached the server."
   },
@@ -6588,7 +6588,7 @@
   "@syncSyncedTitle": {
     "description": "Title of the More sync card when every write has reached the server."
   },
-  "syncSyncedSubtitle": "Everything on this device is saved to your account.",
+  "syncSyncedSubtitle": "Everything is backed up.",
   "@syncSyncedSubtitle": {
     "description": "Subtitle of the More sync card when every write has reached the server."
   },
