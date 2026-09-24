@@ -12,29 +12,6 @@ part of 'more_screen.dart';
 class _DeleteAllDataCard extends ConsumerWidget {
   const _DeleteAllDataCard();
 
-  /// Asks first, and says what survives. A seller's real workspace is one tap
-  /// away from this button, and nothing here is recoverable afterwards.
-  Future<void> _confirm(BuildContext context, WidgetRef ref) => showSdDialogV3(
-    context,
-    SdDialogV3(
-      title: 'Delete all data?',
-      message:
-          'Deletes every item, listing, order, offer, purchase, source, '
-          'expense, category, location, marketplace and carrier in this '
-          'workspace. The business itself, its members and its activity log '
-          'stay. This cannot be undone.',
-      icon: AppIconConstant.warning,
-      actions: <SdDialogActionV3>[
-        SdDialogActionV3(
-          label: 'Delete everything',
-          isDestructive: true,
-          onPressed: () => _delete(context, ref),
-        ),
-        SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
-      ],
-    ),
-  );
-
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     try {
       final int deleted = await ref
@@ -102,7 +79,7 @@ class _DeleteAllDataCard extends ConsumerWidget {
             icon: AppIconConstant.deleteForever,
             expand: true,
             busy: running,
-            onPressed: hasWorkspace ? () => _confirm(context, ref) : null,
+            onPressed: hasWorkspace ? () => _delete(context, ref) : null,
           ),
         ],
       ),

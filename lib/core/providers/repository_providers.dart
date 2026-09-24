@@ -52,6 +52,7 @@ import '../../features/subscription/data/repositories/revenue_cat_subscription_r
 import '../../features/subscription/data/repositories/unconfigured_subscription_repository.dart';
 import '../../features/subscription/domain/repositories/subscription_repository.dart';
 import '../../features/workspace/data/repositories/firestore_workspace_purge_repository.dart';
+import '../../features/workspace/data/repositories/local_workspace_purge_repository.dart';
 import '../../features/workspace/domain/repositories/workspace_purge_repository.dart';
 import '../../features/workspace/providers.dart';
 import '../account/account_kind.dart';
@@ -279,15 +280,15 @@ final Provider<AppConfigRepository> appConfigRepositoryProvider =
 /// **Developer-only**, and it is the seeder's opposite number — the card that
 /// reads it lives in the same Developer section on More, behind the same grant.
 final Provider<WorkspacePurgeRepository> workspacePurgeRepositoryProvider =
-    Provider<WorkspacePurgeRepository>((Ref ref) {
-      final WorkspaceContext? context = ref.watch(workspaceContextProvider);
-
-      if (context == null) {
-        LiveRepositoryGuard.noWorkspace('WorkspacePurgeRepository');
-      }
-
-      return FirestoreWorkspacePurgeRepository(context);
-    });
+    Provider<WorkspacePurgeRepository>(
+      (Ref ref) => RepositoryChoice.between<WorkspacePurgeRepository>(
+        ref,
+        name: 'WorkspacePurgeRepository',
+        guest: (LocalDatabase db, String currency) =>
+            LocalWorkspacePurgeRepository(db),
+        linked: FirestoreWorkspacePurgeRepository.new,
+      ),
+    );
 
 /// Writes the seed business through the same repositories every screen reads.
 ///

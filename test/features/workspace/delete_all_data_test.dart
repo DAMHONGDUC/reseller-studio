@@ -11,7 +11,7 @@ import '../../support/pump_app.dart';
 
 /// **What a "delete all data" sweep must leave standing.**
 ///
-/// The developer affordance in More → Settings empties a workspace so the
+/// The Developer section on More empties a workspace so the
 /// empty screens can be looked at again. Two rows must survive it whatever
 /// else goes: the membership that decides every permission (hard rule 11) and
 /// the audit log a client may not write at all (hard rule 12) — the first

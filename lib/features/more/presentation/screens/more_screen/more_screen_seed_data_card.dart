@@ -11,23 +11,6 @@ part of 'more_screen.dart';
 class _SeedDataCard extends ConsumerWidget {
   const _SeedDataCard();
 
-  /// Asks first. It writes tens of documents into a real workspace, and
-  /// running it against the wrong business is not something a snackbar undoes.
-  Future<void> _confirm(BuildContext context, WidgetRef ref) => showSdDialogV3(
-    context,
-    SdDialogV3(
-      title: 'Seed demo data?',
-      message:
-          'Writes the demo business into this workspace. Rows with the same '
-          'ids are replaced, so running it twice is safe.',
-      icon: AppIconConstant.database,
-      actions: <SdDialogActionV3>[
-        SdDialogActionV3(label: 'Seed', onPressed: () => _seed(context, ref)),
-        SdDialogActionV3(label: context.l10n.actionCancel, onPressed: () {}),
-      ],
-    ),
-  );
-
   Future<void> _seed(BuildContext context, WidgetRef ref) async {
     try {
       final int written = await ref
@@ -94,7 +77,7 @@ class _SeedDataCard extends ConsumerWidget {
             icon: AppIconConstant.download,
             expand: true,
             busy: running,
-            onPressed: hasWorkspace ? () => _confirm(context, ref) : null,
+            onPressed: hasWorkspace ? () => _seed(context, ref) : null,
           ),
         ],
       ),
