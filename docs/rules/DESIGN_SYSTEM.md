@@ -514,6 +514,11 @@ it — a caller had to remember `gutter: false`, and most did not.
 `SdSectionHeaderV3` now carries no horizontal inset at all and follows the
 next section's rule: whatever pads the card pads the heading.
 
+- **A heading over one card is `AppSection`, never the two assembled by
+  hand.** Owner's rule. `AppSection.rows` for a card of `AppListRow`s, the
+  default constructor for any other content in an `SdCardV3`. A bare
+  `SdSectionHeaderV3` is left only where what it heads is not one card —
+  stat tiles, meters, a diagram.
 - **In a `screen()` list** the list's gutter already places both; nothing to
   do.
 - **In a `fullBleed` list** the heading is wrapped in the same
