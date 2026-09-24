@@ -116,13 +116,14 @@ both places a seller sees a list of businesses:
   already looking at, without switching to it first;
 - **the Businesses screen**, the same affordance on the same kind of row.
 
-**Settings does not show the business at all any more.** Owner's rule, and it
-replaces the rule that used to stand here — that Settings held the facts and
-an Edit row. Settings is now what its name says: the device's theme and the
-account. A business is a record, records are managed from More, and a seller looking for their business had to know it was filed
-under a screen about preferences.
+**The account and appearance cards do not show the business.** Owner's rule,
+and it replaces the rule that used to stand here — that Settings held the
+facts and an Edit row. There is no Settings screen any more
+(`lib/features/more/CLAUDE.md`); a business is a record, records are managed
+from More's Business section, and a seller looking for their business had to
+know it was filed under a screen about preferences.
 
-- **Settings no longer edits a field in place** either. It used to open a
+- **Nothing edits a business field in place** either. Settings used to open a
   picker per row and write on the tap; two screens writing the same document
   is the state where one of them quietly stops matching.
 

@@ -1,6 +1,6 @@
 # Seed data — filling a real workspace, from the dev menu
 
-**More → Settings → Developer → Seed demo data** writes three of every table
+**More → Developer → Seed demo data** writes three of every table
 into the workspace currently open. It is the only way to put rows in
 front of someone, and it does it by writing real documents through the real
 repositories — so what is on screen afterwards came back out of Firestore.

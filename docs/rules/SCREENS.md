@@ -450,8 +450,8 @@ screen that owns the action; it never opens a form Home would then have to
 know how to save.
 
 **Two rows here do not create anything, and they ride at the end** — owner's
-rule, About last and Analytics just above it. About lives two levels deep under
-Settings, so Home is what keeps it findable; putting both at the end is what
+rule, About last and Analytics just above it. About sits near the end of a
+long More list, so Home is what keeps it findable; putting both at the end is what
 stops a seller scanning for "add" from stepping over them. Nothing else
 non-create joins them without the same decision.
 
@@ -511,11 +511,10 @@ do it".
 ## About draws the workflow, and the diagram is navigable
 
 Owner's rule: the app carries an About screen holding what it is plus the
-workflow, so a seller can see how the parts connect. **It lives under
-Settings, not in the top-level More list** — More is a long list of places
-work is done, and "what is this app" is asked once rather than worked from.
-Home's Quick Action list carries the shortcut, last, so it stays one tap
-away.
+workflow, so a seller can see how the parts connect. It is a row in More's
+App section — there is no Settings screen to hold it
+(`lib/features/more/CLAUDE.md`). Home's Quick Action list carries the
+shortcut, last, so it stays one tap away.
 
 `WorkflowConstant.steps` is the chain `CLAUDE.md` writes as one line, as data.
 It is drawn **vertically** — nine links across a phone is either unreadable or

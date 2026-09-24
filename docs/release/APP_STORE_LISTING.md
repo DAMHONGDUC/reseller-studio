@@ -167,7 +167,7 @@ build ships with a paywall that has nothing to sell.
 |---|---|
 | Sign-in required | Yes — there is no guest mode (hard rule 1) |
 | Demo account | **[owner]** — a real Google account on the production project, signed in once, with a seeded workspace so the reviewer sees rows rather than empty states |
-| Notes | State that the only ways in are Sign in with Apple and Google Sign-In, that account deletion is in More → Settings → Account, and that the app connects to no marketplace |
+| Notes | State that the only ways in are Sign in with Apple and Google Sign-In, that account deletion is in More → Account, and that the app connects to no marketplace |
 | Contact | **[owner]** — name, phone, email |
 | Attachment | Optional |
 

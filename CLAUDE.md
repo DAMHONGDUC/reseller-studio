@@ -105,6 +105,7 @@ in the left.
 | a document created by hand in the Firebase console | `sample_data/README.md` |
 | anything in `lib/features/seed_data/` | `lib/features/seed_data/CLAUDE.md` (loads on its own) |
 | anything in `lib/features/workspace/` | `lib/features/workspace/CLAUDE.md` (loads on its own) |
+| anything in `lib/features/more/` | `lib/features/more/CLAUDE.md` (loads on its own) |
 
 ## What this project is
 

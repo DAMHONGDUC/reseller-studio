@@ -127,7 +127,7 @@ same reasoning puts the intro flag in preferences.
 **`MOCK_DATA_DEFAULT` is gone, and no flag replaces it** — owner's rule. The
 app has one backend. A dev run opens on **what a new seller sees** — five tabs
 with nothing in them (hard rule 1) — and what puts rows in them is
-More → Settings → Developer → Seed demo data, which writes real documents
+More → Developer → Seed demo data, which writes real documents
 into the open workspace.
 
 - **There is no build-time way to fake a business any more.** The switch was

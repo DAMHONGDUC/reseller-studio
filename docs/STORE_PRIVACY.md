@@ -55,7 +55,7 @@ the data flow changes.
 | Form question | Answer |
 |---|---|
 | Encrypted in transit | Yes |
-| User can request deletion | Yes, in Settings |
+| User can request deletion | Yes, in More → Account |
 | Designed for children | No |
 
 ## Hosted privacy policy draft

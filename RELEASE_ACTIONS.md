@@ -34,7 +34,7 @@ auth, backend rules and signing must already work.
 | Deploy | Use `melos run deploy-firebase-dev` or `melos run deploy-firebase-prod` |
 
 The app has no auth bypass. Until Firebase is configured, use mock data from
-More → Settings.
+More → Developer.
 
 ## RevenueCat
 
