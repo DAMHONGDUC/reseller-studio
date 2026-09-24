@@ -1,75 +1,122 @@
 part of 'more_screen.dart';
 
-class _MoreRow extends StatelessWidget {
-  const _MoreRow({
-    required this.destination,
-    required this.isLast,
-    required this.plan,
-    required this.signedIn,
+/// One More row: icon, one-line label, an optional value, then the chevron.
+///
+/// Every row on More is drawn by this, destinations and General alike
+/// (`lib/features/more/CLAUDE.md`), so no section looks pasted in.
+class _MoreRowTile extends StatelessWidget {
+  const _MoreRowTile({
+    required this.icon,
+    required this.label,
+    this.value,
+    this.onTap,
+    this.color,
+    this.trailing,
+    this.showChevron = true,
   });
 
-  final MoreDestination destination;
-  final bool isLast;
-  final SellerPlan plan;
-  final bool signedIn;
+  final IconData icon;
+  final String label;
+  final String? value;
+  final VoidCallback? onTap;
+
+  /// Icon and label together; null is the primary text colour.
+  final Color? color;
+
+  /// Replaces the chevron — a badge, or a spinner while the row works.
+  final Widget? trailing;
+
+  final bool showChevron;
 
   @override
   Widget build(BuildContext context) {
-    final Color foreground = destination.isBuilt
-        ? context.sdTheme3.textPrimary
-        : context.sdTheme3.textTertiary;
-    final String? value = MoreValueLabel.of(
-      context,
-      destination.kind,
-      plan: plan,
-      signedIn: signedIn,
-    );
+    final Color foreground = color ?? context.sdTheme3.textPrimary;
+    final String? shown = value;
+    final Widget? end = trailing;
 
-    return Column(
-      children: <Widget>[
-        InkWell(
-          onTap: destination.isBuilt
-              ? () => context.push(destination.route)
-              : null,
-          child: Padding(
-            padding: SdContentPaddingV3.row,
-            child: Row(
-              children: <Widget>[
-                SdIconV3(destination.icon, color: foreground),
-                SizedBox(width: SdSpacingConstant.w12),
-                Expanded(
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: SdContentPaddingV3.row,
+        child: Row(
+          children: <Widget>[
+            SdIconV3(icon, color: foreground),
+            SizedBox(width: SdSpacingConstant.w12),
+            // - with a value, the label takes what it needs and the value is
+            //   pushed to the right edge, before the chevron
+            // - the value sits before the chevron, never instead of it
+            //   (`docs/rules/DESIGN_SYSTEM.md`)
+            if (shown == null)
+              Expanded(
+                child: _MoreRowLabel(label: label, color: foreground),
+              )
+            else ...<Widget>[
+              Flexible(
+                child: _MoreRowLabel(label: label, color: foreground),
+              ),
+              // The gap is inside the flexible half, so a narrow row shrinks it.
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(left: SdSpacingConstant.w8),
                   child: Text(
-                    MoreLabel.of(context, destination.kind),
-                    style: context.textTheme3.bodyLarge!.copyWith(
-                      color: foreground,
+                    shown,
+                    style: context.textTheme3.bodyMedium!.copyWith(
+                      color: context.sdTheme3.textSecondary,
                     ),
+                    textAlign: TextAlign.end,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (!destination.isBuilt)
-                  SdBadgeV3(label: context.l10n.moreComingSoon)
-                else ...<Widget>[
-                  // The value sits before the chevron, never instead of it:
-                  // the row still opens something, and the glyph is what says
-                  // so (`docs/rules/DESIGN_SYSTEM.md`).
-                  if (value != null) ...<Widget>[
-                    Text(
-                      value,
-                      style: context.textTheme3.bodyMedium!.copyWith(
-                        color: context.sdTheme3.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(width: SdSpacingConstant.w8),
-                  ],
-                  const AppRowChevron(),
-                ],
-              ],
-            ),
-          ),
+              ),
+            ],
+            if (end != null) ...<Widget>[
+              SizedBox(width: SdSpacingConstant.w8),
+              end,
+            ] else if (showChevron) ...<Widget>[
+              SizedBox(width: SdSpacingConstant.w8),
+              const AppRowChevron(),
+            ],
+          ],
         ),
-        if (!isLast) const SdDividerV3(),
-      ],
+      ),
     );
   }
+}
+
+class _MoreRowLabel extends StatelessWidget {
+  const _MoreRowLabel({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    label,
+    style: context.textTheme3.bodyLarge!.copyWith(color: color),
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+  );
+}
+
+/// A destination row: opens its screen, or reads "Soon" until it has one.
+class _MoreRow extends StatelessWidget {
+  const _MoreRow({required this.destination, required this.plan});
+
+  final MoreDestination destination;
+  final SellerPlan plan;
+
+  @override
+  Widget build(BuildContext context) => _MoreRowTile(
+    icon: destination.icon,
+    label: MoreLabel.of(context, destination.kind),
+    value: destination.isBuilt
+        ? MoreValueLabel.of(context, destination.kind, plan: plan)
+        : null,
+    color: destination.isBuilt ? null : context.sdTheme3.textTertiary,
+    trailing: destination.isBuilt
+        ? null
+        : SdBadgeV3(label: context.l10n.moreComingSoon),
+    onTap: destination.isBuilt ? () => context.push(destination.route) : null,
+  );
 }

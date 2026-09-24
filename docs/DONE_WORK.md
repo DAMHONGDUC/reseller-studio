@@ -20,8 +20,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Workspace and team | Create, switch, delete, invite, role and member management | Team actions require deployed Functions |
 | Notifications | Inbox, unread state, FCM registration, event pushes, per-workspace-timezone digest, twelve types with a switch each | Functions, APNs and Scheduler |
 | Subscription | Free ceilings — items for the life of the business, orders over a rolling 30 days, one business — plus two gated capabilities (tax pack, payout chasing), monthly/yearly paywall, restore, management screen | RevenueCat and webhook setup |
-| Settings | Account, workspace, theme | None |
-| More → Developer | Seed demo data, delete all data (dev mode only) | None |
+| More → General | One section, first on More, replacing the Settings screen: account / sign in, subscription, theme, language, notifications, about, contact support, sign out, delete account; seed demo data and delete all data in dev mode | None |
 | More → Sync status | Card heading More: synced, syncing (writes still queued), or on this device only for a guest | None |
 
 ## Platform foundations

@@ -41,13 +41,19 @@ void main() {
         MoreDestinationKind.team,
         MoreDestinationKind.activity,
       ],
-      MoreSectionKind.account: <MoreDestinationKind>[
+    });
+  });
+
+  test('General carries the app-level destinations, in order', () {
+    expect(
+      MoreConstant.general.map((MoreDestination d) => d.kind).toList(),
+      <MoreDestinationKind>[
         MoreDestinationKind.subscription,
-        MoreDestinationKind.settings,
+        MoreDestinationKind.notifications,
         MoreDestinationKind.about,
         MoreDestinationKind.contactSupport,
       ],
-    });
+    );
   });
 
   test('the businesses row heads the Business section', () {
@@ -64,10 +70,9 @@ void main() {
 
   test('Contact support is not drawn without a configured address', () {
     // The suite runs with no env file, so CONTACT_EMAIL_SUPPORT is empty.
-    final Iterable<MoreDestinationKind> kinds =
-        MoreConstant.sectionsFor(signedIn: true)
-            .expand((MoreSection section) => section.destinations)
-            .map((MoreDestination destination) => destination.kind);
+    final Iterable<MoreDestinationKind> kinds = MoreConstant.general
+        .where((MoreDestination d) => MoreConstant.isVisible(d, true))
+        .map((MoreDestination destination) => destination.kind);
 
     expect(kinds, contains(MoreDestinationKind.about));
     expect(kinds, isNot(contains(MoreDestinationKind.contactSupport)));

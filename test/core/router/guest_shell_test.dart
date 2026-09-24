@@ -120,7 +120,7 @@ void main() {
     await goTo(tester, AppRoutes.more);
 
     // Records the guest store holds: a guest may see all of them.
-    for (final String shown in <String>['Sourcing', 'Listings', 'Settings']) {
+    for (final String shown in <String>['Theme', 'Sourcing', 'Listings']) {
       await tester.scrollUntilVisible(
         find.text(shown),
         300,
@@ -131,8 +131,9 @@ void main() {
     }
 
     // Team addresses an email account; Activity is the audit log, written
-    // only by Cloud Functions (hard rule 12).
+    // only by Cloud Functions (hard rule 12); Notifications is the account's.
     expect(find.text('Team'), findsNothing);
+    expect(find.text('Notifications'), findsNothing);
   });
 
   testWidgets('a create route is reachable without an account', (

@@ -175,14 +175,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final Element more = tester.element(find.text('Settings').first);
+    final Element more = tester.element(find.text('Sourcing').first);
     for (final bool expanded in <bool>[false, true, false]) {
       await tester.tap(find.byKey(SdNavPanelToggleV3.toggleKey));
       await tester.pumpAndSettle();
       final SdNavPanelV3 panel = tester.widget(find.byType(SdNavPanelV3));
       expect(panel.isExpanded, expanded);
       expect(panel.selectedIndex, 4);
-      expect(tester.element(find.text('Settings').first), same(more));
+      expect(tester.element(find.text('Sourcing').first), same(more));
       expect(find.byType(SdNavCellV3), findsNWidgets(expanded ? 5 : 0));
       expect(tester.takeException(), isNull);
     }

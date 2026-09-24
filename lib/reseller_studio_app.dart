@@ -17,9 +17,9 @@ import 'core/widgets/startup_error_screen.dart';
 import 'features/app_config/presentation/widgets/error_notice_gate.dart';
 import 'features/app_config/presentation/widgets/force_update_gate.dart';
 import 'features/app_config/providers.dart';
+import 'features/more/presentation/controllers/app_locale_controller.dart';
+import 'features/more/presentation/controllers/theme_mode_controller.dart';
 import 'features/notifications/providers.dart';
-import 'features/settings/presentation/controllers/app_locale_controller.dart';
-import 'features/settings/presentation/controllers/theme_mode_controller.dart';
 import 'features/workspace/presentation/widgets/guest_drain_gate.dart';
 import 'l10n/gen/app_localizations.dart';
 

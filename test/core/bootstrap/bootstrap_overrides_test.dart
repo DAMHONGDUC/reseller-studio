@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/constants/prefs_key_constant.dart';
 import 'package:reseller_studio/core/providers/shared_preferences_provider.dart';
-import 'package:reseller_studio/features/settings/presentation/controllers/theme_mode_controller.dart';
+import 'package:reseller_studio/features/more/presentation/controllers/theme_mode_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// **The theme has to be right on the first frame, not on the second.**

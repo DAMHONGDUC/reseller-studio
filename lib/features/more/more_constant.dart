@@ -46,7 +46,7 @@ enum MoreDestinationKind {
   activity,
   tax,
   subscription,
-  settings,
+  notifications,
   about,
   contactSupport,
 }
@@ -71,7 +71,8 @@ final class MoreLabel {
         MoreDestinationKind.activity => context.l10n.moreActivity,
         MoreDestinationKind.tax => context.l10n.moreTax,
         MoreDestinationKind.subscription => context.l10n.moreSubscription,
-        MoreDestinationKind.settings => context.l10n.moreSettings,
+        MoreDestinationKind.notifications =>
+          context.l10n.notificationSettingsTitle,
         MoreDestinationKind.about => context.l10n.moreAbout,
         MoreDestinationKind.contactSupport => context.l10n.moreContactSupport,
       };
@@ -80,20 +81,17 @@ final class MoreLabel {
 /// The value at the end of a More row — what the seller would otherwise have
 /// to open the screen to find out.
 ///
-/// **Two rows have one, and the rest return null.** A value on every row would
-/// be a second column of text competing with the labels; these two answer
-/// questions a seller asks before tapping — which plan am I on, and am I
-/// signed in.
+/// **One row has one, and the rest return null.** A value on every row would
+/// be a second column of text competing with the labels; this one answers a
+/// question a seller asks before tapping — which plan am I on. Whether they
+/// are signed in, the Account card on More says outright.
 final class MoreValueLabel {
   static String? of(
     BuildContext context,
     MoreDestinationKind kind, {
     required SellerPlan plan,
-    required bool signedIn,
   }) => switch (kind) {
     MoreDestinationKind.subscription => plan.label,
-    MoreDestinationKind.settings =>
-      signedIn ? context.l10n.settingsSignedIn : context.l10n.settingsSignedOut,
     _ => null,
   };
 }
@@ -106,8 +104,8 @@ class MoreSection {
   final List<MoreDestination> destinations;
 }
 
-/// The four questions that split More's destinations into readable groups.
-enum MoreSectionKind { operations, finance, business, account }
+/// The three questions that split More's destinations into readable groups.
+enum MoreSectionKind { operations, finance, business }
 
 /// The localized title for a More section.
 final class MoreSectionLabel {
@@ -116,7 +114,6 @@ final class MoreSectionLabel {
         MoreSectionKind.operations => context.l10n.moreSectionOperations,
         MoreSectionKind.finance => context.l10n.moreSectionFinance,
         MoreSectionKind.business => context.l10n.moreSectionBusiness,
-        MoreSectionKind.account => context.l10n.moreSectionAccount,
       };
 }
 
@@ -236,41 +233,50 @@ final class MoreConstant {
         ),
       ],
     ),
-
-    MoreSection(
-      kind: MoreSectionKind.account,
-      destinations: <MoreDestination>[
-        MoreDestination(
-          kind: MoreDestinationKind.subscription,
-          icon: AppIconConstant.workspacePremium,
-          route: AppRoutes.subscription,
-          isBuilt: true,
-        ),
-        MoreDestination(
-          kind: MoreDestinationKind.settings,
-          icon: AppIconConstant.settings,
-          route: AppRoutes.settings,
-          isBuilt: true,
-        ),
-        MoreDestination(
-          kind: MoreDestinationKind.about,
-          icon: AppIconConstant.info,
-          route: AppRoutes.about,
-          isBuilt: true,
-        ),
-        MoreDestination(
-          kind: MoreDestinationKind.contactSupport,
-          icon: AppIconConstant.mail,
-          route: AppRoutes.contactSupport,
-          isBuilt: true,
-        ),
-      ],
-    ),
   ];
 
-  static List<MoreDestination> get destinations => sections
-      .expand((MoreSection section) => section.destinations)
-      .toList(growable: false);
+  /// The destinations drawn in the General section, not in [sections] — they
+  /// sit among the settings rows (`lib/features/more/CLAUDE.md`).
+  static const MoreDestination subscription = MoreDestination(
+    kind: MoreDestinationKind.subscription,
+    icon: AppIconConstant.workspacePremium,
+    route: AppRoutes.subscription,
+    isBuilt: true,
+  );
+
+  static const MoreDestination notifications = MoreDestination(
+    kind: MoreDestinationKind.notifications,
+    icon: AppIconConstant.notifications,
+    route: AppRoutes.notificationSettings,
+    isBuilt: true,
+  );
+
+  static const MoreDestination about = MoreDestination(
+    kind: MoreDestinationKind.about,
+    icon: AppIconConstant.info,
+    route: AppRoutes.about,
+    isBuilt: true,
+  );
+
+  static const MoreDestination contactSupport = MoreDestination(
+    kind: MoreDestinationKind.contactSupport,
+    icon: AppIconConstant.mail,
+    route: AppRoutes.contactSupport,
+    isBuilt: true,
+  );
+
+  /// General's destinations, in the order General draws them.
+  static const List<MoreDestination> general = <MoreDestination>[
+    subscription,
+    notifications,
+    about,
+    contactSupport,
+  ];
+
+  static List<MoreDestination> get destinations => <MoreDestination>[
+    ...sections.expand((MoreSection section) => section.destinations),
+    ...general,
+  ];
 
   /// What More lists for this seller.
   ///
@@ -280,7 +286,7 @@ final class MoreConstant {
   /// (`lib/features/workspace/CLAUDE.md`).
   /// What a guest cannot be shown, because a server writes it.
   ///
-  /// **Three rows, not the whole list** — this used to be the other way round
+  /// **Four rows, not the whole list** — this used to be the other way round
   /// and left a signed-out seller with Settings alone, which was right when
   /// there was nothing else to show them (`docs/rules/GUEST_MODE.md` reversed
   /// it). Everything else is a view onto records the guest store holds.
@@ -291,24 +297,26 @@ final class MoreConstant {
   /// - **Activity** is the audit log, written only by Cloud Functions
   ///   (hard rule 12), so a guest's would be permanently empty — and hard
   ///   rule 5's reasoning says an empty list is a claim.
+  /// - **Notifications** reads and writes the signed-in person's own document.
   static const Set<MoreDestinationKind> accountOnly = <MoreDestinationKind>{
     MoreDestinationKind.businesses,
     MoreDestinationKind.team,
     MoreDestinationKind.activity,
+    MoreDestinationKind.notifications,
   };
 
   static List<MoreSection> sectionsFor({required bool signedIn}) =>
       <MoreSection>[
         for (final MoreSection section in sections)
           if (section.destinations.any(
-            (MoreDestination destination) => _visible(destination, signedIn),
+            (MoreDestination destination) => isVisible(destination, signedIn),
           ))
             MoreSection(
               kind: section.kind,
               destinations: section.destinations
                   .where(
                     (MoreDestination destination) =>
-                        _visible(destination, signedIn),
+                        isVisible(destination, signedIn),
                   )
                   .toList(growable: false),
             ),
@@ -316,7 +324,7 @@ final class MoreConstant {
 
   /// - A guest loses [accountOnly].
   /// - Contact support is not drawn with no address configured.
-  static bool _visible(MoreDestination destination, bool signedIn) =>
+  static bool isVisible(MoreDestination destination, bool signedIn) =>
       (signedIn || !accountOnly.contains(destination.kind)) &&
       (destination.kind != MoreDestinationKind.contactSupport ||
           AppEnv.hasSupportEmail);

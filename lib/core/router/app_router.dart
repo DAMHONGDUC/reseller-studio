@@ -50,7 +50,6 @@ import '../../features/receipts/presentation/screens/receipts_screen/receipts_sc
 import '../../features/reports/presentation/screens/books_screen/books_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen/reports_screen.dart';
 import '../../features/search/presentation/screens/search_screen/search_screen.dart';
-import '../../features/settings/presentation/screens/settings_screen/settings_screen.dart';
 import '../../features/sourcing/presentation/screens/purchase_detail_screen/purchase_detail_screen.dart';
 import '../../features/sourcing/presentation/screens/purchase_evaluator_screen/purchase_evaluator_screen.dart';
 import '../../features/sourcing/presentation/screens/purchases_screen/purchases_screen.dart';
@@ -449,17 +448,9 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,
-                    path: 'settings',
+                    path: 'notifications',
                     builder: (BuildContext context, GoRouterState state) =>
-                        const SettingsScreen(),
-                    routes: <RouteBase>[
-                      GoRoute(
-                        parentNavigatorKey: AppNavigatorKey.root,
-                        path: 'notifications',
-                        builder: (BuildContext context, GoRouterState state) =>
-                            const NotificationSettingsScreen(),
-                      ),
-                    ],
+                        const NotificationSettingsScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

@@ -440,10 +440,6 @@
   "@moreSectionBusiness": {
     "description": "More section for marketplaces, team, and activity."
   },
-  "moreSectionAccount": "Account",
-  "@moreSectionAccount": {
-    "description": "More section for subscription and settings."
-  },
   "moreSourcing": "Sourcing",
   "@moreSourcing": {
     "description": "More destination: where stock comes from and what it returned."
@@ -670,25 +666,9 @@
   "@moreSubscription": {
     "description": "More destination: the current plan and the other tiers."
   },
-  "moreSettings": "Settings",
-  "@moreSettings": {
-    "description": "More destination: account and workspace settings."
-  },
   "settingsAccount": "Account",
   "@settingsAccount": {
     "description": "Settings section header."
-  },
-  "settingsDeveloper": "Developer",
-  "@settingsDeveloper": {
-    "description": "Settings section header for the debug-only block."
-  },
-  "settingsDeveloperNote": "Debug builds only — not present in a release build.",
-  "@settingsDeveloperNote": {
-    "description": "Explains that the developer block is compiled out of a release build."
-  },
-  "settingsAppearance": "Appearance",
-  "@settingsAppearance": {
-    "description": "Settings section for device preferences that need no account."
   },
   "settingsTheme": "Theme",
   "@settingsTheme": {
@@ -722,10 +702,6 @@
   "@settingsSignedOut": {
     "description": "Account row title before anyone signs in."
   },
-  "settingsSignedOutBody": "Sign in to load your business.",
-  "@settingsSignedOutBody": {
-    "description": "Account row subtitle before anyone signs in."
-  },
   "settingsSignedIn": "Signed in",
   "@settingsSignedIn": {
     "description": "Fallback account row title when the provider gave no name or email."
@@ -749,10 +725,6 @@
   "settingsDeleteAccount": "Delete account",
   "@settingsDeleteAccount": {
     "description": "Row that opens the irreversible account deletion dialog."
-  },
-  "settingsDeleteAccountPermanent": "Permanent",
-  "@settingsDeleteAccountPermanent": {
-    "description": "Caption under the delete account row."
   },
   "settingsDeleteAccountConfirmTitle": "Delete your account?",
   "@settingsDeleteAccountConfirmTitle": {
@@ -6627,5 +6599,9 @@
   "syncDeviceOnlySubtitle": "Sign in to back up your records to an account.",
   "@syncDeviceOnlySubtitle": {
     "description": "Subtitle of the More sync card for a signed-out seller; tapping opens sign-in."
+  },
+  "moreSectionGeneral": "General",
+  "@moreSectionGeneral": {
+    "description": "Heading of the first section on More, holding the account, theme, language and notification settings."
   }
 }

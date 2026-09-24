@@ -152,13 +152,12 @@ final class AppRoutes {
   static const String workspaces = '/more/businesses';
 
   static const String team = '/more/team';
-  static const String settings = '/more/settings';
 
-  /// Which reminders this person wants. **Under Settings, and one of the few
-  /// things a guest cannot reach**: it reads and writes the signed-in
+  /// Which reminders this person wants. **One of the few things a guest
+  /// cannot reach**: it reads and writes the signed-in
   /// person's own document, so unlike theme and language it is not a device
   /// preference.
-  static const String notificationSettings = '/more/settings/notifications';
+  static const String notificationSettings = '/more/notifications';
 
   /// The audit log (§23). Under More rather than under Home: it is something
   /// you go and check, not something you are told.

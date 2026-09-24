@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reseller_studio/features/settings/presentation/controllers/app_locale_controller.dart';
+import 'package:reseller_studio/features/more/presentation/controllers/app_locale_controller.dart';
 
 void main() {
   test('a shipped code pins that locale', () {
