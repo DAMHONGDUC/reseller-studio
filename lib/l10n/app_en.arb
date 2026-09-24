@@ -516,7 +516,7 @@
   "@settingsApp": {
     "description": "Settings section holding what the app is and how it works."
   },
-  "moreAbout": "About Reseller Studio",
+  "moreAbout": "About app",
   "@moreAbout": {
     "description": "More destination: what the app is and how it works."
   },

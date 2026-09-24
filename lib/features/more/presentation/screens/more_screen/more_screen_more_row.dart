@@ -28,6 +28,13 @@ class _MoreRowTile extends StatelessWidget {
 
   final bool showChevron;
 
+  /// A cap on the value's own width, so one genuinely long value (an email)
+  /// cannot push the row past its edge. [label] is the one child that gives
+  /// way first — it is the only flex child, so it always absorbs whatever
+  /// the end group does not use, which is what keeps the chevron flush to
+  /// the row's true right edge on every row, value or none.
+  static const double _valueMaxWidth = 160;
+
   @override
   Widget build(BuildContext context) {
     final Color foreground = color ?? context.sdTheme3.textPrimary;
@@ -42,31 +49,23 @@ class _MoreRowTile extends StatelessWidget {
           children: <Widget>[
             SdIconV3(icon, color: foreground),
             SizedBox(width: SdSpacingConstant.w12),
-            // - with a value, the label takes what it needs and the value is
-            //   pushed to the right edge, before the chevron
-            // - the value sits before the chevron, never instead of it
-            //   (`docs/rules/DESIGN_SYSTEM.md`)
-            if (shown == null)
-              Expanded(
-                child: _MoreRowLabel(label: label, color: foreground),
-              )
-            else ...<Widget>[
-              Flexible(
-                child: _MoreRowLabel(label: label, color: foreground),
-              ),
-              // The gap is inside the flexible half, so a narrow row shrinks it.
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(left: SdSpacingConstant.w8),
-                  child: Text(
-                    shown,
-                    style: context.textTheme3.bodyMedium!.copyWith(
-                      color: context.sdTheme3.textSecondary,
-                    ),
-                    textAlign: TextAlign.end,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            Expanded(
+              child: _MoreRowLabel(label: label, color: foreground),
+            ),
+            // The value sits before the chevron, never instead of it
+            // (`docs/rules/DESIGN_SYSTEM.md`).
+            if (shown != null) ...<Widget>[
+              SizedBox(width: SdSpacingConstant.w8),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _valueMaxWidth),
+                child: Text(
+                  shown,
+                  style: context.textTheme3.bodyMedium!.copyWith(
+                    color: context.sdTheme3.textSecondary,
                   ),
+                  textAlign: TextAlign.end,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

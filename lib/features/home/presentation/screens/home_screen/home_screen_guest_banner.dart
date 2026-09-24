@@ -34,47 +34,16 @@ class _HomeGuestBanner extends ConsumerWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-      child: SdCardV3(
-        padding: SdContentPaddingV3.row,
-        onTap: () => context.push(AppRoutes.login),
-        semanticLabel: context.l10n.homeGuestBannerTitle,
-        // Warning, not primary: this is a risk the seller is carrying, not an
-        // offer. Colour is never the only signal — the icon says it too.
+      child: AppStatusCard(
+        icon: AppIconConstant.warning,
+        // Warning, not primary: this is a risk the seller is carrying, not
+        // an offer. Colour is never the only signal — the icon says it too.
+        tint: context.sdTheme3.warning,
         borderColor: context.sdTheme3.warning,
-        child: Row(
-          children: <Widget>[
-            SdIconTileV3(
-              icon: AppIconConstant.warning,
-              tint: context.sdTheme3.warning,
-            ),
-            SizedBox(width: SdSpacingConstant.w12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    context.l10n.homeGuestBannerTitle,
-                    style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
-                      color: context.sdTheme3.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: SdSpacingConstant.h4),
-                  Text(
-                    context.l10n.homeGuestBannerSubtitle,
-                    style: context.textTheme3.bodySmall!.copyWith(
-                      color: context.sdTheme3.textSecondary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: SdSpacingConstant.w8),
-            const AppRowChevron(),
-          ],
-        ),
+        title: context.l10n.homeGuestBannerTitle,
+        detail: context.l10n.homeGuestBannerSubtitle,
+        semanticLabel: context.l10n.homeGuestBannerTitle,
+        onTap: () => context.push(AppRoutes.login),
       ),
     );
   }
