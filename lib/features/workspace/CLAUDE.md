@@ -176,6 +176,13 @@ is that neither one is a version of the other:
   a row joinable for whatever points at it, and nothing points at anything
   once the sweep finishes — a workspace full of `deletedAt` rows is not the
   empty workspace this exists to reproduce.
+- **Neither button asks first.** Owner's rule, and it replaces the confirm
+  dialogs both used to open: this is developer UI, run over and over against
+  a test business, and a dialog in front of every run was friction with no
+  seller behind it to protect. Dev mode is the guard, not a second tap.
+- **Both work for a guest.** The purge has a local half beside the Firestore
+  one, chosen by `RepositoryChoice` like every other repository — without it
+  a signed-out developer's tap threw `noWorkspace` and did nothing.
 - **Dev mode gates it twice**, the section and the card, the same as the seed
   card beside it: this one deletes, so one guard being forgotten must not be
   enough.
