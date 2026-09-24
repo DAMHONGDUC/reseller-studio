@@ -164,6 +164,7 @@ final class AppRoutes {
   /// you go and check, not something you are told.
   static const String activity = '/more/activity';
   static const String about = '/more/about';
+  static const String contactSupport = '/more/support';
 
   /// Plan §25's Subscription block, over §27's tiers. Under More rather than
   /// nested in Settings: a blocked action pushes straight here, and a paywall

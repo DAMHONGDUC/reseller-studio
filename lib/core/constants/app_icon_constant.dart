@@ -196,6 +196,9 @@ final class AppIconConstant {
   /// Sign out of the current account.
   static const IconData logout = Symbols.logout_rounded;
 
+  /// Email — writing to support.
+  static const IconData mail = Symbols.mail_rounded;
+
   /// Mark a notification or message as read.
   static const IconData markEmailRead = Symbols.mark_email_read_rounded;
 
@@ -305,9 +308,6 @@ final class AppIconConstant {
 
   /// Open or represent a summary report.
   static const IconData summarize = Symbols.summarize_rounded;
-
-  /// Reach a person — the support inbox.
-  static const IconData supportAgent = Symbols.support_agent_rounded;
 
   /// Reject or rate an outcome negatively.
   static const IconData thumbDown = Symbols.thumb_down_rounded;

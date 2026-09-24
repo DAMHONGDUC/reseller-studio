@@ -84,7 +84,7 @@ void main() {
 
   test('About sits in More, directly below Settings', () {
     // Owner's call, reversing the old home in Settings.
-    final List<String?> routes = MoreConstant.destinations
+    final List<String> routes = MoreConstant.destinations
         .map((MoreDestination d) => d.route)
         .toList();
 

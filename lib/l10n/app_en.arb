@@ -537,6 +537,18 @@
       }
     }
   },
+  "contactSupportIntro": "Questions, a problem, or an idea? Write to us and we will reply by email.",
+  "@contactSupportIntro": {
+    "description": "Contact support screen: one line on what to write about."
+  },
+  "contactSupportEmail": "Email",
+  "@contactSupportEmail": {
+    "description": "Contact support screen: label above the support address."
+  },
+  "contactSupportSend": "Send email",
+  "@contactSupportSend": {
+    "description": "Contact support screen: pinned button that opens the mail app."
+  },
   "aboutTitle": "About",
   "@aboutTitle": {
     "description": "App bar title of the About screen."

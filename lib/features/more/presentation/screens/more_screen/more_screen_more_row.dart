@@ -13,30 +13,6 @@ class _MoreRow extends StatelessWidget {
   final SellerPlan plan;
   final bool signedIn;
 
-  Future<void> _contactSupport(BuildContext context) async {
-    final String address = AppEnv.contactEmailSupport;
-    final bool opened = await LinkUtils.open(LinkUtils.mailto(address));
-
-    // LinkUtils already logged the failure; the address is shown so the
-    // seller can still write by hand.
-    if (context.mounted && !opened) {
-      SdSnackBarUtilsV3.error(
-        context,
-        context.l10n.moreContactSupportFailed(address),
-      );
-    }
-  }
-
-  void _open(BuildContext context) {
-    final String? route = destination.route;
-
-    if (route != null) {
-      context.push(route);
-    } else if (destination.kind == MoreDestinationKind.contactSupport) {
-      _contactSupport(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final Color foreground = destination.isBuilt
@@ -52,7 +28,9 @@ class _MoreRow extends StatelessWidget {
     return Column(
       children: <Widget>[
         InkWell(
-          onTap: destination.isBuilt ? () => _open(context) : null,
+          onTap: destination.isBuilt
+              ? () => context.push(destination.route)
+              : null,
           child: Padding(
             padding: SdContentPaddingV3.row,
             child: Row(

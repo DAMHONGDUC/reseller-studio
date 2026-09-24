@@ -15,15 +15,13 @@ class MoreDestination {
   const MoreDestination({
     required this.kind,
     required this.icon,
-    this.route,
+    required this.route,
     this.isBuilt = false,
   });
 
   final MoreDestinationKind kind;
   final IconData icon;
-
-  /// Null for a row that leaves the app instead of pushing a screen.
-  final String? route;
+  final String route;
 
   /// False until the destination has a screen. Drives the disabled look and
   /// the "Soon" badge.
@@ -262,7 +260,8 @@ final class MoreConstant {
         ),
         MoreDestination(
           kind: MoreDestinationKind.contactSupport,
-          icon: AppIconConstant.supportAgent,
+          icon: AppIconConstant.mail,
+          route: AppRoutes.contactSupport,
           isBuilt: true,
         ),
       ],
