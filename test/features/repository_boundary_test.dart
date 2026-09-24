@@ -40,6 +40,7 @@ void main() {
   const List<String> constantRepositories = <String>[
     'fallback_app_config_repository.dart',
     'unconfigured_subscription_repository.dart',
+    'local_sync_status_repository.dart',
   ];
 
   /// The one stream that degrades instead of mapping, and why.
@@ -142,21 +143,19 @@ void main() {
   }
 
   test('every data repository method maps its failures', () {
-    final List<File> repositories =
-        <File>[
-            ...Directory('lib/features')
-                .listSync(recursive: true)
-                .whereType<File>()
-                .where(
-                  (File file) =>
-                      file.path.contains('/data/repositories/') &&
-                      file.path.endsWith('.dart'),
-                ),
-            // Not under `data/repositories/`, but it is where every guest
-            // repository's failures actually get mapped.
-            File('lib/core/local/local_collection.dart'),
-          ]
-          ..sort((File a, File b) => a.path.compareTo(b.path));
+    final List<File> repositories = <File>[
+      ...Directory('lib/features')
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where(
+            (File file) =>
+                file.path.contains('/data/repositories/') &&
+                file.path.endsWith('.dart'),
+          ),
+      // Not under `data/repositories/`, but it is where every guest
+      // repository's failures actually get mapped.
+      File('lib/core/local/local_collection.dart'),
+    ]..sort((File a, File b) => a.path.compareTo(b.path));
     final List<String> unguarded = <String>[];
 
     // The scan is worthless if it stops finding the files.

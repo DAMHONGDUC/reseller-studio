@@ -76,6 +76,15 @@ final class AppIconConstant {
   /// Confirm a choice or action.
   static const IconData check = Symbols.check_rounded;
 
+  /// Every change has reached the server.
+  static const IconData cloudDone = Symbols.cloud_done_rounded;
+
+  /// Records that live on this device only.
+  static const IconData cloudOff = Symbols.cloud_off_rounded;
+
+  /// Changes still on their way to the server.
+  static const IconData cloudSync = Symbols.cloud_sync_rounded;
+
   /// Open the detail for a row.
   static const IconData chevronRight = Symbols.chevron_right_rounded;
 

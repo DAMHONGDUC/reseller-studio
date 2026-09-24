@@ -1467,5 +1467,13 @@
   "guestSyncKeepSeparate": "In einem neuen Geschäft behalten",
   "guestSyncRunning": "Deine Einträge werden verschoben …",
   "homeGuestBannerTitle": "Diese Einträge sind nur auf diesem Telefon",
-  "homeGuestBannerSubtitle": "Wenn du die App löschst, sind sie weg. Melde dich an, um sie zu sichern."
+  "homeGuestBannerSubtitle": "Wenn du die App löschst, sind sie weg. Melde dich an, um sie zu sichern.",
+  "syncCheckingTitle": "Synchronisierung wird geprüft…",
+  "syncCheckingSubtitle": "Dieses Gerät wird mit deinem Konto abgeglichen.",
+  "syncSyncingTitle": "Änderungen werden synchronisiert…",
+  "syncSyncingSubtitle": "Einige Änderungen haben den Server noch nicht erreicht. Sie sind auf diesem Gerät sicher und werden hochgeladen, sobald du online bist.",
+  "syncSyncedTitle": "Alle Änderungen synchronisiert",
+  "syncSyncedSubtitle": "Alles auf diesem Gerät ist in deinem Konto gespeichert.",
+  "syncDeviceOnlyTitle": "Nur auf diesem Gerät gespeichert",
+  "syncDeviceOnlySubtitle": "Melde dich an, um deine Daten in einem Konto zu sichern."
 }

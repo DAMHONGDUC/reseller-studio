@@ -1467,5 +1467,13 @@
   "guestSyncKeepSeparate": "Guardarlos en un negocio nuevo",
   "guestSyncRunning": "Moviendo tus registros…",
   "homeGuestBannerTitle": "Estos registros solo están en este teléfono",
-  "homeGuestBannerSubtitle": "Si eliminas la app, se eliminan. Inicia sesión para conservarlos."
+  "homeGuestBannerSubtitle": "Si eliminas la app, se eliminan. Inicia sesión para conservarlos.",
+  "syncCheckingTitle": "Comprobando la sincronización…",
+  "syncCheckingSubtitle": "Comparando este dispositivo con tu cuenta.",
+  "syncSyncingTitle": "Sincronizando cambios…",
+  "syncSyncingSubtitle": "Algunos cambios aún no han llegado al servidor. Están seguros en este dispositivo y se subirán cuando tengas conexión.",
+  "syncSyncedTitle": "Todos los cambios sincronizados",
+  "syncSyncedSubtitle": "Todo lo de este dispositivo está guardado en tu cuenta.",
+  "syncDeviceOnlyTitle": "Guardado solo en este dispositivo",
+  "syncDeviceOnlySubtitle": "Inicia sesión para respaldar tus registros en una cuenta."
 }

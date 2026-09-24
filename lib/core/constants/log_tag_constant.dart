@@ -59,6 +59,7 @@ final class LogTagConstant {
   static const String subscription = 'Subscription';
   static const String appConfig = 'App Config';
   static const String notification = 'Notification';
+  static const String sync = 'Sync';
 
   // --- Device and development ---
   static const String settings = 'Settings';

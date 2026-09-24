@@ -3,13 +3,11 @@ part of 'more_screen.dart';
 class _MoreSection extends StatelessWidget {
   const _MoreSection({
     required this.section,
-    required this.first,
     required this.plan,
     required this.signedIn,
   });
 
   final MoreSection section;
-  final bool first;
 
   /// Passed down rather than watched in the row: one read per screen, and a
   /// row stays a `StatelessWidget`.
@@ -20,7 +18,6 @@ class _MoreSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AppSection(
     title: MoreSectionLabel.of(context, section.kind),
-    first: first,
     padding: EdgeInsets.zero,
     child: Column(
       children: <Widget>[

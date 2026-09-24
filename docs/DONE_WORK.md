@@ -22,6 +22,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Subscription | Free ceilings — items for the life of the business, orders over a rolling 30 days, one business — plus two gated capabilities (tax pack, payout chasing), monthly/yearly paywall, restore, management screen | RevenueCat and webhook setup |
 | Settings | Account, workspace, theme | None |
 | More → Developer | Seed demo data, delete all data (dev mode only) | None |
+| More → Sync status | Card heading More: synced, syncing (writes still queued), or on this device only for a guest | None |
 
 ## Platform foundations
 

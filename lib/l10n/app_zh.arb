@@ -1467,5 +1467,13 @@
   "guestSyncKeepSeparate": "放到一个新店铺",
   "guestSyncRunning": "正在移动你的记录…",
   "homeGuestBannerTitle": "这些记录只保存在这部手机上",
-  "homeGuestBannerSubtitle": "删除应用就会删除它们。登录以妥善保存。"
+  "homeGuestBannerSubtitle": "删除应用就会删除它们。登录以妥善保存。",
+  "syncCheckingTitle": "正在检查同步…",
+  "syncCheckingSubtitle": "正在将此设备与你的账户进行比对。",
+  "syncSyncingTitle": "正在同步更改…",
+  "syncSyncingSubtitle": "部分更改尚未到达服务器。它们已安全保存在此设备上，联网后会自动上传。",
+  "syncSyncedTitle": "所有更改已同步",
+  "syncSyncedSubtitle": "此设备上的所有内容都已保存到你的账户。",
+  "syncDeviceOnlyTitle": "仅保存在此设备上",
+  "syncDeviceOnlySubtitle": "登录即可将记录备份到账户。"
 }

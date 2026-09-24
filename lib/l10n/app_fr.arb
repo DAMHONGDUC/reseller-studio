@@ -1467,5 +1467,13 @@
   "guestSyncKeepSeparate": "Les garder dans une nouvelle activité",
   "guestSyncRunning": "Déplacement de vos données…",
   "homeGuestBannerTitle": "Ces données ne sont que sur ce téléphone",
-  "homeGuestBannerSubtitle": "Supprimer l'app les supprime. Connectez-vous pour les protéger."
+  "homeGuestBannerSubtitle": "Supprimer l'app les supprime. Connectez-vous pour les protéger.",
+  "syncCheckingTitle": "Vérification de la synchronisation…",
+  "syncCheckingSubtitle": "Comparaison de cet appareil avec votre compte.",
+  "syncSyncingTitle": "Synchronisation en cours…",
+  "syncSyncingSubtitle": "Certaines modifications n'ont pas encore atteint le serveur. Elles sont en sécurité sur cet appareil et seront envoyées dès que vous serez en ligne.",
+  "syncSyncedTitle": "Toutes les modifications sont synchronisées",
+  "syncSyncedSubtitle": "Tout ce qui est sur cet appareil est enregistré dans votre compte.",
+  "syncDeviceOnlyTitle": "Enregistré sur cet appareil uniquement",
+  "syncDeviceOnlySubtitle": "Connectez-vous pour sauvegarder vos données dans un compte."
 }

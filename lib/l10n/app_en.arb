@@ -6595,5 +6595,37 @@
   "homeGuestBannerSubtitle": "Deleting the app deletes them. Sign in to keep them safe.",
   "@homeGuestBannerSubtitle": {
     "description": "Subtitle of the Home banner warning a signed-out seller about losing their records."
+  },
+  "syncCheckingTitle": "Checking sync…",
+  "@syncCheckingTitle": {
+    "description": "Title of the More sync card while the first check is running."
+  },
+  "syncCheckingSubtitle": "Comparing this device with your account.",
+  "@syncCheckingSubtitle": {
+    "description": "Subtitle of the More sync card while the first check is running."
+  },
+  "syncSyncingTitle": "Syncing changes…",
+  "@syncSyncingTitle": {
+    "description": "Title of the More sync card when some writes have not reached the server."
+  },
+  "syncSyncingSubtitle": "Some changes haven't reached the server yet. They're safe on this device and upload when you're online.",
+  "@syncSyncingSubtitle": {
+    "description": "Subtitle of the More sync card when some writes have not reached the server."
+  },
+  "syncSyncedTitle": "All changes synced",
+  "@syncSyncedTitle": {
+    "description": "Title of the More sync card when every write has reached the server."
+  },
+  "syncSyncedSubtitle": "Everything on this device is saved to your account.",
+  "@syncSyncedSubtitle": {
+    "description": "Subtitle of the More sync card when every write has reached the server."
+  },
+  "syncDeviceOnlyTitle": "Saved on this device only",
+  "@syncDeviceOnlyTitle": {
+    "description": "Title of the More sync card for a signed-out seller whose records are local only."
+  },
+  "syncDeviceOnlySubtitle": "Sign in to back up your records to an account.",
+  "@syncDeviceOnlySubtitle": {
+    "description": "Subtitle of the More sync card for a signed-out seller; tapping opens sign-in."
   }
 }

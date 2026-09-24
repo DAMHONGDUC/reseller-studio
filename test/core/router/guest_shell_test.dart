@@ -119,10 +119,14 @@ void main() {
     await pumpShell(tester);
     await goTo(tester, AppRoutes.more);
 
-    expect(find.text('Settings'), findsOneWidget);
-
     // Records the guest store holds: a guest may see all of them.
-    for (final String shown in <String>['Sourcing', 'Listings']) {
+    for (final String shown in <String>['Sourcing', 'Listings', 'Settings']) {
+      await tester.scrollUntilVisible(
+        find.text(shown),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+
       expect(find.text(shown), findsOneWidget, reason: shown);
     }
 

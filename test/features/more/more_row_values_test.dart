@@ -45,6 +45,12 @@ void main() {
       overrides: <Override>[isSignedInProvider.overrideWithValue(false)],
     );
 
+    await tester.scrollUntilVisible(
+      find.text('Not signed in'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+
     expect(find.text('Not signed in'), findsOneWidget);
   });
 }
