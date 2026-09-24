@@ -14,7 +14,6 @@ import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../../reseller_studio_app.dart';
 import '../../../../app_config/providers.dart';
-import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../auth/providers.dart';
 import '../../../../subscription/domain/enums/seller_plan.dart';
 import '../../../../subscription/providers.dart';
@@ -27,7 +26,6 @@ import '../../controllers/delete_all_data_controller.dart';
 import '../../controllers/seed_data_controller.dart';
 import '../../controllers/theme_mode_controller.dart';
 
-part 'more_screen_account_actions.dart';
 part 'more_screen_dev_rows.dart';
 part 'more_screen_general_section.dart';
 part 'more_screen_more_row.dart';

@@ -10,6 +10,7 @@ import 'package:reseller_studio/features/app_config/presentation/screens/account
 import 'package:reseller_studio/features/inventory/presentation/screens/intake_session_screen/intake_session_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/scanner_screen/scanner_screen.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/listings_screen/listings_screen.dart';
+import 'package:reseller_studio/features/more/presentation/screens/account_screen/account_screen.dart';
 import 'package:reseller_studio/features/onboarding/presentation/screens/onboarding_screen/onboarding_screen.dart';
 import 'package:reseller_studio/features/reports/presentation/screens/books_screen/books_screen.dart';
 import 'package:reseller_studio/features/search/presentation/screens/search_screen/search_screen.dart';
@@ -38,6 +39,7 @@ void main() {
     'Analytics — marketplace': () => const AnalyticsMarketplaceScreen(),
     'Analytics — profit': () => const AnalyticsProfitScreen(),
     'Analytics — sales': () => const AnalyticsSalesScreen(),
+    'Account': () => const AccountScreen(),
     'Account blocked': () => const AccountBlockedScreen(),
     'Books': () => const BooksScreen(),
     'Intake session': () => const IntakeSessionScreen(),

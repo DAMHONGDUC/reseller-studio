@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/widgets/app_row_chevron.dart';
 import 'package:reseller_studio/features/auth/providers.dart';
 import 'package:reseller_studio/features/more/presentation/screens/more_screen/more_screen.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
@@ -15,7 +16,7 @@ import '../../support/pump_app.dart';
 /// assertions moved to `test/features/subscription/plan_meters_test.dart`.
 /// What is left here is what More itself still says.
 void main() {
-  testWidgets('More names the plan and the session without opening either', (
+  testWidgets('More names the plan and the session', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -36,7 +37,39 @@ void main() {
     expect(find.text('Signed in'), findsOneWidget);
   });
 
-  testWidgets('signed out, the Settings row says so', (
+  testWidgets(
+    'the Account row is a destination once signed in, never the email itself',
+    (WidgetTester tester) async {
+      await pumpScreen(
+        tester,
+        const MoreScreen(),
+        overrides: <Override>[
+          isSignedInProvider.overrideWithValue(true),
+          currentPlanProvider.overrideWithValue(SellerPlan.free),
+        ],
+      );
+
+      final Finder row = find.ancestor(
+        of: find.text('Signed in'),
+        matching: find.byType(InkWell),
+      );
+
+      await tester.scrollUntilVisible(
+        find.text('Signed in'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      // A chevron, not a value that stops at "Signed in" — the account's own
+      // screen is where the name and the email actually show.
+      expect(
+        find.descendant(of: row, matching: find.byType(AppRowChevron)),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets('signed out, the Account row says so', (
     WidgetTester tester,
   ) async {
     await pumpScreen(

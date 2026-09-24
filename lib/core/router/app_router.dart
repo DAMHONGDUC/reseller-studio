@@ -32,6 +32,7 @@ import '../../features/listings/presentation/screens/listings_screen/listings_sc
 import '../../features/marketplaces/presentation/screens/marketplace_detail_screen/marketplace_detail_screen.dart';
 import '../../features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import '../../features/more/presentation/screens/about_screen/about_screen.dart';
+import '../../features/more/presentation/screens/account_screen/account_screen.dart';
 import '../../features/more/presentation/screens/contact_support_screen/contact_support_screen.dart';
 import '../../features/more/presentation/screens/more_screen/more_screen.dart';
 import '../../features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart';
@@ -451,6 +452,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'notifications',
                     builder: (BuildContext context, GoRouterState state) =>
                         const NotificationSettingsScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'account',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AccountScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

@@ -28,7 +28,6 @@ class _GeneralSection extends ConsumerWidget {
       ?_destination(MoreConstant.notifications),
       ?_destination(MoreConstant.about),
       ?_destination(MoreConstant.contactSupport),
-      if (signedIn) ...<Widget>[const _SignOutRow(), const _DeleteAccountRow()],
       if (ref.watch(devModeEnabledProvider)) ...<Widget>[
         const _SeedDataRow(),
         const _DeleteAllDataRow(),
@@ -43,8 +42,6 @@ class _AccountRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final String? email = ref.watch(authUserProvider).value?.email;
-    final String? name = ref.watch(authUserProvider).value?.displayName;
     final bool signedIn = ref.watch(isSignedInProvider) ?? false;
 
     if (!signedIn) {
@@ -56,11 +53,14 @@ class _AccountRow extends ConsumerWidget {
       );
     }
 
+    // The value says only whether an account is signed in — never the email
+    // or the name, which do not belong on a row nothing else on More prints.
+    // The row opens the Account screen, where they do belong.
     return _MoreRowTile(
       icon: AppIconConstant.person,
       label: context.l10n.settingsAccount,
-      value: email ?? name ?? context.l10n.settingsSignedIn,
-      showChevron: false,
+      value: context.l10n.settingsSignedIn,
+      onTap: () => context.push(AppRoutes.account),
     );
   }
 }

@@ -159,6 +159,10 @@ final class AppRoutes {
   /// preference.
   static const String notificationSettings = '/more/notifications';
 
+  /// Who is signed in, and the two ways out. Pushed from the Account row on
+  /// More, which never prints the email or the name itself.
+  static const String account = '/more/account';
+
   /// The audit log (§23). Under More rather than under Home: it is something
   /// you go and check, not something you are told.
   static const String activity = '/more/activity';
