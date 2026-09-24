@@ -22,6 +22,23 @@ place to look.
 - Anything that would once have gone "in Settings" becomes a section or a row
   on More. Do not bring the screen back.
 
+## Copy that commits to a line budget is tested, not guessed
+
+`_SyncStatusCard` and Home's `_HomeGuestBanner` share `AppStatusCard`
+(`core/widgets/`): a one-line title and a detail capped at one line for the
+sync card, two for the banner. **A `maxLines` cap stops the layout breaking;
+it does not stop a seller reading a sentence cut off mid-word — that is a
+content bug, checked by width, not by eye.**
+`test/core/widgets/status_card_text_fit_test.dart` pumps every shipping
+locale's real copy through the real widget and asserts
+`RenderParagraph.didExceedMaxLines` is false. A widget test needs Inter
+loaded first (`test/support/load_app_fonts.dart`) — Flutter's built-in test
+font is wider than Inter at nearly every weight, and measuring against it
+both misses real overflow and flags copy that fits.
+
+A string a test catches gets shortened, not exempted: the copy carries the
+meaning, the width decides how much copy that can be.
+
 ## The dev rows
 
 Seed demo data and Delete all data are the last two rows of General, behind
