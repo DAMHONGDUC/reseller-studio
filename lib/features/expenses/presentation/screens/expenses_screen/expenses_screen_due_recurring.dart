@@ -48,12 +48,10 @@ class _DueRecurring extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.sectionGap),
-        SdSectionHeaderV3(
+        AppSection.rows(
           title: context.l10n.expensesRecurringDue,
           subtitle: context.l10n.expensesRecurringDueNote,
           first: true,
-        ),
-        AppListCard(
           children: due
               .map(
                 (RecurringExpense series) => AppListRow(

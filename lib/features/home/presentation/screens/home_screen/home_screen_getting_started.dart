@@ -28,38 +28,25 @@ class _GettingStarted extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        SdSectionHeaderV3(
-          title: context.l10n.homeGettingStarted,
-          subtitle: context.l10n.homeGettingStartedProgress(
-            done.length,
-            steps.length,
-          ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
+      child: AppSection.rows(
+        title: context.l10n.homeGettingStarted,
+        subtitle: context.l10n.homeGettingStartedProgress(
+          done.length,
+          steps.length,
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SdContentPaddingV3.horizontal,
-          ),
-          child: AppListCard(
-            // The one card on Home asking for something. It sits under three
-            // shortcut cards and above the dashboard, so without an edge it
-            // reads as more chrome; the "N of 3 done" header is the label that
-            // keeps colour from being the only signal.
-            borderColor: context.colorScheme3.primary,
-            children: <Widget>[
-              for (int i = 0; i < steps.length; i++) ...<Widget>[
-                if (i > 0) const SdDividerV3(),
-                _GettingStartedRow(
-                  step: steps[i],
-                  isDone: done.contains(steps[i]),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
+        // The one card on Home asking for something. It sits under three
+        // shortcut cards and above the dashboard, so without an edge it
+        // reads as more chrome; the "N of 3 done" header is the label.
+        borderColor: context.colorScheme3.primary,
+        children: <Widget>[
+          for (int i = 0; i < steps.length; i++) ...<Widget>[
+            if (i > 0) const SdDividerV3(),
+            _GettingStartedRow(step: steps[i], isDone: done.contains(steps[i])),
+          ],
+        ],
+      ),
     );
   }
 }

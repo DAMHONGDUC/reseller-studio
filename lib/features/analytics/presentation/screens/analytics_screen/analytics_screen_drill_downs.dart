@@ -10,7 +10,9 @@ class _DrillDowns extends StatelessWidget {
   const _DrillDowns();
 
   @override
-  Widget build(BuildContext context) => AppListCard(
+  Widget build(BuildContext context) => AppSection.rows(
+    title: context.l10n.analyticsGoDeeper,
+    subtitle: context.l10n.analyticsTheSameFiguresOneQuestionAt,
     children: <Widget>[
       AppListRow(
         title: context.l10n.analyticsSales,

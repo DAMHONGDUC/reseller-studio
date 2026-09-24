@@ -47,58 +47,53 @@ class _ExportPack extends ConsumerWidget {
     final BookkeepingGaps gaps = ref.watch(taxYearGapsProvider);
     final bool isBusy = ref.watch(reportControllerProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        SdSectionHeaderV3(title: context.l10n.taxPackTitle),
-        SdCardV3(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                context.l10n.taxPackChecked(gaps.checkedOrders),
-                style: context.textTheme3.bodyMedium!.copyWith(
-                  color: context.sdTheme3.textPrimary,
-                ),
-              ),
-              SizedBox(height: SdSpacingConstant.h4),
-              Text(
-                gaps.isClear
-                    ? context.l10n.taxPackExact
-                    : context.l10n.taxPackApproximate(
-                        gaps.missingPayouts.length,
-                        gaps.unknownCost.length,
-                      ),
-                style: context.textTheme3.bodySmall!.copyWith(
-                  // Amber, never red: an estimate is not an error, and the
-                  // pack is still exportable — it just says so out loud.
-                  color: gaps.isClear
-                      ? context.sdTheme3.textSecondary
-                      : context.sdTheme3.warning,
-                ),
-              ),
-              if (!gaps.isClear) ...<Widget>[
-                SizedBox(height: SdSpacingConstant.h8),
-                SdButtonV3(
-                  variant: SdButtonVariantV3.text,
-                  label: context.l10n.taxPackFixFirst,
-                  size: SdButtonSizeV3.small,
-                  onPressed: () => context.push(AppRoutes.books),
-                ),
-              ],
-              SizedBox(height: SdSpacingConstant.h12),
-              SdButtonV3(
-                variant: SdButtonVariantV3.primary,
-                label: context.l10n.taxPackExport,
-                icon: AppIconConstant.download,
-                expand: true,
-                busy: isBusy,
-                onPressed: isBusy ? null : () => _export(context, ref),
-              ),
-            ],
+    return AppSection(
+      title: context.l10n.taxPackTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            context.l10n.taxPackChecked(gaps.checkedOrders),
+            style: context.textTheme3.bodyMedium!.copyWith(
+              color: context.sdTheme3.textPrimary,
+            ),
           ),
-        ),
-      ],
+          SizedBox(height: SdSpacingConstant.h4),
+          Text(
+            gaps.isClear
+                ? context.l10n.taxPackExact
+                : context.l10n.taxPackApproximate(
+                    gaps.missingPayouts.length,
+                    gaps.unknownCost.length,
+                  ),
+            style: context.textTheme3.bodySmall!.copyWith(
+              // Amber, never red: an estimate is not an error, and the
+              // pack is still exportable — it just says so out loud.
+              color: gaps.isClear
+                  ? context.sdTheme3.textSecondary
+                  : context.sdTheme3.warning,
+            ),
+          ),
+          if (!gaps.isClear) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h8),
+            SdButtonV3(
+              variant: SdButtonVariantV3.text,
+              label: context.l10n.taxPackFixFirst,
+              size: SdButtonSizeV3.small,
+              onPressed: () => context.push(AppRoutes.books),
+            ),
+          ],
+          SizedBox(height: SdSpacingConstant.h12),
+          SdButtonV3(
+            variant: SdButtonVariantV3.primary,
+            label: context.l10n.taxPackExport,
+            icon: AppIconConstant.download,
+            expand: true,
+            busy: isBusy,
+            onPressed: isBusy ? null : () => _export(context, ref),
+          ),
+        ],
+      ),
     );
   }
 }

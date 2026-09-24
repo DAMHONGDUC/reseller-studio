@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../domain/entities/analytics_summary.dart';
 import '../../../providers.dart';
 
@@ -35,31 +36,12 @@ class AnalyticsScreen extends ConsumerWidget {
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.navAnalytics),
       body: ListView(
-        padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
+        padding: SdContentPaddingV3.screen(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
-          SdSectionHeaderV3(title: context.l10n.analyticsOverview, first: true),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
-            ),
-            child: _ProfitStatement(summary: summary),
-          ),
-          SdSectionHeaderV3(
-            title: context.l10n.analyticsByMarketplace,
-            subtitle: context.l10n.analyticsWhereTheMoneyActuallyComesFrom,
-          ),
+          _ProfitStatement(summary: summary),
           const _MarketplaceBreakdown(),
-          SdSectionHeaderV3(
-            title: context.l10n.analyticsGoDeeper,
-            subtitle: context.l10n.analyticsTheSameFiguresOneQuestionAt,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
-            ),
-            child: const _DrillDowns(),
-          ),
+          const _DrillDowns(),
         ],
       ),
     );

@@ -24,36 +24,29 @@ class _RecentActivity extends ConsumerWidget {
 
     if (recent.isEmpty) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        SdSectionHeaderV3(title: context.l10n.homeRecentActivity),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SdContentPaddingV3.horizontal,
-          ),
-          child: SdCardV3(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: <Widget>[
-                for (int i = 0; i < recent.length; i++) ...<Widget>[
-                  _ActivityRow(order: recent[i]),
-                  if (i != recent.length - 1)
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left:
-                            SdSpacingConstant.w16 +
-                            SdIconTileSizeV3.small.box +
-                            SdSpacingConstant.w12,
-                      ),
-                      child: const SdDividerV3(),
-                    ),
-                ],
-              ],
-            ),
-          ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
+      child: AppSection(
+        title: context.l10n.homeRecentActivity,
+        padding: EdgeInsets.zero,
+        child: Column(
+          children: <Widget>[
+            for (int i = 0; i < recent.length; i++) ...<Widget>[
+              _ActivityRow(order: recent[i]),
+              if (i != recent.length - 1)
+                Padding(
+                  padding: EdgeInsets.only(
+                    left:
+                        SdSpacingConstant.w16 +
+                        SdIconTileSizeV3.small.box +
+                        SdSpacingConstant.w12,
+                  ),
+                  child: const SdDividerV3(),
+                ),
+            ],
+          ],
         ),
-      ],
+      ),
     );
   }
 }

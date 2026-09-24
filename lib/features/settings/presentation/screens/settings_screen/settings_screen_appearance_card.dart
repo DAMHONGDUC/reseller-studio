@@ -69,7 +69,9 @@ class _AppearanceCard extends ConsumerWidget {
     final ThemeMode mode = ref.watch(themeModeProvider);
     final Locale? locale = ref.watch(appLocaleProvider);
 
-    return AppListCard(
+    return AppSection.rows(
+      title: context.l10n.settingsAppearance,
+      first: true,
       children: <Widget>[
         AppListRow(
           title: context.l10n.settingsTheme,

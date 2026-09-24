@@ -15,12 +15,10 @@ class _Lines extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      SdSectionHeaderV3(
+      AppSection.rows(
         title: context.l10n.taxExpensesByLine,
         subtitle: context.l10n.taxYourCategoriesGroupedTheWayThe,
         first: true,
-      ),
-      AppListCard(
         children: <Widget>[
           for (final TaxLineTotal line in summary.lines)
             AppListRow(
@@ -50,12 +48,10 @@ class _MileageCard extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      SdSectionHeaderV3(
+      AppSection.rows(
         title: context.l10n.taxMileage,
         subtitle: context.l10n.taxDeductedAtThePublishedRateNot,
         first: true,
-      ),
-      AppListCard(
         children: <Widget>[
           AppListRow(
             title: context.l10n.taxDistance,

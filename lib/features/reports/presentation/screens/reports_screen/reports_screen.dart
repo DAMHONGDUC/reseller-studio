@@ -9,6 +9,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../../../core/widgets/app_stat_tile_row.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
 import '../../../../analytics/providers.dart';
@@ -114,12 +115,10 @@ class ReportsScreen extends ConsumerWidget {
             ),
           ),
           SizedBox(height: SdContentPaddingV3.sectionGap),
-          SdSectionHeaderV3(
+          AppSection.rows(
             title: context.l10n.reportsExport,
             subtitle: context.l10n.reportsCsvReadyForASpreadsheetOr,
             first: true,
-          ),
-          AppListCard(
             children: <Widget>[
               AppListRow(
                 title: context.l10n.analyticsSales,

@@ -61,9 +61,6 @@ class AppEditableSection extends StatelessWidget {
       SdSectionHeaderV3(
         title: title,
         first: first,
-        // The block is already inside the screen's gutter, so the heading
-        // pays it once rather than twice.
-        gutter: false,
         action: isEditing
             ? Row(
                 mainAxisSize: MainAxisSize.min,

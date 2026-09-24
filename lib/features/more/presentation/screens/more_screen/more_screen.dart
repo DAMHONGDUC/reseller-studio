@@ -5,6 +5,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../../auth/providers.dart';
 import '../../../../subscription/domain/enums/seller_plan.dart';
 import '../../../../subscription/providers.dart';
@@ -43,7 +44,7 @@ class MoreScreen extends ConsumerWidget {
     return SdScaffoldV3(
       appBar: SdAppBarV3(title: context.l10n.navMore),
       body: ListView(
-        padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
+        padding: SdContentPaddingV3.screen(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
           for (int index = 0; index < sections.length; index++)

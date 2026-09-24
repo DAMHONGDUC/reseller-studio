@@ -8,6 +8,7 @@ import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../../reseller_studio_app.dart';
@@ -42,57 +43,30 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => SdScaffoldV3(
     appBar: SdAppBarV3(title: context.l10n.moreSettings),
     body: ListView(
-      padding: SdContentPaddingV3.fullBleed(context),
+      padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
-        SdSectionHeaderV3(title: context.l10n.settingsAppearance, first: true),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SdContentPaddingV3.horizontal,
-          ),
-          child: const _AppearanceCard(),
-        ),
-        SdSectionHeaderV3(title: context.l10n.settingsAccount),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SdContentPaddingV3.horizontal,
-          ),
-          child: const _AccountCard(),
-        ),
-        SdSectionHeaderV3(title: context.l10n.settingsApp),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SdContentPaddingV3.horizontal,
-          ),
-          child: AppListCard(
-            children: <Widget>[
-              AppListRow(
-                title: context.l10n.notificationSettingsTitle,
-                subtitle: context.l10n.notificationSettingsIntro,
-                icon: AppIconConstant.notifications,
-                onTap: () => context.push(AppRoutes.notificationSettings),
-              ),
-            ],
-          ),
+        const _AppearanceCard(),
+        const _AccountCard(),
+        AppSection.rows(
+          title: context.l10n.settingsApp,
+          children: <Widget>[
+            AppListRow(
+              title: context.l10n.notificationSettingsTitle,
+              subtitle: context.l10n.notificationSettingsIntro,
+              icon: AppIconConstant.notifications,
+              onTap: () => context.push(AppRoutes.notificationSettings),
+            ),
+          ],
         ),
         if (ref.watch(devModeEnabledProvider)) ...<Widget>[
           SdSectionHeaderV3(
             title: context.l10n.settingsDeveloper,
             subtitle: context.l10n.settingsDeveloperNote,
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
-            ),
-            child: const _SeedDataCard(),
-          ),
+          const _SeedDataCard(),
           SizedBox(height: SdSpacingConstant.h12),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SdContentPaddingV3.horizontal,
-            ),
-            child: const _DeleteAllDataCard(),
-          ),
+          const _DeleteAllDataCard(),
         ],
       ],
     ),

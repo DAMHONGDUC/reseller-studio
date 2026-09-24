@@ -11,6 +11,7 @@ import '../../../../../core/utils/mileage_unit_label.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_row_icon_button.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../../tax/providers.dart';
 import '../../../domain/entities/expense.dart';
@@ -115,11 +116,9 @@ class ExpensesScreen extends ConsumerWidget {
             const _DueRecurring(),
             if (totals.isNotEmpty) ...<Widget>[
               SizedBox(height: SdContentPaddingV3.sectionGap),
-              SdSectionHeaderV3(
+              AppSection.rows(
                 title: context.l10n.analyticsByCategory,
                 first: true,
-              ),
-              AppListCard(
                 children: totals
                     .map(
                       (MapEntry<ExpenseCategory, Money> row) => AppListRow(
@@ -132,11 +131,9 @@ class ExpensesScreen extends ConsumerWidget {
               ),
             ],
             SizedBox(height: SdContentPaddingV3.sectionGap),
-            SdSectionHeaderV3(
+            AppSection.rows(
               title: context.l10n.expensesEverything,
               first: true,
-            ),
-            AppListCard(
               children: expenses
                   .map(
                     (Expense expense) => AppListRow(

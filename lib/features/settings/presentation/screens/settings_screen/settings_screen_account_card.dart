@@ -89,7 +89,8 @@ class _AccountCard extends ConsumerWidget {
     // Settings is reachable without an account (owner's rule), so this card
     // has to have something to say in that state — and "Sign out" is not it.
     if (!signedIn) {
-      return AppListCard(
+      return AppSection.rows(
+        title: context.l10n.settingsAccount,
         children: <Widget>[
           AppListRow(
             title: context.l10n.settingsSignedOut,
@@ -106,7 +107,8 @@ class _AccountCard extends ConsumerWidget {
       );
     }
 
-    return AppListCard(
+    return AppSection.rows(
+      title: context.l10n.settingsAccount,
       children: <Widget>[
         AppListRow(
           title: name ?? email ?? context.l10n.settingsSignedIn,

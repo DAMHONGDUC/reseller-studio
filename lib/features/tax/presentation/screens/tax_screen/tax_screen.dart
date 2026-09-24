@@ -10,6 +10,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../../reports/domain/services/bookkeeping_gaps.dart';
 import '../../../../reports/presentation/controllers/report_controller.dart';
 import '../../../../reports/providers.dart';
@@ -122,11 +123,13 @@ class TaxScreen extends ConsumerWidget {
     );
   }
 
-  static String _authority(BuildContext context, TaxJurisdiction jurisdiction) =>
-      switch (jurisdiction) {
-        TaxJurisdiction.us => context.l10n.taxAuthorityUs,
-        TaxJurisdiction.uk => context.l10n.taxAuthorityUk,
-      };
+  static String _authority(
+    BuildContext context,
+    TaxJurisdiction jurisdiction,
+  ) => switch (jurisdiction) {
+    TaxJurisdiction.us => context.l10n.taxAuthorityUs,
+    TaxJurisdiction.uk => context.l10n.taxAuthorityUk,
+  };
 
   /// The period spelled out, because "2026/27" means nothing until you see
   /// the two dates behind it.

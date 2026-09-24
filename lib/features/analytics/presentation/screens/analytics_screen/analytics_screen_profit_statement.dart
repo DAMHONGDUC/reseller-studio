@@ -11,7 +11,9 @@ class _ProfitStatement extends StatelessWidget {
   final AnalyticsSummary summary;
 
   @override
-  Widget build(BuildContext context) => SdCardV3(
+  Widget build(BuildContext context) => AppSection(
+    title: context.l10n.analyticsOverview,
+    first: true,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[

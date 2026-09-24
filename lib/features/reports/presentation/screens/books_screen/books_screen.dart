@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../../orders/domain/entities/order.dart';
 import '../../../../sourcing/domain/entities/purchase.dart';
 import '../../../domain/services/bookkeeping_gaps.dart';
@@ -48,17 +49,12 @@ class BooksScreen extends ConsumerWidget {
               message: context.l10n.booksClearBody,
             )
           : ListView(
-              padding: SdContentPaddingV3.fullBleed(context),
+              padding: SdContentPaddingV3.screen(context),
               children: <Widget>[
                 SizedBox(height: SdContentPaddingV3.topGap),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: SdContentPaddingV3.horizontal,
-                  ),
-                  child: Text(
-                    context.l10n.booksIntro(gaps.total),
-                    style: context.textTheme3.bodySmall!.muted3(context),
-                  ),
+                Text(
+                  context.l10n.booksIntro(gaps.total),
+                  style: context.textTheme3.bodySmall!.muted3(context),
                 ),
                 _OrderGroup(
                   title: context.l10n.booksEstimatedFees,

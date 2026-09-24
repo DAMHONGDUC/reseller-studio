@@ -12,49 +12,42 @@ class _TakenIn extends StatelessWidget {
   final IntakeSessionState state;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: <Widget>[
-      SdSectionHeaderV3(
-        title: context.l10n.intakeTakenIn(state.count),
-        first: true,
-      ),
-      SdCardV3(
-        padding: EdgeInsets.zero,
-        child: Column(
-          children: <Widget>[
-            for (int i = 0; i < state.lines.length; i++) ...<Widget>[
-              Padding(
-                padding: SdContentPaddingV3.row,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        state.lines[i].title,
-                        style: context.textTheme3.bodyMedium!.copyWith(
-                          color: context.sdTheme3.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+  Widget build(BuildContext context) => AppSection(
+    title: context.l10n.intakeTakenIn(state.count),
+    first: true,
+    padding: EdgeInsets.zero,
+    child: Column(
+      children: <Widget>[
+        for (int i = 0; i < state.lines.length; i++) ...<Widget>[
+          Padding(
+            padding: SdContentPaddingV3.row,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    state.lines[i].title,
+                    style: context.textTheme3.bodyMedium!.copyWith(
+                      color: context.sdTheme3.textPrimary,
                     ),
-                    SizedBox(width: SdSpacingConstant.w8),
-                    // `—` where no cost was entered, never a zero: a blank
-                    // box means nobody said, not that it was free.
-                    Text(
-                      context.money(state.lines[i].cost),
-                      style: context.textTheme3.bodyMedium!.tabular3.copyWith(
-                        color: context.sdTheme3.textSecondary,
-                      ),
-                    ),
-                  ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              if (i != state.lines.length - 1) const SdDividerV3(),
-            ],
-          ],
-        ),
-      ),
-    ],
+                SizedBox(width: SdSpacingConstant.w8),
+                // `—` where no cost was entered, never a zero: a blank
+                // box means nobody said, not that it was free.
+                Text(
+                  context.money(state.lines[i].cost),
+                  style: context.textTheme3.bodyMedium!.tabular3.copyWith(
+                    color: context.sdTheme3.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (i != state.lines.length - 1) const SdDividerV3(),
+        ],
+      ],
+    ),
   );
 }

@@ -37,49 +37,35 @@ class _OrderGroup extends StatelessWidget {
 
     final List<Order> shown = orders.take(_maxRowsPerGroup).toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return AppSection.rows(
+      title: title,
+      subtitle: explanation,
+      action: Text(
+        '${orders.length}',
+        style: context.textTheme3.titleSmall!.tabular3.copyWith(
+          color: context.sdTheme3.textSecondary,
+        ),
+      ),
+      first: first,
       children: <Widget>[
-        SdSectionHeaderV3(
-          title: title,
-          subtitle: explanation,
-          action: Text(
-            '${orders.length}',
-            style: context.textTheme3.titleSmall!.tabular3.copyWith(
-              color: context.sdTheme3.textSecondary,
+        for (final Order order in shown)
+          AppListRow(
+            title: order.lines.isEmpty
+                ? context.l10n.orderFallbackTitle(order.id)
+                : order.lines.first.title,
+            subtitle: DateTimeUtils.mediumDate(
+              order.orderedAt,
+              locale: context.localeTag,
             ),
+            icon: icon,
+            trailingText: context.money(order.salePrice),
+            onTap: () => context.push(AppRoutes.order(order.id)),
           ),
-          first: first,
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SdContentPaddingV3.horizontal,
+        if (orders.length > shown.length)
+          AppListRow(
+            title: context.l10n.booksAndMore(orders.length - shown.length),
+            showChevron: false,
           ),
-          child: AppListCard(
-            children: <Widget>[
-              for (final Order order in shown)
-                AppListRow(
-                  title: order.lines.isEmpty
-                      ? context.l10n.orderFallbackTitle(order.id)
-                      : order.lines.first.title,
-                  subtitle: DateTimeUtils.mediumDate(
-                    order.orderedAt,
-                    locale: context.localeTag,
-                  ),
-                  icon: icon,
-                  trailingText: context.money(order.salePrice),
-                  onTap: () => context.push(AppRoutes.order(order.id)),
-                ),
-              if (orders.length > shown.length)
-                AppListRow(
-                  title: context.l10n.booksAndMore(
-                    orders.length - shown.length,
-                  ),
-                  showChevron: false,
-                ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -101,46 +87,32 @@ class _PurchaseGroup extends StatelessWidget {
 
     final List<Purchase> shown = purchases.take(_maxRowsPerGroup).toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return AppSection.rows(
+      title: context.l10n.booksNoReceipt,
+      subtitle: context.l10n.booksNoReceiptBody,
+      action: Text(
+        '${purchases.length}',
+        style: context.textTheme3.titleSmall!.tabular3.copyWith(
+          color: context.sdTheme3.textSecondary,
+        ),
+      ),
       children: <Widget>[
-        SdSectionHeaderV3(
-          title: context.l10n.booksNoReceipt,
-          subtitle: context.l10n.booksNoReceiptBody,
-          action: Text(
-            '${purchases.length}',
-            style: context.textTheme3.titleSmall!.tabular3.copyWith(
-              color: context.sdTheme3.textSecondary,
+        for (final Purchase purchase in shown)
+          AppListRow(
+            title: DateTimeUtils.mediumDate(
+              purchase.purchaseDate,
+              locale: context.localeTag,
             ),
+            subtitle: context.l10n.booksPurchaseItems(purchase.itemCount),
+            icon: AppIconConstant.receiptLong,
+            trailingText: context.money(purchase.totalCost),
+            onTap: () => context.push(AppRoutes.purchase(purchase.id)),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SdContentPaddingV3.horizontal,
+        if (purchases.length > shown.length)
+          AppListRow(
+            title: context.l10n.booksAndMore(purchases.length - shown.length),
+            showChevron: false,
           ),
-          child: AppListCard(
-            children: <Widget>[
-              for (final Purchase purchase in shown)
-                AppListRow(
-                  title: DateTimeUtils.mediumDate(
-                    purchase.purchaseDate,
-                    locale: context.localeTag,
-                  ),
-                  subtitle: context.l10n.booksPurchaseItems(purchase.itemCount),
-                  icon: AppIconConstant.receiptLong,
-                  trailingText: context.money(purchase.totalCost),
-                  onTap: () => context.push(AppRoutes.purchase(purchase.id)),
-                ),
-              if (purchases.length > shown.length)
-                AppListRow(
-                  title: context.l10n.booksAndMore(
-                    purchases.length - shown.length,
-                  ),
-                  showChevron: false,
-                ),
-            ],
-          ),
-        ),
       ],
     );
   }

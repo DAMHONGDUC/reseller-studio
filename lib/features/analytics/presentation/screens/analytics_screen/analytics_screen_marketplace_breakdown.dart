@@ -18,18 +18,15 @@ class _MarketplaceBreakdown extends ConsumerWidget {
     // in the screen's rhythm — and the words sit centred in it, on the card's
     // own air rather than on a page band this slot does not own.
     if (rows.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: SdContentPaddingV3.horizontal,
-        ),
-        child: SdCardV3(
-          child: SdEmptyStateV3(
-            variant: SdEmptyStateVariantV3.inline,
-            icon: AppIconConstant.barChart,
-            title: context.l10n.analyticsNoSalesYet,
-            message:
-                context.l10n.analyticsMarketplacePerformanceAppearsOnceYouHave,
-          ),
+      return AppSection(
+        title: context.l10n.analyticsByMarketplace,
+        subtitle: context.l10n.analyticsWhereTheMoneyActuallyComesFrom,
+        child: SdEmptyStateV3(
+          variant: SdEmptyStateVariantV3.inline,
+          icon: AppIconConstant.barChart,
+          title: context.l10n.analyticsNoSalesYet,
+          message:
+              context.l10n.analyticsMarketplacePerformanceAppearsOnceYouHave,
         ),
       );
     }
@@ -38,30 +35,29 @@ class _MarketplaceBreakdown extends ConsumerWidget {
         .map((MarketplacePerformance row) => row.revenue.minor)
         .reduce((int a, int b) => a > b ? a : b);
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-      child: SdCardV3(
-        child: Column(
-          children: <Widget>[
-            for (int i = 0; i < rows.length; i++)
-              Padding(
-                padding: EdgeInsets.only(
-                  bottom: i == rows.length - 1 ? 0 : SdSpacingConstant.h16,
-                ),
-                child: _MarketplaceRow(
-                  row: rows[i],
-                  maxRevenue: maxRevenue,
-                  // The marketplace's own hue, not a chart series colour: a
-                  // platform that is amber on an order card and blue on a bar
-                  // is two colours for one thing.
-                  color: AppMarketplaceDot.hueOf(
-                    ref,
-                    rows[i].marketplaceId,
-                  ).of(context),
-                ),
+    return AppSection(
+      title: context.l10n.analyticsByMarketplace,
+      subtitle: context.l10n.analyticsWhereTheMoneyActuallyComesFrom,
+      child: Column(
+        children: <Widget>[
+          for (int i = 0; i < rows.length; i++)
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: i == rows.length - 1 ? 0 : SdSpacingConstant.h16,
               ),
-          ],
-        ),
+              child: _MarketplaceRow(
+                row: rows[i],
+                maxRevenue: maxRevenue,
+                // The marketplace's own hue, not a chart series colour: a
+                // platform that is amber on an order card and blue on a bar
+                // is two colours for one thing.
+                color: AppMarketplaceDot.hueOf(
+                  ref,
+                  rows[i].marketplaceId,
+                ).of(context),
+              ),
+            ),
+        ],
       ),
     );
   }

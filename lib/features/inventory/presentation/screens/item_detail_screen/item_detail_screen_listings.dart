@@ -56,10 +56,6 @@ class _ListingsSection extends ConsumerWidget {
       children: <Widget>[
         SdSectionHeaderV3(
           title: context.l10n.itemListings,
-          // Flush, like every `AppEditableSection` header it sits between:
-          // one indent for the block above and another for this one reads as
-          // a mistake.
-          gutter: false,
           action: SdButtonV3(
             variant: SdButtonVariantV3.text,
             label: context.l10n.actionEdit,

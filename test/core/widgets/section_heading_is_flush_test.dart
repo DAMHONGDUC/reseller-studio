@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/widgets/app_editable_section.dart';
+import 'package:reseller_studio/core/widgets/app_section.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
-/// **A heading inside something that already carries the gutter is flush with
-/// it** — owner's rule, and the reason `SdSectionHeaderV3` takes a `gutter`
-/// flag rather than a padding.
+/// **A section heading sits on its card's left edge, and a fixed gap holds it
+/// off that card** — owner's rule (`docs/rules/DESIGN_SYSTEM.md`).
 ///
-/// The heading and the card under it sit in the same block, so a heading set
-/// 16 further in than its own card reads as a stray indent. What the flag
-/// must NOT drop is the vertical rhythm: a flush heading still sits the same
-/// distance from the group above it as every other heading on the screen.
+/// The heading carries no gutter of its own, so it can never be set further
+/// in than the card it heads, whichever list it is placed in.
 void main() {
   testWidgets('an editable section heads its card at the same left edge', (
     WidgetTester tester,
@@ -35,32 +33,50 @@ void main() {
     expect(heading, card);
   });
 
-  testWidgets('dropping the gutter keeps the gap above the heading', (
+  testWidgets('in a list that holds the gutter, heading and card share it', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
       tester,
-      const Column(
-        children: <Widget>[
-          SdSectionHeaderV3(title: 'With gutter'),
-          SdSectionHeaderV3(title: 'Flush', gutter: false),
+      ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: SdContentPaddingV3.horizontal,
+        ),
+        children: const <Widget>[
+          SdSectionHeaderV3(title: 'Usage'),
+          SdCardV3(child: Text('Items', style: TextStyle())),
         ],
       ),
     );
 
-    final Size withGutter = tester.getSize(
-      find.ancestor(
-        of: find.text('With gutter'),
-        matching: find.byType(Padding),
-      ).first,
+    final Rect heading = tester.getRect(find.byType(SdSectionHeaderV3));
+    final Rect card = tester.getRect(find.byType(SdCardV3));
+
+    expect(tester.getTopLeft(find.text('Usage')).dx, card.left);
+    expect(
+      card.top - tester.getBottomLeft(find.text('Usage')).dy,
+      closeTo(SdContentPaddingV3.sectionHeader().bottom, 0.001),
     );
-    final Size flush = tester.getSize(
-      find.ancestor(
-        of: find.text('Flush'),
-        matching: find.byType(Padding),
-      ).first,
+    expect(heading.bottom, card.top);
+  });
+
+  testWidgets('AppSection heads its card on the same edge, a token apart', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      const AppSection(
+        title: 'Overview',
+        child: Text('Revenue', style: TextStyle()),
+      ),
     );
 
-    expect(flush.height, withGutter.height);
+    final Rect card = tester.getRect(find.byType(SdCardV3));
+
+    expect(tester.getTopLeft(find.text('Overview')).dx, card.left);
+    expect(
+      card.top - tester.getBottomLeft(find.text('Overview')).dy,
+      closeTo(SdContentPaddingV3.sectionHeader().bottom, 0.001),
+    );
   });
 }

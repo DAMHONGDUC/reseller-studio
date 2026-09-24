@@ -16,6 +16,7 @@ import '../../../../../core/utils/scroll_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
+import '../../../../../core/widgets/app_section.dart';
 import '../../../../../core/widgets/notification_bell.dart';
 import '../../../../../core/widgets/workspace_switcher_sheet.dart';
 import '../../../../analytics/domain/entities/analytics_summary.dart';
@@ -141,15 +142,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SizedBox(height: SdContentPaddingV3.listItemGap),
           _HomeShortcuts(onQuickAction: _toQuickAction),
           const _GettingStarted(),
-          SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
+          ),
           const _NeedsAttention(),
-          SdSectionHeaderV3(title: context.l10n.homePerformance),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: SdSectionHeaderV3(title: context.l10n.homePerformance),
+          ),
           const _PerformanceBlock(),
           const _HomeFlowOverview(),
           const _RecentActivity(),
-          SdSectionHeaderV3(
-            title: context.l10n.homeQuickAction,
-            subtitle: context.l10n.homeQuickActionSubtitle,
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SdContentPaddingV3.horizontal,
+            ),
+            child: SdSectionHeaderV3(
+              title: context.l10n.homeQuickAction,
+              subtitle: context.l10n.homeQuickActionSubtitle,
+            ),
           ),
           const _QuickAction(),
         ],
