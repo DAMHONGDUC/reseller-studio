@@ -25,8 +25,8 @@ place to look.
 ## Destinations are a grid of tiles; General stays rows
 
 Owner's rule. Every section under General — Operations, Finance, Business —
-is a grid of tiles, four across: a tinted icon tile over a one-line label,
-and the value (a count, a plan) under it when it has one. General keeps the
+is a grid of tiles, three across: a tinted icon tile over its label, which
+may take two lines. General keeps the
 row shape above, because it holds controls (a theme, a language) whose
 current value is the point, and a tile has no room to say it.
 
@@ -40,8 +40,11 @@ current value is the point, and a tile has no room to say it.
   `MoreHue.of(kind)` — an exhaustive switch to an `AppTagHue`, never an index
   (the palette rule in `CLAUDE.md`), so a new destination cannot ship
   untinted.
-- `test/features/more/more_sections_test.dart` holds the grid and the
-  "Soon" tile.
+- **Three across, not four.** At a quarter of a phone "Emplacements" or
+  "Marktplätze" breaks mid-word; a third holds every shipping locale's
+  longest label on two lines.
+- `test/features/more/more_sections_test.dart` holds the grid, the hue and
+  that every tile label fits in every shipping locale.
 
 ## The account row never prints who is signed in
 

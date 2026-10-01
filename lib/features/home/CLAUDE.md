@@ -45,9 +45,13 @@ decide it, and they are listed in the order they outrank each other.
      button and the row it shortcuts can never disagree.
    - **Three, and the list is closed.** A fourth makes the row a launcher.
      Adding one is a product decision — ask.
+   - **Icon over label, not a pill.** "Enregistrer une vente" does not fit
+     beside its icon at a third of a phone; stacked, a label takes two lines
+     without the row changing shape.
    - `HomeShortcutConstant` is the list;
-     `test/features/home/home_shortcuts_test.dart` holds the placement and the
-     enum-to-button completeness.
+     `test/features/home/home_shortcuts_test.dart` holds the placement, that
+     each shortcut is a Quick Action row opening that row's route, and that
+     every label fits its button in every shipping locale.
 3. **Getting started sits directly under the shortcut row, and wears a tinted
    edge.** Owner's rule. It is the only card on Home that asks the seller to
    do something rather than reporting on what they have done, and it is gone

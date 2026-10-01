@@ -295,6 +295,40 @@ the detail screen.
   things.
 - `test/features/orders/order_actions_placement_test.dart` pins all of it.
 
+## The order card carries a track and, while it waits to ship, one move
+
+Owner's rule.
+
+- **`Sold → Shipped → Paid out`, as three dots joined by bars.** A status
+  says where the order is; the track also says what is left, which is what a
+  seller scanning the list is asking. `OrderProgress` reads it off facts
+  already on the order — a ship date, a recorded payout — and stores nothing.
+- **Paid out means the payout is recorded**, not that a status says so: the
+  profit is unknown until it is (hard rule 3), so the stage reads
+  `Order.needsPayout`.
+- **An order off the happy path has no track.** A cancelled, refunded or
+  returned order did not stop at a stage, and drawing one would promise money
+  that is not coming.
+- **`toShip` cards carry Ship it**, opening the same `ShipOrderSheet` the
+  detail screen's pinned move opens. It is the one move a list can make
+  without opening the order; filled when the order is late, tonal otherwise.
+  Every other verb stays in the detail screen and its sheet.
+- `test/features/orders/order_progress_test.dart` and
+  `order_card_progress_test.dart` pin both.
+
+## A recorded sale is celebrated, not toasted
+
+Owner's rule. Saving `MarkSoldSheet` turns the sheet into `SaleRecordedView`
+— the check, the price, and `Sold → Ship it → Record the payout` — rather
+than closing it behind a snackbar. The sale is the moment the app exists for.
+
+- **It never shows a profit.** Until a payout is recorded the last step says
+  why the figure is not known yet (hard rule 3).
+- **`MarkSoldSheet.show` returns true however the view is left** — Done, the
+  close button, a swipe. The record-sale screen pops itself on true, and a
+  sale that already happened must not leave the seller on the picker.
+- `test/core/widgets/sale_recorded_test.dart` pins both.
+
 ## The order row's tags are the compact display badge
 
 Owner's rule, given for Inventory and applied here in the same turn: status,
