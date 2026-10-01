@@ -25,7 +25,7 @@ class _FixedConfig implements AppConfigRepository {
 }
 
 void main() {
-  testWidgets('Free sees the compact Premium banner above shortcuts', (
+  testWidgets('Free sees the compact Premium banner above Needs Attention', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -49,7 +49,9 @@ void main() {
     expect(banner.onTap, isNotNull);
     expect(
       tester.getTopLeft(find.text('Go Premium')).dy,
-      lessThan(tester.getTopLeft(find.text('Quick Action').first).dy),
+      // Needs Attention now opens Home's own content (owner's rule), so the
+      // banner is measured against it rather than the old shortcut cards.
+      lessThan(tester.getTopLeft(find.text('Needs Attention')).dy),
     );
   });
 

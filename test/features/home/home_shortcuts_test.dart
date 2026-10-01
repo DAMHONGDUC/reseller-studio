@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reseller_studio/core/extensions/context_extensions.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reseller_studio/features/home/home_constant.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:reseller_studio/l10n/gen/app_localizations.dart';
+import 'package:reseller_studio/reseller_studio_app.dart';
 
+import '../../support/load_app_fonts.dart';
 import '../../support/pump_app.dart';
 import 'premium_subscription.dart';
 
-/// The three cards that open Home.
+/// The three create actions in Home's shortcut row.
 ///
-/// **Their value is being the first thing on the screen.** A shortcut a
-/// seller has to scroll to is not a shortcut — it is one more row of a
-/// dashboard they were trying to get past.
+/// **Their value is one tap from the first screen**, directly under Needs
+/// Attention — a shortcut a seller has to scroll to is one more row of a
+/// dashboard (`lib/features/home/CLAUDE.md`).
 void main() {
-  /// The card, not the section header of the same name: only the card is
-  /// inside an `SdCardV3`.
-  Finder cardFor(BuildContext context, HomeShortcutKind kind) => find.ancestor(
-    of: find.text(HomeShortcutLabel.of(context, kind)),
-    matching: find.byType(SdCardV3),
-  );
+  setUpAll(loadAppFonts);
+
+  /// The button, not the Quick Action row of the same name further down:
+  /// only the shortcut is an `InkWell` inside a `Material` with a shape.
+  Finder buttonFor(BuildContext context, QuickActionKind kind) => find
+      .ancestor(
+        of: find.text(QuickActionLabel.of(context, kind)),
+        matching: find.byType(InkWell),
+      )
+      .first;
 
   testWidgets('all three are on screen before anything is scrolled', (
     WidgetTester tester,
@@ -31,17 +38,21 @@ void main() {
     );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
+    final double screenHeight = tester.view.physicalSize.height / 3;
 
-    for (final HomeShortcut shortcut in HomeShortcutConstant.shortcuts) {
+    for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
+      final Finder button = buttonFor(context, kind);
+
+      expect(button, findsOneWidget, reason: '${kind.name} is not on Home');
       expect(
-        cardFor(context, shortcut.kind),
-        findsOneWidget,
-        reason: '${shortcut.kind.name} is not a card on Home',
+        tester.getRect(button).bottom,
+        lessThan(screenHeight),
+        reason: '${kind.name} needs a scroll to reach',
       );
     }
   });
 
-  testWidgets('they sit above every section of the dashboard', (
+  testWidgets('they sit under Needs Attention and above the numbers', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -51,91 +62,98 @@ void main() {
     );
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
+    final Rect first = tester.getRect(
+      buttonFor(context, HomeShortcutConstant.shortcuts.first),
+    );
 
-    // Owner's rule: ways *out* of Home come before Home's own content, and
-    // that includes Needs Attention, which outranks everything else here.
-    final double cardsBottom = tester
-        .getRect(cardFor(context, HomeShortcutKind.quickAction))
-        .bottom;
+    // Owner's rule: what needs attention opens the screen, the fast actions
+    // follow it, and the figures come after both.
+    expect(
+      tester.getRect(find.text('Needs Attention')).bottom,
+      lessThan(first.top),
+    );
+
+    await tester.scrollUntilVisible(find.text('Performance'), 200);
 
     expect(
-      tester.getRect(find.text('Needs Attention')).top,
-      greaterThanOrEqualTo(cardsBottom),
-    );
-  });
-
-  testWidgets('the Quick Access card scrolls Home to Quick Access', (
-    WidgetTester tester,
-  ) async {
-    await pumpScreen(
-      tester,
-      const HomeScreen(),
-      overrides: premiumSubscription(),
-    );
-
-    final BuildContext context = tester.element(find.byType(HomeScreen));
-    final ScrollableState scrollable = tester.state(
-      find.byType(Scrollable).first,
-    );
-
-    expect(scrollable.position.pixels, 0);
-
-    await tester.tap(cardFor(context, HomeShortcutKind.quickAction));
-    await tester.pumpAndSettle();
-
-    // Quick Access is the last section, so landing on it means landing on the
-    // end — and a single animation pass would stop short of it, because a
-    // lazy list only estimates its extent from what it has built.
-    expect(scrollable.position.pixels, scrollable.position.maxScrollExtent);
-    expect(
-      find.text(
-        QuickActionLabel.of(context, QuickActionConstant.actions.last.kind),
+      tester.getRect(find.text('Performance')).top,
+      greaterThan(
+        tester
+            .getRect(buttonFor(context, HomeShortcutConstant.shortcuts.first))
+            .bottom,
       ),
-      findsWidgets,
     );
   });
 
-  testWidgets('Scan replaces Flow overview in the shortcut row', (
+  testWidgets('each button opens its Quick Action row’s route', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(
-      tester,
-      const HomeScreen(),
-      overrides: premiumSubscription(),
-    );
+    for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
+      final GoRouter router = await pumpRoutedScreen(
+        tester,
+        const HomeScreen(),
+        overrides: premiumSubscription(),
+      );
+      final BuildContext context = tester.element(find.byType(HomeScreen));
 
-    final BuildContext context = tester.element(find.byType(HomeScreen));
+      await tester.tap(buttonFor(context, kind));
+      await tester.pumpAndSettle();
 
-    expect(cardFor(context, HomeShortcutKind.scan), findsOneWidget);
-
-    // Flow overview is below the numbers, and Home is taller than a phone —
-    // the card has to be scrolled to before it exists to be found.
-    await tester.scrollUntilVisible(
-      find.text(context.l10n.homeFlowOverview),
-      200,
-    );
-
-    expect(find.text(context.l10n.homeFlowOverview), findsOneWidget);
-    expect(
-      find.ancestor(
-        of: find.text(context.l10n.flowOverviewIntro),
-        matching: find.byType(SdCardV3),
-      ),
-      findsOneWidget,
-    );
+      expect(
+        router.state.uri.toString(),
+        HomeShortcutConstant.actionFor(kind).route,
+        reason: '${kind.name} went somewhere its row does not',
+      );
+    }
   });
 
-  test('every kind has a card, and every card a kind', () {
-    // The enum and the list are two halves of the same fact; adding a case
-    // without a card compiles.
+  test('three shortcuts, each a Quick Action, none twice', () {
+    expect(HomeShortcutConstant.shortcuts, hasLength(3));
     expect(
-      HomeShortcutConstant.shortcuts.map((HomeShortcut s) => s.kind).toSet(),
-      HomeShortcutKind.values.toSet(),
-    );
-    expect(
-      HomeShortcutConstant.shortcuts.length,
-      HomeShortcutKind.values.length,
+      HomeShortcutConstant.shortcuts.toSet(),
+      hasLength(HomeShortcutConstant.shortcuts.length),
       reason: 'a kind is listed twice',
     );
+
+    // `actionFor` throws on a kind Quick Action does not offer — the button
+    // would have no route and no words of its own.
+    for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
+      expect(HomeShortcutConstant.actionFor(kind).kind, kind);
+    }
   });
+
+  // A label cut off mid-word is a content bug that only shows once
+  // translated, so every shipping locale is pumped at phone width.
+  for (final Locale locale in ResellerStudioApp.shippingLocales) {
+    testWidgets('every label fits its button — ${locale.languageCode}', (
+      WidgetTester tester,
+    ) async {
+      final AppLocalizations l10n = lookupAppLocalizations(locale);
+
+      await pumpScreen(
+        tester,
+        const HomeScreen(),
+        overrides: premiumSubscription(),
+        locale: locale,
+      );
+
+      final BuildContext context = tester.element(find.byType(HomeScreen));
+
+      for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
+        final String label = QuickActionLabel.of(context, kind);
+        final RenderParagraph paragraph = tester.renderObject(
+          find.descendant(
+            of: buttonFor(context, kind),
+            matching: find.text(label),
+          ),
+        );
+
+        expect(
+          paragraph.didExceedMaxLines,
+          isFalse,
+          reason: '${l10n.localeName}: "$label"',
+        );
+      }
+    });
+  }
 }

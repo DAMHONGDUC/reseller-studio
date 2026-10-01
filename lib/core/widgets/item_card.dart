@@ -118,9 +118,14 @@ class ItemCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: SdCardV3(
         onTap: onTap,
-        // Outlined as well as ticked: colour is never the only signal, and
-        // the tick is never the only one either.
-        borderColor: isSelected ? context.colorScheme3.primary : null,
+        // - selected: outlined as well as ticked, so colour is never the
+        //   only signal
+        // - stale: the warning edge repeats the Stale badge on the card
+        borderColor: isSelected
+            ? context.colorScheme3.primary
+            : _StateBadges.isStale(item, now)
+            ? context.sdTheme3.warning
+            : null,
         // The card holds no inset of its own: the hairline between its two
         // zones runs edge to edge, so the padding belongs to the zones it
         // separates rather than to the card around both of them.

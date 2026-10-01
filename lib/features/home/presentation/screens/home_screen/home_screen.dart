@@ -9,12 +9,11 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/local/local_providers.dart';
 import '../../../../../core/money/money.dart';
 import '../../../../../core/router/app_routes.dart';
-import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
-import '../../../../../core/utils/scroll_utils.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
+import '../../../../../core/widgets/app_profit_hero.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../../core/widgets/app_section.dart';
 import '../../../../../core/widgets/app_status_card.dart';
@@ -40,7 +39,7 @@ import '../../widgets/flow_overview_sheet.dart';
 
 part 'home_screen_activity_row.dart';
 part 'home_screen_all_clear.dart';
-part 'home_screen_attention_row.dart';
+part 'home_screen_attention_tile.dart';
 part 'home_screen_flow_overview.dart';
 part 'home_screen_getting_started.dart';
 part 'home_screen_guest_banner.dart';
@@ -54,48 +53,23 @@ part 'home_screen_start_here.dart';
 
 /// Home — "what do I need to do today?".
 ///
-/// **Needs Attention sits above the numbers**, inverting the order the plan
-/// lists them in (§6). A seller opening the app at 8am needs the orders
-/// waiting to ship, not last night's revenue. The plan's own core principle —
-/// *tell the seller what needs attention today, then make the action fast* —
-/// is the tiebreaker, and it outranks the fact that a hero card at the very
-/// top would look stronger.
+/// **Needs Attention opens the screen** — owner's rule, and the plan's own
+/// core principle: *tell the seller what needs attention today, then make the
+/// action fast*. It is a grid of tiles with the count set large, so the
+/// number is the first thing read rather than the last.
+///
+/// **The three create actions sit directly under it**, as one filled button
+/// and two outlined ones — the fast half of the same principle. See
+/// `HomeShortcutConstant`.
 ///
 /// Below that the hierarchy is deliberate and has exactly one loud element:
-/// profit as a filled hero, then three quiet tiles. Four equal tiles said
-/// four things mattered equally, which on a dashboard means none of them
-/// does.
-///
-/// **Three shortcut cards sit above even Needs Attention** — owner's rule,
-/// and the one thing on this screen that outranks it. They are ways *out* of
-/// Home rather than content, so they are read in a glance and skipped by
-/// anyone who came to read the dashboard. See `HomeShortcutConstant`.
-class HomeScreen extends ConsumerStatefulWidget {
+/// profit as a filled hero, then three quiet tiles. The whole order is in
+/// `lib/features/home/CLAUDE.md`.
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  /// Owned here because the Quick Access card scrolls this list, and a
-  /// controller a child created is one the screen cannot drive.
-  final ScrollController _controller = ScrollController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-
-    super.dispose();
-  }
-
-  /// Quick Action is the last section (owner's rule, held by
-  /// `test/features/home/quick_action_test.dart`), so the end of the list is
-  /// where it is — no key to keep in sync with a section that moved.
-  void _toQuickAction() => ScrollUtils.toEnd(_controller);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final Workspace? workspace = ref.watch(currentWorkspaceProvider);
 
     return SdScaffoldV3(
@@ -129,7 +103,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: ListView(
-        controller: _controller,
         padding: SdContentPaddingV3.fullBleed(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
@@ -141,15 +114,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const _HomePremiumBanner(),
           if (_HomePremiumBanner.shows(ref))
             SizedBox(height: SdContentPaddingV3.listItemGap),
-          _HomeShortcuts(onQuickAction: _toQuickAction),
-          const _GettingStarted(),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,
             ),
-            child: SdSectionHeaderV3(title: context.l10n.homeNeedsAttention),
+            child: SdSectionHeaderV3(
+              title: context.l10n.homeNeedsAttention,
+              first: true,
+            ),
           ),
           const _NeedsAttention(),
+          SizedBox(height: SdContentPaddingV3.listItemGap),
+          const _HomeShortcuts(),
+          const _GettingStarted(),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,

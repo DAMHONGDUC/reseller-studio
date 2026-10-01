@@ -1,12 +1,21 @@
 part of 'home_screen.dart';
 
-class _AttentionRow extends StatelessWidget {
-  const _AttentionRow({
+/// One thing waiting on the seller: the count large, what it is under it.
+///
+/// **The count is read first.** As a row it sat at the end of a line of text,
+/// the last thing the eye reached; a tile sets it at headline size above the
+/// label.
+///
+/// [isUrgent] adds a tinted edge for a problem with a clock on it. The detail
+/// line says the same thing in words — colour is never the only signal.
+class _AttentionTile extends StatelessWidget {
+  const _AttentionTile({
     required this.icon,
     required this.label,
     required this.count,
     required this.tint,
     this.detail,
+    this.isUrgent = false,
     this.onTap,
   });
 
@@ -15,50 +24,46 @@ class _AttentionRow extends StatelessWidget {
   final int count;
   final Color tint;
   final String? detail;
+  final bool isUrgent;
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => SdCardV3(
     onTap: onTap,
-    child: Padding(
-      padding: SdContentPaddingV3.card,
-      child: Row(
-        children: <Widget>[
-          SdIconTileV3(icon: icon, tint: tint),
-          SizedBox(width: SdSpacingConstant.w12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  label,
-                  style: context.textTheme3.titleSmall!.semiBold3.copyWith(
-                    color: context.sdTheme3.textPrimary,
-                  ),
-                ),
-                if (detail != null)
-                  Text(
-                    detail!,
-                    style: context.textTheme3.bodySmall!.muted3(context),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-              ],
-            ),
+    borderColor: isUrgent ? tint : null,
+    semanticLabel: '$label: $count',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        SdIconTileV3(icon: icon, tint: tint),
+        SizedBox(height: SdSpacingConstant.h12),
+        Text(
+          '$count',
+          style: context.textTheme3.headlineMedium!.tabular3.copyWith(
+            color: context.sdTheme3.textPrimary,
           ),
-          SizedBox(width: SdSpacingConstant.w8),
-          // The count is the point of the row, so it is set at title weight
-          // in the tint rather than tucked into a badge.
+        ),
+        SizedBox(height: SdSpacingConstant.h2),
+        Text(
+          label,
+          style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
+            color: context.sdTheme3.textPrimary,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (detail != null) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h2),
           Text(
-            '$count',
-            style: context.textTheme3.titleLarge!.tabular3.copyWith(
-              color: tint,
-            ),
+            detail!,
+            style: isUrgent
+                ? context.textTheme3.bodySmall!.semiBold3.copyWith(color: tint)
+                : context.textTheme3.bodySmall!.muted3(context),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(width: SdSpacingConstant.w4),
-          const AppRowChevron(),
         ],
-      ),
+      ],
     ),
   );
 }

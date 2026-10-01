@@ -21,6 +21,7 @@ import '../utils/date_time_utils.dart';
 import 'money_field.dart';
 import 'option_picker_sheet.dart';
 import 'picker_field.dart';
+import 'sale_recorded_view.dart';
 
 /// Record that an item sold.
 ///
@@ -47,21 +48,37 @@ import 'picker_field.dart';
 /// what the buyer paid in total and `BundleAllocation` decides each line's
 /// share — by expected price when every item has one, evenly otherwise, and
 /// the shares always add back up to the total exactly.
+///
+/// **Saving turns the sheet into `SaleRecordedView`** rather than closing it
+/// behind a snackbar — the sale is the moment the app exists for.
 class MarkSoldSheet extends ConsumerStatefulWidget {
-  const MarkSoldSheet({required this.items, super.key});
+  const MarkSoldSheet({required this.items, this.onRecorded, super.key});
 
   final List<Item> items;
+
+  /// Told once the sale is saved, before the seller has left the sheet.
+  final VoidCallback? onRecorded;
 
   /// True when a sale was recorded, null when the seller dismissed the sheet.
   ///
   /// The record-sale screen pops itself on a true so the seller lands back on
   /// Orders with the new order under them; Inventory's Actions sheet has
   /// nothing to close and ignores it.
-  static Future<bool?> show(BuildContext context, List<Item> items) =>
-      showSdBottomSheetV3<bool>(
-        context: context,
-        builder: (BuildContext context) => MarkSoldSheet(items: items),
-      );
+  ///
+  /// **True however the success view is left** — Done, the close button or a
+  /// swipe. The sale is saved by then, and a caller told "dismissed" would
+  /// keep the seller on a screen for a sale that already happened.
+  static Future<bool?> show(BuildContext context, List<Item> items) async {
+    bool recorded = false;
+
+    final bool? result = await showSdBottomSheetV3<bool>(
+      context: context,
+      builder: (BuildContext context) =>
+          MarkSoldSheet(items: items, onRecorded: () => recorded = true),
+    );
+
+    return recorded ? true : result;
+  }
 
   @override
   ConsumerState<MarkSoldSheet> createState() => _MarkSoldSheetState();
@@ -69,6 +86,9 @@ class MarkSoldSheet extends ConsumerStatefulWidget {
 
 class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
     with FormSeed<MarkSoldSheet> {
+  /// Set once the sale is saved; the sheet then shows the success view.
+  ({Money price, String marketplace, bool hasPayout})? _recorded;
+
   /// Filled once the listings arrive, and refilled every time the seller
   /// picks another marketplace.
   ///
@@ -171,7 +191,6 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
   }
 
   Future<void> _submit() async {
-    final NavigatorState navigator = Navigator.of(context);
     final String currency = ref.read(workspaceCurrencyProvider);
     final Money? price = Money.tryParse(_price.text, currency);
     final List<Marketplace> marketplaces = ref.read(activeMarketplacesProvider);
@@ -201,8 +220,14 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
 
       if (!mounted) return;
 
-      navigator.pop(true);
-      SdSnackBarUtilsV3.success(context, context.l10n.markSoldDone);
+      widget.onRecorded?.call();
+      setState(
+        () => _recorded = (
+          price: price,
+          marketplace: marketplace.name,
+          hasPayout: Money.tryParse(_payout.text, currency) != null,
+        ),
+      );
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;
@@ -216,6 +241,25 @@ class _MarkSoldSheetState extends ConsumerState<MarkSoldSheet>
 
   @override
   Widget build(BuildContext context) {
+    final ({Money price, String marketplace, bool hasPayout})? recorded =
+        _recorded;
+
+    if (recorded != null) {
+      return SdBottomSheetV3(
+        title: context.l10n.itemStatusSold,
+        closeTooltip: context.l10n.commonClose,
+        child: SaleRecordedView(
+          salePrice: recorded.price,
+          marketplaceName: recorded.marketplace,
+          subject: widget.items.length == 1
+              ? widget.items.single.title
+              : context.l10n.saleRecordedBundle(widget.items.length),
+          payoutRecorded: recorded.hasPayout,
+          onDone: () => Navigator.of(context).pop(true),
+        ),
+      );
+    }
+
     final bool isBusy = ref.watch(recordSaleControllerProvider);
     final String currency = ref.watch(workspaceCurrencyProvider);
     final DateTime now = DateTime.now();

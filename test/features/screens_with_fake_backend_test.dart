@@ -166,7 +166,10 @@ void main() {
       expect(find.text('1 overdue'), findsOneWidget);
       expect(find.text('Stale inventory'), findsOneWidget);
       // Compact currency must render a symbol, not the ISO code — the bug
-      // `NumberFormat.compactCurrency` introduced.
+      // `NumberFormat.compactCurrency` introduced. The tiles sit below Needs
+      // Attention and the shortcut row, so they are scrolled to first.
+      await tester.scrollUntilVisible(find.text(r'$439'), 200);
+
       expect(find.text(r'$439'), findsOneWidget);
       expect(find.textContaining('USD4'), findsNothing);
     });
@@ -338,10 +341,12 @@ void main() {
       await pumpScreen(tester, const AnalyticsScreen());
 
       expect(find.text('Revenue'), findsOneWidget);
-      expect(find.text('Net profit'), findsOneWidget);
+      // Twice on purpose: the hero carries the headline, and the statement's
+      // last line is the same figure as the answer to its subtraction.
+      expect(find.text('Net profit'), findsNWidgets(2));
       expect(find.text('− Cost of goods'), findsOneWidget);
       expect(find.text(r'$439.00'), findsOneWidget);
-      expect(find.text(r'$49.47'), findsOneWidget);
+      expect(find.text(r'$49.47'), findsNWidgets(2));
     });
 
     testWidgets('More offers seeding and nothing that fakes a business', (

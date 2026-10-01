@@ -5,6 +5,9 @@ part of 'analytics_screen.dart';
 /// Shown as a running deduction rather than four separate tiles because that
 /// is how a seller checks it: revenue at the top, each cost taken off, net at
 /// the bottom. Four tiles would show the same numbers and hide the arithmetic.
+///
+/// **It sits under `AppProfitHero`**, which carries the headline, the margin
+/// and the partial flag — so this card is the working, not the answer.
 class _ProfitStatement extends StatelessWidget {
   const _ProfitStatement({required this.summary});
 
@@ -12,8 +15,7 @@ class _ProfitStatement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppSection(
-    title: context.l10n.analyticsOverview,
-    first: true,
+    title: context.l10n.analyticsTheStatement,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -53,32 +55,6 @@ class _ProfitStatement extends StatelessWidget {
                     : context.sdTheme3.profit,
               ),
             ),
-          ],
-        ),
-        SizedBox(height: SdSpacingConstant.h8),
-        // Wrap, not Row: three badges whose labels grow with the numbers in
-        // them overflowed the card by 44px on a narrow screen. A Row cannot
-        // give way; this drops to a second line instead.
-        Wrap(
-          spacing: SdSpacingConstant.w6,
-          runSpacing: SdSpacingConstant.h4,
-          children: <Widget>[
-            SdBadgeV3(
-              label: context.l10n.analyticsMarginValue(
-                context.percent(summary.margin),
-              ),
-            ),
-            SdBadgeV3(
-              label: context.l10n.analyticsOrderCount(summary.orderCount),
-            ),
-            // Saying the figure is partial is the difference between a number
-            // a seller can act on and one that quietly misleads.
-            if (!summary.isProfitComplete)
-              SdBadgeV3(
-                label: context.l10n.commonPartial,
-                tone: SdBadgeToneV3.warning,
-                icon: AppIconConstant.info,
-              ),
           ],
         ),
       ],

@@ -8,6 +8,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
+import '../../../../../core/widgets/app_profit_hero.dart';
 import '../../../../../core/widgets/app_section.dart';
 import '../../../domain/entities/analytics_summary.dart';
 import '../../../providers.dart';
@@ -39,6 +40,8 @@ class AnalyticsScreen extends ConsumerWidget {
         padding: SdContentPaddingV3.screen(context, floatingNav: true),
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
+          // The headline first, then the subtraction that produced it.
+          AppProfitHero(summary: summary),
           _ProfitStatement(summary: summary),
           const _MarketplaceBreakdown(),
           const _DrillDowns(),

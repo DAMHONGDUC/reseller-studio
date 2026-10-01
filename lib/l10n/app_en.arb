@@ -1431,9 +1431,47 @@
   "@markSoldPriceRequired": {
     "description": "Plan §29: selling needs sale information."
   },
-  "markSoldDone": "Sold — the order is in Orders",
-  "@markSoldDone": {
-    "description": "Confirmation. Says where the order went, because marking sold creates one."
+  "saleRecordedOn": "Sold on {marketplace}",
+  "@saleRecordedOn": {
+    "description": "Caption over the sale price once a sale is recorded.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "saleRecordedBundle": "{count} items",
+  "@saleRecordedBundle": {
+    "description": "Names a bundle sale on the success sheet, in place of one item's title. Always two or more.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "saleRecordedNext": "What happens next",
+  "@saleRecordedNext": {
+    "description": "Heading over the three-step timeline on the sale success sheet."
+  },
+  "saleRecordedShipDetail": "Waiting in Orders to ship",
+  "@saleRecordedShipDetail": {
+    "description": "Under the Ship it step: says the new order is already in the queue."
+  },
+  "saleRecordedPayoutStep": "Record the payout",
+  "@saleRecordedPayoutStep": {
+    "description": "Last step of the sale timeline, when the payout was not entered."
+  },
+  "saleRecordedPayoutDetail": "Profit is exact once the platform pays you",
+  "@saleRecordedPayoutDetail": {
+    "description": "Under the payout step. Says why the profit is not shown yet; never an estimate (hard rule 3)."
+  },
+  "saleRecordedPayoutDone": "Payout recorded",
+  "@saleRecordedPayoutDone": {
+    "description": "Last step of the sale timeline, when the payout was entered with the sale."
+  },
+  "commonDone": "Done",
+  "@commonDone": {
+    "description": "Closes a finished flow."
   },
   "recordSaleTitle": "Record a sale",
   "@recordSaleTitle": {
@@ -3220,6 +3258,10 @@
         "type": "String"
       }
     }
+  },
+  "analyticsProfitPartial": "Partial — some item costs are missing",
+  "@analyticsProfitPartial": {
+    "description": "Caption under the net profit hero when some sold items have no recorded cost, so the figure is not the whole truth."
   },
   "analyticsMarketplaceRowDetail": "{orders} · fees {fees} ({rate}) · profit {profit}",
   "@analyticsMarketplaceRowDetail": {

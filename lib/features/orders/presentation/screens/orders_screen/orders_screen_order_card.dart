@@ -15,6 +15,7 @@ class _OrderCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isOverdue = order.isOverdue(now) ?? false;
     final Money? profit = order.profit().netProfit;
+    final Set<OrderStage>? reached = OrderProgress.reached(order);
 
     return SdCardV3(
       onTap: onTap,
@@ -111,6 +112,31 @@ class _OrderCard extends ConsumerWidget {
                     ),
                   ],
                 ),
+                if (reached != null) ...<Widget>[
+                  SizedBox(height: SdSpacingConstant.h12),
+                  _OrderProgressTrack(
+                    reached: reached,
+                    next: OrderProgress.next(order),
+                    isOverdue: isOverdue,
+                  ),
+                ],
+                // The one move the list can make without opening the order,
+                // and the same sheet the detail's pinned button opens.
+                if (order.status == OrderStatus.toShip) ...<Widget>[
+                  SizedBox(height: SdSpacingConstant.h12),
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: SdButtonV3(
+                      variant: isOverdue
+                          ? SdButtonVariantV3.primary
+                          : SdButtonVariantV3.secondary,
+                      size: SdButtonSizeV3.small,
+                      icon: AppIconConstant.localShipping,
+                      label: context.l10n.orderShipIt,
+                      onPressed: () => ShipOrderSheet.show(context, order),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
