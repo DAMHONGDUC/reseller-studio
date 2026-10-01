@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/widgets/app_list_row.dart';
 import 'package:reseller_studio/core/widgets/app_row_chevron.dart';
 import 'package:reseller_studio/core/widgets/item_card.dart';
@@ -122,13 +123,16 @@ void main() {
     await pumpScreen(tester, const InventoryScreen());
 
     final Rect itemCard = tester.getRect(find.byType(ItemCard).first);
+    // By glyph, not by position: a card may also carry a quick-action
+    // button lower down, whose icon is not an end glyph.
     final Rect dots = tester.getRect(
-      find
-          .descendant(
-            of: find.byType(ItemCard).first,
-            matching: find.byType(SdIconV3),
-          )
-          .last,
+      find.descendant(
+        of: find.byType(ItemCard).first,
+        matching: find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is SdIconV3 && widget.icon == AppIconConstant.moreVert,
+        ),
+      ),
     );
 
     await pumpScreen(tester, const OrdersScreen());

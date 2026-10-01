@@ -19,6 +19,7 @@ import 'app_row_icon_button.dart';
 part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
 part 'item_card_money_line.dart';
+part 'item_card_quick_action.dart';
 part 'item_card_state_badges.dart';
 part 'item_card_updated.dart';
 part 'item_card_thumbnail.dart';
@@ -50,6 +51,7 @@ class ItemCard extends StatelessWidget {
     this.onLongPress,
     this.onActions,
     this.onMarketPrices,
+    this.onReprice,
     this.isSelected = false,
     this.isSelecting = false,
     this.notice,
@@ -90,6 +92,11 @@ class ItemCard extends StatelessWidget {
   /// screen that wants another one. Null on a list that only navigates, and
   /// ignored while a selection is open.
   final VoidCallback? onMarketPrices;
+
+  /// Opens the reprice sheet for this item. When set, a stale row carries a
+  /// Reprice button of its own (`_QuickAction`); null on a list that only
+  /// navigates.
+  final VoidCallback? onReprice;
 
   final bool isSelected;
 
@@ -205,6 +212,24 @@ class ItemCard extends StatelessWidget {
                 onMarketPrices: isSelecting ? null : onMarketPrices,
               ),
             ),
+            if (!isSelecting &&
+                _QuickAction.shows(
+                  item: item,
+                  now: now,
+                  listings: listings,
+                  onReprice: onReprice,
+                  onMarketPrices: onMarketPrices,
+                ))
+              Padding(
+                padding: SdContentPaddingV3.card.copyWith(top: 0),
+                child: _QuickAction(
+                  item: item,
+                  now: now,
+                  listings: listings,
+                  onReprice: onReprice,
+                  onMarketPrices: onMarketPrices,
+                ),
+              ),
           ],
         ),
       ),

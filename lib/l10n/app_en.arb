@@ -3263,6 +3263,46 @@
   "@analyticsProfitPartial": {
     "description": "Caption under the net profit hero when some sold items have no recorded cost, so the figure is not the whole truth."
   },
+  "analyticsPeriodLabel": "Period",
+  "@analyticsPeriodLabel": {
+    "description": "Screen-reader name of the Analytics period selector."
+  },
+  "analyticsPeriodAll": "All",
+  "@analyticsPeriodAll": {
+    "description": "Period option: every sale ever recorded. Very short, it sits in a five-way selector."
+  },
+  "analyticsPeriod7d": "7D",
+  "@analyticsPeriod7d": {
+    "description": "Period option: the last 7 days. Very short."
+  },
+  "analyticsPeriod30d": "30D",
+  "@analyticsPeriod30d": {
+    "description": "Period option: the last 30 days. Very short."
+  },
+  "analyticsPeriod90d": "90D",
+  "@analyticsPeriod90d": {
+    "description": "Period option: the last 90 days. Very short."
+  },
+  "analyticsPeriodYtd": "YTD",
+  "@analyticsPeriodYtd": {
+    "description": "Period option: since 1 January this year. Very short."
+  },
+  "analyticsTrend": "Trend",
+  "@analyticsTrend": {
+    "description": "Section title over the revenue and profit bar chart."
+  },
+  "analyticsTrendCaption": "Each sale's own profit, before overhead expenses",
+  "@analyticsTrendCaption": {
+    "description": "Subtitle of the trend chart: says why its profit bars do not add up to net profit."
+  },
+  "analyticsTrendEmpty": "No sales in this period",
+  "@analyticsTrendEmpty": {
+    "description": "Shown in place of the trend chart when the period holds no sale."
+  },
+  "analyticsTrendSemantics": "Revenue and profit over time",
+  "@analyticsTrendSemantics": {
+    "description": "Screen-reader name of the trend chart."
+  },
   "analyticsMarketplaceRowDetail": "{orders} · fees {fees} ({rate}) · profit {profit}",
   "@analyticsMarketplaceRowDetail": {
     "description": "One marketplace's line under its bar. Every value arrives formatted.",

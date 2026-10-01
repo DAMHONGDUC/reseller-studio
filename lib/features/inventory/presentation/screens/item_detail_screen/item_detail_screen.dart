@@ -11,6 +11,7 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_editable_section.dart';
 import '../../../../../core/widgets/app_photo.dart';
+import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/item_warning_lines.dart';
 import '../../../../../core/widgets/money_field.dart';
 import '../../../../listings/domain/entities/listing.dart';
@@ -29,12 +30,14 @@ import '../../controllers/item_actions_controller.dart';
 import '../../controllers/item_detail_edit_controller.dart';
 import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_field.dart';
+import '../../widgets/item_quick_actions.dart';
 
 part 'item_detail_screen_detail_row.dart';
 part 'item_detail_screen_item_body.dart';
 part 'item_detail_screen_listing_row.dart';
 part 'item_detail_screen_listings.dart';
 part 'item_detail_screen_photos.dart';
+part 'item_detail_screen_pinned_actions.dart';
 part 'item_detail_screen_provenance.dart';
 
 /// Item detail (plan §7).
@@ -47,6 +50,9 @@ part 'item_detail_screen_provenance.dart';
 /// would each get an icon nobody recognises; one sheet names them in words,
 /// and the ones that would be refused say which field is missing rather than
 /// disappearing.
+///
+/// **The two a seller came for are also pinned** — Mark as sold and Reprice
+/// hold the bottom edge while the item is on hand (`_PinnedActions`).
 class ItemDetailScreen extends ConsumerWidget {
   const ItemDetailScreen({required this.itemId, super.key});
 
@@ -70,6 +76,9 @@ class ItemDetailScreen extends ConsumerWidget {
             ),
         ],
       ),
+      bottomNavigationBar: value != null && value.status.isOnHand
+          ? _PinnedActions(item: value)
+          : null,
       body: switch (item) {
         AsyncLoading<Item?>() when !item.hasValue => const SdLoadingV3Page(),
         AsyncError<Item?>() => SdEmptyStateV3(

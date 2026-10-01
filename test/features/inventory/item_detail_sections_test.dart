@@ -40,9 +40,27 @@ void main() {
   ) async {
     await pumpDetail(tester);
 
-    // Overview, Quantity, Status, Pricing and Listings are above the fold;
-    // Provenance, Description and Notes are built as the list reaches them.
-    expect(find.text('Edit'), findsNWidgets(5));
+    // Overview, Quantity, Status and Pricing are above the fold, which the
+    // pinned Mark as sold bar now shortens; Listings and everything under it
+    // are built as the list reaches them.
+    expect(find.text('Edit'), findsNWidgets(4));
+
+    await tester.scrollUntilVisible(
+      find.text('Listings'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    // Listings offers its Edit even on no marketplace: it is the only way
+    // onto a first one, so an item listed nowhere still has a way out.
+    expect(
+      find.descendant(
+        of: find.widgetWithText(SdSectionHeaderV3, 'Listings'),
+        matching: find.text('Edit'),
+      ),
+      findsOneWidget,
+    );
 
     await tester.scrollUntilVisible(
       find.text('Notes'),
@@ -51,9 +69,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Listings offers its Edit even on no marketplace: it is the only way
-    // onto a first one, so an item listed nowhere still has a way out.
-    expect(find.text('Listings'), findsOneWidget);
+    expect(find.text('Notes'), findsOneWidget);
   });
 
   testWidgets('Pricing edits the expected price alongside cost and floor', (
@@ -87,19 +103,28 @@ void main() {
     // Owner's rule: the money on this screen reads in one run.
     await pumpDetail(tester);
 
-    expect(
-      tester.getTopLeft(find.text('Pricing')).dy,
-      lessThan(tester.getTopLeft(find.text('Listings')).dy),
-    );
+    // Listings is below the fold since the pinned bar took the bottom edge,
+    // so both are measured in the list's own coordinates: on-screen y plus
+    // how far the list had scrolled when each was read.
+    final ScrollableState list = tester.state(find.byType(Scrollable).last);
+    final double pricingTop =
+        tester.getTopLeft(find.text('Pricing')).dy + list.position.pixels;
 
-    // Provenance is below the fold now that the count and the status have
-    // sections of their own, so it has to be scrolled to before it can be
-    // measured against the section above it.
+    await revealText(tester, 'Listings');
+
+    final double listingsTop =
+        tester.getTopLeft(find.text('Listings')).dy + list.position.pixels;
+
+    expect(pricingTop, lessThan(listingsTop));
+
+    // Provenance is further down still, measured the same way.
     await revealText(tester, 'Provenance');
 
     expect(
-      tester.getTopLeft(find.text('Listings')).dy,
-      lessThan(tester.getTopLeft(find.text('Provenance')).dy),
+      listingsTop,
+      lessThan(
+        tester.getTopLeft(find.text('Provenance')).dy + list.position.pixels,
+      ),
     );
   });
 

@@ -340,7 +340,8 @@ void main() {
     ) async {
       await pumpScreen(tester, const AnalyticsScreen());
 
-      expect(find.text('Revenue'), findsOneWidget);
+      // The statement's first line and the trend chart's legend.
+      expect(find.text('Revenue'), findsNWidgets(2));
       // Twice on purpose: the hero carries the headline, and the statement's
       // last line is the same figure as the answer to its subtraction.
       expect(find.text('Net profit'), findsNWidgets(2));
