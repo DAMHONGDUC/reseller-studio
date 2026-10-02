@@ -12,17 +12,18 @@ SOURCE → PURCHASE → INVENTORY → LIST → SELL → SHIP → PROFIT → ANAL
 | State | Riverpod |
 | Backend | Firebase |
 | Navigation | `go_router`, five-tab shell |
-| Design system | `packages/system_design` v3 submodule |
+| Design system | `packages/flutter-system-design-kit` v3 submodule |
 | Launch markets | United States and United Kingdom |
 
 ## Setup
 
-Requirements: [FVM](https://fvm.app) and Melos 6.3.3.
+Requirements: [FVM](https://fvm.app) and `make`. Commands come from the
+`packages/script-tools` submodule; `make` lists them.
 
 ```sh
-dart pub global activate melos 6.3.3
+git submodule update --init
 fvm install
-melos run set-up
+make set-up
 ```
 
 Firebase and store accounts are not included in the repository. See
@@ -32,10 +33,10 @@ Firebase and store accounts are not included in the repository. See
 
 | Task | Command |
 |---|---|
-| Generate localization | `melos run gen` |
-| Analyze | `melos run analyze` |
-| Test | `melos run test` |
-| Build checks | `melos run pre-build` |
+| Generate localization | `make gen` |
+| Analyze | `make analyze` |
+| Test one file | `make test TEST=<path>` |
+| Build checks | `make pre-build` |
 
 Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 
@@ -60,15 +61,15 @@ Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 ## Release
 
 ```sh
-melos run release-dev
+make release-dev
 ```
 
 ```sh
-melos run release-prod
+make release-prod
 ```
 
 Config, Firebase and TestFlight in that order, and it stops at the first
-failure. Add a TestFlight note with `melos run release-prod -- what changed`.
+failure. Add a TestFlight note with `make release-prod NOTE="what changed"`.
 
 Do not archive from Xcode. The release lane supplies the build-time
 configuration required by Firebase.

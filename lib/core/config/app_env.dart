@@ -222,7 +222,7 @@ final class AppEnv {
 
   /// Whether a key was actually filled in.
   ///
-  /// `env.example.json` ships `<placeholder>` values and `melos run set-up`
+  /// `env.example.json` ships `<placeholder>` values and `make set-up`
   /// copies them verbatim, so a half-filled flavour file otherwise reads as
   /// configured and fails at the SDK instead of at the diagnostics.
   static bool _isFilled(String value) =>

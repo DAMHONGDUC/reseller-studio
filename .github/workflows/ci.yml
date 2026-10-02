@@ -18,26 +18,29 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      # `packages/system_design` is a submodule and the analyze step compiles
-      # it standalone, so a checkout without it fails on the first command
-      # rather than the last.
+      # The design kit and script-tools are submodules, and every step below
+      # needs one or the other, so a checkout without them fails on the first
+      # command rather than the last.
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      # **CI follows the design system's `main`, not the pinned gitlink.**
+      # **CI follows the submodules' `main`, not the pinned gitlinks.**
       # Owner's call: the submodule is developed alongside the app, and having
       # to bump the gitlink here for every widget change is a second commit
       # nobody remembers. `--remote` takes the branch named in `.gitmodules`,
-      # which is already `main`.
+      # which is already `main` for both.
       #
       # The trade this makes, and it is a real one: a green run proves the app
-      # builds against the *tip* of the design system, not against the commit
+      # builds against the *tip* of each submodule, not against the commit
       # this repo has recorded. A local checkout still uses the gitlink, so the
       # two can disagree — if CI passes and a laptop does not, that gap is the
       # first thing to check.
-      - name: Track the design system's main
-        run: git submodule update --remote packages/system_design
+      - name: Track the submodules' main
+        run: git submodule update --remote --recursive
+
+      - name: Submodules checked out
+        run: test -f packages/flutter-system-design-kit/pubspec.yaml && test -f packages/script-tools/flutter/lib/common.sh
 
       # Read from `.fvmrc` rather than pinned here. The version is a number,
       # and a number belongs in one place — repeating it in this file is how a
@@ -52,24 +55,25 @@ jobs:
           channel: stable
           cache: true
 
-      # Both packages: the app, and the design system on its own, because it
-      # is analyzed on its own.
+      # Every package the analyzer walks: the app, the design kit on its own,
+      # and script-tools' icon tools, which fail analysis unresolved.
       - name: Dependencies
         run: |
           flutter pub get
-          (cd packages/system_design && flutter pub get)
+          (cd packages/flutter-system-design-kit && flutter pub get)
+          (cd packages/script-tools/flutter/dart && dart pub get)
 
       # `lib/l10n/gen/` is gitignored, so nothing compiles until it is built.
       - name: Localizations
         run: flutter gen-l10n
 
-      # The scripts, not their contents retyped here. The shared analyze script calls
-      # itself "exactly what CI runs" and this is what makes that true.
+      # The scripts, not their contents retyped here. `make analyze` is
+      # "exactly what CI runs" and this is what makes that true.
       - name: Analyze
-        run: sh packages/system_design/tool/analyze.sh
+        run: bash packages/script-tools/flutter/analyze_code.sh
 
       - name: Test
-        run: sh packages/system_design/tool/test.sh
+        run: bash packages/script-tools/flutter/run_tests.sh
 
   functions:
     name: Cloud Functions

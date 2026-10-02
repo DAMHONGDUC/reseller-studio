@@ -1,7 +1,7 @@
 # Release checklist
 
 These tasks require an external account, credential, private key or production
-decision. Complete them in order. Run `melos run pre-build` before a
+decision. Complete them in order. Run `make pre-build` before a
 release — `release-dev` and `release-prod` do not run it for you.
 
 ## Blocking setup
@@ -31,7 +31,7 @@ auth, backend rules and signing must already work.
 | Firebase services | Enable Auth, Firestore, Storage, Crashlytics, Analytics and Messaging |
 | Google | Register debug/release SHA-1 and SHA-256; test a release-signed Android build |
 | Apple | Enable Sign in with Apple on the App ID and configure Firebase's Apple provider |
-| Deploy | Use `melos run deploy-firebase-dev` or `melos run deploy-firebase-prod` |
+| Deploy | Use `make deploy-dev` or `make deploy-prod` |
 
 The app has no auth bypass. Until Firebase is configured, use mock data from
 More → General → Seed demo data.
@@ -64,7 +64,7 @@ this checklist. A downgrade keeps existing records and blocks only new creates.
 | Signing | Create a private certificates repo and a read-only fine-grained PAT |
 | Local Fastlane | Fill `ios/fastlane/.env`, then run `bundle exec fastlane certificates` |
 | GitHub Actions | Add the secrets listed in [`docs/release/CREDENTIALS.md`](docs/release/CREDENTIALS.md) |
-| Rehearsal | From `ios/`, run `bundle exec fastlane pre_build`, then `CI=true bundle exec fastlane pre_build` |
+| Rehearsal | From `ios/`, run `bundle exec fastlane preflight`, then `CI=true bundle exec fastlane preflight` |
 | First upload | Use `bump:false` with a known-free build number |
 
 Do not archive from Xcode. It omits `--dart-define-from-file` and can produce a
@@ -85,7 +85,7 @@ binary without Firebase configuration.
 ## Release command
 
 ```sh
-melos run release-prod -- release notes
+make release-prod NOTE="release notes"
 ```
 
 Detailed pipeline behavior: [`docs/release/PIPELINE.md`](docs/release/PIPELINE.md).

@@ -17,7 +17,7 @@ void main() {
     // **One template, not one per flavour.** `dev.example.json` and
     // `prod.example.json` only ever differed by values a developer fills in,
     // so the key list lived twice and went stale in one copy — which is
-    // exactly what happened to REVENUECAT_*. `set-up.sh` seeds both flavours
+    // exactly what happened to REVENUECAT_*. `set_up.sh` seeds both flavours
     // from this file.
     test('the template carries exactly the keys AppEnv reads', () {
       // The list every reader of this file trusts, pinned. A key nothing

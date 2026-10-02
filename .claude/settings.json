@@ -31,7 +31,9 @@
       "Bash(fvm flutter test:*)",
       "Bash(fvm flutter pub get:*)",
       "Bash(fvm flutter gen-l10n:*)",
-      "Bash(melos run:*)",
+      "Bash(make analyze:*)",
+      "Bash(make test:*)",
+      "Bash(make gen:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)"

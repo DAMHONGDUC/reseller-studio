@@ -37,8 +37,8 @@ coverage/
 # FVM
 .fvm/
 
-# Generated localizations. `melos run gen` (flutter gen-l10n) writes these
-# from the ARB files, and set-up.sh runs it on every clone — checking them in
+# Generated localizations. `make gen` (flutter gen-l10n) writes these
+# from the ARB files, and set_up.sh runs it on every clone — checking them in
 # only creates merge conflicts in files nobody edits by hand.
 lib/l10n/gen/
 
@@ -93,7 +93,7 @@ env/*.json
 !env/*.example.json
 
 # Your own copies of every per-project file, one set per flavour.
-# `melos run prepare-env-dev` copies them to the paths the build reads. Never
+# `make env-dev` copies them to the paths the build reads. Never
 # committed: this is the folder that holds real project identifiers, and one
 # of the two places a mistake here would be invisible (see docs/rules/RELEASE.md).
 env_assets/
@@ -130,9 +130,6 @@ ios/fastlane/report.xml
 ios/fastlane/Preview.html
 ios/fastlane/ExportOptions.plist
 
-# Melos
-pubspec_overrides.yaml
-
 # GitNexus local index and generated editor skills.
 .gitnexus/
 .claude/skills/gitnexus-*/
@@ -143,7 +140,7 @@ pubspec_overrides.yaml
 # `*_tmp_test.dart` — throwaway harnesses (screenshot shooters, geometry
 # probes). They are written to be run by hand against one question and are
 # often built on `matchesGoldenFile` or `dart:io`, which hang the runner here:
-# `shot_tmp_test.dart` times out at 10 minutes per case. `melos run test`
+# `shot_tmp_test.dart` times out at 10 minutes per case. `make test`
 # picks up anything matching `*_test.dart`, so the only thing keeping one out
 # of a CI run is this line.
 *_tmp_test.dart
