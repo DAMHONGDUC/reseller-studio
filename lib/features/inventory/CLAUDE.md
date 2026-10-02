@@ -100,6 +100,35 @@ list: the detail screen's Actions button, and **the `more_vert` button on
   pass it.
 - `test/features/inventory/item_card_actions_test.dart` holds all of it.
 
+## A row asking for one move carries it as a button
+
+Owner's rule, and it sits beside the ⋮ rather than replacing it.
+
+- **Stale stock gets Reprice; stock on the shelf listed nowhere gets
+  List on…** — the move each row is plainly asking for. List on… opens the
+  same cross-list screen the marketplace arrow does.
+- **One button at most, and none on any other row.** Two would be a menu, and
+  the menu is the ⋮. A row with nothing to ask stays exactly as tall as it was
+  — the extra line is paid only by the rows that need attention, which is the
+  trade "stay short" allows.
+- **Hidden while a selection is open**, for the same reason the ⋮ is.
+- **Stale also tints the card's edge**, repeating the Stale badge — colour is
+  never the only signal.
+- `ItemQuickActions` owns the guarded reprice and mark-sold moves, so the
+  sheet, the card and the detail screen cannot disagree about what is
+  allowed. `test/core/widgets/item_card_quick_action_test.dart` and
+  `item_card_stale_edge_test.dart` pin the row.
+
+## The detail screen pins Mark as sold and Reprice
+
+Owner's rule. While the item is on hand, `AppPinnedAction` holds the bottom
+edge: Mark as sold is the primary, Reprice is stacked above it. Every other
+verb stays behind the Actions button, and the sheet still lists both.
+
+- **Only on hand.** A sold or archived item has no next move, and a bar
+  holding one would invite a mistake — the order detail's rule.
+- `test/features/inventory/item_detail_pinned_actions_test.dart` pins it.
+
 ## The actions sheet names no marketplace, and never did more than one thing
 
 Owner's rule, in two moves. The sheet first collapsed **two** verbs into one —

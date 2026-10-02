@@ -34,6 +34,7 @@ import '../../controllers/item_actions_controller.dart';
 import '../../widgets/bulk_list_sheet.dart';
 import '../../widgets/inventory_filter_sheet.dart';
 import '../../widgets/item_actions_sheet.dart';
+import '../../widgets/item_quick_actions.dart';
 import '../../widgets/reprice_sheet.dart';
 
 part 'inventory_screen_bulk_bar.dart';

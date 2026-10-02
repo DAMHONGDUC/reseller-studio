@@ -497,7 +497,7 @@ by `ConfirmedStream.grace` and the held answer is released when it expires.
 
 ## The page loader is a newton's cradle, and it costs a dependency
 
-Explains `loading_animation_widget` in `packages/system_design/pubspec.yaml`,
+Explains `loading_animation_widget` in `packages/flutter-system-design-kit/pubspec.yaml`,
 approved by the owner, who named both the package and the animation.
 
 The v3 loading indicator was a `CircularProgressIndicator` at both of its

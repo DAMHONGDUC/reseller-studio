@@ -190,7 +190,7 @@ is not the one this has.
 **The generated files are committed**, and that is not a convenience: it is
 the clause that preserves what the original rule was actually protecting. A
 fresh checkout must analyze and test with no build step, so
-`melos run analyze` never depends on codegen having been run. Regenerating is
+`make analyze` never depends on codegen having been run. Regenerating is
 a deliberate act after a schema change, never a precondition for reading the
 repo.
 

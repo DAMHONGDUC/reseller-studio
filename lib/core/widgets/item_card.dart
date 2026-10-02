@@ -19,6 +19,7 @@ import 'app_row_icon_button.dart';
 part 'item_card_marketplaces.dart';
 part 'item_card_money_cell.dart';
 part 'item_card_money_line.dart';
+part 'item_card_quick_action.dart';
 part 'item_card_state_badges.dart';
 part 'item_card_updated.dart';
 part 'item_card_thumbnail.dart';
@@ -50,6 +51,7 @@ class ItemCard extends StatelessWidget {
     this.onLongPress,
     this.onActions,
     this.onMarketPrices,
+    this.onReprice,
     this.isSelected = false,
     this.isSelecting = false,
     this.notice,
@@ -91,6 +93,11 @@ class ItemCard extends StatelessWidget {
   /// ignored while a selection is open.
   final VoidCallback? onMarketPrices;
 
+  /// Opens the reprice sheet for this item. When set, a stale row carries a
+  /// Reprice button of its own (`_QuickAction`); null on a list that only
+  /// navigates.
+  final VoidCallback? onReprice;
+
   final bool isSelected;
 
   /// True once *any* row is ticked, so every row shows its checkbox rather
@@ -118,9 +125,14 @@ class ItemCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: SdCardV3(
         onTap: onTap,
-        // Outlined as well as ticked: colour is never the only signal, and
-        // the tick is never the only one either.
-        borderColor: isSelected ? context.colorScheme3.primary : null,
+        // - selected: outlined as well as ticked, so colour is never the
+        //   only signal
+        // - stale: the warning edge repeats the Stale badge on the card
+        borderColor: isSelected
+            ? context.colorScheme3.primary
+            : _StateBadges.isStale(item, now)
+            ? context.sdTheme3.warning
+            : null,
         // The card holds no inset of its own: the hairline between its two
         // zones runs edge to edge, so the padding belongs to the zones it
         // separates rather than to the card around both of them.
@@ -200,6 +212,24 @@ class ItemCard extends StatelessWidget {
                 onMarketPrices: isSelecting ? null : onMarketPrices,
               ),
             ),
+            if (!isSelecting &&
+                _QuickAction.shows(
+                  item: item,
+                  now: now,
+                  listings: listings,
+                  onReprice: onReprice,
+                  onMarketPrices: onMarketPrices,
+                ))
+              Padding(
+                padding: SdContentPaddingV3.card.copyWith(top: 0),
+                child: _QuickAction(
+                  item: item,
+                  now: now,
+                  listings: listings,
+                  onReprice: onReprice,
+                  onMarketPrices: onMarketPrices,
+                ),
+              ),
           ],
         ),
       ),

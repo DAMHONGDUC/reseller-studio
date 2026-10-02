@@ -22,6 +22,30 @@ place to look.
 - Anything that would once have gone "in Settings" becomes a section or a row
   on More. Do not bring the screen back.
 
+## Destinations are a grid of tiles; General stays rows
+
+Owner's rule. Every section under General — Operations, Finance, Business —
+is a grid of tiles, three across: a tinted icon tile over its label, which
+may take two lines. General keeps the
+row shape above, because it holds controls (a theme, a language) whose
+current value is the point, and a tile has no room to say it.
+
+- **A grid is where a seller goes to pick a place, rows are where they read
+  a setting.** Twelve destinations as rows was a list to scan top to bottom;
+  as tiles it is one glance per section.
+- **A destination with no screen yet is a tile drawn faint with a "Soon"
+  badge**, the same rule as the row it replaced: shown, not hidden, and no
+  tap leading nowhere.
+- **The tint comes from the destination, not the section**, through
+  `MoreHue.of(kind)` — an exhaustive switch to an `AppTagHue`, never an index
+  (the palette rule in `CLAUDE.md`), so a new destination cannot ship
+  untinted.
+- **Three across, not four.** At a quarter of a phone "Emplacements" or
+  "Marktplätze" breaks mid-word; a third holds every shipping locale's
+  longest label on two lines.
+- `test/features/more/more_sections_test.dart` holds the grid, the hue and
+  that every tile label fits in every shipping locale.
+
 ## The account row never prints who is signed in
 
 Owner's rule, and it narrows the row rule above: the value beside "Account"

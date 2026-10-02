@@ -58,6 +58,7 @@ class _ItemList extends ConsumerWidget {
             onActions: () => ItemActionsSheet.show(context, item),
             // The row shows no price per marketplace; this is where they are.
             onMarketPrices: () => context.push(AppRoutes.crossList(item.id)),
+            onReprice: () => ItemQuickActions.reprice(context, ref, item),
           );
         },
       ),

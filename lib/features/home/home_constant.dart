@@ -16,62 +16,26 @@ final class HomeConstant {
   static const int recentActivityMaxRows = 3;
 }
 
-/// One of the three cards at the top of Home.
+/// **The three create actions in Home's shortcut row** — owner's rule.
 ///
-/// **No route on it, unlike [QuickAction].** Only two of the three are
-/// a navigation at all — the first scrolls this screen — so the card asks
-/// [HomeShortcutKind] what to do rather than pushing a path it was handed.
-class HomeShortcut {
-  const HomeShortcut({required this.kind, required this.icon});
-
-  final HomeShortcutKind kind;
-  final IconData icon;
-}
-
-/// The three ways out of Home.
-enum HomeShortcutKind { quickAction, search, scan }
-
-/// **The three cards that open Home** — owner's rule.
+/// Quick add, Scan and Record sale are what a seller starts while holding an
+/// item or a sale, so they get one tap from the first screen. Each is a
+/// [QuickActionKind], so the button wears its Quick Action row's words and
+/// opens its route — the button and the row it shortcuts cannot disagree.
 ///
-/// Home's own content answers "what needs attention today", and everything
-/// that answers it is *inside* this screen. These three are the ways out: down
-/// to Quick Action, sideways into global search, and into the scanner.
-/// They sit first because a seller who opened the app to *go somewhere* should
-/// not have to read a dashboard on the way.
-///
-/// Flow overview now gets a full section immediately below this row. Scan
-/// takes its card because it is a frequent action a seller starts while
-/// holding an item, and the shortcut row is the fastest way into it.
-///
-/// **Three, and the list is closed.** A fourth would make this a launcher,
-/// which is exactly what keeping the create actions at the bottom exists to
-/// avoid —
-/// the row works because it is short enough to take in without reading.
+/// **Three, and the list is closed.** A fourth makes the row a launcher.
+/// The first is the filled one; see `lib/features/home/CLAUDE.md`.
 final class HomeShortcutConstant {
-  static const List<HomeShortcut> shortcuts = <HomeShortcut>[
-    HomeShortcut(
-      kind: HomeShortcutKind.quickAction,
-      icon: AppIconConstant.bolt,
-    ),
-    HomeShortcut(kind: HomeShortcutKind.search, icon: AppIconConstant.search),
-    HomeShortcut(
-      kind: HomeShortcutKind.scan,
-      icon: AppIconConstant.barcodeScanner,
-    ),
+  static const List<QuickActionKind> shortcuts = <QuickActionKind>[
+    QuickActionKind.quickAddItem,
+    QuickActionKind.scan,
+    QuickActionKind.recordSale,
   ];
-}
 
-/// The words for a Home shortcut card.
-///
-/// Each reuses the key its destination already owns — a card that said
-/// something other than the section it lands on is a card that lies.
-final class HomeShortcutLabel {
-  static String of(BuildContext context, HomeShortcutKind kind) =>
-      switch (kind) {
-        HomeShortcutKind.quickAction => context.l10n.homeQuickAction,
-        HomeShortcutKind.search => context.l10n.homeShortcutSearch,
-        HomeShortcutKind.scan => context.l10n.inventoryScan,
-      };
+  /// The Quick Action row a shortcut stands for.
+  static QuickAction actionFor(QuickActionKind kind) => QuickActionConstant
+      .actions
+      .firstWhere((QuickAction action) => action.kind == kind);
 }
 
 /// One create action, as Quick Action offers it.

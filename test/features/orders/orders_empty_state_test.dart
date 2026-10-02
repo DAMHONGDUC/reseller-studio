@@ -60,7 +60,8 @@ void main() {
     await pumpScreen(tester, const OrdersScreen());
     // Shipped is the seeded tab with nothing under it while the others are
     // full — exactly the case the shared widget has to keep telling apart.
-    await tester.tap(find.text('Shipped'));
+    // The chip, not the order cards' track, which also reads "Shipped".
+    await tester.tap(find.widgetWithText(SdFilterChipV3, 'Shipped'));
     await tester.pumpAndSettle();
 
     expect(find.text('No orders match this filter.'), findsOneWidget);

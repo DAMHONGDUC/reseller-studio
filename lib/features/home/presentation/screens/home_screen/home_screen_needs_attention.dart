@@ -51,9 +51,9 @@ class _NeedsAttention extends ConsumerWidget {
         .where((Order order) => order.isOverdue(now) ?? false)
         .length;
 
-    final List<Widget> rows = <Widget>[
+    final List<_AttentionTile> rows = <_AttentionTile>[
       if (pending.isNotEmpty)
-        _AttentionRow(
+        _AttentionTile(
           icon: AppIconConstant.localShipping,
           label: context.l10n.homeOrdersToShip,
           count: pending.length,
@@ -66,12 +66,13 @@ class _NeedsAttention extends ConsumerWidget {
           tint: overdue > 0
               ? context.sdTheme3.danger
               : context.sdTheme3.warning,
+          isUrgent: overdue > 0,
           onTap: () => context.go(AppRoutes.orders),
         ),
       // Second, not last: an offer has somebody else's clock on it, and it is
       // the only row here that expires whether or not the seller acts.
       if (offers.isNotEmpty)
-        _AttentionRow(
+        _AttentionTile(
           icon: AppIconConstant.localOffer,
           label: context.l10n.homeOffersWaiting,
           count: offers.length,
@@ -87,7 +88,7 @@ class _NeedsAttention extends ConsumerWidget {
       // cannot show — the count is the work, and being overdue is what makes
       // one of them urgent rather than what makes it exist.
       if (unpaid.isNotEmpty)
-        _AttentionRow(
+        _AttentionTile(
           icon: AppIconConstant.payments,
           label: context.l10n.homePayoutsToRecord,
           count: unpaid.length,
@@ -100,10 +101,11 @@ class _NeedsAttention extends ConsumerWidget {
           tint: overduePayouts > 0
               ? context.sdTheme3.warning
               : context.sdTheme3.info,
+          isUrgent: overduePayouts > 0,
           onTap: () => context.push(AppRoutes.payouts),
         ),
       if (unlisted.isNotEmpty)
-        _AttentionRow(
+        _AttentionTile(
           icon: AppIconConstant.sell,
           label: context.l10n.homeItemsToList,
           count: unlisted.length,
@@ -112,7 +114,7 @@ class _NeedsAttention extends ConsumerWidget {
           onTap: () => context.go(AppRoutes.inventory),
         ),
       if (stale.isNotEmpty)
-        _AttentionRow(
+        _AttentionTile(
           icon: AppIconConstant.hourglassBottom,
           label: context.l10n.homeStaleInventory,
           count: stale.length,
@@ -136,29 +138,40 @@ class _NeedsAttention extends ConsumerWidget {
               WorkspaceActivity.untouched => const _StartHere(),
               WorkspaceActivity.active => const _AllClear(),
             }
-          : SdCardV3(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: <Widget>[
-                  for (int i = 0; i < rows.length; i++) ...<Widget>[
-                    rows[i],
-                    if (i != rows.length - 1)
-                      Padding(
-                        padding: EdgeInsets.only(
-                          // Indented to clear the icon tile, so the rule
-                          // separates the text column rather than cutting the
-                          // whole card in half.
-                          left:
-                              SdSpacingConstant.w16 +
-                              SdIconTileSizeV3.medium.box +
-                              SdSpacingConstant.w12,
-                        ),
-                        child: const SdDividerV3(),
-                      ),
-                  ],
-                ],
-              ),
-            ),
+          : _AttentionGrid(tiles: rows),
     );
   }
+}
+
+/// The tiles two across, each pair stretched to the taller of the two.
+///
+/// An odd tile out keeps half the width rather than spanning the row, so
+/// every count sits in the same column it would in a full pair.
+class _AttentionGrid extends StatelessWidget {
+  const _AttentionGrid({required this.tiles});
+
+  final List<_AttentionTile> tiles;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: <Widget>[
+      for (int start = 0; start < tiles.length; start += 2) ...<Widget>[
+        if (start > 0) SizedBox(height: SdContentPaddingV3.listItemGap),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Expanded(child: tiles[start]),
+              SizedBox(width: SdContentPaddingV3.listItemGap),
+              Expanded(
+                child: start + 1 < tiles.length
+                    ? tiles[start + 1]
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ],
+  );
 }

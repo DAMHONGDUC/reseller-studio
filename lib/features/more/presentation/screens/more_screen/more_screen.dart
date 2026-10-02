@@ -67,7 +67,7 @@ class MoreScreen extends ConsumerWidget {
           const _SyncStatusCard(),
           _GeneralSection(signedIn: signedIn, plan: plan),
           for (final MoreSection section in sections)
-            _MoreSection(section: section, plan: plan),
+            _MoreSection(section: section),
         ],
       ),
     );

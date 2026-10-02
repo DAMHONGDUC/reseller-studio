@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Reseller Studio's palette. **The design system does not own this** — the package
 /// declares colour *slots* (`SdThemeV3`) and this app fills them in, which is
-/// why `packages/system_design` never names a colour and why BaroEase can
+/// why `packages/flutter-system-design-kit` never names a colour and why BaroEase can
 /// render the same widgets in a completely different scheme.
 ///
 /// Two full palettes ship, light and dark, because the app is used in two

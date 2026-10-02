@@ -22,7 +22,7 @@ jobs:
   testflight:
     name: Build and upload
     runs-on: macos-15
-    # The lane commits the bumped pubspec.yaml and the design system's gitlink
+    # The lane commits the bumped pubspec.yaml and both submodule gitlinks
     # and pushes them itself, after the upload — so the job needs write access
     # to contents. Nothing else here writes anything.
     permissions:
@@ -41,10 +41,10 @@ jobs:
         with:
           submodules: recursive
 
-      # Same call the CI workflow makes, and for the same reason: the design
-      # system is developed alongside the app and CI follows its `main`.
-      - name: Track the design system's main
-        run: git submodule update --remote packages/system_design
+      # Same call the CI workflow makes, and for the same reason: the
+      # submodules are developed alongside the app and CI follows their `main`.
+      - name: Track the submodules' main
+        run: git submodule update --remote --recursive
 
       # The bump commit is the bot's, not whoever pressed the button.
       - name: Git identity
@@ -102,7 +102,7 @@ jobs:
       - name: Dependencies
         run: |
           flutter pub get
-          (cd packages/system_design && flutter pub get)
+          (cd packages/flutter-system-design-kit && flutter pub get)
 
       # `lib/l10n/gen/` is gitignored, so nothing compiles until it is built.
       - name: Localizations

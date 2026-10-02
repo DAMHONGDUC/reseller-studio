@@ -1,4 +1,4 @@
-# What this app is, and nothing else. The lanes live in the design system.
+# What this app is, and nothing else. The lanes live in script-tools.
 #
 #   bundle exec fastlane certificates          # local only, once
 #   bundle exec fastlane preflight             # three minutes, no build
@@ -6,15 +6,15 @@
 #   bundle exec fastlane upload flavor:prod    # a built IPA that failed to upload
 #
 # `beta`, `upload`, `preflight` and `certificates` are imported, never copied:
-# every app embedding this design system ships through one pipeline, and a lane
+# every app using script-tools ships through one pipeline, and a lane
 # re-implemented here is one that stops getting the next fix. This file only
 # says which bundle ids, which team and which targets that pipeline is aiming
 # at. See docs/rules/RELEASE.md.
 #
-# **Nothing here archives.** `packages/system_design/tool/build-ipa.sh` does,
+# **Nothing here archives.** `packages/script-tools/flutter/build_ipa.sh` does,
 # because the app's configuration arrives through `--dart-define-from-file` and
 # `gym` knows nothing about that flag.
-import "../../packages/system_design/tool/fastlane/Fastfile"
+import "../../packages/script-tools/flutter/fastlane/Fastfile"
 
 # `targets` is ORDERED and the first one is the app itself — the bundle id every
 # upload, config check and TestFlight query uses. An extension added later is

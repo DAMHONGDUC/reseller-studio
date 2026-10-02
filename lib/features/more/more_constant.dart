@@ -4,6 +4,7 @@ import '../../core/config/app_env.dart';
 import '../../core/constants/app_icon_constant.dart';
 import '../../core/extensions/context_extensions.dart';
 import '../../core/router/app_routes.dart';
+import '../../core/theme/app_tag_hue.dart';
 import '../subscription/domain/enums/seller_plan.dart';
 
 /// One row on the More screen.
@@ -76,6 +77,35 @@ final class MoreLabel {
         MoreDestinationKind.about => context.l10n.moreAbout,
         MoreDestinationKind.contactSupport => context.l10n.moreContactSupport,
       };
+}
+
+/// The tint of a destination's tile on More.
+///
+/// **Exhaustive, so a new destination cannot ship untinted**, and by name
+/// rather than index (the palette rule in `CLAUDE.md`). Related places share
+/// a hue — money is green, stock is indigo — so a section reads as a family.
+final class MoreHue {
+  static AppTagHue of(MoreDestinationKind kind) => switch (kind) {
+    MoreDestinationKind.sourcing => AppTagHue.indigo,
+    MoreDestinationKind.listings => AppTagHue.blue,
+    MoreDestinationKind.categories => AppTagHue.violet,
+    MoreDestinationKind.locations => AppTagHue.teal,
+    MoreDestinationKind.businesses => AppTagHue.indigo,
+    MoreDestinationKind.marketplaces => AppTagHue.blue,
+    MoreDestinationKind.carriers => AppTagHue.amber,
+    MoreDestinationKind.team => AppTagHue.green,
+    MoreDestinationKind.activity => AppTagHue.grey,
+    MoreDestinationKind.expenses => AppTagHue.red,
+    MoreDestinationKind.payouts => AppTagHue.green,
+    MoreDestinationKind.books => AppTagHue.teal,
+    MoreDestinationKind.reports => AppTagHue.violet,
+    MoreDestinationKind.receipts => AppTagHue.amber,
+    MoreDestinationKind.tax => AppTagHue.grey,
+    MoreDestinationKind.subscription => AppTagHue.amber,
+    MoreDestinationKind.notifications => AppTagHue.blue,
+    MoreDestinationKind.about => AppTagHue.grey,
+    MoreDestinationKind.contactSupport => AppTagHue.grey,
+  };
 }
 
 /// The value at the end of a More row — what the seller would otherwise have

@@ -81,4 +81,37 @@ void main() {
   test('isoDate is not localized, so filenames and CSV cells sort', () {
     expect(DateTimeUtils.isoDate(DateTime(2026, 8, 5)), '2026-08-05');
   });
+
+  group('chart buckets start at midnight on the calendar', () {
+    test('startOfWeek is the Monday of the same week', () {
+      // 12 Aug 2026 is a Wednesday.
+      expect(
+        DateTimeUtils.startOfWeek(DateTime(2026, 8, 12, 15, 30)),
+        DateTime(2026, 8, 10),
+      );
+      expect(
+        DateTimeUtils.startOfWeek(DateTime(2026, 8, 10)),
+        DateTime(2026, 8, 10),
+      );
+      expect(
+        DateTimeUtils.startOfWeek(DateTime(2026, 8, 16)),
+        DateTime(2026, 8, 10),
+      );
+    });
+
+    test('daysBefore crosses a month and lands on midnight', () {
+      expect(
+        DateTimeUtils.daysBefore(DateTime(2026, 3, 2, 9), 3),
+        DateTime(2026, 2, 27),
+      );
+      expect(
+        DateTimeUtils.daysAfter(DateTime(2026, 2, 27), 3),
+        DateTime(2026, 3, 2),
+      );
+    });
+
+    test('startOfYear is 1 January', () {
+      expect(DateTimeUtils.startOfYear(DateTime(2026, 8, 12)), DateTime(2026));
+    });
+  });
 }

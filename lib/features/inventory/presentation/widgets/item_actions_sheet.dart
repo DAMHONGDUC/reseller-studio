@@ -9,11 +9,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/app_sheet_action_row.dart';
 import '../../../../core/widgets/app_sheet_option_list.dart';
-import '../../../../core/widgets/mark_sold_sheet.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
-import '../../../subscription/domain/services/plan_gate.dart';
-import '../../../subscription/presentation/widgets/plan_block_sheet.dart';
-import '../../../subscription/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/entities/storage_location.dart';
 import '../../domain/enums/item_status.dart';
@@ -21,7 +17,7 @@ import '../../domain/services/item_transition.dart';
 import '../../item_block_presenter.dart';
 import '../../providers.dart';
 import '../controllers/item_actions_controller.dart';
-import 'reprice_sheet.dart';
+import 'item_quick_actions.dart';
 
 /// Everything a seller can do to one item, in one sheet (plan §7).
 ///
@@ -204,10 +200,12 @@ class ItemActionsSheet extends ConsumerWidget {
       AppSheetActionRow(
         icon: AppIconConstant.priceChange,
         label: context.l10n.itemActionReprice,
-        onTap: () {
-          Navigator.of(context).pop();
-          RepriceSheet.show(context, ref, <Item>[item]);
-        },
+        onTap: () => ItemQuickActions.reprice(
+          context,
+          ref,
+          item,
+          closeSheet: Navigator.of(context).pop,
+        ),
       ),
       AppSheetActionRow(
         icon: AppIconConstant.shelves,
@@ -217,28 +215,12 @@ class ItemActionsSheet extends ConsumerWidget {
       AppSheetActionRow(
         icon: AppIconConstant.payments,
         label: context.l10n.itemActionMarkSold,
-        onTap: () async {
-          final PlanBlock block = ref.read(addOrderBlockProvider);
-
-          if (block != PlanBlock.none) {
-            Navigator.of(context).pop();
-            await PlanBlockSheet.show(
-              context,
-              block: block,
-              plan: ref.read(currentPlanProvider),
-            );
-
-            return;
-          }
-
-          _guarded(context, ref, ItemStatus.sold, () {
-            Navigator.of(context).pop();
-            // One item: selling several at once starts from the Orders tab,
-            // where the seller is already picking rather than already inside
-            // one record.
-            MarkSoldSheet.show(context, <Item>[item]);
-          });
-        },
+        onTap: () => ItemQuickActions.markSold(
+          context,
+          ref,
+          item,
+          closeSheet: Navigator.of(context).pop,
+        ),
       ),
       // **A draft is not stock until the seller says so** — owner's rule, and
       // the row that says it. Only a draft can take it: everything else is

@@ -11,7 +11,7 @@
 | 5 | Verify flavor/Firebase pairing | Safe release configuration |
 | 6 | Resolve TestFlight build number | Unique build |
 | 7 | Load signing through Match | Certificate and profile |
-| 8 | Build only through `packages/system_design/tool/build-ipa.sh` | IPA and dSYMs |
+| 8 | Build only through `packages/script-tools/flutter/build_ipa.sh` | IPA and dSYMs |
 | 9 | Upload to TestFlight | Processing build |
 | 10 | Commit/push build number when requested | Traceable version |
 | 11 | Upload the IPA workflow artifact | Downloadable artifact |
@@ -33,8 +33,8 @@
 Run both from `ios/`:
 
 ```sh
-bundle exec fastlane pre_build
-CI=true bundle exec fastlane pre_build
+bundle exec fastlane preflight
+CI=true bundle exec fastlane preflight
 ```
 
 The first checks the local path; the second checks CI-only behavior without

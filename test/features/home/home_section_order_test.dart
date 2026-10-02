@@ -8,9 +8,9 @@ import 'premium_subscription.dart';
 
 /// The order of Home is a product decision, and this is what holds it.
 ///
-/// Owner's rule: **Getting started sits directly under the shortcut row**,
-/// then Needs Attention, then the numbers. See `lib/features/home/CLAUDE.md`,
-/// which carries the whole order.
+/// Owner's rule: **Needs Attention opens the screen**, the shortcut row sits
+/// under it, Getting started under that, then the numbers. See
+/// `lib/features/home/CLAUDE.md`, which carries the whole order.
 void main() {
   /// The order [labels] appear in as Home is scrolled from the top.
   ///
@@ -34,19 +34,20 @@ void main() {
     final List<String> seen = <String>[];
 
     while (seen.length < labels.length) {
-      final List<String> arrived = labels
-          .where(
-            (String label) =>
-                !seen.contains(label) &&
-                find.text(label).evaluate().isNotEmpty,
-          )
-          .toList()
-        ..sort(
-          (String a, String b) => tester
-              .getTopLeft(find.text(a).first)
-              .dy
-              .compareTo(tester.getTopLeft(find.text(b).first).dy),
-        );
+      final List<String> arrived =
+          labels
+              .where(
+                (String label) =>
+                    !seen.contains(label) &&
+                    find.text(label).evaluate().isNotEmpty,
+              )
+              .toList()
+            ..sort(
+              (String a, String b) => tester
+                  .getTopLeft(find.text(a).first)
+                  .dy
+                  .compareTo(tester.getTopLeft(find.text(b).first).dy),
+            );
 
       seen.addAll(arrived);
 
@@ -80,7 +81,7 @@ void main() {
     );
   });
 
-  testWidgets('Getting started is above Needs Attention when it shows', (
+  testWidgets('Getting started sits under Needs Attention when it shows', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -91,27 +92,32 @@ void main() {
 
     expect(
       await orderDownThePage(tester, <String>[
-        'Needs Attention',
         'Getting started',
+        'Needs Attention',
       ]),
-      <String>['Getting started', 'Needs Attention'],
+      <String>['Needs Attention', 'Getting started'],
     );
   });
 
-  testWidgets('the shortcut row is still first', (WidgetTester tester) async {
+  testWidgets('Needs Attention opens the screen, the shortcut row follows', (
+    WidgetTester tester,
+  ) async {
     await pumpScreen(
       tester,
       const HomeScreen(),
       overrides: premiumSubscription(),
     );
 
+    // `Quick Add` is the first shortcut; the Quick Action row of the same
+    // name is at the very end, so the first one to arrive is the button.
     expect(
       await orderDownThePage(tester, <String>[
+        'Quick Add',
         'Needs Attention',
-        'Quick Action',
+        'Performance',
       ]),
-      <String>['Quick Action', 'Needs Attention'],
-      reason: 'the three shortcut cards open the screen (owner\u2019s rule)',
+      <String>['Needs Attention', 'Quick Add', 'Performance'],
+      reason: 'what needs attention comes first (owner\u2019s rule)',
     );
   });
 }

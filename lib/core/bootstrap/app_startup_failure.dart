@@ -31,7 +31,7 @@ final class AppStartupFailure {
 ///
 /// `env/<flavour>.json` is compiled in by `--dart-define-from-file`;
 /// `GoogleService-Info.plist` and `google-services.json` are read by the
-/// native SDK. `melos run prepare-env-<flavour>` installs both, and nothing
+/// native SDK. `make env-<flavour>` installs both, and nothing
 /// else ties them together — so a run started before that script, or after
 /// the other flavour's, compiles, installs, launches and writes a dev
 /// session into the production Firestore. Neither half is wrong on its own,
@@ -52,7 +52,7 @@ final class FlavorConfigMismatch implements Exception {
   @override
   String toString() =>
       'env/${AppEnv.flavor.name}.json is $expected, but the native config is '
-      '$actual. Run `melos run prepare-env-${AppEnv.flavor.name}`.';
+      '$actual. Run `make env-${AppEnv.flavor.name}`.';
 }
 
 /// Which startup failures stop the app, and which ones it opens without.

@@ -7,7 +7,9 @@
 library;
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:system_design/common.dart';
 
+import '../../core/constants/log_tag_constant.dart';
 import '../../core/money/money.dart';
 import '../../core/time/app_clock.dart';
 import '../expenses/domain/entities/expense.dart';
@@ -21,6 +23,10 @@ import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/analytics_breakdowns.dart';
 import 'domain/entities/analytics_summary.dart';
+import 'domain/entities/trend_bucket.dart';
+import 'domain/enums/analytics_period.dart';
+import 'domain/services/analytics_period_window.dart';
+import 'domain/services/profit_trend.dart';
 
 /// The headline figures — Home's overview tiles and the top of Analytics.
 final Provider<AnalyticsSummary> analyticsSummaryProvider =
@@ -37,6 +43,66 @@ final Provider<AnalyticsSummary> analyticsSummaryProvider =
         items: items,
         expenses: expenses,
         currency: currency,
+      );
+    });
+
+/// The window the Analytics tab reports over. Home always reports all time.
+class AnalyticsPeriodController extends Notifier<AnalyticsPeriod> {
+  @override
+  AnalyticsPeriod build() => AnalyticsPeriod.all;
+
+  void select(AnalyticsPeriod period) {
+    SdLogger.action(LogTagConstant.analytics, 'Select period', <String, String>{
+      'period': period.name,
+    });
+
+    state = period;
+  }
+}
+
+final NotifierProvider<AnalyticsPeriodController, AnalyticsPeriod>
+analyticsPeriodProvider =
+    NotifierProvider<AnalyticsPeriodController, AnalyticsPeriod>(
+      AnalyticsPeriodController.new,
+    );
+
+/// [analyticsSummaryProvider] over the selected period only.
+///
+/// Orders by when they were placed, expenses by their own date; what is on
+/// the shelf is a snapshot and is not windowed.
+final Provider<AnalyticsSummary> periodSummaryProvider =
+    Provider<AnalyticsSummary>((Ref ref) {
+      final DateTime? start = AnalyticsPeriodWindow.startOf(
+        ref.watch(analyticsPeriodProvider),
+        ref.watch(clockProvider).now(),
+      );
+
+      return AnalyticsSummary.from(
+        orders: AnalyticsPeriodWindow.orders(
+          ref.watch(ordersProvider).value ?? const <Order>[],
+          start,
+        ),
+        items: ref.watch(itemsProvider).value ?? const <Item>[],
+        expenses: AnalyticsPeriodWindow.expenses(
+          ref.watch(expensesProvider).value ?? const <Expense>[],
+          start,
+        ),
+        currency: ref.watch(workspaceCurrencyProvider),
+      );
+    });
+
+/// Revenue and profit bucketed over the selected period — the trend chart.
+final Provider<List<TrendBucket>> profitTrendProvider =
+    Provider<List<TrendBucket>>((Ref ref) {
+      final AnalyticsPeriod period = ref.watch(analyticsPeriodProvider);
+      final DateTime now = ref.watch(clockProvider).now();
+
+      return ProfitTrend.build(
+        orders: ref.watch(ordersProvider).value ?? const <Order>[],
+        start: AnalyticsPeriodWindow.startOf(period, now),
+        now: now,
+        grain: AnalyticsPeriodWindow.grainOf(period),
+        currency: ref.watch(workspaceCurrencyProvider),
       );
     });
 
