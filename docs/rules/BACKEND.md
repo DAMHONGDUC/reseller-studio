@@ -90,7 +90,7 @@ about how the backend is written.
 
 ## Indexes
 
-- **Indexes and rules deploy together.** `melos run deploy-firebase-<flavour>` does both;
+- **Indexes and rules deploy together.** `make deploy-<flavour>` does both;
   deploying one without the other is how a screen that passed review returns
   `FAILED_PRECONDITION` in production.
 - **A missing composite index fails at runtime, not at build.** A test can

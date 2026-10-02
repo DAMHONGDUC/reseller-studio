@@ -4,14 +4,14 @@ Read this when running, building, generating or deploying. **This file is the
 authority on the command set, and the only place it is explained.** The README
 may list the names; it never gets a second explanation.
 
-**Never create or edit a command script in `packages/system_design/tool/` from
-this app repository.** Owner's rule. Those files belong to the design-system
+**Never create or edit a command script in `packages/script-tools/` from
+this app repository.** Owner's rule. Those files belong to the script-tools
 submodule and must remain exactly as supplied by it; when the app's command
 configuration names a missing or incompatible script, fix the app-side
 configuration or update the submodule through its own repository instead of
 patching the script locally.
 
-**Command scripts live in `packages/system_design/tool/`, never in the app
+**Command scripts live in `packages/script-tools/flutter/`, never in the app
 repo's `tool/`.** Owner's rule. The same setup, analysis, test and release
 pipeline serves every app that consumes the submodule; keeping another copy in
 the app lets fixes land in one pipeline while the other silently stays stale.
@@ -20,52 +20,51 @@ the app lets fixes land in one pipeline while the other silently stays stale.
 the design system deleted `tool/pre-build.sh`: a gate full of one app's bundle
 ids, entitlements and store rules cannot live in a directory every app
 embedding the submodule shares — it arrived as another app's checks and would
-drift again. It belongs to this app's fastlane lane, never to a second local
-script tree.
+drift again. It belongs to this app's fastlane lane and, if it needs a short
+name, a target in this app's own `Makefile` — never a second local script tree.
 
 ## The set
 
-Fourteen commands. Every one is `melos run <name>`, and every body is a file
-in `packages/system_design/tool/` — except `pre-build`, which is this app's own
-fastlane lane.
+Every command is `make <name>`, and `make` with no target lists them. The root
+`Makefile` includes `packages/script-tools/flutter/flutter.mk`, which maps each
+target to a script in `packages/script-tools/flutter/` — except `pre-build`,
+which the `Makefile` defines itself because its body is this app's fastlane
+lane.
 
 | Command | Script | Promise |
 |---|---|---|
-| `set-up` | `set-up.sh` | Wipe, then everything a fresh clone needs. Idempotent. |
-| `deep-set-up` | `deep-set-up.sh` | `set-up` plus Xcode's derived data. Costs a cold build. |
-| `prepare-env-dev` | `prepare-env.sh dev` | Install dev's config — env files + native files. |
-| `prepare-env-prod` | `prepare-env.sh prod` | The same, prod's native files. |
-| `gen` | `gen.sh` | Localizations and codegen, nothing else. |
-| `analyze` | `analyze.sh` | Zero findings, or fail. What CI runs. |
-| `test` | `test.sh` | The test suite. |
-| `pre-build` | `fastlane pre_build` | The app's own gate — config, signing, build number. |
-| `build-ipa-dev` | `build-ipa.sh dev` | The IPA, dev config attached. |
-| `build-ipa-prod` | `build-ipa.sh prod` | The IPA, prod config attached. |
-| `deploy-firebase-dev` | `deploy-firebase.sh dev` | Rules, indexes and functions to the dev alias. |
-| `deploy-firebase-prod` | `deploy-firebase.sh prod` | The same, prod alias. |
-| `release-dev` | `release.sh dev` | Set up, dev config, dev Firebase, then TestFlight. |
-| `release-prod` | `release.sh prod` | The same, prod. |
+| `set-up` | `set_up.sh` | Wipe, then everything a fresh clone needs. Idempotent. |
+| `deep-set-up` | `set_up.sh --deep` | `set-up` plus Xcode's derived data. Costs a cold build. |
+| `env-dev` / `env-prod` | `prepare_env.sh <flavour>` | Install that flavour's config — env files + native files. |
+| `gen` | `generate_code.sh` | Localizations and codegen, nothing else. |
+| `analyze` | `analyze_code.sh` | Zero findings, or fail. What CI runs. |
+| `test` | `run_tests.sh` | `TEST=<path>` scopes it to one file or folder. |
+| `pre-build` | fastlane `preflight` | The app's own gate — config, signing, build number. |
+| `build-ipa-dev` / `build-ipa-prod` | `build_ipa.sh <flavour>` | The IPA, that flavour's config attached. |
+| `deploy-dev` / `deploy-prod` | `deploy_firebase.sh <flavour>` | Rules, indexes and functions to that alias. `ONLY=rules\|functions` narrows it. |
+| `release-dev` / `release-prod` | `release_ios.sh <flavour>` | Config, Firebase, then TestFlight. `NOTE="…"` for What to Test. |
+| `upload-ipa-dev` / `upload-ipa-prod` | `upload_ipa.sh <flavour>` | Upload the IPA already built, for one that did not reach TestFlight. |
+| `app-icon` / `app-icon-strip-marker` | `generate_app_icon.sh` / `strip_icon_marker.sh` | Launcher and launch icons from the artwork; erase its watermark. |
 
-Three shapes recur, and they are the pattern to copy:
+The shapes that recur, and the pattern to copy:
 
-- **A flavour is a separate command, never a flag on a shared one.** `-dev` and
-  `-prod` are typed on purpose; a prod deploy inherited from whatever the CLI
-  was last pointed at is the failure this prevents.
-- **One script serves both flavours, taking the flavour as `$1`.** The
-  `melos.yaml` entry is the only thing that is duplicated.
-- **Underscore-prefixed files are not commands.** `_common.sh` and `_clean.sh`
-  are sourced or called by others, never named in `melos.yaml`.
+- **A flavour is part of the target's name, never a defaulted flag.** `-dev`
+  and `-prod` are typed on purpose; a prod deploy inherited from whatever the
+  CLI was last pointed at is the failure this prevents. A flavour not in
+  `FLAVORS` (default `dev prod`) is refused with the usage line.
+- **One script serves every flavour, taking it as `$1`.** `flutter.mk` holds
+  one pattern rule per command; nothing is duplicated per flavour.
 - **A command that chains others calls their scripts, never their steps.**
-  `release.sh` runs `set-up.sh`, `prepare-env.sh`, `deploy-firebase.sh` and the
-  beta lane in order; it re-implements none of them, so the confirm prompt and
+  `release_ios.sh` runs `prepare_env.sh`, `deploy_firebase.sh` and the beta
+  lane in order; it re-implements none of them, so the confirm prompt and
   every check are the same ones a step run on its own gets.
 
-**There is no `run`, `test-rules`, `_url-scheme` or `pre-build` script.** The
-first three were deleted. `pre-build` is the one command whose body is not a
-shared script: a gate naming this app's bundle ids, entitlements and store
-rules cannot live in a folder every app embedding the design system shares, so
-it is a lane in `ios/fastlane/Fastfile` instead.
-**`release-*` no longer runs it** — the shared `release.sh` names no app — so
+**There is no `run`, `test-rules` or `_url-scheme` command, and no `pre-build`
+script.** The first three were deleted. `pre-build` is the one command whose
+body is not a shared script: a gate naming this app's bundle ids, entitlements
+and store rules cannot live in a folder every app shares, so it is the
+`preflight` lane, reached through this app's `Makefile`.
+**`release-*` does not run it** — `release_ios.sh` names no app — so
 `pre-build` is a step to run before a release, not one the release runs for
 you.
 
@@ -75,14 +74,15 @@ you.
 
 Ordered, and the order is the contract:
 
-1. **Wipe, unconditionally** (`_clean.sh`). A clean that has to be decided is
+1. **Wipe, unconditionally** (the top of `set_up.sh`). A clean that has to be decided is
    one nobody runs.
 2. **Submodules onto their branch, not the pinned commit** — read
    `submodule.<name>.branch` out of `.gitmodules`, check out, `pull --ff-only`,
    and **report per submodule when either step fails instead of dying**: a
    developer mid-edit in one of them should still get a working set-up.
-3. Dependencies, each package then the app.
-4. Localizations and codegen (`gen.sh`).
+3. Dependencies: the app, every `packages/*/pubspec.yaml`, and script-tools'
+   own Dart tools.
+4. Localizations and codegen (`generate_code.sh`).
 5. **Env templates** — copy `env/env.example.json` into each missing flavour
    file, collect the names, and warn loudly at the end where it is still on
    screen. One template serves both flavours: they only ever differed by the
@@ -90,29 +90,21 @@ Ordered, and the order is the contract:
    goes stale in one place and not the other. Never overwrite: a developer's
    `dev.json` holds ids they filled in.
 6. `npm ci` in `functions/` when it exists.
-7. `pod install`, macOS only, when a `Podfile` exists.
 
-Two details in step 7 that are not cosmetic:
-
-- **`LANG` is forced, not defaulted.** Ruby without a UTF-8 locale reads the
-  Podfile as ASCII-8BIT and dies inside its own error reporter, on a trace
-  naming the encoding and never the missing locale. `LANG=C` breaks
-  identically, and only an *unset* one would be caught by a `:-` default.
-- **`pod install 2>&1`.** Melos labels every stderr line `ERROR:`, so an
-  otherwise clean run reads as a failed one. `set -e` still stops on a real
-  failure.
+There is no `pod install`: every iOS plugin resolves as a Swift Package, which
+Xcode does itself on the first build.
 
 **The submodule choice has a price, and it is stated where people read it:**
-after this, what you build is whatever is on the design system's branch, not
+after this, what you build is whatever is on each submodule's branch, not
 what the parent commit pins — so a past parent commit no longer rebuilds byte
-for byte. It is also why CI runs `git submodule update --remote`, and why the
+for byte. It is also why CI runs `git submodule update --remote`, and why a
 submodule must be **pushed** for CI to see it. When CI and a laptop disagree,
 check that gap first.
 
 ### `deep-set-up` — the second entry point, and the last one
 
-Sets one variable and calls `set-up`; `_clean.sh` reads it and additionally
-clears Xcode's derived data.
+`set_up.sh --deep`: the same run, and the wipe additionally clears Xcode's
+derived data.
 
 Why it is separate: Xcode caches precompiled modules against the modulemap it
 saw at the time, so bumping a native plugin leaves a `.pcm` no `flutter clean`
@@ -135,7 +127,7 @@ becomes the reflex for a one-line change.
 **There is one `build_runner` step, and it is Drift's.** Riverpod providers
 are still written by hand — that rule has not moved — but the guest database
 is generated (`docs/rules/GUEST_MODE.md` carries the exception and why it is
-safe). `gen.sh` runs it only when `build_runner` is in `pubspec.yaml`, so the
+safe). `generate_code.sh` runs it only when `build_runner` is in `pubspec.yaml`, so the
 script is the same one the sibling app uses.
 
 **Run it after a schema change, never before reading the repo.** The generated
@@ -167,7 +159,7 @@ check `RELEASE_ACTIONS.md` cannot be.
 prod would fail a rehearsal on a dev machine over the one question it was not
 asked.
 
-### `prepare-env-*` and `build-ipa-*`
+### `env-*` and `build-ipa-*`
 
 `docs/rules/RELEASE.md`. In one line each: nothing else ties
 `env/<flavour>.json` to the installed `GoogleService-Info.plist`, and
@@ -176,7 +168,7 @@ Xcode's Product > Archive, both of which skip `--dart-define-from-file` and
 produce a binary that dies on
 `[core/no-app] No Firebase App '[DEFAULT]' has been created`.
 
-### `deploy-firebase-*` — the one that reaches real users
+### `deploy-*` — the one that reaches real users
 
 **The environment is a CLI alias in `.firebaserc`, not an `env/*.json` file**:
 the alias resolves to a project id, and the project id is what picks the
@@ -185,16 +177,16 @@ switch.
 
 Its contract, in order:
 
-1. Validate the flavour, and an optional target (`rules` | `functions` |
-   `both`).
+1. Validate the flavour, and an optional target (`ONLY=rules` |
+   `ONLY=functions`; both when unset).
 2. **Resolve the alias to a project id itself**, so the prompt can name the
    project before anything is sent, and so a missing alias fails with the
    command that creates it rather than a CLI error naming neither.
 3. **Warn when dev and prod resolve to the same project.** Until they are
-   split, `deploy-firebase-dev` is a production deploy wearing another name —
+   split, `deploy-dev` is a production deploy wearing another name —
    the one thing an alias in the prompt would otherwise hide.
-4. **Confirm interactively, reading from `/dev/tty`.** Melos pipes stdout but
-   leaves stdin alone, and `/dev/tty` is the descriptor that survives a
+4. **Confirm interactively, reading from `/dev/tty`.** A caller may pipe
+   stdout or stdin, and `/dev/tty` is the descriptor that survives a
    redirected invocation. No terminal at all is a refusal, never a silent yes.
 5. **Build and test the functions before deploying them.** Deploying a build
    that fails its own tests costs a second deploy to undo.
@@ -221,10 +213,10 @@ Its contract, in order:
 script while `RELEASE_ACTIONS.md` still named it, and the bucket the app
 uploads to was the one nobody was deploying rules for.
 
-### `release-*` — the four commands that are always run together
+### `release-*` — the three steps that are always run together
 
-Set up, config, Firebase, TestFlight — `set-up.sh`, `prepare-env.sh`,
-`deploy-firebase.sh`, then the `beta` lane. What the command adds over typing
+Config, Firebase, TestFlight — `prepare_env.sh`, `deploy_firebase.sh`, then
+the `beta` lane. It never runs `set_up.sh`: it builds the tree as it stands. What the command adds over typing
 them is the two things a person gets wrong at 2am:
 
 - **The order, which is a rule and not a preference.** Backend first: a build
@@ -234,69 +226,48 @@ them is the two things a person gets wrong at 2am:
   followed by an upload — the `&&` that used to carry that lived in a shell
   history nobody shared.
 
-It is **not** a shortcut past anything. `deploy-firebase.sh` still asks for the
+It is **not** a shortcut past anything. `deploy_firebase.sh` still asks for the
 project id on `/dev/tty` and still refuses without a terminal, so an unattended
-run stops before it ships. The TestFlight note is everything after the flavour
-(`melos run release-prod -- what changed`), collected with `$*` because melos
-joins its extra args into one command line before a shell sees them.
+run stops before it ships. The TestFlight note is the `NOTE` variable
+(`make release-prod NOTE="what changed"`), quoted so spaces never split it.
 
 ## The conventions
 
-### Every body is a file; `melos.yaml` only names it
+### `make` names a script; the script is the body
 
-Melos echoes the whole `run:` block before **and** after every run, with no
-flag to turn it off, so a multi-line body buries the output it introduces. A
-file is also the only version that can be linted and run directly. Adding a
-command is a `packages/system_design/tool/*.sh` plus one line in `melos.yaml` — **a `run:` longer than
-one line is the smell.** Every command also carries a real `description:`; that
-is what `melos run` prints.
+`flutter.mk` gives every target one line that calls one script, so the body is
+always a file that can be linted and run directly — `bash
+packages/script-tools/flutter/<name>.sh` is the same command without `make`,
+and it is what CI calls. **A target longer than one line is the smell.** Every
+target carries a `## description`; that is what `make` prints.
 
-### POSIX `sh`, not bash
+The root `Makefile` stays the include plus this app's own targets, and an app
+target exists only for what no shared script can do (`pre-build`). A change
+every app needs is committed to script-tools first, then the gitlink is
+bumped — never a fork of a shared script here.
 
-Melos runs scripts through `/bin/sh`, which is dash on Linux: `set -o pipefail`,
-`[[ ]]` and `local` are syntax errors there. macOS will not catch it — its
-`/bin/sh` is bash under another name. Check before committing:
+### Settings come from `script-tools.properties`, and this app needs none
 
-```bash
-dash -n packages/system_design/tool/<name>.sh
-```
+Every script finds the project from `PROJECT_ROOT` (the Makefile exports it)
+or the nearest `pubspec.yaml`, and reads optional keys from
+`script-tools.properties` at the root. Its flavours are the default
+`dev prod`, so the file does not exist; a third flavour adds it with
+`FLAVORS=…` and the same list in `sd_ios_app(flavors:)`.
 
-### Every script opens the same way
+### What the shared helpers guarantee
 
-```sh
-#!/bin/sh
-set -eu
-. "$(dirname "$0")/_common.sh"
-```
+`packages/script-tools/flutter/lib/common.sh`, sourced by every script:
 
-`packages/system_design/tool/_common.sh` holds what they share:
-
-- `cd "${MELOS_ROOT_PATH:-.}"` — every path in every script is repo-relative.
-- **SDK resolution**, exported as `$FL` / `$DT`: `fvm flutter` when `.fvmrc`
-  and `fvm` are both present, plain `flutter` otherwise. A shell alias does not
-  exist inside a script, so without this a machine using a version manager
-  silently runs the wrong SDK — and it is the only difference between a runner
-  and a laptop.
-- `step` / `warn` / `done_msg` / `fail`, colour-coded.
-- **Colour is emitted unconditionally unless `NO_COLOR` is set.** Melos hands
-  every script a piped stdout and `TERM=dumb` even on a real terminal, so
-  `[ -t 1 ]` and a `TERM` check both mean "never colour at all". Melos passes
-  ANSI through and CI renders it.
-
-### Pin the runner exactly, and know why you are on that major
-
-`dart pub global activate melos 6.3.3` — **exact, not caret**, and the global
-and local versions must match. This repo stays on 6 deliberately: 7+ moves to
-pub workspaces, which requires `resolution: workspace` inside
-`packages/system_design` — and that stops the package resolving in any project
-that is not itself a workspace, which is exactly the portability the submodule
-exists for. BaroEase consumes the same submodule and is not a workspace.
-
-A version pin with no recorded reason is one the next session "upgrades", so
-the reason lives in `melos.yaml` next to the pin as well as here.
-`ide: intellij: false` is there for the same kind of reason: 6.3.3 ships
-without the run-configuration templates it tries to write, and nothing here
-uses them.
+- **SDK resolution**, as `$FL` / `$DT`: `fvm flutter` when `.fvmrc` and `fvm`
+  are both present, plain `flutter` otherwise. A shell alias does not exist
+  inside a script, so without this a machine using a version manager silently
+  runs the wrong SDK — and it is the only difference between a runner and a
+  laptop.
+- **A flavour outside `FLAVORS` is refused** with the usage line, before
+  anything is read or written.
+- **Fastlane always gets a UTF-8 locale** (`ensure_utf8_locale`): under
+  `LANG=C` Ruby reads the shared Fastfile as ASCII and the lane dies on its
+  first em dash.
 
 ## Two rules that are not about any one command
 
@@ -321,16 +292,19 @@ More → General → Seed demo data.
 
 ## Releasing
 
-Three fastlane lanes, run from `ios/`. `docs/rules/RELEASE.md` is the authority
+Four fastlane lanes, imported from `packages/script-tools/flutter/fastlane/Fastfile` and run from `ios/`. `docs/rules/RELEASE.md` is the authority
 on what each does and why the order matters.
 
 ```bash
-bundle exec fastlane pre_build
+bundle exec fastlane preflight
 ```
 
-- `pre_build` — everything a release depends on except the build. Three minutes
-  instead of twenty-eight. Run `CI=true bundle exec fastlane pre_build` after
-  it: the CI half is the one most likely to break.
+- `preflight` (`make pre-build`) — everything a release depends on except the
+  build. Three minutes instead of twenty-eight. Run
+  `CI=true bundle exec fastlane preflight` after it: the CI half is the one
+  most likely to break.
+- `upload flavor:prod` (`make upload-ipa-prod`) — the IPA already built, for
+  one that did not reach TestFlight.
 - `certificates` — **local only**, and refuses to run on a runner.
   `force:true` regenerates the profiles after enabling a capability.
 - `beta flavor:prod bump:true notes:"…"` — the real thing. **Normally run from

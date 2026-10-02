@@ -1,11 +1,11 @@
 # Design system — `system_design` v3
 
-Read this when touching `packages/system_design/`, or when building any screen
+Read this when touching `packages/flutter-system-design-kit/`, or when building any screen
 or widget that renders `Sd*` v3 components.
 
 ## `system_design` — the design system is a separate package
 
-Tokens and string-free widgets live in `packages/system_design`, a **separate
+Tokens and string-free widgets live in `packages/flutter-system-design-kit`, a **separate
 git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired
 in as a path dependency. There are two imports and no others — the index for
 anything with a look, and `common.dart` for the shared app infrastructure that
@@ -363,7 +363,7 @@ site.
 
 why: see DECISIONS.md § The app bar stays opaque
 
-`packages/system_design/WIDGET_RULES.md` is the authority on what may go in
+`packages/flutter-system-design-kit/WIDGET_RULES.md` is the authority on what may go in
 the package and how it must be written. **Read it before adding to the
 package.** The short version:
 
@@ -1001,6 +1001,6 @@ get broken from this side.
   number in a widget (`\.w\b|\.h\b|\.r\b|\.sp\b` outside `SdSpacingConstant`), a
   quoted user-facing string, and an import that starts with anything other than
   the framework, a declared dependency, or a sibling widget folder.
-- **The package analyzes standalone** — `melos run analyze` does it first and
+- **The package analyzes standalone** — `make analyze` does it first and
   from outside the app, on purpose. If it only analyzes from inside, an app
   dependency has leaked in.

@@ -28,7 +28,7 @@ list named `env/*.json`, the copies it is made from were not on it, and the
 whole discipline was worth nothing. A path that holds a value blocked here is
 blocked wherever else it lives.
 
-**A script may read one; you may not print one.** `packages/system_design/tool/prepare-env.sh` copies
+**A script may read one; you may not print one.** `packages/script-tools/flutter/prepare_env.sh` copies
 these files, which is fine and is why it says it copies bytes and never reads
 them. The line is the
 transcript: a command whose output contains a value from one of these files has
@@ -87,7 +87,7 @@ passphrase.
   reads it, on purpose, and it is the single file under `env/` a session may
   open.
 - `lib/core/config/app_env.dart`, which is how a key is *used*.
-- `packages/system_design/tool/prepare-env.sh prod` and the release scripts. They **copy** prod files
+- `make env-prod` and the release scripts. They **copy** prod files
   and never echo them — the read/print line above applies unchanged. Running
   one is not reading one.
 
