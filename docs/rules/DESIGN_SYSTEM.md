@@ -727,8 +727,13 @@ means, the thing underneath owns it.
     label and sunken ground; the filled radio wears the value's colour.
   - **A progress line is ink on a sunken track.** It turns `danger` only when
     the thing it measures has hit its wall. A track of stages — an order's,
-    the sale timeline's — draws reached stages in `textSecondary`, the next one
-    in `textPrimary`, and only a late one in `danger`.
+    the sale timeline's — draws reached stages filled in `textPrimary`, the
+    next one ringed in it, and only a late one in `danger`.
+  - **Ink means `textPrimary`, not the secondary grey.** Owner's rule, given
+    after the first pass read too quiet: a badge's label, a progress fill and
+    a reached stage were grey and the change made them hard to find. The
+    secondary grey stays for supporting text; anything that *reports* a state
+    draws in the primary ink.
   - **An identity hue on a bar moves to a dot beside the name.** The
     marketplace breakdown keeps each platform's colour, on the dot; the bar
     itself is the same ink line as every other.
