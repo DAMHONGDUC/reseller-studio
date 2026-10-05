@@ -589,3 +589,28 @@ business. There is no recovery and the owner chose that over putting the
 records on a server. It is the reason the sign-in prompt and the local export
 in `GUEST_MODE.md` are not optional: the architecture is allowed to make that
 trade only if the product says so out loud.
+
+## Sign in with Apple on iOS presents its own sheet
+
+App Review rejected build 34 under guideline 2.1(a): on an iPad Air
+(iPadOS 27), Sign in with Apple loaded indefinitely. Two things could hold that
+button forever, and both are closed.
+
+- **FlutterFire's Apple path can present from no window.** It searches the
+  connected scenes for a key window and, finding none, falls back to a
+  deprecated `keyWindow` that is nil under the UIScene lifecycle. The sheet
+  never appears and the call never answers; several of its delegate branches
+  also return without answering at all. `ios/Runner/AppleSignInPlugin.swift`
+  replaces it on iOS: the anchor is the Flutter view's own window, found before
+  the request runs, and every path answers exactly once. The token goes to
+  Firebase through `signInWithCredential`. Other platforms keep
+  `signInWithProvider`, the web flow, which has no window to get wrong.
+- **The sign-in awaited two calls with no upper bound.** The profile write
+  waits for the server to acknowledge it and RevenueCat's `logIn` is a network
+  round trip; both were awaited before the button stopped spinning, on a
+  session that was already valid. They now run unawaited and log their own
+  failure. `test/features/auth/sign_in_test.dart` pins it.
+
+**Why not the `sign_in_with_apple` package.** It is a new dependency for about
+a hundred lines of Swift, and the bug was in who owns the presentation — moving
+that to another package moves the question rather than answering it.

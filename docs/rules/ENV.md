@@ -113,9 +113,10 @@ twice, and the copy nothing read. What stayed:
   written twice on purpose, and disagreeing means Crashlytics symbols land in
   another project's dashboard.
 
-**`APPLE_SIGN_IN_SERVICE_ID` is not an env key.** Sign in with Apple goes
-through `FirebaseAuth.signInWithProvider`, which needs nothing in the binary;
-the Services ID is configured in the Firebase console. See
+**`APPLE_SIGN_IN_SERVICE_ID` is not an env key.** Sign in with Apple needs
+nothing in the binary — on iOS the app presents Apple's sheet itself and hands
+the token to Firebase, elsewhere `FirebaseAuth.signInWithProvider` runs the web
+flow — and the Services ID is configured in the Firebase console. See
 `RELEASE_ACTIONS.md`.
 
 **Theme is a preference, not a build flag.** `ThemeModeController` reads
