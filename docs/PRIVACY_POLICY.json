@@ -1,7 +1,7 @@
 {
   "name": "Reseller Studio",
   "tagline": "The operating system for resellers: source, list, sell, ship, profit. Your business records are yours; you can use the app without an account, and nothing is sold or used for advertising.",
-  "icon": "📦",
+  "icon": "/app-icons/reseller-studio.png",
   "accent": "#3D50DF",
   "platforms": [
     "iOS"
