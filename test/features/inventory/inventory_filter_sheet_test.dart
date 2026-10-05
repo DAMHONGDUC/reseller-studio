@@ -7,6 +7,7 @@ import 'package:reseller_studio/features/inventory/presentation/widgets/inventor
 
 import 'package:system_design/index.dart';
 
+import '../../support/filter_sheet_finder.dart';
 import '../../support/pump_app.dart';
 
 /// A filtered list has to say it is filtered — and it is only filtered once
@@ -61,14 +62,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Once, not twice: the sheet counts what the seller has ticked, and the
-    // list behind it has not moved — nothing is applied until Apply.
-    expect(find.text('1 filter applied'), findsOneWidget);
+    // The list behind the sheet has not moved — nothing is applied until
+    // Apply — but the footer's Reset now has something to empty.
+    expect(find.byType(AppActiveFilterBar), findsNothing);
+    expect(FilterSheetFinder.resetEnabled(tester), isTrue);
 
-    await tester.tap(find.text('Reset'));
+    await tester.tap(FilterSheetFinder.reset());
     await tester.pumpAndSettle();
 
-    expect(find.text('1 filter applied'), findsNothing);
+    expect(FilterSheetFinder.resetEnabled(tester), isFalse);
 
     // Ticked again and abandoned: closing the sheet leaves the list exactly
     // as the seller found it.

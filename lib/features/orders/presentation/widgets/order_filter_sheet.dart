@@ -6,8 +6,8 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
 import '../../../../core/money/money.dart';
-import '../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../core/widgets/app_filter_chip_group.dart';
+import '../../../../core/widgets/app_filter_sheet_actions.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/order_filter_criteria.dart';
@@ -119,12 +119,6 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          AppActiveFilterBar(
-            // The draft's groups plus the preset, which this sheet offers.
-            count: pending,
-            onReset: _reset,
-            gutter: false,
-          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -266,11 +260,11 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
             ),
           ),
           SizedBox(height: SdContentPaddingV3.pinnedActionsGap),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
-            expand: true,
-            label: context.l10n.filterApply,
-            onPressed: _apply,
+          AppFilterSheetActions(
+            // The draft's groups plus the preset, which this sheet offers.
+            pending: pending,
+            onReset: _reset,
+            onApply: _apply,
           ),
         ],
       ),

@@ -5,8 +5,8 @@ import 'package:system_design/index.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
-import '../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../core/widgets/app_filter_chip_group.dart';
+import '../../../../core/widgets/app_filter_sheet_actions.dart';
 import '../../../sourcing/providers.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/item_filter_criteria.dart';
@@ -22,10 +22,10 @@ import '../../providers.dart';
 /// deciding, and closing the sheet any other way leaves the list exactly as
 /// they found it.
 ///
-/// **Reset clears the draft, not the screen.** It is the same button, but it
-/// now empties what is pending — the strip behind the sheet has its own Reset
-/// for the filters that are actually on, and that one still clears the tab
-/// with them.
+/// **Reset clears the draft, not the screen.** It sits beside Apply and
+/// empties what is pending — the strip behind the sheet has its own Reset for
+/// the filters that are actually on, and that one still clears the tab with
+/// them.
 ///
 /// **The strip's five tabs are deliberately not repeated here.** They are one
 /// tap away above the list; what is here is the vocabulary that has nowhere
@@ -105,14 +105,6 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          AppActiveFilterBar(
-            // The draft's own groups, and not the tab: the sheet does not
-            // offer the tab, so a number counting it could not be made true
-            // by the Reset beside it.
-            count: criteria.activeCount,
-            onReset: () => _edit(ItemFilterCriteria.none),
-            gutter: false,
-          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -226,14 +218,12 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
             ),
           ),
           SizedBox(height: SdContentPaddingV3.pinnedActionsGap),
-          SdButtonV3(
-            variant: SdButtonVariantV3.primary,
-            expand: true,
-            // "Apply", not a count: the number of rows left is a fact about a
-            // filter that has been applied, and this button is what applies
-            // one.
-            label: context.l10n.filterApply,
-            onPressed: _apply,
+          AppFilterSheetActions(
+            // The draft's own groups, and not the tab: this sheet does not
+            // offer the tab.
+            pending: criteria.activeCount,
+            onReset: () => _edit(ItemFilterCriteria.none),
+            onApply: _apply,
           ),
         ],
       ),

@@ -7,6 +7,7 @@ import 'package:reseller_studio/features/orders/presentation/screens/orders_scre
 import 'package:reseller_studio/features/orders/presentation/widgets/order_filter_sheet.dart';
 import 'package:system_design/index.dart';
 
+import '../../support/filter_sheet_finder.dart';
 import '../../support/pump_app.dart';
 
 /// Orders answers the same two questions Inventory does: what is filtered, and
@@ -67,8 +68,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Once: the sheet counts what is ticked, the list behind it has not moved.
-    expect(find.text('1 filter applied'), findsOneWidget);
+    // Pending: the footer can reset it, the list behind it has not moved.
+    expect(FilterSheetFinder.resetEnabled(tester), isTrue);
+    expect(find.byType(AppActiveFilterBar), findsNothing);
 
     // Closing without applying leaves the list as the seller found it.
     await tester.tap(find.byIcon(AppIconConstant.close));
@@ -116,12 +118,13 @@ void main() {
       await openSheet(tester);
 
       expect(find.text('Show'), findsOneWidget);
+      expect(FilterSheetFinder.resetEnabled(tester), isFalse);
 
       await tester.tap(inSheet);
       await tester.pumpAndSettle();
 
-      // The sheet offers the preset, so its bar counts it.
-      expect(find.text('1 filter applied'), findsOneWidget);
+      // The sheet offers the preset, so its Reset has something to empty.
+      expect(FilterSheetFinder.resetEnabled(tester), isTrue);
 
       await tester.tap(find.text('Apply'));
       await tester.pumpAndSettle();
@@ -130,12 +133,7 @@ void main() {
 
       // Inside the sheet, Reset returns the preset to All.
       await openSheet(tester);
-      await tester.tap(
-        find.descendant(
-          of: find.byType(OrderFilterSheet),
-          matching: find.text('Reset'),
-        ),
-      );
+      await tester.tap(FilterSheetFinder.reset());
       await tester.pumpAndSettle();
       await tester.tap(find.text('Apply'));
       await tester.pumpAndSettle();
