@@ -106,6 +106,10 @@ this is the file people read when they are thinking about it:
 - Log the **shape** of a failure — `'marketplace token refresh failed'`, the
   key name, the count, the collection — never the contents.
 - `SdCrashReporter.setUserId` takes a Firebase UID and nothing else.
+- `SdLogger.action`, `info` and `warning` leave a Crashlytics breadcrumb in
+  every build — the tag and the message, never the data argument. So **a
+  value goes in the data argument, never into the message string**: an
+  interpolated message is sent off the device, and its data is not.
 
 ## Buyer data
 
