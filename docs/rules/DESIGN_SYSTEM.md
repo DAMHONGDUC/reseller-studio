@@ -137,7 +137,12 @@ five, so the bar behaves one way wherever it is.
   is ever covered" rule above holds in both states. The bar is translated,
   never removed from layout.
 - **It follows the finger, then settles.** The bar moves by exactly as much
-  as the list does, and a release finishes it whichever way it was nearer.
+  as the list does, and a release finishes it in the direction the list last
+  moved — finishing to the nearer end left it hidden after a short scroll up.
+  - **Past either end the finger still drives it.** A short list runs out of
+    scroll before the bar is gone; stopping there left it stuck half way.
+  - **The bounce settling back is ignored.** It is the list, not the seller,
+    and reading it as a scroll up brought the bar straight back.
   Owner's rule, given after the first version — a timed slide fired on each
   change of direction — bounced with every tremor of the thumb.
 - **No fade.** An opacity layer over the glass re-renders its refraction
