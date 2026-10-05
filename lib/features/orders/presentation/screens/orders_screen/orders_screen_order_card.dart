@@ -22,126 +22,121 @@ class _OrderCard extends ConsumerWidget {
       // A tinted edge, and a "Late" badge saying the same thing — colour is
       // never the only signal.
       borderColor: isOverdue ? context.sdTheme3.danger : null,
-      child: Row(
+      // The chevron ends the title row rather than taking a column, so the
+      // lines below span the card and both side insets match.
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        order.lines.isEmpty
-                            ? context.l10n.orderFallbackTitle(order.id)
-                            : order.lines.first.title,
-                        style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
-                          color: context.sdTheme3.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(width: SdSpacingConstant.w8),
-                    Text(
-                      context.money(order.salePrice),
-                      style: context.textTheme3.bodyLarge!.semiBold3.tabular3
-                          .copyWith(color: context.sdTheme3.textPrimary),
-                    ),
-                  ],
-                ),
-                SizedBox(height: SdSpacingConstant.h8),
-                Wrap(
-                  spacing: SdSpacingConstant.w6,
-                  runSpacing: SdSpacingConstant.h4,
-                  children: <Widget>[
-                    // Compact, the same presentation the Inventory row uses:
-                    // read-only card metadata sitting beside a title and a
-                    // price cannot spend a picker's padding.
-                    SdBadgeV3(
-                      label: OrderStatusLabel.of(context, order.status),
-                      tone: _statusTone(order.status),
-                      size: SdBadgeSizeV3.compact,
-                    ),
-                    AppMarketplaceTag(
-                      marketplaceId: order.marketplaceId,
-                      name: order.marketplaceName,
-                      size: SdBadgeSizeV3.compact,
-                    ),
-                    if (isOverdue)
-                      SdBadgeV3(
-                        label: context.l10n.orderLate,
-                        tone: SdBadgeToneV3.danger,
-                        icon: AppIconConstant.priorityHigh,
-                        size: SdBadgeSizeV3.compact,
-                      ),
-                  ],
-                ),
-                SizedBox(height: SdSpacingConstant.h8),
-                Row(
-                  children: <Widget>[
-                    // Expanded, not a bare Text with a Spacer: the buyer name
-                    // is the one thing on this card with no length limit, so
-                    // it is what has to give when the row runs out of width.
-                    Expanded(
-                      child: Text(
-                        order.buyerName ?? '—',
-                        style: context.textTheme3.bodySmall!.muted3(context),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(width: SdSpacingConstant.w8),
-                    Text(
-                      '${context.l10n.orderProfitPrefix} ',
-                      style: context.textTheme3.bodySmall!.faint3(context),
-                    ),
-                    // `—` until the payout is in: nothing is approximated
-                    // any more (hard rule 3).
-                    Text(
-                      context.money(profit),
-                      style: context.textTheme3.bodySmall!.semiBold3.tabular3
-                          .copyWith(
-                            color: profit == null
-                                ? context.sdTheme3.textTertiary
-                                : profit.isNegative
-                                ? context.sdTheme3.loss
-                                : context.sdTheme3.profit,
-                          ),
-                    ),
-                  ],
-                ),
-                if (reached != null) ...<Widget>[
-                  SizedBox(height: SdSpacingConstant.h12),
-                  _OrderProgressTrack(
-                    reached: reached,
-                    next: OrderProgress.next(order),
-                    isOverdue: isOverdue,
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  order.lines.isEmpty
+                      ? context.l10n.orderFallbackTitle(order.id)
+                      : order.lines.first.title,
+                  style: context.textTheme3.bodyLarge!.semiBold3.copyWith(
+                    color: context.sdTheme3.textPrimary,
                   ),
-                ],
-                // The one move the list can make without opening the order,
-                // and the same sheet the detail's pinned button opens.
-                if (order.status == OrderStatus.toShip) ...<Widget>[
-                  SizedBox(height: SdSpacingConstant.h12),
-                  Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: SdButtonV3(
-                      variant: isOverdue
-                          ? SdButtonVariantV3.primary
-                          : SdButtonVariantV3.secondary,
-                      size: SdButtonSizeV3.small,
-                      icon: AppIconConstant.localShipping,
-                      label: context.l10n.orderShipIt,
-                      onPressed: () => ShipOrderSheet.show(context, order),
-                    ),
-                  ),
-                ],
-              ],
-            ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(width: SdSpacingConstant.w8),
+              Text(
+                context.money(order.salePrice),
+                style: context.textTheme3.bodyLarge!.semiBold3.tabular3
+                    .copyWith(color: context.sdTheme3.textPrimary),
+              ),
+              SizedBox(width: SdSpacingConstant.w8),
+              const AppRowChevron(),
+            ],
           ),
-          SizedBox(width: SdSpacingConstant.w8),
-          const AppRowChevron(),
+          SizedBox(height: SdSpacingConstant.h8),
+          Wrap(
+            spacing: SdSpacingConstant.w6,
+            runSpacing: SdSpacingConstant.h4,
+            children: <Widget>[
+              // Compact, the same presentation the Inventory row uses:
+              // read-only card metadata sitting beside a title and a
+              // price cannot spend a picker's padding.
+              SdBadgeV3(
+                label: OrderStatusLabel.of(context, order.status),
+                tone: _statusTone(order.status),
+                size: SdBadgeSizeV3.compact,
+              ),
+              AppMarketplaceTag(
+                marketplaceId: order.marketplaceId,
+                name: order.marketplaceName,
+                size: SdBadgeSizeV3.compact,
+              ),
+              if (isOverdue)
+                SdBadgeV3(
+                  label: context.l10n.orderLate,
+                  tone: SdBadgeToneV3.danger,
+                  icon: AppIconConstant.priorityHigh,
+                  size: SdBadgeSizeV3.compact,
+                ),
+            ],
+          ),
+          SizedBox(height: SdSpacingConstant.h8),
+          Row(
+            children: <Widget>[
+              // Expanded, not a bare Text with a Spacer: the buyer name
+              // is the one thing on this card with no length limit, so
+              // it is what has to give when the row runs out of width.
+              Expanded(
+                child: Text(
+                  order.buyerName ?? '—',
+                  style: context.textTheme3.bodySmall!.muted3(context),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(width: SdSpacingConstant.w8),
+              Text(
+                '${context.l10n.orderProfitPrefix} ',
+                style: context.textTheme3.bodySmall!.faint3(context),
+              ),
+              // `—` until the payout is in: nothing is approximated
+              // any more (hard rule 3).
+              Text(
+                context.money(profit),
+                style: context.textTheme3.bodySmall!.semiBold3.tabular3
+                    .copyWith(
+                      color: profit == null
+                          ? context.sdTheme3.textTertiary
+                          : profit.isNegative
+                          ? context.sdTheme3.loss
+                          : context.sdTheme3.profit,
+                    ),
+              ),
+            ],
+          ),
+          if (reached != null) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h12),
+            _OrderProgressTrack(
+              reached: reached,
+              next: OrderProgress.next(order),
+              isOverdue: isOverdue,
+            ),
+          ],
+          // The one move the list can make without opening the order,
+          // and the same sheet the detail's pinned button opens.
+          if (order.status == OrderStatus.toShip) ...<Widget>[
+            SizedBox(height: SdSpacingConstant.h12),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: SdButtonV3(
+                variant: isOverdue
+                    ? SdButtonVariantV3.primary
+                    : SdButtonVariantV3.secondary,
+                size: SdButtonSizeV3.small,
+                icon: AppIconConstant.localShipping,
+                label: context.l10n.orderShipIt,
+                onPressed: () => ShipOrderSheet.show(context, order),
+              ),
+            ),
+          ],
         ],
       ),
     );

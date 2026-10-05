@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/widgets/app_row_chevron.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
@@ -61,6 +62,44 @@ void main() {
 
     // The same sheet the detail screen's pinned button opens.
     expect(find.byType(ShipOrderSheet), findsOneWidget);
+  });
+
+  testWidgets('the chevron ends the title row and the lines below span the '
+      'card', (WidgetTester tester) async {
+    await pumpScreen(tester, const OrdersScreen());
+
+    final Order order = (await seededOrders(
+      tester,
+    )).firstWhere((Order o) => o.status == OrderStatus.toShip);
+    final Finder title = find.text(order.lines.first.title);
+    final Finder card = cardOf(order.lines.first.title);
+
+    await tester.scrollUntilVisible(
+      card,
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+
+    final Rect cardRect = tester.getRect(card);
+    final Rect titleRect = tester.getRect(title);
+    final Rect chevron = tester.getRect(
+      find.descendant(of: card, matching: find.byType(AppRowChevron)),
+    );
+    final Rect ship = tester.getRect(
+      find.descendant(
+        of: card,
+        matching: find.widgetWithText(SdButtonV3, 'Ship it'),
+      ),
+    );
+
+    // On the title row, not centred on the whole card.
+    expect(chevron.center.dy, closeTo(titleRect.center.dy, 1));
+    // The same inset either side, and the button reaches the right edge.
+    expect(
+      cardRect.right - chevron.right,
+      closeTo(titleRect.left - cardRect.left, 1),
+    );
+    expect(ship.right, closeTo(chevron.right, 1));
   });
 
   testWidgets('an order that left the happy path has no track', (
