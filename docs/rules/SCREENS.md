@@ -228,9 +228,8 @@ row missing because of a bug look identical — and the seller's only way to
 check is to reopen the sheet and read every group.
 
 - **`AppActiveFilterBar` (`core/widgets/`) is the one implementation**, and it
-  renders in two places at once: under the strip on the screen, and at the top
-  of that screen's filter sheet. One widget, so the two counts are one line of
-  code — what each one counts is not the same, and the sheet's is below.
+  renders under the strip on the screen only. The filter sheet has no bar of
+  its own: its Reset is a footer button beside Apply (below).
 - **It renders nothing at zero.** A row saying "0 filters" is chrome describing
   the absence of chrome.
 - **The count is by group, never by chip.** Three categories ticked is one
@@ -252,27 +251,31 @@ check is to reopen the sheet and read every group.
   - **The primary button says "Apply", not a count.** How many rows are left
     is a fact about a filter that has been applied, and this button is what
     applies one.
-  - **The sheet's own bar counts the draft, and the tab only where the sheet
-    offers it.** A number counting something the sheet cannot change could
-    not be made true by the Reset beside it — inside the sheet, Reset empties
-    what is pending and nothing else. The strip's bar still counts the tab and
-    its Reset still clears it.
+  - **The sheet's footer is two buttons, Reset then Apply** — owner's rule,
+    and it **reverses "the sheet's Reset is the bar at its top"**. Both are
+    where the thumb already is when the seller is done choosing, and the pair
+    is `AppFilterSheetActions` (`core/widgets/`) so both sheets build it once.
+  - **The sheet's Reset empties the draft, and the tab only where the sheet
+    offers it.** Nothing is applied until Apply, the same as a tick. It is
+    disabled while nothing is pending — a Reset with nothing to reset is a
+    button that does nothing. The strip's bar still counts the tab and its
+    Reset still clears it.
   - **Orders' sheet repeats the strip's presets as its first group** — owner's
     rule, and it **reverses "the strip's tabs are deliberately not repeated
     in the sheet"** for Orders. A seller who opened the sheet to say "shipped
     orders on eBay this month" looked for "shipped" in it and found only raw
-    statuses. The preset is part of the draft: it moves with Apply, the
-    sheet's bar counts it when it is not `All`, and the sheet's Reset returns
-    it there. Inventory's sheet still leaves its tabs out.
+    statuses. The preset is part of the draft: it moves with Apply, and the
+    sheet's Reset returns it to `All`. Inventory's sheet still leaves its tabs
+    out.
+  - **Ticking a chip is a method on the criteria, not on the notifier**
+    (`ItemFilterCriteria.withStatusToggled`). Two places tick a chip now — the
+    draft and the applied value — so what a tick means lives in one place, and
+    `apply(pending)` is all the controller keeps.
 - **Every group in a filter sheet is separated from the next by a divider** —
   owner's rule. A blank gap between a dozen chip groups reads as one wall of
   chips; a rule says where one question stops. It is `AppFilterGroupDivider`
   (`core/widgets/`), so both sheets space it the same way, and it sits
   between groups only — never above the first or below the last.
-  - **Ticking a chip is a method on the criteria, not on the notifier**
-    (`ItemFilterCriteria.withStatusToggled`). Two places tick a chip now — the
-    draft and the applied value — so what a tick means lives in one place, and
-    `apply(pending)` is all the controller keeps.
 - **The entry point is an app-bar action, never a chip on the strip.** Five
   tabs are already wider than a phone, so a sixth chip pushes a real tab off
   the edge to reach a sheet that is not a tab.
