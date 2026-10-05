@@ -593,8 +593,8 @@ feature's own `CLAUDE.md`.
   `part of 'home_screen.dart';`.
 - **Every screen with a create action uses the same button Inventory does.**
   Owner's rule. That is `SdFabV3` in the floating-action slot — a labelled
-  button that sheds its label while the list is moving and brings it back the
-  moment it stops — via `AppAddFabScaffold` (`core/widgets/`), never an
+  button that keeps its label and its place, with no animation while the list
+  or the tab bar moves — via `AppAddFabScaffold` (`core/widgets/`), never an
   `IconButton` in the app bar. An add hidden behind a 24pt glyph in the corner
   is one a seller has to hunt for, and a create action that is hard to find is
   one they stop using. Same button, same place, every screen: Inventory,

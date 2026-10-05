@@ -114,27 +114,28 @@ decides the arguments the look would otherwise keep re-opening:
 
 `test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds all three.
 
-#### On the two long lists the bar gets out of the way
+#### The bar gets out of the way while a tab scrolls down
 
-Owner's rule. **On Inventory and Orders, scrolling down slides the bar off
-the bottom of the screen; scrolling up slides it back.** Those are the two
-screens a seller reads hundreds of rows on, and a pill floating over the
-lowest rows is a pill they read around on every one of them.
+Owner's rule. **On every tab, scrolling down slides the bar off the bottom of
+the screen; scrolling up slides it back.** It began on Inventory and Orders —
+the lists a seller reads hundreds of rows on — and the owner widened it to all
+five, so the bar behaves one way wherever it is.
 
-- **Opt-in per screen, never the shell's default.** A screen asks for it with
-  `AppAddFabScaffold.hidesNavOnScroll`, which wraps its body in
-  `SdHidesNavOnScrollV3`; that only *reports* direction, and
-  `SdBottomNavigationV3` alone decides to move the bar. Home, Analytics and
-  More keep a bar that never moves.
+- **The shell owns it, not the screens.** `SdBottomNavigationV3` listens to
+  the tab body's own vertical list and moves the bar; no screen opts in or
+  out, and none can make it behave differently.
+- **Only the tab's main list counts.** A horizontal filter strip, or a
+  vertical scrollable nested inside the page, moves nothing.
 - **It always comes back without a scroll the seller has to invent.** It
   reappears on a tab change, at the top of the list, and whenever the list
   stops being scrollable — a filter that empties the list must not strand the
   seller with no tabs and nothing to drag.
-- **The add button follows it down** by `floatingBarHeight`, reading
-  `SdNavVisibilityScopeV3`, so it never hovers over the hole the bar left.
+- **The add button stays where it is** — see "The FAB" below. It does not
+  follow the bar down.
 - **The clearance under the last row does not shrink.** The bar can come back
   at any moment, so the list keeps reserving its footprint — the "no content
-  is ever covered" rule above holds in both states.
+  is ever covered" rule above holds in both states. The bar is translated,
+  never removed from layout.
 - Reduce Motion moves it without the slide.
 
 #### The bar is glyphs only — no words on any tab
@@ -362,9 +363,12 @@ Owner's rules, all of them read from one place so no screen types them:
   lands inside the glass tab bar instead of above it. The presenter draws
   into the root overlay, which is also what lets a message outlive the route
   that raised it — pop first, then call it.
-- **The FAB is `SdFabV3`, never Material's.** It is shorter than Material's
-  and sheds its label while the list is moving — but it never hides. A create
-  action a seller has to hunt for is one they stop using.
+- **The FAB is `SdFabV3`, never Material's, and it does not animate.**
+  Owner's rule, and it **reverses "sheds its label while the list is
+  moving"**: the button keeps its label and its place whatever the list or
+  the tab bar is doing. A control that changes shape under the thumb is one
+  the seller has to find again, and it never hides. A create action a seller
+  has to hunt for is one they stop using.
 - **Every screen that creates something uses that same button, in that same
   place.** Owner's rule. Not an `IconButton` in the app bar, not a row at the
   bottom of a list — the labelled FAB Inventory has. `AppAddFabScaffold`
