@@ -4,8 +4,8 @@ part of 'orders_screen.dart';
 ///
 /// **A track rather than a status word** — a status says where the order is;
 /// the track also says what is left, which is the question a seller scanning
-/// the list is asking. Drawn in ink: reached stages in the secondary grey, the
-/// next one ringed in the primary ink, and in danger only when it is late.
+/// the list is asking. Drawn in ink: reached stages filled, the next one
+/// ringed, and in danger only when it is late.
 class _OrderProgressTrack extends StatelessWidget {
   const _OrderProgressTrack({
     required this.reached,
@@ -19,7 +19,7 @@ class _OrderProgressTrack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color done = context.sdTheme3.textSecondary;
+    final Color done = context.sdTheme3.textPrimary;
     final Color pending = context.sdTheme3.border;
     final Color upcoming = isOverdue
         ? context.sdTheme3.danger

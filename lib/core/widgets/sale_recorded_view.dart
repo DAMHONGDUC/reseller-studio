@@ -181,7 +181,7 @@ class _Step extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color done = context.sdTheme3.textSecondary;
+    final Color done = context.sdTheme3.textPrimary;
     final Color faint = context.sdTheme3.textTertiary;
     final double disc = SdSpacingConstant.w28;
     final Color accent = switch (state) {

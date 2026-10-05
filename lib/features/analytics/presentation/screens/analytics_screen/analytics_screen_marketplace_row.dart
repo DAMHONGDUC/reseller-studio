@@ -38,7 +38,7 @@ class _MarketplaceRow extends StatelessWidget {
           minHeight: SdFreeLimitProgressV3.barHeight,
           backgroundColor: context.sdTheme3.surfaceSunken,
           valueColor: AlwaysStoppedAnimation<Color>(
-            context.sdTheme3.textSecondary,
+            context.sdTheme3.textPrimary,
           ),
         ),
       ),
