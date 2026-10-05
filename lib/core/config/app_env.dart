@@ -148,8 +148,8 @@ final class AppEnv {
   // Client *ids*, which are public by design — the OAuth flow shows them in a
   // browser URL. The matching secrets stay server-side.
   //
-  // Google only. Apple needs nothing in the binary: the app goes through
-  // `FirebaseAuth.signInWithProvider`, and the Services ID lives in the
+  // Google only. Apple needs nothing in the binary: the iOS sheet is the
+  // app's own and the token goes to Firebase, and the Services ID lives in the
   // Firebase console.
 
   static const String googleSignInClientIdIos = String.fromEnvironment(

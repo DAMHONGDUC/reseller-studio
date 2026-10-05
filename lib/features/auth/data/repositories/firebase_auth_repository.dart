@@ -8,16 +8,18 @@ import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/app_failure.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../datasources/apple_sign_in_datasource.dart';
 
 /// Apple and Google sign-in, behind the domain interface.
 ///
 /// **The two providers take different routes on purpose.**
 ///
-/// - **Apple** goes through `FirebaseAuth.signInWithProvider`, which uses the
-///   native sheet on iOS and a web flow elsewhere, and generates and verifies
-///   its own nonce. Doing it by hand would mean a raw nonce, a SHA-256 of it,
-///   and a third-party package — three more things to get wrong for an
-///   identical result.
+/// - **Apple on iOS** goes through the app's own sheet
+///   ([AppleSignInDatasource]) and then `signInWithCredential`.
+///   `signInWithProvider` presented it from whatever window it could find and,
+///   on an iPad in App Review, found none — the button spun forever.
+/// - **Apple elsewhere** stays on `FirebaseAuth.signInWithProvider`, the web
+///   flow, which has no window to get wrong.
 /// - **Google** goes through `google_sign_in`, because Firebase's provider
 ///   flow would open a web view and Google rejects sign-in from embedded web
 ///   views on Android. The plugin uses the platform account picker.
@@ -25,9 +27,14 @@ import '../../domain/repositories/auth_repository.dart';
 /// Nothing here logs an email, a token or a display name (hard rule 9). The
 /// uid is enough to find a session, and it is not a credential.
 class FirebaseAuthRepository implements AuthRepository {
-  const FirebaseAuthRepository(this._auth, this._functions);
+  const FirebaseAuthRepository(
+    this._auth,
+    this._functions, [
+    this._apple = const AppleSignInDatasource(),
+  ]);
 
   final FirebaseAuth _auth;
+  final AppleSignInDatasource _apple;
 
   /// Only [deleteAccount] uses it, and that is the point: the delete is the
   /// one thing here a client is not allowed to do for itself.
@@ -49,6 +56,17 @@ class FirebaseAuthRepository implements AuthRepository {
           ..addScope('name');
 
         try {
+          if (AppleSignInDatasource.isAvailable) {
+            final OAuthCredential? apple = await _nativeAppleCredential();
+
+            if (apple == null) return _cancelled(AuthProviderKind.apple);
+
+            return _signedIn(
+              await _auth.signInWithCredential(apple),
+              AuthProviderKind.apple,
+            );
+          }
+
           final UserCredential credential = await _auth.signInWithProvider(
             provider,
           );
@@ -199,7 +217,9 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       switch (provider) {
         case AuthProviderKind.apple:
-          await user.reauthenticateWithProvider(AppleAuthProvider());
+          if (!await _reauthenticateWithApple(user)) {
+            return _reauthCancelled(provider);
+          }
         case AuthProviderKind.google:
           await _reauthenticateWithGoogle(user);
       }
@@ -226,6 +246,42 @@ class FirebaseAuthRepository implements AuthRepository {
     );
 
     return true;
+  }
+
+  /// False when the seller closed the sheet.
+  Future<bool> _reauthenticateWithApple(User user) async {
+    if (!AppleSignInDatasource.isAvailable) {
+      await user.reauthenticateWithProvider(AppleAuthProvider());
+
+      return true;
+    }
+
+    final OAuthCredential? apple = await _nativeAppleCredential();
+
+    if (apple == null) return false;
+
+    await user.reauthenticateWithCredential(apple);
+
+    return true;
+  }
+
+  /// The iOS sheet's answer as a Firebase credential, or null when cancelled.
+  ///
+  /// The name rides along because Apple sends it on the first sign-in only,
+  /// and Firebase takes the display name from it.
+  Future<OAuthCredential?> _nativeAppleCredential() async {
+    final AppleIdCredential? apple = await _apple.requestCredential();
+
+    if (apple == null) return null;
+
+    return AppleAuthProvider.credentialWithIDToken(
+      apple.idToken,
+      apple.rawNonce,
+      AppleFullPersonName(
+        givenName: apple.givenName,
+        familyName: apple.familyName,
+      ),
+    );
   }
 
   Future<void> _reauthenticateWithGoogle(User user) async {
