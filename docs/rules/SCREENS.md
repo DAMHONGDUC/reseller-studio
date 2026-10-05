@@ -175,6 +175,12 @@ because they are about the shell, not the bar:
   - This is the one analytics event raised from a widget rather than a
     controller. There is no controller between a tab tap and the shell, and it
     is a lifecycle callback, never `build`.
+  - **Every other screen is `AppScreenTracker`'s** (`core/analytics/`). It
+    listens to the router delegate — the whole stack, not one of the six
+    navigators — and reports the top screen's route template
+    (`/orders/:orderId`), never its location, so no record id reaches the
+    report. It skips `AppRoutes.tabRoots`, which are the tabs' and counted
+    above; a new tab root goes into that set or is counted twice.
 
 ## Lists
 
