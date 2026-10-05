@@ -710,6 +710,29 @@ means, the thing underneath owns it.
 - **A list of physical things gets a thumbnail, not an icon.** Sellers
   recognise a row by the picture. Icons in tinted `SdIconTileV3` squares are
   for categories and status rows, where there is no picture to show.
+- **A hue lives in a mark, never in a slab.** Owner's rule, given because the
+  tinted look read as machine-made: a 12% wash of the hue behind a label in
+  that hue, a border in the hue, a progress bar in brand indigo — every badge,
+  chip and meter a different pastel. The colour now goes into one small mark,
+  and everything around it is ink.
+  - **Borders are neutral, always.** `border` at rest; a chosen control is
+    told by `textPrimary` — the ink — on its border and label, plus a sunken
+    ground. No border is ever drawn in a hue.
+  - **A badge is a neutral ground, a dot in its hue, and the word.**
+    `SdBadgeV3` keeps `color` and `tone`, and they colour the dot (or the
+    `icon`) only. The label stays ink, except `warning` and `danger`, which
+    tint the word as well: an alert has to read as one without the seller
+    finding a six-point dot.
+  - **A tag puts its hue in the radio.** `SdTagV3` chosen is ink border, ink
+    label and sunken ground; the filled radio wears the value's colour.
+  - **A progress line is ink on a sunken track.** It turns `danger` only when
+    the thing it measures has hit its wall. A track of stages — an order's,
+    the sale timeline's — draws reached stages in `textSecondary`, the next one
+    in `textPrimary`, and only a late one in `danger`.
+  - **An identity hue on a bar moves to a dot beside the name.** The
+    marketplace breakdown keeps each platform's colour, on the dot; the bar
+    itself is the same ink line as every other.
+  - **No glow.** A shadow tinted with a hue is decoration, not depth.
 - **Every price, cost and total uses `.tabular3`.** Proportional digits are
   why a column of money appears to shuffle sideways as it updates, and this
   app is mostly columns of money.
