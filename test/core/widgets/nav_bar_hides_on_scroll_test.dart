@@ -71,6 +71,36 @@ void main() {
     });
   }
 
+  testWidgets('the bar follows the finger, then settles', (
+    WidgetTester tester,
+  ) async {
+    await pumpInShell(tester, const InventoryScreen());
+
+    final double restingTop = barTop(tester);
+    final TestGesture gesture = await tester.startGesture(
+      tester.getCenter(verticalList().first),
+    );
+
+    // Past the touch slop first, then a short move the bar must track.
+    await gesture.moveBy(const Offset(0, -40));
+    await tester.pump();
+    await gesture.moveBy(const Offset(0, -20));
+    await tester.pump(const Duration(milliseconds: 16));
+
+    // Part-way, not snapped: a timed slide would be at one end or racing.
+    expect(barTop(tester), greaterThan(restingTop));
+    expect(barTop(tester), lessThan(windowHeight(tester)));
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(
+      barTop(tester) == restingTop || barTop(tester) >= windowHeight(tester),
+      isTrue,
+      reason: 'a released bar ends fully shown or fully hidden',
+    );
+  });
+
   testWidgets('the add button keeps its label and its place', (
     WidgetTester tester,
   ) async {
