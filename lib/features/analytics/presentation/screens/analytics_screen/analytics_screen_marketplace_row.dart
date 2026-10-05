@@ -1,15 +1,10 @@
 part of 'analytics_screen.dart';
 
 class _MarketplaceRow extends StatelessWidget {
-  const _MarketplaceRow({
-    required this.row,
-    required this.maxRevenue,
-    required this.color,
-  });
+  const _MarketplaceRow({required this.row, required this.maxRevenue});
 
   final MarketplacePerformance row;
   final int maxRevenue;
-  final Color color;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -17,6 +12,8 @@ class _MarketplaceRow extends StatelessWidget {
     children: <Widget>[
       Row(
         children: <Widget>[
+          AppMarketplaceDot(marketplaceId: row.marketplaceId),
+          SizedBox(width: SdSpacingConstant.w8),
           Expanded(
             child: Text(
               row.marketplaceName,
@@ -38,9 +35,11 @@ class _MarketplaceRow extends StatelessWidget {
         borderRadius: SdRadiusV3.fullAll,
         child: LinearProgressIndicator(
           value: maxRevenue == 0 ? 0 : row.revenue.minor / maxRevenue,
-          minHeight: SdSpacingConstant.h8,
+          minHeight: SdFreeLimitProgressV3.barHeight,
           backgroundColor: context.sdTheme3.surfaceSunken,
-          valueColor: AlwaysStoppedAnimation<Color>(color),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            context.sdTheme3.textSecondary,
+          ),
         ),
       ),
       SizedBox(height: SdSpacingConstant.h6),

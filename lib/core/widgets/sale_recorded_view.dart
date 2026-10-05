@@ -100,17 +100,7 @@ class _SoldBadge extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: tint,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: tint.withValues(alpha: 0.35),
-              blurRadius: SdSpacingConstant.w32,
-              spreadRadius: SdSpacingConstant.w4,
-            ),
-          ],
-        ),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: tint),
         child: SdIconV3(
           AppIconConstant.check,
           size: SdSpacingConstant.w40,
@@ -191,13 +181,12 @@ class _Step extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color profit = context.sdTheme3.profit;
-    final Color primary = context.colorScheme3.primary;
+    final Color done = context.sdTheme3.textSecondary;
     final Color faint = context.sdTheme3.textTertiary;
     final double disc = SdSpacingConstant.w28;
     final Color accent = switch (state) {
-      _StepState.done => profit,
-      _StepState.next => primary,
+      _StepState.done => done,
+      _StepState.next => context.sdTheme3.textPrimary,
       _StepState.later => faint,
     };
 
@@ -213,7 +202,7 @@ class _Step extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: state == _StepState.done
-                      ? profit
+                      ? done
                       : context.sdTheme3.surfaceElevated,
                   border: state == _StepState.done
                       ? null
@@ -223,7 +212,7 @@ class _Step extends StatelessWidget {
                   icon,
                   size: SdSpacingConstant.w16,
                   color: state == _StepState.done
-                      ? context.colorScheme3.onPrimary
+                      ? context.sdTheme3.surfaceElevated
                       : accent,
                 ),
               ),
@@ -235,7 +224,7 @@ class _Step extends StatelessWidget {
                       minHeight: SdSpacingConstant.h12,
                     ),
                     color: state == _StepState.done
-                        ? profit
+                        ? done
                         : context.sdTheme3.border,
                   ),
                 ),
