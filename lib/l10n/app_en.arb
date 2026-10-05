@@ -6272,6 +6272,10 @@
   "@filterStatus": {
     "description": "Filter group over the record's status."
   },
+  "filterShow": "Show",
+  "@filterShow": {
+    "description": "Orders filter sheet group repeating the tab strip's presets: All, To Ship, Shipped, Delivered, Returns."
+  },
   "filterCategory": "Category",
   "@filterCategory": {
     "description": "Filter group over item categories."

@@ -86,13 +86,16 @@ class OrderCriteriaController extends Notifier<OrderFilterCriteria> {
 
   /// Writes what the filter sheet was holding, once Apply is pressed — see
   /// `InventoryCriteriaController.apply` for why the sheet holds it.
-  void apply(OrderFilterCriteria pending) {
+  ///
+  /// [tab] is the strip's preset, which the sheet repeats as its first group.
+  void apply(OrderFilterCriteria pending, {required OrderFilter tab}) {
     SdLogger.action(
       LogTagConstant.order,
       'Apply order filters',
-      <String, Object?>{'groups': pending.activeCount},
+      <String, Object?>{'groups': pending.activeCount, 'tab': tab.name},
     );
 
+    ref.read(orderFilterProvider.notifier).select(tab);
     state = pending;
   }
 

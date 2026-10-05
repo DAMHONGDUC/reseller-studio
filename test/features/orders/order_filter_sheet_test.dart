@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/widgets/app_active_filter_bar.dart';
+import 'package:reseller_studio/core/widgets/app_filter_chip_group.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:reseller_studio/features/orders/presentation/widgets/order_filter_sheet.dart';
+import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
@@ -92,5 +94,63 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AppActiveFilterBar), findsNothing);
+  });
+
+  testWidgets(
+    'the strip\u2019s presets are in the sheet, pending until Apply',
+    (WidgetTester tester) async {
+      final Finder inSheet = find.descendant(
+        of: find.byType(OrderFilterSheet),
+        matching: find.text('Returns'),
+      );
+      SdFilterChipV3 stripChip() => tester.widget<SdFilterChipV3>(
+        find
+            .ancestor(
+              of: find.text('Returns'),
+              matching: find.byType(SdFilterChipV3),
+            )
+            .first,
+      );
+
+      await pumpScreen(tester, const OrdersScreen());
+      await openSheet(tester);
+
+      expect(find.text('Show'), findsOneWidget);
+
+      await tester.tap(inSheet);
+      await tester.pumpAndSettle();
+
+      // The sheet offers the preset, so its bar counts it.
+      expect(find.text('1 filter applied'), findsOneWidget);
+
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      expect(stripChip().selected, isTrue);
+
+      // Inside the sheet, Reset returns the preset to All.
+      await openSheet(tester);
+      await tester.tap(
+        find.descendant(
+          of: find.byType(OrderFilterSheet),
+          matching: find.text('Reset'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      expect(stripChip().selected, isFalse);
+    },
+  );
+
+  testWidgets('a divider sits between groups, never at either end', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(tester, const OrdersScreen());
+    await openSheet(tester);
+
+    // Seven chip groups and the sale range: eight blocks, seven rules.
+    expect(find.byType(AppFilterGroupDivider), findsNWidgets(7));
   });
 }

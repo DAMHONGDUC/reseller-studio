@@ -69,3 +69,14 @@ class AppFilterChipGroup<T> extends StatelessWidget {
     ],
   );
 }
+
+/// The rule between two groups of a filter sheet.
+///
+/// One widget so both sheets space it the same way. Between groups only —
+/// never above the first or below the last (`docs/rules/SCREENS.md`).
+class AppFilterGroupDivider extends StatelessWidget {
+  const AppFilterGroupDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) => SdDividerV3(gap: SdSpacingConstant.h16);
+}

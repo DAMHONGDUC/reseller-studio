@@ -97,7 +97,6 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
           in ref.watch(categoriesProvider).value ?? const <ItemCategory>[])
         category.id: category.name,
     };
-    final double groupGap = SdSpacingConstant.h20;
 
     return SdBottomSheetV3(
       title: context.l10n.filterTitle,
@@ -132,7 +131,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (ItemStatus value) =>
                         _edit(criteria.withStatusToggled(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<ItemCondition>(
                     title: context.l10n.itemCondition,
                     options: <AppFilterOption<ItemCondition>>[
@@ -147,7 +146,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (ItemCondition value) =>
                         _edit(criteria.withConditionToggled(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterCategory,
                     options: _byId(context, categories),
@@ -155,7 +154,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (String id) =>
                         _edit(criteria.withCategoryToggled(id)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterLocation,
                     options: _byId(context, ref.watch(locationPathsProvider)),
@@ -163,7 +162,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (String id) =>
                         _edit(criteria.withLocationToggled(id)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterSource,
                     options: _byId(context, ref.watch(sourceNamesProvider)),
@@ -171,7 +170,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (String id) =>
                         _edit(criteria.withSourceToggled(id)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterPhotos,
                     options: _presence(
@@ -183,7 +182,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (PresenceFilter value) =>
                         _edit(criteria.withPhotos(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterCost,
                     options: _presence(
@@ -195,7 +194,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (PresenceFilter value) =>
                         _edit(criteria.withCost(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterListed,
                     options: _presence(
@@ -207,7 +206,7 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
                     onSelected: (PresenceFilter value) =>
                         _edit(criteria.withListed(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<DateRangeFilter>(
                     title: context.l10n.filterAdded,
                     options: <AppFilterOption<DateRangeFilter>>[

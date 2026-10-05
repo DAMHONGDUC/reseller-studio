@@ -14,6 +14,7 @@ import '../../domain/entities/order_filter_criteria.dart';
 import '../../domain/enums/order_deadline_filter.dart';
 import '../../domain/enums/order_status.dart';
 import '../../providers.dart';
+import '../order_filter_label.dart';
 import '../order_status_label.dart';
 
 /// Everything Orders can be narrowed by, in one sheet.
@@ -21,6 +22,9 @@ import '../order_status_label.dart';
 /// The same shape Inventory's has — a draft the chips edit, written to the
 /// screen only when Apply is pressed. See `InventoryFilterSheet` for the rule
 /// and its reason.
+///
+/// **Unlike Inventory's, it repeats the strip's presets as its first group**,
+/// and the preset is part of the draft (`docs/rules/SCREENS.md`).
 class OrderFilterSheet extends ConsumerStatefulWidget {
   const OrderFilterSheet({super.key});
 
@@ -47,6 +51,9 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
   /// field edits.
   late OrderFilterCriteria _draft = ref.read(orderCriteriaProvider);
 
+  /// The strip's preset, pending like everything else here.
+  late OrderFilter _tab = ref.read(orderFilterProvider);
+
   @override
   void initState() {
     super.initState();
@@ -65,17 +72,21 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
 
   void _edit(OrderFilterCriteria next) => setState(() => _draft = next);
 
+  void _selectTab(OrderFilter tab) => setState(() => _tab = tab);
+
   void _apply() {
-    ref.read(orderCriteriaProvider.notifier).apply(_draft);
+    ref.read(orderCriteriaProvider.notifier).apply(_draft, tab: _tab);
     Navigator.of(context).pop();
   }
 
-  /// Empties the draft and the two boxes that are part of it. The tab is the
-  /// strip's own Reset, behind the sheet.
+  /// Empties the draft, the two boxes that are part of it, and the preset.
   void _reset() {
     _min.clear();
     _max.clear();
-    _edit(OrderFilterCriteria.none);
+    setState(() {
+      _tab = OrderFilter.all;
+      _draft = OrderFilterCriteria.none;
+    });
   }
 
   List<AppFilterOption<PresenceFilter>> _presence(
@@ -97,7 +108,9 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
     final Map<String, String> marketplaces = ref.watch(
       orderMarketplaceNamesProvider,
     );
-    final double groupGap = SdSpacingConstant.h20;
+    final int pending = _tab == OrderFilter.all
+        ? criteria.activeCount
+        : criteria.activeCount + 1;
 
     return SdBottomSheetV3(
       title: context.l10n.filterTitle,
@@ -107,8 +120,8 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           AppActiveFilterBar(
-            // The draft's own groups, never the tab — see Inventory's sheet.
-            count: criteria.activeCount,
+            // The draft's groups plus the preset, which this sheet offers.
+            count: pending,
             onReset: _reset,
             gutter: false,
           ),
@@ -117,6 +130,19 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  AppFilterChipGroup<OrderFilter>(
+                    title: context.l10n.filterShow,
+                    options: <AppFilterOption<OrderFilter>>[
+                      for (final OrderFilter tab in OrderFilter.values)
+                        AppFilterOption<OrderFilter>(
+                          value: tab,
+                          label: OrderFilterLabel.of(context, tab),
+                        ),
+                    ],
+                    selected: <OrderFilter>{_tab},
+                    onSelected: _selectTab,
+                  ),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<OrderStatus>(
                     title: context.l10n.filterStatus,
                     options: <AppFilterOption<OrderStatus>>[
@@ -130,7 +156,7 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
                     onSelected: (OrderStatus value) =>
                         _edit(criteria.withStatusToggled(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<String>(
                     title: context.l10n.filterMarketplace,
                     options: <AppFilterOption<String>>[
@@ -145,7 +171,7 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
                     onSelected: (String id) =>
                         _edit(criteria.withMarketplaceToggled(id)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<DateRangeFilter>(
                     title: context.l10n.filterOrdered,
                     options: <AppFilterOption<DateRangeFilter>>[
@@ -160,7 +186,7 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
                     onSelected: (DateRangeFilter value) =>
                         _edit(criteria.withOrdered(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<OrderDeadlineFilter>(
                     title: context.l10n.filterDeadline,
                     options: <AppFilterOption<OrderDeadlineFilter>>[
@@ -175,7 +201,7 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
                     onSelected: (OrderDeadlineFilter value) =>
                         _edit(criteria.withDeadline(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterPayout,
                     options: _presence(
@@ -186,7 +212,7 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
                     onSelected: (PresenceFilter value) =>
                         _edit(criteria.withPayout(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   AppFilterChipGroup<PresenceFilter>(
                     title: context.l10n.filterTracking,
                     options: _presence(
@@ -197,7 +223,7 @@ class _OrderFilterSheetState extends ConsumerState<OrderFilterSheet> {
                     onSelected: (PresenceFilter value) =>
                         _edit(criteria.withTracking(value)),
                   ),
-                  SizedBox(height: groupGap),
+                  const AppFilterGroupDivider(),
                   Text(
                     context.l10n.filterSaleRange,
                     style: context.textTheme3.labelMedium!.semiBold3.copyWith(

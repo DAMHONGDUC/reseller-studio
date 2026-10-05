@@ -1401,6 +1401,7 @@
   "filterThisYear": "Cette année",
   "filterUnassigned": "Non attribué",
   "filterStatus": "Statut",
+  "filterShow": "Afficher",
   "filterCategory": "Catégorie",
   "filterLocation": "Emplacement",
   "filterSource": "Source",
