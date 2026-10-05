@@ -57,7 +57,7 @@ void main() {
 
     final Rect bar = tester.getRect(find.byType(SdAppBarV3).first);
     final Rect strip = stripRect(tester);
-    final Rect list = tester.getRect(find.byType(ListView).first);
+    final Rect list = tester.getRect(find.byType(CustomScrollView).first);
 
     expect(
       strip.top - bar.bottom,
