@@ -21,6 +21,12 @@ decide it, and they are listed in the order they outrank each other.
      tile makes it the first. A tile whose problem has a clock on it (an
      overdue order, an overdue payout) wears a tinted edge as well as the
      tinted detail line — colour is never the only signal.
+   - **The tiles are compact.** Owner's rule. The count sits beside a small
+     icon tile on one line instead of under a medium one, and the card's
+     inner padding is tighter than a default card's. Stacked, five tiles
+     filled the first screen and pushed everything below Needs Attention out
+     of sight; compact, the block is a glance and Performance shows above
+     the fold.
    - **It carries the plan's four rows and one more: an overdue payout.**
      Orders to ship, offers waiting, items to list and stale inventory are
      §6's; "not paid out yet" is the only tile on Home that hands the seller
