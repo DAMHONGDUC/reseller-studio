@@ -143,6 +143,40 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
+  testWidgets('iOS — a list that fits on screen never moves the bar', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await pumpInShell(
+      tester,
+      ListView(
+        children: const <Widget>[
+          SizedBox(height: 80, child: Text('One', style: TextStyle())),
+          SizedBox(height: 80, child: Text('Two', style: TextStyle())),
+        ],
+      ),
+    );
+
+    final double restingTop = barTop(tester);
+    final TestGesture gesture = await tester.startGesture(
+      tester.getCenter(verticalList().first),
+    );
+
+    // Held mid-drag: the rubber band dragged the bar part way and left it.
+    await gesture.moveBy(const Offset(0, -40));
+    await tester.pump();
+    await gesture.moveBy(const Offset(0, -120));
+    await tester.pump();
+
+    expect(barTop(tester), restingTop);
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(barTop(tester), restingTop);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
   testWidgets('the add button keeps its place', (WidgetTester tester) async {
     await pumpInShell(tester, const InventoryScreen());
 
