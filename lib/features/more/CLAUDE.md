@@ -13,7 +13,7 @@ place to look.
   across an Account card, an Appearance card and a row in another section.
 - **General holds**: the account row (who is signed in, or Sign in),
   Subscription, Theme, Language, Notifications, About, Contact support — and,
-  in dev mode, Seed demo data and Delete all data last. Owner's rule: there is
+  in dev mode, Seed demo data, Test Crashlytics and Delete all data last. Owner's rule: there is
   no separate App or Developer section.
 - **Every row is drawn the way every other More row is** — owner's rule: icon,
   one-line label, the value before the chevron, hairlines between rows, no
@@ -77,6 +77,25 @@ meaning, the width decides how much copy that can be.
 
 ## The dev rows
 
-Seed demo data and Delete all data are the last two rows of General, behind
-`devModeEnabledProvider` — checked by the section and again by each row. What
-each does and why neither asks first is in `lib/features/workspace/CLAUDE.md`.
+Seed demo data, Test Crashlytics and Delete all data are the last three rows
+of General, behind `devModeEnabledProvider` — checked by the section and again
+by each row. What seeding and deleting do and why neither asks first is in
+`lib/features/workspace/CLAUDE.md`.
+
+**Test Crashlytics sends one non-fatal report and uploads it at once**, so a
+developer can see the whole path work without waiting for a real failure.
+
+- **It works in debug, where collection is off**: the report is stored on the
+  device and `sendUnsentReports` pushes it. Turning collection on instead
+  would leave every later debug error flowing to the dashboard.
+- **It deletes the stored backlog first.** That backlog is every debug-session
+  error the bootstrap keeps out of the dashboard on purpose, and the upload
+  would otherwise send all of it along with the test.
+- **It sends a non-fatal, never a real crash.** A native crash is uploaded on
+  the next launch, which in debug never comes — the bootstrap turns
+  collection off again before anything is sent — and with Xcode attached the
+  debugger catches it first.
+- The report carries `CrashlyticsTestException`, so the dashboard files it as
+  its own issue, apart from real failures.
+- In a build with no Firebase there is nothing to send to, and the snackbar
+  says so.

@@ -22,6 +22,7 @@ import '../../../../sync/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../more_constant.dart';
 import '../../controllers/app_locale_controller.dart';
+import '../../controllers/crashlytics_test_controller.dart';
 import '../../controllers/delete_all_data_controller.dart';
 import '../../controllers/seed_data_controller.dart';
 import '../../controllers/theme_mode_controller.dart';

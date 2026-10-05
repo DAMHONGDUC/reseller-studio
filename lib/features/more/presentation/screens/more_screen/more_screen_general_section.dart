@@ -30,6 +30,7 @@ class _GeneralSection extends ConsumerWidget {
       ?_destination(MoreConstant.contactSupport),
       if (ref.watch(devModeEnabledProvider)) ...<Widget>[
         const _SeedDataRow(),
+        const _CrashlyticsTestRow(),
         const _DeleteAllDataRow(),
       ],
     ],

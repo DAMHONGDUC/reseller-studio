@@ -1,6 +1,8 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:system_design/common.dart';
 
+import 'crashlytics_test_exception.dart';
+
 /// The Crashlytics half of [SdCrashReporter], and the app's only contact with
 /// the Crashlytics SDK.
 ///
@@ -12,6 +14,30 @@ final class FirebaseCrashReporter implements SdCrashReporter {
   const FirebaseCrashReporter(this._crashlytics);
 
   final FirebaseCrashlytics _crashlytics;
+
+  /// The reporter `AppBootstrap` attached, or null in a build with no Firebase.
+  static FirebaseCrashReporter? get attached {
+    final SdCrashReporter reporter = SdCrashReporter.instance;
+
+    return reporter is FirebaseCrashReporter ? reporter : null;
+  }
+
+  /// Records one non-fatal test report and uploads it now.
+  ///
+  /// Debug keeps collection off, so the report is stored on the device and
+  /// [FirebaseCrashlytics.sendUnsentReports] pushes it; in release it goes on
+  /// its own and that call is a no-op. The stored backlog is deleted first:
+  /// it is every debug-session error the bootstrap deliberately keeps out of
+  /// the dashboard, and the test must not be what lets it in.
+  Future<void> sendTestReport() async {
+    await _crashlytics.deleteUnsentReports();
+    await _crashlytics.recordError(
+      const CrashlyticsTestException(),
+      StackTrace.current,
+      reason: 'Crashlytics test report',
+    );
+    await _crashlytics.sendUnsentReports();
+  }
 
   @override
   void recordError(String reason, {Object? error, StackTrace? stackTrace}) {

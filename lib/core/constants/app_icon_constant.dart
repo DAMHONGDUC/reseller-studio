@@ -52,6 +52,9 @@ final class AppIconConstant {
   /// Highlight a quick or automated action.
   static const IconData bolt = Symbols.bolt_rounded;
 
+  /// Report a bug, or send a test crash report.
+  static const IconData bugReport = Symbols.bug_report_rounded;
+
   /// The business the seller is standing in.
   static const IconData business = Symbols.business_center_rounded;
 

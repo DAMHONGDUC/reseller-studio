@@ -65,6 +65,7 @@ final class LogTagConstant {
   static const String settings = 'Settings';
   static const String onboarding = 'Onboarding';
   static const String seedData = 'Seed Data';
+  static const String crashReporting = 'Crash Reporting';
 
   /// The fresh-install check that runs before `runApp`. Handed to
   /// `SdFreshInstall` as its `logTag`, so the design system's half and this
