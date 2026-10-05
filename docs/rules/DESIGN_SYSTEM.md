@@ -114,6 +114,29 @@ decides the arguments the look would otherwise keep re-opening:
 
 `test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds all three.
 
+#### On the two long lists the bar gets out of the way
+
+Owner's rule. **On Inventory and Orders, scrolling down slides the bar off
+the bottom of the screen; scrolling up slides it back.** Those are the two
+screens a seller reads hundreds of rows on, and a pill floating over the
+lowest rows is a pill they read around on every one of them.
+
+- **Opt-in per screen, never the shell's default.** A screen asks for it with
+  `AppAddFabScaffold.hidesNavOnScroll`, which wraps its body in
+  `SdHidesNavOnScrollV3`; that only *reports* direction, and
+  `SdBottomNavigationV3` alone decides to move the bar. Home, Analytics and
+  More keep a bar that never moves.
+- **It always comes back without a scroll the seller has to invent.** It
+  reappears on a tab change, at the top of the list, and whenever the list
+  stops being scrollable — a filter that empties the list must not strand the
+  seller with no tabs and nothing to drag.
+- **The add button follows it down** by `floatingBarHeight`, reading
+  `SdNavVisibilityScopeV3`, so it never hovers over the hole the bar left.
+- **The clearance under the last row does not shrink.** The bar can come back
+  at any moment, so the list keeps reserving its footprint — the "no content
+  is ever covered" rule above holds in both states.
+- Reduce Motion moves it without the slide.
+
 #### The bar is glyphs only — no words on any tab
 
 Owner's rule, given as the sibling app's own bar: **five equal segments, one
