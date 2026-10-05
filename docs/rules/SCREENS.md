@@ -235,10 +235,10 @@ check is to reopen the sheet and read every group.
 - **The count is by group, never by chip.** Three categories ticked is one
   filter; a seller who made one choice cannot reconcile "3 filters" with the
   sheet in front of them.
-- **The selected tab counts as one whenever it is not `All`**, and Reset
-  returns it there. A seller looking at three rows of eleven is filtered by the
-  tab exactly as much as by the sheet, and a bar reading "no filters" over a
-  narrowed list would be describing a different screen.
+- **The Show preset counts as one whenever it is not `All`**, and Reset
+  returns it there. A seller looking at three rows of eleven is narrowed by the
+  preset exactly as much as by any other group, and a bar reading "no
+  filters" over a narrowed list would be describing a different screen.
 - **The search box is not counted and Reset leaves it alone.** It is visible on
   the screen with its own clear button, so it is not the filter that went
   missing.
@@ -255,18 +255,18 @@ check is to reopen the sheet and read every group.
     and it **reverses "the sheet's Reset is the bar at its top"**. Both are
     where the thumb already is when the seller is done choosing, and the pair
     is `AppFilterSheetActions` (`core/widgets/`) so both sheets build it once.
-  - **The sheet's Reset empties the draft, and the tab only where the sheet
-    offers it.** Nothing is applied until Apply, the same as a tick. It is
-    disabled while nothing is pending — a Reset with nothing to reset is a
-    button that does nothing. The strip's bar still counts the tab and its
-    Reset still clears it.
-  - **Orders' sheet repeats the strip's presets as its first group** — owner's
-    rule, and it **reverses "the strip's tabs are deliberately not repeated
-    in the sheet"** for Orders. A seller who opened the sheet to say "shipped
-    orders on eBay this month" looked for "shipped" in it and found only raw
-    statuses. The preset is part of the draft: it moves with Apply, and the
-    sheet's Reset returns it to `All`. Inventory's sheet still leaves its tabs
-    out.
+  - **A sheet's Reset empties what that sheet shows, and nothing else.**
+    The full sheet empties every group, the preset included; a one-group
+    sheet empties its one group. Nothing is applied until Apply, the same as
+    a tick. It is disabled while nothing it shows is pending — a Reset with
+    nothing to reset is a button that does nothing.
+  - **Both sheets open with the preset as their first group, "Show"** —
+    owner's rule, and it **reverses "the strip's tabs are deliberately not
+    repeated in the sheet"** for Inventory as it already had for Orders. The
+    presets left the strip (below), and Stale and To Ship are not statuses,
+    so a sheet without them would have deleted two filters the plan names.
+    The preset is part of the draft: it moves with Apply, and Reset returns
+    it to `All`.
   - **Ticking a chip is a method on the criteria, not on the notifier**
     (`ItemFilterCriteria.withStatusToggled`). Two places tick a chip now — the
     draft and the applied value — so what a tick means lives in one place, and
@@ -276,16 +276,26 @@ check is to reopen the sheet and read every group.
   chips; a rule says where one question stops. It is `AppFilterGroupDivider`
   (`core/widgets/`), so both sheets space it the same way, and it sits
   between groups only — never above the first or below the last.
-- **The entry point is an app-bar action, never a chip on the strip.** Five
-  tabs are already wider than a phone, so a sixth chip pushes a real tab off
-  the edge to reach a sheet that is not a tab.
-- **That action is lit while the sheet holds something** — owner's rule.
-  `SdAppBarActionButtonV3.isActive` fills the glyph and paints it primary, so
-  a seller who scrolled past the bar under the strip can still see, from the
-  chrome that never moves, that the list is narrower than the shelf. It
-  follows the sheet's own groups and not the tab, for the reason the sheet's
-  bar does: the strip already shows which tab is picked, and a lit glyph over
-  a sheet that opens empty is a lie about where the rows went.
+- **The strip is the sheet, laid out sideways** — owner's rule, and it
+  **reverses "the entry point is an app-bar action, never a chip on the
+  strip"** together with the preset tabs the strip used to carry. A seller who
+  wanted one question answered had to open a sheet of ten and scroll for it.
+  - **The first chip opens the whole sheet, always first.** It carries the
+    `tune` glyph and is selected while anything at all narrows the list —
+    the preset included, because the sheet it opens now holds the preset.
+  - **Then one chip per group, in the sheet's own order** — Show first. Each
+    opens a sheet holding that group alone, with the same draft, the same
+    Reset beside Apply and the same "nothing moves until Apply". The seller
+    edits a group here or in the full sheet; both write the one applied value.
+  - **A group's chip is selected while its group narrows** and carries a
+    caret, because it opens something rather than toggling. The chip's label
+    is the group's title, the same word the full sheet prints above it.
+  - **No preset tabs on the strip.** The preset is one group among the
+    others, and the Show sheet carries each preset's row count on its chip.
+  - The groups are enums on the domain (`ItemFilterGroup`,
+    `OrderFilterGroup`), so the chips, the full sheet and the one-group sheet
+    are three readings of one list and a new group cannot reach one of them
+    without the others.
 - `test/features/inventory/inventory_filter_sheet_test.dart` and
   `test/features/orders/order_filter_sheet_test.dart` hold the count, the two
   places it renders, and Reset.
