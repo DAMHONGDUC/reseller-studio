@@ -7,10 +7,10 @@ import '../constants/app_icon_constant.dart';
 ///
 /// **Owner's rule: every screen that creates something uses the same button,
 /// in the same place.** Not an `IconButton` in the app bar, not a row at the
-/// bottom of a list — the labelled `SdFabV3`. A create action a seller has to
-/// hunt for is one they stop using.
+/// bottom of a list — the `SdFabV3`: a `+` in a filled circle, no title. A
+/// create action a seller has to hunt for is one they stop using.
 ///
-/// **The button does not animate** — owner's rule. It keeps its label and its
+/// **The button does not animate** — owner's rule. It keeps its shape and its
 /// place while the list scrolls and while the tab bar slides away, so it is
 /// always where the thumb last found it.
 ///
@@ -36,9 +36,8 @@ class AppAddFabScaffold extends StatelessWidget {
 
   final Widget body;
 
-  /// What the button says. A verb and its object — "Add a category", not
-  /// "Add": the label is the only thing telling a seller what they are about
-  /// to create.
+  /// What a screen reader announces — never painted. A verb and its object,
+  /// "Add a category", not "Add": the glyph alone does not say what it makes.
   final String addLabel;
 
   final VoidCallback onAdd;

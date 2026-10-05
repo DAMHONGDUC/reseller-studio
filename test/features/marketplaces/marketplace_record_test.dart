@@ -14,6 +14,7 @@ import 'package:reseller_studio/features/marketplaces/presentation/screens/marke
 import 'package:reseller_studio/features/marketplaces/presentation/screens/marketplaces_screen/marketplaces_screen.dart';
 import 'package:reseller_studio/features/marketplaces/providers.dart';
 
+import '../../support/add_button_finder.dart';
 import '../../support/pump_app.dart';
 
 void main() {
@@ -38,7 +39,7 @@ void main() {
     ) async {
       await pumpScreen(tester, const MarketplacesScreen());
 
-      expect(find.text('Add marketplace'), findsOneWidget);
+      expect(AddButtonFinder.named('Add marketplace'), findsOneWidget);
       expect(find.text('eBay'), findsOneWidget);
       expect(find.text('Poshmark'), findsOneWidget);
       expect(find.byType(Switch), findsNothing);

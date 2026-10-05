@@ -10,6 +10,7 @@ import 'package:reseller_studio/features/subscription/domain/services/plan_gate.
 import 'package:reseller_studio/features/subscription/providers.dart';
 import 'package:system_design/index.dart';
 
+import '../../support/add_button_finder.dart';
 import '../../support/pump_app.dart';
 
 /// The two ways this list can be empty are different sentences.
@@ -48,9 +49,10 @@ void main() {
       overrides: orders(const <Order>[]),
     );
 
-    // Twice: the button in the corner and the empty state's own action say
-    // the same thing, so a seller is never taught a second route to it.
-    expect(find.text('Record a sale'), findsNWidgets(2));
+    // The button in the corner and the empty state's own action say the
+    // same thing, so a seller is never taught a second route to it.
+    expect(find.text('Record a sale'), findsOneWidget);
+    expect(AddButtonFinder.named('Record a sale'), findsOneWidget);
     expect(find.text('Go to inventory'), findsNothing);
   });
 

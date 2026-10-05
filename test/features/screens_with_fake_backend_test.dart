@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/analytics/domain/entities/analytics_summary.dart';
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
@@ -15,6 +16,7 @@ import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:system_design/index.dart';
 
+import '../support/add_button_finder.dart';
 import '../support/pump_app.dart';
 
 /// Every screen, rendered against the seeded mock business.
@@ -303,36 +305,22 @@ void main() {
       );
     });
 
-    testWidgets('Add stock keeps its label while the list is moving', (
+    testWidgets('Add stock is a plus with no title, named for a reader', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const InventoryScreen());
 
       // The button asks which way stock is coming in — quickly, or as a
-      // buying trip — so its label is the question, not one of the answers.
-      expect(find.text('Add stock'), findsOneWidget);
-
-      // Held, not flicked: mid-scroll is where the label used to collapse
-      // (owner's rule now: the button never animates).
-      final TestGesture gesture = await tester.startGesture(
-        tester.getCenter(find.byType(CustomScrollView)),
+      // buying trip — so its name is the question, not one of the answers.
+      expect(find.text('Add stock'), findsNothing);
+      expect(AddButtonFinder.named('Add stock'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(SdFabV3),
+          matching: find.byIcon(AppIconConstant.add),
+        ),
+        findsOneWidget,
       );
-
-      // Two steps, because one long move is a single pointer event and the
-      // drag recogniser never sees the touch slop crossed — the list would
-      // not move at all and the assertion below would pass for the wrong
-      // reason.
-      await gesture.moveBy(const Offset(0, -40));
-      await tester.pump();
-      await gesture.moveBy(const Offset(0, -260));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Add stock'), findsOneWidget);
-
-      await gesture.up();
-      await tester.pumpAndSettle();
-
-      expect(find.text('Add stock'), findsOneWidget);
     });
 
     testWidgets('Analytics renders the profit statement', (

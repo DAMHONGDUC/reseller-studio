@@ -20,6 +20,7 @@ import 'package:reseller_studio/features/orders/presentation/screens/record_sale
 import 'package:reseller_studio/features/orders/presentation/widgets/cannot_sell_sheet.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 
+import '../../support/add_button_finder.dart';
 import '../../support/pump_app.dart';
 
 /// The second way an order is created — the Orders tab's own button
@@ -118,7 +119,7 @@ void main() {
   ) async {
     await pumpScreen(tester, const OrdersScreen());
 
-    expect(find.text('Record a sale'), findsOneWidget);
+    expect(AddButtonFinder.named('Record a sale'), findsOneWidget);
   });
 
   testWidgets('the picker lists what has left the shelf too, with its reason', (

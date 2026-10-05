@@ -101,14 +101,39 @@ void main() {
     );
   });
 
-  testWidgets('the add button keeps its label and its place', (
+  testWidgets('Orders — a short scroll up brings the bar back', (
     WidgetTester tester,
   ) async {
+    await pumpInShell(tester, const OrdersScreen());
+
+    final double restingTop = barTop(tester);
+
+    await scroll(tester, -300);
+
+    expect(barTop(tester), greaterThanOrEqualTo(windowHeight(tester)));
+
+    final TestGesture gesture = await tester.startGesture(
+      tester.getCenter(verticalList().first),
+    );
+
+    // Past the touch slop, then a few points — far less than half the bar.
+    // Settling to the nearer end left it hidden here: the bar was stuck.
+    await gesture.moveBy(const Offset(0, 20));
+    await tester.pump();
+    await gesture.moveBy(const Offset(0, 6));
+    await tester.pump();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(barTop(tester), restingTop);
+  });
+
+  testWidgets('the add button keeps its place', (WidgetTester tester) async {
     await pumpInShell(tester, const InventoryScreen());
 
     final Rect resting = tester.getRect(find.byType(SdFabV3));
 
-    // Mid-scroll, where the label used to collapse.
+    // Mid-scroll, and again once the bar has settled out of the way.
     await tester.drag(verticalList().first, const Offset(0, -300));
     await tester.pump();
 
