@@ -46,6 +46,12 @@ abstract class AppAnalytics {
 
   // --- Session ---
 
+  /// Ties every later event to the account, or clears it on sign-out.
+  ///
+  /// A Firebase uid and nothing else — the same contract as
+  /// `SdCrashReporter.setUserId` (hard rule 9).
+  void setUserId(String? uid);
+
   void signedIn({required String provider});
 
   void signedOut();
@@ -108,6 +114,9 @@ class _NoopAnalytics implements AppAnalytics {
   void tabViewed({required String tab}) {}
 
   @override
+  void setUserId(String? uid) {}
+
+  @override
   void signedIn({required String provider}) {}
 
   @override
@@ -166,6 +175,10 @@ class _FirebaseAppAnalytics implements AppAnalytics {
   @override
   void tabViewed({required String tab}) =>
       _report('screen_view', _analytics.logScreenView(screenName: tab));
+
+  @override
+  void setUserId(String? uid) =>
+      _report('set_user_id', _analytics.setUserId(id: uid));
 
   @override
   void signedIn({required String provider}) =>

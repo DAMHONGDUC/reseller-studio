@@ -74,6 +74,8 @@ class AuthController extends Notifier<AuthFormState> {
       if (uid == null) return false;
 
       SdCrashReporter.instance.setUserId(uid);
+
+      AppAnalytics.instance.setUserId(uid);
       AppAnalytics.instance.signedIn(provider: provider.name);
       unawaited(_ensureProfile(uid));
       unawaited(_identifyForBilling(uid));
@@ -110,6 +112,7 @@ class AuthController extends Notifier<AuthFormState> {
     try {
       await ref.read(authRepositoryProvider).signOut();
       SdCrashReporter.instance.setUserId(null);
+      AppAnalytics.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
 
       // **After the session ends, never before.** The wipe is what makes the
@@ -141,6 +144,7 @@ class AuthController extends Notifier<AuthFormState> {
     try {
       await ref.read(authRepositoryProvider).deleteAccount();
       SdCrashReporter.instance.setUserId(null);
+      AppAnalytics.instance.setUserId(null);
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.deleteAccount,
