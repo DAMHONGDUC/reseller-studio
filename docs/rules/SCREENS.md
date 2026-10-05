@@ -252,11 +252,23 @@ check is to reopen the sheet and read every group.
   - **The primary button says "Apply", not a count.** How many rows are left
     is a fact about a filter that has been applied, and this button is what
     applies one.
-  - **The sheet's own bar counts the draft, and never the tab.** The tab is
-    not in the sheet, so a number counting it could not be made true by the
-    Reset beside it — inside the sheet, Reset empties what is pending and
-    nothing else. The strip's bar still counts the tab and its Reset still
-    clears it.
+  - **The sheet's own bar counts the draft, and the tab only where the sheet
+    offers it.** A number counting something the sheet cannot change could
+    not be made true by the Reset beside it — inside the sheet, Reset empties
+    what is pending and nothing else. The strip's bar still counts the tab and
+    its Reset still clears it.
+  - **Orders' sheet repeats the strip's presets as its first group** — owner's
+    rule, and it **reverses "the strip's tabs are deliberately not repeated
+    in the sheet"** for Orders. A seller who opened the sheet to say "shipped
+    orders on eBay this month" looked for "shipped" in it and found only raw
+    statuses. The preset is part of the draft: it moves with Apply, the
+    sheet's bar counts it when it is not `All`, and the sheet's Reset returns
+    it there. Inventory's sheet still leaves its tabs out.
+- **Every group in a filter sheet is separated from the next by a divider** —
+  owner's rule. A blank gap between a dozen chip groups reads as one wall of
+  chips; a rule says where one question stops. It is `AppFilterGroupDivider`
+  (`core/widgets/`), so both sheets space it the same way, and it sits
+  between groups only — never above the first or below the last.
   - **Ticking a chip is a method on the criteria, not on the notifier**
     (`ItemFilterCriteria.withStatusToggled`). Two places tick a chip now — the
     draft and the applied value — so what a tick means lives in one place, and
