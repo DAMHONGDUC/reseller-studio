@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/constants/app_icon_constant.dart';
@@ -126,6 +127,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(barTop(tester), restingTop);
+  });
+
+  testWidgets('iOS — a bounce at the end leaves the bar hidden', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await pumpInShell(tester, const OrdersScreen());
+
+    // Far past the end, so the list overscrolls and bounces back. The bounce
+    // settling up was read as a scroll up and brought the bar back.
+    await scroll(tester, -3000);
+
+    expect(barTop(tester), greaterThanOrEqualTo(windowHeight(tester)));
+    debugDefaultTargetPlatformOverride = null;
   });
 
   testWidgets('the add button keeps its place', (WidgetTester tester) async {
