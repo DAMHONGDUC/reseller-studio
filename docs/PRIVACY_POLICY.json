@@ -7,7 +7,7 @@
     "iOS"
   ],
   "effectiveDate": "2026-08-31",
-  "lastUpdated": "2026-09-22",
+  "lastUpdated": "2026-10-05",
   "contactEmail": "ducdam.dev@gmail.com",
   "controller": "Dam Hong Duc, Ho Chi Minh City, Viet Nam",
   "url": "https://damhongduc.github.io/personal_work_space",
@@ -46,12 +46,13 @@
         "Items — title, quantity, condition, status, cost, asking price, category, storage location",
         "Sources and purchases — where you bought, when, and what it cost",
         "Listings and offers — marketplace, price, status, and the amount a buyer offered",
-        "Orders — sale price, fees, shipping cost, refunds, payout, tracking number, carrier and lifecycle dates",
+        "Orders — sale price, shipping cost, refund, the payout the marketplace actually paid you, the marketplace's own order number, buyer name if you type one, tracking number, carrier and lifecycle dates",
         "Expenses, receipts and the tax figures derived from them",
-        "Your own categories, storage locations, marketplaces and their fee rates, and carriers",
+        "Your own categories, storage locations, marketplaces and carriers",
+        "Payouts read from a marketplace report you import — the order number and the amount paid, and nothing else from the file",
         "Any free-text note you type on a record"
       ],
-      "purpose": "This is what the app is for. Until you sign in these stay on your phone and we never receive them. Once you have an account they are stored in our backend under the business they belong to, so they survive a lost phone, sync to your other devices and reach the team you invite. Profit, margin and ROI are never stored — they are worked out from these facts each time you look at them.",
+      "purpose": "This is what the app is for. Until you sign in these stay on your phone and we never receive them. Once you have an account they are stored in our backend under the business they belong to, so they survive a lost phone, sync to your other devices and reach the team you invite. A marketplace's fee is never typed in or estimated either — it is worked out from what the marketplace paid you. Profit, margin and ROI are never stored — they are worked out from these facts each time you look at them.",
       "linked": true
     },
     {
@@ -71,13 +72,14 @@
         "A tracking number and carrier for a shipment",
         "Anything you type into an order's notes"
       ],
-      "purpose": "Keep your sale history readable. The app never asks for a buyer's address, never imports one, and never puts any of this into a log line, an analytics event or a crash report. What ends up in these fields is what you choose to type.",
+      "purpose": "Keep your sale history readable. The app never asks for a buyer's address, never imports one — an imported payout report's buyer columns are never read — and never puts any of this into a log line, an analytics event or a crash report. What ends up in these fields is what you choose to type.",
       "linked": true
     },
     {
       "category": "Team and business data",
       "items": [
         "Business name, country, currency, time zone and business type",
+        "The settings that shape your numbers — the one fee rate you plan purchases with, and when stock counts as stale or low",
         "Each member's role, display name and email address, visible to the other members of that business",
         "The email address of anyone you invite, until the invitation is accepted or withdrawn",
         "An activity log of who changed which record, and what it looked like before and after"
@@ -89,18 +91,20 @@
       "category": "Notification settings and history",
       "items": [
         "Push notification token and device platform",
+        "Which kinds of alert you have switched off",
         "Your in-app notification history — type, the record it points at, a count, and whether you have read it"
       ],
-      "purpose": "Deliver the alerts the app sends — an order that needs shipping, a returns deadline, a teammate's invitation — and let you see them again in the app. Deny the notification permission and none of this is collected.",
+      "purpose": "Deliver the alerts the app sends — an order to ship today, an offer about to expire, a payout nobody has recorded, a teammate joining your business — and let you see them again in the app. Read notifications are pruned automatically after a few months. Deny the notification permission and no push token is collected.",
       "linked": true
     },
     {
       "category": "Subscription state",
       "items": [
         "Which plan and entitlement you hold, and when it renews or lapses",
-        "Your account identifier, used as the subscription identifier"
+        "Your account identifier, used as the subscription identifier",
+        "How many items and recent orders each business holds, counted by our backend"
       ],
-      "purpose": "Unlock Premium and enforce the Free tier's limits. Payment is taken by the App Store — card details are handled by Apple and never reach us.",
+      "purpose": "Unlock Premium and apply the Free tier's limits, which are counts of items and recent orders. Payment is taken by the App Store — card details are handled by Apple and never reach us.",
       "linked": true
     },
     {
@@ -126,7 +130,7 @@
   "notCollected": [
     "Location of any kind — precise or coarse. The app asks for no location permission.",
     "Marketplace passwords or OAuth tokens — {{app}} does not connect to marketplace accounts at all",
-    "Buyer shipping addresses — no field in the app stores one",
+    "Buyer shipping addresses — no field in the app stores one, and an imported payout report's address columns are never read",
     "Contacts",
     "Health or fitness data",
     "Microphone or audio",
@@ -148,7 +152,7 @@
     {
       "name": "Notifications",
       "required": false,
-      "reason": "Deliver alerts about orders that need shipping, returns deadlines and team invitations. Deny it and nothing else changes."
+      "reason": "Deliver alerts about orders to ship, expiring offers, payouts nobody has recorded and teammates joining. Deny it and nothing else changes."
     }
   ],
   "thirdParties": [
@@ -190,7 +194,7 @@
       "body": [
         "You do not need an account to use {{app}}. Open it and start recording: the whole app works, and everything you enter is written to a database on your phone and **sent nowhere**. We do not receive it, we cannot read it, and no account exists for it to belong to.",
         "**While you have no account, this phone holds the only copy.** Deleting the app deletes your records, and neither we nor anyone else can restore them — there is nothing on our side to restore from. The app says so on its home screen rather than leaving you to find out.",
-        "When you decide to sign in, the records already on your phone are uploaded **once** into your account, and the copy on the phone is deleted as each record is confirmed. If your account already has more than one business, the app asks which one they should join rather than choosing for you.",
+        "When you decide to sign in, the records already on your phone are uploaded **once** into your account, and the copy on the phone is deleted as each record is confirmed. If your account already has a business, the app asks which one they should join — or whether to keep them as a business of their own — rather than choosing for you.",
         "There are exactly two ways in: **Sign in with Apple** and **Google Sign-In**. There is no email-and-password form, no sign-up form and no password reset, which means this app stores no password and there is none for anyone to steal from us.",
         "**Signing out empties the device.** Your records stay in your account and the phone is left blank, so a shared or handed-on phone does not carry your business with it."
       ]
@@ -230,8 +234,9 @@
       "id": "no-marketplace-connection",
       "title": "We do not connect to your marketplace accounts",
       "body": [
-        "{{app}} has no eBay, Depop, Vinted, Poshmark or Etsy login, no OAuth flow and no sync. What the app knows about a marketplace is what **you** tell it: its name, and the fee rate you use for planning.",
-        "This is a deliberate limit rather than a missing feature. It means no marketplace password, token or API key ever reaches this app or our backend, and a compromise of {{app}} could not touch your selling accounts."
+        "{{app}} has no eBay, Depop, Vinted, Poshmark or Etsy login, no OAuth flow and no sync. What the app knows about a marketplace is what **you** tell it: its name, and what each sale paid you.",
+        "This is a deliberate limit rather than a missing feature. It means no marketplace password, token or API key ever reaches this app or our backend, and a compromise of {{app}} could not touch your selling accounts.",
+        "If you want to record payouts in bulk, you can hand the app a payout report you downloaded from a marketplace yourself. It is read **on your phone**: from each row the app takes the marketplace's order number and the amount paid, matches them to your orders, and reads nothing else — a buyer's name or address in that file is never held, logged or uploaded. The file itself is never sent to us."
       ]
     },
     {
@@ -280,7 +285,7 @@
       ],
       "list": [
         "Delete a business — from that business's detail screen. Removes the business, every record under it, its photos and receipts, and every member's access to it. Your account and your other businesses are untouched.",
-        "Delete your account — Settings → Account. Removes your profile, your devices and notifications, and any invitation waiting for you. Every business you are the **sole owner** of is deleted with all its records and files. A business somebody else owns loses only your membership, because deleting a shared business over one person leaving would destroy other people's records.",
+        "Delete your account — More → Account. Removes your profile, your devices and notifications, and any invitation waiting for you. Every business you are the **sole owner** of is deleted with all its records and files. A business somebody else owns loses only your membership, because deleting a shared business over one person leaving would destroy other people's records.",
         "Your sign-in is deleted last, so a failure part way through leaves an account you can sign back into and retry rather than records nobody can reach.",
         "Neither action cancels your subscription. That lives in the App Store and only you can cancel it there — do that first if you are leaving.",
         "Backups held by our infrastructure provider may retain deleted content for a short period before they expire."
