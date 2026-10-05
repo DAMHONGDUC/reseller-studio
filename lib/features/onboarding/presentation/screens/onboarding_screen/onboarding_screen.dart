@@ -44,8 +44,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   /// Marks the intro done, whether it was read or skipped.
-  Future<void> _finish() =>
-      ref.read(onboardingStatusProvider.notifier).complete();
+  Future<void> _finish({bool skipped = false}) => ref
+      .read(onboardingStatusProvider.notifier)
+      .complete(skipped: skipped, page: _index + 1);
 
   Future<void> _next(int total) {
     if (_index >= total - 1) return _finish();
@@ -68,7 +69,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         bottom: false,
         child: Column(
           children: <Widget>[
-            _SkipRow(visible: !isLast, onSkip: _finish),
+            _SkipRow(visible: !isLast, onSkip: () => _finish(skipped: true)),
             Expanded(
               child: PageView.builder(
                 controller: _pages,

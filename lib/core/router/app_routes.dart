@@ -47,6 +47,16 @@ final class AppRoutes {
   /// the seller is not currently standing in.
   static const String workspaceDetailPath = '/workspace/:workspaceId';
 
+  /// The five tabs' own roots. Their screen views are `AppShell`'s to report,
+  /// so `AppScreenTracker` skips them rather than count a tab twice.
+  static const Set<String> tabRoots = <String>{
+    home,
+    inventory,
+    orders,
+    analytics,
+    more,
+  };
+
   // --- Shell branch 1: Home ---
 
   static const String home = '/home';

@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/local/drain/drain_destination.dart';
 import '../../../../core/local/local_providers.dart';
@@ -102,6 +103,7 @@ class GuestDrainController extends Notifier<bool> {
           );
 
       ref.invalidate(guestRowsOwedProvider);
+      AppAnalytics.instance.guestRecordsSynced();
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.workspace,

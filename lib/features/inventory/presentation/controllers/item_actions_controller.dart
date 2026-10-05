@@ -155,6 +155,10 @@ class ItemActionsController extends Notifier<bool> {
         action: 'Cross-list item',
         count: prices.length + reprice.length,
       );
+
+      for (final String marketplaceId in prices.keys) {
+        AppAnalytics.instance.itemListed(marketplace: marketplaceId);
+      }
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.listing,
@@ -231,6 +235,12 @@ class ItemActionsController extends Notifier<bool> {
         action: 'Bulk cross-list',
         count: plan.listingCount,
       );
+
+      for (final BulkListingLine line in plan.lines) {
+        for (final String marketplaceId in line.prices.keys) {
+          AppAnalytics.instance.itemListed(marketplace: marketplaceId);
+        }
+      }
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.listing,

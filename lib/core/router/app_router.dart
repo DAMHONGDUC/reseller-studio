@@ -64,6 +64,7 @@ import '../../features/workspace/presentation/screens/workspace_detail_screen/wo
 import '../../features/workspace/presentation/screens/workspace_setup_screen/workspace_setup_screen.dart';
 import '../../features/workspace/presentation/screens/workspaces_screen/workspaces_screen.dart';
 import '../../features/workspace/providers.dart';
+import '../analytics/app_screen_tracker.dart';
 import '../constants/log_tag_constant.dart';
 import '../widgets/app_shell.dart';
 import '../widgets/splash_screen.dart';
@@ -674,7 +675,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
     },
   );
 
-  ref.onDispose(router.dispose);
+  final AppScreenTracker screens = AppScreenTracker(router)..attach();
+
+  ref.onDispose(() {
+    screens.detach();
+    router.dispose();
+  });
 
   return router;
 });
