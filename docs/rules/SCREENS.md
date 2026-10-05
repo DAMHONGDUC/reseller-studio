@@ -184,10 +184,20 @@ because they are about the shell, not the bar:
   own `padding`. Under an opaque bar this is not about scrolling behind chrome
   — it is about the scrollbar, the overscroll glow and the last row's clearance
   of the floating tab bar all belonging to the scrollable itself.
-- **A list is a `CustomScrollView` of slivers, and padding is per sliver.**
-  That is what lets a header sit flush while the rows below take the gutter and
-  the item gap; one `ListView` padding cannot express it, and screens that try
-  end up with a header inset differently from its list.
+- **Every scrolling list is a `CustomScrollView` or a
+  `SingleChildScrollView` — never a `ListView` or a `GridView`, in any
+  constructor and on any axis.** Owner's rule.
+  - **`CustomScrollView`** for a list of records, or anything that can grow:
+    slivers, built lazily, padding per sliver. That is what lets a header sit
+    flush while the rows below take the gutter and the item gap; one
+    `ListView` padding cannot express it, and screens that tried ended up
+    with a header inset differently from its list. A grid is a `SliverGrid`
+    inside one.
+  - **`SingleChildScrollView`** for a fixed, short set of children — a form, a
+    sheet's options, a strip of chips — whose `Column` or `Row` the screen
+    already lays out.
+  - `test/core/widgets/lists_are_slivers_test.dart` reads `lib/` and fails on
+    any `ListView` or `GridView`.
 - **Item spacing is `SliverList.separated` with `listItemGap`** — never a
   margin on the tile, never a raw number. Rows that inset themselves sit flush
   and take no gap.
@@ -205,7 +215,7 @@ because they are about the shell, not the bar:
   chip row inside the list drives the collapse. The threshold is a static on
   the widget it belongs to; an element that must scroll fully out before it
   fires has to start at offset 0, so nothing may be padded in above it.
-  `SdSearchHeaderV3` and `AppAddFabScaffold` are the two implementations —
+  `SdSearchHeaderV3` and `SdBottomNavigationV3` are the two implementations —
   read them before writing a third.
 - **Pull-to-refresh is one wrapper.** There is no v3 refresh indicator yet;
   when one is added it goes in the package, not in a screen. Its `edgeOffset`
