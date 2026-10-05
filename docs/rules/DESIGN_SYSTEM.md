@@ -418,6 +418,13 @@ one that opens a sheet of verbs.
   own layout; each wraps its content in a `Row` with the glyph as the last
   child, rather than growing a private idea of what a tappable card looks
   like.
+- **The order card carries its glyph on the title row, not in a column of
+  its own.** Owner's rule. Its glyph was a column the full height of a card
+  several lines tall, so everything under the title gave up that width:
+  the badges, the profit line and the Ship it button sat with
+  `SdContentPaddingV3.card` on the left and that inset plus the glyph on the
+  right. The title row ends in the chevron, and every line below it
+  spans the card's full content width, so both side insets match.
 - **The end glyph is `AppRowChevron`, and nothing draws one inline.** Owner's
   rule. Five call sites had grown their own — three at `smallSize` in
   `textTertiary`, one a raw `Icon` at Material's default in `textSecondary` —
