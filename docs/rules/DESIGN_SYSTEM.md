@@ -143,6 +143,9 @@ five, so the bar behaves one way wherever it is.
     scroll before the bar is gone; stopping there left it stuck half way.
   - **The bounce settling back is ignored.** It is the list, not the seller,
     and reading it as a scroll up brought the bar straight back.
+  - **A list that fits on screen never moves it.** With nothing to scroll,
+    the only motion is iOS's rubber band, and following it dragged the bar a
+    few points down and left it hanging there for as long as the finger was.
   Owner's rule, given after the first version — a timed slide fired on each
   change of direction — bounced with every tremor of the thumb.
 - **No fade.** An opacity layer over the glass re-renders its refraction
