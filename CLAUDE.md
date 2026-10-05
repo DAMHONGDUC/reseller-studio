@@ -592,13 +592,15 @@ feature's own `CLAUDE.md`.
   `home_screen.dart` + `home_screen_needs_attention.dart` with
   `part of 'home_screen.dart';`.
 - **Every screen with a create action uses the same button Inventory does.**
-  Owner's rule. That is `SdFabV3` in the floating-action slot — a labelled
-  button that keeps its label and its place, with no animation while the list
-  or the tab bar moves — via `AppAddFabScaffold` (`core/widgets/`), never an
-  `IconButton` in the app bar. An add hidden behind a 24pt glyph in the corner
-  is one a seller has to hunt for, and a create action that is hard to find is
-  one they stop using. Same button, same place, every screen: Inventory,
-  Categories, Locations, Sources, Purchases, Expenses.
+  Owner's rule. That is `SdFabV3` in the floating-action slot — a filled
+  circle carrying a `+` and **no title**, which keeps its place with no
+  animation while the list or the tab bar moves — via `AppAddFabScaffold`
+  (`core/widgets/`), never an `IconButton` in the app bar. A filled circle in
+  the brand colour is found at a glance where a 24pt glyph in the app bar
+  corner is hunted for, and a create action that is hard to find is one they
+  stop using. The label survives as what a screen reader says. Same button,
+  same place, every screen: Inventory, Categories, Locations, Sources,
+  Purchases, Expenses.
   - `floatingNav: true` **only on the five tab screens** — a pushed route has
     nothing floating over it, and adding the inset there leaves the button
     hovering in dead space (`docs/rules/DESIGN_SYSTEM.md`).

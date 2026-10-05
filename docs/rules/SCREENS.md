@@ -25,7 +25,7 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   passes `automaticallyImplyLeading: false` so the framework cannot add a
   second one on top of it.
 - **A screen with a create action gets it through `AppAddFabScaffold`** — the
-  labelled `SdFabV3`, same button, same place, every screen. That is an
+  `+` `SdFabV3` with no title, same button, same place, every screen. That is an
   always-apply rule and it lives in the root `CLAUDE.md`; the design-system
   half is in `DESIGN_SYSTEM.md`.
 - **A screen with content and an action button pins that button to the bottom**

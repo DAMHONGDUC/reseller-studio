@@ -105,7 +105,7 @@ re-argued.
 - **"No FAB on a screen with the floating nav" — inverted.** There, the pill
   overlays the content and eats the tap, so every tab puts its primary action
   in the app bar. Here the opposite is an owner's rule: **every screen that
-  creates something uses the same labelled `SdFabV3`**, tab screens included,
+  creates something uses the same `+` `SdFabV3`**, tab screens included,
   and `AppAddFabScaffold` lifts it clear by `floatingBarInset` so the glass
   never covers it. The reasoning is the product's, not the layout's — a seller
   adds inventory dozens of times a day, and a create action hidden behind a

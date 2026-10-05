@@ -369,19 +369,19 @@ Owner's rules, all of them read from one place so no screen types them:
   lands inside the glass tab bar instead of above it. The presenter draws
   into the root overlay, which is also what lets a message outlive the route
   that raised it — pop first, then call it.
-- **The FAB is `SdFabV3`, never Material's, and it does not animate.**
-  Owner's rule, and it **reverses "sheds its label while the list is
-  moving"**: the button keeps its label and its place whatever the list or
-  the tab bar is doing. A control that changes shape under the thumb is one
-  the seller has to find again, and it never hides. A create action a seller
-  has to hunt for is one they stop using.
+- **The FAB is `SdFabV3`, never Material's: a `+` in a filled circle, no
+  title, no animation.** Owner's rules, and they **reverse "sheds its label
+  while the list is moving"** and then the label itself. The button keeps
+  its shape and its place whatever the list or the tab bar is doing — a
+  control that changes shape under the thumb is one the seller has to find
+  again — and it never hides. Its label is the semantics name only, so the
+  button is not anonymous to a screen reader.
 - **Every screen that creates something uses that same button, in that same
   place.** Owner's rule. Not an `IconButton` in the app bar, not a row at the
-  bottom of a list — the labelled FAB Inventory has. `AppAddFabScaffold`
+  bottom of a list — the `+` FAB Inventory has. `AppAddFabScaffold`
   (`lib/core/widgets/app_add_fab_scaffold.dart`) is the one implementation:
-  it owns the scroll notifier, installs the `NotificationListener` around the
-  body, and lifts the button clear of the floating tab bar when the screen is
-  a tab. Screens pass a label and a callback and get the behaviour.
+  it places the button and lifts it clear of the floating tab bar when the
+  screen is a tab. Screens pass a semantics label and a callback.
   - **`floatingNav` is true on the five tab screens and false everywhere
     else.** A pushed route has no glass bar under it, so the inset would leave
     the button hovering above nothing.
