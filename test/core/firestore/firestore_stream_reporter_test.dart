@@ -24,6 +24,12 @@ class _RecordingReporter implements SdCrashReporter {
   }
 
   @override
+  void recordFatal(String reason, {Object? error, StackTrace? stackTrace}) {}
+
+  @override
+  void log(String message) {}
+
+  @override
   void setUserId(String? uid) {}
 }
 

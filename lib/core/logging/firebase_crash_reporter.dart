@@ -50,6 +50,18 @@ final class FirebaseCrashReporter implements SdCrashReporter {
   }
 
   @override
+  void recordFatal(String reason, {Object? error, StackTrace? stackTrace}) {
+    _crashlytics
+        .recordError(error ?? reason, stackTrace, reason: reason, fatal: true)
+        .ignore();
+  }
+
+  @override
+  void log(String message) {
+    _crashlytics.log(message).ignore();
+  }
+
+  @override
   void setUserId(String? uid) {
     _crashlytics.setUserIdentifier(uid ?? '').ignore();
   }
