@@ -74,7 +74,7 @@ decide it, and they are listed in the order they outrank each other.
    it costs the seller who came to read nothing.
 
 **Home is taller than a phone, so a section-order test cannot read pixels.**
-A lazy sliver list estimates the extent of every child it has not built, which
+A lazy `ListView` estimates the extent of every child it has not built, which
 makes `position.pixels` a moving target rather than an absolute coordinate —
 two scrolled measurements compared against each other reported the wrong
 order outright. `home_section_order_test.dart` scrolls from the top and
