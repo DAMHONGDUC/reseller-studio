@@ -136,7 +136,13 @@ five, so the bar behaves one way wherever it is.
   at any moment, so the list keeps reserving its footprint — the "no content
   is ever covered" rule above holds in both states. The bar is translated,
   never removed from layout.
-- Reduce Motion moves it without the slide.
+- **It follows the finger, then settles.** The bar moves by exactly as much
+  as the list does, and a release finishes it whichever way it was nearer.
+  Owner's rule, given after the first version — a timed slide fired on each
+  change of direction — bounced with every tremor of the thumb.
+- **No fade.** An opacity layer over the glass re-renders its refraction
+  offscreen on every frame of the slide; the bar is only ever translated.
+- Reduce Motion settles it without the slide.
 
 #### The bar is glyphs only — no words on any tab
 
