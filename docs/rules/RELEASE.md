@@ -76,6 +76,14 @@ second derivation step.
 is deliberate and it leaves the working tree dirty: the installed file pins one
 flavour, so **never commit it**.
 
+**A change to the tracked `Info.plist` goes into both `env_assets/*-Info.plist`
+in the same turn.** The next `make env-<flavour>` replaces the file whole, so a
+fix made only to the tracked copy is undone by the next flavour switch — which
+is how the locales and the portrait lock were lost twice. The flavour files
+should differ from the tracked one in the Google sign-in callback and nothing
+else; `portrait_orientation_test` and `shipping_locales_test` read the
+installed file and fail when they drift.
+
 ## No one ever archives from Xcode
 
 `packages/script-tools/flutter/build_ipa.sh` — `make build-ipa-dev` / `make build-ipa-prod` — is the only place an archive is made, and **the fastlane
