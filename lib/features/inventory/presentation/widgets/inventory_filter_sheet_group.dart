@@ -151,6 +151,7 @@ class _StatusGroup extends ConsumerWidget {
       ref.watch(itemsProvider).value ?? const <Item>[],
       query: ref.watch(inventorySearchProvider),
       now: ref.watch(clockProvider).now(),
+      staleThreshold: ref.watch(staleThresholdProvider),
     );
 
     return AppFilterChipGroup<ItemStatusFilter>(

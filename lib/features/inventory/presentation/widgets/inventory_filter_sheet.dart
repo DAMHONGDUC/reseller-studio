@@ -9,6 +9,7 @@ import '../../../../core/time/app_clock.dart';
 import '../../../../core/widgets/app_filter_chip_group.dart';
 import '../../../../core/widgets/app_filter_sheet_actions.dart';
 import '../../../sourcing/providers.dart';
+import '../../../workspace/providers.dart';
 import '../../domain/entities/item.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/item_filter_criteria.dart';

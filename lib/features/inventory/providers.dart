@@ -240,11 +240,13 @@ final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
   final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
   final DateTime now = ref.watch(clockProvider).now();
+  final Duration staleThreshold = ref.watch(staleThresholdProvider);
 
   return items
       .where(
         (Item item) =>
-            criteria.matches(item, now: now) && ItemSearch.matches(item, query),
+            criteria.matches(item, now: now, staleThreshold: staleThreshold) &&
+            ItemSearch.matches(item, query),
       )
       .toList();
 });

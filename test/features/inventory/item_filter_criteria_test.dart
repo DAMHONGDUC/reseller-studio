@@ -7,11 +7,13 @@ import 'package:reseller_studio/features/inventory/domain/entities/item_filter_c
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status_filter.dart';
 import 'package:reseller_studio/features/inventory/item_filter_constant.dart';
+import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
 
 /// What Inventory's filter sheet asks of an item, and what it tells the
 /// seller it is asking.
 void main() {
   final DateTime now = DateTime(2026, 8, 31);
+  const Duration threshold = StaleInventoryPolicy.defaultThreshold;
 
   Item itemWith({
     ItemStatus status = ItemStatus.inStock,
@@ -41,7 +43,14 @@ void main() {
 
   group('an empty criteria', () {
     test('matches every item and counts as no filters', () {
-      expect(ItemFilterCriteria.none.matches(itemWith(), now: now), isTrue);
+      expect(
+        ItemFilterCriteria.none.matches(
+          itemWith(),
+          now: now,
+          staleThreshold: threshold,
+        ),
+        isTrue,
+      );
       expect(ItemFilterCriteria.none.activeCount, 0);
       expect(ItemFilterCriteria.none.isActive, isFalse);
     });
@@ -53,9 +62,20 @@ void main() {
         categoryIds: <String>{'cat-1'},
       );
 
-      expect(criteria.matches(itemWith(categoryId: 'cat-1'), now: now), isTrue);
       expect(
-        criteria.matches(itemWith(categoryId: 'cat-2'), now: now),
+        criteria.matches(
+          itemWith(categoryId: 'cat-1'),
+          now: now,
+          staleThreshold: threshold,
+        ),
+        isTrue,
+      );
+      expect(
+        criteria.matches(
+          itemWith(categoryId: 'cat-2'),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isFalse,
       );
     });
@@ -68,8 +88,14 @@ void main() {
         categoryIds: <String>{ItemFilterConstant.unassignedId},
       );
 
-      expect(named.matches(itemWith(), now: now), isFalse);
-      expect(unassigned.matches(itemWith(), now: now), isTrue);
+      expect(
+        named.matches(itemWith(), now: now, staleThreshold: threshold),
+        isFalse,
+      );
+      expect(
+        unassigned.matches(itemWith(), now: now, staleThreshold: threshold),
+        isTrue,
+      );
     });
   });
 
@@ -82,12 +108,19 @@ void main() {
         cost: PresenceFilter.present,
       );
 
-      expect(missing.matches(itemWith(), now: now), isTrue);
-      expect(recorded.matches(itemWith(), now: now), isFalse);
+      expect(
+        missing.matches(itemWith(), now: now, staleThreshold: threshold),
+        isTrue,
+      );
+      expect(
+        recorded.matches(itemWith(), now: now, staleThreshold: threshold),
+        isFalse,
+      );
       expect(
         recorded.matches(
           itemWith(purchasePrice: const Money(1000, 'USD')),
           now: now,
+          staleThreshold: threshold,
         ),
         isTrue,
       );
@@ -98,9 +131,16 @@ void main() {
         listed: PresenceFilter.absent,
       );
 
-      expect(never.matches(itemWith(), now: now), isTrue);
       expect(
-        never.matches(itemWith(listedAt: DateTime(2026, 7, 1)), now: now),
+        never.matches(itemWith(), now: now, staleThreshold: threshold),
+        isTrue,
+      );
+      expect(
+        never.matches(
+          itemWith(listedAt: DateTime(2026, 7, 1)),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isFalse,
       );
     });
@@ -110,11 +150,15 @@ void main() {
         photos: PresenceFilter.present,
       );
 
-      expect(withPhotos.matches(itemWith(), now: now), isFalse);
+      expect(
+        withPhotos.matches(itemWith(), now: now, staleThreshold: threshold),
+        isFalse,
+      );
       expect(
         withPhotos.matches(
           itemWith(photoUrls: const <String>['a.jpg']),
           now: now,
+          staleThreshold: threshold,
         ),
         isTrue,
       );
@@ -128,11 +172,19 @@ void main() {
       );
 
       expect(
-        lastWeek.matches(itemWith(createdAt: DateTime(2026, 8, 30)), now: now),
+        lastWeek.matches(
+          itemWith(createdAt: DateTime(2026, 8, 30)),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isTrue,
       );
       expect(
-        lastWeek.matches(itemWith(createdAt: DateTime(2026, 8, 1)), now: now),
+        lastWeek.matches(
+          itemWith(createdAt: DateTime(2026, 8, 1)),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isFalse,
       );
     });
@@ -156,20 +208,47 @@ void main() {
       );
 
       expect(
-        stale.matches(itemWith(listedAt: DateTime(2026, 5, 1)), now: now),
+        stale.matches(
+          itemWith(listedAt: DateTime(2026, 5, 1)),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isTrue,
       );
       expect(
-        stale.matches(itemWith(listedAt: DateTime(2026, 8, 20)), now: now),
+        stale.matches(
+          itemWith(listedAt: DateTime(2026, 8, 20)),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isFalse,
       );
-      expect(stale.matches(itemWith(), now: now), isFalse);
+      expect(
+        stale.matches(itemWith(), now: now, staleThreshold: threshold),
+        isFalse,
+      );
       expect(
         stale.matches(
           itemWith(status: ItemStatus.sold, listedAt: DateTime(2026, 5, 1)),
           now: now,
+          staleThreshold: threshold,
         ),
         isFalse,
+      );
+    });
+
+    test('Stale follows the business threshold, not the default', () {
+      const ItemFilterCriteria stale = ItemFilterCriteria(
+        statuses: <ItemStatusFilter>{ItemStatusFilter.stale},
+      );
+      // Listed 40 days before `now`: fresh at the 60-day default, stale for a
+      // business that chose 30.
+      final Item item = itemWith(listedAt: DateTime(2026, 7, 22));
+
+      expect(stale.matches(item, now: now, staleThreshold: threshold), isFalse);
+      expect(
+        stale.matches(item, now: now, staleThreshold: const Duration(days: 30)),
+        isTrue,
       );
     });
 
@@ -182,14 +261,25 @@ void main() {
       );
 
       expect(
-        criteria.matches(itemWith(status: ItemStatus.draft), now: now),
+        criteria.matches(
+          itemWith(status: ItemStatus.draft),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isTrue,
       );
       expect(
-        criteria.matches(itemWith(listedAt: DateTime(2026, 5, 1)), now: now),
+        criteria.matches(
+          itemWith(listedAt: DateTime(2026, 5, 1)),
+          now: now,
+          staleThreshold: threshold,
+        ),
         isTrue,
       );
-      expect(criteria.matches(itemWith(), now: now), isFalse);
+      expect(
+        criteria.matches(itemWith(), now: now, staleThreshold: threshold),
+        isFalse,
+      );
     });
 
     test('a count ignores the status group but not the others', () {
@@ -205,6 +295,7 @@ void main() {
         ],
         query: '',
         now: now,
+        staleThreshold: threshold,
       );
 
       expect(counts[ItemStatusFilter.inStock], 1);

@@ -39,6 +39,7 @@ void main() {
         body: ItemCard(
           item: item,
           now: testNow,
+          staleThreshold: StaleInventoryPolicy.defaultThreshold,
           isSelecting: isSelecting,
           onReprice: () => taps.add('reprice'),
           onMarketPrices: () => taps.add('market'),

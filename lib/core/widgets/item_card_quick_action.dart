@@ -13,6 +13,7 @@ class _QuickAction extends StatelessWidget {
   const _QuickAction({
     required this.item,
     required this.now,
+    required this.staleThreshold,
     required this.listings,
     this.onReprice,
     this.onMarketPrices,
@@ -20,6 +21,7 @@ class _QuickAction extends StatelessWidget {
 
   final Item item;
   final DateTime now;
+  final Duration staleThreshold;
   final List<Listing> listings;
   final VoidCallback? onReprice;
   final VoidCallback? onMarketPrices;
@@ -28,11 +30,12 @@ class _QuickAction extends StatelessWidget {
   static bool shows({
     required Item item,
     required DateTime now,
+    required Duration staleThreshold,
     required List<Listing> listings,
     required VoidCallback? onReprice,
     required VoidCallback? onMarketPrices,
   }) =>
-      (onReprice != null && _StateBadges.isStale(item, now)) ||
+      (onReprice != null && _StateBadges.isStale(item, now, staleThreshold)) ||
       (onMarketPrices != null && _isUnlisted(item, listings));
 
   static bool _isUnlisted(Item item, List<Listing> listings) =>
@@ -41,7 +44,8 @@ class _QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool reprice = onReprice != null && _StateBadges.isStale(item, now);
+    final bool reprice =
+        onReprice != null && _StateBadges.isStale(item, now, staleThreshold);
 
     return Align(
       alignment: AlignmentDirectional.centerEnd,

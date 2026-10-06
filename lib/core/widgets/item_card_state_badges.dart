@@ -18,24 +18,30 @@ class _StateBadges extends StatelessWidget {
   const _StateBadges({
     required this.item,
     required this.now,
+    required this.staleThreshold,
     required this.listings,
   });
 
   final Item item;
   final DateTime now;
+  final Duration staleThreshold;
   final List<Listing> listings;
 
   /// Stale is a question about stock that went live and did not move, so it
   /// asks the clock rather than the status: `listed` is not a state any more.
   ///
   /// The card asks it too, for its tinted edge, so there is one answer.
-  static bool isStale(Item item, DateTime now) =>
+  static bool isStale(Item item, DateTime now, Duration threshold) =>
       item.status.isOnHand &&
-      StaleInventoryPolicy.isStale(item.listedAt, now: now);
+      StaleInventoryPolicy.isStale(
+        item.listedAt,
+        now: now,
+        threshold: threshold,
+      );
 
   @override
   Widget build(BuildContext context) {
-    final bool isStale = _StateBadges.isStale(item, now);
+    final bool isStale = _StateBadges.isStale(item, now, staleThreshold);
     final int marketCount = ListingMarketplaces.of(listings).length;
     // An item that has left inventory is not late for anything, so the second
     // line goes with it rather than holding a gap.

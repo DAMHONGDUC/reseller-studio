@@ -89,10 +89,17 @@ class ItemFilterCriteria {
   bool get isActive => activeCount > 0;
 
   /// Whether [item] survives every group at once.
-  bool matches(Item item, {required DateTime now}) {
+  ///
+  /// [staleThreshold] is the business's own, for the Stale status option.
+  bool matches(
+    Item item, {
+    required DateTime now,
+    required Duration staleThreshold,
+  }) {
     if (statuses.isNotEmpty &&
         !statuses.any(
-          (ItemStatusFilter status) => status.matches(item, now: now),
+          (ItemStatusFilter status) =>
+              status.matches(item, now: now, staleThreshold: staleThreshold),
         )) {
       return false;
     }
@@ -116,19 +123,27 @@ class ItemFilterCriteria {
     List<Item> items, {
     required String query,
     required DateTime now,
+    required Duration staleThreshold,
   }) {
     final ItemFilterCriteria others = cleared(ItemFilterGroup.status);
     final List<Item> pool = items
         .where(
           (Item item) =>
-              others.matches(item, now: now) && ItemSearch.matches(item, query),
+              others.matches(item, now: now, staleThreshold: staleThreshold) &&
+              ItemSearch.matches(item, query),
         )
         .toList();
 
     return <ItemStatusFilter, int>{
       for (final ItemStatusFilter status in ItemStatusFilter.values)
         status: pool
-            .where((Item item) => status.matches(item, now: now))
+            .where(
+              (Item item) => status.matches(
+                item,
+                now: now,
+                staleThreshold: staleThreshold,
+              ),
+            )
             .length,
     };
   }

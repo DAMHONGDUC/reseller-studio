@@ -46,6 +46,7 @@ class ItemCard extends StatelessWidget {
   const ItemCard({
     required this.item,
     required this.now,
+    required this.staleThreshold,
     this.listings = const <Listing>[],
     this.onTap,
     this.onLongPress,
@@ -70,6 +71,10 @@ class ItemCard extends StatelessWidget {
   /// Passed in rather than read from the clock, so every row in one build
   /// agrees about what "stale" means and a widget test can pin it.
   final DateTime now;
+
+  /// The business's own stale threshold (`staleThresholdProvider`), so the
+  /// badge, the edge and Reprice agree with Home and the Status filter.
+  final Duration staleThreshold;
 
   final VoidCallback? onTap;
 
@@ -130,7 +135,7 @@ class ItemCard extends StatelessWidget {
         // - stale: the warning edge repeats the Stale badge on the card
         borderColor: isSelected
             ? context.colorScheme3.primary
-            : _StateBadges.isStale(item, now)
+            : _StateBadges.isStale(item, now, staleThreshold)
             ? context.sdTheme3.warning
             : null,
         // The card holds no inset of its own: the hairline between its two
@@ -177,7 +182,12 @@ class ItemCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: ItemCardMetricConstant.titleGap),
-                        _StateBadges(item: item, now: now, listings: listings),
+                        _StateBadges(
+                          item: item,
+                          now: now,
+                          staleThreshold: staleThreshold,
+                          listings: listings,
+                        ),
                         _UpdatedLine(
                           item: item,
                           warnings: warnings,
@@ -216,6 +226,7 @@ class ItemCard extends StatelessWidget {
                 _QuickAction.shows(
                   item: item,
                   now: now,
+                  staleThreshold: staleThreshold,
                   listings: listings,
                   onReprice: onReprice,
                   onMarketPrices: onMarketPrices,
@@ -225,6 +236,7 @@ class ItemCard extends StatelessWidget {
                 child: _QuickAction(
                   item: item,
                   now: now,
+                  staleThreshold: staleThreshold,
                   listings: listings,
                   onReprice: onReprice,
                   onMarketPrices: onMarketPrices,

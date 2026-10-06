@@ -22,12 +22,21 @@ enum ItemStatusFilter {
   /// The status this option is, or null for the one that is a query.
   final ItemStatus? status;
 
-  /// Whether [item] is under this option.
-  bool matches(Item item, {required DateTime now}) => switch (status) {
+  /// Whether [item] is under this option. [staleThreshold] is the
+  /// business's own (`staleThresholdProvider`), never the default.
+  bool matches(
+    Item item, {
+    required DateTime now,
+    required Duration staleThreshold,
+  }) => switch (status) {
     final ItemStatus status => item.status == status,
     null =>
       item.status.isOnHand &&
-          StaleInventoryPolicy.isStale(item.listedAt, now: now),
+          StaleInventoryPolicy.isStale(
+            item.listedAt,
+            now: now,
+            threshold: staleThreshold,
+          ),
   };
 }
 

@@ -18,6 +18,7 @@ import '../../../../inventory/providers.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/services/listings_by_item.dart';
 import '../../../../listings/providers.dart';
+import '../../../../workspace/providers.dart';
 import '../../../providers.dart';
 import '../../widgets/cannot_sell_sheet.dart';
 

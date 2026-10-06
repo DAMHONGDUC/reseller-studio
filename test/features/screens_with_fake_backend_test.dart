@@ -18,6 +18,7 @@ import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/more/presentation/screens/more_screen/more_screen.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/workspace/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../support/add_button_finder.dart';
@@ -120,6 +121,7 @@ void main() {
             items,
             query: '',
             now: container.read(clockProvider).now(),
+            staleThreshold: container.read(staleThresholdProvider),
           );
 
       expect(items, hasLength(11));

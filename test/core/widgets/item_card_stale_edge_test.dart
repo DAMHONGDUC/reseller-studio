@@ -36,6 +36,7 @@ void main() {
         body: ItemCard(
           item: item,
           now: testNow,
+          staleThreshold: StaleInventoryPolicy.defaultThreshold,
           isSelected: isSelected,
           isSelecting: isSelected,
         ),

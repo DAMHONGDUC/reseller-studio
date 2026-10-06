@@ -101,6 +101,7 @@ class _SaleItemRow extends ConsumerWidget {
       item: item,
       listings: listings,
       now: now,
+      staleThreshold: ref.watch(staleThresholdProvider),
       isSelected: isSelected,
       isSelecting: isSelecting,
       // Short, because it is a tag beside the date: the reason in full is what

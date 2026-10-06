@@ -27,6 +27,7 @@ import '../../../../subscription/domain/enums/plan_allowance.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';
+import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_filter_criteria.dart';
 import '../../../domain/entities/storage_location.dart';

@@ -7,6 +7,7 @@ import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
 
 import '../../support/pump_app.dart';
 
@@ -49,7 +50,12 @@ void main() {
 
     await pumpScreen(
       tester,
-      ItemCard(item: item, now: testNow, listings: listings),
+      ItemCard(
+        item: item,
+        now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
+        listings: listings,
+      ),
     );
 
     expect(find.text('2 markets'), findsOneWidget);
