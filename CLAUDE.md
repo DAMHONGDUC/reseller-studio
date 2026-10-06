@@ -877,6 +877,11 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
   local; pushing is the irreversible half and it is the owner's to call. That
   includes the `packages/flutter-system-design-kit` and `packages/script-tools`
   submodules — commit there too, and leave them unpushed unless told otherwise.
+- **Never commit `ios/Runner/Info.plist` changes a flavour wrote into it.**
+  Owner's rule. `prepare_env.sh` fills the Google sign-in URL scheme in place
+  of the checked-in `...` placeholder, so a local diff there is one flavour's
+  config, not a source change. Leave it unstaged; a deliberate edit to the
+  plist is the owner's to commit.
 - **Never add a `Co-Authored-By` trailer to a commit.** Owner's rule. The
   commit message describes the change, not who or what typed it.
 - **No tool, agent or model is ever named in a commit message or a PR.**
