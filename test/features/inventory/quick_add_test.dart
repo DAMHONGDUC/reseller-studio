@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:reseller_studio/core/widgets/app_list_row.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/presentation/controllers/quick_add_controller.dart';
@@ -140,6 +141,22 @@ void main() {
       // Hard rule 2 as a test: a second field appearing here is the change
       // that needs approval.
       expect(find.byType(SdTextFieldV3), findsOneWidget);
+    });
+
+    testWidgets('Scan sits in the body, not the app bar', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(tester, const QuickAddScreen());
+
+      // Owner's rule: a glyph in the bar corner is one the seller never spots.
+      expect(
+        find.descendant(
+          of: find.byType(SdAppBarV3),
+          matching: find.byType(SdAppBarActionButtonV3),
+        ),
+        findsNothing,
+      );
+      expect(find.widgetWithText(AppListRow, 'Scan'), findsOneWidget);
     });
 
     testWidgets('the item ceiling blocks Save with the Premium gate', (

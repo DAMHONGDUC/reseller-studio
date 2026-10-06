@@ -6,6 +6,7 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -103,18 +104,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
     final QuickAddState state = ref.watch(quickAddControllerProvider);
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: context.l10n.quickAddTitle,
-        actions: <Widget>[
-          // For the seller who opened this and then found the item already
-          // carries a code: the scanner finds it, or starts it pre-filled.
-          SdAppBarActionButtonV3(
-            icon: AppIconConstant.barcodeScanner,
-            tooltip: context.l10n.inventoryScan,
-            onPressed: () => context.push(AppRoutes.scanner),
-          ),
-        ],
-      ),
+      appBar: SdAppBarV3(title: context.l10n.quickAddTitle),
       body: Column(
         children: <Widget>[
           Expanded(
@@ -141,6 +131,19 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                   onSubmitted: (_) {
                     if (state.canSubmit) _submit();
                   },
+                ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                // In the body, not the app bar (owner's rule): for the seller
+                // who found the item already carries a code.
+                AppListCard(
+                  children: <Widget>[
+                    AppListRow(
+                      icon: AppIconConstant.barcodeScanner,
+                      title: context.l10n.inventoryScan,
+                      subtitle: context.l10n.inventoryAddScanCaption,
+                      onTap: () => context.push(AppRoutes.scanner),
+                    ),
+                  ],
                 ),
               ],
             ),
