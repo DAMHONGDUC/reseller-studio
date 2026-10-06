@@ -146,6 +146,10 @@ ios/fastlane/ExportOptions.plist
 *_tmp_test.dart
 test/**/shots/
 
+# `tmp/` — files the owner drops in for a session to look at: screen
+# recordings, screenshots. Never source, never a fixture.
+tmp/
+
 # Backups left beside the file they copy — `CLAUDE.md.orig.bak` and friends.
 # Made before a large rewrite so the original can be diffed against the
 # result; git already holds the committed history, so these never belong in it.
