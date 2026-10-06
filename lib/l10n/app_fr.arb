@@ -257,6 +257,7 @@
   "inventoryAddTitle": "Ajouter du stock",
   "inventoryAddQuickCaption": "Un article, un titre, c'est tout",
   "inventoryAddIntakeCaption": "Marchandise ou fournitures, avec le prix payé",
+  "inventoryAddScanCaption": "Retrouvez un article par son code, ou créez-en un nouveau",
   "itemPurchase": "Achat (facultatif)",
   "itemPurchaseEmptyHint": "Aucun achat enregistré pour l'instant",
   "itemAddPurchaseFirst": "Enregistrez d'abord un achat, dans Plus → Approvisionnement.",

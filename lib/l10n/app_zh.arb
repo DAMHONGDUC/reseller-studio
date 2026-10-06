@@ -257,6 +257,7 @@
   "inventoryAddTitle": "添加库存",
   "inventoryAddQuickCaption": "一件商品，一个标题，搞定",
   "inventoryAddIntakeCaption": "货品或材料，连同你支付的金额",
+  "inventoryAddScanCaption": "按编码找到已有的商品，或新建一件",
   "itemPurchase": "进货记录（可选）",
   "itemPurchaseEmptyHint": "还没有进货记录",
   "itemAddPurchaseFirst": "请先在 更多 → 进货 中记录一次进货。",

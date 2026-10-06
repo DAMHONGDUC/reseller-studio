@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -100,7 +103,18 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
     final QuickAddState state = ref.watch(quickAddControllerProvider);
 
     return SdScaffoldV3(
-      appBar: SdAppBarV3(title: context.l10n.quickAddTitle),
+      appBar: SdAppBarV3(
+        title: context.l10n.quickAddTitle,
+        actions: <Widget>[
+          // For the seller who opened this and then found the item already
+          // carries a code: the scanner finds it, or starts it pre-filled.
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.barcodeScanner,
+            tooltip: context.l10n.inventoryScan,
+            onPressed: () => context.push(AppRoutes.scanner),
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           Expanded(

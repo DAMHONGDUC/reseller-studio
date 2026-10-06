@@ -257,6 +257,7 @@
   "inventoryAddTitle": "Bestand hinzufügen",
   "inventoryAddQuickCaption": "Ein Artikel, ein Titel, fertig",
   "inventoryAddIntakeCaption": "Ware oder Material, mit dem, was du bezahlt hast",
+  "inventoryAddScanCaption": "Finde Vorhandenes per Code oder lege etwas Neues an",
   "itemPurchase": "Einkauf (optional)",
   "itemPurchaseEmptyHint": "Noch keine Einkäufe erfasst",
   "itemAddPurchaseFirst": "Erfasse zuerst einen Einkauf unter Mehr → Einkauf.",

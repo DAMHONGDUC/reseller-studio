@@ -1087,6 +1087,10 @@
   "@inventoryAddIntakeCaption": {
     "description": "Caption for the intake session on the Inventory add sheet — the flow that ties items to a purchase."
   },
+  "inventoryAddScanCaption": "Find what you own by its code, or start something new",
+  "@inventoryAddScanCaption": {
+    "description": "Caption for Scan on the Add stock sheet — a code either finds an item the seller already has or starts a new one."
+  },
   "itemPurchase": "Purchase (optional)",
   "@itemPurchase": {
     "description": "Which purchase this item came off. Optional like every create field (hard rule 2)."

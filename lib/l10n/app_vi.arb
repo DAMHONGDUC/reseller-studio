@@ -257,6 +257,7 @@
   "inventoryAddTitle": "Thêm hàng",
   "inventoryAddQuickCaption": "Một món, một tiêu đề, xong",
   "inventoryAddIntakeCaption": "Hàng hoặc vật tư, kèm số tiền bạn đã trả",
+  "inventoryAddScanCaption": "Tìm món bạn đã có bằng mã, hoặc tạo món mới",
   "itemPurchase": "Lần nhập hàng (không bắt buộc)",
   "itemPurchaseEmptyHint": "Chưa ghi lần nhập hàng nào",
   "itemAddPurchaseFirst": "Hãy ghi một lần nhập hàng trước, trong Thêm → Nguồn hàng.",

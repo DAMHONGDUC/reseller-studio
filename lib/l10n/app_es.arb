@@ -257,6 +257,7 @@
   "inventoryAddTitle": "Añadir existencias",
   "inventoryAddQuickCaption": "Un artículo, un título y listo",
   "inventoryAddIntakeCaption": "Mercancía o materiales, con lo que pagaste",
+  "inventoryAddScanCaption": "Encuentra lo que tienes por su código o empieza algo nuevo",
   "itemPurchase": "Compra (opcional)",
   "itemPurchaseEmptyHint": "Aún no hay compras registradas",
   "itemAddPurchaseFirst": "Primero registra una compra, en Más → Abastecimiento.",

@@ -257,6 +257,7 @@
   "inventoryAddTitle": "Adicionar estoque",
   "inventoryAddQuickCaption": "Um item, um título, pronto",
   "inventoryAddIntakeCaption": "Mercadoria ou materiais, com o valor que você pagou",
+  "inventoryAddScanCaption": "Encontre o que você tem pelo código ou comece algo novo",
   "itemPurchase": "Compra (opcional)",
   "itemPurchaseEmptyHint": "Nenhuma compra registrada ainda",
   "itemAddPurchaseFirst": "Registre uma compra primeiro, em Mais → Garimpo.",
