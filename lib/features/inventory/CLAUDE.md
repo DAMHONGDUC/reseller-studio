@@ -502,15 +502,16 @@ Owner's rule, and it replaces the six-state lifecycle:
   for a buyer was a state nothing in the app could act on. Cross-listing no
   longer moves the status — `ItemTransition.markListed` stamps `listedAt` and
   turns a draft into stock, and that timestamp is what staleness, the Stale
-  tab and Home's progress read.
+  filter and Home's progress read.
 - **A document written before the change still reads.** `ItemDto` folds
   `listed` and `reserved` into `inStock`; nothing rewrites them until the item
   is next saved, and no migration runs.
 - **`isListable` now means `isOnHand`.** A draft can be put on a marketplace —
   listing it is what makes it stock. What cannot is an item that has left
   inventory.
-- **The Inventory tabs follow**: All, Draft, In stock, Sold, Stale. Stale is
-  still a query, not a status (`docs/DATA_MODEL.md`).
+- **The Status filter follows**: Draft, In stock, Sold, Archived, and Stale
+  as one more option (`ItemStatusFilter`). There are no tabs; Stale is still
+  a query, not a status (`docs/DATA_MODEL.md`, `docs/rules/SCREENS.md`).
 
 ## There is no Restock verb; the count is edited on the detail screen
 
