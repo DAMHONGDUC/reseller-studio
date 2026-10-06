@@ -67,6 +67,11 @@ with background they did not ask for, and don't narrate the options that were
 not taken. Two labelled rows and a sentence each beat three paragraphs saying
 the same thing.
 
+**A reply to the owner is in Vietnamese, short, and shaped as bullets or a
+table.** Owner's rule. No paragraphs, no padding — the same reason as the
+rule above, applied to every answer in chat. Documents in the repo stay in
+English.
+
 **`env/` is off limits, with exactly one exception: `env/env.example.json`.**
 Owner's rule. Never read, write, move or rename anything else in there —
 `dev.json` and `prod.json` are the owner's filled-in config, and no session
