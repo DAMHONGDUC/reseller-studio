@@ -44,6 +44,30 @@ running total.
 
 `test/features/inventory/intake_session_test.dart` pins all four.
 
+## Add stock is one sheet, opened from Inventory and from Home
+
+Owner's rule. `AddStockSheet` (`core/widgets/`, because two features open it)
+offers **Quick add, Scan and Take stock in** — Inventory's create button and
+Home's Add stock shortcut both open it, so the two cannot offer different
+ways in.
+
+- **Scan is one of them** because a seller holding something unlabelled in
+  their hand does not yet know whether it is new stock or a thing they own.
+- **The plan gate runs when an option is picked, before its screen opens** —
+  the reason is the Quick Add rule above: refusing a title someone already
+  typed loses their work. Scan is not gated; it finds before it adds.
+- **Quick Add's app bar carries Scan too**, for the seller who opened it and
+  then found the item already had a code.
+
+## Stale reads the business's own threshold, everywhere
+
+Owner's rule. `Workspace.staleThresholdDays` is what the seller chose, and
+**every** reading of stale takes it from `staleThresholdProvider` — the
+Status filter's Stale option, the card's badge, its tinted edge and its
+Reprice button, as well as Home and Analytics. A card reading the 60-day
+default while Home read 30 told a seller five items were stale and then
+showed none of them.
+
 ## New-business category defaults
 
 Every new business starts with three normal category records: Clothing,

@@ -39,25 +39,27 @@ decide it, and they are listed in the order they outrank each other.
      this section exists to prevent.
    - Adding a sixth tile is a product decision — ask. The block works because
      it is short enough that every tile still reads as urgent.
-2. **The shortcut row follows it: three create actions, as buttons.** Owner's
-   rule, replacing the three shortcut cards (Quick Action, Search, Scan).
-   Quick add, Scan and Record sale are the three things a seller starts while
-   holding an item or a sale, so they get one tap from the first screen.
-   - **Quick add is the filled button; the other two are outlined.** One
-     primary per row — three equal weights said three things mattered equally.
-   - **Search left the row** because it is already the app bar's action, and
-     two ways to the same place on one screen is one too many.
-   - **Each button reuses its Quick Action row's words and route**, so the
-     button and the row it shortcuts can never disagree.
+2. **The shortcut row follows it: Add stock, Quick Action, Record sale.**
+   Owner's rule, and it **reverses "Quick add, Scan and Record sale"**.
+   - **Add stock is the filled button, and it opens `AddStockSheet`** —
+     Quick add, Scan and Take stock in, the same sheet Inventory's create
+     button opens (`lib/features/inventory/CLAUDE.md`). One tap still starts
+     any of the three; the sheet is what lets one button stand for them.
+   - **Quick Action scrolls Home to its Quick Action section**, rather than
+     opening anything. The section is the complete list, and this is the way
+     to it that does not need a scroll past every figure first.
+   - **Scan left the row for the app bar**, beside Search: it is a way to find
+     a thing as much as to add one, and it is also inside Add stock.
+   - **One primary per row** — Add stock is filled, the other two outlined.
    - **Three, and the list is closed.** A fourth makes the row a launcher.
      Adding one is a product decision — ask.
    - **Icon over label, not a pill.** "Enregistrer une vente" does not fit
      beside its icon at a third of a phone; stacked, a label takes two lines
      without the row changing shape.
-   - `HomeShortcutConstant` is the list;
-     `test/features/home/home_shortcuts_test.dart` holds the placement, that
-     each shortcut is a Quick Action row opening that row's route, and that
-     every label fits its button in every shipping locale.
+   - `HomeShortcut` is the list;
+     `test/features/home/home_shortcuts_test.dart` holds the placement, what
+     each button does, and that every label fits its button in every
+     shipping locale.
 3. **Getting started sits directly under the shortcut row, and wears a tinted
    edge.** Owner's rule. It is the only card on Home that asks the seller to
    do something rather than reporting on what they have done, and it is gone
@@ -87,10 +89,11 @@ order outright. `home_section_order_test.dart` scrolls from the top and
 compares the order sections *come into view* in, sorting anything that arrives
 in the same frame by its y within that frame.
 
-**Quick Action stays last on its own merit, not because a card scrolls to
-it.** The shortcut row no longer has a "Quick Action" button, so nothing
-depends on the section being at the end of the list — keep it there for the
-reason in point 6, not for a mechanism that is gone.
+**Quick Action stays last on its own merit**, for the reason in point 6. The
+shortcut row's Quick Action button scrolls to it wherever it sits, so the
+button is not a reason to keep it at the end — and **Home's body is built
+whole, not lazily**, because a lazy list has not built the section the button
+has to scroll to.
 
 ## Home never reports on a business that has not started
 
@@ -155,6 +158,8 @@ an `unknown`.
 
 ## Where Home sends the seller
 
+- **The app bar carries Search and Scan**, both `push`ed: each is a place to
+  go looking, and neither is a section of Home.
 - **Search is `push`; Analytics is `go`.** Search lives outside the shell and
   comes back here. Analytics is a tab, and pushing a branch root over Home
   leaves the seller on the wrong tab with a back button they should not have.
