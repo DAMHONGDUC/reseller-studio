@@ -56,8 +56,12 @@ ways in.
 - **The plan gate runs when an option is picked, before its screen opens** —
   the reason is the Quick Add rule above: refusing a title someone already
   typed loses their work. Scan is not gated; it finds before it adds.
-- **Quick Add's app bar carries Scan too**, for the seller who opened it and
-  then found the item already had a code.
+- **Quick Add carries Scan too, in its body under the title field — never
+  in the app bar.** Owner's rule, and it reverses the app-bar placement. It
+  is for the seller who opened Quick Add and then found the item already had
+  a code, and a 24pt glyph in the bar corner is one they never spot: a card
+  row beside the field they are already looking at is found without
+  hunting.
 
 ## Stale reads the business's own threshold, everywhere
 
