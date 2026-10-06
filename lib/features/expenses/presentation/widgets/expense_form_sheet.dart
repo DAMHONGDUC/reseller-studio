@@ -8,10 +8,12 @@ import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/permissions/permission_blocked.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/utils/mileage_unit_label.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../core/widgets/permission_settings_sheet.dart';
 import '../../../../core/widgets/picker_field.dart';
 import '../../../../core/widgets/receipt_field.dart';
 import '../../../listings/domain/enums/listing_status.dart';
@@ -81,6 +83,14 @@ class _ExpenseFormSheetState extends ConsumerState<ExpenseFormSheet> {
       if (url == null || !mounted) return;
 
       setState(() => _receiptUrl = url);
+    } on PermissionBlocked catch (blocked) {
+      // Logged where it was raised; the way out is Settings, not an error.
+      if (!mounted) return;
+
+      await PermissionSettingsSheet.show(
+        context,
+        permission: blocked.permission,
+      );
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;

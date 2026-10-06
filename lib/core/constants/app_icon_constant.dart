@@ -217,8 +217,14 @@ final class AppIconConstant {
   /// Open the main or overflow menu.
   static const IconData menu = Symbols.menu_rounded;
 
+  /// The camera refused for this app in the system Settings.
+  static const IconData noPhotography = Symbols.no_photography_rounded;
+
   /// Open or represent notifications.
   static const IconData notifications = Symbols.notifications_rounded;
+
+  /// Notifications refused for this app in the system Settings.
+  static const IconData notificationsOff = Symbols.notifications_off_rounded;
 
   /// Open content in an external destination.
   static const IconData openInNew = Symbols.open_in_new_rounded;

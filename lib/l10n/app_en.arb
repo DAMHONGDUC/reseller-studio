@@ -1762,7 +1762,7 @@
   "@scannerSwitchCamera": {
     "description": "Tooltip on the camera flip."
   },
-  "scannerHint": "Point at a barcode, a SKU label or a bin tag.",
+  "scannerHint": "Fit a barcode, a SKU label or a bin tag inside the frame.",
   "@scannerHint": {
     "description": "Names the three things a scan can match."
   },
@@ -3787,7 +3787,7 @@
   "@sourcingScanTitle": {
     "description": "Title of the camera opened from the purchase evaluator."
   },
-  "sourcingScanHint": "Point at the barcode. We check it against what you have sold before.",
+  "sourcingScanHint": "Fit the barcode inside the frame. We check it against what you have sold before.",
   "@sourcingScanHint": {
     "description": "Hint over the camera in the purchase evaluator."
   },
@@ -6681,5 +6681,45 @@
   "moreSectionGeneral": "General",
   "@moreSectionGeneral": {
     "description": "Heading of the first section on More, holding the account, theme, language and notification settings."
+  },
+  "permissionCameraTitle": "Camera access is off",
+  "@permissionCameraTitle": {
+    "description": "Title of the sheet shown when camera access is refused for good."
+  },
+  "permissionCameraMessage": "Reseller Studio uses the camera to scan barcodes and photograph items. Turn on Camera for Reseller Studio in Settings.",
+  "@permissionCameraMessage": {
+    "description": "Body of the camera-blocked sheet: what the camera is for, and where to turn it back on."
+  },
+  "permissionPhotosTitle": "Photo access is off",
+  "@permissionPhotosTitle": {
+    "description": "Title of the sheet shown when photo library access is refused for good."
+  },
+  "permissionPhotosMessage": "To attach photos you already have, turn on Photos for Reseller Studio in Settings.",
+  "@permissionPhotosMessage": {
+    "description": "Body of the photos-blocked sheet: what the library is for, and where to turn it back on."
+  },
+  "permissionNotificationsTitle": "Notifications are off",
+  "@permissionNotificationsTitle": {
+    "description": "Title of the sheet and of the Notification settings card when notifications are off for the app."
+  },
+  "permissionNotificationsMessage": "You won't hear about new orders or reminders on this phone. Turn on Notifications for Reseller Studio in Settings.",
+  "@permissionNotificationsMessage": {
+    "description": "Body of the notifications-blocked sheet: what is missed, and where to turn it back on."
+  },
+  "permissionOpenSettings": "Open Settings",
+  "@permissionOpenSettings": {
+    "description": "Primary button on a permission-blocked sheet; opens this app's page in the system Settings."
+  },
+  "permissionNotNow": "Not now",
+  "@permissionNotNow": {
+    "description": "Secondary button on a permission-blocked sheet; closes it."
+  },
+  "scannerAllowCamera": "Allow camera",
+  "@scannerAllowCamera": {
+    "description": "Button on the scanner when the camera is not allowed; asks again, or explains how to allow it in Settings."
+  },
+  "notificationSettingsBlockedDetail": "Nothing below reaches this phone until you turn them on in Settings.",
+  "@notificationSettingsBlockedDetail": {
+    "description": "Detail line of the card on Notification settings when the system has notifications off for the app."
   }
 }

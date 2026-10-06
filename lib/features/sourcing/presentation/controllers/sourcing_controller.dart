@@ -4,7 +4,9 @@ import 'package:system_design/common.dart';
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/permissions/permission_blocked.dart';
 import '../../../../core/providers/repository_providers.dart';
+import '../../../../core/providers/system_permissions_provider.dart';
 import '../../../../core/storage/document_picker.dart';
 import '../../../../core/storage/file_uploader.dart';
 import '../../../inventory/domain/entities/item.dart';
@@ -176,10 +178,14 @@ class SourcingController extends Notifier<bool> {
     try {
       return await DocumentPicker.pickAndUpload(
         uploader: ref.read(fileUploaderProvider),
+        permissions: ref.read(systemPermissionsProvider),
         folder: FileFolder.receipts,
         recordId: recordId,
         fromCamera: fromCamera,
       );
+    } on PermissionBlocked {
+      // Logged by `PhotoPicker`: a refusal is the seller's call, not a failure.
+      rethrow;
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.sourcing,

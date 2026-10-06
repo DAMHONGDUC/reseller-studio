@@ -6,9 +6,11 @@ import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/constants/date_picker_constant.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/permissions/permission_blocked.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/widgets/money_field.dart';
 import '../../../../core/widgets/option_picker_sheet.dart';
+import '../../../../core/widgets/permission_settings_sheet.dart';
 import '../../../../core/widgets/picker_field.dart';
 import '../../../../core/widgets/receipt_field.dart';
 import '../../../workspace/providers.dart';
@@ -62,6 +64,14 @@ class _PurchaseFormSheetState extends ConsumerState<PurchaseFormSheet> {
       if (url == null || !mounted) return;
 
       setState(() => _receiptUrl = url);
+    } on PermissionBlocked catch (blocked) {
+      // Logged where it was raised; the way out is Settings, not an error.
+      if (!mounted) return;
+
+      await PermissionSettingsSheet.show(
+        context,
+        permission: blocked.permission,
+      );
     } catch (error) {
       // Already logged by the controller.
       if (!mounted) return;

@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/permissions/app_permission.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_status_card.dart';
+import '../../../../../core/widgets/permission_settings_sheet.dart';
 import '../../../domain/entities/notification_preferences.dart';
 import '../../../domain/enums/notification_type.dart';
 import '../../../providers.dart';
 
+part 'notification_settings_screen_push_blocked.dart';
 part 'notification_settings_screen_row.dart';
 
 /// One switch per kind of reminder.
@@ -49,6 +54,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
             ),
           ),
           SizedBox(height: SdSpacingConstant.h16),
+          const _PushBlockedCard(),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: SdContentPaddingV3.horizontal,

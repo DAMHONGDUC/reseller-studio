@@ -18,6 +18,14 @@ class _PhotoStrip extends ConsumerWidget {
       await ref
           .read(itemFormControllerProvider.notifier)
           .addPhoto(fromCamera: fromCamera);
+    } on PermissionBlocked catch (blocked) {
+      // Logged where it was raised; the way out is Settings, not an error.
+      if (!context.mounted) return;
+
+      await PermissionSettingsSheet.show(
+        context,
+        permission: blocked.permission,
+      );
     } catch (error) {
       // Already logged by the controller.
       if (!context.mounted) return;

@@ -16,5 +16,9 @@ import UIKit
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "AppleSignInPlugin") {
       AppleSignInPlugin.register(with: registrar)
     }
+
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "SystemPermissionsPlugin") {
+      SystemPermissionsPlugin.register(with: registrar)
+    }
   }
 }
