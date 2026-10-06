@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reseller_studio/core/router/app_routes.dart';
+import 'package:reseller_studio/core/widgets/option_picker_sheet.dart';
 import 'package:reseller_studio/features/home/home_constant.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:reseller_studio/reseller_studio_app.dart';
+import 'package:system_design/index.dart';
 
 import '../../support/load_app_fonts.dart';
 import '../../support/pump_app.dart';
 import 'premium_subscription.dart';
 
-/// The three create actions in Home's shortcut row.
+/// Home's shortcut row: Add stock, Quick Action, Record sale.
 ///
 /// **Their value is one tap from the first screen**, directly under Needs
 /// Attention — a shortcut a seller has to scroll to is one more row of a
@@ -19,11 +22,11 @@ import 'premium_subscription.dart';
 void main() {
   setUpAll(loadAppFonts);
 
-  /// The button, not the Quick Action row of the same name further down:
-  /// only the shortcut is an `InkWell` inside a `Material` with a shape.
-  Finder buttonFor(BuildContext context, QuickActionKind kind) => find
+  /// The button, not a Quick Action row or header of the same name further
+  /// down: only the shortcut is an `InkWell` inside a `Material` with a shape.
+  Finder buttonFor(BuildContext context, HomeShortcut shortcut) => find
       .ancestor(
-        of: find.text(QuickActionLabel.of(context, kind)),
+        of: find.text(shortcut.label(context)),
         matching: find.byType(InkWell),
       )
       .first;
@@ -40,14 +43,14 @@ void main() {
     final BuildContext context = tester.element(find.byType(HomeScreen));
     final double screenHeight = tester.view.physicalSize.height / 3;
 
-    for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
-      final Finder button = buttonFor(context, kind);
+    for (final HomeShortcut shortcut in HomeShortcut.values) {
+      final Finder button = buttonFor(context, shortcut);
 
-      expect(button, findsOneWidget, reason: '${kind.name} is not on Home');
+      expect(button, findsOneWidget, reason: '${shortcut.name} is not on Home');
       expect(
         tester.getRect(button).bottom,
         lessThan(screenHeight),
-        reason: '${kind.name} needs a scroll to reach',
+        reason: '${shortcut.name} needs a scroll to reach',
       );
     }
   });
@@ -63,7 +66,7 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
     final Rect first = tester.getRect(
-      buttonFor(context, HomeShortcutConstant.shortcuts.first),
+      buttonFor(context, HomeShortcut.values.first),
     );
 
     // Owner's rule: what needs attention opens the screen, the fast actions
@@ -72,23 +75,74 @@ void main() {
       tester.getRect(find.text('Needs Attention')).bottom,
       lessThan(first.top),
     );
-
-    await tester.scrollUntilVisible(find.text('Performance'), 200);
-
     expect(
       tester.getRect(find.text('Performance')).top,
-      greaterThan(
-        tester
-            .getRect(buttonFor(context, HomeShortcutConstant.shortcuts.first))
-            .bottom,
-      ),
+      greaterThan(first.bottom),
     );
   });
 
-  testWidgets('each button opens its Quick Action row’s route', (
+  testWidgets('Add stock opens the shared sheet with its three ways in', (
     WidgetTester tester,
   ) async {
-    for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+
+    await tester.tap(buttonFor(context, HomeShortcut.addStock));
+    await tester.pumpAndSettle();
+
+    final Finder sheet = find.byType(OptionPickerSheet<String>);
+
+    expect(sheet, findsOneWidget);
+    for (final String option in <String>[
+      'Quick Add',
+      'Scan',
+      'Take stock in',
+    ]) {
+      expect(
+        find.descendant(of: sheet, matching: find.text(option)),
+        findsOneWidget,
+        reason: '$option is not offered',
+      );
+    }
+  });
+
+  testWidgets('Quick Action scrolls Home to its section', (
+    WidgetTester tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
+
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+    final Finder header = find.widgetWithText(
+      SdSectionHeaderV3,
+      'Quick Action',
+    );
+    final double viewport =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+
+    expect(tester.getRect(header).top, greaterThan(viewport));
+
+    await tester.tap(buttonFor(context, HomeShortcut.quickAction));
+    await tester.pumpAndSettle();
+
+    expect(tester.getRect(header).top, lessThan(viewport));
+  });
+
+  testWidgets('Record sale and the app bar’s Scan open their screens', (
+    WidgetTester tester,
+  ) async {
+    for (final (String what, String route) in <(String, String)>[
+      ('record sale', AppRoutes.recordSale),
+      ('scan', AppRoutes.scanner),
+    ]) {
       final GoRouter router = await pumpRoutedScreen(
         tester,
         const HomeScreen(),
@@ -96,30 +150,20 @@ void main() {
       );
       final BuildContext context = tester.element(find.byType(HomeScreen));
 
-      await tester.tap(buttonFor(context, kind));
+      await tester.tap(
+        what == 'scan'
+            ? find.byTooltip('Scan')
+            : buttonFor(context, HomeShortcut.recordSale),
+      );
       await tester.pumpAndSettle();
 
-      expect(
-        router.state.uri.toString(),
-        HomeShortcutConstant.actionFor(kind).route,
-        reason: '${kind.name} went somewhere its row does not',
-      );
+      expect(router.state.uri.toString(), route, reason: '$what went astray');
     }
   });
 
-  test('three shortcuts, each a Quick Action, none twice', () {
-    expect(HomeShortcutConstant.shortcuts, hasLength(3));
-    expect(
-      HomeShortcutConstant.shortcuts.toSet(),
-      hasLength(HomeShortcutConstant.shortcuts.length),
-      reason: 'a kind is listed twice',
-    );
-
-    // `actionFor` throws on a kind Quick Action does not offer — the button
-    // would have no route and no words of its own.
-    for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
-      expect(HomeShortcutConstant.actionFor(kind).kind, kind);
-    }
+  test('three shortcuts, Add stock first', () {
+    expect(HomeShortcut.values, hasLength(3));
+    expect(HomeShortcut.values.first, HomeShortcut.addStock);
   });
 
   // A label cut off mid-word is a content bug that only shows once
@@ -139,11 +183,11 @@ void main() {
 
       final BuildContext context = tester.element(find.byType(HomeScreen));
 
-      for (final QuickActionKind kind in HomeShortcutConstant.shortcuts) {
-        final String label = QuickActionLabel.of(context, kind);
+      for (final HomeShortcut shortcut in HomeShortcut.values) {
+        final String label = shortcut.label(context);
         final RenderParagraph paragraph = tester.renderObject(
           find.descendant(
-            of: buttonFor(context, kind),
+            of: buttonFor(context, shortcut),
             matching: find.text(label),
           ),
         );

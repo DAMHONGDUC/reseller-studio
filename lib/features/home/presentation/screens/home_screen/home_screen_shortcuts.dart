@@ -1,16 +1,36 @@
 part of 'home_screen.dart';
 
-/// The three create actions, directly under Needs Attention.
+/// Add stock, Quick Action and Record sale, directly under Needs Attention.
 ///
 /// **Tiles, not pills** — a label like "Enregistrer une vente" does not fit
 /// beside its icon at a third of a phone, and a cut-off label is a content
 /// bug. Icon over label lets the words take two lines without the row
-/// changing shape. See `HomeShortcutConstant`.
-class _HomeShortcuts extends StatelessWidget {
-  const _HomeShortcuts();
+/// changing shape. See [HomeShortcut].
+class _HomeShortcuts extends ConsumerWidget {
+  const _HomeShortcuts({required this.onQuickAction});
+
+  /// Scrolls Home to its Quick Action section — the screen owns the scroll.
+  final VoidCallback onQuickAction;
+
+  void _open(BuildContext context, WidgetRef ref, HomeShortcut shortcut) {
+    SdLogger.action(
+      LogTagConstant.navigation,
+      'Tap Home shortcut',
+      <String, Object?>{'shortcut': shortcut.name},
+    );
+
+    switch (shortcut) {
+      case HomeShortcut.addStock:
+        unawaited(AddStockSheet.show(context, ref));
+      case HomeShortcut.quickAction:
+        onQuickAction();
+      case HomeShortcut.recordSale:
+        unawaited(context.push(AppRoutes.recordSale));
+    }
+  }
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context, WidgetRef ref) => Padding(
     padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
     // - stretch, so a label that wraps lifts all three buttons together
     // - IntrinsicHeight, because stretching inside a list means no height yet
@@ -18,18 +38,14 @@ class _HomeShortcuts extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          for (
-            int i = 0;
-            i < HomeShortcutConstant.shortcuts.length;
-            i++
-          ) ...<Widget>[
-            if (i > 0) SizedBox(width: SdContentPaddingV3.listItemGap),
+          for (final HomeShortcut shortcut in HomeShortcut.values) ...<Widget>[
+            if (shortcut.index > 0)
+              SizedBox(width: SdContentPaddingV3.listItemGap),
             Expanded(
               child: _HomeShortcutButton(
-                action: HomeShortcutConstant.actionFor(
-                  HomeShortcutConstant.shortcuts[i],
-                ),
-                isPrimary: i == 0,
+                shortcut: shortcut,
+                isPrimary: shortcut.index == 0,
+                onTap: () => _open(context, ref, shortcut),
               ),
             ),
           ],
@@ -39,19 +55,24 @@ class _HomeShortcuts extends StatelessWidget {
   );
 }
 
-/// One shortcut: a glyph over its Quick Action label.
+/// One shortcut: a glyph over its label.
 ///
 /// The first is filled in the brand colour and the rest are outlined — one
 /// primary per row (`lib/features/home/CLAUDE.md`).
 class _HomeShortcutButton extends StatelessWidget {
-  const _HomeShortcutButton({required this.action, required this.isPrimary});
+  const _HomeShortcutButton({
+    required this.shortcut,
+    required this.isPrimary,
+    required this.onTap,
+  });
 
-  final QuickAction action;
+  final HomeShortcut shortcut;
   final bool isPrimary;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final String label = QuickActionLabel.of(context, action.kind);
+    final String label = shortcut.label(context);
     final Color background = isPrimary
         ? context.colorScheme3.primary
         : context.sdTheme3.surfaceElevated;
@@ -73,10 +94,7 @@ class _HomeShortcutButton extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => switch (action.open) {
-            QuickActionOpen.push => context.push(action.route),
-            QuickActionOpen.goTab => context.go(action.route),
-          },
+          onTap: onTap,
           child: Padding(
             padding: SdContentPaddingV3.row,
             child: Column(
@@ -84,7 +102,7 @@ class _HomeShortcutButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SdIconV3(
-                  action.icon,
+                  shortcut.icon,
                   color: isPrimary ? foreground : context.colorScheme3.primary,
                 ),
                 SizedBox(height: SdSpacingConstant.h6),

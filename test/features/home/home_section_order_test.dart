@@ -14,12 +14,10 @@ import 'premium_subscription.dart';
 void main() {
   /// The order [labels] appear in as Home is scrolled from the top.
   ///
-  /// **Not pixel offsets.** Home is a lazy `ListView` with variable-height
-  /// children, so it estimates the extent of everything it has not built —
-  /// which makes `position.pixels` a moving target rather than an absolute
-  /// coordinate, and made a comparison of two scrolled measurements report
-  /// the wrong order. Reading the order things come into view in is the same
-  /// question asked in a way the list can answer.
+  /// **Not pixel offsets.** Home was a lazy `ListView`, whose estimated extent
+  /// made `position.pixels` a moving target and once reported the wrong order
+  /// outright. It is built whole now, but reading the order things come into
+  /// view in asks the same question without depending on how it is built.
   ///
   /// Labels that arrive in the same frame are sorted by their y within it,
   /// where positions *are* comparable — otherwise two sections that fit on
@@ -108,15 +106,14 @@ void main() {
       overrides: premiumSubscription(),
     );
 
-    // `Quick Add` is the first shortcut; the Quick Action row of the same
-    // name is at the very end, so the first one to arrive is the button.
+    // `Add stock` is the first shortcut and appears nowhere else on Home.
     expect(
       await orderDownThePage(tester, <String>[
-        'Quick Add',
+        'Add stock',
         'Needs Attention',
         'Performance',
       ]),
-      <String>['Needs Attention', 'Quick Add', 'Performance'],
+      <String>['Needs Attention', 'Add stock', 'Performance'],
       reason: 'what needs attention comes first (owner\u2019s rule)',
     );
   });

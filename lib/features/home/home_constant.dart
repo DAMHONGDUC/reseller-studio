@@ -16,26 +16,38 @@ final class HomeConstant {
   static const int recentActivityMaxRows = 3;
 }
 
-/// **The three create actions in Home's shortcut row** — owner's rule.
+/// **The three buttons in Home's shortcut row, in order** — owner's rule.
 ///
-/// Quick add, Scan and Record sale are what a seller starts while holding an
-/// item or a sale, so they get one tap from the first screen. Each is a
-/// [QuickActionKind], so the button wears its Quick Action row's words and
-/// opens its route — the button and the row it shortcuts cannot disagree.
-///
-/// **Three, and the list is closed.** A fourth makes the row a launcher.
-/// The first is the filled one; see `lib/features/home/CLAUDE.md`.
-final class HomeShortcutConstant {
-  static const List<QuickActionKind> shortcuts = <QuickActionKind>[
-    QuickActionKind.quickAddItem,
-    QuickActionKind.scan,
-    QuickActionKind.recordSale,
-  ];
+/// The first is the filled one; what each does is in
+/// `lib/features/home/CLAUDE.md`. **Three, and the list is closed.** A fourth
+/// makes the row a launcher.
+enum HomeShortcut {
+  /// Opens `AddStockSheet`: Quick add, Scan, Take stock in.
+  addStock,
 
-  /// The Quick Action row a shortcut stands for.
-  static QuickAction actionFor(QuickActionKind kind) => QuickActionConstant
-      .actions
-      .firstWhere((QuickAction action) => action.kind == kind);
+  /// Scrolls Home to its Quick Action section.
+  quickAction,
+
+  /// Pushes the record-sale flow, as its Quick Action row does.
+  recordSale,
+}
+
+/// How a shortcut reads and looks lives on the enum — owner's rule.
+extension HomeShortcutDisplay on HomeShortcut {
+  String label(BuildContext context) => switch (this) {
+    HomeShortcut.addStock => context.l10n.inventoryAddTitle,
+    HomeShortcut.quickAction => context.l10n.homeQuickAction,
+    HomeShortcut.recordSale => QuickActionLabel.of(
+      context,
+      QuickActionKind.recordSale,
+    ),
+  };
+
+  IconData get icon => switch (this) {
+    HomeShortcut.addStock => AppIconConstant.addBox,
+    HomeShortcut.quickAction => AppIconConstant.bolt,
+    HomeShortcut.recordSale => AppIconConstant.payments,
+  };
 }
 
 /// One create action, as Quick Action offers it.
@@ -266,7 +278,7 @@ final class QuickActionLabel {
 
 /// The words and the glyph for one Getting started step.
 ///
-/// Same shape as [HomeShortcutLabel] and [QuickActionLabel], for the same
+/// Same shape as [HomeShortcutDisplay] and [QuickActionLabel], for the same
 /// reason: the enum stays `const` and the strings stay in ARB (hard rule 7).
 final class GettingStartedStepLabel {
   static String title(BuildContext context, GettingStartedStep step) =>
