@@ -3,10 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/time/app_clock.dart';
 import 'package:reseller_studio/features/analytics/domain/entities/analytics_summary.dart';
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import 'package:reseller_studio/features/analytics/providers.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item_filter_criteria.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
@@ -17,6 +19,7 @@ import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../support/add_button_finder.dart';
+import '../support/filter_sheet_finder.dart';
 import '../support/pump_app.dart';
 
 /// Every screen, rendered against the seeded mock business.
@@ -104,13 +107,16 @@ void main() {
   });
 
   group('inventory filters', () {
-    test('counts split the seed across the five tabs', () async {
+    test('counts split the seed across the five presets', () async {
       final ProviderContainer container = mockContainer();
 
       await warmUp(container);
 
-      final Map<InventoryFilter, int> counts = container.read(
-        inventoryCountsProvider,
+      final Map<InventoryFilter, int> counts = InventoryFilter.countsIn(
+        container.read(itemsProvider).value!,
+        criteria: ItemFilterCriteria.none,
+        query: '',
+        now: container.read(clockProvider).now(),
       );
 
       expect(counts[InventoryFilter.all], 11);
@@ -127,8 +133,11 @@ void main() {
 
       await warmUp(container);
 
-      final Map<InventoryFilter, int> counts = container.read(
-        inventoryCountsProvider,
+      final Map<InventoryFilter, int> counts = InventoryFilter.countsIn(
+        container.read(itemsProvider).value!,
+        criteria: ItemFilterCriteria.none,
+        query: '',
+        now: container.read(clockProvider).now(),
       );
 
       expect(
@@ -176,13 +185,10 @@ void main() {
       expect(find.textContaining('USD4'), findsNothing);
     });
 
-    testWidgets('Inventory lists items with counts on every tab', (
+    testWidgets('Inventory lists items, newest first', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const InventoryScreen());
-
-      expect(find.text('All'), findsOneWidget);
-      expect(find.text('11'), findsOneWidget);
 
       // The list sorts newest-created first, so this is the top row.
       expect(find.textContaining('Nike windbreaker'), findsOneWidget);
@@ -207,7 +213,7 @@ void main() {
       //
       // `.first` is the `CustomScrollView`'s own scrollable, which is the
       // outermost one on this screen. Deliberately not `.last`: the pinned
-      // header holds the filter strip, and that is a horizontal `ListView` —
+      // header holds the filter strip, and that scrolls horizontally —
       // dragging it vertically scrolls nothing and the row never appears.
       await tester.scrollUntilVisible(
         find.textContaining('Vintage Levi'),
@@ -280,7 +286,7 @@ void main() {
       // It is still not *part* of the app bar: it pins as its own sliver
       // below the chrome, which the next test measures.
       expect(find.byTooltip('Scan'), findsOneWidget);
-      expect(find.text('All'), findsOneWidget);
+      expect(FilterSheetFinder.stripChip('Filters'), findsOneWidget);
     });
 
     testWidgets('Inventory keeps the filter strip out of the app bar', (
@@ -288,7 +294,8 @@ void main() {
     ) async {
       await pumpScreen(tester, const InventoryScreen());
 
-      final Rect strip = tester.getRect(find.text('All'));
+      final Finder filters = FilterSheetFinder.stripChip('Filters');
+      final Rect strip = tester.getRect(filters);
       final Rect field = tester.getRect(find.byType(SdSearchFieldV3));
 
       // Below the chrome, not inside it.
@@ -300,7 +307,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        tester.getRect(find.text('All')).top,
+        tester.getRect(filters).top,
         greaterThan(tester.getRect(find.byType(SdSearchFieldV3)).bottom),
       );
     });

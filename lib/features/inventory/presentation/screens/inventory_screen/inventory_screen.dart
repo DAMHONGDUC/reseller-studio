@@ -28,7 +28,9 @@ import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';
 import '../../../domain/entities/item.dart';
+import '../../../domain/entities/item_filter_criteria.dart';
 import '../../../domain/entities/storage_location.dart';
+import '../../../domain/enums/item_filter_group.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
 import '../../widgets/bulk_list_sheet.dart';
@@ -43,14 +45,9 @@ part 'inventory_screen_item_list.dart';
 
 /// Inventory — "what do I have?".
 ///
-/// The five tabs are fixed by the plan (§7): `All | Listed | Reserved | Sold |
-/// Stale`. Each carries its count, because a seller scanning the strip decides
-/// where to tap from the number — which is why `SdFilterChipV3` renders the
-/// count inside the chip rather than beside it.
-///
-/// **All five counts come from one stream**, folded in
-/// `inventoryCountsProvider`. Per-tab queries would mean five live listeners
-/// for one screen, and the counts could disagree with the list being shown.
+/// **The strip is the filter sheet laid out sideways**: the Filters chip
+/// opens the whole sheet, and every chip after it opens one group of it —
+/// the Show preset (plan §7) first (`docs/rules/SCREENS.md`).
 ///
 /// **The chrome collapses as the list scrolls.** `SdSearchHeaderV3` docks the
 /// search field into the title's row and pins the filter strip under it, so a
@@ -166,18 +163,6 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             onChanged: (String value) =>
                 ref.read(inventorySearchProvider.notifier).update(value),
             actions: <SdAppBarActionV3>[
-              // In the chrome rather than on the strip: the five tabs already
-              // scroll on a narrow phone, and a sixth chip pushes Returns off
-              // the edge to reach a sheet that is not a tab.
-              SdAppBarActionV3(
-                icon: AppIconConstant.filterAlt,
-                tooltip: context.l10n.filterTitle,
-                // Lit while the sheet behind it is holding something — the
-                // tab is not counted, because the strip is already showing
-                // which one is picked.
-                isActive: ref.watch(inventoryCriteriaProvider).isActive,
-                onPressed: () => InventoryFilterSheet.show(context),
-              ),
               SdAppBarActionV3(
                 icon: AppIconConstant.addBox,
                 tooltip: context.l10n.inventoryAddItem,

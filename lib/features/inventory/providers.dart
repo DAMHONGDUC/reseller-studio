@@ -30,7 +30,8 @@ final Provider<List<ItemCategory>> defaultItemCategoriesProvider =
       ];
     });
 
-/// The tabs across the top of Inventory (plan §7).
+/// Inventory's Show preset (plan §7) — the first group of the filter sheet
+/// and the first chip after Filters on the strip.
 ///
 /// **[stale] is not an [ItemStatus]** and this enum is where the difference
 /// becomes visible: three of these map to a status, and one is a question
@@ -68,6 +69,33 @@ enum InventoryFilter {
                     staleThreshold ?? StaleInventoryPolicy.defaultThreshold,
               ),
       };
+
+  /// How many of [items] each preset would show under [criteria] and
+  /// [query] — narrowed by everything except the preset itself.
+  ///
+  /// One copy for the applied filters and a sheet's draft alike, so the
+  /// number on a Show chip is the count tapping it would leave.
+  static Map<InventoryFilter, int> countsIn(
+    List<Item> items, {
+    required ItemFilterCriteria criteria,
+    required String query,
+    required DateTime now,
+  }) {
+    final List<Item> pool = items
+        .where(
+          (Item item) =>
+              criteria.matches(item, now: now) &&
+              ItemSearch.matches(item, query),
+        )
+        .toList();
+
+    return <InventoryFilter, int>{
+      for (final InventoryFilter filter in InventoryFilter.values)
+        filter: pool
+            .where((Item item) => filter.matches(item, now: now))
+            .length,
+    };
+  }
 }
 
 /// Every item in the workspace, live.
@@ -95,7 +123,7 @@ final itemProvider = StreamProvider.family<Item?, String>((Ref ref, String id) {
   );
 });
 
-/// Which tab is selected.
+/// Which Show preset is selected.
 class InventoryFilterController extends Notifier<InventoryFilter> {
   @override
   InventoryFilter build() => InventoryFilter.all;
@@ -139,13 +167,16 @@ class InventoryCriteriaController extends Notifier<ItemFilterCriteria> {
   /// used to tick straight into this notifier, so the list moved under the
   /// sheet on every chip and a seller trying two combinations had already
   /// changed the screen twice.
-  void apply(ItemFilterCriteria pending) {
+  ///
+  /// [tab] is the Show preset, which the sheet holds as its first group.
+  void apply(ItemFilterCriteria pending, {required InventoryFilter tab}) {
     SdLogger.action(
       LogTagConstant.item,
       'Apply inventory filters',
-      <String, Object?>{'groups': pending.activeCount},
+      <String, Object?>{'groups': pending.activeCount, 'tab': tab.name},
     );
 
+    ref.read(inventoryFilterProvider.notifier).select(tab);
     state = pending;
   }
 
@@ -180,10 +211,11 @@ inventoryCriteriaProvider =
 /// How many filters are narrowing the list right now — what the seller is
 /// told above it, and what the Filters chip carries.
 ///
-/// **The tab counts as one when it is not `all`.** A seller looking at three
-/// rows of eleven is filtered by the tab exactly as much as by the sheet, and
-/// a bar that said "no filters" while Sold was selected would be describing a
-/// different screen. Reset clears both, so the number and the button agree.
+/// **The Show preset counts as one when it is not `all`.** A seller looking at
+/// three rows of eleven is filtered by the preset exactly as much as by any
+/// other group, and a bar that said "no filters" while Sold was selected
+/// would be describing a different screen. Reset clears both, so the number
+/// and the button agree.
 final Provider<int> inventoryActiveFilterCountProvider = Provider<int>((
   Ref ref,
 ) {
@@ -191,35 +223,6 @@ final Provider<int> inventoryActiveFilterCountProvider = Provider<int>((
   final InventoryFilter tab = ref.watch(inventoryFilterProvider);
 
   return tab == InventoryFilter.all ? extras : extras + 1;
-});
-
-/// How many items sit under each tab.
-///
-/// **Computed from the one item stream rather than five queries.** Inventory
-/// shows all five counts at once, so per-tab queries would mean five live
-/// listeners for one screen; folding over the list already in memory costs
-/// nothing and cannot disagree with the list being displayed.
-final Provider<Map<InventoryFilter, int>>
-inventoryCountsProvider = Provider<Map<InventoryFilter, int>>((Ref ref) {
-  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
-  final DateTime now = ref.watch(clockProvider).now();
-  final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
-  final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
-
-  // Narrowed by everything except the tab itself, so a chip's number is
-  // exactly how many rows tapping it would show. A count taken before the
-  // sheet was applied says 40 over a list of three.
-  final List<Item> pool = items
-      .where(
-        (Item item) =>
-            criteria.matches(item, now: now) && ItemSearch.matches(item, query),
-      )
-      .toList();
-
-  return <InventoryFilter, int>{
-    for (final InventoryFilter filter in InventoryFilter.values)
-      filter: pool.where((Item item) => filter.matches(item, now: now)).length,
-  };
 });
 
 /// Which items are ticked for a bulk action.

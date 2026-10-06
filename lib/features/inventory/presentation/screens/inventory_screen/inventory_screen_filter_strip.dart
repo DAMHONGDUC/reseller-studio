@@ -1,22 +1,35 @@
 part of 'inventory_screen.dart';
 
+/// The Filters chip first, then the Show preset, then one chip per group of
+/// the sheet — each opening that group alone (`docs/rules/SCREENS.md`).
 class _FilterStrip extends ConsumerWidget {
   const _FilterStrip();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final InventoryFilter selected = ref.watch(inventoryFilterProvider);
-    final Map<InventoryFilter, int> counts = ref.watch(inventoryCountsProvider);
+    final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
+    final InventoryFilter tab = ref.watch(inventoryFilterProvider);
 
     return AppFilterStrip(
       children: <Widget>[
-        for (final InventoryFilter filter in InventoryFilter.values)
+        SdFilterChipV3(
+          icon: AppIconConstant.tune,
+          label: context.l10n.filterTitle,
+          selected: ref.watch(inventoryActiveFilterCountProvider) > 0,
+          onSelected: () => InventoryFilterSheet.show(context),
+        ),
+        SdFilterChipV3(
+          label: context.l10n.filterShow,
+          opensSheet: true,
+          selected: tab != InventoryFilter.all,
+          onSelected: () => InventoryFilterSheet.showPreset(context),
+        ),
+        for (final ItemFilterGroup group in ItemFilterGroup.values)
           SdFilterChipV3(
-            label: filter.label,
-            count: counts[filter],
-            selected: filter == selected,
-            onSelected: () =>
-                ref.read(inventoryFilterProvider.notifier).select(filter),
+            label: group.label(context),
+            opensSheet: true,
+            selected: criteria.narrows(group),
+            onSelected: () => InventoryFilterSheet.showGroup(context, group),
           ),
       ],
     );

@@ -37,7 +37,10 @@ void main() {
 
   test('a signed-out seller reads the local store', () {
     expect(container.read(itemRepositoryProvider), isA<LocalItemRepository>());
-    expect(container.read(orderRepositoryProvider), isA<LocalOrderRepository>());
+    expect(
+      container.read(orderRepositoryProvider),
+      isA<LocalOrderRepository>(),
+    );
     expect(
       container.read(sourceRepositoryProvider),
       isA<LocalSourceRepository>(),

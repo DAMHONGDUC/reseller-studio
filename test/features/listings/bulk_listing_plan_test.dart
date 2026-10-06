@@ -34,15 +34,15 @@ void main() {
   );
 
   Listing listingOf({required String itemId, required String on}) => Listing(
-        id: 'lst-$itemId-$on',
-        itemId: itemId,
-        marketplaceId: on,
-        marketplaceName: on,
-        title: 'Item $itemId',
-        price: gbpOf(4500),
-        status: ListingStatus.draft,
-        createdAt: now,
-      );
+    id: 'lst-$itemId-$on',
+    itemId: itemId,
+    marketplaceId: on,
+    marketplaceName: on,
+    title: 'Item $itemId',
+    price: gbpOf(4500),
+    status: ListingStatus.draft,
+    createdAt: now,
+  );
 
   BulkListingPlan planFor(
     List<Item> items, {

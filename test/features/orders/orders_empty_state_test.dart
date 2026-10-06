@@ -5,12 +5,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
+import 'package:reseller_studio/features/orders/presentation/widgets/order_filter_sheet.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/add_button_finder.dart';
+import '../../support/filter_sheet_finder.dart';
 import '../../support/pump_app.dart';
 
 /// The two ways this list can be empty are different sentences.
@@ -62,8 +64,17 @@ void main() {
     await pumpScreen(tester, const OrdersScreen());
     // Shipped is the seeded tab with nothing under it while the others are
     // full — exactly the case the shared widget has to keep telling apart.
-    // The chip, not the order cards' track, which also reads "Shipped".
-    await tester.tap(find.widgetWithText(SdFilterChipV3, 'Shipped'));
+    // The preset's chip, not the order cards' track, which also reads
+    // "Shipped".
+    await FilterSheetFinder.tapStripChip(tester, 'Show');
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OrderFilterSheet),
+        matching: find.text('Shipped'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
 
     expect(find.text('No orders match this filter.'), findsOneWidget);

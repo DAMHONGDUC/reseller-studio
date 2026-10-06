@@ -34,11 +34,8 @@ class NamePromptSheet extends StatefulWidget {
     required String submitLabel,
   }) => showSdBottomSheetV3<String>(
     context: context,
-    builder: (BuildContext context) => NamePromptSheet(
-      title: title,
-      label: label,
-      submitLabel: submitLabel,
-    ),
+    builder: (BuildContext context) =>
+        NamePromptSheet(title: title, label: label, submitLabel: submitLabel),
   );
 
   @override

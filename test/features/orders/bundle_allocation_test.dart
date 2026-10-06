@@ -76,10 +76,9 @@ void main() {
 
   test('one item takes the whole price, untouched', () {
     // The single-sale path is the same call, and it must not round anything.
-    expect(
-      BundleAllocation.across(gbpOf(4999), <Money?>[null]),
-      <Money>[gbpOf(4999)],
-    );
+    expect(BundleAllocation.across(gbpOf(4999), <Money?>[null]), <Money>[
+      gbpOf(4999),
+    ]);
   });
 
   test('nothing to split is an empty answer, not a crash', () {

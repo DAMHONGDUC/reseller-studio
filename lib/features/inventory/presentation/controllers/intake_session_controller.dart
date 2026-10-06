@@ -102,14 +102,13 @@ class IntakeSessionController extends Notifier<IntakeSessionState> {
   IntakeSessionState build() =>
       IntakeSessionState(purchaseDate: DateTime.now());
 
-  void selectSource(String? sourceId) =>
-      state = IntakeSessionState(
-        purchaseDate: state.purchaseDate,
-        sourceId: sourceId,
-        lines: state.lines,
-        isSaving: state.isSaving,
-        isFinished: state.isFinished,
-      );
+  void selectSource(String? sourceId) => state = IntakeSessionState(
+    purchaseDate: state.purchaseDate,
+    sourceId: sourceId,
+    lines: state.lines,
+    isSaving: state.isSaving,
+    isFinished: state.isFinished,
+  );
 
   void selectDate(DateTime date) => state = state.copyWith(purchaseDate: date);
 
@@ -229,10 +228,7 @@ class IntakeSessionController extends Notifier<IntakeSessionState> {
         'Failed to finish intake',
         error: error,
         stackTrace: stackTrace,
-        data: <String, Object>{
-          'purchaseId': purchaseId,
-          'lines': lines.length,
-        },
+        data: <String, Object>{'purchaseId': purchaseId, 'lines': lines.length},
       );
 
       state = state.copyWith(isSaving: false);

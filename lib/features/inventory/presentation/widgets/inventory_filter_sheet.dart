@@ -5,16 +5,22 @@ import 'package:system_design/index.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
+import '../../../../core/time/app_clock.dart';
 import '../../../../core/widgets/app_filter_chip_group.dart';
 import '../../../../core/widgets/app_filter_sheet_actions.dart';
 import '../../../sourcing/providers.dart';
+import '../../domain/entities/item.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/item_filter_criteria.dart';
+import '../../domain/enums/item_filter_group.dart';
 import '../../domain/enums/item_status.dart';
 import '../../item_filter_constant.dart';
 import '../../providers.dart';
 
-/// Everything Inventory can be narrowed by, in one sheet.
+part 'inventory_filter_sheet_group.dart';
+
+/// Everything Inventory can be narrowed by — the whole sheet, or one group
+/// of it opened from its chip on the strip.
 ///
 /// **Nothing is applied until Apply is pressed** — owner's rule, and it
 /// **reverses "it applies as it is tapped"**. The chips edit a draft this
@@ -22,27 +28,58 @@ import '../../providers.dart';
 /// deciding, and closing the sheet any other way leaves the list exactly as
 /// they found it.
 ///
-/// **Reset clears the draft, not the screen.** It sits beside Apply and
-/// empties what is pending — the strip behind the sheet has its own Reset for
-/// the filters that are actually on, and that one still clears the tab with
-/// them.
-///
-/// **The strip's five tabs are deliberately not repeated here.** They are one
-/// tap away above the list; what is here is the vocabulary that has nowhere
-/// else to be asked — including a status group, because `archived` and the
-/// seller's own condition grades are not tabs.
+/// - **Reset empties what this sheet shows** — every group in the whole
+///   sheet, one group in a one-group sheet (`docs/rules/SCREENS.md`)
+/// - **The Show preset is the first group**, and part of the draft
 class InventoryFilterSheet extends ConsumerStatefulWidget {
-  const InventoryFilterSheet({super.key});
+  const InventoryFilterSheet({
+    this.preset = true,
+    this.groups = ItemFilterGroup.values,
+    super.key,
+  });
 
-  /// How much of the screen the sheet takes. Fixed rather than sized to its
-  /// groups: the content grows with the seller's own categories and locations,
-  /// so a sheet that fitted it would be a different height in every business.
+  /// Whether the Show preset is offered.
+  final bool preset;
+
+  /// The groups offered after the preset, in the sheet's order.
+  final List<ItemFilterGroup> groups;
+
+  /// How much of the screen the whole sheet takes. Fixed rather than sized to
+  /// its groups: the content grows with the seller's own categories and
+  /// locations, so a sheet that fitted it would be a different height in
+  /// every business.
   static const double heightFactor = 0.85;
 
-  static Future<void> show(BuildContext context) => showSdBottomSheetV3<void>(
-    context: context,
-    builder: (BuildContext context) => const InventoryFilterSheet(),
+  /// The tallest a one-group sheet's chips grow before they scroll.
+  static const double groupHeightFactor = 0.6;
+
+  /// The whole sheet — the strip's Filters chip.
+  static Future<void> show(BuildContext context) =>
+      _present(context, const InventoryFilterSheet());
+
+  /// The Show preset alone.
+  static Future<void> showPreset(BuildContext context) => _present(
+    context,
+    const InventoryFilterSheet(groups: <ItemFilterGroup>[]),
   );
+
+  /// One group alone — its chip on the strip.
+  static Future<void> showGroup(BuildContext context, ItemFilterGroup group) =>
+      _present(
+        context,
+        InventoryFilterSheet(preset: false, groups: <ItemFilterGroup>[group]),
+      );
+
+  static Future<void> _present(
+    BuildContext context,
+    InventoryFilterSheet sheet,
+  ) => showSdBottomSheetV3<void>(
+    context: context,
+    builder: (BuildContext context) => sheet,
+  );
+
+  /// Whether this is the whole sheet rather than one group of it.
+  bool get isWhole => preset && groups.length == ItemFilterGroup.values.length;
 
   @override
   ConsumerState<InventoryFilterSheet> createState() =>
@@ -55,174 +92,93 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
   /// after that moves this and nothing else.
   late ItemFilterCriteria _draft = ref.read(inventoryCriteriaProvider);
 
+  /// The Show preset, pending like everything else here.
+  late InventoryFilter _tab = ref.read(inventoryFilterProvider);
+
   void _edit(ItemFilterCriteria next) => setState(() => _draft = next);
 
+  void _selectTab(InventoryFilter tab) => setState(() => _tab = tab);
+
   void _apply() {
-    ref.read(inventoryCriteriaProvider.notifier).apply(_draft);
+    ref.read(inventoryCriteriaProvider.notifier).apply(_draft, tab: _tab);
     Navigator.of(context).pop();
   }
 
-  /// The three states of "does it have one", worded for what is being asked.
-  List<AppFilterOption<PresenceFilter>> _presence(
-    BuildContext context,
-    String yes,
-    String no,
-  ) => <AppFilterOption<PresenceFilter>>[
-    AppFilterOption<PresenceFilter>(
-      value: PresenceFilter.any,
-      label: context.l10n.filterAny,
-    ),
-    AppFilterOption<PresenceFilter>(value: PresenceFilter.present, label: yes),
-    AppFilterOption<PresenceFilter>(value: PresenceFilter.absent, label: no),
-  ];
+  /// Empties what this sheet shows, and leaves every other group alone.
+  void _reset() => setState(() {
+    if (widget.preset) _tab = InventoryFilter.all;
+    _draft = widget.groups.fold(
+      _draft,
+      (ItemFilterCriteria criteria, ItemFilterGroup group) =>
+          criteria.cleared(group),
+    );
+  });
 
-  /// A group of records plus the chip for the items that name none of them.
-  List<AppFilterOption<String>> _byId(
-    BuildContext context,
-    Map<String, String> namesById,
-  ) => <AppFilterOption<String>>[
-    for (final MapEntry<String, String> entry in namesById.entries)
-      AppFilterOption<String>(value: entry.key, label: entry.value),
-    AppFilterOption<String>(
-      value: ItemFilterConstant.unassignedId,
-      label: context.l10n.filterUnassigned,
-    ),
-  ];
+  String _title(BuildContext context) {
+    if (widget.isWhole) return context.l10n.filterTitle;
+    if (widget.groups.isEmpty) return context.l10n.filterShow;
+
+    return widget.groups.single.label(context);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final ItemFilterCriteria criteria = _draft;
-    final Map<String, String> categories = <String, String>{
-      for (final ItemCategory category
-          in ref.watch(categoriesProvider).value ?? const <ItemCategory>[])
-        category.id: category.name,
-    };
-
-    return SdBottomSheetV3(
-      title: context.l10n.filterTitle,
-      closeTooltip: context.l10n.commonClose,
-      heightFactor: InventoryFilterSheet.heightFactor,
+    final bool isWhole = widget.isWhole;
+    final int pending =
+        (widget.preset && _tab != InventoryFilter.all ? 1 : 0) +
+        widget.groups.where(_draft.narrows).length;
+    final List<Widget> sections = <Widget>[
+      if (widget.preset)
+        _PresetGroup(
+          draft: _draft,
+          selected: _tab,
+          showTitle: isWhole,
+          onSelected: _selectTab,
+        ),
+      for (final ItemFilterGroup group in widget.groups)
+        _ItemFilterGroupView(
+          group: group,
+          draft: _draft,
+          showTitle: isWhole,
+          onEdit: _edit,
+        ),
+    ];
+    final Widget body = SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  AppFilterChipGroup<ItemStatus>(
-                    title: context.l10n.filterStatus,
-                    options: <AppFilterOption<ItemStatus>>[
-                      for (final ItemStatus status in ItemStatus.values)
-                        AppFilterOption<ItemStatus>(
-                          value: status,
-                          label: status.label(context),
-                        ),
-                    ],
-                    selected: criteria.statuses,
-                    onSelected: (ItemStatus value) =>
-                        _edit(criteria.withStatusToggled(value)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<ItemCondition>(
-                    title: context.l10n.itemCondition,
-                    options: <AppFilterOption<ItemCondition>>[
-                      for (final ItemCondition condition
-                          in ItemCondition.values)
-                        AppFilterOption<ItemCondition>(
-                          value: condition,
-                          label: condition.label(context),
-                        ),
-                    ],
-                    selected: criteria.conditions,
-                    onSelected: (ItemCondition value) =>
-                        _edit(criteria.withConditionToggled(value)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<String>(
-                    title: context.l10n.filterCategory,
-                    options: _byId(context, categories),
-                    selected: criteria.categoryIds,
-                    onSelected: (String id) =>
-                        _edit(criteria.withCategoryToggled(id)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<String>(
-                    title: context.l10n.filterLocation,
-                    options: _byId(context, ref.watch(locationPathsProvider)),
-                    selected: criteria.locationIds,
-                    onSelected: (String id) =>
-                        _edit(criteria.withLocationToggled(id)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<String>(
-                    title: context.l10n.filterSource,
-                    options: _byId(context, ref.watch(sourceNamesProvider)),
-                    selected: criteria.sourceIds,
-                    onSelected: (String id) =>
-                        _edit(criteria.withSourceToggled(id)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<PresenceFilter>(
-                    title: context.l10n.filterPhotos,
-                    options: _presence(
-                      context,
-                      context.l10n.filterWithPhotos,
-                      context.l10n.filterWithoutPhotos,
-                    ),
-                    selected: <PresenceFilter>{criteria.photos},
-                    onSelected: (PresenceFilter value) =>
-                        _edit(criteria.withPhotos(value)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<PresenceFilter>(
-                    title: context.l10n.filterCost,
-                    options: _presence(
-                      context,
-                      context.l10n.filterCostRecorded,
-                      context.l10n.filterCostMissing,
-                    ),
-                    selected: <PresenceFilter>{criteria.cost},
-                    onSelected: (PresenceFilter value) =>
-                        _edit(criteria.withCost(value)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<PresenceFilter>(
-                    title: context.l10n.filterListed,
-                    options: _presence(
-                      context,
-                      context.l10n.filterEverListed,
-                      context.l10n.filterNeverListed,
-                    ),
-                    selected: <PresenceFilter>{criteria.listed},
-                    onSelected: (PresenceFilter value) =>
-                        _edit(criteria.withListed(value)),
-                  ),
-                  const AppFilterGroupDivider(),
-                  AppFilterChipGroup<DateRangeFilter>(
-                    title: context.l10n.filterAdded,
-                    options: <AppFilterOption<DateRangeFilter>>[
-                      for (final DateRangeFilter range
-                          in DateRangeFilter.values)
-                        AppFilterOption<DateRangeFilter>(
-                          value: range,
-                          label: range.label(context),
-                        ),
-                    ],
-                    selected: <DateRangeFilter>{criteria.added},
-                    onSelected: (DateRangeFilter value) =>
-                        _edit(criteria.withAdded(value)),
-                  ),
-                ],
+          for (int i = 0; i < sections.length; i++) ...<Widget>[
+            if (i != 0) const AppFilterGroupDivider(),
+            sections[i],
+          ],
+        ],
+      ),
+    );
+
+    return SdBottomSheetV3(
+      title: _title(context),
+      closeTooltip: context.l10n.commonClose,
+      // A one-group sheet fits its chips; the whole sheet is a fixed height.
+      heightFactor: isWhole ? InventoryFilterSheet.heightFactor : null,
+      child: Column(
+        mainAxisSize: isWhole ? MainAxisSize.max : MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          if (isWhole)
+            Expanded(child: body)
+          else
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight:
+                    MediaQuery.sizeOf(context).height *
+                    InventoryFilterSheet.groupHeightFactor,
               ),
+              child: body,
             ),
-          ),
           SizedBox(height: SdContentPaddingV3.pinnedActionsGap),
           AppFilterSheetActions(
-            // The draft's own groups, and not the tab: this sheet does not
-            // offer the tab.
-            pending: criteria.activeCount,
-            onReset: () => _edit(ItemFilterCriteria.none),
+            pending: pending,
+            onReset: _reset,
             onApply: _apply,
           ),
         ],

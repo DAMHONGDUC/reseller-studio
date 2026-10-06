@@ -16,8 +16,9 @@ void main() {
       AppDetailActionButton(label: 'Actions', onPressed: () {}),
     );
 
-    final SdAppBarActionButtonV3 button = tester
-        .widget<SdAppBarActionButtonV3>(find.byType(SdAppBarActionButtonV3));
+    final SdAppBarActionButtonV3 button = tester.widget<SdAppBarActionButtonV3>(
+      find.byType(SdAppBarActionButtonV3),
+    );
 
     expect(button.icon, AppIconConstant.moreVert);
     expect(button.tooltip, 'Actions');

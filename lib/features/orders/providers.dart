@@ -19,7 +19,8 @@ import 'domain/enums/order_status.dart';
 import 'domain/services/payout_reconciliation.dart';
 import 'presentation/controllers/record_sale_controller.dart';
 
-/// The tabs across the top of Orders (plan §8).
+/// Orders' Show preset (plan §8) — the first group of the filter sheet and
+/// the first chip after Filters on the strip.
 enum OrderFilter {
   all,
   toShip,
@@ -42,6 +43,24 @@ enum OrderFilter {
           order.status == OrderStatus.returned ||
           order.status == OrderStatus.refunded,
   };
+
+  /// How many of [orders] each preset would show under [criteria] —
+  /// narrowed by everything except the preset itself. One copy for the
+  /// applied filters and a sheet's draft alike.
+  static Map<OrderFilter, int> countsIn(
+    List<Order> orders, {
+    required OrderFilterCriteria criteria,
+    required DateTime now,
+  }) {
+    final List<Order> pool = orders
+        .where((Order order) => criteria.matches(order, now: now))
+        .toList();
+
+    return <OrderFilter, int>{
+      for (final OrderFilter filter in OrderFilter.values)
+        filter: pool.where(filter.matches).length,
+    };
+  }
 }
 
 final StreamProvider<List<Order>> ordersProvider = StreamProvider<List<Order>>((
@@ -87,7 +106,7 @@ class OrderCriteriaController extends Notifier<OrderFilterCriteria> {
   /// Writes what the filter sheet was holding, once Apply is pressed — see
   /// `InventoryCriteriaController.apply` for why the sheet holds it.
   ///
-  /// [tab] is the strip's preset, which the sheet repeats as its first group.
+  /// [tab] is the Show preset, which the sheet holds as its first group.
   void apply(OrderFilterCriteria pending, {required OrderFilter tab}) {
     SdLogger.action(
       LogTagConstant.order,
@@ -131,25 +150,6 @@ final Provider<int> orderActiveFilterCountProvider = Provider<int>((Ref ref) {
 
   return tab == OrderFilter.all ? extras : extras + 1;
 });
-
-final Provider<Map<OrderFilter, int>> orderCountsProvider =
-    Provider<Map<OrderFilter, int>>((Ref ref) {
-      final List<Order> orders =
-          ref.watch(ordersProvider).value ?? const <Order>[];
-      final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
-      final DateTime now = ref.watch(clockProvider).now();
-
-      // Narrowed by the sheet but not by the tab, so a chip's number is
-      // exactly how many rows tapping it would show.
-      final List<Order> pool = orders
-          .where((Order order) => criteria.matches(order, now: now))
-          .toList();
-
-      return <OrderFilter, int>{
-        for (final OrderFilter filter in OrderFilter.values)
-          filter: pool.where(filter.matches).length,
-      };
-    });
 
 /// Marketplace id → the name to put on a chip, taken from the orders
 /// themselves.

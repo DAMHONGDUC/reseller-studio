@@ -1,22 +1,35 @@
 part of 'orders_screen.dart';
 
+/// The Filters chip first, then the Show preset, then one chip per group of
+/// the sheet — each opening that group alone (`docs/rules/SCREENS.md`).
 class _OrderFilterStrip extends ConsumerWidget {
   const _OrderFilterStrip();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final OrderFilter selected = ref.watch(orderFilterProvider);
-    final Map<OrderFilter, int> counts = ref.watch(orderCountsProvider);
+    final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
+    final OrderFilter tab = ref.watch(orderFilterProvider);
 
     return AppFilterStrip(
       children: <Widget>[
-        for (final OrderFilter filter in OrderFilter.values)
+        SdFilterChipV3(
+          icon: AppIconConstant.tune,
+          label: context.l10n.filterTitle,
+          selected: ref.watch(orderActiveFilterCountProvider) > 0,
+          onSelected: () => OrderFilterSheet.show(context),
+        ),
+        SdFilterChipV3(
+          label: context.l10n.filterShow,
+          opensSheet: true,
+          selected: tab != OrderFilter.all,
+          onSelected: () => OrderFilterSheet.showPreset(context),
+        ),
+        for (final OrderFilterGroup group in OrderFilterGroup.values)
           SdFilterChipV3(
-            label: OrderFilterLabel.of(context, filter),
-            count: counts[filter],
-            selected: filter == selected,
-            onSelected: () =>
-                ref.read(orderFilterProvider.notifier).select(filter),
+            label: group.label(context),
+            opensSheet: true,
+            selected: criteria.narrows(group),
+            onSelected: () => OrderFilterSheet.showGroup(context, group),
           ),
       ],
     );

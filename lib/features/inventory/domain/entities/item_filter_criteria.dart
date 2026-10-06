@@ -2,17 +2,17 @@ import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
 import '../../../../core/utils/set_utils.dart';
 import '../../item_filter_constant.dart';
+import '../enums/item_filter_group.dart';
 import '../enums/item_status.dart';
 import 'item.dart';
 
-/// Everything Inventory can be narrowed by beyond its five tabs.
+/// Everything Inventory can be narrowed by beyond its Show preset.
 ///
-/// **The tab strip and this are two different questions.** `InventoryFilter`
-/// is the one preset a seller taps constantly — all, draft, in stock, sold,
-/// stale — and it stays a single choice on the strip. This is the rest of the
-/// vocabulary: what it is, where it is, where it came from and what is missing
-/// from it. The two are ANDed, so a narrowed tab count is still the count of
-/// what the tab would show.
+/// **The preset and this are two different questions.** `InventoryFilter`
+/// is one single choice — all, draft, in stock, sold, stale. This is the rest
+/// of the vocabulary: what it is, where it is, where it came from and what is
+/// missing from it. The two are ANDed, so a preset's count is still the count
+/// of what that preset would show.
 ///
 /// **Empty means "not narrowed", never "nothing".** An empty set matches every
 /// item, which is what makes [none] the state the screen opens in.
@@ -59,21 +59,34 @@ class ItemFilterCriteria {
   /// **Counted by group, not by chip.** Three categories ticked is one filter
   /// ("category"), and telling a seller they have three filters on when they
   /// made one choice is a number they cannot reconcile with the sheet.
-  int get activeCount {
-    int count = 0;
+  int get activeCount => ItemFilterGroup.values.where(narrows).length;
 
-    if (statuses.isNotEmpty) count++;
-    if (conditions.isNotEmpty) count++;
-    if (categoryIds.isNotEmpty) count++;
-    if (locationIds.isNotEmpty) count++;
-    if (sourceIds.isNotEmpty) count++;
-    if (photos.isActive) count++;
-    if (cost.isActive) count++;
-    if (listed.isActive) count++;
-    if (added.isActive) count++;
+  /// Whether [group] is narrowing the list — what lights its chip.
+  bool narrows(ItemFilterGroup group) => switch (group) {
+    ItemFilterGroup.status => statuses.isNotEmpty,
+    ItemFilterGroup.condition => conditions.isNotEmpty,
+    ItemFilterGroup.category => categoryIds.isNotEmpty,
+    ItemFilterGroup.location => locationIds.isNotEmpty,
+    ItemFilterGroup.source => sourceIds.isNotEmpty,
+    ItemFilterGroup.photos => photos.isActive,
+    ItemFilterGroup.cost => cost.isActive,
+    ItemFilterGroup.listed => listed.isActive,
+    ItemFilterGroup.added => added.isActive,
+  };
 
-    return count;
-  }
+  /// These criteria with [group] back to "not narrowed" — a one-group
+  /// sheet's Reset, which must leave every other group alone.
+  ItemFilterCriteria cleared(ItemFilterGroup group) => switch (group) {
+    ItemFilterGroup.status => copyWith(statuses: none.statuses),
+    ItemFilterGroup.condition => copyWith(conditions: none.conditions),
+    ItemFilterGroup.category => copyWith(categoryIds: none.categoryIds),
+    ItemFilterGroup.location => copyWith(locationIds: none.locationIds),
+    ItemFilterGroup.source => copyWith(sourceIds: none.sourceIds),
+    ItemFilterGroup.photos => copyWith(photos: none.photos),
+    ItemFilterGroup.cost => copyWith(cost: none.cost),
+    ItemFilterGroup.listed => copyWith(listed: none.listed),
+    ItemFilterGroup.added => copyWith(added: none.added),
+  };
 
   bool get isActive => activeCount > 0;
 
