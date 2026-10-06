@@ -7,17 +7,11 @@ import '../enums/order_filter_group.dart';
 import '../enums/order_status.dart';
 import 'order.dart';
 
-/// Everything Orders can be narrowed by beyond its Show preset.
+/// Everything Orders can be narrowed by: where it is, which platform, when,
+/// how much, and what the order is still missing.
 ///
-/// The preset answers "where is it", one at a time. This answers the rest —
-/// which platform, when, how much, and what the order is still missing. The
-/// two are ANDed, so a preset's count is always the count of what that preset
-/// would show.
-///
-/// **[statuses] overlaps the presets on purpose.** The presets group the eight
-/// statuses into five, and `cancelled` and `awaitingPayment` are not
-/// presets of their own — a seller looking for exactly those has nowhere else
-/// to ask.
+/// **[statuses] is the raw eight**, and ticking several is how a seller asks
+/// for what the old To Ship and Returns presets grouped.
 class OrderFilterCriteria {
   const OrderFilterCriteria({
     this.statuses = const <OrderStatus>{},
@@ -98,6 +92,23 @@ class OrderFilterCriteria {
     if (!deadline.matches(order, now: now)) return false;
 
     return _matchesSaleRange(order.salePrice);
+  }
+
+  /// How many of [orders] each status would show on its own — under every
+  /// other group, but not the status group itself.
+  Map<OrderStatus, int> statusCounts(
+    List<Order> orders, {
+    required DateTime now,
+  }) {
+    final OrderFilterCriteria others = cleared(OrderFilterGroup.status);
+    final List<Order> pool = orders
+        .where((Order order) => others.matches(order, now: now))
+        .toList();
+
+    return <OrderStatus, int>{
+      for (final OrderStatus status in OrderStatus.values)
+        status: pool.where((Order order) => order.status == status).length,
+    };
   }
 
   /// Ticking a chip, as a value rather than as a write — the reason the

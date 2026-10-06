@@ -5,7 +5,7 @@ import '../../../../core/extensions/context_extensions.dart';
 /// One question Orders' filter sheet asks, in the order it asks them.
 ///
 /// The same single list `ItemFilterGroup` is for Inventory: the strip's chips
-/// and both sheets read it. The Show preset is `OrderFilter`, held apart.
+/// and both sheets read it.
 enum OrderFilterGroup {
   status,
   marketplace,

@@ -42,27 +42,28 @@ void main() {
         .map((SdFilterChipV3 chip) => chip.label)
         .toList();
 
-    expect(labels.take(3), <String>['Filters', 'Show', 'Status']);
+    expect(labels.take(2), <String>['Filters', 'Status']);
     expect(labels, contains('Category'));
-    // The presets are a group now, not chips of their own on the strip.
+    // No preset group and no preset chips: Status is the one question.
+    expect(labels, isNot(contains('Show')));
     expect(labels, isNot(contains('Draft')));
     // The entry point left the app bar.
     expect(find.byIcon(AppIconConstant.filterAlt), findsNothing);
   });
 
-  testWidgets('Filters opens every group, the preset first', (
+  testWidgets('Filters opens every group, Status first', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const InventoryScreen());
     await FilterSheetFinder.tapStripChip(tester, 'Filters');
 
     expect(find.byType(InventoryFilterSheet), findsOneWidget);
-    expect(inSheet('Show'), findsOneWidget);
+    expect(inSheet('Show'), findsNothing);
     expect(inSheet('Stale'), findsOneWidget);
     expect(inSheet('Category'), findsOneWidget);
     expect(inSheet('Source'), findsOneWidget);
-    // Ten groups, nine rules between them.
-    expect(find.byType(AppFilterGroupDivider), findsNWidgets(9));
+    // Nine groups, eight rules between them.
+    expect(find.byType(AppFilterGroupDivider), findsNWidgets(8));
   });
 
   testWidgets('a ticked chip is pending, and closing applies nothing', (
@@ -111,7 +112,7 @@ void main() {
     expect(find.text('1 filter applied'), findsOneWidget);
     expect(FilterSheetFinder.stripChipSelected(tester, 'Filters'), isTrue);
     expect(FilterSheetFinder.stripChipSelected(tester, 'Status'), isTrue);
-    expect(FilterSheetFinder.stripChipSelected(tester, 'Show'), isFalse);
+    expect(FilterSheetFinder.stripChipSelected(tester, 'Photos'), isFalse);
 
     await tester.tap(find.text('Reset'));
     await tester.pumpAndSettle();
@@ -147,8 +148,8 @@ void main() {
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const InventoryScreen());
-    await FilterSheetFinder.tapStripChip(tester, 'Show');
-    await tester.tap(inSheet('Draft'));
+    await FilterSheetFinder.tapStripChip(tester, 'Photos');
+    await tester.tap(inSheet('With photos'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
@@ -160,7 +161,7 @@ void main() {
 
     expect(find.text('2 filters applied'), findsOneWidget);
 
-    // Status's own sheet empties Status, and the preset stays on Draft.
+    // Status's own sheet empties Status, and Photos stays as it was.
     await FilterSheetFinder.tapStripChip(tester, 'Status');
     await tester.tap(FilterSheetFinder.reset());
     await tester.pumpAndSettle();
@@ -168,27 +169,32 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('1 filter applied'), findsOneWidget);
-    expect(FilterSheetFinder.stripChipSelected(tester, 'Show'), isTrue);
+    expect(FilterSheetFinder.stripChipSelected(tester, 'Photos'), isTrue);
     expect(FilterSheetFinder.stripChipSelected(tester, 'Status'), isFalse);
   });
 
-  testWidgets('the preset is a filter too, and Reset returns it to All', (
+  testWidgets('Stale is a Status option, and every option is counted', (
     WidgetTester tester,
   ) async {
+    SdFilterChipV3 sheetChip(String label) => tester.widget<SdFilterChipV3>(
+      find.descendant(
+        of: find.byType(InventoryFilterSheet),
+        matching: find.widgetWithText(SdFilterChipV3, label),
+      ),
+    );
+
     await pumpScreen(tester, const InventoryScreen());
-    await FilterSheetFinder.tapStripChip(tester, 'Show');
-    await tester.tap(inSheet('Draft'));
+    await FilterSheetFinder.tapStripChip(tester, 'Status');
+
+    expect(sheetChip('Stale').count, isNotNull);
+    expect(sheetChip('Draft').count, isNotNull);
+
+    await tester.tap(inSheet('Stale'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
 
     expect(find.text('1 filter applied'), findsOneWidget);
-    expect(FilterSheetFinder.stripChipSelected(tester, 'Filters'), isTrue);
-
-    await tester.tap(find.text('Reset'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('1 filter applied'), findsNothing);
-    expect(FilterSheetFinder.stripChipSelected(tester, 'Show'), isFalse);
+    expect(FilterSheetFinder.stripChipSelected(tester, 'Status'), isTrue);
   });
 }

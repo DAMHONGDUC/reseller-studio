@@ -1,45 +1,5 @@
 part of 'inventory_filter_sheet.dart';
 
-/// The Show preset, each chip carrying how many rows it would leave under
-/// the draft.
-class _PresetGroup extends ConsumerWidget {
-  const _PresetGroup({
-    required this.draft,
-    required this.selected,
-    required this.showTitle,
-    required this.onSelected,
-  });
-
-  final ItemFilterCriteria draft;
-  final InventoryFilter selected;
-  final bool showTitle;
-  final ValueChanged<InventoryFilter> onSelected;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final Map<InventoryFilter, int> counts = InventoryFilter.countsIn(
-      ref.watch(itemsProvider).value ?? const <Item>[],
-      criteria: draft,
-      query: ref.watch(inventorySearchProvider),
-      now: ref.watch(clockProvider).now(),
-    );
-
-    return AppFilterChipGroup<InventoryFilter>(
-      title: showTitle ? context.l10n.filterShow : null,
-      options: <AppFilterOption<InventoryFilter>>[
-        for (final InventoryFilter tab in InventoryFilter.values)
-          AppFilterOption<InventoryFilter>(
-            value: tab,
-            label: tab.label,
-            count: counts[tab],
-          ),
-      ],
-      selected: <InventoryFilter>{selected},
-      onSelected: onSelected,
-    );
-  }
-}
-
 /// One group of the sheet, edited on the draft.
 class _ItemFilterGroupView extends ConsumerWidget {
   const _ItemFilterGroupView({
@@ -86,18 +46,10 @@ class _ItemFilterGroupView extends ConsumerWidget {
     final String? title = showTitle ? group.label(context) : null;
 
     return switch (group) {
-      ItemFilterGroup.status => AppFilterChipGroup<ItemStatus>(
+      ItemFilterGroup.status => _StatusGroup(
         title: title,
-        options: <AppFilterOption<ItemStatus>>[
-          for (final ItemStatus status in ItemStatus.values)
-            AppFilterOption<ItemStatus>(
-              value: status,
-              label: status.label(context),
-            ),
-        ],
-        selected: draft.statuses,
-        onSelected: (ItemStatus value) =>
-            onEdit(draft.withStatusToggled(value)),
+        draft: draft,
+        onEdit: onEdit,
       ),
       ItemFilterGroup.condition => AppFilterChipGroup<ItemCondition>(
         title: title,
@@ -177,5 +129,43 @@ class _ItemFilterGroupView extends ConsumerWidget {
         onSelected: (DateRangeFilter value) => onEdit(draft.withAdded(value)),
       ),
     };
+  }
+}
+
+/// Status, Stale among the options, each carrying how many rows ticking it
+/// alone would show under the draft's other groups.
+class _StatusGroup extends ConsumerWidget {
+  const _StatusGroup({
+    required this.title,
+    required this.draft,
+    required this.onEdit,
+  });
+
+  final String? title;
+  final ItemFilterCriteria draft;
+  final ValueChanged<ItemFilterCriteria> onEdit;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final Map<ItemStatusFilter, int> counts = draft.statusCounts(
+      ref.watch(itemsProvider).value ?? const <Item>[],
+      query: ref.watch(inventorySearchProvider),
+      now: ref.watch(clockProvider).now(),
+    );
+
+    return AppFilterChipGroup<ItemStatusFilter>(
+      title: title,
+      options: <AppFilterOption<ItemStatusFilter>>[
+        for (final ItemStatusFilter status in ItemStatusFilter.values)
+          AppFilterOption<ItemStatusFilter>(
+            value: status,
+            label: status.label(context),
+            count: counts[status],
+          ),
+      ],
+      selected: draft.statuses,
+      onSelected: (ItemStatusFilter value) =>
+          onEdit(draft.withStatusToggled(value)),
+    );
   }
 }

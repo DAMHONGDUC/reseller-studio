@@ -58,15 +58,15 @@ void main() {
     expect(find.text('Go to inventory'), findsNothing);
   });
 
-  testWidgets('an empty tab on a real business still blames the filter', (
+  testWidgets('an empty status on a real business still blames the filter', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
-    // Shipped is the seeded tab with nothing under it while the others are
-    // full — exactly the case the shared widget has to keep telling apart.
-    // The preset's chip, not the order cards' track, which also reads
+    // Shipped is the seeded status with nothing under it while the others
+    // are full — exactly the case the shared widget has to keep telling
+    // apart. The sheet's chip, not the order cards' track, which also reads
     // "Shipped".
-    await FilterSheetFinder.tapStripChip(tester, 'Show');
+    await FilterSheetFinder.tapStripChip(tester, 'Status');
     await tester.tap(
       find.descendant(
         of: find.byType(OrderFilterSheet),

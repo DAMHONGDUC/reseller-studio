@@ -14,6 +14,7 @@ import '../../domain/entities/item_category.dart';
 import '../../domain/entities/item_filter_criteria.dart';
 import '../../domain/enums/item_filter_group.dart';
 import '../../domain/enums/item_status.dart';
+import '../../domain/enums/item_status_filter.dart';
 import '../../item_filter_constant.dart';
 import '../../providers.dart';
 
@@ -28,20 +29,12 @@ part 'inventory_filter_sheet_group.dart';
 /// deciding, and closing the sheet any other way leaves the list exactly as
 /// they found it.
 ///
-/// - **Reset empties what this sheet shows** — every group in the whole
-///   sheet, one group in a one-group sheet (`docs/rules/SCREENS.md`)
-/// - **The Show preset is the first group**, and part of the draft
+/// **Reset empties what this sheet shows** — every group in the whole sheet,
+/// one group in a one-group sheet (`docs/rules/SCREENS.md`).
 class InventoryFilterSheet extends ConsumerStatefulWidget {
-  const InventoryFilterSheet({
-    this.preset = true,
-    this.groups = ItemFilterGroup.values,
-    super.key,
-  });
+  const InventoryFilterSheet({this.groups = ItemFilterGroup.values, super.key});
 
-  /// Whether the Show preset is offered.
-  final bool preset;
-
-  /// The groups offered after the preset, in the sheet's order.
+  /// The groups offered, in the sheet's order.
   final List<ItemFilterGroup> groups;
 
   /// How much of the screen the whole sheet takes. Fixed rather than sized to
@@ -57,18 +50,9 @@ class InventoryFilterSheet extends ConsumerStatefulWidget {
   static Future<void> show(BuildContext context) =>
       _present(context, const InventoryFilterSheet());
 
-  /// The Show preset alone.
-  static Future<void> showPreset(BuildContext context) => _present(
-    context,
-    const InventoryFilterSheet(groups: <ItemFilterGroup>[]),
-  );
-
   /// One group alone — its chip on the strip.
   static Future<void> showGroup(BuildContext context, ItemFilterGroup group) =>
-      _present(
-        context,
-        InventoryFilterSheet(preset: false, groups: <ItemFilterGroup>[group]),
-      );
+      _present(context, InventoryFilterSheet(groups: <ItemFilterGroup>[group]));
 
   static Future<void> _present(
     BuildContext context,
@@ -79,7 +63,7 @@ class InventoryFilterSheet extends ConsumerStatefulWidget {
   );
 
   /// Whether this is the whole sheet rather than one group of it.
-  bool get isWhole => preset && groups.length == ItemFilterGroup.values.length;
+  bool get isWhole => groups.length == ItemFilterGroup.values.length;
 
   @override
   ConsumerState<InventoryFilterSheet> createState() =>
@@ -92,21 +76,15 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
   /// after that moves this and nothing else.
   late ItemFilterCriteria _draft = ref.read(inventoryCriteriaProvider);
 
-  /// The Show preset, pending like everything else here.
-  late InventoryFilter _tab = ref.read(inventoryFilterProvider);
-
   void _edit(ItemFilterCriteria next) => setState(() => _draft = next);
 
-  void _selectTab(InventoryFilter tab) => setState(() => _tab = tab);
-
   void _apply() {
-    ref.read(inventoryCriteriaProvider.notifier).apply(_draft, tab: _tab);
+    ref.read(inventoryCriteriaProvider.notifier).apply(_draft);
     Navigator.of(context).pop();
   }
 
   /// Empties what this sheet shows, and leaves every other group alone.
   void _reset() => setState(() {
-    if (widget.preset) _tab = InventoryFilter.all;
     _draft = widget.groups.fold(
       _draft,
       (ItemFilterCriteria criteria, ItemFilterGroup group) =>
@@ -115,26 +93,16 @@ class _InventoryFilterSheetState extends ConsumerState<InventoryFilterSheet> {
   });
 
   String _title(BuildContext context) {
-    if (widget.isWhole) return context.l10n.filterTitle;
-    if (widget.groups.isEmpty) return context.l10n.filterShow;
-
-    return widget.groups.single.label(context);
+    return widget.isWhole
+        ? context.l10n.filterTitle
+        : widget.groups.single.label(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isWhole = widget.isWhole;
-    final int pending =
-        (widget.preset && _tab != InventoryFilter.all ? 1 : 0) +
-        widget.groups.where(_draft.narrows).length;
+    final int pending = widget.groups.where(_draft.narrows).length;
     final List<Widget> sections = <Widget>[
-      if (widget.preset)
-        _PresetGroup(
-          draft: _draft,
-          selected: _tab,
-          showTitle: isWhole,
-          onSelected: _selectTab,
-        ),
       for (final ItemFilterGroup group in widget.groups)
         _ItemFilterGroupView(
           group: group,

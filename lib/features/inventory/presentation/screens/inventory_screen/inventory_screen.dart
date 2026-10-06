@@ -46,8 +46,8 @@ part 'inventory_screen_item_list.dart';
 /// Inventory — "what do I have?".
 ///
 /// **The strip is the filter sheet laid out sideways**: the Filters chip
-/// opens the whole sheet, and every chip after it opens one group of it —
-/// the Show preset (plan §7) first (`docs/rules/SCREENS.md`).
+/// opens the whole sheet, and every chip after it opens one group of it
+/// (`docs/rules/SCREENS.md`).
 ///
 /// **The chrome collapses as the list scrolls.** `SdSearchHeaderV3` docks the
 /// search field into the title's row and pins the filter strip under it, so a

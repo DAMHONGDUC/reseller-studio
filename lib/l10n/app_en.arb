@@ -1895,14 +1895,6 @@
   "@ordersNoMatch": {
     "description": "Empty state when a tab is empty."
   },
-  "orderFilterToShip": "To Ship",
-  "@orderFilterToShip": {
-    "description": "Orders tab. Folds in awaiting-payment: from the seller’s point of view both are \"not gone yet\"."
-  },
-  "orderFilterReturns": "Returns",
-  "@orderFilterReturns": {
-    "description": "Orders tab covering return requested, returned and refunded."
-  },
   "orderLate": "Late",
   "@orderLate": {
     "description": "Badge on an order past its shipping deadline. The one thing here with an external penalty."
@@ -6271,10 +6263,6 @@
   "filterStatus": "Status",
   "@filterStatus": {
     "description": "Filter group over the record's status."
-  },
-  "filterShow": "Show",
-  "@filterShow": {
-    "description": "Orders filter sheet group repeating the tab strip's presets: All, To Ship, Shipped, Delivered, Returns."
   },
   "filterCategory": "Category",
   "@filterCategory": {

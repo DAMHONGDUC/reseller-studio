@@ -8,7 +8,9 @@ import 'package:reseller_studio/features/analytics/domain/entities/analytics_sum
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import 'package:reseller_studio/features/analytics/providers.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item_filter_criteria.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status_filter.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
@@ -107,43 +109,30 @@ void main() {
   });
 
   group('inventory filters', () {
-    test('counts split the seed across the five presets', () async {
+    test('status counts split the seed, Stale among them', () async {
       final ProviderContainer container = mockContainer();
 
       await warmUp(container);
 
-      final Map<InventoryFilter, int> counts = InventoryFilter.countsIn(
-        container.read(itemsProvider).value!,
-        criteria: ItemFilterCriteria.none,
-        query: '',
-        now: container.read(clockProvider).now(),
-      );
+      final List<Item> items = container.read(itemsProvider).value!;
+      final Map<ItemStatusFilter, int> counts = ItemFilterCriteria.none
+          .statusCounts(
+            items,
+            query: '',
+            now: container.read(clockProvider).now(),
+          );
 
-      expect(counts[InventoryFilter.all], 11);
-      expect(counts[InventoryFilter.inStock], 6);
-      expect(counts[InventoryFilter.draft], 2);
-      expect(counts[InventoryFilter.sold], 3);
+      expect(items, hasLength(11));
+      expect(counts[ItemStatusFilter.inStock], 6);
+      expect(counts[ItemStatusFilter.draft], 2);
+      expect(counts[ItemStatusFilter.sold], 3);
       // itm-4 (listed 84 days ago) and itm-5 (66) are past the 60-day
       // threshold; itm-6 (20 days) is not.
-      expect(counts[InventoryFilter.stale], 2);
-    });
-
-    test('stale is a subset of stock, never its own status', () async {
-      final ProviderContainer container = mockContainer();
-
-      await warmUp(container);
-
-      final Map<InventoryFilter, int> counts = InventoryFilter.countsIn(
-        container.read(itemsProvider).value!,
-        criteria: ItemFilterCriteria.none,
-        query: '',
-        now: container.read(clockProvider).now(),
-      );
-
+      expect(counts[ItemStatusFilter.stale], 2);
+      // A stale item is still stock the seller is holding.
       expect(
-        counts[InventoryFilter.stale]! <= counts[InventoryFilter.inStock]!,
+        counts[ItemStatusFilter.stale]! <= counts[ItemStatusFilter.inStock]!,
         isTrue,
-        reason: 'a stale item is still stock the seller is holding',
       );
     });
   });

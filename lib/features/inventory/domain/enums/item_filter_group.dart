@@ -5,9 +5,7 @@ import '../../../../core/extensions/context_extensions.dart';
 /// One question Inventory's filter sheet asks, in the order it asks them.
 ///
 /// **The strip's chips, the full sheet and a one-group sheet all read this
-/// list**, so a new group cannot reach one of them without the others. The
-/// Show preset is not here: it is `InventoryFilter`, held apart from the
-/// criteria, and every reader puts it first.
+/// list**, so a new group cannot reach one of them without the others.
 enum ItemFilterGroup {
   status,
   condition,

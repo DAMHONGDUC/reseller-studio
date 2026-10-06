@@ -37,11 +37,10 @@ part 'orders_screen_order_progress.dart';
 
 /// Orders — "what am I selling and processing?".
 ///
-/// The Show preset is `All | To Ship | Shipped | Delivered | Returns` (plan
-/// §8), reached from the strip like every other filter group, and Offers live
-/// under this tab rather than as a sixth bottom tab.
+/// The strip filters by status and every other group of the filter sheet,
+/// and Offers live under this tab rather than as a sixth bottom tab.
 ///
-/// **To Ship is the tab that matters**; everything else is history. An
+/// **To Ship is the status that matters**; everything else is history. An
 /// overdue order is called out in red on its row, because the shipping
 /// deadline is the one thing here with an external penalty attached.
 ///

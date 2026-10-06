@@ -5,6 +5,7 @@ import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item_filter_criteria.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status_filter.dart';
 import 'package:reseller_studio/features/inventory/item_filter_constant.dart';
 
 /// What Inventory's filter sheet asks of an item, and what it tells the
@@ -137,10 +138,88 @@ void main() {
     });
   });
 
+  group('status', () {
+    test('every status is an option, and Stale is the one extra', () {
+      expect(
+        ItemStatusFilter.values
+            .map((ItemStatusFilter option) => option.status)
+            .whereType<ItemStatus>()
+            .toSet(),
+        ItemStatus.values.toSet(),
+      );
+      expect(ItemStatusFilter.stale.status, isNull);
+    });
+
+    test('Stale is stock listed long ago, never a draft unlisted', () {
+      const ItemFilterCriteria stale = ItemFilterCriteria(
+        statuses: <ItemStatusFilter>{ItemStatusFilter.stale},
+      );
+
+      expect(
+        stale.matches(itemWith(listedAt: DateTime(2026, 5, 1)), now: now),
+        isTrue,
+      );
+      expect(
+        stale.matches(itemWith(listedAt: DateTime(2026, 8, 20)), now: now),
+        isFalse,
+      );
+      expect(stale.matches(itemWith(), now: now), isFalse);
+      expect(
+        stale.matches(
+          itemWith(status: ItemStatus.sold, listedAt: DateTime(2026, 5, 1)),
+          now: now,
+        ),
+        isFalse,
+      );
+    });
+
+    test('options OR with each other, Stale included', () {
+      const ItemFilterCriteria criteria = ItemFilterCriteria(
+        statuses: <ItemStatusFilter>{
+          ItemStatusFilter.draft,
+          ItemStatusFilter.stale,
+        },
+      );
+
+      expect(
+        criteria.matches(itemWith(status: ItemStatus.draft), now: now),
+        isTrue,
+      );
+      expect(
+        criteria.matches(itemWith(listedAt: DateTime(2026, 5, 1)), now: now),
+        isTrue,
+      );
+      expect(criteria.matches(itemWith(), now: now), isFalse);
+    });
+
+    test('a count ignores the status group but not the others', () {
+      const ItemFilterCriteria criteria = ItemFilterCriteria(
+        statuses: <ItemStatusFilter>{ItemStatusFilter.sold},
+        categoryIds: <String>{'cat-1'},
+      );
+      final Map<ItemStatusFilter, int> counts = criteria.statusCounts(
+        <Item>[
+          itemWith(categoryId: 'cat-1'),
+          itemWith(status: ItemStatus.draft, categoryId: 'cat-1'),
+          itemWith(categoryId: 'cat-2'),
+        ],
+        query: '',
+        now: now,
+      );
+
+      expect(counts[ItemStatusFilter.inStock], 1);
+      expect(counts[ItemStatusFilter.draft], 1);
+      expect(counts[ItemStatusFilter.sold], 0);
+    });
+  });
+
   group('activeCount', () {
     test('counts groups, not chips', () {
       const ItemFilterCriteria criteria = ItemFilterCriteria(
-        statuses: <ItemStatus>{ItemStatus.draft, ItemStatus.inStock},
+        statuses: <ItemStatusFilter>{
+          ItemStatusFilter.draft,
+          ItemStatusFilter.inStock,
+        },
         categoryIds: <String>{'cat-1', 'cat-2', 'cat-3'},
       );
 

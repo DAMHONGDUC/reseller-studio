@@ -5,6 +5,8 @@ import 'package:reseller_studio/core/widgets/app_filter_chip_group.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:reseller_studio/features/orders/presentation/widgets/order_filter_sheet.dart';
 
+import 'package:system_design/index.dart';
+
 import '../../support/filter_sheet_finder.dart';
 import '../../support/pump_app.dart';
 
@@ -16,7 +18,7 @@ void main() {
     matching: find.text(label),
   );
 
-  testWidgets('Filters opens every group, the preset first', (
+  testWidgets('Filters opens every group, Status first', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
@@ -27,13 +29,12 @@ void main() {
     await FilterSheetFinder.tapStripChip(tester, 'Filters');
 
     expect(find.byType(OrderFilterSheet), findsOneWidget);
-    expect(inSheet('Show'), findsOneWidget);
+    expect(inSheet('Show'), findsNothing);
     expect(inSheet('Marketplace'), findsOneWidget);
     expect(inSheet('Payout'), findsOneWidget);
-    // The two statuses no preset offers on its own.
     expect(inSheet('Cancelled'), findsOneWidget);
-    // Seven chip groups and the sale range: eight blocks, seven rules.
-    expect(find.byType(AppFilterGroupDivider), findsNWidgets(7));
+    // Six chip groups and the sale range: seven blocks, six rules.
+    expect(find.byType(AppFilterGroupDivider), findsNWidgets(6));
   });
 
   testWidgets('a ticked chip is pending until Apply, and Reset undoes it', (
@@ -72,42 +73,34 @@ void main() {
     expect(find.byType(AppActiveFilterBar), findsNothing);
   });
 
-  testWidgets('the Show chip opens the presets alone, pending until Apply', (
+  testWidgets('Status is the raw statuses, each with its count', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
-    await FilterSheetFinder.tapStripChip(tester, 'Show');
+    await FilterSheetFinder.tapStripChip(tester, 'Status');
 
-    expect(inSheet('Returns'), findsOneWidget);
-    expect(inSheet('Marketplace'), findsNothing);
-    expect(FilterSheetFinder.resetEnabled(tester), isFalse);
-
-    await tester.tap(inSheet('Returns'));
-    await tester.pumpAndSettle();
-
-    expect(FilterSheetFinder.resetEnabled(tester), isTrue);
-
-    await tester.tap(find.text('Apply'));
-    await tester.pumpAndSettle();
-
-    expect(FilterSheetFinder.stripChipSelected(tester, 'Show'), isTrue);
-
-    // Inside the sheet, Reset returns the preset to All.
-    await FilterSheetFinder.tapStripChip(tester, 'Show');
-    await tester.tap(FilterSheetFinder.reset());
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Apply'));
-    await tester.pumpAndSettle();
-
-    expect(FilterSheetFinder.stripChipSelected(tester, 'Show'), isFalse);
+    // What the old presets grouped is ticked status by status now.
+    expect(inSheet('To Ship'), findsNothing);
+    expect(inSheet('Cancelled'), findsOneWidget);
+    expect(
+      tester
+          .widget<SdFilterChipV3>(
+            find.descendant(
+              of: find.byType(OrderFilterSheet),
+              matching: find.widgetWithText(SdFilterChipV3, 'Cancelled'),
+            ),
+          )
+          .count,
+      isNotNull,
+    );
   });
 
   testWidgets('a one-group Reset leaves every other group alone', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
-    await FilterSheetFinder.tapStripChip(tester, 'Show');
-    await tester.tap(inSheet('Returns'));
+    await FilterSheetFinder.tapStripChip(tester, 'Tracking');
+    await tester.tap(inSheet('With tracking'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
@@ -126,7 +119,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('1 filter applied'), findsOneWidget);
-    expect(FilterSheetFinder.stripChipSelected(tester, 'Show'), isTrue);
+    expect(FilterSheetFinder.stripChipSelected(tester, 'Tracking'), isTrue);
     expect(FilterSheetFinder.stripChipSelected(tester, 'Status'), isFalse);
   });
 }

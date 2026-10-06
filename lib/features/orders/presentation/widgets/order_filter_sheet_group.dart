@@ -1,44 +1,5 @@
 part of 'order_filter_sheet.dart';
 
-/// The Show preset, each chip carrying how many orders it would leave under
-/// the draft.
-class _PresetGroup extends ConsumerWidget {
-  const _PresetGroup({
-    required this.draft,
-    required this.selected,
-    required this.showTitle,
-    required this.onSelected,
-  });
-
-  final OrderFilterCriteria draft;
-  final OrderFilter selected;
-  final bool showTitle;
-  final ValueChanged<OrderFilter> onSelected;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final Map<OrderFilter, int> counts = OrderFilter.countsIn(
-      ref.watch(ordersProvider).value ?? const <Order>[],
-      criteria: draft,
-      now: ref.watch(clockProvider).now(),
-    );
-
-    return AppFilterChipGroup<OrderFilter>(
-      title: showTitle ? context.l10n.filterShow : null,
-      options: <AppFilterOption<OrderFilter>>[
-        for (final OrderFilter tab in OrderFilter.values)
-          AppFilterOption<OrderFilter>(
-            value: tab,
-            label: OrderFilterLabel.of(context, tab),
-            count: counts[tab],
-          ),
-      ],
-      selected: <OrderFilter>{selected},
-      onSelected: onSelected,
-    );
-  }
-}
-
 /// One group of the sheet, edited on the draft.
 class _OrderFilterGroupView extends ConsumerWidget {
   const _OrderFilterGroupView({
@@ -79,18 +40,10 @@ class _OrderFilterGroupView extends ConsumerWidget {
     final String? title = showTitle ? group.label(context) : null;
 
     return switch (group) {
-      OrderFilterGroup.status => AppFilterChipGroup<OrderStatus>(
+      OrderFilterGroup.status => _StatusGroup(
         title: title,
-        options: <AppFilterOption<OrderStatus>>[
-          for (final OrderStatus status in OrderStatus.values)
-            AppFilterOption<OrderStatus>(
-              value: status,
-              label: OrderStatusLabel.of(context, status),
-            ),
-        ],
-        selected: draft.statuses,
-        onSelected: (OrderStatus value) =>
-            onEdit(draft.withStatusToggled(value)),
+        draft: draft,
+        onEdit: onEdit,
       ),
       OrderFilterGroup.marketplace => AppFilterChipGroup<String>(
         title: title,
@@ -216,6 +169,42 @@ class _SaleRange extends ConsumerWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// The raw statuses, each carrying how many orders ticking it alone would
+/// show under the draft's other groups.
+class _StatusGroup extends ConsumerWidget {
+  const _StatusGroup({
+    required this.title,
+    required this.draft,
+    required this.onEdit,
+  });
+
+  final String? title;
+  final OrderFilterCriteria draft;
+  final ValueChanged<OrderFilterCriteria> onEdit;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final Map<OrderStatus, int> counts = draft.statusCounts(
+      ref.watch(ordersProvider).value ?? const <Order>[],
+      now: ref.watch(clockProvider).now(),
+    );
+
+    return AppFilterChipGroup<OrderStatus>(
+      title: title,
+      options: <AppFilterOption<OrderStatus>>[
+        for (final OrderStatus status in OrderStatus.values)
+          AppFilterOption<OrderStatus>(
+            value: status,
+            label: OrderStatusLabel.of(context, status),
+            count: counts[status],
+          ),
+      ],
+      selected: draft.statuses,
+      onSelected: (OrderStatus value) => onEdit(draft.withStatusToggled(value)),
     );
   }
 }
