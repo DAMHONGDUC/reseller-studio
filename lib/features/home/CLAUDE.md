@@ -81,13 +81,13 @@ decide it, and they are listed in the order they outrank each other.
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
 
-**Home is taller than a phone, so a section-order test cannot read pixels.**
-A lazy `ListView` estimates the extent of every child it has not built, which
-makes `position.pixels` a moving target rather than an absolute coordinate —
-two scrolled measurements compared against each other reported the wrong
-order outright. `home_section_order_test.dart` scrolls from the top and
-compares the order sections *come into view* in, sorting anything that arrives
-in the same frame by its y within that frame.
+**A section-order test reads the order sections come into view in, not
+pixels.** Home was a lazy `ListView` whose estimated extent made
+`position.pixels` a moving target and once reported the wrong order outright.
+It is built whole now, but `home_section_order_test.dart` still scrolls from
+the top and compares arrival order, sorting anything that arrives in the same
+frame by its y within that frame — the test does not depend on how the body is
+built.
 
 **Quick Action stays last on its own merit**, for the reason in point 6. The
 shortcut row's Quick Action button scrolls to it wherever it sits, so the
