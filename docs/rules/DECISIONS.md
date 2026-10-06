@@ -614,3 +614,24 @@ button forever, and both are closed.
 **Why not the `sign_in_with_apple` package.** It is a new dependency for about
 a hundred lines of Swift, and the bug was in who owns the presentation — moving
 that to another package moves the question rather than answering it.
+
+## A refused permission opens Settings through the app's own channel
+
+A seller who refused the camera got "Something went wrong" on a photo, a
+blank error icon on the scanner, and nothing at all about notifications —
+and no way back but finding the app's page in Settings themselves.
+`PermissionSettingsSheet` now says what is off and opens that page.
+
+- **Shown only when the system will not ask again.** iOS asks once, so any
+  refusal is final. Android asks twice: the first refusal is the seller
+  changing their mind and is treated like a cancel; the sheet comes once
+  `shouldShowRequestPermissionRationale` says the dialog is gone for good.
+- **The plugins still do the asking.** `image_picker`, `mobile_scanner` and
+  FCM request their own permissions; `SystemPermissions` only answers what
+  happens after they were told no.
+
+**Why not `permission_handler`.** Two questions — "will it ask again?" and
+"open Settings" — are about sixty lines across `SystemPermissionsPlugin.swift`
+and `MainActivity.kt`, the same trade as the Apple sheet above. The package
+would also become a second thing requesting the same permissions the plugins
+already request, and the two can disagree about what was asked.
