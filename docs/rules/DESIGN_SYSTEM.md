@@ -353,16 +353,16 @@ Owner's rules, all of them read from one place so no screen types them:
   bottom. **A control docking into the bar pads itself; it does not fill the
   bar.**
 - **A row in a sheet that can be the chosen one is `AppSelectableRow`**
-  (`core/widgets/`). It owns the ground, the corner and the hit target, and
-  nothing else — what "chosen" looks like inside stays the sheet's, because
-  the picker ticks the row while the workspace switcher fills its icon tile.
+  (`core/widgets/`). It owns the ground and the hit target, and nothing
+  else — what "chosen" looks like inside stays the sheet's, because the
+  picker ticks the row while the workspace switcher fills its icon tile.
   Two things it settles that a hand-rolled `InkWell` kept getting wrong: a
   one-line row is otherwise only as tall as its text, which is under the 44pt
   Apple asks for; and the chosen row said so only with a tick at the far right,
   which is a long way from the label somebody is actually reading. **Colour is
   never the only signal** — the ground comes with a weight change and a glyph.
-  Rows separated by a gap rather than a hairline: each carries its own rounded
-  ground, and a rule cutting through that reads as two competing shapes.
+  The ground is square and full-bleed: the row sits in an
+  `AppSheetOptionList` card, which rounds the corners.
 - **The rule between two rows is `SdDividerV3`, never Material's `Divider`.**
   Material reserves a whole `height` around a rule only `thickness` tall, and
   defaults that height to 16 — so a call site asking for a hairline silently
@@ -941,9 +941,21 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   the choices.
   - Between items only, per the divider rule below: nothing above the first row
     or below the last.
-  - The rule keeps a small gap either side, because a picker's chosen row draws
-    a rounded ground and a hairline flush against that corner reads as two
-    shapes fighting.
+- **A sheet's options sit in one card, the card Home's lists use.**
+  `AppSheetOptionList` is an `SdCardV3` with no padding, so its rules run edge
+  to edge like any hairline inside a card. Loose rows were set a gutter past
+  the sheet's title, with rules running wider than the rows; the card's edge
+  lines up with the title and the rows inset from it.
+  - **The plain `surface` layer, not `elevated`.** The modal already sits a
+    step below a card; the elevated shade is the divider's own colour in
+    dark, which hid every rule.
+  - **A group is its own card.** A different kind of row — the switcher's
+    invitations, its "create a business" — gets a second card, with
+    `listItemGap` between them, rather than a rule in the same one.
+- **A sheet's action is a tile, a label and a target, like an `AppListRow`.**
+  `AppSheetActionRow` leads with an `SdIconTileV3` in the primary accent and a
+  semi-bold label; a destructive one tints both in `danger`. A picker option
+  that carries an icon wears the same tile, filled when it is the chosen one.
 - Use `SdPressableScaleV3` for tactile button feedback.
 
 ## The rest of the primitives
