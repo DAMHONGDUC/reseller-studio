@@ -991,6 +991,11 @@ quietly re-invent one.
   one short doc comment stating its UI meaning and one blank line before the
   next entry.** The name alone is not enough when one glyph serves several
   workflows, and the separation keeps future icon-source swaps reviewable.
+- **One action, one glyph — scanning is `AppIconConstant.barcodeScanner`
+  everywhere.** Owner's rule. Inventory's app bar, the scan result and the
+  purchase evaluator drew a QR mark while Home, Quick Add and Add stock drew
+  a barcode, so the same camera looked like two features. The registry holds
+  no second scan glyph, so a screen cannot pick one.
 - **An enum's colour — and its label — live on that enum, as one extension in
   the enum's own file** — owner's rule. `ItemStatusDisplay` sits in
   `domain/enums/item_status.dart` beside the enum, carrying
