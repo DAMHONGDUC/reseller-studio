@@ -196,15 +196,20 @@ as a fresh install.**
   once as the router's `/splash` route with no child, already inside the tree
   the first one gated.
 - **The outer one sits above `ForceUpdateGate`, and that ordering is the
-  point.** `clearPersistence` throws `failed-precondition` once the Firestore
-  client is running, and `ForceUpdateGate`'s `app_config` read is what starts
-  it on the first frame — so nothing below may build until the check returns.
-  Letting the first screen build alongside would also race the sign-out against
-  the screens reading that session.
+  point.** Letting the first screen build alongside the wipe would race its
+  sign-out against the screens reading that session.
+- **The splash does not stop every listener, and it cannot.** The router is
+  built above it and listens to `app_config` and the user profile on the first
+  frame. So every Firestore listener goes through `FirestoreMaintenance`
+  (`core/firestore/`): a reset detaches them, terminates, clears the cache and
+  re-attaches them, and a listener opened mid-reset waits. A listen that
+  reaches a terminating client is an uncatchable abort on iOS — TestFlight
+  builds 45 and 46 crashed on launch exactly that way, because the wipe's
+  sign-out makes `app_config` re-subscribe just before `terminate`.
   `test/core/widgets/splash_screen_test.dart` pins all three states.
 - **`AppFreshInstall` is the half that touches the device**, and it is an
   `SdFreshInstallHost`: `isBackendReady`, `signOut` (Google then Firebase), and
-  `clearCache` (`terminate` then `clearPersistence`). Nothing else — the order
+  `clearCache` (`FirestoreMaintenance.reset`). Nothing else — the order
   of a wipe and the names of its steps are `SdFreshInstall`'s. Emptying
   preferences is appended there and takes the onboarding flag with it, because
   that is what a fresh install is.
