@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:system_design/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
+import '../../../../core/firestore/firestore_maintenance.dart';
 import '../../domain/entities/app_config.dart';
 import '../../domain/repositories/app_config_repository.dart';
 import '../dtos/app_config_dto.dart';
@@ -24,11 +25,11 @@ class FirestoreAppConfigRepository implements AppConfigRepository {
 
   final FirebaseFirestore _firestore;
 
+  DocumentReference<Map<String, Object?>> get _document =>
+      _firestore.collection(AppConfigDto.collection).doc(AppConfigDto.document);
+
   @override
-  Stream<AppConfig> watch() => _firestore
-      .collection(AppConfigDto.collection)
-      .doc(AppConfigDto.document)
-      .snapshots()
+  Stream<AppConfig> watch() => FirestoreMaintenance.listen(_document.snapshots)
       .map((DocumentSnapshot<Map<String, Object?>> doc) {
         final AppConfig config = doc.exists
             ? AppConfigDto.toEntity(doc)
