@@ -1,6 +1,7 @@
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/seed_data/domain/seed_dataset.dart';
 
 /// One sample bottle: the label drawn in `sample_bottles/<slug>.svg` and the
 /// code a scanner reads off it.
@@ -28,12 +29,13 @@ class SampleBottle {
 /// from retail labels, and one that matches nothing.
 ///
 /// The SVGs are printable: point a phone at one on screen to try the scanner
-/// for real. `generate.py` draws them from the same codes.
+/// for real. The owned codes are `SeedDatasetConstant`'s, so a seeded
+/// workspace finds them; `generate.py` draws the labels from the same codes.
 final class SampleBottles {
   static const SampleBottle perfume = SampleBottle(
     slug: 'perfume',
     title: 'Santal 33 eau de parfum — 50 ml',
-    code: '5901234123457',
+    code: SeedDatasetConstant.ean13Barcode,
     itemId: 'itm-bottle-perfume',
   );
 
@@ -41,14 +43,14 @@ final class SampleBottles {
   static const SampleBottle flask = SampleBottle(
     slug: 'flask',
     title: 'Hydro Flask wide mouth — 32 oz',
-    code: '036000291452',
+    code: SeedDatasetConstant.upcABarcode,
     itemId: 'itm-bottle-flask',
   );
 
   static const SampleBottle cola = SampleBottle(
     slug: 'cola',
     title: 'Coca-Cola glass bottle — 1960s',
-    code: '96385074',
+    code: SeedDatasetConstant.ean8Barcode,
     itemId: 'itm-bottle-cola',
   );
 

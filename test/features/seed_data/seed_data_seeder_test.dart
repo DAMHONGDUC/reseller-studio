@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/scan_match.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/inventory/domain/services/scan_lookup.dart';
 import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
@@ -9,6 +11,7 @@ import 'package:reseller_studio/features/seed_data/domain/services/seed_data_see
 
 import '../../support/fakes/in_memory_repositories.dart';
 import '../../support/fakes/mock_dataset.dart';
+import '../../support/fixtures/sample_bottles.dart';
 import '../../support/pump_app.dart';
 
 /// **The seeder has to write every collection, and twice must equal once.**
@@ -151,6 +154,36 @@ void main() {
 
     expect(uncosted.purchasePrice, isNull);
     expect(unpaid.payout, isNull);
+  });
+
+  test('the sample bottles a seller owns are found in the seed', () {
+    for (final SampleBottle bottle in SampleBottles.all) {
+      final ScanMatch match = ScanLookup.resolve(
+        bottle.code,
+        items: seed.items,
+        locations: seed.locations,
+      );
+
+      expect(
+        match is ScanMatchItem,
+        bottle.itemId != null,
+        reason: '${bottle.slug} should match only if the business owns it',
+      );
+    }
+
+    // Read the way iOS reads a UPC-A label, with a leading zero.
+    expect(
+      ScanLookup.resolve(
+        '0${SeedDatasetConstant.upcABarcode}',
+        items: seed.items,
+        locations: seed.locations,
+      ),
+      isA<ScanMatchItem>().having(
+        (ScanMatchItem match) => match.item.id,
+        'item',
+        SeedDatasetConstant.uncostedItemId,
+      ),
+    );
   });
 
   test('no pending offer sits on something already sold', () {
