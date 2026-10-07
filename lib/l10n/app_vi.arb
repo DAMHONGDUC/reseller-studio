@@ -354,6 +354,7 @@
   "repriceTitleBulk": "Đổi giá {count} món",
   "repriceNewPrice": "Giá bán mới",
   "repriceBulkHelp": "Áp dụng cho mọi món đã chọn",
+  "repriceAllMarketplacesWarning": "Giá mới sẽ thay giá trên mọi sàn mà món này đang đăng bán.",
   "repriceSubmit": "Cập nhật giá",
   "repriceRequired": "Hãy nhập giá mới",
   "repriceDone": "Đã cập nhật giá",

@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../features/workspace/providers.dart';
+import '../constants/app_icon_constant.dart';
 import '../error/failure_presenter.dart';
 import '../extensions/context_extensions.dart';
 import '../money/money.dart';
@@ -27,6 +28,7 @@ class PriceEntrySheet extends ConsumerStatefulWidget {
     required this.onSubmit,
     this.initialPrice,
     this.helperText,
+    this.warningText,
     super.key,
   });
 
@@ -45,6 +47,10 @@ class PriceEntrySheet extends ConsumerStatefulWidget {
 
   final String? helperText;
 
+  /// A consequence the seller must see before pressing, drawn in red under
+  /// the field — Inventory's "this moves every marketplace". Null for none.
+  final String? warningText;
+
   static Future<void> show(
     BuildContext context, {
     required String title,
@@ -53,6 +59,7 @@ class PriceEntrySheet extends ConsumerStatefulWidget {
     required Future<void> Function(Money price) onSubmit,
     Money? initialPrice,
     String? helperText,
+    String? warningText,
   }) => showSdBottomSheetV3<void>(
     context: context,
     builder: (BuildContext context) => PriceEntrySheet(
@@ -62,6 +69,7 @@ class PriceEntrySheet extends ConsumerStatefulWidget {
       onSubmit: onSubmit,
       initialPrice: initialPrice,
       helperText: helperText,
+      warningText: warningText,
     ),
   );
 
@@ -130,6 +138,10 @@ class _PriceEntrySheetState extends ConsumerState<PriceEntrySheet> {
           textInputAction: TextInputAction.done,
           onSubmitted: (_) => _submit(),
         ),
+        if (widget.warningText case final String warning) ...<Widget>[
+          SizedBox(height: SdSpacingConstant.h12),
+          _PriceWarning(text: warning),
+        ],
         SizedBox(height: SdSpacingConstant.h24),
         SdButtonV3(
           variant: SdButtonVariantV3.primary,
@@ -140,5 +152,34 @@ class _PriceEntrySheetState extends ConsumerState<PriceEntrySheet> {
         ),
       ],
     ),
+  );
+}
+
+/// The red line under the field: a glyph as well as a colour, so the colour is
+/// never the only signal.
+class _PriceWarning extends StatelessWidget {
+  const _PriceWarning({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      SdIconV3(
+        AppIconConstant.warning,
+        size: SdSpacingConstant.w16,
+        color: context.sdTheme3.danger,
+      ),
+      SizedBox(width: SdSpacingConstant.w8),
+      Expanded(
+        child: Text(
+          text,
+          style: context.textTheme3.bodySmall!.copyWith(
+            color: context.sdTheme3.danger,
+          ),
+        ),
+      ),
+    ],
   );
 }

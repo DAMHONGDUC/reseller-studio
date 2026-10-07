@@ -354,6 +354,7 @@
   "repriceTitleBulk": "为 {count} 件商品调价",
   "repriceNewPrice": "新标价",
   "repriceBulkHelp": "应用于所有选中的商品",
+  "repriceAllMarketplacesWarning": "新价格将替换此商品在所有已上架平台上的价格。",
   "repriceSubmit": "更新价格",
   "repriceRequired": "请输入新价格",
   "repriceDone": "价格已更新",

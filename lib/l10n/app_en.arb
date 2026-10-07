@@ -1518,6 +1518,10 @@
   "@repriceBulkHelp": {
     "description": "Helper on a bulk reprice, so nobody is surprised."
   },
+  "repriceAllMarketplacesWarning": "The new price replaces the price on every marketplace this item is listed on.",
+  "@repriceAllMarketplacesWarning": {
+    "description": "Red warning on the item reprice sheet: the item has no price of its own, so the new price goes onto every marketplace listing."
+  },
   "repriceSubmit": "Update price",
   "@repriceSubmit": {
     "description": "Confirm button."

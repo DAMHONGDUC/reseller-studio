@@ -354,6 +354,7 @@
   "repriceTitleBulk": "Changer le prix de {count} articles",
   "repriceNewPrice": "Nouveau prix demandé",
   "repriceBulkHelp": "Appliqué à chaque article sélectionné",
+  "repriceAllMarketplacesWarning": "Le nouveau prix remplace le prix sur toutes les plateformes où cet article est en vente.",
   "repriceSubmit": "Mettre à jour le prix",
   "repriceRequired": "Saisissez le nouveau prix",
   "repriceDone": "Prix mis à jour",
