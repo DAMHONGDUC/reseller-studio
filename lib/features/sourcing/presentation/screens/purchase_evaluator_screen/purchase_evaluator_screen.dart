@@ -143,6 +143,7 @@ class _PurchaseEvaluatorScreenState
     final Money buy = Money.tryParse(_buy.text, currency) ?? zero;
     final Money? sale = Money.tryParse(_sale.text, currency);
     final Money shipping = Money.tryParse(_shipping.text, currency) ?? zero;
+    final bool isTyping = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     // The business's own planning rate — the last estimate left in the app
     // (hard rule 3). Nothing has sold, so there is no payout to measure, and
@@ -171,8 +172,6 @@ class _PurchaseEvaluatorScreenState
               ),
               children: <Widget>[
                 SizedBox(height: SdContentPaddingV3.topGap),
-                _Verdict(evaluation: evaluation, marketplace: _marketplace),
-                SizedBox(height: SdContentPaddingV3.sectionGap),
                 _SoldBeforeCard(found: _soldBefore),
                 // The gap belongs to the card under it, and exists only when
                 // the history card above does.
@@ -238,34 +237,39 @@ class _PurchaseEvaluatorScreenState
                     ],
                   ),
                 ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                _Verdict(evaluation: evaluation, marketplace: _marketplace),
                 SizedBox(height: SdSpacingConstant.h16),
                 Text(
                   'Fees are the platform\'s published rate, not a quote. The '
                   'real fee arrives with the order.',
                   style: context.textTheme3.bodySmall!.faint3(context),
                 ),
+                // With the keyboard up the pinned action is gone, so the
+                // scroll owns the bottom edge again.
+                if (isTyping) SizedBox(height: SdContentPaddingV3.bottomGap),
               ],
             ),
           ),
-          // The screen's one action, and it is what a seller reaches for
-          // holding the item — a thumb's width from where the phone is held,
-          // not three fields up the scroll.
-          AppPinnedAction(
-            variant: SdButtonVariantV3.outlined,
-            label: context.l10n.sourcingScanAction,
-            icon: AppIconConstant.qrCodeScanner,
-            onPressed: _scan,
-          ),
+          // - a thumb's width from where the phone is held, not up the scroll
+          // - hidden while typing: riding the keyboard it covers the verdict
+          if (!isTyping)
+            AppPinnedAction(
+              variant: SdButtonVariantV3.outlined,
+              label: context.l10n.sourcingScanAction,
+              icon: AppIconConstant.barcodeScanner,
+              onPressed: _scan,
+            ),
         ],
       ),
     );
   }
 }
 
-/// The answer, above the inputs.
+/// The answer, under the inputs.
 ///
-/// Above rather than below because it is what the seller came for, and a
-/// figure they have to scroll to is one they work out in their head instead.
+/// Owner's rule: the screen reads in the order the seller works — type the
+/// prices, then read what they come to (`lib/features/sourcing/CLAUDE.md`).
 class _Verdict extends StatelessWidget {
   const _Verdict({required this.evaluation, required this.marketplace});
 
