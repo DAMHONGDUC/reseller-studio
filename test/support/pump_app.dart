@@ -146,7 +146,22 @@ Future<GoRouter> pumpRoutedScreen(
   return router;
 }
 
-/// The wiring both pumps share: the device surface, the in-memory backend,
+/// Pump a [router] the test built itself, for a flow that crosses several
+/// real screens — the scanner and its result, say — rather than one screen
+/// and placeholders.
+Future<void> pumpRouter(
+  WidgetTester tester,
+  GoRouter router, {
+  List<Override> overrides = const <Override>[],
+  Set<Object> replaces = const <Object>{},
+}) => _pumpApp(
+  tester,
+  overrides: overrides,
+  replaces: replaces,
+  router: router,
+);
+
+/// The wiring every pump shares: the device surface, the in-memory backend,
 /// the theme and the localizations.
 Future<void> _pumpApp(
   WidgetTester tester, {
