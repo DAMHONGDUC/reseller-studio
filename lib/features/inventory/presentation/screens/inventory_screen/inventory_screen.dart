@@ -122,7 +122,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 onPressed: () => _add(AppRoutes.addItem),
               ),
               SdAppBarActionV3(
-                icon: AppIconConstant.qrCodeScanner,
+                icon: AppIconConstant.barcodeScanner,
                 tooltip: context.l10n.inventoryScan,
                 onPressed: () => context.push(AppRoutes.scanner),
               ),

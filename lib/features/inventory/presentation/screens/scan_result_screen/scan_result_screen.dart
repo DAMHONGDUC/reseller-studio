@@ -71,7 +71,7 @@ class ScanResultScreen extends ConsumerWidget {
                 ),
                 AppPinnedAction(
                   label: context.l10n.scannerScanAgain,
-                  icon: AppIconConstant.qrCodeScanner,
+                  icon: AppIconConstant.barcodeScanner,
                   onPressed: () {
                     SdLogger.action(LogTagConstant.scanner, 'Scan again');
                     context.pop();

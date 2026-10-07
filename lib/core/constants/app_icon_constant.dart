@@ -46,7 +46,7 @@ final class AppIconConstant {
   /// Open chart-based analytics.
   static const IconData barChart = Symbols.bar_chart_rounded;
 
-  /// Scan a product barcode.
+  /// Scan a code — the one scan glyph, on every scan entry point.
   static const IconData barcodeScanner = Symbols.barcode_scanner_rounded;
 
   /// Highlight a quick or automated action.
@@ -258,9 +258,6 @@ final class AppIconConstant {
 
   /// Represent public or global visibility.
   static const IconData public = Symbols.public_rounded;
-
-  /// Scan a QR code.
-  static const IconData qrCodeScanner = Symbols.qr_code_scanner_rounded;
 
   /// Indicate the chosen single-choice option.
   static const IconData radioButtonChecked =

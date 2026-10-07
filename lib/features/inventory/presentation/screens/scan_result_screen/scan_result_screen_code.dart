@@ -21,7 +21,7 @@ class _ScannedCode extends StatelessWidget {
         context.l10n.scanResultFoundLocation,
       ),
       ScanMatchNone() => (
-        AppIconConstant.qrCodeScanner,
+        AppIconConstant.barcodeScanner,
         context.sdTheme3.warning,
         context.l10n.scannerNoMatchTitle,
       ),
