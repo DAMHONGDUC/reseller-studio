@@ -61,3 +61,17 @@ Two things about widget tests here, both learned the hard way:
   made the Home test fail as the calendar moved past it. A widget or provider
   that still calls `DateTime.now()` to derive something is the bug, not the
   test — see the `clockProvider` rule in the root `CLAUDE.md`.
+
+## The camera is tested through `FakeScannerPlatform`
+
+`test/support/fakes/fake_scanner_platform.dart` replaces
+`MobileScannerPlatform.instance`, so the real `MobileScanner` widget and
+controller run above it and only the hardware is fake. `scan(code)` holds a
+label up to the lens; `calls` records every start and stop; `startError`
+refuses the camera. A scanner test that stubs `BarcodeCameraView` instead tests
+nothing the seller touches — the first-hit guard, the pause under the result
+screen and the refused-camera loop all live in the real widget.
+
+The sample bottles in `test/support/fixtures/sample_bottles/` are the codes to
+scan: their SVG bars are decoded back to digits by a test, and the owned ones
+are `SeedDatasetConstant`'s.
