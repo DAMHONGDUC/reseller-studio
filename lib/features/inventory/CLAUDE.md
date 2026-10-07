@@ -157,6 +157,18 @@ verb stays behind the Actions button, and the sheet still lists both.
   holding one would invite a mistake — the order detail's rule.
 - `test/features/inventory/item_detail_pinned_actions_test.dart` pins it.
 
+## Reprice warns, in red, that it moves every marketplace
+
+Owner's rule. The item has no price of its own, so Reprice writes the new
+price onto **every** listing the item carries. The sheet says so under the
+field in the danger colour, on one item and on forty — a seller who meant to
+change eBay alone finds out before pressing, not after.
+
+- **Only the item's reprice carries it.** Listings' bulk reprice moves the
+  listings that were picked and nothing else, so the line would be untrue
+  there; `PriceEntrySheet.warningText` is null for it.
+- `test/features/inventory/reprice_sheet_test.dart` pins it.
+
 ## The actions sheet names no marketplace, and never did more than one thing
 
 Owner's rule, in two moves. The sheet first collapsed **two** verbs into one —
