@@ -42,7 +42,8 @@ where a fake belongs. `test/support/pump_app.dart` wires them, and
   block is populated), and **the three items carry the sample bottles'
   barcodes** (owner's rule — so scanning a label from
   `test/support/fixtures/sample_bottles/` on a seeded device finds a row, and
-  the UPC-A sits on the in-stock item, where every scan action applies). The two a test names have ids on
+  the UPC-A sits on the in-stock item, where every scan action applies). The
+  two a test names have ids on
   `SeedDatasetConstant`; the rest are an implementation detail.
 - **It empties the workspace before it fills it.** Owner's rule. Ids come from
   the seed and every write is an upsert, so the *dataset* was already
