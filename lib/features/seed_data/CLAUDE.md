@@ -32,14 +32,17 @@ where a fake belongs. `test/support/pump_app.dart` wires them, and
 - **The seed is coherent, not random.** Every item traces to a purchase, every
   purchase to a source, every order to an item that existed. Random rows would
   fill the screens and prove nothing.
-- **Five properties are deliberate and must survive any edit**, because they
+- **Six properties are deliberate and must survive any edit**, because they
   are what the screens must handle and what a tidy dataset would hide:
   **one item has no cost** (so `—` appears and hard rule 5 is exercised),
   **one listing is stale and one failed to publish** (so Needs Attention has
   rows), **one order sold under cost** (so the loss colour renders),
   **one order has no payout** (so Payouts has work — hard rule 3), and
   **one expense is recurring and older than a month** (so Expenses' "Due now"
-  block is populated). The two a test names have ids on
+  block is populated), and **the three items carry the sample bottles'
+  barcodes** (owner's rule — so scanning a label from
+  `test/support/fixtures/sample_bottles/` on a seeded device finds a row, and
+  the UPC-A sits on the in-stock item, where every scan action applies). The two a test names have ids on
   `SeedDatasetConstant`; the rest are an implementation detail.
 - **It empties the workspace before it fills it.** Owner's rule. Ids come from
   the seed and every write is an upsert, so the *dataset* was already
