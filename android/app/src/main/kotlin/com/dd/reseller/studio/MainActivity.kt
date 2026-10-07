@@ -29,6 +29,7 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "isBlocked" -> result.success(isBlocked(call.argument<String>("permission")))
+                    "isGranted" -> result.success(isGranted(call.argument<String>("permission")))
                     "openAppSettings" -> result.success(openAppSettings())
                     else -> result.notImplemented()
                 }
@@ -42,6 +43,13 @@ class MainActivity : FlutterActivity() {
                 isRefusedForGood(Manifest.permission.POST_NOTIFICATIONS))
         // The system photo picker needs no permission, so there is nothing to block.
         else -> false
+    }
+
+    private fun isGranted(permission: String?): Boolean = when (permission) {
+        "camera" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+            checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        "notifications" -> areNotificationsEnabled()
+        else -> true
     }
 
     private fun isRefusedForGood(permission: String): Boolean =

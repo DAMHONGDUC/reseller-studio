@@ -83,6 +83,10 @@ final class AppRoutes {
   /// asked once for the trip rather than once per item.
   static const String intake = '/inventory/intake';
   static const String scanner = '/inventory/scanner';
+
+  /// What a scanned code named, and what to do with it. Pushed over the
+  /// scanner, so going back is scanning again.
+  static const String scanResultPath = '/inventory/scanner/result';
   static const String locations = '/inventory/locations';
 
   // --- Shell branch 3: Orders ---
@@ -220,6 +224,11 @@ final class AppRoutes {
   static String evaluate({String? code}) => code == null || code.isEmpty
       ? purchaseEvaluator
       : '$purchaseEvaluator?code=${Uri.encodeComponent(code)}';
+
+  /// The scan result for [code]. A query parameter because a code is any
+  /// string a label can carry, slashes included.
+  static String scanResult(String code) =>
+      '$scanResultPath?code=${Uri.encodeComponent(code)}';
 
   /// The item form, optionally opened on a code the seller just scanned.
   ///

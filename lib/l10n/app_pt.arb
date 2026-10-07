@@ -401,7 +401,6 @@
   "scannerTorch": "Lanterna",
   "scannerSwitchCamera": "Trocar câmera",
   "scannerHint": "Encaixe um código de barras, uma etiqueta de SKU ou a etiqueta de uma caixa dentro da moldura.",
-  "scannerFoundLocation": "Isso é {name}",
   "scannerNoMatchTitle": "Nada tem esse código",
   "scannerNoMatchBody": "Adicionar um item com este código?",
   "scannerAddItem": "Adicionar um item",
@@ -1496,5 +1495,14 @@
   "permissionOpenSettings": "Abrir Ajustes",
   "permissionNotNow": "Agora não",
   "scannerAllowCamera": "Permitir câmera",
-  "notificationSettingsBlockedDetail": "Nada abaixo chega a este celular até você ativá-las nos Ajustes."
+  "notificationSettingsBlockedDetail": "Nada abaixo chega a este celular até você ativá-las nos Ajustes.",
+  "scanResultTitle": "Resultado da leitura",
+  "scanResultCodeLabel": "Código lido",
+  "scanResultFoundItem": "No seu estoque",
+  "scanResultFoundLocation": "Um local de armazenamento",
+  "scanResultActions": "Ações",
+  "scanResultOpenItem": "Abrir item",
+  "scanResultMoreActions": "Mais ações",
+  "scanResultItemsHere": "Guardado aqui",
+  "scanResultNothingHere": "Não há nada guardado aqui agora."
 }

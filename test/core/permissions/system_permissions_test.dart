@@ -47,7 +47,28 @@ void main() {
       await const SystemPermissions().isBlocked(AppPermission.camera),
       isFalse,
     );
+    expect(
+      await const SystemPermissions().isGranted(AppPermission.camera),
+      isFalse,
+    );
     expect(await const SystemPermissions().openAppSettings(), isFalse);
+  });
+
+  test('asks whether it is granted without asking the seller', () async {
+    final List<MethodCall> calls = <MethodCall>[];
+
+    answer((MethodCall call) async {
+      calls.add(call);
+
+      return true;
+    });
+
+    expect(
+      await const SystemPermissions().isGranted(AppPermission.camera),
+      isTrue,
+    );
+    expect(calls.single.method, 'isGranted');
+    expect(calls.single.arguments, <String, String>{'permission': 'camera'});
   });
 
   test('opening Settings answers what the platform said', () async {

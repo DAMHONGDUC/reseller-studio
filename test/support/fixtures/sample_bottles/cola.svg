@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="411" height="560" viewBox="0 0 411 560">
+  <rect width="411" height="560" fill="#eef1f5"/>
+  <rect x="171.5" y="20" width="68" height="46" rx="8" fill="#2f3542"/>
+  <rect x="179.5" y="62" width="52" height="58" fill="#c8d6e5"/>
+  <path d="M179.5 120 C179.5 160 30.0 170 30.0 210 L30.0 520 Q30.0 545 55.0 545 L356.0 545 Q381.0 545 381.0 520 L381.0 210 C381.0 170 231.5 160 231.5 120 Z" fill="#c8d6e5" stroke="#8395a7" stroke-width="3"/>
+  <rect x="60.0" y="220" width="291" height="250" rx="10" fill="#ffffff"/>
+  <text x="205.5" y="256" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="700" text-anchor="middle" fill="#222f3e">Coca-Cola glass bottle</text>
+  <text x="205.5" y="284" font-family="Helvetica, Arial, sans-serif" font-size="16" text-anchor="middle" fill="#576574">1960s</text>
+  <g id="barcode" fill="#000000" data-origin="105.0" data-module="3" data-modules="67">
+    <rect x="105.0" y="300" width="3" height="96"/>
+    <rect x="111.0" y="300" width="3" height="96"/>
+    <rect x="123.0" y="300" width="3" height="96"/>
+    <rect x="129.0" y="300" width="6" height="96"/>
+    <rect x="138.0" y="300" width="3" height="96"/>
+    <rect x="144.0" y="300" width="12" height="96"/>
+    <rect x="159.0" y="300" width="12" height="96"/>
+    <rect x="174.0" y="300" width="3" height="96"/>
+    <rect x="180.0" y="300" width="6" height="96"/>
+    <rect x="189.0" y="300" width="9" height="96"/>
+    <rect x="201.0" y="300" width="3" height="96"/>
+    <rect x="207.0" y="300" width="3" height="96"/>
+    <rect x="213.0" y="300" width="3" height="96"/>
+    <rect x="222.0" y="300" width="9" height="96"/>
+    <rect x="234.0" y="300" width="9" height="96"/>
+    <rect x="249.0" y="300" width="3" height="96"/>
+    <rect x="255.0" y="300" width="3" height="96"/>
+    <rect x="267.0" y="300" width="3" height="96"/>
+    <rect x="276.0" y="300" width="3" height="96"/>
+    <rect x="282.0" y="300" width="9" height="96"/>
+    <rect x="297.0" y="300" width="3" height="96"/>
+    <rect x="303.0" y="300" width="3" height="96"/>
+  </g>
+  <text x="205.5" y="424" font-family="Menlo, Courier, monospace" font-size="20" text-anchor="middle" fill="#000000">96385074</text>
+</svg>

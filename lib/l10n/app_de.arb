@@ -401,7 +401,6 @@
   "scannerTorch": "Taschenlampe",
   "scannerSwitchCamera": "Kamera wechseln",
   "scannerHint": "Bring einen Barcode, ein SKU-Etikett oder ein Fachschild in den Rahmen.",
-  "scannerFoundLocation": "Das ist {name}",
   "scannerNoMatchTitle": "Nichts hat diesen Code",
   "scannerNoMatchBody": "Einen Artikel mit diesem Code hinzufügen?",
   "scannerAddItem": "Artikel hinzufügen",
@@ -1496,5 +1495,14 @@
   "permissionOpenSettings": "Einstellungen öffnen",
   "permissionNotNow": "Nicht jetzt",
   "scannerAllowCamera": "Kamera erlauben",
-  "notificationSettingsBlockedDetail": "Nichts davon erreicht dieses Telefon, bis du sie in den Einstellungen aktivierst."
+  "notificationSettingsBlockedDetail": "Nichts davon erreicht dieses Telefon, bis du sie in den Einstellungen aktivierst.",
+  "scanResultTitle": "Scan-Ergebnis",
+  "scanResultCodeLabel": "Gescannter Code",
+  "scanResultFoundItem": "In deinem Bestand",
+  "scanResultFoundLocation": "Ein Lagerort",
+  "scanResultActions": "Aktionen",
+  "scanResultOpenItem": "Artikel öffnen",
+  "scanResultMoreActions": "Weitere Aktionen",
+  "scanResultItemsHere": "Hier gelagert",
+  "scanResultNothingHere": "Hier ist gerade nichts gelagert."
 }

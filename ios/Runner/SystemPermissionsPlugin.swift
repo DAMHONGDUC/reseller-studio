@@ -9,6 +9,7 @@ import UserNotifications
 /// iOS shows each permission dialog once; after a refusal the only way back
 /// is the app's page in Settings, so a refusal here is always for good.
 /// - `isBlocked` answers for `camera`, `photos` or `notifications`.
+/// - `isGranted` answers whether it is allowed now, without asking.
 /// - `openAppSettings` opens this app's page and answers whether it opened.
 final class SystemPermissionsPlugin: NSObject, FlutterPlugin {
   private static let channelName = "app.dd.reseller.studio/system_permissions"
@@ -25,6 +26,9 @@ final class SystemPermissionsPlugin: NSObject, FlutterPlugin {
     case "isBlocked":
       let permission = (call.arguments as? [String: Any])?["permission"] as? String
       isBlocked(permission, result: result)
+    case "isGranted":
+      let permission = (call.arguments as? [String: Any])?["permission"] as? String
+      isGranted(permission, result: result)
     case "openAppSettings":
       openAppSettings(result: result)
     default:
@@ -43,6 +47,23 @@ final class SystemPermissionsPlugin: NSObject, FlutterPlugin {
     case "notifications":
       UNUserNotificationCenter.current().getNotificationSettings { settings in
         DispatchQueue.main.async { result(settings.authorizationStatus == .denied) }
+      }
+    default:
+      result(FlutterError(code: "unknown-permission", message: "Unknown permission", details: permission))
+    }
+  }
+
+  private func isGranted(_ permission: String?, result: @escaping FlutterResult) {
+    switch permission {
+    case "camera":
+      result(AVCaptureDevice.authorizationStatus(for: .video) == .authorized)
+    case "photos":
+      let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+      result(status == .authorized || status == .limited)
+    case "notifications":
+      UNUserNotificationCenter.current().getNotificationSettings { settings in
+        let status = settings.authorizationStatus
+        DispatchQueue.main.async { result(status == .authorized || status == .provisional) }
       }
     default:
       result(FlutterError(code: "unknown-permission", message: "Unknown permission", details: permission))

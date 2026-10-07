@@ -47,7 +47,7 @@ class ItemFormScreen extends ConsumerStatefulWidget {
 
   /// A code the seller just scanned, filled into the barcode box on create.
   ///
-  /// The scanner's own dialog offers to "add an item and keep the code on
+  /// The scan result screen offers to "add an item and keep the code on
   /// it", and this is the half that keeps it. Ignored while editing: that
   /// item already has whatever code it has.
   final String? initialBarcode;

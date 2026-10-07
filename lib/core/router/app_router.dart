@@ -26,6 +26,7 @@ import '../../features/inventory/presentation/screens/item_detail_screen/item_de
 import '../../features/inventory/presentation/screens/item_form_screen/item_form_screen.dart';
 import '../../features/inventory/presentation/screens/locations_screen/locations_screen.dart';
 import '../../features/inventory/presentation/screens/quick_add_screen/quick_add_screen.dart';
+import '../../features/inventory/presentation/screens/scan_result_screen/scan_result_screen.dart';
 import '../../features/inventory/presentation/screens/scanner_screen/scanner_screen.dart';
 import '../../features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
 import '../../features/listings/presentation/screens/listings_screen/listings_screen.dart';
@@ -313,6 +314,16 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'scanner',
                     builder: (BuildContext context, GoRouterState state) =>
                         const ScannerScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'result',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            ScanResultScreen(
+                              code: state.uri.queryParameters['code'] ?? '',
+                            ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

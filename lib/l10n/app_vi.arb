@@ -401,7 +401,6 @@
   "scannerTorch": "Đèn pin",
   "scannerSwitchCamera": "Đổi camera",
   "scannerHint": "Đưa mã vạch, nhãn SKU hoặc thẻ thùng hàng vào trong khung.",
-  "scannerFoundLocation": "Đó là {name}",
   "scannerNoMatchTitle": "Không có gì mang mã đó",
   "scannerNoMatchBody": "Thêm một món và giữ mã này cho nó?",
   "scannerAddItem": "Thêm một món",
@@ -1496,5 +1495,14 @@
   "permissionOpenSettings": "Mở Cài đặt",
   "permissionNotNow": "Để sau",
   "scannerAllowCamera": "Cho phép camera",
-  "notificationSettingsBlockedDetail": "Các mục dưới đây sẽ không đến điện thoại này cho đến khi bạn bật thông báo trong Cài đặt."
+  "notificationSettingsBlockedDetail": "Các mục dưới đây sẽ không đến điện thoại này cho đến khi bạn bật thông báo trong Cài đặt.",
+  "scanResultTitle": "Kết quả quét",
+  "scanResultCodeLabel": "Mã đã quét",
+  "scanResultFoundItem": "Có trong kho của bạn",
+  "scanResultFoundLocation": "Một vị trí lưu kho",
+  "scanResultActions": "Thao tác",
+  "scanResultOpenItem": "Mở sản phẩm",
+  "scanResultMoreActions": "Thao tác khác",
+  "scanResultItemsHere": "Đang để ở đây",
+  "scanResultNothingHere": "Hiện không có gì để ở đây."
 }

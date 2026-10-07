@@ -5,7 +5,7 @@ import 'package:reseller_studio/features/inventory/presentation/screens/item_for
 
 import '../../support/pump_app.dart';
 
-/// The scanner's unknown-code dialog offers to "add an item and keep the code
+/// The scan result for an unknown code offers to "add an item and keep the code
 /// on it", and for a while it kept nothing: it pushed the bare add route and
 /// the seller retyped the digits they had just scanned.
 ///

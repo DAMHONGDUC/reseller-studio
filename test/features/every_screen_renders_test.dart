@@ -8,6 +8,7 @@ import 'package:reseller_studio/features/analytics/presentation/screens/analytic
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_sales_screen/analytics_sales_screen.dart';
 import 'package:reseller_studio/features/app_config/presentation/screens/account_blocked_screen/account_blocked_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/intake_session_screen/intake_session_screen.dart';
+import 'package:reseller_studio/features/inventory/presentation/screens/scan_result_screen/scan_result_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/scanner_screen/scanner_screen.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/listings_screen/listings_screen.dart';
 import 'package:reseller_studio/features/more/presentation/screens/account_screen/account_screen.dart';
@@ -46,6 +47,7 @@ void main() {
     'Listings': () => const ListingsScreen(),
     'Onboarding': () => const OnboardingScreen(),
     'Purchase detail': () => const PurchaseDetailScreen(purchaseId: 'pur-1'),
+    'Scan result': () => const ScanResultScreen(code: 'BIN-A1'),
     'Scanner': () => const ScannerScreen(),
     'Search': () => const SearchScreen(),
     'Sourcing': () => const SourcingScreen(),

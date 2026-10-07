@@ -13,8 +13,10 @@ import '../workspace/providers.dart';
 import 'domain/entities/item.dart';
 import 'domain/entities/item_category.dart';
 import 'domain/entities/item_filter_criteria.dart';
+import 'domain/entities/scan_match.dart';
 import 'domain/entities/storage_location.dart';
 import 'domain/services/item_search.dart';
+import 'domain/services/scan_lookup.dart';
 import 'item_category_constant.dart';
 
 /// The normal category records created for every new business.
@@ -161,6 +163,31 @@ final StreamProvider<List<StorageLocation>> locationsProvider =
         () => ref.watch(locationRepositoryProvider).watchLocations(),
       );
     });
+
+/// What a scanned code names, or **null while either list is still loading**.
+///
+/// A "no match" read before the items arrive would offer to add something the
+/// seller already owns.
+// Inferred for the same reason as [itemProvider]: Riverpod 3 does not export
+// the family type.
+// ignore: type_annotate_public_apis
+final scanMatchProvider = Provider.autoDispose.family<ScanMatch?, String>((
+  Ref ref,
+  String code,
+) {
+  final AsyncValue<List<Item>> items = ref.watch(itemsProvider);
+  final AsyncValue<List<StorageLocation>> locations = ref.watch(
+    locationsProvider,
+  );
+
+  if (!items.hasValue || !locations.hasValue) return null;
+
+  return ScanLookup.resolve(
+    code,
+    items: items.requireValue,
+    locations: locations.requireValue,
+  );
+});
 
 /// Category id → name, for rendering a row without looking one up per item.
 final Provider<Map<String, String>> categoryNamesProvider =

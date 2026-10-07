@@ -401,7 +401,6 @@
   "scannerTorch": "Lampe",
   "scannerSwitchCamera": "Changer de caméra",
   "scannerHint": "Placez un code-barres, une étiquette SKU ou l'étiquette d'un bac dans le cadre.",
-  "scannerFoundLocation": "C'est {name}",
   "scannerNoMatchTitle": "Rien n'a ce code",
   "scannerNoMatchBody": "Ajouter un article avec ce code ?",
   "scannerAddItem": "Ajouter un article",
@@ -1496,5 +1495,14 @@
   "permissionOpenSettings": "Ouvrir Réglages",
   "permissionNotNow": "Plus tard",
   "scannerAllowCamera": "Autoriser l'appareil photo",
-  "notificationSettingsBlockedDetail": "Rien ci-dessous n'atteindra ce téléphone tant que vous ne les aurez pas activées dans Réglages."
+  "notificationSettingsBlockedDetail": "Rien ci-dessous n'atteindra ce téléphone tant que vous ne les aurez pas activées dans Réglages.",
+  "scanResultTitle": "Résultat du scan",
+  "scanResultCodeLabel": "Code scanné",
+  "scanResultFoundItem": "Dans votre inventaire",
+  "scanResultFoundLocation": "Un emplacement de stockage",
+  "scanResultActions": "Actions",
+  "scanResultOpenItem": "Ouvrir l'article",
+  "scanResultMoreActions": "Plus d'actions",
+  "scanResultItemsHere": "Rangé ici",
+  "scanResultNothingHere": "Rien n'est rangé ici pour le moment."
 }

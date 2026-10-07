@@ -1766,15 +1766,6 @@
   "@scannerHint": {
     "description": "Names the three things a scan can match."
   },
-  "scannerFoundLocation": "That is {name}",
-  "@scannerFoundLocation": {
-    "description": "Shown when a scanned code matched a bin rather than an item.",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "scannerNoMatchTitle": "Nothing has that code",
   "@scannerNoMatchTitle": {
     "description": "Dialog title when a scan matched nothing."
@@ -6721,5 +6712,41 @@
   "notificationSettingsBlockedDetail": "Nothing below reaches this phone until you turn them on in Settings.",
   "@notificationSettingsBlockedDetail": {
     "description": "Detail line of the card on Notification settings when the system has notifications off for the app."
+  },
+  "scanResultTitle": "Scan result",
+  "@scanResultTitle": {
+    "description": "Title of the screen shown after a code is scanned."
+  },
+  "scanResultCodeLabel": "Scanned code",
+  "@scanResultCodeLabel": {
+    "description": "Label over the code the camera read, on the scan result screen."
+  },
+  "scanResultFoundItem": "In your inventory",
+  "@scanResultFoundItem": {
+    "description": "Under the scanned code: the code belongs to an item in this business."
+  },
+  "scanResultFoundLocation": "A storage location",
+  "@scanResultFoundLocation": {
+    "description": "Under the scanned code: the code is a storage location's label."
+  },
+  "scanResultActions": "Actions",
+  "@scanResultActions": {
+    "description": "Section heading over what can be done with the scanned item or code."
+  },
+  "scanResultOpenItem": "Open item",
+  "@scanResultOpenItem": {
+    "description": "Row on the scan result screen; opens the scanned item's detail screen."
+  },
+  "scanResultMoreActions": "More actions",
+  "@scanResultMoreActions": {
+    "description": "Row on the scan result screen; opens the item's full actions sheet (move, archive, delete)."
+  },
+  "scanResultItemsHere": "Stored here",
+  "@scanResultItemsHere": {
+    "description": "Section heading over the items stored at the scanned location."
+  },
+  "scanResultNothingHere": "Nothing is stored here right now.",
+  "@scanResultNothingHere": {
+    "description": "Shown under a scanned location that holds no items right now."
   }
 }

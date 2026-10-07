@@ -7,8 +7,8 @@ import 'app_permission.dart';
 /// The Dart half of `ios/Runner/SystemPermissionsPlugin.swift` and of the
 /// channel in `MainActivity.kt`.
 ///
-/// Two questions only: will the system still ask for a permission, and open
-/// this app's page in Settings. The plugins (`image_picker`, `mobile_scanner`,
+/// Three questions only: is a permission allowed, will the system still ask
+/// for it, and open this app's page in Settings. The plugins (`image_picker`, `mobile_scanner`,
 /// FCM) still do the asking — this is what comes after they were told no.
 ///
 /// Every method answers rather than throws: a channel that fails must leave
@@ -43,6 +43,36 @@ class SystemPermissions {
       SdLogger.error(
         LogTagConstant.permission,
         'Permission state unavailable',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'permission': permission.name},
+      );
+
+      return false;
+    }
+  }
+
+  /// Whether [permission] is allowed right now. **Never shows a dialog**, so
+  /// it is safe to call on every resume.
+  Future<bool> isGranted(AppPermission permission) async {
+    try {
+      final bool granted =
+          await _channel.invokeMethod<bool>('isGranted', <String, String>{
+            'permission': permission.channelName,
+          }) ??
+          false;
+
+      SdLogger.info(
+        LogTagConstant.permission,
+        'Permission grant read',
+        <String, Object>{'permission': permission.name, 'granted': granted},
+      );
+
+      return granted;
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.permission,
+        'Permission grant unavailable',
         error: error,
         stackTrace: stackTrace,
         data: <String, Object>{'permission': permission.name},

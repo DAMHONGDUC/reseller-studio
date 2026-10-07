@@ -66,16 +66,36 @@ class BarcodeCameraViewState extends ConsumerState<BarcodeCameraView> {
   /// The Settings sheet is offered once per visit, not on every retry.
   bool _offeredSettings = false;
 
+  /// Another screen covers the camera — set by [pause], cleared by [resume].
+  bool _paused = false;
+
+  /// The app went to the background with the camera running.
+  bool _stoppedInBackground = false;
+
+  /// Turn the camera off while a pushed screen covers it, so it is not
+  /// filming behind the result screen.
+  void pause() {
+    _paused = true;
+    unawaited(_stop());
+  }
+
   /// Take codes again, after the caller has finished with the last one.
-  void resume() => setState(() => _handled = false);
+  void resume() {
+    _paused = false;
+    setState(() => _handled = false);
+    unawaited(_start());
+  }
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(_onScannerState);
-    // The scanner restarts itself on resume only when it already had the
-    // camera, so a seller back from Settings would still see it refused.
-    _lifecycle = AppLifecycleListener(onResume: _restartIfRefused);
+    // Owned here rather than by `MobileScanner`, which restarts on every
+    // resume — including under a pushed screen this view has paused.
+    _lifecycle = AppLifecycleListener(
+      onInactive: _onInactive,
+      onResume: _onResume,
+    );
   }
 
   @override
@@ -139,10 +159,48 @@ class BarcodeCameraViewState extends ConsumerState<BarcodeCameraView> {
     await _start();
   }
 
-  void _restartIfRefused() {
+  void _onInactive() {
+    if (!_controller.value.isRunning) return;
+
+    _stoppedInBackground = true;
+    unawaited(_stop());
+  }
+
+  /// Restarts what backgrounding stopped, and picks the camera up once it is
+  /// allowed in Settings.
+  ///
+  /// **Never starts a refused camera that is still refused**: on Android that
+  /// shows the dialog again, whose own dismissal is a resume — a loop.
+  Future<void> _onResume() async {
+    if (_paused) return;
+
+    if (_stoppedInBackground) {
+      _stoppedInBackground = false;
+      await _start();
+
+      return;
+    }
+
     if (!_isRefused) return;
 
-    unawaited(_start());
+    final bool granted = await ref
+        .read(systemPermissionsProvider)
+        .isGranted(AppPermission.camera);
+
+    if (granted) await _start();
+  }
+
+  Future<void> _stop() async {
+    try {
+      await _controller.stop();
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.scanner,
+        'Scanner failed to stop',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<void> _start() async {
@@ -188,6 +246,7 @@ class BarcodeCameraViewState extends ConsumerState<BarcodeCameraView> {
             controller: _controller,
             onDetect: _onDetect,
             scanWindow: frame,
+            useAppLifecycleState: false,
             overlayBuilder: (BuildContext context, BoxConstraints _) =>
                 ScanWindowOverlay(
                   controller: _controller,

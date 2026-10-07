@@ -401,7 +401,6 @@
   "scannerTorch": "Linterna",
   "scannerSwitchCamera": "Cambiar cámara",
   "scannerHint": "Encaja un código de barras, una etiqueta SKU o la etiqueta de una caja dentro del marco.",
-  "scannerFoundLocation": "Es {name}",
   "scannerNoMatchTitle": "Nada tiene ese código",
   "scannerNoMatchBody": "¿Añadir un artículo con este código?",
   "scannerAddItem": "Añadir un artículo",
@@ -1496,5 +1495,14 @@
   "permissionOpenSettings": "Abrir Ajustes",
   "permissionNotNow": "Ahora no",
   "scannerAllowCamera": "Permitir cámara",
-  "notificationSettingsBlockedDetail": "Nada de lo que aparece abajo llegará a este teléfono hasta que las actives en Ajustes."
+  "notificationSettingsBlockedDetail": "Nada de lo que aparece abajo llegará a este teléfono hasta que las actives en Ajustes.",
+  "scanResultTitle": "Resultado del escaneo",
+  "scanResultCodeLabel": "Código escaneado",
+  "scanResultFoundItem": "En tu inventario",
+  "scanResultFoundLocation": "Una ubicación de almacenamiento",
+  "scanResultActions": "Acciones",
+  "scanResultOpenItem": "Abrir artículo",
+  "scanResultMoreActions": "Más acciones",
+  "scanResultItemsHere": "Guardado aquí",
+  "scanResultNothingHere": "Ahora mismo no hay nada guardado aquí."
 }

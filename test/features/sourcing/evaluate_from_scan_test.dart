@@ -7,7 +7,7 @@ import 'package:reseller_studio/core/router/app_routes.dart';
 /// and it used to live three taps down under More. The scanner already has a
 /// one-tap card on Home, and a code that matches nothing means one of two
 /// things — the seller is about to add it, or they are deciding whether to
-/// buy it. The dialog now offers both.
+/// buy it. The scan result screen offers both.
 void main() {
   group('AppRoutes.evaluate', () {
     test('carries the scanned code so the screen opens on its history', () {

@@ -401,7 +401,6 @@
   "scannerTorch": "手电筒",
   "scannerSwitchCamera": "切换摄像头",
   "scannerHint": "将条形码、SKU 标签或货箱标签放入框内。",
-  "scannerFoundLocation": "这是{name}",
   "scannerNoMatchTitle": "没有匹配此编码的内容",
   "scannerNoMatchBody": "添加一件商品并保留此编码？",
   "scannerAddItem": "添加商品",
@@ -1496,5 +1495,14 @@
   "permissionOpenSettings": "打开设置",
   "permissionNotNow": "以后再说",
   "scannerAllowCamera": "允许使用相机",
-  "notificationSettingsBlockedDetail": "在“设置”中打开通知之前，以下内容都不会推送到这部手机。"
+  "notificationSettingsBlockedDetail": "在“设置”中打开通知之前，以下内容都不会推送到这部手机。",
+  "scanResultTitle": "扫描结果",
+  "scanResultCodeLabel": "已扫描的码",
+  "scanResultFoundItem": "在你的库存中",
+  "scanResultFoundLocation": "一个存放位置",
+  "scanResultActions": "操作",
+  "scanResultOpenItem": "打开商品",
+  "scanResultMoreActions": "更多操作",
+  "scanResultItemsHere": "存放在这里",
+  "scanResultNothingHere": "这里目前没有存放任何东西。"
 }
