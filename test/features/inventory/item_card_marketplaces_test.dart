@@ -6,6 +6,7 @@ import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
@@ -46,6 +47,7 @@ void main() {
       ItemCard(
         item: item,
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
         listings: <Listing>[
           listingOn('ebay', 4500),
           listingOn('ebay', 4200, suffix: '-duplicate'),
@@ -102,6 +104,7 @@ void main() {
       ItemCard(
         item: item,
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
         listings: <Listing>[listingOn('ebay', 4500)],
       ),
     );
@@ -128,7 +131,14 @@ void main() {
   testWidgets('an item nobody has listed says so, in red', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, ItemCard(item: item, now: testNow));
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: item,
+        now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
+      ),
+    );
 
     final Finder unlisted = find.widgetWithText(SdBadgeV3, 'Not listed');
 
@@ -150,6 +160,7 @@ void main() {
       ItemCard(
         item: item.copyWith(status: ItemStatus.sold),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 

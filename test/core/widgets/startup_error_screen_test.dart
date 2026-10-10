@@ -6,7 +6,7 @@ import 'package:reseller_studio/core/widgets/startup_error_screen.dart';
 import '../../support/pump_app.dart';
 
 /// The one failure this screen exists for: a dev build holding the production
-/// project, because `prepare-env` was last run for the other flavour. Nothing
+/// project, because `make env-<flavour>` was last run for the other flavour. Nothing
 /// is unreachable — the app would work, against the wrong Firestore.
 FlavorConfigMismatch _mismatch() => const FlavorConfigMismatch(
   expected: 'reseller-studio-dev',
@@ -15,9 +15,12 @@ FlavorConfigMismatch _mismatch() => const FlavorConfigMismatch(
 
 void main() {
   group('StartupFailurePolicy', () {
-    test('config whose two halves name different projects stops the launch', () {
-      expect(StartupFailurePolicy.isFatal(_mismatch()), isTrue);
-    });
+    test(
+      'config whose two halves name different projects stops the launch',
+      () {
+        expect(StartupFailurePolicy.isFatal(_mismatch()), isTrue);
+      },
+    );
 
     test('nothing else does', () {
       // The seller is standing in a store with no signal. They get the app.
@@ -38,7 +41,7 @@ void main() {
 
       expect(detail, contains('reseller-studio-dev'));
       expect(detail, contains('reseller-studio-prod'));
-      expect(detail, contains('prepare-env'));
+      expect(detail, contains('make env-'));
     });
   });
 
@@ -70,7 +73,7 @@ void main() {
       // The step and the failure together: 'Firebase' alone sends the reader
       // to the wrong half, and the failure alone does not say when it landed.
       expect(find.textContaining('Firebase'), findsOneWidget);
-      expect(find.textContaining('prepare-env'), findsOneWidget);
+      expect(find.textContaining('make env-'), findsOneWidget);
     });
   });
 }

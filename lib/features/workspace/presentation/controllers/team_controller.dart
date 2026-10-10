@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../listings/domain/enums/listing_status.dart';
 import '../../domain/repositories/team_repository.dart';
@@ -34,6 +35,7 @@ class TeamController extends Notifier<bool> {
           email: email,
           role: role,
         );
+        AppAnalytics.instance.teammateInvited(role: role.name);
       }, <String, Object>{'role': role.name});
 
   Future<void> changeRole({
@@ -77,6 +79,8 @@ class TeamController extends Notifier<bool> {
 
     try {
       final String workspaceId = await repository.acceptInvite(inviteId);
+
+      AppAnalytics.instance.invitationAccepted();
 
       await ref
           .read(workspaceSwitchControllerProvider.notifier)

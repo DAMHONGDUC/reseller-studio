@@ -2,7 +2,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:system_design/common.dart';
 
 import '../constants/log_tag_constant.dart';
+import '../permissions/system_permissions.dart';
 import 'file_uploader.dart';
+import 'photo_picker.dart';
 
 /// Picking a receipt or a photo and putting it in storage, in one call.
 ///
@@ -24,17 +26,20 @@ final class DocumentPicker {
   static const int quality = 90;
 
   /// Returns the stored URL, or **null when the seller cancelled** — which is
-  /// not an error and is not logged as one.
+  /// not an error and is not logged as one. A permission refused for good
+  /// throws `PermissionBlocked` (see [PhotoPicker]).
   static Future<String?> pickAndUpload({
     required FileUploader uploader,
+    required SystemPermissions permissions,
     required FileFolder folder,
     required String recordId,
     required bool fromCamera,
   }) async {
-    final XFile? picked = await ImagePicker().pickImage(
-      source: fromCamera ? ImageSource.camera : ImageSource.gallery,
+    final XFile? picked = await PhotoPicker.pick(
+      permissions: permissions,
+      fromCamera: fromCamera,
       maxWidth: maxWidth,
-      imageQuality: quality,
+      quality: quality,
     );
 
     if (picked == null) return null;

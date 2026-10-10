@@ -56,7 +56,9 @@ void main() {
   ) async {
     await pumpScreen(
       tester,
-      Scaffold(body: AppPinnedAction(label: 'Save', onPressed: () {})),
+      Scaffold(
+        body: AppPinnedAction(label: 'Save', onPressed: () {}),
+      ),
     );
 
     final Column column = tester.widget<Column>(

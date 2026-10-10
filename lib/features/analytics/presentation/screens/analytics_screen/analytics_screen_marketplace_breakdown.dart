@@ -45,17 +45,7 @@ class _MarketplaceBreakdown extends ConsumerWidget {
               padding: EdgeInsets.only(
                 bottom: i == rows.length - 1 ? 0 : SdSpacingConstant.h16,
               ),
-              child: _MarketplaceRow(
-                row: rows[i],
-                maxRevenue: maxRevenue,
-                // The marketplace's own hue, not a chart series colour: a
-                // platform that is amber on an order card and blue on a bar
-                // is two colours for one thing.
-                color: AppMarketplaceDot.hueOf(
-                  ref,
-                  rows[i].marketplaceId,
-                ).of(context),
-              ),
+              child: _MarketplaceRow(row: rows[i], maxRevenue: maxRevenue),
             ),
         ],
       ),

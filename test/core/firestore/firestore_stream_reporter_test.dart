@@ -24,6 +24,12 @@ class _RecordingReporter implements SdCrashReporter {
   }
 
   @override
+  void recordFatal(String reason, {Object? error, StackTrace? stackTrace}) {}
+
+  @override
+  void log(String message) {}
+
+  @override
   void setUserId(String? uid) {}
 }
 
@@ -62,11 +68,7 @@ void main() {
     final AppFailure third = report(_indexBuilding());
 
     // Every error is still mapped and thrown on to the watcher.
-    expect(<AppFailure>[
-      first,
-      second,
-      third,
-    ], everyElement(isA<AppFailure>()));
+    expect(<AppFailure>[first, second, third], everyElement(isA<AppFailure>()));
     expect(first.kind, AppFailureKind.invalidData);
 
     expect(crashes.reasons, hasLength(1));

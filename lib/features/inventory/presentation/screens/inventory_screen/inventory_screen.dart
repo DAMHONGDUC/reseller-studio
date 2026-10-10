@@ -11,6 +11,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/utils/date_time_utils.dart';
+import '../../../../../core/widgets/add_stock_sheet.dart';
 import '../../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
@@ -24,16 +25,17 @@ import '../../../../listings/providers.dart';
 import '../../../../sourcing/domain/entities/purchase.dart';
 import '../../../../sourcing/providers.dart';
 import '../../../../subscription/domain/enums/plan_allowance.dart';
-import '../../../../subscription/domain/services/plan_gate.dart';
-import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
-import '../../../../subscription/providers.dart';
+import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
+import '../../../domain/entities/item_filter_criteria.dart';
 import '../../../domain/entities/storage_location.dart';
+import '../../../domain/enums/item_filter_group.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
 import '../../widgets/bulk_list_sheet.dart';
 import '../../widgets/inventory_filter_sheet.dart';
 import '../../widgets/item_actions_sheet.dart';
+import '../../widgets/item_quick_actions.dart';
 import '../../widgets/reprice_sheet.dart';
 
 part 'inventory_screen_bulk_bar.dart';
@@ -42,14 +44,9 @@ part 'inventory_screen_item_list.dart';
 
 /// Inventory — "what do I have?".
 ///
-/// The five tabs are fixed by the plan (§7): `All | Listed | Reserved | Sold |
-/// Stale`. Each carries its count, because a seller scanning the strip decides
-/// where to tap from the number — which is why `SdFilterChipV3` renders the
-/// count inside the chip rather than beside it.
-///
-/// **All five counts come from one stream**, folded in
-/// `inventoryCountsProvider`. Per-tab queries would mean five live listeners
-/// for one screen, and the counts could disagree with the list being shown.
+/// **The strip is the filter sheet laid out sideways**: the Filters chip
+/// opens the whole sheet, and every chip after it opens one group of it
+/// (`docs/rules/SCREENS.md`).
 ///
 /// **The chrome collapses as the list scrolls.** `SdSearchHeaderV3` docks the
 /// search field into the title's row and pins the filter strip under it, so a
@@ -87,55 +84,9 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     super.dispose();
   }
 
-  /// Opens the create flow, or explains why it cannot.
-  ///
-  /// **Checked before the form opens, never after the seller has typed.**
-  /// Refusing a title someone has already entered is the worst moment to
-  /// mention a plan limit, and it loses their work.
-  Future<void> _add(String route) async {
-    final PlanBlock block = ref.read(addItemBlockProvider);
-
-    if (block == PlanBlock.none) {
-      unawaited(context.push(route));
-
-      return;
-    }
-
-    await PlanBlockSheet.show(
-      context,
-      block: block,
-      plan: ref.read(currentPlanProvider),
-    );
-  }
-
-  /// Two ways to take stock in, asked at the button rather than buried.
-  ///
-  /// **The buying trip is the only flow that ties items to a receipt**, and it
-  /// lived in Quick Action's sixteen-row list while Getting Started sent every
-  /// new seller to Quick Add — which is why a lot of twelve arrived as twelve
-  /// items belonging to no purchase.
-  Future<void> _openAdd() async {
-    final String? picked = await OptionPickerSheet.show<String>(
-      context,
-      title: context.l10n.inventoryAddTitle,
-      options: <PickerOption<String>>[
-        PickerOption<String>(
-          value: AppRoutes.quickAdd,
-          label: context.l10n.quickAddTitle,
-          caption: context.l10n.inventoryAddQuickCaption,
-        ),
-        PickerOption<String>(
-          value: AppRoutes.intake,
-          label: context.l10n.quickActionIntakeSession,
-          caption: context.l10n.inventoryAddIntakeCaption,
-        ),
-      ],
-    );
-
-    if (picked == null || !mounted) return;
-
-    await _add(picked);
-  }
+  /// Opens a create flow, behind the same plan gate the Add stock sheet uses.
+  Future<void> _add(String route) =>
+      AddStockSheet.openGated(context, ref, route);
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +100,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
 
     return AppAddFabScaffold(
       addLabel: context.l10n.inventoryAddTitle,
-      onAdd: _openAdd,
+      onAdd: () => AddStockSheet.show(context, ref),
       floatingNav: true,
       showAdd: !isSelecting,
       bottomNavigationBar: isSelecting ? const _BulkActionBar() : null,
@@ -165,25 +116,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             onChanged: (String value) =>
                 ref.read(inventorySearchProvider.notifier).update(value),
             actions: <SdAppBarActionV3>[
-              // In the chrome rather than on the strip: the five tabs already
-              // scroll on a narrow phone, and a sixth chip pushes Returns off
-              // the edge to reach a sheet that is not a tab.
-              SdAppBarActionV3(
-                icon: AppIconConstant.filterAlt,
-                tooltip: context.l10n.filterTitle,
-                // Lit while the sheet behind it is holding something — the
-                // tab is not counted, because the strip is already showing
-                // which one is picked.
-                isActive: ref.watch(inventoryCriteriaProvider).isActive,
-                onPressed: () => InventoryFilterSheet.show(context),
-              ),
               SdAppBarActionV3(
                 icon: AppIconConstant.addBox,
                 tooltip: context.l10n.inventoryAddItem,
                 onPressed: () => _add(AppRoutes.addItem),
               ),
               SdAppBarActionV3(
-                icon: AppIconConstant.qrCodeScanner,
+                icon: AppIconConstant.barcodeScanner,
                 tooltip: context.l10n.inventoryScan,
                 onPressed: () => context.push(AppRoutes.scanner),
               ),

@@ -10,6 +10,7 @@ import 'package:reseller_studio/features/workspace/presentation/widgets/invite_m
 import 'package:reseller_studio/features/workspace/providers.dart';
 import 'package:system_design/index.dart';
 
+import '../../support/add_button_finder.dart';
 import '../../support/pump_app.dart';
 
 /// Team management (plan §24).
@@ -66,7 +67,7 @@ void main() {
       replaces: <Object>{teamRepositoryProvider},
     );
 
-    expect(find.text('Invite a teammate'), findsOneWidget);
+    expect(AddButtonFinder.named('Invite a teammate'), findsOneWidget);
   });
 
   testWidgets('the demo offers nothing to invite with', (

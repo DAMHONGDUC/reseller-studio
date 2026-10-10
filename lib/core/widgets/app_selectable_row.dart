@@ -3,7 +3,8 @@ import 'package:system_design/index.dart';
 
 /// A row in a sheet that can be the chosen one.
 ///
-/// **The shell only** — the ground, the corner and the hit target. What goes
+/// **The shell only** — the ground and the hit target. It sits in an
+/// `AppSheetOptionList`, whose card rounds the corners. What goes
 /// inside is the caller's, because the two sheets that use it say "chosen" in
 /// different words: the picker ticks the row, the workspace switcher fills its
 /// icon tile. Both still need the same ground under them or the sheets stop
@@ -25,19 +26,16 @@ class AppSelectableRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Ink(
-    decoration: BoxDecoration(
-      // The same tint strength the icon tiles use, so a selected row and the
-      // glyph beside it are visibly the same accent at the same weight.
-      color: isSelected
-          ? context.colorScheme3.primary.withValues(
-              alpha: SdIconTileV3.backgroundOpacity,
-            )
-          : Colors.transparent,
-      borderRadius: SdRadiusV3.inputAll,
-    ),
+    // - the same tint strength the icon tiles use, so a selected row and the
+    //   glyph beside it are visibly the same accent at the same weight
+    // - square, and full-bleed: the card it sits in rounds the corners
+    color: isSelected
+        ? context.colorScheme3.primary.withValues(
+            alpha: SdIconTileV3.backgroundOpacity,
+          )
+        : Colors.transparent,
     child: InkWell(
       onTap: onTap,
-      borderRadius: SdRadiusV3.inputAll,
       child: ConstrainedBox(
         // A one-line row is otherwise only as tall as its text, which is under
         // the 44pt Apple asks for — a mis-tap waiting to happen in a list

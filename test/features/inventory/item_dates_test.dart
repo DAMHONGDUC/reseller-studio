@@ -8,6 +8,7 @@ import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart
 import 'package:reseller_studio/features/inventory/domain/repositories/item_repository.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
+import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
 
 import '../../support/pump_app.dart';
 
@@ -33,6 +34,7 @@ void main() {
       ItemCard(
         item: itemWith(updatedAt: testNow.subtract(const Duration(days: 2))),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -42,7 +44,14 @@ void main() {
   testWidgets('a record nothing has touched says nothing', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, ItemCard(item: itemWith(), now: testNow));
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(),
+        now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
+      ),
+    );
 
     // Dressing the creation date up as an edit would answer "did my edit
     // save?" with a yes for an item nobody has edited.
@@ -52,7 +61,14 @@ void main() {
   testWidgets('the row carries the grade a buyer reads first', (
     WidgetTester tester,
   ) async {
-    await pumpScreen(tester, ItemCard(item: itemWith(), now: testNow));
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(),
+        now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
+      ),
+    );
 
     expect(find.text('Good'), findsOneWidget);
   });

@@ -64,11 +64,11 @@ in the left.
 
 | Working on | Read |
 |---|---|
-| `packages/system_design/`, or any screen or widget rendering `Sd*` v3 components | `docs/rules/DESIGN_SYSTEM.md` |
+| `packages/flutter-system-design-kit/`, or any screen or widget rendering `Sd*` v3 components | `docs/rules/DESIGN_SYSTEM.md` |
 | a screen's app bar, status bar, scrolling list, empty state or search mode | `docs/rules/SCREENS.md` |
 | `firestore.rules`, `firestore.indexes.json`, `functions/`, or a `data/` method that queries or calls out | `docs/rules/BACKEND.md` |
 | a build-time key, `lib/core/config/app_env.dart`, `lib/core/config/dev_flags.dart` | `docs/rules/ENV.md` |
-| `env_assets/`, `packages/system_design/tool/prepare-env.sh`, `packages/system_design/tool/build-ipa.sh`, `ios/fastlane/`, the release workflow | `docs/rules/RELEASE.md` |
+| `env_assets/`, `packages/script-tools/flutter/prepare_env.sh`, `packages/script-tools/flutter/build_ipa.sh`, `ios/fastlane/`, the release workflow | `docs/rules/RELEASE.md` |
 | running, building, generating or deploying | `docs/rules/COMMANDS.md` |
 | writing or fixing a test | `docs/rules/TESTING.md` |
 | anything that reads a key, logs, exports or uploads | `docs/rules/PRIVACY_AND_SECURITY.md` |
@@ -124,7 +124,7 @@ rate is the bug this rule exists to stop.
   with Drift: health data must survive with no account, whereas a seller's
   inventory is inherently a synced business record shared with a team. Do not
   add Drift here.
-- **Design system**: `packages/system_design`, a **submodule**, on its **v3**
+- **Design system**: `packages/flutter-system-design-kit`, a **submodule**, on its **v3**
   generation. See `docs/rules/DESIGN_SYSTEM.md`.
 - **Charts**: `fl_chart`. **Scanning**: `mobile_scanner`. **Photos**:
   `image_picker`.
@@ -185,9 +185,9 @@ lib/
         widgets/
       providers.dart       # Riverpod wiring for the feature
 functions/                 # Cloud Functions (TypeScript)
-packages/system_design/    # the design system, its own git repo (submodule)
+packages/flutter-system-design-kit/ # the design system, its own git repo (submodule)
 test/features/             # mirrors lib/features
-packages/system_design/tool/ # shared melos script bodies (submodule)
+packages/script-tools/     # shared command scripts and iOS lanes (submodule)
 docs/
 ```
 
@@ -586,7 +586,7 @@ feature's own `AGENTS.md`.
   - **A canonical empty instance** (`AnalyticsSummary.empty`) is a value of the
     type, not configuration about it — the same shape as `Duration.zero`. It
     stays.
-  - **`packages/system_design` is out of scope** — it is a separate repo with
+  - **`packages/flutter-system-design-kit` is out of scope** — it is a separate repo with
     its own `WIDGET_RULES.md`, and its statics are widget-intrinsic.
 - **Read-time "now" comes from `clockProvider`, never `DateTime.now()`**
   (`core/time/app_clock.dart`). Anything a screen or a provider *derives* —
@@ -637,7 +637,7 @@ feature's own `AGENTS.md`.
   state have nothing to catch and stay bare.
 - **The logger is `SdLogger`, it comes from the design system, and every call
   names its flow first.** Owner's rule. It lives in
-  `packages/system_design/lib/core/common/` and is imported from
+  `packages/flutter-system-design-kit/lib/core/common/` and is imported from
   `package:system_design/common.dart` — a pure-Dart entrypoint, so a
   `domain/` file can log without pulling Flutter in. The app owns no logger of
   its own; what it owns is the vendor half (`FirebaseCrashReporter`) and the
@@ -749,8 +749,8 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
     everything from here follows the form above.
 - **Commit freely; never push.** Owner's rule. Committing costs nothing and is
   local; pushing is the irreversible half and it is the owner's to call. That
-  includes the `packages/system_design` submodule — commit there too, and
-  leave it unpushed unless told otherwise.
+  includes the `packages/flutter-system-design-kit` and `packages/script-tools`
+  submodules — commit there too, and leave them unpushed unless told otherwise.
 - **Never add a `Co-Authored-By` trailer to a commit.** Owner's rule. The
   commit message describes the change, not who or what typed it.
 - **No tool, agent or model is ever named in a commit message or a PR.**
@@ -771,7 +771,7 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
 
 ## Definition of done
 
-- `melos run analyze` — `--fatal-infos`, exactly what CI runs. **Must pass
+- `make analyze` — `--fatal-infos`, exactly what CI runs. **Must pass
   with zero findings before considering any task done.** It analyzes the
   design system standalone first, on purpose: the package must compile without
   the host app, and running it from inside the app would hide an app
@@ -781,7 +781,7 @@ tabular figures, motion, spacing, snackbars, dialogs and sheets — are in
 
 - Product questions → `SELLER_OS_FINAL_MASTER_PLAN.md` first.
 - What is stored, and what a field may mean → `docs/DATA_MODEL.md`.
-- What may go in the design system → `packages/system_design/WIDGET_RULES.md`.
+- What may go in the design system → `packages/flutter-system-design-kit/WIDGET_RULES.md`.
 - Ask before adding a required field to any create flow (hard rule 2), before
   adding a bottom tab (hard rule 13), and before adding any third-party
   service.

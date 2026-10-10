@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/providers/repository_providers.dart';
@@ -138,16 +139,22 @@ class OfferActionsController extends Notifier<bool> {
     }
   }
 
-  Future<void> _save(Offer offer, OfferStatus status, {Money? counterAmount}) {
+  Future<void> _save(
+    Offer offer,
+    OfferStatus status, {
+    Money? counterAmount,
+  }) async {
     final OfferRepository repository = ref.read(offerRepositoryProvider);
 
-    return repository.save(
+    await repository.save(
       offer.copyWith(
         status: status,
         counterAmount: counterAmount,
         respondedAt: DateTime.now(),
       ),
     );
+
+    AppAnalytics.instance.offerResponded(outcome: status.name);
   }
 }
 

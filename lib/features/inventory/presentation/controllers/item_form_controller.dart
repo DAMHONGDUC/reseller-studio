@@ -8,9 +8,12 @@ import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/photo_constant.dart';
 import '../../../../core/constants/prefs_key_constant.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/permissions/permission_blocked.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../../core/providers/shared_preferences_provider.dart';
+import '../../../../core/providers/system_permissions_provider.dart';
 import '../../../../core/storage/file_uploader.dart';
+import '../../../../core/storage/photo_picker.dart';
 import '../../../../core/utils/text_input_utils.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
@@ -331,10 +334,11 @@ class ItemFormController extends Notifier<ItemFormState> {
     state = state.copyWith(isUploadingPhoto: true);
 
     try {
-      final XFile? picked = await ImagePicker().pickImage(
-        source: fromCamera ? ImageSource.camera : ImageSource.gallery,
+      final XFile? picked = await PhotoPicker.pick(
+        permissions: ref.read(systemPermissionsProvider),
+        fromCamera: fromCamera,
         maxWidth: PhotoConstant.maxWidth,
-        imageQuality: PhotoConstant.quality,
+        quality: PhotoConstant.quality,
       );
 
       if (picked == null) {
@@ -358,6 +362,9 @@ class ItemFormController extends Notifier<ItemFormState> {
         'Item photo attached',
         <String, Object>{'recordId': recordId, 'count': state.photoUrls.length},
       );
+    } on PermissionBlocked {
+      // Logged by `PhotoPicker`: a refusal is the seller's call, not a failure.
+      rethrow;
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.item,

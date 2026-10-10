@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:system_design/common.dart';
 
 import '../constants/log_tag_constant.dart';
+import '../firestore/firestore_maintenance.dart';
 import 'local_database.dart';
 
 /// Taking the device back to a blank guest after a sign-out.
@@ -52,28 +53,24 @@ class GuestResetService {
     }
   }
 
-  /// **Best effort, and the failure is expected rather than exceptional.**
-  /// `clearPersistence` throws `failed-precondition` while any listener is
-  /// open, and sign-out happens with the app on screen — the guest shell has
-  /// already swapped every repository over, but Firestore's own streams are
-  /// torn down on Riverpod's schedule, not on this one.
+  /// Through [FirestoreMaintenance], which detaches every listener first —
+  /// sign-out happens with the app on screen, and a listener opened while the
+  /// client terminates aborts the app on iOS.
   ///
-  /// What is left behind when it does throw is a disk cache nothing can read
-  /// past: every query in the app carries a `workspaceId` filter (hard rule
-  /// 14), and the next account does not match the last one's. The cold start
-  /// after this clears it for real.
+  /// Still best effort: what a failure leaves behind is a disk cache nothing
+  /// can read past, since every query carries a `workspaceId` filter (hard
+  /// rule 14) and the next account does not match the last one's.
   Future<void> _clearFirestoreCache() async {
     final FirebaseFirestore? firestore = _firestore;
 
     if (firestore == null) return;
 
     try {
-      await firestore.terminate();
-      await firestore.clearPersistence();
+      await FirestoreMaintenance.reset(firestore);
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.logout,
-        'Firestore cache still open — cleared on next launch instead',
+        'Firestore cache not cleared',
         error: error,
         stackTrace: stackTrace,
       );

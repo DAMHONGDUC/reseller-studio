@@ -20,22 +20,27 @@ import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
 import '../../../../subscription/providers.dart';
 import '../../../domain/entities/order.dart';
+import '../../../domain/entities/order_filter_criteria.dart';
+import '../../../domain/enums/order_filter_group.dart';
+import '../../../domain/enums/order_stage.dart';
 import '../../../domain/enums/order_status.dart';
+import '../../../domain/services/order_progress.dart';
 import '../../../providers.dart';
-import '../../order_filter_label.dart';
 import '../../order_status_label.dart';
 import '../../widgets/order_filter_sheet.dart';
+import '../../widgets/ship_order_sheet.dart';
 
 part 'orders_screen_order_card.dart';
 part 'orders_screen_order_filter_strip.dart';
 part 'orders_screen_order_list.dart';
+part 'orders_screen_order_progress.dart';
 
 /// Orders — "what am I selling and processing?".
 ///
-/// Tabs are `All | To Ship | Shipped | Delivered | Returns` (plan §8), and
-/// Offers live under this tab rather than as a sixth bottom tab.
+/// The strip filters by status and every other group of the filter sheet,
+/// and Offers live under this tab rather than as a sixth bottom tab.
 ///
-/// **To Ship is the tab that matters**; everything else is history. An
+/// **To Ship is the status that matters**; everything else is history. An
 /// overdue order is called out in red on its row, because the shipping
 /// deadline is the one thing here with an external penalty attached.
 ///
@@ -76,16 +81,6 @@ class OrdersScreen extends ConsumerWidget {
       appBar: SdAppBarV3(
         title: context.l10n.navOrders,
         actions: <Widget>[
-          // The screen's own control leads, ahead of the two that navigate
-          // somewhere else.
-          SdAppBarActionButtonV3(
-            icon: AppIconConstant.filterAlt,
-            tooltip: context.l10n.filterTitle,
-            // Lit while the sheet behind it is holding something — see
-            // Inventory's, and the tab is not counted there either.
-            isActive: ref.watch(orderCriteriaProvider).isActive,
-            onPressed: () => OrderFilterSheet.show(context),
-          ),
           SdAppBarActionButtonV3(
             icon: AppIconConstant.localOffer,
             tooltip: context.l10n.offersTitle,

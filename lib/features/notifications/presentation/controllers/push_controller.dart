@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../auth/providers.dart';
@@ -146,6 +147,9 @@ class PushController extends Notifier<void> {
       },
     );
 
+    AppAnalytics.instance.pushOpened(
+      type: message.data['type']?.toString() ?? '',
+    );
     ref.read(routerProvider).go(route);
   }
 

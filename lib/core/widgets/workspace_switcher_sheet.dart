@@ -16,6 +16,7 @@ import '../extensions/context_extensions.dart';
 import '../router/app_routes.dart';
 import 'app_row_icon_button.dart';
 import 'app_selectable_row.dart';
+import 'app_sheet_action_row.dart';
 import 'app_sheet_option_list.dart';
 import 'option_picker_sheet.dart';
 
@@ -25,7 +26,7 @@ import 'option_picker_sheet.dart';
 /// rule 13 closes the tab list), so the trigger is Home's title and this is
 /// what it opens. The parts that matter are kept: every business the seller
 /// belongs to, the current one **ticked as well as tinted** (colour is never
-/// the only signal), and creating another at the bottom of the same list
+/// the only signal), and creating another at the bottom of the same sheet
 /// rather than hidden in settings.
 ///
 /// **Invitations are listed here too**, above the businesses. An invitation
@@ -129,12 +130,16 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
           // Above the list on purpose: an invitation expires in the sense that
           // somebody is waiting on it, and a business you are already in is
           // not going anywhere.
-          for (final PendingInvite invite in invites)
-            _InviteRow(
-              invite: invite,
-              onAccept: () => _accept(context, ref, invite),
+          if (invites.isNotEmpty) ...<Widget>[
+            AppSheetOptionList(
+              itemCount: invites.length,
+              itemBuilder: (BuildContext context, int index) => _InviteRow(
+                invite: invites[index],
+                onAccept: () => _accept(context, ref, invites[index]),
+              ),
             ),
-          if (invites.isNotEmpty) const SdDividerV3(),
+            SizedBox(height: SdContentPaddingV3.listItemGap),
+          ],
           AppSheetOptionList(
             maxHeight: OptionPickerSheet.listMaxHeight,
             itemCount: workspaces.length,
@@ -152,8 +157,17 @@ class WorkspaceSwitcherSheet extends ConsumerWidget {
               );
             },
           ),
-          const SdDividerV3(),
-          _CreateWorkspaceRow(onTap: () => _create(context, ref)),
+          // Its own card: an action, not one of the businesses above it.
+          SizedBox(height: SdContentPaddingV3.listItemGap),
+          AppSheetOptionList(
+            itemCount: 1,
+            itemBuilder: (BuildContext context, int index) =>
+                AppSheetActionRow(
+                  icon: AppIconConstant.add,
+                  label: context.l10n.workspaceCreateNew,
+                  onTap: () => _create(context, ref),
+                ),
+          ),
         ],
       ),
     );
@@ -276,31 +290,6 @@ class _InviteRow extends StatelessWidget {
         ),
         Text(
           context.l10n.teamInviteAccept,
-          style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
-            color: context.colorScheme3.primary,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _CreateWorkspaceRow extends StatelessWidget {
-  const _CreateWorkspaceRow({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => AppSelectableRow(
-    // Never the selected one — it is an action, not a business you can be in.
-    isSelected: false,
-    onTap: onTap,
-    child: Row(
-      children: <Widget>[
-        SdIconV3(AppIconConstant.add, color: context.colorScheme3.primary),
-        SizedBox(width: SdSpacingConstant.w12),
-        Text(
-          context.l10n.workspaceCreateNew,
           style: context.textTheme3.bodyMedium!.semiBold3.copyWith(
             color: context.colorScheme3.primary,
           ),

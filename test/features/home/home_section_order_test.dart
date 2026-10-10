@@ -8,18 +8,16 @@ import 'premium_subscription.dart';
 
 /// The order of Home is a product decision, and this is what holds it.
 ///
-/// Owner's rule: **Getting started sits directly under the shortcut row**,
-/// then Needs Attention, then the numbers. See `lib/features/home/CLAUDE.md`,
-/// which carries the whole order.
+/// Owner's rule: **Needs Attention opens the screen**, the shortcut row sits
+/// under it, Getting started under that, then the numbers. See
+/// `lib/features/home/CLAUDE.md`, which carries the whole order.
 void main() {
   /// The order [labels] appear in as Home is scrolled from the top.
   ///
-  /// **Not pixel offsets.** Home is a lazy `ListView` with variable-height
-  /// children, so it estimates the extent of everything it has not built —
-  /// which makes `position.pixels` a moving target rather than an absolute
-  /// coordinate, and made a comparison of two scrolled measurements report
-  /// the wrong order. Reading the order things come into view in is the same
-  /// question asked in a way the list can answer.
+  /// **Not pixel offsets.** Home was a lazy `ListView`, whose estimated extent
+  /// made `position.pixels` a moving target and once reported the wrong order
+  /// outright. It is built whole now, but reading the order things come into
+  /// view in asks the same question without depending on how it is built.
   ///
   /// Labels that arrive in the same frame are sorted by their y within it,
   /// where positions *are* comparable — otherwise two sections that fit on
@@ -34,19 +32,20 @@ void main() {
     final List<String> seen = <String>[];
 
     while (seen.length < labels.length) {
-      final List<String> arrived = labels
-          .where(
-            (String label) =>
-                !seen.contains(label) &&
-                find.text(label).evaluate().isNotEmpty,
-          )
-          .toList()
-        ..sort(
-          (String a, String b) => tester
-              .getTopLeft(find.text(a).first)
-              .dy
-              .compareTo(tester.getTopLeft(find.text(b).first).dy),
-        );
+      final List<String> arrived =
+          labels
+              .where(
+                (String label) =>
+                    !seen.contains(label) &&
+                    find.text(label).evaluate().isNotEmpty,
+              )
+              .toList()
+            ..sort(
+              (String a, String b) => tester
+                  .getTopLeft(find.text(a).first)
+                  .dy
+                  .compareTo(tester.getTopLeft(find.text(b).first).dy),
+            );
 
       seen.addAll(arrived);
 
@@ -80,7 +79,7 @@ void main() {
     );
   });
 
-  testWidgets('Getting started is above Needs Attention when it shows', (
+  testWidgets('Getting started sits under Needs Attention when it shows', (
     WidgetTester tester,
   ) async {
     await pumpScreen(
@@ -91,27 +90,31 @@ void main() {
 
     expect(
       await orderDownThePage(tester, <String>[
-        'Needs Attention',
         'Getting started',
+        'Needs Attention',
       ]),
-      <String>['Getting started', 'Needs Attention'],
+      <String>['Needs Attention', 'Getting started'],
     );
   });
 
-  testWidgets('the shortcut row is still first', (WidgetTester tester) async {
+  testWidgets('Needs Attention opens the screen, the shortcut row follows', (
+    WidgetTester tester,
+  ) async {
     await pumpScreen(
       tester,
       const HomeScreen(),
       overrides: premiumSubscription(),
     );
 
+    // `Add stock` is the first shortcut and appears nowhere else on Home.
     expect(
       await orderDownThePage(tester, <String>[
+        'Add stock',
         'Needs Attention',
-        'Quick Action',
+        'Performance',
       ]),
-      <String>['Quick Action', 'Needs Attention'],
-      reason: 'the three shortcut cards open the screen (owner\u2019s rule)',
+      <String>['Needs Attention', 'Add stock', 'Performance'],
+      reason: 'what needs attention comes first (owner\u2019s rule)',
     );
   });
 }

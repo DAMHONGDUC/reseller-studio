@@ -21,28 +21,34 @@ class _OrderList extends ConsumerWidget {
         ? 0
         : 1;
 
-    return ListView.separated(
-      // Clears the create button as well as the glass bar; without it the
-      // last order sits under the button and cannot be tapped.
-      padding: AppAddFabScaffold.listPadding(context, floatingNav: true),
-      itemCount: orders.length + header,
-      // The separator between the meter and the first card is the same gap
-      // as between two cards, and it belongs to neither of them.
-      separatorBuilder: (BuildContext context, int index) =>
-          SizedBox(height: SdContentPaddingV3.listItemGap),
-      itemBuilder: (BuildContext context, int index) {
-        if (index < header) {
-          return const PlanLimitMeters(allowances: _meterAllowances);
-        }
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverPadding(
+          // Clears the create button as well as the glass bar; without it the
+          // last order sits under the button and cannot be tapped.
+          padding: AppAddFabScaffold.listPadding(context, floatingNav: true),
+          sliver: SliverList.separated(
+            itemCount: orders.length + header,
+            // The separator between the meter and the first card is the same
+            // gap as between two cards, and it belongs to neither of them.
+            separatorBuilder: (BuildContext context, int index) =>
+                SizedBox(height: SdContentPaddingV3.listItemGap),
+            itemBuilder: (BuildContext context, int index) {
+              if (index < header) {
+                return const PlanLimitMeters(allowances: _meterAllowances);
+              }
 
-        final Order order = orders[index - header];
+              final Order order = orders[index - header];
 
-        return _OrderCard(
-          order: order,
-          now: now,
-          onTap: () => context.push(AppRoutes.order(order.id)),
-        );
-      },
+              return _OrderCard(
+                order: order,
+                now: now,
+                onTap: () => context.push(AppRoutes.order(order.id)),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

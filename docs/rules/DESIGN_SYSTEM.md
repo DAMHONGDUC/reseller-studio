@@ -1,11 +1,11 @@
 # Design system — `system_design` v3
 
-Read this when touching `packages/system_design/`, or when building any screen
+Read this when touching `packages/flutter-system-design-kit/`, or when building any screen
 or widget that renders `Sd*` v3 components.
 
 ## `system_design` — the design system is a separate package
 
-Tokens and string-free widgets live in `packages/system_design`, a **separate
+Tokens and string-free widgets live in `packages/flutter-system-design-kit`, a **separate
 git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired
 in as a path dependency. There are two imports and no others — the index for
 anything with a look, and `common.dart` for the shared app infrastructure that
@@ -113,6 +113,44 @@ decides the arguments the look would otherwise keep re-opening:
   the capsule's too, at the same family of corner as the bar it sits in.
 
 `test/core/widgets/nav_bar_marks_the_current_tab_test.dart` holds all three.
+
+#### The bar gets out of the way while a tab scrolls down
+
+Owner's rule. **On every tab, scrolling down slides the bar off the bottom of
+the screen; scrolling up slides it back.** It began on Inventory and Orders —
+the lists a seller reads hundreds of rows on — and the owner widened it to all
+five, so the bar behaves one way wherever it is.
+
+- **The shell owns it, not the screens.** `SdBottomNavigationV3` listens to
+  the tab body's own vertical list and moves the bar; no screen opts in or
+  out, and none can make it behave differently.
+- **Only the tab's main list counts.** A horizontal filter strip, or a
+  vertical scrollable nested inside the page, moves nothing.
+- **It always comes back without a scroll the seller has to invent.** It
+  reappears on a tab change, at the top of the list, and whenever the list
+  stops being scrollable — a filter that empties the list must not strand the
+  seller with no tabs and nothing to drag.
+- **The add button stays where it is** — see "The FAB" below. It does not
+  follow the bar down.
+- **The clearance under the last row does not shrink.** The bar can come back
+  at any moment, so the list keeps reserving its footprint — the "no content
+  is ever covered" rule above holds in both states. The bar is translated,
+  never removed from layout.
+- **It follows the finger, then settles.** The bar moves by exactly as much
+  as the list does, and a release finishes it in the direction the list last
+  moved — finishing to the nearer end left it hidden after a short scroll up.
+  - **Past either end the finger still drives it.** A short list runs out of
+    scroll before the bar is gone; stopping there left it stuck half way.
+  - **The bounce settling back is ignored.** It is the list, not the seller,
+    and reading it as a scroll up brought the bar straight back.
+  - **A list that fits on screen never moves it.** With nothing to scroll,
+    the only motion is iOS's rubber band, and following it dragged the bar a
+    few points down and left it hanging there for as long as the finger was.
+  Owner's rule, given after the first version — a timed slide fired on each
+  change of direction — bounced with every tremor of the thumb.
+- **No fade.** An opacity layer over the glass re-renders its refraction
+  offscreen on every frame of the slide; the bar is only ever translated.
+- Reduce Motion settles it without the slide.
 
 #### The bar is glyphs only — no words on any tab
 
@@ -315,16 +353,16 @@ Owner's rules, all of them read from one place so no screen types them:
   bottom. **A control docking into the bar pads itself; it does not fill the
   bar.**
 - **A row in a sheet that can be the chosen one is `AppSelectableRow`**
-  (`core/widgets/`). It owns the ground, the corner and the hit target, and
-  nothing else — what "chosen" looks like inside stays the sheet's, because
-  the picker ticks the row while the workspace switcher fills its icon tile.
+  (`core/widgets/`). It owns the ground and the hit target, and nothing
+  else — what "chosen" looks like inside stays the sheet's, because the
+  picker ticks the row while the workspace switcher fills its icon tile.
   Two things it settles that a hand-rolled `InkWell` kept getting wrong: a
   one-line row is otherwise only as tall as its text, which is under the 44pt
   Apple asks for; and the chosen row said so only with a tick at the far right,
   which is a long way from the label somebody is actually reading. **Colour is
   never the only signal** — the ground comes with a weight change and a glyph.
-  Rows separated by a gap rather than a hairline: each carries its own rounded
-  ground, and a rule cutting through that reads as two competing shapes.
+  The ground is square and full-bleed: the row sits in an
+  `AppSheetOptionList` card, which rounds the corners.
 - **The rule between two rows is `SdDividerV3`, never Material's `Divider`.**
   Material reserves a whole `height` around a rule only `thickness` tall, and
   defaults that height to 16 — so a call site asking for a hairline silently
@@ -339,16 +377,19 @@ Owner's rules, all of them read from one place so no screen types them:
   lands inside the glass tab bar instead of above it. The presenter draws
   into the root overlay, which is also what lets a message outlive the route
   that raised it — pop first, then call it.
-- **The FAB is `SdFabV3`, never Material's.** It is shorter than Material's
-  and sheds its label while the list is moving — but it never hides. A create
-  action a seller has to hunt for is one they stop using.
+- **The FAB is `SdFabV3`, never Material's: a `+` in a filled circle, no
+  title, no animation.** Owner's rules, and they **reverse "sheds its label
+  while the list is moving"** and then the label itself. The button keeps
+  its shape and its place whatever the list or the tab bar is doing — a
+  control that changes shape under the thumb is one the seller has to find
+  again — and it never hides. Its label is the semantics name only, so the
+  button is not anonymous to a screen reader.
 - **Every screen that creates something uses that same button, in that same
   place.** Owner's rule. Not an `IconButton` in the app bar, not a row at the
-  bottom of a list — the labelled FAB Inventory has. `AppAddFabScaffold`
+  bottom of a list — the `+` FAB Inventory has. `AppAddFabScaffold`
   (`lib/core/widgets/app_add_fab_scaffold.dart`) is the one implementation:
-  it owns the scroll notifier, installs the `NotificationListener` around the
-  body, and lifts the button clear of the floating tab bar when the screen is
-  a tab. Screens pass a label and a callback and get the behaviour.
+  it places the button and lifts it clear of the floating tab bar when the
+  screen is a tab. Screens pass a semantics label and a callback.
   - **`floatingNav` is true on the five tab screens and false everywhere
     else.** A pushed route has no glass bar under it, so the inset would leave
     the button hovering above nothing.
@@ -363,7 +404,7 @@ site.
 
 why: see DECISIONS.md § The app bar stays opaque
 
-`packages/system_design/WIDGET_RULES.md` is the authority on what may go in
+`packages/flutter-system-design-kit/WIDGET_RULES.md` is the authority on what may go in
 the package and how it must be written. **Read it before adding to the
 package.** The short version:
 
@@ -418,6 +459,13 @@ one that opens a sheet of verbs.
   own layout; each wraps its content in a `Row` with the glyph as the last
   child, rather than growing a private idea of what a tappable card looks
   like.
+- **The order card carries its glyph on the title row, not in a column of
+  its own.** Owner's rule. Its glyph was a column the full height of a card
+  several lines tall, so everything under the title gave up that width:
+  the badges, the profit line and the Ship it button sat with
+  `SdContentPaddingV3.card` on the left and that inset plus the glyph on the
+  right. The title row ends in the chevron, and every line below it
+  spans the card's full content width, so both side insets match.
 - **The end glyph is `AppRowChevron`, and nothing draws one inline.** Owner's
   rule. Five call sites had grown their own — three at `smallSize` in
   `textTertiary`, one a raw `Icon` at Material's default in `textSecondary` —
@@ -703,6 +751,34 @@ means, the thing underneath owns it.
 - **A list of physical things gets a thumbnail, not an icon.** Sellers
   recognise a row by the picture. Icons in tinted `SdIconTileV3` squares are
   for categories and status rows, where there is no picture to show.
+- **A hue lives in a mark, never in a slab.** Owner's rule, given because the
+  tinted look read as machine-made: a 12% wash of the hue behind a label in
+  that hue, a border in the hue, a progress bar in brand indigo — every badge,
+  chip and meter a different pastel. The colour now goes into one small mark,
+  and everything around it is ink.
+  - **Borders are neutral, always.** `border` at rest; a chosen control is
+    told by `textPrimary` — the ink — on its border and label, plus a sunken
+    ground. No border is ever drawn in a hue.
+  - **A badge is a neutral ground, a dot in its hue, and the word.**
+    `SdBadgeV3` keeps `color` and `tone`, and they colour the dot (or the
+    `icon`) only. The label stays ink, except `warning` and `danger`, which
+    tint the word as well: an alert has to read as one without the seller
+    finding a six-point dot.
+  - **A tag puts its hue in the radio.** `SdTagV3` chosen is ink border, ink
+    label and sunken ground; the filled radio wears the value's colour.
+  - **A progress line is ink on a sunken track.** It turns `danger` only when
+    the thing it measures has hit its wall. A track of stages — an order's,
+    the sale timeline's — draws reached stages filled in `textPrimary`, the
+    next one ringed in it, and only a late one in `danger`.
+  - **Ink means `textPrimary`, not the secondary grey.** Owner's rule, given
+    after the first pass read too quiet: a badge's label, a progress fill and
+    a reached stage were grey and the change made them hard to find. The
+    secondary grey stays for supporting text; anything that *reports* a state
+    draws in the primary ink.
+  - **An identity hue on a bar moves to a dot beside the name.** The
+    marketplace breakdown keeps each platform's colour, on the dot; the bar
+    itself is the same ink line as every other.
+  - **No glow.** A shadow tinted with a hue is decoration, not depth.
 - **Every price, cost and total uses `.tabular3`.** Proportional digits are
   why a column of money appears to shuffle sideways as it updates, and this
   app is mostly columns of money.
@@ -865,9 +941,21 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
   the choices.
   - Between items only, per the divider rule below: nothing above the first row
     or below the last.
-  - The rule keeps a small gap either side, because a picker's chosen row draws
-    a rounded ground and a hairline flush against that corner reads as two
-    shapes fighting.
+- **A sheet's options sit in one card, the card Home's lists use.**
+  `AppSheetOptionList` is an `SdCardV3` with no padding, so its rules run edge
+  to edge like any hairline inside a card. Loose rows were set a gutter past
+  the sheet's title, with rules running wider than the rows; the card's edge
+  lines up with the title and the rows inset from it.
+  - **The plain `surface` layer, not `elevated`.** The modal already sits a
+    step below a card; the elevated shade is the divider's own colour in
+    dark, which hid every rule.
+  - **A group is its own card.** A different kind of row — the switcher's
+    invitations, its "create a business" — gets a second card, with
+    `listItemGap` between them, rather than a rule in the same one.
+- **A sheet's action is a tile, a label and a target, like an `AppListRow`.**
+  `AppSheetActionRow` leads with an `SdIconTileV3` in the primary accent and a
+  semi-bold label; a destructive one tints both in `danger`. A picker option
+  that carries an icon wears the same tile, filled when it is the chosen one.
 - Use `SdPressableScaleV3` for tactile button feedback.
 
 ## The rest of the primitives
@@ -903,6 +991,11 @@ quietly re-invent one.
   one short doc comment stating its UI meaning and one blank line before the
   next entry.** The name alone is not enough when one glyph serves several
   workflows, and the separation keeps future icon-source swaps reviewable.
+- **One action, one glyph — scanning is `AppIconConstant.barcodeScanner`
+  everywhere.** Owner's rule. Inventory's app bar, the scan result and the
+  purchase evaluator drew a QR mark while Home, Quick Add and Add stock drew
+  a barcode, so the same camera looked like two features. The registry holds
+  no second scan glyph, so a screen cannot pick one.
 - **An enum's colour — and its label — live on that enum, as one extension in
   the enum's own file** — owner's rule. `ItemStatusDisplay` sits in
   `domain/enums/item_status.dart` beside the enum, carrying
@@ -1001,6 +1094,6 @@ get broken from this side.
   number in a widget (`\.w\b|\.h\b|\.r\b|\.sp\b` outside `SdSpacingConstant`), a
   quoted user-facing string, and an import that starts with anything other than
   the framework, a declared dependency, or a sibling widget folder.
-- **The package analyzes standalone** — `melos run analyze` does it first and
+- **The package analyzes standalone** — `make analyze` does it first and
   from outside the app, on purpose. If it only analyzes from inside, an app
   dependency has leaked in.

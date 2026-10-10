@@ -132,9 +132,7 @@ void main() {
           .read(itemActionsControllerProvider.notifier)
           .crossList(
             coat,
-            prices: const <String, Money>{
-              'etsy': Money(3000, 'USD'),
-            },
+            prices: const <String, Money>{'etsy': Money(3000, 'USD')},
           );
 
       final Item? saved = await container
@@ -165,9 +163,7 @@ void main() {
             .read(itemActionsControllerProvider.notifier)
             .crossList(
               coat,
-              prices: const <String, Money>{
-                'poshmark': Money(4000, 'USD'),
-              },
+              prices: const <String, Money>{'poshmark': Money(4000, 'USD')},
             );
 
         final Item? saved = await container
@@ -365,9 +361,7 @@ void main() {
       final CrossListState current = state(
         price: const Money(4500, 'USD'),
         selected: <String>{'depop'},
-        prices: const <String, Money>{
-          'depop': Money(4000, 'USD'),
-        },
+        prices: const <String, Money>{'depop': Money(4000, 'USD')},
       );
 
       expect(current.priceFor('ebay'), const Money(4500, 'USD'));
@@ -388,9 +382,7 @@ void main() {
         state(
           selected: <String>{'depop'},
           price: const Money(4500, 'USD'),
-          prices: const <String, Money>{
-            'depop': Money(4000, 'USD'),
-          },
+          prices: const <String, Money>{'depop': Money(4000, 'USD')},
         ).canPublish,
         isTrue,
       );

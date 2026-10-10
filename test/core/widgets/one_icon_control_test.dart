@@ -20,8 +20,9 @@ void main() {
     final List<({String path, String source})> found =
         <({String path, String source})>[];
 
-    for (final FileSystemEntity entity
-        in Directory('lib').listSync(recursive: true)) {
+    for (final FileSystemEntity entity in Directory(
+      'lib',
+    ).listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
 
       found.add((path: entity.path, source: entity.readAsStringSync()));

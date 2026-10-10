@@ -10,6 +10,7 @@ import 'package:reseller_studio/features/carriers/presentation/screens/carrier_d
 import 'package:reseller_studio/features/carriers/presentation/screens/carriers_screen/carriers_screen.dart';
 import 'package:reseller_studio/features/carriers/providers.dart';
 
+import '../../support/add_button_finder.dart';
 import '../../support/pump_app.dart';
 
 void main() {
@@ -31,7 +32,7 @@ void main() {
   ) async {
     await pumpScreen(tester, const CarriersScreen());
 
-    expect(find.text('Add carrier'), findsOneWidget);
+    expect(AddButtonFinder.named('Add carrier'), findsOneWidget);
     expect(find.text('USPS'), findsOneWidget);
     expect(find.text('Royal Mail'), findsOneWidget);
 

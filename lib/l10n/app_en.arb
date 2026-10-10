@@ -1087,6 +1087,10 @@
   "@inventoryAddIntakeCaption": {
     "description": "Caption for the intake session on the Inventory add sheet — the flow that ties items to a purchase."
   },
+  "inventoryAddScanCaption": "Find what you own by its code, or start something new",
+  "@inventoryAddScanCaption": {
+    "description": "Caption for Scan on the Add stock sheet — a code either finds an item the seller already has or starts a new one."
+  },
   "itemPurchase": "Purchase (optional)",
   "@itemPurchase": {
     "description": "Which purchase this item came off. Optional like every create field (hard rule 2)."
@@ -1431,9 +1435,47 @@
   "@markSoldPriceRequired": {
     "description": "Plan §29: selling needs sale information."
   },
-  "markSoldDone": "Sold — the order is in Orders",
-  "@markSoldDone": {
-    "description": "Confirmation. Says where the order went, because marking sold creates one."
+  "saleRecordedOn": "Sold on {marketplace}",
+  "@saleRecordedOn": {
+    "description": "Caption over the sale price once a sale is recorded.",
+    "placeholders": {
+      "marketplace": {
+        "type": "String"
+      }
+    }
+  },
+  "saleRecordedBundle": "{count} items",
+  "@saleRecordedBundle": {
+    "description": "Names a bundle sale on the success sheet, in place of one item's title. Always two or more.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "saleRecordedNext": "What happens next",
+  "@saleRecordedNext": {
+    "description": "Heading over the three-step timeline on the sale success sheet."
+  },
+  "saleRecordedShipDetail": "Waiting in Orders to ship",
+  "@saleRecordedShipDetail": {
+    "description": "Under the Ship it step: says the new order is already in the queue."
+  },
+  "saleRecordedPayoutStep": "Record the payout",
+  "@saleRecordedPayoutStep": {
+    "description": "Last step of the sale timeline, when the payout was not entered."
+  },
+  "saleRecordedPayoutDetail": "Profit is exact once the platform pays you",
+  "@saleRecordedPayoutDetail": {
+    "description": "Under the payout step. Says why the profit is not shown yet; never an estimate (hard rule 3)."
+  },
+  "saleRecordedPayoutDone": "Payout recorded",
+  "@saleRecordedPayoutDone": {
+    "description": "Last step of the sale timeline, when the payout was entered with the sale."
+  },
+  "commonDone": "Done",
+  "@commonDone": {
+    "description": "Closes a finished flow."
   },
   "recordSaleTitle": "Record a sale",
   "@recordSaleTitle": {
@@ -1475,6 +1517,10 @@
   "repriceBulkHelp": "Applied to every selected item",
   "@repriceBulkHelp": {
     "description": "Helper on a bulk reprice, so nobody is surprised."
+  },
+  "repriceAllMarketplacesWarning": "The new price replaces the price on every marketplace this item is listed on.",
+  "@repriceAllMarketplacesWarning": {
+    "description": "Red warning on the item reprice sheet: the item has no price of its own, so the new price goes onto every marketplace listing."
   },
   "repriceSubmit": "Update price",
   "@repriceSubmit": {
@@ -1720,18 +1766,9 @@
   "@scannerSwitchCamera": {
     "description": "Tooltip on the camera flip."
   },
-  "scannerHint": "Point at a barcode, a SKU label or a bin tag.",
+  "scannerHint": "Fit a barcode, a SKU label or a bin tag inside the frame.",
   "@scannerHint": {
     "description": "Names the three things a scan can match."
-  },
-  "scannerFoundLocation": "That is {name}",
-  "@scannerFoundLocation": {
-    "description": "Shown when a scanned code matched a bin rather than an item.",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
   },
   "scannerNoMatchTitle": "Nothing has that code",
   "@scannerNoMatchTitle": {
@@ -1856,14 +1893,6 @@
   "ordersNoMatch": "No orders match this filter.",
   "@ordersNoMatch": {
     "description": "Empty state when a tab is empty."
-  },
-  "orderFilterToShip": "To Ship",
-  "@orderFilterToShip": {
-    "description": "Orders tab. Folds in awaiting-payment: from the seller’s point of view both are \"not gone yet\"."
-  },
-  "orderFilterReturns": "Returns",
-  "@orderFilterReturns": {
-    "description": "Orders tab covering return requested, returned and refunded."
   },
   "orderLate": "Late",
   "@orderLate": {
@@ -3221,6 +3250,50 @@
       }
     }
   },
+  "analyticsProfitPartial": "Partial — some item costs are missing",
+  "@analyticsProfitPartial": {
+    "description": "Caption under the net profit hero when some sold items have no recorded cost, so the figure is not the whole truth."
+  },
+  "analyticsPeriodLabel": "Period",
+  "@analyticsPeriodLabel": {
+    "description": "Screen-reader name of the Analytics period selector."
+  },
+  "analyticsPeriodAll": "All",
+  "@analyticsPeriodAll": {
+    "description": "Period option: every sale ever recorded. Very short, it sits in a five-way selector."
+  },
+  "analyticsPeriod7d": "7D",
+  "@analyticsPeriod7d": {
+    "description": "Period option: the last 7 days. Very short."
+  },
+  "analyticsPeriod30d": "30D",
+  "@analyticsPeriod30d": {
+    "description": "Period option: the last 30 days. Very short."
+  },
+  "analyticsPeriod90d": "90D",
+  "@analyticsPeriod90d": {
+    "description": "Period option: the last 90 days. Very short."
+  },
+  "analyticsPeriodYtd": "YTD",
+  "@analyticsPeriodYtd": {
+    "description": "Period option: since 1 January this year. Very short."
+  },
+  "analyticsTrend": "Trend",
+  "@analyticsTrend": {
+    "description": "Section title over the revenue and profit bar chart."
+  },
+  "analyticsTrendCaption": "Each sale's own profit, before overhead expenses",
+  "@analyticsTrendCaption": {
+    "description": "Subtitle of the trend chart: says why its profit bars do not add up to net profit."
+  },
+  "analyticsTrendEmpty": "No sales in this period",
+  "@analyticsTrendEmpty": {
+    "description": "Shown in place of the trend chart when the period holds no sale."
+  },
+  "analyticsTrendSemantics": "Revenue and profit over time",
+  "@analyticsTrendSemantics": {
+    "description": "Screen-reader name of the trend chart."
+  },
   "analyticsMarketplaceRowDetail": "{orders} · fees {fees} ({rate}) · profit {profit}",
   "@analyticsMarketplaceRowDetail": {
     "description": "One marketplace's line under its bar. Every value arrives formatted.",
@@ -3709,7 +3782,7 @@
   "@sourcingScanTitle": {
     "description": "Title of the camera opened from the purchase evaluator."
   },
-  "sourcingScanHint": "Point at the barcode. We check it against what you have sold before.",
+  "sourcingScanHint": "Fit the barcode inside the frame. We check it against what you have sold before.",
   "@sourcingScanHint": {
     "description": "Hint over the camera in the purchase evaluator."
   },
@@ -6603,5 +6676,81 @@
   "moreSectionGeneral": "General",
   "@moreSectionGeneral": {
     "description": "Heading of the first section on More, holding the account, theme, language and notification settings."
+  },
+  "permissionCameraTitle": "Camera access is off",
+  "@permissionCameraTitle": {
+    "description": "Title of the sheet shown when camera access is refused for good."
+  },
+  "permissionCameraMessage": "Reseller Studio uses the camera to scan barcodes and photograph items. Turn on Camera for Reseller Studio in Settings.",
+  "@permissionCameraMessage": {
+    "description": "Body of the camera-blocked sheet: what the camera is for, and where to turn it back on."
+  },
+  "permissionPhotosTitle": "Photo access is off",
+  "@permissionPhotosTitle": {
+    "description": "Title of the sheet shown when photo library access is refused for good."
+  },
+  "permissionPhotosMessage": "To attach photos you already have, turn on Photos for Reseller Studio in Settings.",
+  "@permissionPhotosMessage": {
+    "description": "Body of the photos-blocked sheet: what the library is for, and where to turn it back on."
+  },
+  "permissionNotificationsTitle": "Notifications are off",
+  "@permissionNotificationsTitle": {
+    "description": "Title of the sheet and of the Notification settings card when notifications are off for the app."
+  },
+  "permissionNotificationsMessage": "You won't hear about new orders or reminders on this phone. Turn on Notifications for Reseller Studio in Settings.",
+  "@permissionNotificationsMessage": {
+    "description": "Body of the notifications-blocked sheet: what is missed, and where to turn it back on."
+  },
+  "permissionOpenSettings": "Open Settings",
+  "@permissionOpenSettings": {
+    "description": "Primary button on a permission-blocked sheet; opens this app's page in the system Settings."
+  },
+  "permissionNotNow": "Not now",
+  "@permissionNotNow": {
+    "description": "Secondary button on a permission-blocked sheet; closes it."
+  },
+  "scannerAllowCamera": "Allow camera",
+  "@scannerAllowCamera": {
+    "description": "Button on the scanner when the camera is not allowed; asks again, or explains how to allow it in Settings."
+  },
+  "notificationSettingsBlockedDetail": "Nothing below reaches this phone until you turn them on in Settings.",
+  "@notificationSettingsBlockedDetail": {
+    "description": "Detail line of the card on Notification settings when the system has notifications off for the app."
+  },
+  "scanResultTitle": "Scan result",
+  "@scanResultTitle": {
+    "description": "Title of the screen shown after a code is scanned."
+  },
+  "scanResultCodeLabel": "Scanned code",
+  "@scanResultCodeLabel": {
+    "description": "Label over the code the camera read, on the scan result screen."
+  },
+  "scanResultFoundItem": "In your inventory",
+  "@scanResultFoundItem": {
+    "description": "Under the scanned code: the code belongs to an item in this business."
+  },
+  "scanResultFoundLocation": "A storage location",
+  "@scanResultFoundLocation": {
+    "description": "Under the scanned code: the code is a storage location's label."
+  },
+  "scanResultActions": "Actions",
+  "@scanResultActions": {
+    "description": "Section heading over what can be done with the scanned item or code."
+  },
+  "scanResultOpenItem": "Open item",
+  "@scanResultOpenItem": {
+    "description": "Row on the scan result screen; opens the scanned item's detail screen."
+  },
+  "scanResultMoreActions": "More actions",
+  "@scanResultMoreActions": {
+    "description": "Row on the scan result screen; opens the item's full actions sheet (move, archive, delete)."
+  },
+  "scanResultItemsHere": "Stored here",
+  "@scanResultItemsHere": {
+    "description": "Section heading over the items stored at the scanned location."
+  },
+  "scanResultNothingHere": "Nothing is stored here right now.",
+  "@scanResultNothingHere": {
+    "description": "Shown under a scanned location that holds no items right now."
   }
 }

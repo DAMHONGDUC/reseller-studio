@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../auth/providers.dart';
 import '../../providers.dart';
@@ -51,6 +52,7 @@ class WorkspaceSwitchController extends Notifier<void> {
         'Workspace switched',
         <String, String>{'workspaceId': workspaceId},
       );
+      AppAnalytics.instance.workspaceSwitched();
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.workspace,

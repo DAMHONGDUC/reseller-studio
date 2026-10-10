@@ -1,11 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/time/app_clock.dart';
 import 'package:reseller_studio/features/analytics/domain/entities/analytics_summary.dart';
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import 'package:reseller_studio/features/analytics/providers.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item_filter_criteria.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_status_filter.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
@@ -13,8 +18,11 @@ import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/more/presentation/screens/more_screen/more_screen.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/workspace/providers.dart';
 import 'package:system_design/index.dart';
 
+import '../support/add_button_finder.dart';
+import '../support/filter_sheet_finder.dart';
 import '../support/pump_app.dart';
 
 /// Every screen, rendered against the seeded mock business.
@@ -102,37 +110,31 @@ void main() {
   });
 
   group('inventory filters', () {
-    test('counts split the seed across the five tabs', () async {
+    test('status counts split the seed, Stale among them', () async {
       final ProviderContainer container = mockContainer();
 
       await warmUp(container);
 
-      final Map<InventoryFilter, int> counts = container.read(
-        inventoryCountsProvider,
-      );
+      final List<Item> items = container.read(itemsProvider).value!;
+      final Map<ItemStatusFilter, int> counts = ItemFilterCriteria.none
+          .statusCounts(
+            items,
+            query: '',
+            now: container.read(clockProvider).now(),
+            staleThreshold: container.read(staleThresholdProvider),
+          );
 
-      expect(counts[InventoryFilter.all], 11);
-      expect(counts[InventoryFilter.inStock], 6);
-      expect(counts[InventoryFilter.draft], 2);
-      expect(counts[InventoryFilter.sold], 3);
+      expect(items, hasLength(11));
+      expect(counts[ItemStatusFilter.inStock], 6);
+      expect(counts[ItemStatusFilter.draft], 2);
+      expect(counts[ItemStatusFilter.sold], 3);
       // itm-4 (listed 84 days ago) and itm-5 (66) are past the 60-day
       // threshold; itm-6 (20 days) is not.
-      expect(counts[InventoryFilter.stale], 2);
-    });
-
-    test('stale is a subset of stock, never its own status', () async {
-      final ProviderContainer container = mockContainer();
-
-      await warmUp(container);
-
-      final Map<InventoryFilter, int> counts = container.read(
-        inventoryCountsProvider,
-      );
-
+      expect(counts[ItemStatusFilter.stale], 2);
+      // A stale item is still stock the seller is holding.
       expect(
-        counts[InventoryFilter.stale]! <= counts[InventoryFilter.inStock]!,
+        counts[ItemStatusFilter.stale]! <= counts[ItemStatusFilter.inStock]!,
         isTrue,
-        reason: 'a stale item is still stock the seller is holding',
       );
     });
   });
@@ -166,18 +168,18 @@ void main() {
       expect(find.text('1 overdue'), findsOneWidget);
       expect(find.text('Stale inventory'), findsOneWidget);
       // Compact currency must render a symbol, not the ISO code — the bug
-      // `NumberFormat.compactCurrency` introduced.
+      // `NumberFormat.compactCurrency` introduced. The tiles sit below Needs
+      // Attention and the shortcut row, so they are scrolled to first.
+      await tester.scrollUntilVisible(find.text(r'$439'), 200);
+
       expect(find.text(r'$439'), findsOneWidget);
       expect(find.textContaining('USD4'), findsNothing);
     });
 
-    testWidgets('Inventory lists items with counts on every tab', (
+    testWidgets('Inventory lists items, newest first', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const InventoryScreen());
-
-      expect(find.text('All'), findsOneWidget);
-      expect(find.text('11'), findsOneWidget);
 
       // The list sorts newest-created first, so this is the top row.
       expect(find.textContaining('Nike windbreaker'), findsOneWidget);
@@ -202,7 +204,7 @@ void main() {
       //
       // `.first` is the `CustomScrollView`'s own scrollable, which is the
       // outermost one on this screen. Deliberately not `.last`: the pinned
-      // header holds the filter strip, and that is a horizontal `ListView` —
+      // header holds the filter strip, and that scrolls horizontally —
       // dragging it vertically scrolls nothing and the row never appears.
       await tester.scrollUntilVisible(
         find.textContaining('Vintage Levi'),
@@ -275,7 +277,7 @@ void main() {
       // It is still not *part* of the app bar: it pins as its own sliver
       // below the chrome, which the next test measures.
       expect(find.byTooltip('Scan'), findsOneWidget);
-      expect(find.text('All'), findsOneWidget);
+      expect(FilterSheetFinder.stripChip('Filters'), findsOneWidget);
     });
 
     testWidgets('Inventory keeps the filter strip out of the app bar', (
@@ -283,7 +285,8 @@ void main() {
     ) async {
       await pumpScreen(tester, const InventoryScreen());
 
-      final Rect strip = tester.getRect(find.text('All'));
+      final Finder filters = FilterSheetFinder.stripChip('Filters');
+      final Rect strip = tester.getRect(filters);
       final Rect field = tester.getRect(find.byType(SdSearchFieldV3));
 
       // Below the chrome, not inside it.
@@ -295,41 +298,27 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        tester.getRect(find.text('All')).top,
+        tester.getRect(filters).top,
         greaterThan(tester.getRect(find.byType(SdSearchFieldV3)).bottom),
       );
     });
 
-    testWidgets('Add stock sheds its label only while the list is moving', (
+    testWidgets('Add stock is a plus with no title, named for a reader', (
       WidgetTester tester,
     ) async {
       await pumpScreen(tester, const InventoryScreen());
 
       // The button asks which way stock is coming in — quickly, or as a
-      // buying trip — so its label is the question, not one of the answers.
-      expect(find.text('Add stock'), findsOneWidget);
-
-      // Held, not flicked: the button expands again the moment a scroll
-      // ends, so a completed drag would prove nothing.
-      final TestGesture gesture = await tester.startGesture(
-        tester.getCenter(find.byType(CustomScrollView)),
-      );
-
-      // Two steps, because one long move is a single pointer event and the
-      // drag recogniser never sees the touch slop crossed — the list would
-      // not move at all and the assertion below would pass for the wrong
-      // reason.
-      await gesture.moveBy(const Offset(0, -40));
-      await tester.pump();
-      await gesture.moveBy(const Offset(0, -260));
-      await tester.pumpAndSettle();
-
+      // buying trip — so its name is the question, not one of the answers.
       expect(find.text('Add stock'), findsNothing);
-
-      await gesture.up();
-      await tester.pumpAndSettle();
-
-      expect(find.text('Add stock'), findsOneWidget);
+      expect(AddButtonFinder.named('Add stock'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(SdFabV3),
+          matching: find.byIcon(AppIconConstant.add),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('Analytics renders the profit statement', (
@@ -337,11 +326,14 @@ void main() {
     ) async {
       await pumpScreen(tester, const AnalyticsScreen());
 
-      expect(find.text('Revenue'), findsOneWidget);
-      expect(find.text('Net profit'), findsOneWidget);
+      // The statement's first line and the trend chart's legend.
+      expect(find.text('Revenue'), findsNWidgets(2));
+      // Twice on purpose: the hero carries the headline, and the statement's
+      // last line is the same figure as the answer to its subtraction.
+      expect(find.text('Net profit'), findsNWidgets(2));
       expect(find.text('− Cost of goods'), findsOneWidget);
       expect(find.text(r'$439.00'), findsOneWidget);
-      expect(find.text(r'$49.47'), findsOneWidget);
+      expect(find.text(r'$49.47'), findsNWidgets(2));
     });
 
     testWidgets('More offers seeding and nothing that fakes a business', (

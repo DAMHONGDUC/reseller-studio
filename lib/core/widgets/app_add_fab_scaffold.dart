@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../constants/app_icon_constant.dart';
@@ -9,20 +7,17 @@ import '../constants/app_icon_constant.dart';
 ///
 /// **Owner's rule: every screen that creates something uses the same button,
 /// in the same place.** Not an `IconButton` in the app bar, not a row at the
-/// bottom of a list — the labelled `SdFabV3` that sheds its label while the
-/// list is moving and brings it back the moment it stops. A create action a
-/// seller has to hunt for is one they stop using.
+/// bottom of a list — the `SdFabV3`: a `+` in a filled circle, no title. A
+/// create action a seller has to hunt for is one they stop using.
 ///
-/// The behaviour cannot live in the button alone: the label collapses on a
-/// scroll notification, and the notification only reaches an *ancestor* of the
-/// scrollable — while the button sits in the scaffold's own slot, a sibling of
-/// the body. So the wrapper owns both, which is the whole reason this class
-/// exists rather than a bare widget.
+/// **The button does not animate** — owner's rule. It keeps its shape and its
+/// place while the list scrolls and while the tab bar slides away, so it is
+/// always where the thumb last found it.
 ///
 /// [floatingNav] is true on the five tab screens and false everywhere else: a
 /// pushed route has no glass bar under it, and the inset would leave the
 /// button hovering above nothing.
-class AppAddFabScaffold extends ConsumerStatefulWidget {
+class AppAddFabScaffold extends StatelessWidget {
   const AppAddFabScaffold({
     required this.body,
     this.appBar,
@@ -41,9 +36,8 @@ class AppAddFabScaffold extends ConsumerStatefulWidget {
 
   final Widget body;
 
-  /// What the button says. A verb and its object — "Add a category", not
-  /// "Add": the label is the only thing telling a seller what they are about
-  /// to create.
+  /// What a screen reader announces — never painted. A verb and its object,
+  /// "Add a category", not "Add": the glyph alone does not say what it makes.
   final String addLabel;
 
   final VoidCallback onAdd;
@@ -94,66 +88,26 @@ class AppAddFabScaffold extends ConsumerStatefulWidget {
   );
 
   @override
-  ConsumerState<AppAddFabScaffold> createState() => _AppAddFabScaffoldState();
-}
-
-class _AppAddFabScaffoldState extends ConsumerState<AppAddFabScaffold> {
-  /// Whether the button shows its label. A notifier rather than `setState`:
-  /// the direction of a scroll changes several times a second, and rebuilding
-  /// the whole body for the width of a button is exactly the cost a list
-  /// screen cannot pay.
-  final ValueNotifier<bool> _expanded = ValueNotifier<bool>(true);
-
-  @override
-  void dispose() {
-    _expanded.dispose();
-    super.dispose();
-  }
-
-  /// Collapses while the list moves away under the thumb, and expands the
-  /// moment it stops or reverses. `idle` counts as expanded — a seller who has
-  /// stopped scrolling is a seller reading, and that is when they decide to
-  /// add something.
-  ///
-  /// Vertical only: a horizontal filter strip inside the body is not a reason
-  /// to shrink the button.
-  bool _onUserScroll(UserScrollNotification notification) {
-    if (notification.metrics.axis != Axis.vertical) return false;
-
-    _expanded.value = notification.direction != ScrollDirection.reverse;
-
-    return false;
-  }
-
-  @override
   Widget build(BuildContext context) => SdScaffoldV3(
-    appBar: widget.appBar,
-    bottomNavigationBar: widget.bottomNavigationBar,
-    floatingActionButton: widget.showAdd
+    appBar: appBar,
+    bottomNavigationBar: bottomNavigationBar,
+    floatingActionButton: showAdd
         ? Padding(
             // `extendBody` keeps the FAB in the body's coordinate space
             // rather than stacking it above the bottom slot, so without this
             // lift the button renders *behind* the glass on a tab screen.
             padding: EdgeInsets.only(
-              bottom: widget.floatingNav
+              bottom: floatingNav
                   ? SdContentPaddingV3.floatingBarInset(context)
                   : 0,
             ),
-            child: ValueListenableBuilder<bool>(
-              valueListenable: _expanded,
-              builder: (BuildContext context, bool expanded, Widget? _) =>
-                  SdFabV3(
-                    icon: AppIconConstant.add,
-                    label: widget.addLabel,
-                    expanded: expanded,
-                    onPressed: widget.onAdd,
-                  ),
+            child: SdFabV3(
+              icon: AppIconConstant.add,
+              label: addLabel,
+              onPressed: onAdd,
             ),
           )
         : null,
-    body: NotificationListener<UserScrollNotification>(
-      onNotification: _onUserScroll,
-      child: widget.body,
-    ),
+    body: body,
   );
 }

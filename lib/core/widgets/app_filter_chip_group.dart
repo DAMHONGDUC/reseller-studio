@@ -7,10 +7,13 @@ import 'package:system_design/index.dart';
 /// knows nothing about what it is filtering, the same contract
 /// `PickerOption` has.
 class AppFilterOption<T> {
-  const AppFilterOption({required this.value, required this.label});
+  const AppFilterOption({required this.value, required this.label, this.count});
 
   final T value;
   final String label;
+
+  /// How many rows choosing this would show, where the caller knows it.
+  final int? count;
 }
 
 /// A titled block of filter chips inside a filter sheet.
@@ -26,14 +29,16 @@ class AppFilterOption<T> {
 /// be wrong for half the groups in either sheet.
 class AppFilterChipGroup<T> extends StatelessWidget {
   const AppFilterChipGroup({
-    required this.title,
     required this.options,
     required this.selected,
     required this.onSelected,
+    this.title,
     super.key,
   });
 
-  final String title;
+  /// Null in a sheet holding this group alone — the sheet's own title
+  /// already names it.
+  final String? title;
   final List<AppFilterOption<T>> options;
 
   /// The values currently chosen — one for a single-choice group, any number
@@ -47,13 +52,15 @@ class AppFilterChipGroup<T> extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      Text(
-        title,
-        style: context.textTheme3.labelMedium!.semiBold3.copyWith(
-          color: context.sdTheme3.textSecondary,
+      if (title != null) ...<Widget>[
+        Text(
+          title!,
+          style: context.textTheme3.labelMedium!.semiBold3.copyWith(
+            color: context.sdTheme3.textSecondary,
+          ),
         ),
-      ),
-      SizedBox(height: SdSpacingConstant.h8),
+        SizedBox(height: SdSpacingConstant.h8),
+      ],
       Wrap(
         spacing: SdSpacingConstant.w8,
         runSpacing: SdSpacingConstant.h8,
@@ -61,6 +68,7 @@ class AppFilterChipGroup<T> extends StatelessWidget {
           for (final AppFilterOption<T> option in options)
             SdFilterChipV3(
               label: option.label,
+              count: option.count,
               selected: selected.contains(option.value),
               onSelected: () => onSelected(option.value),
             ),
@@ -68,4 +76,15 @@ class AppFilterChipGroup<T> extends StatelessWidget {
       ),
     ],
   );
+}
+
+/// The rule between two groups of a filter sheet.
+///
+/// One widget so both sheets space it the same way. Between groups only —
+/// never above the first or below the last (`docs/rules/SCREENS.md`).
+class AppFilterGroupDivider extends StatelessWidget {
+  const AppFilterGroupDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) => SdDividerV3(gap: SdSpacingConstant.h16);
 }

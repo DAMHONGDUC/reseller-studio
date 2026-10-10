@@ -104,7 +104,8 @@ void main() {
     expect(
       after.itemCount,
       itemsOf(container, purchase.id).length,
-      reason: 'the count Books and Purchases read is denormalised, so filing '
+      reason:
+          'the count Books and Purchases read is denormalised, so filing '
           'items has to keep it in step — it used to read 0 beside twelve',
     );
   });

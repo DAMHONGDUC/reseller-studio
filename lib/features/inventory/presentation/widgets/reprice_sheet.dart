@@ -19,7 +19,8 @@ import '../controllers/item_actions_controller.dart';
 /// what "done" says.
 ///
 /// The item has no price of its own, so what it writes is the price of every
-/// listing the selection carries.
+/// listing the selection carries — which the sheet says, in red, before the
+/// seller presses (`lib/features/inventory/CLAUDE.md`).
 final class RepriceSheet {
   static Future<void> show(
     BuildContext context,
@@ -40,6 +41,7 @@ final class RepriceSheet {
         items,
       ),
       helperText: count == 1 ? null : context.l10n.repriceBulkHelp,
+      warningText: context.l10n.repriceAllMarketplacesWarning,
       onSubmit: (Money price) => ref
           .read(itemActionsControllerProvider.notifier)
           .reprice(items, price),

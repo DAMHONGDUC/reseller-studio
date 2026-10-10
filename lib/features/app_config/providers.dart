@@ -18,9 +18,21 @@ import 'domain/entities/app_error_notice.dart';
 import 'domain/entities/app_update_policy.dart';
 import 'domain/enums/app_platform.dart';
 
-final StreamProvider<AppConfig> appConfigProvider = StreamProvider<AppConfig>(
-  (Ref ref) => ref.watch(appConfigRepositoryProvider).watch(),
-);
+/// The live `app_config/current`, listened to again whenever the account
+/// changes.
+///
+/// **The uid is watched for the re-listen, not for the value.** The repository
+/// swallows a failed read and its stream closes, so a read denied or dropped
+/// before sign-in left the whole session on [AppConfig.fallback] — the dev and
+/// premium email lists only applied after a cold start. A new account is a new
+/// listener; Riverpod keeps the old value while it connects.
+final StreamProvider<AppConfig> appConfigProvider = StreamProvider<AppConfig>((
+  Ref ref,
+) {
+  ref.watch(currentUidProvider);
+
+  return ref.watch(appConfigRepositoryProvider).watch();
+});
 
 /// The build number this binary was compiled as — the `+7` of `1.0.0+7`.
 ///

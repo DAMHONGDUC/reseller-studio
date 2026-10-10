@@ -44,13 +44,44 @@ abstract class AppAnalytics {
   /// label: a name that changes with the locale splits one tab into two series.
   void tabViewed({required String tab});
 
+  /// A screen the router opened — anything that is not a tab's own root.
+  ///
+  /// [screen] is the route's template (`/inventory/item/:itemId`), never the
+  /// location: a location carries the record id, which splits one screen into
+  /// a series per record and puts ids in a third-party report.
+  void screenViewed({required String screen});
+
+  /// A tapped push opened the app. [type] is the server's notification kind.
+  void pushOpened({required String type});
+
   // --- Session ---
+
+  /// Ties every later event to the account, or clears it on sign-out.
+  ///
+  /// A Firebase uid and nothing else — the same contract as
+  /// `SdCrashReporter.setUserId` (hard rule 9).
+  void setUserId(String? uid);
 
   void signedIn({required String provider});
 
   void signedOut();
 
+  /// [skipped] tells reading the intro from leaving it; [page] is how far the
+  /// seller got, counted from one.
+  void onboardingCompleted({required bool skipped, required int page});
+
   void workspaceCreated({required String currency, required String country});
+
+  void workspaceSwitched();
+
+  /// A guest's local records went into an account — the moment guest mode
+  /// turns into a signed-in seller (hard rule 1).
+  void guestRecordsSynced();
+
+  /// [role] is a `MemberRole` name. Never the address it went to (hard rule 9).
+  void teammateInvited({required String role});
+
+  void invitationAccepted();
 
   // --- Inventory ---
 
@@ -72,6 +103,13 @@ abstract class AppAnalytics {
   void orderShipped({required bool hasTracking});
 
   void returnOpened();
+
+  /// [outcome] is the `OfferStatus` the seller chose.
+  void offerResponded({required String outcome});
+
+  /// Payouts recorded in one sitting. [viaImport] tells a marketplace CSV from
+  /// typed figures — how often sellers reach for the import is the question.
+  void payoutsRecorded({required int count, required bool viaImport});
 
   // --- Money in and out ---
 
@@ -108,13 +146,37 @@ class _NoopAnalytics implements AppAnalytics {
   void tabViewed({required String tab}) {}
 
   @override
+  void screenViewed({required String screen}) {}
+
+  @override
+  void pushOpened({required String type}) {}
+
+  @override
+  void setUserId(String? uid) {}
+
+  @override
   void signedIn({required String provider}) {}
 
   @override
   void signedOut() {}
 
   @override
+  void onboardingCompleted({required bool skipped, required int page}) {}
+
+  @override
   void workspaceCreated({required String currency, required String country}) {}
+
+  @override
+  void workspaceSwitched() {}
+
+  @override
+  void guestRecordsSynced() {}
+
+  @override
+  void teammateInvited({required String role}) {}
+
+  @override
+  void invitationAccepted() {}
 
   @override
   void itemCreated({required bool viaQuickAdd, required bool hasPhoto}) {}
@@ -133,6 +195,12 @@ class _NoopAnalytics implements AppAnalytics {
 
   @override
   void returnOpened() {}
+
+  @override
+  void offerResponded({required String outcome}) {}
+
+  @override
+  void payoutsRecorded({required int count, required bool viaImport}) {}
 
   @override
   void expenseRecorded({required String category}) {}
@@ -168,6 +236,18 @@ class _FirebaseAppAnalytics implements AppAnalytics {
       _report('screen_view', _analytics.logScreenView(screenName: tab));
 
   @override
+  void screenViewed({required String screen}) =>
+      _report('screen_view', _analytics.logScreenView(screenName: screen));
+
+  @override
+  void pushOpened({required String type}) =>
+      _send('push_opened', <String, Object>{'type': type});
+
+  @override
+  void setUserId(String? uid) =>
+      _report('set_user_id', _analytics.setUserId(id: uid));
+
+  @override
   void signedIn({required String provider}) =>
       _send('sign_in', <String, Object>{'provider': provider});
 
@@ -175,11 +255,33 @@ class _FirebaseAppAnalytics implements AppAnalytics {
   void signedOut() => _send('sign_out', const <String, Object>{});
 
   @override
+  void onboardingCompleted({required bool skipped, required int page}) => _send(
+    'onboarding_completed',
+    <String, Object>{'skipped': skipped, 'page': page},
+  );
+
+  @override
   void workspaceCreated({required String currency, required String country}) =>
       _send('workspace_created', <String, Object>{
         'currency': currency,
         'country': country,
       });
+
+  @override
+  void workspaceSwitched() =>
+      _send('workspace_switched', const <String, Object>{});
+
+  @override
+  void guestRecordsSynced() =>
+      _send('guest_records_synced', const <String, Object>{});
+
+  @override
+  void teammateInvited({required String role}) =>
+      _send('teammate_invited', <String, Object>{'role': role});
+
+  @override
+  void invitationAccepted() =>
+      _send('invitation_accepted', const <String, Object>{});
 
   @override
   void itemCreated({required bool viaQuickAdd, required bool hasPhoto}) =>
@@ -211,6 +313,16 @@ class _FirebaseAppAnalytics implements AppAnalytics {
 
   @override
   void returnOpened() => _send('return_opened', const <String, Object>{});
+
+  @override
+  void offerResponded({required String outcome}) =>
+      _send('offer_responded', <String, Object>{'outcome': outcome});
+
+  @override
+  void payoutsRecorded({required int count, required bool viaImport}) => _send(
+    'payouts_recorded',
+    <String, Object>{'count': count, 'via_import': viaImport},
+  );
 
   @override
   void expenseRecorded({required String category}) =>

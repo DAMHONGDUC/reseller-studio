@@ -79,10 +79,7 @@ void main() {
       // correctly reclaims the inset this test is about.
       await pumpScreen(
         tester,
-        SdFloatingBarScopeV3(
-          edge: SdFloatingBarEdgeV3.bottom,
-          child: screen,
-        ),
+        SdFloatingBarScopeV3(edge: SdFloatingBarEdgeV3.bottom, child: screen),
       );
       await toEnd(tester);
 

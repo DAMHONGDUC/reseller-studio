@@ -148,8 +148,8 @@ final class AppEnv {
   // Client *ids*, which are public by design — the OAuth flow shows them in a
   // browser URL. The matching secrets stay server-side.
   //
-  // Google only. Apple needs nothing in the binary: the app goes through
-  // `FirebaseAuth.signInWithProvider`, and the Services ID lives in the
+  // Google only. Apple needs nothing in the binary: the iOS sheet is the
+  // app's own and the token goes to Firebase, and the Services ID lives in the
   // Firebase console.
 
   static const String googleSignInClientIdIos = String.fromEnvironment(
@@ -222,7 +222,7 @@ final class AppEnv {
 
   /// Whether a key was actually filled in.
   ///
-  /// `env.example.json` ships `<placeholder>` values and `melos run set-up`
+  /// `env.example.json` ships `<placeholder>` values and `make set-up`
   /// copies them verbatim, so a half-filled flavour file otherwise reads as
   /// configured and fails at the SDK instead of at the diagnostics.
   static bool _isFilled(String value) =>

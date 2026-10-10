@@ -27,10 +27,9 @@ class _FixedConfig implements AppConfigRepository {
 void main() {
   /// The entity the DTO reads out of a document holding [errorView] under
   /// `error_view` — the hand-typed shape, not the Dart one.
-  AppErrorNotice noticeFrom(Object? errorView) =>
-      AppConfigDto.fromData(<String, Object?>{
-        'error_view': errorView,
-      }).errorNotice;
+  AppErrorNotice noticeFrom(Object? errorView) => AppConfigDto.fromData(
+    <String, Object?>{'error_view': errorView},
+  ).errorNotice;
 
   const AppErrorNotice live = AppErrorNotice(
     enabled: true,

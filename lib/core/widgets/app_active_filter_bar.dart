@@ -12,14 +12,12 @@ import '../extensions/context_extensions.dart';
 /// item missing from the list and an item filtered out of it look identical —
 /// and the seller's fix is to hunt through a sheet for the chip they forgot.
 ///
-/// In `core/widgets/` because both tabs render it, and it is the same row
-/// again at the top of each filter sheet: one widget, so the count on the
-/// screen and the count in the sheet cannot come out differently.
+/// In `core/widgets/` because both tabs render it. The filter sheets do not:
+/// their Reset is `AppFilterSheetActions`, beside Apply.
 class AppActiveFilterBar extends StatelessWidget {
   const AppActiveFilterBar({
     required this.count,
     required this.onReset,
-    this.gutter = true,
     super.key,
   });
 
@@ -28,11 +26,6 @@ class AppActiveFilterBar extends StatelessWidget {
   final int count;
 
   final VoidCallback onReset;
-
-  /// Whether to place the screen's horizontal gutter. **Off inside a sheet**,
-  /// which has already placed one — a second gutter there would inset this row
-  /// further than every group under it.
-  final bool gutter;
 
   /// The band this occupies, stated so Inventory's pinned sliver can give its
   /// extent before it lays anything out — the same reason
@@ -47,7 +40,7 @@ class AppActiveFilterBar extends StatelessWidget {
       height: height,
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: gutter ? SdContentPaddingV3.horizontal : 0,
+          horizontal: SdContentPaddingV3.horizontal,
         ),
         child: Row(
           children: <Widget>[

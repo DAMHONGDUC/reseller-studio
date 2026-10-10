@@ -92,10 +92,7 @@ class _IntakeSessionScreenState extends ConsumerState<IntakeSessionScreen> {
     try {
       final bool added = await ref
           .read(intakeSessionControllerProvider.notifier)
-          .add(
-            title: _title.text,
-            cost: Money.tryParse(_cost.text, currency),
-          );
+          .add(title: _title.text, cost: Money.tryParse(_cost.text, currency));
 
       if (!added || !mounted) return;
 
@@ -170,57 +167,55 @@ class _IntakeSessionScreenState extends ConsumerState<IntakeSessionScreen> {
     IntakeSessionState state,
     String currency,
   ) => ListView(
-        // No bottom inset: the pinned action owns the bottom edge.
-        padding: EdgeInsets.symmetric(
-          horizontal: SdContentPaddingV3.horizontal,
+    // No bottom inset: the pinned action owns the bottom edge.
+    padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
+    children: <Widget>[
+      SizedBox(height: SdContentPaddingV3.topGap),
+      _TripHeader(state: state),
+      SizedBox(height: SdSpacingConstant.h16),
+      SdTextFieldV3(
+        label: context.l10n.intakeItemTitle,
+        controller: _title,
+        focusNode: _titleFocus,
+        isRequired: true,
+        textInputAction: TextInputAction.next,
+      ),
+      SizedBox(height: SdSpacingConstant.h12),
+      MoneyField(
+        label: context.l10n.intakeItemCost,
+        controller: _cost,
+        currency: currency,
+        // The whole reason this screen exists, said out loud: nobody
+        // remembers a week later.
+        helperText: context.l10n.intakeCostHelper,
+        textInputAction: TextInputAction.done,
+        onSubmitted: (_) => _add(),
+      ),
+      SizedBox(height: SdSpacingConstant.h12),
+      SdButtonV3(
+        variant: SdButtonVariantV3.secondary,
+        label: context.l10n.intakeAdd,
+        icon: AppIconConstant.add,
+        expand: true,
+        busy: state.isSaving,
+        onPressed: state.isSaving ? null : _add,
+      ),
+      if (state.lines.isNotEmpty) ...<Widget>[
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+        MoneyField(
+          label: context.l10n.intakeReceiptTotal,
+          controller: _receiptTotal,
+          currency: currency,
+          // `Purchase.totalCost` is what left the pocket, and it is
+          // allowed to disagree with the items — a box lot apportioned
+          // across eleven things is the case it exists for.
+          helperText: context.l10n.intakeReceiptTotalHelper,
+          textInputAction: TextInputAction.done,
         ),
-        children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          _TripHeader(state: state),
-          SizedBox(height: SdSpacingConstant.h16),
-          SdTextFieldV3(
-            label: context.l10n.intakeItemTitle,
-            controller: _title,
-            focusNode: _titleFocus,
-            isRequired: true,
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: SdSpacingConstant.h12),
-          MoneyField(
-            label: context.l10n.intakeItemCost,
-            controller: _cost,
-            currency: currency,
-            // The whole reason this screen exists, said out loud: nobody
-            // remembers a week later.
-            helperText: context.l10n.intakeCostHelper,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _add(),
-          ),
-          SizedBox(height: SdSpacingConstant.h12),
-          SdButtonV3(
-            variant: SdButtonVariantV3.secondary,
-            label: context.l10n.intakeAdd,
-            icon: AppIconConstant.add,
-            expand: true,
-            busy: state.isSaving,
-            onPressed: state.isSaving ? null : _add,
-          ),
-          if (state.lines.isNotEmpty) ...<Widget>[
-            SizedBox(height: SdContentPaddingV3.sectionGap),
-            MoneyField(
-              label: context.l10n.intakeReceiptTotal,
-              controller: _receiptTotal,
-              currency: currency,
-              // `Purchase.totalCost` is what left the pocket, and it is
-              // allowed to disagree with the items — a box lot apportioned
-              // across eleven things is the case it exists for.
-              helperText: context.l10n.intakeReceiptTotalHelper,
-              textInputAction: TextInputAction.done,
-            ),
-            SizedBox(height: SdContentPaddingV3.sectionGap),
-            _TakenIn(state: state),
-          ],
-          SizedBox(height: SdContentPaddingV3.bottomGap),
-        ],
-      );
+        SizedBox(height: SdContentPaddingV3.sectionGap),
+        _TakenIn(state: state),
+      ],
+      SizedBox(height: SdContentPaddingV3.bottomGap),
+    ],
+  );
 }

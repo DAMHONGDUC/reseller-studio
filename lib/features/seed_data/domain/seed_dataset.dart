@@ -126,6 +126,7 @@ class SeedDataset {
         categoryId: 'seed-cat-1',
         purchaseDate: daysAgo(96),
         sku: 'SEED-0001',
+        barcode: SeedDatasetConstant.ean13Barcode,
         condition: ItemCondition.good,
         locationId: 'seed-loc-2',
         listedAt: daysAgo(92),
@@ -144,6 +145,7 @@ class SeedDataset {
         categoryId: 'seed-cat-3',
         purchaseDate: daysAgo(41),
         sku: 'SEED-0002',
+        barcode: SeedDatasetConstant.ean8Barcode,
         condition: ItemCondition.fair,
         notes: 'Battery held 20 minutes. Sold cheap rather than eat it.',
         locationId: 'seed-loc-3',
@@ -162,6 +164,7 @@ class SeedDataset {
         sourceId: 'seed-src-3',
         categoryId: 'seed-cat-2',
         sku: 'SEED-0003',
+        barcode: SeedDatasetConstant.upcABarcode,
         condition: ItemCondition.good,
         locationId: 'seed-loc-3',
         listedAt: daysAgo(84),
@@ -448,4 +451,17 @@ final class SeedDatasetConstant {
 
   /// The order with no payout recorded — what Payouts has to reconcile.
   static const String unpaidOrderId = 'seed-ord-3';
+
+  // The sample bottle labels in `test/support/fixtures/sample_bottles/` carry
+  // these, so scanning one on a seeded device finds a row.
+
+  /// On the sold fleece.
+  static const String ean13Barcode = '5901234123457';
+
+  /// On the sold speaker.
+  static const String ean8Barcode = '96385074';
+
+  /// On the in-stock Levi's, so a scan lands where every action applies —
+  /// and it is the format iOS reads with an extra leading zero.
+  static const String upcABarcode = '036000291452';
 }

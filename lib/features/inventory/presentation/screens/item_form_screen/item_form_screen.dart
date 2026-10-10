@@ -6,10 +6,12 @@ import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/money/money.dart';
+import '../../../../../core/permissions/permission_blocked.dart';
 import '../../../../../core/state/form_seed.dart';
 import '../../../../../core/widgets/app_photo.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/money_field.dart';
+import '../../../../../core/widgets/permission_settings_sheet.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/providers.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
@@ -45,7 +47,7 @@ class ItemFormScreen extends ConsumerStatefulWidget {
 
   /// A code the seller just scanned, filled into the barcode box on create.
   ///
-  /// The scanner's own dialog offers to "add an item and keep the code on
+  /// The scan result screen offers to "add an item and keep the code on
   /// it", and this is the half that keeps it. Ignored while editing: that
   /// item already has whatever code it has.
   final String? initialBarcode;

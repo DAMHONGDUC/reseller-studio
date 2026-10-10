@@ -226,50 +226,50 @@ class ItemCategoryField extends ConsumerWidget {
       // **Never a dead end.** A business with no categories used to be told to
       // go and make one in another screen, mid-form, losing what was typed.
       onTap: () async {
-              final String? picked = await OptionPickerSheet.show<String>(
-                context,
-                title: context.l10n.commonCategory,
-                selected: selected,
-                options: <PickerOption<String>>[
-                  ...categories.map(
-                    (ItemCategory category) => PickerOption<String>(
-                      value: category.id,
-                      label: category.name,
-                    ),
-                  ),
-                  PickerOption<String>(
-                    value: _createNew,
-                    label: context.l10n.commonCreateNew,
-                    icon: AppIconConstant.addBox,
-                  ),
-                ],
-              );
+        final String? picked = await OptionPickerSheet.show<String>(
+          context,
+          title: context.l10n.commonCategory,
+          selected: selected,
+          options: <PickerOption<String>>[
+            ...categories.map(
+              (ItemCategory category) => PickerOption<String>(
+                value: category.id,
+                label: category.name,
+              ),
+            ),
+            PickerOption<String>(
+              value: _createNew,
+              label: context.l10n.commonCreateNew,
+              icon: AppIconConstant.addBox,
+            ),
+          ],
+        );
 
-              if (picked == null) return;
+        if (picked == null) return;
 
-              if (picked == _createNew) {
-                if (!context.mounted) return;
+        if (picked == _createNew) {
+          if (!context.mounted) return;
 
-                final String? name = await NamePromptSheet.show(
-                  context,
-                  title: context.l10n.categoriesAddTitle,
-                  label: context.l10n.commonName,
-                  submitLabel: context.l10n.actionSave,
-                );
+          final String? name = await NamePromptSheet.show(
+            context,
+            title: context.l10n.categoriesAddTitle,
+            label: context.l10n.commonName,
+            submitLabel: context.l10n.actionSave,
+          );
 
-                if (name == null) return;
+          if (name == null) return;
 
-                final String? created = await ref
-                    .read(catalogControllerProvider.notifier)
-                    .saveCategory(name: name);
+          final String? created = await ref
+              .read(catalogControllerProvider.notifier)
+              .saveCategory(name: name);
 
-                if (created != null) onSelected(created);
+          if (created != null) onSelected(created);
 
-                return;
-              }
+          return;
+        }
 
-              onSelected(picked);
-            },
+        onSelected(picked);
+      },
     );
   }
 }
@@ -300,51 +300,51 @@ class ItemLocationField extends ConsumerWidget {
       // Same reason as the category picker: an empty list is a thing to fix
       // here, not an errand somewhere else.
       onTap: () async {
-              final String? picked = await OptionPickerSheet.show<String>(
-                context,
-                title: context.l10n.commonLocation,
-                selected: selected,
-                options: <PickerOption<String>>[
-                  ...locations.map(
-                    (StorageLocation location) => PickerOption<String>(
-                      value: location.id,
-                      label: paths[location.id] ?? location.name,
-                      caption: LocationKindLabel.of(context, location.kind),
-                    ),
-                  ),
-                  PickerOption<String>(
-                    value: _createNew,
-                    label: context.l10n.commonCreateNew,
-                    icon: AppIconConstant.addBox,
-                  ),
-                ],
-              );
+        final String? picked = await OptionPickerSheet.show<String>(
+          context,
+          title: context.l10n.commonLocation,
+          selected: selected,
+          options: <PickerOption<String>>[
+            ...locations.map(
+              (StorageLocation location) => PickerOption<String>(
+                value: location.id,
+                label: paths[location.id] ?? location.name,
+                caption: LocationKindLabel.of(context, location.kind),
+              ),
+            ),
+            PickerOption<String>(
+              value: _createNew,
+              label: context.l10n.commonCreateNew,
+              icon: AppIconConstant.addBox,
+            ),
+          ],
+        );
 
-              if (picked == null) return;
+        if (picked == null) return;
 
-              if (picked == _createNew) {
-                if (!context.mounted) return;
+        if (picked == _createNew) {
+          if (!context.mounted) return;
 
-                final String? name = await NamePromptSheet.show(
-                  context,
-                  title: context.l10n.locationsAddTitle,
-                  label: context.l10n.commonName,
-                  submitLabel: context.l10n.actionSave,
-                );
+          final String? name = await NamePromptSheet.show(
+            context,
+            title: context.l10n.locationsAddTitle,
+            label: context.l10n.commonName,
+            submitLabel: context.l10n.actionSave,
+          );
 
-                if (name == null) return;
+          if (name == null) return;
 
-                final String? created = await ref
-                    .read(catalogControllerProvider.notifier)
-                    .saveLocation(name: name, kind: LocationKind.shelf);
+          final String? created = await ref
+              .read(catalogControllerProvider.notifier)
+              .saveLocation(name: name, kind: LocationKind.shelf);
 
-                if (created != null) onSelected(created);
+          if (created != null) onSelected(created);
 
-                return;
-              }
+          return;
+        }
 
-              onSelected(picked);
-            },
+        onSelected(picked);
+      },
     );
   }
 }
@@ -400,7 +400,9 @@ class ItemPurchaseField extends ConsumerWidget {
       label: context.l10n.itemPurchase,
       icon: AppIconConstant.receipt,
       value: current == null ? null : label(current),
-      placeholder: purchases.isEmpty ? context.l10n.itemPurchaseEmptyHint : null,
+      placeholder: purchases.isEmpty
+          ? context.l10n.itemPurchaseEmptyHint
+          : null,
       onTap: purchases.isEmpty
           ? () => SdSnackBarUtilsV3.info(
               context,

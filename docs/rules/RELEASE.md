@@ -1,7 +1,7 @@
 # Release
 
-Read this before touching `env_assets/`, `packages/system_design/tool/prepare-env.sh`,
-`packages/system_design/tool/build-ipa.sh`, anything under `ios/fastlane/`, or
+Read this before touching `env_assets/`, `packages/script-tools/flutter/prepare_env.sh`,
+`packages/script-tools/flutter/build_ipa.sh`, anything under `ios/fastlane/`, or
 `.github/workflows/release.yml`.
 
 Two halves, and they are independent: **env config is what a build carries,
@@ -18,7 +18,7 @@ second is useless without it.
 **Nothing ties the two together.** `env/prod.json` beside a dev
 `GoogleService-Info.plist` compiles, installs, launches, and writes into the
 wrong Firestore. Every guard below exists because of that one gap:
-`packages/system_design/tool/prepare-env.sh` keeps the halves in step, and `verify_flavor_config` in
+`packages/script-tools/flutter/prepare_env.sh` keeps the halves in step, and `verify_flavor_config` in
 the beta lane is the last place a mismatch can be caught.
 
 `ios/Runner/Info.plist` is in that list because it carries the Google sign-in
@@ -37,7 +37,7 @@ env_assets/
   dev-Info.plist                    prod-Info.plist
 ```
 
-`melos run prepare-env-dev` / `-prod` copies them where the build reads them.
+`make env-dev` / `make env-prod` copies them where the build reads them.
 The script's contract, and none of it is optional:
 
 - **Every copy replaces the destination whole.** Owner's rule. The source's
@@ -47,9 +47,9 @@ The script's contract, and none of it is optional:
   one state this script exists to make impossible: half of it says dev and half
   says prod, and nothing on disk says which half came from where. A tracked
   destination (`ios/Runner/Info.plist`) is overwritten like any other.
-  - `melos run set-up` is the opposite and is not in conflict: it seeds
+  - `make set-up` is the opposite and is not in conflict: it seeds
     `env/*.json` from the templates **only when the file is missing**, so it
-    never touches a real one. `prepare-env` is the command that installs a
+    never touches a real one. `make env-<flavour>` is the command that installs a
     flavour, and installing means replacing.
 - **Both `env/*.json` every run; only the native pair is flavour-picked.** One
   destination each, so there is nothing to choose at build time.
@@ -72,13 +72,21 @@ Google sign-in callback alongside the shared usage strings, deep-link scheme
 and orientations; the release workflow installs the selected file without a
 second derivation step.
 
-**`ios/Runner/Info.plist` is tracked, and `prepare-env` overwrites it.** That
+**`ios/Runner/Info.plist` is tracked, and `make env-<flavour>` overwrites it.** That
 is deliberate and it leaves the working tree dirty: the installed file pins one
 flavour, so **never commit it**.
 
+**A change to the tracked `Info.plist` goes into both `env_assets/*-Info.plist`
+in the same turn.** The next `make env-<flavour>` replaces the file whole, so a
+fix made only to the tracked copy is undone by the next flavour switch — which
+is how the locales and the portrait lock were lost twice. The flavour files
+should differ from the tracked one in the Google sign-in callback and nothing
+else; `portrait_orientation_test` and `shipping_locales_test` read the
+installed file and fail when they drift.
+
 ## No one ever archives from Xcode
 
-`packages/system_design/tool/build-ipa.sh` — `melos run build-ipa-dev` / `-prod` — is the only place an archive is made, and **the fastlane
+`packages/script-tools/flutter/build_ipa.sh` — `make build-ipa-dev` / `make build-ipa-prod` — is the only place an archive is made, and **the fastlane
 lane shells out to it rather than calling `gym`**. The reason is not taste:
 the app's whole configuration arrives through `--dart-define-from-file`, a flag
 `xcodebuild`, `gym` and Product > Archive all know nothing about. An archive
@@ -95,13 +103,13 @@ see `docs/rules/COMMANDS.md`.
 ## The lanes are the design system's; this app only declares itself
 
 `ios/fastlane/Fastfile` is an `import` of
-`packages/system_design/tool/fastlane/Fastfile` and one `sd_ios_app(...)` call.
+`packages/script-tools/flutter/fastlane/Fastfile` and one `sd_ios_app(...)` call.
 It defines no lane, no helper and no constant. **Never re-implement a lane
 here.** Every app embedding this design system releases through one pipeline,
 and a lane copied into an app is one that stops getting the next fix — the
 duplicate `beta` this repo carried had already drifted on three points before
 it was removed: it never pushed the bump, it never recorded the design system's
-commit, and it had no `upload` at all while `packages/system_design/tool/upload-ipa.sh`
+commit, and it had no `upload` at all while `packages/script-tools/flutter/upload_ipa.sh`
 was calling for one.
 
 What belongs to the app is what the pipeline cannot know: the team, the bundle
@@ -116,7 +124,7 @@ Four lanes come with it:
 |---|---|
 | `beta` | the release: check, settle the number, sign, build, upload, symbols, commit |
 | `upload` | the IPA already on disk, no rebuild — for a build that shipped and an upload that did not |
-| `preflight` | everything `beta` does except the build, in three minutes (`melos run pre-build`) |
+| `preflight` | everything `beta` does except the build, in three minutes (`make pre-build`) |
 | `certificates` | mint or renew the certificate and profiles, **local only** |
 
 ## The beta lane's order is the design
@@ -131,17 +139,17 @@ Every step that can fail cheaply runs before the twenty-five minute one.
    twenty-five minutes.
 3. CI only: `setup_ci` → `match(readonly: true)` → entitlement check → manual
    signing → write `ExportOptions.plist`.
-4. Build, through `packages/system_design/tool/build-ipa.sh`.
+4. Build, through `packages/script-tools/flutter/build_ipa.sh`.
 5. Upload, **always carrying a release note**. Owner's rule: no build reaches
    TestFlight blank. `RELEASE_NOTES` — or `notes:` — is used when the release
    was given one, and the lane composes `<flavour> - <version> (<build>)`
    otherwise: `dev - 1.0.0 (20)`, `prod - 1.0.0 (21)`.
-   - **The default is composed in the lane, never in `release.sh`.** The build
+   - **The default is composed in the lane, never in `release_ios.sh`.** The build
      number is settled at step 2, inside the lane; the shell's `pubspec.yaml`
      still holds the previous one, so a note written before the lane runs names
      a build that is not the one uploaded.
    - **The note is the design system's, not this app's.**
-     `packages/system_design/tool/fastlane/Fastfile` is imported by
+     `packages/script-tools/flutter/fastlane/Fastfile` is imported by
      `ios/fastlane/Fastfile` and owns `sd_release_note` and
      `sd_upload_to_testflight`, so every app shipping through this tooling
      writes the same `<env> - <version name> (<version number>)`. The lane
@@ -163,14 +171,14 @@ Every step that can fail cheaply runs before the twenty-five minute one.
    this ordering exists to prevent.
    - **Committed and pushed by the lane, and only on CI** (`bump && is_ci`).
      The workflow no longer pushes a step of its own. A local `bump:true` run
-     rewrites `pubspec.yaml` and leaves it for you — `release.sh` says so when
+     rewrites `pubspec.yaml` and leaves it for you — `release_ios.sh` says so when
      it finishes.
    - **The design system's gitlink goes in the same commit**, and its short sha
      and subject go in the message. The workflow follows the submodule's `main`
      rather than the commit the parent pins, so without that line the IPA on
      TestFlight would contain UI the app repo never wrote down.
 
-`melos run pre-build` is the `preflight` lane — everything a release depends on
+`make pre-build` is the `preflight` lane — everything a release depends on
 except the build, three minutes instead of twenty-eight, and every credential
 failure ever met surfaces in it. **`release-*` does not run it**: it is the
 step to run by hand before starting a release.
@@ -198,7 +206,7 @@ every "profile doesn't include the … entitlement".
   multi-target apps a TODO. With automatic signing this never shows; with
   manual signing an extension gets no profile and `exportArchive` fails after
   the full build. The lane writes the plist itself with every id in it, and
-  `packages/system_design/tool/build-ipa.sh` drops its own `--export-method` when a caller passes one.
+  `packages/script-tools/flutter/build_ipa.sh` drops its own `--export-method` when a caller passes one.
   **One target today. Adding an extension means adding it to `sd_ios_app` in
   `ios/fastlane/Fastfile` and to the Matchfile** — the lane builds the plist
   from that list — and nothing will remind you.
@@ -206,7 +214,7 @@ every "profile doesn't include the … entitlement".
   Swift package resolves from GitHub at the start of the archive, and when the
   network cannot reach it xcodebuild says `Couldn't fetch updates from remote
   repositories:` — with the reason on the next line, which flutter drops. Forty
-  seconds, no cause named. `packages/system_design/tool/build-ipa.sh` checks
+  seconds, no cause named. `packages/script-tools/flutter/build_ipa.sh` checks
   reachability first and says so in ten. Nothing in the tree fixes it: connect
   to a VPN and run the release again.
 - **Delete the empty auth variable.** Actions sets every `${{ secrets.X }}` a

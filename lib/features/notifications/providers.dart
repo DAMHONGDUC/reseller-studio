@@ -5,6 +5,8 @@ library;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/firestore/user_collections.dart';
+import '../../core/permissions/app_permission.dart';
+import '../../core/providers/system_permissions_provider.dart';
 import '../auth/providers.dart';
 import '../workspace/providers.dart';
 import 'data/datasources/push_messaging.dart';
@@ -60,6 +62,17 @@ final Provider<DeviceRepository?> deviceRepositoryProvider =
 final Provider<PushMessaging> pushMessagingProvider = Provider<PushMessaging>(
   (Ref ref) => const PushMessaging(),
 );
+
+/// Whether the system has notifications off for this app and will not ask.
+///
+/// Read after `PushController` has asked at sign-in, which is what makes
+/// Android's answer mean "refused" rather than "never asked".
+final FutureProvider<bool> pushBlockedProvider =
+    FutureProvider.autoDispose<bool>(
+      (Ref ref) => ref
+          .watch(systemPermissionsProvider)
+          .isBlocked(AppPermission.notifications),
+    );
 
 /// The inbox, newest first.
 final StreamProvider<List<AppNotification>> notificationsProvider =

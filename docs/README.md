@@ -13,6 +13,7 @@ intentionally detailed; operational documents are short checklists.
 | What remains? | [`REMAINING_WORK.md`](REMAINING_WORK.md) |
 | What blocks release? | [`../RELEASE_ACTIONS.md`](../RELEASE_ACTIONS.md) |
 | What do stores need for privacy? | [`STORE_PRIVACY.md`](STORE_PRIVACY.md) |
+| What does the published privacy policy say? | [`PRIVACY_POLICY.json`](PRIVACY_POLICY.json) — the source copy, rendered by the website repo; `icon` is a path on that site |
 
 ## Engineering rules
 

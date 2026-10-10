@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
+import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../subscription/domain/services/plan_gate.dart';
 import '../../../../subscription/presentation/widgets/plan_block_sheet.dart';
@@ -127,6 +131,19 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                   onSubmitted: (_) {
                     if (state.canSubmit) _submit();
                   },
+                ),
+                SizedBox(height: SdContentPaddingV3.sectionGap),
+                // In the body, not the app bar (owner's rule): for the seller
+                // who found the item already carries a code.
+                AppListCard(
+                  children: <Widget>[
+                    AppListRow(
+                      icon: AppIconConstant.barcodeScanner,
+                      title: context.l10n.inventoryScan,
+                      subtitle: context.l10n.inventoryAddScanCaption,
+                      onTap: () => context.push(AppRoutes.scanner),
+                    ),
+                  ],
                 ),
               ],
             ),

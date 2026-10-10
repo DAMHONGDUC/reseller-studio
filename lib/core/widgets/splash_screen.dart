@@ -27,13 +27,10 @@ import '../router/splash_hold.dart';
 /// not a second loading widget that looks slightly different. So the wipe runs
 /// behind this screen and this screen is what waits for it.
 ///
-/// **Nothing below it is built until the check finishes.** The wipe signs the
-/// seller out and calls Firestore's `clearPersistence`, which throws
-/// `failed-precondition` once that client is running — so this has to sit
-/// above every widget that opens a stream, which on the first frame means
-/// above `ForceUpdateGate` and its `app_config` read. Letting the first screen
-/// build alongside would also race the sign-out against the screens reading
-/// that session.
+/// **Nothing below it is built until the check finishes**, so no screen races
+/// the wipe's sign-out against the session it is reading. The router above it
+/// still listens on the first frame; `FirestoreMaintenance` is what keeps
+/// those listeners off the client while the wipe terminates it.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({this.child, super.key});
 

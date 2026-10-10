@@ -3,9 +3,11 @@
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/core/account/account_kind.dart';
 import 'package:reseller_studio/core/providers/repository_providers.dart';
+import 'package:reseller_studio/core/providers/system_permissions_provider.dart';
 import 'package:reseller_studio/features/workspace/domain/entities/workspace.dart';
 import 'package:reseller_studio/features/workspace/providers.dart';
 
+import 'fake_system_permissions.dart';
 import 'in_memory_repositories.dart';
 import 'passthrough_file_uploader.dart';
 
@@ -79,6 +81,11 @@ final class FakeOverrides {
       // on the first byte.
       fileUploaderProvider: fileUploaderProvider.overrideWithValue(
         const PassthroughFileUploader(),
+      ),
+      // No platform channel in a widget test; nothing is refused unless a
+      // test says so.
+      systemPermissionsProvider: systemPermissionsProvider.overrideWithValue(
+        FakeSystemPermissions(),
       ),
       // Team management needs a live backend, and the screen draws no add
       // button rather than offering one that cannot work.

@@ -3,20 +3,15 @@ import '../../../../core/filters/presence_filter.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/utils/set_utils.dart';
 import '../enums/order_deadline_filter.dart';
+import '../enums/order_filter_group.dart';
 import '../enums/order_status.dart';
 import 'order.dart';
 
-/// Everything Orders can be narrowed by beyond its five tabs.
+/// Everything Orders can be narrowed by: where it is, which platform, when,
+/// how much, and what the order is still missing.
 ///
-/// The tab strip answers "where is it", one preset at a time. This answers the
-/// rest — which platform, when, how much, and what the order is still missing.
-/// The two are ANDed, so a tab's count is always the count of what that tab
-/// would show.
-///
-/// **[statuses] overlaps the tabs on purpose.** The strip groups the eight
-/// statuses into five presets, and `cancelled` and `awaitingPayment` are not
-/// presets of their own — a seller looking for exactly those has nowhere else
-/// to ask.
+/// **[statuses] is the raw eight**, and ticking several is how a seller asks
+/// for what the old To Ship and Returns presets grouped.
 class OrderFilterCriteria {
   const OrderFilterCriteria({
     this.statuses = const <OrderStatus>{},
@@ -53,19 +48,35 @@ class OrderFilterCriteria {
 
   /// How many groups are narrowing the list — counted by group, never by
   /// chip. See `ItemFilterCriteria.activeCount`.
-  int get activeCount {
-    int count = 0;
+  int get activeCount => OrderFilterGroup.values.where(narrows).length;
 
-    if (statuses.isNotEmpty) count++;
-    if (marketplaceIds.isNotEmpty) count++;
-    if (ordered.isActive) count++;
-    if (payout.isActive) count++;
-    if (tracking.isActive) count++;
-    if (deadline.isActive) count++;
-    if (minSale != null || maxSale != null) count++;
+  /// Whether [group] is narrowing the list — what lights its chip.
+  bool narrows(OrderFilterGroup group) => switch (group) {
+    OrderFilterGroup.status => statuses.isNotEmpty,
+    OrderFilterGroup.marketplace => marketplaceIds.isNotEmpty,
+    OrderFilterGroup.ordered => ordered.isActive,
+    OrderFilterGroup.deadline => deadline.isActive,
+    OrderFilterGroup.payout => payout.isActive,
+    OrderFilterGroup.tracking => tracking.isActive,
+    OrderFilterGroup.saleRange => minSale != null || maxSale != null,
+  };
 
-    return count;
-  }
+  /// These criteria with [group] back to "not narrowed" — a one-group
+  /// sheet's Reset, which must leave every other group alone.
+  OrderFilterCriteria cleared(OrderFilterGroup group) => switch (group) {
+    OrderFilterGroup.status => copyWith(statuses: none.statuses),
+    OrderFilterGroup.marketplace => copyWith(
+      marketplaceIds: none.marketplaceIds,
+    ),
+    OrderFilterGroup.ordered => copyWith(ordered: none.ordered),
+    OrderFilterGroup.deadline => copyWith(deadline: none.deadline),
+    OrderFilterGroup.payout => copyWith(payout: none.payout),
+    OrderFilterGroup.tracking => copyWith(tracking: none.tracking),
+    OrderFilterGroup.saleRange => copyWith(
+      clearMinSale: true,
+      clearMaxSale: true,
+    ),
+  };
 
   bool get isActive => activeCount > 0;
 
@@ -81,6 +92,23 @@ class OrderFilterCriteria {
     if (!deadline.matches(order, now: now)) return false;
 
     return _matchesSaleRange(order.salePrice);
+  }
+
+  /// How many of [orders] each status would show on its own — under every
+  /// other group, but not the status group itself.
+  Map<OrderStatus, int> statusCounts(
+    List<Order> orders, {
+    required DateTime now,
+  }) {
+    final OrderFilterCriteria others = cleared(OrderFilterGroup.status);
+    final List<Order> pool = orders
+        .where((Order order) => others.matches(order, now: now))
+        .toList();
+
+    return <OrderStatus, int>{
+      for (final OrderStatus status in OrderStatus.values)
+        status: pool.where((Order order) => order.status == status).length,
+    };
   }
 
   /// Ticking a chip, as a value rather than as a write — the reason the
@@ -105,13 +133,11 @@ class OrderFilterCriteria {
 
   /// **Null clears that end of the window** — an empty box means unbounded,
   /// never zero.
-  OrderFilterCriteria withMinSale(Money? value) => value == null
-      ? copyWith(clearMinSale: true)
-      : copyWith(minSale: value);
+  OrderFilterCriteria withMinSale(Money? value) =>
+      value == null ? copyWith(clearMinSale: true) : copyWith(minSale: value);
 
-  OrderFilterCriteria withMaxSale(Money? value) => value == null
-      ? copyWith(clearMaxSale: true)
-      : copyWith(maxSale: value);
+  OrderFilterCriteria withMaxSale(Money? value) =>
+      value == null ? copyWith(clearMaxSale: true) : copyWith(maxSale: value);
 
   OrderFilterCriteria copyWith({
     Set<OrderStatus>? statuses,

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'confirmed_stream.dart';
+import 'firestore_maintenance.dart';
 import 'firestore_stream_reporter.dart';
 
 /// Turning Firestore's snapshot streams into streams of entities.
@@ -19,12 +20,9 @@ final class FirestoreStream {
     T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity, {
     required String operation,
   }) {
-    final FirestoreStreamReporter reporter = FirestoreStreamReporter(
-      operation,
-    );
+    final FirestoreStreamReporter reporter = FirestoreStreamReporter(operation);
 
-    return query
-        .snapshots()
+    return FirestoreMaintenance.listen(query.snapshots)
         .map((QuerySnapshot<Map<String, Object?>> snapshot) {
           reporter.recovered();
 
@@ -49,7 +47,11 @@ final class FirestoreStream {
     DocumentReference<Map<String, Object?>> reference,
     T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity, {
     required String operation,
-  }) => _entities(reference.snapshots(), toEntity, operation);
+  }) => _entities(
+    FirestoreMaintenance.listen(reference.snapshots),
+    toEntity,
+    operation,
+  );
 
   /// The same, for a document whose *absence* changes where the app sends the
   /// seller.
@@ -65,7 +67,7 @@ final class FirestoreStream {
     required String operation,
   }) => _entities(
     ConfirmedStream.of(
-      reference.snapshots(),
+      FirestoreMaintenance.listen(reference.snapshots),
       isUnconfirmed: (DocumentSnapshot<Map<String, Object?>> doc) =>
           doc.metadata.isFromCache,
     ),
@@ -78,9 +80,7 @@ final class FirestoreStream {
     T Function(DocumentSnapshot<Map<String, Object?>> doc) toEntity,
     String operation,
   ) {
-    final FirestoreStreamReporter reporter = FirestoreStreamReporter(
-      operation,
-    );
+    final FirestoreStreamReporter reporter = FirestoreStreamReporter(operation);
 
     return snapshots
         .map((DocumentSnapshot<Map<String, Object?>> doc) {

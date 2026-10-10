@@ -106,8 +106,9 @@ data and does not use it for advertising.
 
 ### Subscription terms block
 
-App Store guideline 3.1.2 wants the terms in the listing as well as in the app.
-Append to the description, with the prices filled in for each storefront:
+**Required in every locale's description, not optional.** Build 34 was
+rejected under guideline 3.1.2(c) because the listing had no working Terms of
+Use (EULA) link. Append to the description:
 
 ```text
 Reseller Studio Premium is an auto-renewing subscription, billed monthly or
@@ -115,8 +116,20 @@ yearly at the price shown in the app. Payment is charged to your Apple Account
 at confirmation. It renews automatically unless turned off at least 24 hours
 before the period ends; manage or cancel it in your Apple Account settings.
 Privacy Policy: [privacy URL]
-Terms of Use: [terms URL]
+Terms of Use (EULA): [terms URL]
 ```
+
+`[terms URL]` is one of two things, and the paywall's Terms link must open the
+same one:
+
+- **Apple's standard EULA** —
+  `https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`. Leave
+  the EULA field in App Store Connect empty.
+- **A custom EULA** — the hosted page in `TERMS_OF_SERVICE_URL`, and also
+  pasted into App Store Connect → App Information → License Agreement.
+
+Both URLs must open in a signed-out browser before submitting; a link that
+needs a login or 404s is the same rejection.
 
 | Field | Value |
 |---|---|
@@ -165,9 +178,9 @@ build ships with a paywall that has nothing to sell.
 
 | Field | Value |
 |---|---|
-| Sign-in required | Yes — there is no guest mode (hard rule 1) |
+| Sign-in required | No — the app works without an account (hard rule 1); Sign in with Apple and Google are offered from More and from the banner on Home |
 | Demo account | **[owner]** — a real Google account on the production project, signed in once, with a seeded workspace so the reviewer sees rows rather than empty states |
-| Notes | State that the only ways in are Sign in with Apple and Google Sign-In, that account deletion is in More → Account, and that the app connects to no marketplace |
+| Notes | State that the only ways in are Sign in with Apple and Google Sign-In, that account deletion is in More → Account, and that the app connects to no marketplace. Since build 34's 3.1.2(c) rejection, also state that the description carries the Terms of Use (EULA) and Privacy Policy links, and that the paywall shows each plan's title, length and price with both links |
 | Contact | **[owner]** — name, phone, email |
 | Attachment | Optional |
 

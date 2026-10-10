@@ -2,6 +2,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_design/common.dart';
 
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/constants/prefs_key_constant.dart';
 import '../../../../core/providers/shared_preferences_provider.dart';
@@ -38,10 +39,15 @@ class OnboardingController extends Notifier<OnboardingStatus> {
   /// write lands the router has already left this route on the state change
   /// above, so there is no caller left to handle it — rethrowing would only
   /// raise an unhandled async error into a disposed widget.
-  Future<void> complete() async {
+  ///
+  /// [skipped] and [page] are for analytics only: skipping still counts as
+  /// finishing.
+  Future<void> complete({bool skipped = false, int page = 0}) async {
     state = OnboardingStatus.done;
 
     final SharedPreferences? prefs = ref.read(sharedPreferencesProvider).value;
+
+    AppAnalytics.instance.onboardingCompleted(skipped: skipped, page: page);
 
     if (prefs == null) {
       SdLogger.warning(

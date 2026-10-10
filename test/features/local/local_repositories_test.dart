@@ -22,14 +22,17 @@ void main() {
   late LocalOrderRepository orders;
   late LocalSourceRepository sources;
 
-  Item item(String id, {int quantity = 1, ItemStatus status = ItemStatus.inStock}) =>
-      Item(
-        id: id,
-        title: 'Item $id',
-        quantity: quantity,
-        status: status,
-        createdAt: DateTime(2026, 1, 1),
-      );
+  Item item(
+    String id, {
+    int quantity = 1,
+    ItemStatus status = ItemStatus.inStock,
+  }) => Item(
+    id: id,
+    title: 'Item $id',
+    quantity: quantity,
+    status: status,
+    createdAt: DateTime(2026, 1, 1),
+  );
 
   setUp(() {
     db = LocalDatabase.forTesting(NativeDatabase.memory());

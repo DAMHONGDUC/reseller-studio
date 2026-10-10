@@ -18,19 +18,19 @@ this one.** `env/<flavour>.json` is the Dart-visible half; the native SDK half
 is `ios/Runner/GoogleService-Info.plist`, `android/app/google-services.json`
 and the sign-in URL scheme in `ios/Runner/Info.plist`. A prod env file beside a
 dev plist compiles, installs, launches and writes into the wrong Firestore.
-`melos run prepare-env-<flavour>` is what keeps them in step and
+`make env-<flavour>` is what keeps them in step and
 `env_assets/` is where your copies live — **`docs/rules/RELEASE.md` is the
 authority on both**, and this file does not repeat it.
 
 - **`env/env.example.json` is the one checked-in template and it is the key
-  list**; `env/dev.json` and `env/prod.json` are gitignored. `melos run set-up`
+  list**; `env/dev.json` and `env/prod.json` are gitignored. `make set-up`
   copies it into each missing flavour file and **never overwrites** an existing
   one. One template rather than one per flavour: the two only ever differed by
   the values a developer fills in, so the key list lived twice and went stale
   in one copy — which is exactly how the RevenueCat keys ended up misspelled in
   the template while `AppEnv` read the right names.
 - **It is also what tells the build there is config to attach.**
-  `packages/system_design/tool/build-ipa.sh` passes
+  `packages/script-tools/flutter/build_ipa.sh` passes
   `--dart-define-from-file=env/<flavour>.json` only when a template exists —
   the shared tooling serves apps that compile every value in, and a template is
   how this one says it is not one of them. **Deleting or renaming it does not
@@ -49,7 +49,7 @@ authority on both**, and this file does not repeat it.
   templates while `hasBillingConfig` answered false. The same test pins the
   list, by hand, because Dart cannot reflect over `AppEnv`.
 - **Every getter has a default**, so a build with no `--dart-define-from-file`
-  still compiles. That is what keeps `melos run test` working without a
+  still compiles. That is what keeps `make test` working without a
   flavour.
 
 **So the app checks the two halves against each other at startup, and refuses
@@ -113,9 +113,10 @@ twice, and the copy nothing read. What stayed:
   written twice on purpose, and disagreeing means Crashlytics symbols land in
   another project's dashboard.
 
-**`APPLE_SIGN_IN_SERVICE_ID` is not an env key.** Sign in with Apple goes
-through `FirebaseAuth.signInWithProvider`, which needs nothing in the binary;
-the Services ID is configured in the Firebase console. See
+**`APPLE_SIGN_IN_SERVICE_ID` is not an env key.** Sign in with Apple needs
+nothing in the binary — on iOS the app presents Apple's sheet itself and hands
+the token to Firebase, elsewhere `FirebaseAuth.signInWithProvider` runs the web
+flow — and the Services ID is configured in the Firebase console. See
 `RELEASE_ACTIONS.md`.
 
 **Theme is a preference, not a build flag.** `ThemeModeController` reads
@@ -182,7 +183,7 @@ as a fresh install.**
   `AppEnv.flavor.name` and wipes when they differ. It was three classes — a
   reinstall guard, an environment guard and a widget — until the owner merged
   them: both were asking whether the state on this device belongs to the app
-  now running. `packages/system_design/WIDGET_RULES.md` holds the decision
+  now running. `packages/flutter-system-design-kit/WIDGET_RULES.md` holds the decision
   table.
 - **`SplashScreen` runs it, and it is deliberately not a bootstrap step.**
   Owner's rule: the seller should see the splash loading *while* the wipe
@@ -195,15 +196,20 @@ as a fresh install.**
   once as the router's `/splash` route with no child, already inside the tree
   the first one gated.
 - **The outer one sits above `ForceUpdateGate`, and that ordering is the
-  point.** `clearPersistence` throws `failed-precondition` once the Firestore
-  client is running, and `ForceUpdateGate`'s `app_config` read is what starts
-  it on the first frame — so nothing below may build until the check returns.
-  Letting the first screen build alongside would also race the sign-out against
-  the screens reading that session.
+  point.** Letting the first screen build alongside the wipe would race its
+  sign-out against the screens reading that session.
+- **The splash does not stop every listener, and it cannot.** The router is
+  built above it and listens to `app_config` and the user profile on the first
+  frame. So every Firestore listener goes through `FirestoreMaintenance`
+  (`core/firestore/`): a reset detaches them, terminates, clears the cache and
+  re-attaches them, and a listener opened mid-reset waits. A listen that
+  reaches a terminating client is an uncatchable abort on iOS — TestFlight
+  builds 45 and 46 crashed on launch exactly that way, because the wipe's
+  sign-out makes `app_config` re-subscribe just before `terminate`.
   `test/core/widgets/splash_screen_test.dart` pins all three states.
 - **`AppFreshInstall` is the half that touches the device**, and it is an
   `SdFreshInstallHost`: `isBackendReady`, `signOut` (Google then Firebase), and
-  `clearCache` (`terminate` then `clearPersistence`). Nothing else — the order
+  `clearCache` (`FirestoreMaintenance.reset`). Nothing else — the order
   of a wipe and the names of its steps are `SdFreshInstall`'s. Emptying
   preferences is appended there and takes the onboarding flag with it, because
   that is what a fresh install is.

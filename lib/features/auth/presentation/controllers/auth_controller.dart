@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/common.dart';
 
@@ -51,6 +53,11 @@ class AuthController extends Notifier<AuthFormState> {
   AuthFormState build() => const AuthFormState();
 
   /// Returns true when a session now exists, false when the seller backed out.
+  ///
+  /// **It returns the moment the session exists.** The profile write and the
+  /// billing identity run after, unawaited: each is a network round trip with
+  /// no upper bound, and awaiting them kept the button spinning on a valid
+  /// sign-in — App Review's "loaded indefinitely". Both log their own failure.
   Future<bool> signIn(AuthProviderKind provider) async {
     final AuthRepository auth = ref.read(authRepositoryProvider);
 
@@ -67,9 +74,11 @@ class AuthController extends Notifier<AuthFormState> {
       if (uid == null) return false;
 
       SdCrashReporter.instance.setUserId(uid);
+
+      AppAnalytics.instance.setUserId(uid);
       AppAnalytics.instance.signedIn(provider: provider.name);
-      await _ensureProfile(uid);
-      await _identifyForBilling(uid);
+      unawaited(_ensureProfile(uid));
+      unawaited(_identifyForBilling(uid));
 
       return true;
     } catch (error, stackTrace) {
@@ -103,6 +112,7 @@ class AuthController extends Notifier<AuthFormState> {
     try {
       await ref.read(authRepositoryProvider).signOut();
       SdCrashReporter.instance.setUserId(null);
+      AppAnalytics.instance.setUserId(null);
       AppAnalytics.instance.signedOut();
 
       // **After the session ends, never before.** The wipe is what makes the
@@ -134,6 +144,7 @@ class AuthController extends Notifier<AuthFormState> {
     try {
       await ref.read(authRepositoryProvider).deleteAccount();
       SdCrashReporter.instance.setUserId(null);
+      AppAnalytics.instance.setUserId(null);
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.deleteAccount,

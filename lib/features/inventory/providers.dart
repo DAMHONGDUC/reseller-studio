@@ -9,14 +9,14 @@ import '../../core/constants/log_tag_constant.dart';
 import '../../core/providers/repository_providers.dart';
 import '../../core/state/selection_controller.dart';
 import '../../core/time/app_clock.dart';
-import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/item.dart';
 import 'domain/entities/item_category.dart';
 import 'domain/entities/item_filter_criteria.dart';
+import 'domain/entities/scan_match.dart';
 import 'domain/entities/storage_location.dart';
-import 'domain/enums/item_status.dart';
 import 'domain/services/item_search.dart';
+import 'domain/services/scan_lookup.dart';
 import 'item_category_constant.dart';
 
 /// The normal category records created for every new business.
@@ -29,46 +29,6 @@ final Provider<List<ItemCategory>> defaultItemCategoriesProvider =
           ItemCategory(id: seed.id, name: seed.name, createdAt: createdAt),
       ];
     });
-
-/// The tabs across the top of Inventory (plan §7).
-///
-/// **[stale] is not an [ItemStatus]** and this enum is where the difference
-/// becomes visible: three of these map to a status, and one is a question
-/// about how long something has been live. See `StaleInventoryPolicy`.
-enum InventoryFilter {
-  all,
-  draft,
-  inStock,
-  sold,
-  stale;
-
-  String get label => switch (this) {
-    InventoryFilter.all => 'All',
-    InventoryFilter.draft => 'Draft',
-    InventoryFilter.inStock => 'In stock',
-    InventoryFilter.sold => 'Sold',
-    InventoryFilter.stale => 'Stale',
-  };
-
-  /// Whether [item] belongs under this tab.
-  bool matches(Item item, {required DateTime now, Duration? staleThreshold}) =>
-      switch (this) {
-        InventoryFilter.all => true,
-        InventoryFilter.draft => item.status == ItemStatus.draft,
-        InventoryFilter.inStock => item.status == ItemStatus.inStock,
-        InventoryFilter.sold => item.status == ItemStatus.sold,
-        // Still on the shelf, and live a long time ago — the money that has
-        // not moved, which is the whole point of the tab.
-        InventoryFilter.stale =>
-          item.status.isOnHand &&
-              StaleInventoryPolicy.isStale(
-                item.listedAt,
-                now: now,
-                threshold:
-                    staleThreshold ?? StaleInventoryPolicy.defaultThreshold,
-              ),
-      };
-}
 
 /// Every item in the workspace, live.
 final StreamProvider<List<Item>> itemsProvider = StreamProvider<List<Item>>((
@@ -95,20 +55,6 @@ final itemProvider = StreamProvider.family<Item?, String>((Ref ref, String id) {
   );
 });
 
-/// Which tab is selected.
-class InventoryFilterController extends Notifier<InventoryFilter> {
-  @override
-  InventoryFilter build() => InventoryFilter.all;
-
-  void select(InventoryFilter filter) => state = filter;
-}
-
-final NotifierProvider<InventoryFilterController, InventoryFilter>
-inventoryFilterProvider =
-    NotifierProvider<InventoryFilterController, InventoryFilter>(
-      InventoryFilterController.new,
-    );
-
 /// The free-text search box above the list.
 class InventorySearchController extends Notifier<String> {
   @override
@@ -122,13 +68,7 @@ inventorySearchProvider = NotifierProvider<InventorySearchController, String>(
   InventorySearchController.new,
 );
 
-/// The extra filters behind Inventory's filter sheet.
-///
-/// **Separate from `inventoryFilterProvider`, and reset together with it.**
-/// The tab is one preset a seller taps constantly; these are the vocabulary
-/// they open a sheet for. Keeping them apart is what lets the strip stay a
-/// single choice with counts while the sheet stays a set of independent
-/// groups — and [reset] is the one place that knows both halves exist.
+/// The filters behind Inventory's filter sheet and its strip.
 class InventoryCriteriaController extends Notifier<ItemFilterCriteria> {
   @override
   ItemFilterCriteria build() => ItemFilterCriteria.none;
@@ -149,24 +89,17 @@ class InventoryCriteriaController extends Notifier<ItemFilterCriteria> {
     state = pending;
   }
 
-  /// Drops every filter, the tab included.
+  /// Drops every filter.
   ///
   /// The search box is deliberately left alone: it is visible on the screen
   /// with its own clear button, and it is not counted as a filter either.
   void reset() {
-    // Its own state and the tab, never `inventoryActiveFilterCountProvider`:
-    // that provider watches this one, so reading it from here is a circular
-    // dependency the framework refuses at the tap.
     SdLogger.action(
       LogTagConstant.item,
       'Reset inventory filters',
-      <String, Object?>{
-        'groups': state.activeCount,
-        'tab': ref.read(inventoryFilterProvider).name,
-      },
+      <String, Object?>{'groups': state.activeCount},
     );
 
-    ref.read(inventoryFilterProvider.notifier).select(InventoryFilter.all);
     state = ItemFilterCriteria.none;
   }
 }
@@ -178,49 +111,10 @@ inventoryCriteriaProvider =
     );
 
 /// How many filters are narrowing the list right now — what the seller is
-/// told above it, and what the Filters chip carries.
-///
-/// **The tab counts as one when it is not `all`.** A seller looking at three
-/// rows of eleven is filtered by the tab exactly as much as by the sheet, and
-/// a bar that said "no filters" while Sold was selected would be describing a
-/// different screen. Reset clears both, so the number and the button agree.
-final Provider<int> inventoryActiveFilterCountProvider = Provider<int>((
-  Ref ref,
-) {
-  final int extras = ref.watch(inventoryCriteriaProvider).activeCount;
-  final InventoryFilter tab = ref.watch(inventoryFilterProvider);
-
-  return tab == InventoryFilter.all ? extras : extras + 1;
-});
-
-/// How many items sit under each tab.
-///
-/// **Computed from the one item stream rather than five queries.** Inventory
-/// shows all five counts at once, so per-tab queries would mean five live
-/// listeners for one screen; folding over the list already in memory costs
-/// nothing and cannot disagree with the list being displayed.
-final Provider<Map<InventoryFilter, int>>
-inventoryCountsProvider = Provider<Map<InventoryFilter, int>>((Ref ref) {
-  final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
-  final DateTime now = ref.watch(clockProvider).now();
-  final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
-  final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
-
-  // Narrowed by everything except the tab itself, so a chip's number is
-  // exactly how many rows tapping it would show. A count taken before the
-  // sheet was applied says 40 over a list of three.
-  final List<Item> pool = items
-      .where(
-        (Item item) =>
-            criteria.matches(item, now: now) && ItemSearch.matches(item, query),
-      )
-      .toList();
-
-  return <InventoryFilter, int>{
-    for (final InventoryFilter filter in InventoryFilter.values)
-      filter: pool.where((Item item) => filter.matches(item, now: now)).length,
-  };
-});
+/// told above it, and what lights the Filters chip. Counted by group.
+final Provider<int> inventoryActiveFilterCountProvider = Provider<int>(
+  (Ref ref) => ref.watch(inventoryCriteriaProvider).activeCount,
+);
 
 /// Which items are ticked for a bulk action.
 ///
@@ -269,6 +163,31 @@ final StreamProvider<List<StorageLocation>> locationsProvider =
         () => ref.watch(locationRepositoryProvider).watchLocations(),
       );
     });
+
+/// What a scanned code names, or **null while either list is still loading**.
+///
+/// A "no match" read before the items arrive would offer to add something the
+/// seller already owns.
+// Inferred for the same reason as [itemProvider]: Riverpod 3 does not export
+// the family type.
+// ignore: type_annotate_public_apis
+final scanMatchProvider = Provider.autoDispose.family<ScanMatch?, String>((
+  Ref ref,
+  String code,
+) {
+  final AsyncValue<List<Item>> items = ref.watch(itemsProvider);
+  final AsyncValue<List<StorageLocation>> locations = ref.watch(
+    locationsProvider,
+  );
+
+  if (!items.hasValue || !locations.hasValue) return null;
+
+  return ScanLookup.resolve(
+    code,
+    items: items.requireValue,
+    locations: locations.requireValue,
+  );
+});
 
 /// Category id → name, for rendering a row without looking one up per item.
 final Provider<Map<String, String>> categoryNamesProvider =
@@ -340,22 +259,20 @@ final class LocationPathBuilder {
   }
 }
 
-/// The rows actually shown: the selected tab, narrowed by the search box and
-/// by the filter sheet.
+/// The rows actually shown: narrowed by the search box and by the filters.
 final Provider<List<Item>> visibleItemsProvider = Provider<List<Item>>((
   Ref ref,
 ) {
   final List<Item> items = ref.watch(itemsProvider).value ?? const <Item>[];
-  final InventoryFilter filter = ref.watch(inventoryFilterProvider);
   final ItemFilterCriteria criteria = ref.watch(inventoryCriteriaProvider);
   final String query = ref.watch(inventorySearchProvider).trim().toLowerCase();
   final DateTime now = ref.watch(clockProvider).now();
+  final Duration staleThreshold = ref.watch(staleThresholdProvider);
 
   return items
       .where(
         (Item item) =>
-            filter.matches(item, now: now) &&
-            criteria.matches(item, now: now) &&
+            criteria.matches(item, now: now, staleThreshold: staleThreshold) &&
             ItemSearch.matches(item, query),
       )
       .toList();

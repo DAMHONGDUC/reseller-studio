@@ -7,49 +7,66 @@ below is about protecting that answer from the screen filling up around it.
 
 ## The order of the screen is a product decision, not a layout one
 
-Top to bottom: **the three shortcut cards, Getting started, Needs Attention,
+Top to bottom: **Needs Attention, the shortcut row, Getting started,
 Performance, Flow overview, Recent Activity, Quick Action.** Owner's rules
 decide it, and they are listed in the order they outrank each other.
 `test/features/home/home_section_order_test.dart` holds the top of it.
 
-1. **Three shortcut cards come first.** They are the ways *out* of Home — down
-   to Quick Action, sideways into global search, and into Scan — not content,
-   so a seller who opened the app to go somewhere does not read a dashboard on
-   the way there.
-   - **Scan replaces Flow overview in the row.** It is a frequent action a
-     seller starts while holding an item, so it earns the one-tap entry.
-   - **Three, and the list is closed.** A fourth makes the row a launcher, and
-     a launcher above the figures is exactly what keeping the create actions at
-     the bottom exists to prevent. The row works because it is short enough to
-     take in without reading. Adding one is a product decision — ask.
-   - `HomeShortcutConstant` is the list;
-     `test/features/home/home_shortcuts_test.dart` holds the placement and the
-     enum-to-card completeness.
-2. **Getting started sits directly under the shortcut row, and wears a tinted
-   edge.** Owner's rule. It is the only card on Home that asks the seller to
-   do something rather than reporting on what they have done, and it is gone
-   for good once the three steps are — so it costs an established seller
-   nothing to have it first. See below.
-3. **Needs Attention follows it, still above the numbers.** The plan's own
-   core principle: a seller opening the app at 8am needs the orders waiting to
-   ship, not last night's revenue.
+1. **Needs Attention comes first, as a grid of tiles.** Owner's rule, and it
+   **reverses "three shortcut cards come first"** — the plan's own core
+   principle is the tiebreaker: a seller opening the app at 8am needs the
+   orders waiting to ship before any way out of the screen.
+   - **Two tiles across, the count set large, the label under it.** A row of
+     text with the count at its end made the number the last thing read; the
+     tile makes it the first. A tile whose problem has a clock on it (an
+     overdue order, an overdue payout) wears a tinted edge as well as the
+     tinted detail line — colour is never the only signal.
+   - **The tiles are compact.** Owner's rule. The count sits beside a small
+     icon tile on one line instead of under a medium one, and the card's
+     inner padding is tighter than a default card's. Stacked, five tiles
+     filled the first screen and pushed everything below Needs Attention out
+     of sight; compact, the block is a glance and Performance shows above
+     the fold.
    - **It carries the plan's four rows and one more: an overdue payout.**
      Orders to ship, offers waiting, items to list and stale inventory are
-     §6's; "not paid out yet" is the only row on Home that hands the seller
+     §6's; "not paid out yet" is the only tile on Home that hands the seller
      money back rather than work, and a payout that never arrives is invisible
      until somebody goes looking for it.
    - **Overdue, never merely outstanding.** A payout three days old is a
-     platform working normally, so the row uses
-     `PayoutReconciliation.overdueAfterDays` and is absent almost every day.
-     A row that is always there is one the eye learns to skip, which is what
-     the rest of this section exists to prevent.
-   - **It shows the amount, not the count.** The count is what the More row's
-     badge already says; the amount is what makes this worth opening.
-   - Adding a sixth row is a product decision — ask. The block works because
-     it is short enough that every row still reads as urgent.
-4. **Performance follows both.** It briefly sat directly under the shortcuts;
-   that is no longer the order, and nothing should restore it from the record
-   of the intermediate state.
+     platform working normally, so the tile uses
+     `PayoutReconciliation.overdueAfterDays` for its warning. A warning that
+     is always there is one the eye learns to skip, which is what the rest of
+     this section exists to prevent.
+   - Adding a sixth tile is a product decision — ask. The block works because
+     it is short enough that every tile still reads as urgent.
+2. **The shortcut row follows it: Add stock, Quick Action, Record sale.**
+   Owner's rule, and it **reverses "Quick add, Scan and Record sale"**.
+   - **Add stock is the filled button, and it opens `AddStockSheet`** —
+     Quick add, Scan and Take stock in, the same sheet Inventory's create
+     button opens (`lib/features/inventory/CLAUDE.md`). One tap still starts
+     any of the three; the sheet is what lets one button stand for them.
+   - **Quick Action scrolls Home to its Quick Action section**, rather than
+     opening anything. The section is the complete list, and this is the way
+     to it that does not need a scroll past every figure first.
+   - **Scan left the row for the app bar**, beside Search: it is a way to find
+     a thing as much as to add one, and it is also inside Add stock.
+   - **One primary per row** — Add stock is filled, the other two outlined.
+   - **Three, and the list is closed.** A fourth makes the row a launcher.
+     Adding one is a product decision — ask.
+   - **Icon over label, not a pill.** "Enregistrer une vente" does not fit
+     beside its icon at a third of a phone; stacked, a label takes two lines
+     without the row changing shape.
+   - `HomeShortcut` is the list;
+     `test/features/home/home_shortcuts_test.dart` holds the placement, what
+     each button does, and that every label fits its button in every
+     shipping locale.
+3. **Getting started sits directly under the shortcut row, and wears a tinted
+   edge.** Owner's rule. It is the only card on Home that asks the seller to
+   do something rather than reporting on what they have done, and it is gone
+   for good once the three steps are. See below.
+4. **Performance follows all three.** It briefly sat directly under the
+   shortcuts; that is no longer the order, and nothing should restore it from
+   the record of the intermediate state.
 5. **Flow overview is one full-width card, below the numbers.** The card owns
    both its title and description — there is no section header above it — so
    the whole explanation reads and taps as one destination. It opens the
@@ -64,20 +81,19 @@ decide it, and they are listed in the order they outrank each other.
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
 
-**Home is taller than a phone, so a section-order test cannot read pixels.**
-A lazy `ListView` estimates the extent of every child it has not built, which
-makes `position.pixels` a moving target rather than an absolute coordinate —
-two scrolled measurements compared against each other reported the wrong
-order outright. `home_section_order_test.dart` scrolls from the top and
-compares the order sections *come into view* in, sorting anything that arrives
-in the same frame by its y within that frame.
+**A section-order test reads the order sections come into view in, not
+pixels.** Home was a lazy `ListView` whose estimated extent made
+`position.pixels` a moving target and once reported the wrong order outright.
+It is built whole now, but `home_section_order_test.dart` still scrolls from
+the top and compares arrival order, sorting anything that arrives in the same
+frame by its y within that frame — the test does not depend on how the body is
+built.
 
-**The shortcut card and Quick Action being last are one mechanism.** The card
-scrolls to the end of the list rather than to a key, because a lazy
-`ListView` has not built an off-screen target and `ensureVisible` on a key with
-no `currentContext` does nothing — see `_HomeScreenState._toQuickAction` and
-`ScrollUtils.toEnd`. Moving Quick Action off the bottom breaks that card, and
-the Quick Access test is what says so.
+**Quick Action stays last on its own merit**, for the reason in point 6. The
+shortcut row's Quick Action button scrolls to it wherever it sits, so the
+button is not a reason to keep it at the end — and **Home's body is built
+whole, not lazily**, because a lazy list has not built the section the button
+has to scroll to.
 
 ## Home never reports on a business that has not started
 
@@ -142,6 +158,8 @@ an `unknown`.
 
 ## Where Home sends the seller
 
+- **The app bar carries Search and Scan**, both `push`ed: each is a place to
+  go looking, and neither is a section of Home.
 - **Search is `push`; Analytics is `go`.** Search lives outside the shell and
   comes back here. Analytics is a tab, and pushing a branch root over Home
   leaves the seller on the wrong tab with a back button they should not have.

@@ -5,11 +5,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
+import 'package:reseller_studio/features/orders/presentation/widgets/order_filter_sheet.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
 import 'package:system_design/index.dart';
 
+import '../../support/add_button_finder.dart';
+import '../../support/filter_sheet_finder.dart';
 import '../../support/pump_app.dart';
 
 /// The two ways this list can be empty are different sentences.
@@ -48,19 +51,30 @@ void main() {
       overrides: orders(const <Order>[]),
     );
 
-    // Twice: the button in the corner and the empty state's own action say
-    // the same thing, so a seller is never taught a second route to it.
-    expect(find.text('Record a sale'), findsNWidgets(2));
+    // The button in the corner and the empty state's own action say the
+    // same thing, so a seller is never taught a second route to it.
+    expect(find.text('Record a sale'), findsOneWidget);
+    expect(AddButtonFinder.named('Record a sale'), findsOneWidget);
     expect(find.text('Go to inventory'), findsNothing);
   });
 
-  testWidgets('an empty tab on a real business still blames the filter', (
+  testWidgets('an empty status on a real business still blames the filter', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
-    // Shipped is the seeded tab with nothing under it while the others are
-    // full — exactly the case the shared widget has to keep telling apart.
-    await tester.tap(find.text('Shipped'));
+    // Shipped is the seeded status with nothing under it while the others
+    // are full — exactly the case the shared widget has to keep telling
+    // apart. The sheet's chip, not the order cards' track, which also reads
+    // "Shipped".
+    await FilterSheetFinder.tapStripChip(tester, 'Status');
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OrderFilterSheet),
+        matching: find.text('Shipped'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
 
     expect(find.text('No orders match this filter.'), findsOneWidget);

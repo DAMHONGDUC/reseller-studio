@@ -5,6 +5,7 @@ import 'package:reseller_studio/core/widgets/app_photo.dart';
 import 'package:reseller_studio/core/widgets/item_card.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
+import 'package:reseller_studio/features/pricing/domain/services/profit_calculator.dart';
 import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
@@ -37,6 +38,7 @@ void main() {
       ItemCard(
         item: itemWith(cost: const Money(4500, 'USD')),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -49,7 +51,12 @@ void main() {
   ) async {
     await pumpScreen(
       tester,
-      ItemCard(item: itemWith(), now: testNow, onActions: () {}),
+      ItemCard(
+        item: itemWith(),
+        now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
+        onActions: () {},
+      ),
     );
 
     final Rect card = tester.getRect(find.byType(SdCardV3));
@@ -78,6 +85,7 @@ void main() {
       ItemCard(
         item: itemWith(status: ItemStatus.sold),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -97,6 +105,7 @@ void main() {
           expected: const Money(18500, 'USD'),
         ),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -117,6 +126,7 @@ void main() {
       ItemCard(
         item: itemWith(cost: const Money(4500, 'USD')),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
         onMarketPrices: () {},
       ),
     );
@@ -155,6 +165,7 @@ void main() {
       ItemCard(
         item: itemWith(cost: const Money(4500, 'USD')),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -165,6 +176,7 @@ void main() {
       ItemCard(
         item: itemWith(cost: const Money(123456, 'USD')),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -181,6 +193,7 @@ void main() {
       ItemCard(
         item: itemWith(cost: const Money(4500, 'USD')),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
         onMarketPrices: () => taps++,
       ),
     );
@@ -202,6 +215,7 @@ void main() {
       ItemCard(
         item: itemWith(cost: const Money(4500, 'USD')),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
         onMarketPrices: () {},
       ),
     );
@@ -251,6 +265,7 @@ void main() {
       ItemCard(
         item: itemWith(status: ItemStatus.sold),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
         onMarketPrices: () {},
       ),
     );
@@ -269,6 +284,7 @@ void main() {
       ItemCard(
         item: itemWith(status: ItemStatus.draft),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -292,6 +308,7 @@ void main() {
           expected: const Money(9000, 'USD'),
         ),
         now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
       ),
     );
 
@@ -302,7 +319,14 @@ void main() {
   });
 
   testWidgets('the row does not show state age', (WidgetTester tester) async {
-    await pumpScreen(tester, ItemCard(item: itemWith(), now: testNow));
+    await pumpScreen(
+      tester,
+      ItemCard(
+        item: itemWith(),
+        now: testNow,
+        staleThreshold: StaleInventoryPolicy.defaultThreshold,
+      ),
+    );
 
     expect(find.text('3w'), findsNothing);
     expect(find.widgetWithText(SdBadgeV3, 'In stock'), findsOneWidget);

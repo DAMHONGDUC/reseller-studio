@@ -86,11 +86,13 @@ class OrderActionsController extends Notifier<bool> {
   /// **The one stored figure that is not derived** (hard rule 3): it is a fact
   /// the platform reported, and it is what the seller reconciles their bank
   /// against.
-  Future<void> recordSettlement(Order order, {Money? payout}) => _save(
-    'Record settlement',
-    OrderTransition.settle(order, at: DateTime.now(), payout: payout),
-    <String, Object>{'hasPayout': payout != null},
-  );
+  Future<void> recordSettlement(Order order, {Money? payout}) async {
+    await _settle(order, payout);
+
+    if (payout != null) {
+      AppAnalytics.instance.payoutsRecorded(count: 1, viaImport: false);
+    }
+  }
 
   /// Record a run of payouts in one sitting.
   ///
@@ -102,14 +104,23 @@ class OrderActionsController extends Notifier<bool> {
   /// Sequential rather than a `Future.wait`, the same reason `markManyShipped`
   /// is: a mid-run failure must leave the orders before it recorded and the
   /// queue honest about the rest.
+  ///
+  /// [viaImport] says the figures came from a marketplace's payout CSV rather
+  /// than being typed.
   Future<void> recordManySettlements(
     List<Order> orders,
-    Map<String, Money> payoutsByOrderId,
-  ) async {
+    Map<String, Money> payoutsByOrderId, {
+    bool viaImport = false,
+  }) async {
+    int recorded = 0;
+
     SdLogger.action(
       LogTagConstant.order,
       'Record settlements',
-      <String, Object>{'count': payoutsByOrderId.length},
+      <String, Object>{
+        'count': payoutsByOrderId.length,
+        'viaImport': viaImport,
+      },
     );
 
     for (final Order order in orders) {
@@ -117,9 +128,23 @@ class OrderActionsController extends Notifier<bool> {
 
       if (payout == null) continue;
 
-      await recordSettlement(order, payout: payout);
+      await _settle(order, payout);
+      recorded++;
+    }
+
+    if (recorded > 0) {
+      AppAnalytics.instance.payoutsRecorded(
+        count: recorded,
+        viaImport: viaImport,
+      );
     }
   }
+
+  Future<void> _settle(Order order, Money? payout) => _save(
+    'Record settlement',
+    OrderTransition.settle(order, at: DateTime.now(), payout: payout),
+    <String, Object>{'hasPayout': payout != null},
+  );
 
   Future<void> requestReturn(Order order) {
     AppAnalytics.instance.returnOpened();

@@ -19,31 +19,6 @@ import 'domain/enums/order_status.dart';
 import 'domain/services/payout_reconciliation.dart';
 import 'presentation/controllers/record_sale_controller.dart';
 
-/// The tabs across the top of Orders (plan §8).
-enum OrderFilter {
-  all,
-  toShip,
-  shipped,
-  delivered,
-  returns;
-
-  bool matches(Order order) => switch (this) {
-    OrderFilter.all => true,
-    // `awaitingPayment` is folded in here on purpose: from the seller's point
-    // of view both are "not gone yet", and a tab holding a single unpaid
-    // order that they must not ship is worse than a note on the row.
-    OrderFilter.toShip =>
-      order.status == OrderStatus.toShip ||
-          order.status == OrderStatus.awaitingPayment,
-    OrderFilter.shipped => order.status == OrderStatus.shipped,
-    OrderFilter.delivered => order.status == OrderStatus.delivered,
-    OrderFilter.returns =>
-      order.status == OrderStatus.returnRequested ||
-          order.status == OrderStatus.returned ||
-          order.status == OrderStatus.refunded,
-  };
-}
-
 final StreamProvider<List<Order>> ordersProvider = StreamProvider<List<Order>>((
   Ref ref,
 ) {
@@ -65,21 +40,7 @@ final orderProvider = StreamProvider.family<Order?, String>((
   );
 });
 
-class OrderFilterController extends Notifier<OrderFilter> {
-  @override
-  OrderFilter build() => OrderFilter.all;
-
-  void select(OrderFilter filter) => state = filter;
-}
-
-final NotifierProvider<OrderFilterController, OrderFilter> orderFilterProvider =
-    NotifierProvider<OrderFilterController, OrderFilter>(
-      OrderFilterController.new,
-    );
-
-/// The extra filters behind Orders' filter sheet — the same split Inventory
-/// has, for the same reason: the strip stays one preset with counts, and the
-/// sheet holds the groups a seller opens deliberately.
+/// The filters behind Orders' filter sheet and its strip.
 class OrderCriteriaController extends Notifier<OrderFilterCriteria> {
   @override
   OrderFilterCriteria build() => OrderFilterCriteria.none;
@@ -96,20 +57,14 @@ class OrderCriteriaController extends Notifier<OrderFilterCriteria> {
     state = pending;
   }
 
-  /// Drops every filter, the tab included.
+  /// Drops every filter.
   void reset() {
-    // Not `orderActiveFilterCountProvider` — it watches this notifier, so
-    // reading it here is a circular dependency. See Inventory's reset.
     SdLogger.action(
       LogTagConstant.order,
       'Reset order filters',
-      <String, Object?>{
-        'groups': state.activeCount,
-        'tab': ref.read(orderFilterProvider).name,
-      },
+      <String, Object?>{'groups': state.activeCount},
     );
 
-    ref.read(orderFilterProvider.notifier).select(OrderFilter.all);
     state = OrderFilterCriteria.none;
   }
 }
@@ -120,33 +75,11 @@ orderCriteriaProvider =
       OrderCriteriaController.new,
     );
 
-/// How many filters are narrowing the list — the tab counted as one whenever
-/// it is not `all`. See `inventoryActiveFilterCountProvider`.
-final Provider<int> orderActiveFilterCountProvider = Provider<int>((Ref ref) {
-  final int extras = ref.watch(orderCriteriaProvider).activeCount;
-  final OrderFilter tab = ref.watch(orderFilterProvider);
-
-  return tab == OrderFilter.all ? extras : extras + 1;
-});
-
-final Provider<Map<OrderFilter, int>> orderCountsProvider =
-    Provider<Map<OrderFilter, int>>((Ref ref) {
-      final List<Order> orders =
-          ref.watch(ordersProvider).value ?? const <Order>[];
-      final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
-      final DateTime now = ref.watch(clockProvider).now();
-
-      // Narrowed by the sheet but not by the tab, so a chip's number is
-      // exactly how many rows tapping it would show.
-      final List<Order> pool = orders
-          .where((Order order) => criteria.matches(order, now: now))
-          .toList();
-
-      return <OrderFilter, int>{
-        for (final OrderFilter filter in OrderFilter.values)
-          filter: pool.where(filter.matches).length,
-      };
-    });
+/// How many filters are narrowing the list, counted by group. See
+/// `inventoryActiveFilterCountProvider`.
+final Provider<int> orderActiveFilterCountProvider = Provider<int>(
+  (Ref ref) => ref.watch(orderCriteriaProvider).activeCount,
+);
 
 /// Marketplace id → the name to put on a chip, taken from the orders
 /// themselves.
@@ -170,15 +103,11 @@ final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
   Ref ref,
 ) {
   final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
-  final OrderFilter filter = ref.watch(orderFilterProvider);
   final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
   final DateTime now = ref.watch(clockProvider).now();
 
   return orders
-      .where(
-        (Order order) =>
-            filter.matches(order) && criteria.matches(order, now: now),
-      )
+      .where((Order order) => criteria.matches(order, now: now))
       .toList();
 });
 

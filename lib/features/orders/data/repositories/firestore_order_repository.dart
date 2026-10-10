@@ -13,9 +13,9 @@ import '../dtos/order_dto.dart';
 
 /// Orders, in Firestore.
 ///
-/// The Orders screen's five tabs are a fold over this one stream rather than
-/// five queries — five live listeners for one screen is five times the cost
-/// and five chances for the counts to disagree with the list.
+/// The Orders screen's status counts are a fold over this one stream rather
+/// than a query per status — a live listener each is that many times the cost
+/// and as many chances for the counts to disagree with the list.
 class FirestoreOrderRepository implements OrderRepository {
   const FirestoreOrderRepository(this._context);
 

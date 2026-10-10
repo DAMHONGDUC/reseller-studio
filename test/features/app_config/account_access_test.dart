@@ -23,6 +23,34 @@ class _FixedConfig implements AppConfigRepository {
   Stream<AppConfig> watch() => Stream<AppConfig>.value(config);
 }
 
+/// The first listen closes with nothing, the way a denied read does once the
+/// repository has swallowed it; every later one delivers [config].
+class _FailsUntilSignedIn implements AppConfigRepository {
+  _FailsUntilSignedIn(this.config);
+
+  final AppConfig config;
+  int listens = 0;
+
+  @override
+  Stream<AppConfig> watch() {
+    listens++;
+
+    return listens == 1
+        ? const Stream<AppConfig>.empty()
+        : Stream<AppConfig>.value(config);
+  }
+}
+
+class _Uid extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void signIn(String uid) => state = uid;
+}
+
+final NotifierProvider<_Uid, String?> _uidProvider =
+    NotifierProvider<_Uid, String?>(_Uid.new);
+
 void main() {
   ProviderContainer containerWith({
     required AppConfig config,
@@ -144,6 +172,40 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect(container.read(devModeEnabledProvider), isTrue);
+  });
+
+  test('a read that died signed out is listened to again on sign-in', () async {
+    // The repository swallows a failed read and its stream closes; before the
+    // re-listen, the dev and premium lists only applied after a cold start.
+    final _FailsUntilSignedIn repository = _FailsUntilSignedIn(
+      configWith(premium: <String>{'owner@example.com'}),
+    );
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        appConfigRepositoryProvider.overrideWithValue(repository),
+        currentUidProvider.overrideWith((Ref ref) => ref.watch(_uidProvider)),
+        currentEmailProvider.overrideWith(
+          (Ref ref) =>
+              ref.watch(_uidProvider) == null ? null : 'owner@example.com',
+        ),
+      ],
+    );
+
+    addTearDown(container.dispose);
+    container.listen<SellerPlan>(
+      currentPlanProvider,
+      (SellerPlan? previous, SellerPlan next) {},
+      fireImmediately: true,
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    expect(repository.listens, 1);
+
+    container.read(_uidProvider.notifier).signIn('uid-1');
+    await Future<void>.delayed(Duration.zero);
+
+    expect(repository.listens, 2);
+    expect(container.read(currentPlanProvider), SellerPlan.premium);
   });
 
   test('the grant itself is decided by the list', () {

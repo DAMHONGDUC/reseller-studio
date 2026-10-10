@@ -41,7 +41,9 @@ void main() {
     });
 
     expect(
-      FirestoreMapper.dateOrNull(LocalJsonCodec.decode(encoded)['purchaseDate']),
+      FirestoreMapper.dateOrNull(
+        LocalJsonCodec.decode(encoded)['purchaseDate'],
+      ),
       DateTime.utc(2026, 3, 4).toLocal(),
     );
   });
@@ -60,7 +62,9 @@ void main() {
 
   test('records read back newest first', () async {
     await table.put('old', DateTime(2026), <String, Object?>{'title': 'old'});
-    await table.put('new', DateTime(2026, 6), <String, Object?>{'title': 'new'});
+    await table.put('new', DateTime(2026, 6), <String, Object?>{
+      'title': 'new',
+    });
 
     final List<LocalDocument> all = await table.getAll();
 

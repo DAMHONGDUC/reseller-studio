@@ -17,8 +17,8 @@ import '../../support/pump_app.dart';
 /// here stops finding what they need and cannot tell whether the action is
 /// missing or the app cannot do it.
 void main() {
-  /// Quick Access sits at the bottom, so nothing in it is built until the
-  /// list is scrolled there — `find.text` matches built widgets only.
+  /// Quick Action sits at the bottom, so its rows are scrolled to before they
+  /// are measured.
   Future<void> toEnd(WidgetTester tester) async {
     for (int i = 0; i < 12; i++) {
       await tester.drag(find.byType(Scrollable).first, const Offset(0, -600));
@@ -157,7 +157,8 @@ void main() {
 
       expect(
         tester
-            .getRect(find.text(QuickActionLabel.of(context, action.kind)))
+            // `.last`: Record sale is also a shortcut at the top of Home.
+            .getRect(find.text(QuickActionLabel.of(context, action.kind)).last)
             .top,
         lessThan(aboutTop),
         reason: '${action.kind.name} sits below About',

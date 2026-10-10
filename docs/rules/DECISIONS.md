@@ -105,7 +105,7 @@ re-argued.
 - **"No FAB on a screen with the floating nav" — inverted.** There, the pill
   overlays the content and eats the tap, so every tab puts its primary action
   in the app bar. Here the opposite is an owner's rule: **every screen that
-  creates something uses the same labelled `SdFabV3`**, tab screens included,
+  creates something uses the same `+` `SdFabV3`**, tab screens included,
   and `AppAddFabScaffold` lifts it clear by `floatingBarInset` so the glass
   never covers it. The reasoning is the product's, not the layout's — a seller
   adds inventory dozens of times a day, and a create action hidden behind a
@@ -497,7 +497,7 @@ by `ConfirmedStream.grace` and the held answer is released when it expires.
 
 ## The page loader is a newton's cradle, and it costs a dependency
 
-Explains `loading_animation_widget` in `packages/system_design/pubspec.yaml`,
+Explains `loading_animation_widget` in `packages/flutter-system-design-kit/pubspec.yaml`,
 approved by the owner, who named both the package and the animation.
 
 The v3 loading indicator was a `CircularProgressIndicator` at both of its
@@ -589,3 +589,49 @@ business. There is no recovery and the owner chose that over putting the
 records on a server. It is the reason the sign-in prompt and the local export
 in `GUEST_MODE.md` are not optional: the architecture is allowed to make that
 trade only if the product says so out loud.
+
+## Sign in with Apple on iOS presents its own sheet
+
+App Review rejected build 34 under guideline 2.1(a): on an iPad Air
+(iPadOS 27), Sign in with Apple loaded indefinitely. Two things could hold that
+button forever, and both are closed.
+
+- **FlutterFire's Apple path can present from no window.** It searches the
+  connected scenes for a key window and, finding none, falls back to a
+  deprecated `keyWindow` that is nil under the UIScene lifecycle. The sheet
+  never appears and the call never answers; several of its delegate branches
+  also return without answering at all. `ios/Runner/AppleSignInPlugin.swift`
+  replaces it on iOS: the anchor is the Flutter view's own window, found before
+  the request runs, and every path answers exactly once. The token goes to
+  Firebase through `signInWithCredential`. Other platforms keep
+  `signInWithProvider`, the web flow, which has no window to get wrong.
+- **The sign-in awaited two calls with no upper bound.** The profile write
+  waits for the server to acknowledge it and RevenueCat's `logIn` is a network
+  round trip; both were awaited before the button stopped spinning, on a
+  session that was already valid. They now run unawaited and log their own
+  failure. `test/features/auth/sign_in_test.dart` pins it.
+
+**Why not the `sign_in_with_apple` package.** It is a new dependency for about
+a hundred lines of Swift, and the bug was in who owns the presentation — moving
+that to another package moves the question rather than answering it.
+
+## A refused permission opens Settings through the app's own channel
+
+A seller who refused the camera got "Something went wrong" on a photo, a
+blank error icon on the scanner, and nothing at all about notifications —
+and no way back but finding the app's page in Settings themselves.
+`PermissionSettingsSheet` now says what is off and opens that page.
+
+- **Shown only when the system will not ask again.** iOS asks once, so any
+  refusal is final. Android asks twice: the first refusal is the seller
+  changing their mind and is treated like a cancel; the sheet comes once
+  `shouldShowRequestPermissionRationale` says the dialog is gone for good.
+- **The plugins still do the asking.** `image_picker`, `mobile_scanner` and
+  FCM request their own permissions; `SystemPermissions` only answers what
+  happens after they were told no.
+
+**Why not `permission_handler`.** Two questions — "will it ask again?" and
+"open Settings" — are about sixty lines across `SystemPermissionsPlugin.swift`
+and `MainActivity.kt`, the same trade as the Apple sheet above. The package
+would also become a second thing requesting the same permissions the plugins
+already request, and the two can disagree about what was asked.

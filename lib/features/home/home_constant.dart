@@ -16,62 +16,38 @@ final class HomeConstant {
   static const int recentActivityMaxRows = 3;
 }
 
-/// One of the three cards at the top of Home.
+/// **The three buttons in Home's shortcut row, in order** — owner's rule.
 ///
-/// **No route on it, unlike [QuickAction].** Only two of the three are
-/// a navigation at all — the first scrolls this screen — so the card asks
-/// [HomeShortcutKind] what to do rather than pushing a path it was handed.
-class HomeShortcut {
-  const HomeShortcut({required this.kind, required this.icon});
+/// The first is the filled one; what each does is in
+/// `lib/features/home/CLAUDE.md`. **Three, and the list is closed.** A fourth
+/// makes the row a launcher.
+enum HomeShortcut {
+  /// Opens `AddStockSheet`: Quick add, Scan, Take stock in.
+  addStock,
 
-  final HomeShortcutKind kind;
-  final IconData icon;
+  /// Scrolls Home to its Quick Action section.
+  quickAction,
+
+  /// Pushes the record-sale flow, as its Quick Action row does.
+  recordSale,
 }
 
-/// The three ways out of Home.
-enum HomeShortcutKind { quickAction, search, scan }
-
-/// **The three cards that open Home** — owner's rule.
-///
-/// Home's own content answers "what needs attention today", and everything
-/// that answers it is *inside* this screen. These three are the ways out: down
-/// to Quick Action, sideways into global search, and into the scanner.
-/// They sit first because a seller who opened the app to *go somewhere* should
-/// not have to read a dashboard on the way.
-///
-/// Flow overview now gets a full section immediately below this row. Scan
-/// takes its card because it is a frequent action a seller starts while
-/// holding an item, and the shortcut row is the fastest way into it.
-///
-/// **Three, and the list is closed.** A fourth would make this a launcher,
-/// which is exactly what keeping the create actions at the bottom exists to
-/// avoid —
-/// the row works because it is short enough to take in without reading.
-final class HomeShortcutConstant {
-  static const List<HomeShortcut> shortcuts = <HomeShortcut>[
-    HomeShortcut(
-      kind: HomeShortcutKind.quickAction,
-      icon: AppIconConstant.bolt,
+/// How a shortcut reads and looks lives on the enum — owner's rule.
+extension HomeShortcutDisplay on HomeShortcut {
+  String label(BuildContext context) => switch (this) {
+    HomeShortcut.addStock => context.l10n.inventoryAddTitle,
+    HomeShortcut.quickAction => context.l10n.homeQuickAction,
+    HomeShortcut.recordSale => QuickActionLabel.of(
+      context,
+      QuickActionKind.recordSale,
     ),
-    HomeShortcut(kind: HomeShortcutKind.search, icon: AppIconConstant.search),
-    HomeShortcut(
-      kind: HomeShortcutKind.scan,
-      icon: AppIconConstant.barcodeScanner,
-    ),
-  ];
-}
+  };
 
-/// The words for a Home shortcut card.
-///
-/// Each reuses the key its destination already owns — a card that said
-/// something other than the section it lands on is a card that lies.
-final class HomeShortcutLabel {
-  static String of(BuildContext context, HomeShortcutKind kind) =>
-      switch (kind) {
-        HomeShortcutKind.quickAction => context.l10n.homeQuickAction,
-        HomeShortcutKind.search => context.l10n.homeShortcutSearch,
-        HomeShortcutKind.scan => context.l10n.inventoryScan,
-      };
+  IconData get icon => switch (this) {
+    HomeShortcut.addStock => AppIconConstant.addBox,
+    HomeShortcut.quickAction => AppIconConstant.bolt,
+    HomeShortcut.recordSale => AppIconConstant.payments,
+  };
 }
 
 /// One create action, as Quick Action offers it.
@@ -302,7 +278,7 @@ final class QuickActionLabel {
 
 /// The words and the glyph for one Getting started step.
 ///
-/// Same shape as [HomeShortcutLabel] and [QuickActionLabel], for the same
+/// Same shape as [HomeShortcutDisplay] and [QuickActionLabel], for the same
 /// reason: the enum stays `const` and the strings stay in ARB (hard rule 7).
 final class GettingStartedStepLabel {
   static String title(BuildContext context, GettingStartedStep step) =>

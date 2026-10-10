@@ -44,6 +44,34 @@ running total.
 
 `test/features/inventory/intake_session_test.dart` pins all four.
 
+## Add stock is one sheet, opened from Inventory and from Home
+
+Owner's rule. `AddStockSheet` (`core/widgets/`, because two features open it)
+offers **Quick add, Scan and Take stock in** — Inventory's create button and
+Home's Add stock shortcut both open it, so the two cannot offer different
+ways in.
+
+- **Scan is one of them** because a seller holding something unlabelled in
+  their hand does not yet know whether it is new stock or a thing they own.
+- **The plan gate runs when an option is picked, before its screen opens** —
+  the reason is the Quick Add rule above: refusing a title someone already
+  typed loses their work. Scan is not gated; it finds before it adds.
+- **Quick Add carries Scan too, in its body under the title field — never
+  in the app bar.** Owner's rule, and it reverses the app-bar placement. It
+  is for the seller who opened Quick Add and then found the item already had
+  a code, and a 24pt glyph in the bar corner is one they never spot: a card
+  row beside the field they are already looking at is found without
+  hunting.
+
+## Stale reads the business's own threshold, everywhere
+
+Owner's rule. `Workspace.staleThresholdDays` is what the seller chose, and
+**every** reading of stale takes it from `staleThresholdProvider` — the
+Status filter's Stale option, the card's badge, its tinted edge and its
+Reprice button, as well as Home and Analytics. A card reading the 60-day
+default while Home read 30 told a seller five items were stale and then
+showed none of them.
+
 ## New-business category defaults
 
 Every new business starts with three normal category records: Clothing,
@@ -99,6 +127,47 @@ list: the detail screen's Actions button, and **the `more_vert` button on
 - **`onActions` is nullable**, so a list that only navigates simply does not
   pass it.
 - `test/features/inventory/item_card_actions_test.dart` holds all of it.
+
+## A row asking for one move carries it as a button
+
+Owner's rule, and it sits beside the ⋮ rather than replacing it.
+
+- **Stale stock gets Reprice; stock on the shelf listed nowhere gets
+  List on…** — the move each row is plainly asking for. List on… opens the
+  same cross-list screen the marketplace arrow does.
+- **One button at most, and none on any other row.** Two would be a menu, and
+  the menu is the ⋮. A row with nothing to ask stays exactly as tall as it was
+  — the extra line is paid only by the rows that need attention, which is the
+  trade "stay short" allows.
+- **Hidden while a selection is open**, for the same reason the ⋮ is.
+- **Stale also tints the card's edge**, repeating the Stale badge — colour is
+  never the only signal.
+- `ItemQuickActions` owns the guarded reprice and mark-sold moves, so the
+  sheet, the card and the detail screen cannot disagree about what is
+  allowed. `test/core/widgets/item_card_quick_action_test.dart` and
+  `item_card_stale_edge_test.dart` pin the row.
+
+## The detail screen pins Mark as sold and Reprice
+
+Owner's rule. While the item is on hand, `AppPinnedAction` holds the bottom
+edge: Mark as sold is the primary, Reprice is stacked above it. Every other
+verb stays behind the Actions button, and the sheet still lists both.
+
+- **Only on hand.** A sold or archived item has no next move, and a bar
+  holding one would invite a mistake — the order detail's rule.
+- `test/features/inventory/item_detail_pinned_actions_test.dart` pins it.
+
+## Reprice warns, in red, that it moves every marketplace
+
+Owner's rule. The item has no price of its own, so Reprice writes the new
+price onto **every** listing the item carries. The sheet says so under the
+field in the danger colour, on one item and on forty — a seller who meant to
+change eBay alone finds out before pressing, not after.
+
+- **Only the item's reprice carries it.** Listings' bulk reprice moves the
+  listings that were picked and nothing else, so the line would be untrue
+  there; `PriceEntrySheet.warningText` is null for it.
+- `test/features/inventory/reprice_sheet_test.dart` pins it.
 
 ## The actions sheet names no marketplace, and never did more than one thing
 
@@ -473,15 +542,16 @@ Owner's rule, and it replaces the six-state lifecycle:
   for a buyer was a state nothing in the app could act on. Cross-listing no
   longer moves the status — `ItemTransition.markListed` stamps `listedAt` and
   turns a draft into stock, and that timestamp is what staleness, the Stale
-  tab and Home's progress read.
+  filter and Home's progress read.
 - **A document written before the change still reads.** `ItemDto` folds
   `listed` and `reserved` into `inStock`; nothing rewrites them until the item
   is next saved, and no migration runs.
 - **`isListable` now means `isOnHand`.** A draft can be put on a marketplace —
   listing it is what makes it stock. What cannot is an item that has left
   inventory.
-- **The Inventory tabs follow**: All, Draft, In stock, Sold, Stale. Stale is
-  still a query, not a status (`docs/DATA_MODEL.md`).
+- **The Status filter follows**: Draft, In stock, Sold, Archived, and Stale
+  as one more option (`ItemStatusFilter`). There are no tabs; Stale is still
+  a query, not a status (`docs/DATA_MODEL.md`, `docs/rules/SCREENS.md`).
 
 ## There is no Restock verb; the count is edited on the detail screen
 

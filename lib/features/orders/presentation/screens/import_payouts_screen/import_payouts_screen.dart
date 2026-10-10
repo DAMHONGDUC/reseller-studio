@@ -55,7 +55,7 @@ class _ImportPayoutsScreenState extends ConsumerState<ImportPayoutsScreen> {
     try {
       await ref
           .read(orderActionsControllerProvider.notifier)
-          .recordManySettlements(queue, payouts);
+          .recordManySettlements(queue, payouts, viaImport: true);
 
       if (!mounted) return;
 

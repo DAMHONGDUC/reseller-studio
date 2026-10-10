@@ -55,8 +55,9 @@ void main() {
     // of them and call it all.
     final List<String> offenders = <String>[];
 
-    for (final FileSystemEntity entity
-        in Directory('lib').listSync(recursive: true)) {
+    for (final FileSystemEntity entity in Directory(
+      'lib',
+    ).listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
 
       final String source = entity.readAsStringSync();

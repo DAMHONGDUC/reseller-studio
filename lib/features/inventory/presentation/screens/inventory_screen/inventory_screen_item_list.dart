@@ -7,8 +7,10 @@ class _ItemList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // One `now` for the whole list, so every row agrees on what stale means.
+    // One `now` and one threshold for the whole list, so every row agrees on
+    // what stale means — and agrees with Home.
     final DateTime now = ref.watch(clockProvider).now();
+    final Duration staleThreshold = ref.watch(staleThresholdProvider);
     // Grouped once here rather than watched per card: a family subscription
     // on every row rebuilds the whole list on any listing write.
     final Map<String, List<Listing>> listings = ListingsByItem.group(
@@ -41,6 +43,7 @@ class _ItemList extends ConsumerWidget {
             item: item,
             listings: listings[item.id] ?? const <Listing>[],
             now: now,
+            staleThreshold: staleThreshold,
             isSelecting: isSelecting,
             isSelected: selected.contains(item.id),
             // While a selection is open a tap ticks rather than opens: a
@@ -58,6 +61,7 @@ class _ItemList extends ConsumerWidget {
             onActions: () => ItemActionsSheet.show(context, item),
             // The row shows no price per marketplace; this is where they are.
             onMarketPrices: () => context.push(AppRoutes.crossList(item.id)),
+            onReprice: () => ItemQuickActions.reprice(context, ref, item),
           );
         },
       ),

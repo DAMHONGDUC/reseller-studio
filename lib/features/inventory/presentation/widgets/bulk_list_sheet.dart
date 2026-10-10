@@ -70,9 +70,7 @@ class _BulkListSheetState extends ConsumerState<BulkListSheet> {
     final BulkListingPlan plan = _plan();
 
     try {
-      await ref
-          .read(itemActionsControllerProvider.notifier)
-          .crossListAll(plan);
+      await ref.read(itemActionsControllerProvider.notifier).crossListAll(plan);
 
       if (!mounted) return;
 
@@ -143,9 +141,7 @@ class _BulkListSheetState extends ConsumerState<BulkListSheet> {
                 SdFilterChipV3(
                   label: uplift == 0
                       ? context.l10n.bulkListAtExpected
-                      : context.l10n.bulkListUplift(
-                          context.percent(uplift),
-                        ),
+                      : context.l10n.bulkListUplift(context.percent(uplift)),
                   selected: _uplift == uplift,
                   onSelected: () => setState(() => _uplift = uplift),
                 ),

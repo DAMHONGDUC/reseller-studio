@@ -1,7 +1,7 @@
 name: reseller_studio
 description: "Reseller Studio — the operating system for resellers: source, list, sell, ship, profit."
 publish_to: 'none'
-version: 1.0.0+34
+version: 1.0.0+49
 
 environment:
   sdk: ^3.12.2
@@ -52,25 +52,20 @@ dependencies:
   # lib/core. Reseller Studio renders on its v3 generation and never touches v2.
   simple_icons: ^16.23.0
   system_design:
-    path: packages/system_design
+    path: packages/flutter-system-design-kit
   # Flutter team's own plugin, and the only way to open the policy pages the
   # App Store requires a link to. No service behind it — it hands the URL to
   # the OS.
   url_launcher: ^6.3.1
 
 dev_dependencies:
-  # The repo's only codegen, and its output is committed so `melos run
-  # analyze` still needs no build step (docs/rules/GUEST_MODE.md).
+  # The repo's only codegen, and its output is committed so `make analyze`
+  # still needs no build step (docs/rules/GUEST_MODE.md).
   build_runner: ^2.10.0
   drift_dev: ^2.28.2
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  # The task runner. Melos 6 on purpose — see melos.yaml for why.
-  # Pinned exactly: the global install and this one must be the same version,
-  # or melos launches one version's code against the other's asset templates
-  # and bootstrap dies on a missing .tmpl file.
-  melos: 6.3.3
 
 flutter:
   generate: true

@@ -104,6 +104,27 @@ class _RefusingBilling extends InMemorySubscriptionRepository {
       throw const AppFailure(AppFailureKind.unknown);
 }
 
+/// The profile write, never answering — a server that never acknowledges.
+class _SilentProfile extends InMemoryWorkspaceRepository {
+  _SilentProfile(super.store);
+
+  @override
+  Future<void> ensureProfile({
+    required String uid,
+    String? displayName,
+    String? email,
+    String? photoUrl,
+  }) => Completer<void>().future;
+}
+
+/// The billing identity, never answering.
+class _SilentBilling extends InMemorySubscriptionRepository {
+  _SilentBilling(super.store);
+
+  @override
+  Future<void> identify(String uid) => Completer<void>().future;
+}
+
 void main() {
   ProviderContainer containerWith(
     AuthRepository auth, {
@@ -204,6 +225,34 @@ void main() {
           .signIn(AuthProviderKind.google),
       isTrue,
     );
+  });
+
+  test('housekeeping that never answers does not hold the button', () async {
+    final MockStore shared = store();
+    final ProviderContainer container = containerWith(
+      _FakeAuth(apple: const SignInResult.signedIn('uid-1')),
+      overrides: <Override>[
+        workspaceRepositoryProvider.overrideWithValue(_SilentProfile(shared)),
+        subscriptionRepositoryProvider.overrideWithValue(
+          _SilentBilling(shared),
+        ),
+      ],
+      replaces: <Object>{
+        workspaceRepositoryProvider,
+        subscriptionRepositoryProvider,
+      },
+    );
+
+    // App Review's "Sign in with Apple loaded indefinitely": the session was
+    // valid, and the spinner waited on two calls with no upper bound.
+    expect(
+      await container
+          .read(authControllerProvider.notifier)
+          .signIn(AuthProviderKind.apple)
+          .timeout(const Duration(seconds: 1)),
+      isTrue,
+    );
+    expect(container.read(authControllerProvider).isBusy, isFalse);
   });
 
   test('one provider is asked, never both', () async {

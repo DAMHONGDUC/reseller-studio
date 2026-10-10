@@ -164,6 +164,16 @@ class _PickerRow<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color accent = context.colorScheme3.primary;
+    final TextStyle body = context.textTheme3.bodyMedium!;
+
+    // - weight as well as colour: the chosen row has to be findable by
+    //   someone who cannot tell the two apart
+    // - a row with a tile is a menu entry, and reads like an `AppListRow`
+    final TextStyle labelStyle = isSelected
+        ? body.semiBold3.copyWith(color: accent)
+        : option.icon != null
+        ? body.semiBold3.copyWith(color: context.sdTheme3.textPrimary)
+        : body.copyWith(color: context.sdTheme3.textPrimary);
 
     return AppSelectableRow(
       isSelected: isSelected,
@@ -171,10 +181,7 @@ class _PickerRow<T> extends StatelessWidget {
       child: Row(
         children: <Widget>[
           if (option.icon != null) ...<Widget>[
-            SdIconV3(
-              option.icon!,
-              color: isSelected ? accent : context.sdTheme3.textSecondary,
-            ),
+            SdIconTileV3(icon: option.icon!, tint: accent, filled: isSelected),
             SizedBox(width: SdSpacingConstant.w12),
           ],
           Expanded(
@@ -182,18 +189,7 @@ class _PickerRow<T> extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  option.label,
-                  // Weight as well as colour: the chosen row has to be
-                  // findable by someone who cannot tell the two apart.
-                  style: isSelected
-                      ? context.textTheme3.bodyMedium!.semiBold3.copyWith(
-                          color: accent,
-                        )
-                      : context.textTheme3.bodyMedium!.copyWith(
-                          color: context.sdTheme3.textPrimary,
-                        ),
-                ),
+                Text(option.label, style: labelStyle),
                 if (option.caption != null) ...<Widget>[
                   SizedBox(height: SdSpacingConstant.h2),
                   Text(

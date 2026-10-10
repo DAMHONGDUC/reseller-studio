@@ -91,16 +91,17 @@ person's own phone, so a device handed to somebody else must not still hold
 them.
 
 Order: sign out of every provider → empty the Drift database → clear
-Firestore's cache. The first two are guaranteed; the third is best effort and
-the failure is expected rather than exceptional, because `clearPersistence`
-throws `failed-precondition` while any listener is open and sign-out happens
-with the app on screen.
+Firestore's cache. The first two are guaranteed; the third is best effort.
 
-**What is left behind when it does throw is a cache nothing can read past**:
+**The cache is cleared through `FirestoreMaintenance.reset`, never by calling
+`terminate` directly.** Sign-out happens with the app on screen and makes
+`app_config` re-subscribe; a listener that reaches the client while it
+terminates aborts the app on iOS. The reset detaches every listener first,
+holds new ones back, and re-attaches them all to the fresh client.
+
+**What is left behind if it still fails is a cache nothing can read past**:
 every query in the app carries a `workspaceId` filter (hard rule 14), and the
-next account does not match the last one's. The fresh-install gate clears it
-for real on the next cold start, which is the only place in this app where
-`clearPersistence` is reliably above every open stream.
+next account does not match the last one's.
 
 **A sign-out does not create a new guest session.** The app lands on the login
 screen with an empty local store, and the seller starts a guest session again
@@ -190,7 +191,7 @@ is not the one this has.
 **The generated files are committed**, and that is not a convenience: it is
 the clause that preserves what the original rule was actually protecting. A
 fresh checkout must analyze and test with no build step, so
-`melos run analyze` never depends on codegen having been run. Regenerating is
+`make analyze` never depends on codegen having been run. Regenerating is
 a deliberate act after a schema change, never a precondition for reading the
 repo.
 

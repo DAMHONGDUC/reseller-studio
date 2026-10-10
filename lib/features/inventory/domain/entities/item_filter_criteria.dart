@@ -2,23 +2,20 @@ import '../../../../core/filters/date_range_filter.dart';
 import '../../../../core/filters/presence_filter.dart';
 import '../../../../core/utils/set_utils.dart';
 import '../../item_filter_constant.dart';
+import '../enums/item_filter_group.dart';
 import '../enums/item_status.dart';
+import '../enums/item_status_filter.dart';
+import '../services/item_search.dart';
 import 'item.dart';
 
-/// Everything Inventory can be narrowed by beyond its five tabs.
-///
-/// **The tab strip and this are two different questions.** `InventoryFilter`
-/// is the one preset a seller taps constantly — all, draft, in stock, sold,
-/// stale — and it stays a single choice on the strip. This is the rest of the
-/// vocabulary: what it is, where it is, where it came from and what is missing
-/// from it. The two are ANDed, so a narrowed tab count is still the count of
-/// what the tab would show.
+/// Everything Inventory can be narrowed by: where it is, what it is, where it
+/// came from and what is missing from it.
 ///
 /// **Empty means "not narrowed", never "nothing".** An empty set matches every
 /// item, which is what makes [none] the state the screen opens in.
 class ItemFilterCriteria {
   const ItemFilterCriteria({
-    this.statuses = const <ItemStatus>{},
+    this.statuses = const <ItemStatusFilter>{},
     this.conditions = const <ItemCondition>{},
     this.categoryIds = const <String>{},
     this.locationIds = const <String>{},
@@ -32,7 +29,8 @@ class ItemFilterCriteria {
   /// Nothing narrowed — what Inventory opens on and what Reset restores.
   static const ItemFilterCriteria none = ItemFilterCriteria();
 
-  final Set<ItemStatus> statuses;
+  /// The statuses ticked, Stale among them — ORed with each other.
+  final Set<ItemStatusFilter> statuses;
   final Set<ItemCondition> conditions;
 
   /// Ids of the chosen categories, locations and sources, where
@@ -59,27 +57,52 @@ class ItemFilterCriteria {
   /// **Counted by group, not by chip.** Three categories ticked is one filter
   /// ("category"), and telling a seller they have three filters on when they
   /// made one choice is a number they cannot reconcile with the sheet.
-  int get activeCount {
-    int count = 0;
+  int get activeCount => ItemFilterGroup.values.where(narrows).length;
 
-    if (statuses.isNotEmpty) count++;
-    if (conditions.isNotEmpty) count++;
-    if (categoryIds.isNotEmpty) count++;
-    if (locationIds.isNotEmpty) count++;
-    if (sourceIds.isNotEmpty) count++;
-    if (photos.isActive) count++;
-    if (cost.isActive) count++;
-    if (listed.isActive) count++;
-    if (added.isActive) count++;
+  /// Whether [group] is narrowing the list — what lights its chip.
+  bool narrows(ItemFilterGroup group) => switch (group) {
+    ItemFilterGroup.status => statuses.isNotEmpty,
+    ItemFilterGroup.condition => conditions.isNotEmpty,
+    ItemFilterGroup.category => categoryIds.isNotEmpty,
+    ItemFilterGroup.location => locationIds.isNotEmpty,
+    ItemFilterGroup.source => sourceIds.isNotEmpty,
+    ItemFilterGroup.photos => photos.isActive,
+    ItemFilterGroup.cost => cost.isActive,
+    ItemFilterGroup.listed => listed.isActive,
+    ItemFilterGroup.added => added.isActive,
+  };
 
-    return count;
-  }
+  /// These criteria with [group] back to "not narrowed" — a one-group
+  /// sheet's Reset, which must leave every other group alone.
+  ItemFilterCriteria cleared(ItemFilterGroup group) => switch (group) {
+    ItemFilterGroup.status => copyWith(statuses: none.statuses),
+    ItemFilterGroup.condition => copyWith(conditions: none.conditions),
+    ItemFilterGroup.category => copyWith(categoryIds: none.categoryIds),
+    ItemFilterGroup.location => copyWith(locationIds: none.locationIds),
+    ItemFilterGroup.source => copyWith(sourceIds: none.sourceIds),
+    ItemFilterGroup.photos => copyWith(photos: none.photos),
+    ItemFilterGroup.cost => copyWith(cost: none.cost),
+    ItemFilterGroup.listed => copyWith(listed: none.listed),
+    ItemFilterGroup.added => copyWith(added: none.added),
+  };
 
   bool get isActive => activeCount > 0;
 
   /// Whether [item] survives every group at once.
-  bool matches(Item item, {required DateTime now}) {
-    if (statuses.isNotEmpty && !statuses.contains(item.status)) return false;
+  ///
+  /// [staleThreshold] is the business's own, for the Stale status option.
+  bool matches(
+    Item item, {
+    required DateTime now,
+    required Duration staleThreshold,
+  }) {
+    if (statuses.isNotEmpty &&
+        !statuses.any(
+          (ItemStatusFilter status) =>
+              status.matches(item, now: now, staleThreshold: staleThreshold),
+        )) {
+      return false;
+    }
     if (conditions.isNotEmpty && !conditions.contains(item.condition)) {
       return false;
     }
@@ -94,6 +117,37 @@ class ItemFilterCriteria {
     return true;
   }
 
+  /// How many of [items] each status option would show on its own — under
+  /// every other group and [query], but not the status group itself.
+  Map<ItemStatusFilter, int> statusCounts(
+    List<Item> items, {
+    required String query,
+    required DateTime now,
+    required Duration staleThreshold,
+  }) {
+    final ItemFilterCriteria others = cleared(ItemFilterGroup.status);
+    final List<Item> pool = items
+        .where(
+          (Item item) =>
+              others.matches(item, now: now, staleThreshold: staleThreshold) &&
+              ItemSearch.matches(item, query),
+        )
+        .toList();
+
+    return <ItemStatusFilter, int>{
+      for (final ItemStatusFilter status in ItemStatusFilter.values)
+        status: pool
+            .where(
+              (Item item) => status.matches(
+                item,
+                now: now,
+                staleThreshold: staleThreshold,
+              ),
+            )
+            .length,
+    };
+  }
+
   /// Ticking a chip, as a value rather than as a write.
   ///
   /// **The vocabulary lives here, not on the controller** — the filter sheet
@@ -101,7 +155,7 @@ class ItemFilterCriteria {
   /// live in a provider. Two places tick a chip, so what a tick *means* is one
   /// thing in one place; a second copy on the notifier is how the pending
   /// filter and the applied one would come to disagree about a second tap.
-  ItemFilterCriteria withStatusToggled(ItemStatus value) =>
+  ItemFilterCriteria withStatusToggled(ItemStatusFilter value) =>
       copyWith(statuses: SetUtils.toggled(statuses, value));
 
   ItemFilterCriteria withConditionToggled(ItemCondition value) =>
@@ -127,7 +181,7 @@ class ItemFilterCriteria {
   ItemFilterCriteria withAdded(DateRangeFilter value) => copyWith(added: value);
 
   ItemFilterCriteria copyWith({
-    Set<ItemStatus>? statuses,
+    Set<ItemStatusFilter>? statuses,
     Set<ItemCondition>? conditions,
     Set<String>? categoryIds,
     Set<String>? locationIds,

@@ -46,11 +46,14 @@ final class AppIconConstant {
   /// Open chart-based analytics.
   static const IconData barChart = Symbols.bar_chart_rounded;
 
-  /// Scan a product barcode.
+  /// Scan a code — the one scan glyph, on every scan entry point.
   static const IconData barcodeScanner = Symbols.barcode_scanner_rounded;
 
   /// Highlight a quick or automated action.
   static const IconData bolt = Symbols.bolt_rounded;
+
+  /// Report a bug, or send a test crash report.
+  static const IconData bugReport = Symbols.bug_report_rounded;
 
   /// The business the seller is standing in.
   static const IconData business = Symbols.business_center_rounded;
@@ -214,8 +217,14 @@ final class AppIconConstant {
   /// Open the main or overflow menu.
   static const IconData menu = Symbols.menu_rounded;
 
+  /// The camera refused for this app in the system Settings.
+  static const IconData noPhotography = Symbols.no_photography_rounded;
+
   /// Open or represent notifications.
   static const IconData notifications = Symbols.notifications_rounded;
+
+  /// Notifications refused for this app in the system Settings.
+  static const IconData notificationsOff = Symbols.notifications_off_rounded;
 
   /// Open content in an external destination.
   static const IconData openInNew = Symbols.open_in_new_rounded;
@@ -249,9 +258,6 @@ final class AppIconConstant {
 
   /// Represent public or global visibility.
   static const IconData public = Symbols.public_rounded;
-
-  /// Scan a QR code.
-  static const IconData qrCodeScanner = Symbols.qr_code_scanner_rounded;
 
   /// Indicate the chosen single-choice option.
   static const IconData radioButtonChecked =

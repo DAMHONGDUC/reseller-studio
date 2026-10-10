@@ -92,7 +92,7 @@ International transfers use [safeguard].
 **Retention.** Records made without an account are held only by your device and
 have no retention period with us, because they never reach us; deleting the app
 deletes them. Once you have an account we keep data while that account exists.
-Account deletion from Settings removes personal data and solely owned
+Account deletion from More → Account removes personal data and solely owned
 workspaces within [n] days, except records retained to meet a legal obligation.
 Signing out erases this device's copy and leaves the account untouched.
 

@@ -58,6 +58,31 @@ final class DateTimeUtils {
     required int days,
   }) => daysBetween(value, now) < days;
 
+  /// Midnight [days] calendar days back.
+  ///
+  /// Built from the date parts rather than by subtracting a `Duration`, which
+  /// lands an hour off across a daylight-saving change.
+  static DateTime daysBefore(DateTime value, int days) =>
+      DateTime(value.year, value.month, value.day - days);
+
+  /// Midnight [days] calendar days forward, the same way.
+  static DateTime daysAfter(DateTime value, int days) =>
+      daysBefore(value, -days);
+
+  /// Monday of [value]'s week, at midnight — the ISO week a chart buckets by.
+  static DateTime startOfWeek(DateTime value) =>
+      daysBefore(value, value.weekday - DateTime.monday);
+
+  static DateTime startOfYear(DateTime value) => DateTime(value.year);
+
+  /// `Mon` — a day on a chart's axis.
+  static String weekdayShort(DateTime value, {required String locale}) =>
+      DateFormat.E(locale).format(value);
+
+  /// `Aug` — a month on a chart's axis.
+  static String monthShort(DateTime value, {required String locale}) =>
+      DateFormat.MMM(locale).format(value);
+
   static DateTime startOfMonth(DateTime value) =>
       DateTime(value.year, value.month);
 

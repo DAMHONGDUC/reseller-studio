@@ -9,6 +9,7 @@ import 'package:system_design/common.dart';
 import '../config/app_env.dart';
 import '../constants/log_tag_constant.dart';
 import '../constants/prefs_key_constant.dart';
+import '../firestore/firestore_maintenance.dart';
 
 /// This app's half of the fresh-install check — the vendor calls, and nothing
 /// else.
@@ -50,15 +51,12 @@ final class AppFreshInstall implements SdFreshInstallHost {
     await FirebaseAuth.instance.signOut();
   }
 
-  /// **`terminate` first, and this only works before anything reads.**
-  /// `clearPersistence` throws `failed-precondition` while the client is
-  /// running, which is why `SplashScreen` sits above everything that opens a
-  /// stream.
+  /// Through [FirestoreMaintenance], because the router's own listeners are
+  /// already open above `SplashScreen` — and sign-out has just made
+  /// `app_config` re-subscribe.
   @override
-  Future<void> clearCache() async {
-    await FirebaseFirestore.instance.terminate();
-    await FirebaseFirestore.instance.clearPersistence();
-  }
+  Future<void> clearCache() =>
+      FirestoreMaintenance.reset(FirebaseFirestore.instance);
 }
 
 /// `shared_preferences` behind the store the design system asks for.
@@ -86,8 +84,7 @@ class _PrefsStore implements SdInstallScopedStore {
       (await SharedPreferences.getInstance()).remove(key);
 
   @override
-  Future<void> clear() async =>
-      (await SharedPreferences.getInstance()).clear();
+  Future<void> clear() async => (await SharedPreferences.getInstance()).clear();
 }
 
 /// The check, as something the widget tree can wait on.
@@ -96,6 +93,4 @@ class _PrefsStore implements SdInstallScopedStore {
 /// the gate rebuilds, and so the gate reads it as a plain `AsyncValue` rather
 /// than holding a future in `State`.
 final FutureProvider<SdFreshInstallOutcome> freshInstallProvider =
-    FutureProvider<SdFreshInstallOutcome>(
-      (Ref ref) => AppFreshInstall.run(),
-    );
+    FutureProvider<SdFreshInstallOutcome>((Ref ref) => AppFreshInstall.run());

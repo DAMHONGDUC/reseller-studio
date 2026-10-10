@@ -25,7 +25,7 @@ Spacing is not in this file. Every inset, gap and padding named here comes from
   passes `automaticallyImplyLeading: false` so the framework cannot add a
   second one on top of it.
 - **A screen with a create action gets it through `AppAddFabScaffold`** — the
-  labelled `SdFabV3`, same button, same place, every screen. That is an
+  `+` `SdFabV3` with no title, same button, same place, every screen. That is an
   always-apply rule and it lives in the root `CLAUDE.md`; the design-system
   half is in `DESIGN_SYSTEM.md`.
 - **A screen with content and an action button pins that button to the bottom**
@@ -175,6 +175,12 @@ because they are about the shell, not the bar:
   - This is the one analytics event raised from a widget rather than a
     controller. There is no controller between a tab tap and the shell, and it
     is a lifecycle callback, never `build`.
+  - **Every other screen is `AppScreenTracker`'s** (`core/analytics/`). It
+    listens to the router delegate — the whole stack, not one of the six
+    navigators — and reports the top screen's route template
+    (`/orders/:orderId`), never its location, so no record id reaches the
+    report. It skips `AppRoutes.tabRoots`, which are the tabs' and counted
+    above; a new tab root goes into that set or is counted twice.
 
 ## Lists
 
@@ -205,7 +211,7 @@ because they are about the shell, not the bar:
   chip row inside the list drives the collapse. The threshold is a static on
   the widget it belongs to; an element that must scroll fully out before it
   fires has to start at offset 0, so nothing may be padded in above it.
-  `SdSearchHeaderV3` and `AppAddFabScaffold` are the two implementations —
+  `SdSearchHeaderV3` and `SdBottomNavigationV3` are the two implementations —
   read them before writing a third.
 - **Pull-to-refresh is one wrapper.** There is no v3 refresh indicator yet;
   when one is added it goes in the package, not in a screen. Its `edgeOffset`
@@ -222,18 +228,13 @@ row missing because of a bug look identical — and the seller's only way to
 check is to reopen the sheet and read every group.
 
 - **`AppActiveFilterBar` (`core/widgets/`) is the one implementation**, and it
-  renders in two places at once: under the strip on the screen, and at the top
-  of that screen's filter sheet. One widget, so the two counts are one line of
-  code — what each one counts is not the same, and the sheet's is below.
+  renders under the strip on the screen only. The filter sheet has no bar of
+  its own: its Reset is a footer button beside Apply (below).
 - **It renders nothing at zero.** A row saying "0 filters" is chrome describing
   the absence of chrome.
 - **The count is by group, never by chip.** Three categories ticked is one
   filter; a seller who made one choice cannot reconcile "3 filters" with the
   sheet in front of them.
-- **The selected tab counts as one whenever it is not `All`**, and Reset
-  returns it there. A seller looking at three rows of eleven is filtered by the
-  tab exactly as much as by the sheet, and a bar reading "no filters" over a
-  narrowed list would be describing a different screen.
 - **The search box is not counted and Reset leaves it alone.** It is visible on
   the screen with its own clear button, so it is not the filter that went
   missing.
@@ -246,25 +247,57 @@ check is to reopen the sheet and read every group.
   - **The primary button says "Apply", not a count.** How many rows are left
     is a fact about a filter that has been applied, and this button is what
     applies one.
-  - **The sheet's own bar counts the draft, and never the tab.** The tab is
-    not in the sheet, so a number counting it could not be made true by the
-    Reset beside it — inside the sheet, Reset empties what is pending and
-    nothing else. The strip's bar still counts the tab and its Reset still
-    clears it.
+  - **The sheet's footer is two buttons, Reset then Apply** — owner's rule,
+    and it **reverses "the sheet's Reset is the bar at its top"**. Both are
+    where the thumb already is when the seller is done choosing, and the pair
+    is `AppFilterSheetActions` (`core/widgets/`) so both sheets build it once.
+  - **A sheet's Reset empties what that sheet shows, and nothing else.**
+    The full sheet empties every group; a one-group sheet empties its one
+    group. Nothing is applied until Apply, the same as
+    a tick. It is disabled while nothing it shows is pending — a Reset with
+    nothing to reset is a button that does nothing.
+  - **There is no Show preset: Status is the one group that asks where a
+    record is** — owner's rule, and it **reverses "both sheets open with the
+    preset as their first group"** and, with it, the plan's tab lists (§7,
+    §8). The presets were statuses under another name — Draft, In stock and
+    Sold sat in both groups — so a seller had two chips for one question and
+    no way to tell which to press.
+    - **Inventory's Status adds Stale as one more option**
+      (`ItemStatusFilter`). It is the one preset no status could express — on
+      hand and listed long ago — so it joins the group rather than leaving.
+    - **Orders' Status is the raw statuses.** To Ship and Returns were
+      several statuses ticked at once, which the multi-select already does.
+    - **Options are ORed within the group** and the group is ANDed with the
+      rest, like every other multi-select group.
+    - **Each status chip carries its row count**, taken under every other
+      group and the search but not this one — what ticking it alone would
+      show.
   - **Ticking a chip is a method on the criteria, not on the notifier**
     (`ItemFilterCriteria.withStatusToggled`). Two places tick a chip now — the
     draft and the applied value — so what a tick means lives in one place, and
     `apply(pending)` is all the controller keeps.
-- **The entry point is an app-bar action, never a chip on the strip.** Five
-  tabs are already wider than a phone, so a sixth chip pushes a real tab off
-  the edge to reach a sheet that is not a tab.
-- **That action is lit while the sheet holds something** — owner's rule.
-  `SdAppBarActionButtonV3.isActive` fills the glyph and paints it primary, so
-  a seller who scrolled past the bar under the strip can still see, from the
-  chrome that never moves, that the list is narrower than the shelf. It
-  follows the sheet's own groups and not the tab, for the reason the sheet's
-  bar does: the strip already shows which tab is picked, and a lit glyph over
-  a sheet that opens empty is a lie about where the rows went.
+- **Every group in a filter sheet is separated from the next by a divider** —
+  owner's rule. A blank gap between a dozen chip groups reads as one wall of
+  chips; a rule says where one question stops. It is `AppFilterGroupDivider`
+  (`core/widgets/`), so both sheets space it the same way, and it sits
+  between groups only — never above the first or below the last.
+- **The strip is the sheet, laid out sideways** — owner's rule, and it
+  **reverses "the entry point is an app-bar action, never a chip on the
+  strip"** together with the preset tabs the strip used to carry. A seller who
+  wanted one question answered had to open a sheet of ten and scroll for it.
+  - **The first chip opens the whole sheet, always first.** It carries the
+    `tune` glyph and is selected while anything at all narrows the list.
+  - **Then one chip per group, in the sheet's own order.** Each
+    opens a sheet holding that group alone, with the same draft, the same
+    Reset beside Apply and the same "nothing moves until Apply". The seller
+    edits a group here or in the full sheet; both write the one applied value.
+  - **A group's chip is selected while its group narrows** and carries a
+    caret, because it opens something rather than toggling. The chip's label
+    is the group's title, the same word the full sheet prints above it.
+  - The groups are enums on the domain (`ItemFilterGroup`,
+    `OrderFilterGroup`), so the chips, the full sheet and the one-group sheet
+    are three readings of one list and a new group cannot reach one of them
+    without the others.
 - `test/features/inventory/inventory_filter_sheet_test.dart` and
   `test/features/orders/order_filter_sheet_test.dart` hold the count, the two
   places it renders, and Reset.
