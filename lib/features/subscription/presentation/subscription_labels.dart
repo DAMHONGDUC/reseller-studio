@@ -1,5 +1,6 @@
 import '../domain/entities/plan_limits.dart';
 import '../domain/entities/plan_offering.dart';
+import '../domain/enums/plan_allowance.dart';
 import '../domain/enums/plan_feature.dart';
 import '../domain/enums/seller_plan.dart';
 import '../domain/services/plan_gate.dart';
@@ -20,8 +21,8 @@ final class SubscriptionLabels {
   static String name(SellerPlan plan) => plan.label;
 
   static String tagline(SellerPlan plan) => switch (plan) {
-    SellerPlan.free => 'Fifty items and thirty sales a month, free',
-    SellerPlan.premium => 'The answers: tax, payouts, and what to buy next',
+    SellerPlan.free => 'Every tool, with no limits, free',
+    SellerPlan.premium => 'Take your figures out: every CSV and the tax pack',
   };
 
   /// **Two or three words each.** The paywall lists these in two columns, and
@@ -49,19 +50,23 @@ final class SubscriptionLabels {
   /// The mark on the option the paywall recommends.
   static const String bestValue = 'Best value';
 
-  /// What a plan holds, one line per ceiling.
+  /// What a plan gives over Free, one line each.
   ///
-  /// Reads the ceilings from [PlanLimits] rather than repeating them, so a
-  /// price change never leaves the sales copy claiming the old number.
+  /// - An allowance is listed only where this plan's ceiling differs from
+  ///   Free's: "Unlimited items" is a promise of nothing when Free has it too.
+  /// - Reads the ceilings from [PlanLimits] rather than repeating them.
   static List<String> allowances(SellerPlan plan) {
     final PlanLimits limits = PlanLimits.of(plan);
+    final PlanLimits free = PlanLimits.of(SellerPlan.free);
 
     return <String>[
-      _countLine(limits.items, 'item', 'Unlimited items'),
-      _countLine(limits.orders, 'order', 'Unlimited orders'),
-      _countLine(limits.workspaces, 'business', 'Unlimited businesses'),
+      for (final PlanAllowance allowance in PlanAllowance.values)
+        if (allowance.ceilingIn(limits) != allowance.ceilingIn(free))
+          _allowanceLine(allowance, allowance.ceilingIn(limits)),
       for (final PlanFeature capability in PlanFeature.values)
-        if (PlanGate.has(plan, capability)) feature(capability),
+        if (PlanGate.has(plan, capability) &&
+            !PlanGate.has(SellerPlan.free, capability))
+          feature(capability),
     ];
   }
 
@@ -95,6 +100,17 @@ final class SubscriptionLabels {
   /// with the copy is a metric with a hole in it.
   static String blockKey(PlanBlock block) => block.name;
 
-  static String _countLine(int? limit, String noun, String unlimited) =>
-      limit == null ? unlimited : '$limit $noun${limit == 1 ? '' : 's'}';
+  static String _allowanceLine(PlanAllowance allowance, int? limit) =>
+      switch (allowance) {
+        PlanAllowance.items => _countLine(limit, 'item', 'items'),
+        PlanAllowance.orders => _countLine(limit, 'order', 'orders'),
+        PlanAllowance.workspaces => _countLine(
+          limit,
+          'business',
+          'businesses',
+        ),
+      };
+
+  static String _countLine(int? limit, String one, String many) =>
+      limit == null ? 'Unlimited $many' : '$limit ${limit == 1 ? one : many}';
 }

@@ -145,7 +145,7 @@ void main() {
   ) async {
     await pumpScreen(tester, const PaywallScreen());
 
-    expect(cardBehind(tester, 'Unlimited items').layer, SdCardLayerV3.sunken);
+    expect(cardBehind(tester, 'Exports and tax pack').layer, SdCardLayerV3.sunken);
     expect(cardBehind(tester, 'Yearly').layer, SdCardLayerV3.elevated);
   });
 
@@ -157,7 +157,7 @@ void main() {
     final Rect benefits = tester.getRect(
       find
           .ancestor(
-            of: find.text('Unlimited items'),
+            of: find.text('Exports and tax pack'),
             matching: find.byType(SdCardV3),
           )
           .first,
