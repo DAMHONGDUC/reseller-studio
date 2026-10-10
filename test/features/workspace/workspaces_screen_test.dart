@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/misc.dart';
-import 'package:reseller_studio/features/subscription/domain/enums/plan_allowance.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
 import 'package:reseller_studio/features/workspace/presentation/screens/workspaces_screen/workspaces_screen.dart';
@@ -19,35 +18,17 @@ void main() {
     expect(find.text('Current'), findsOneWidget);
   });
 
-  testWidgets('Free sees the ceiling it is about to spend', (
-    WidgetTester tester,
-  ) async {
-    await pumpScreen(
-      tester,
-      const WorkspacesScreen(),
-      overrides: <Override>[
-        currentPlanProvider.overrideWithValue(SellerPlan.free),
-      ],
-    );
+  for (final SellerPlan plan in SellerPlan.values) {
+    testWidgets('${plan.label} has no business ceiling, so no meter', (
+      WidgetTester tester,
+    ) async {
+      await pumpScreen(
+        tester,
+        const WorkspacesScreen(),
+        overrides: <Override>[currentPlanProvider.overrideWithValue(plan)],
+      );
 
-    expect(find.byType(SdFreeLimitProgressV3), findsOneWidget);
-    expect(
-      find.text(PlanAllowance.workspaces.meterTitle(SellerPlan.free)),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('Premium has no ceiling here either', (
-    WidgetTester tester,
-  ) async {
-    await pumpScreen(
-      tester,
-      const WorkspacesScreen(),
-      overrides: <Override>[
-        currentPlanProvider.overrideWithValue(SellerPlan.premium),
-      ],
-    );
-
-    expect(find.byType(SdFreeLimitProgressV3), findsNothing);
-  });
+      expect(find.byType(SdFreeLimitProgressV3), findsNothing);
+    });
+  }
 }

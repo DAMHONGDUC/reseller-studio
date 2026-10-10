@@ -29,21 +29,11 @@ class PlanLimits {
   /// The owner-approved ceilings. They live here rather than in prose because
   /// a copied number goes stale silently; paywall copy and gates read this map.
   ///
-  /// **Free counts records again, and that is the owner's decision.** The
-  /// ceilings had been lifted on the argument that they blocked a seller
-  /// exactly where sell-through, ROI by source and the tax pack start being
-  /// worth something — but a plan with nothing to count also has nothing to
-  /// show: the meters on Inventory and Orders drew a bar with no ceiling to
-  /// fill, so a Free seller was never told what they were on.
-  ///
-  /// **Premium still sells the answers**, not permission to keep typing:
-  /// `PlanFeature.export` and `payoutReconciliation` — every way of taking
-  /// the figures out of the app, and chasing what a platform owes. The counts
-  /// are what makes the plan visible; the capabilities are what makes it worth
-  /// paying for. One business stays a Free ceiling because a second one is a
-  /// second business, not a bigger one.
+  /// **Free has no ceiling — owner's rule: everything is free except
+  /// export** (`docs/rules/SUBSCRIPTION.md`). The rows stay so a ceiling can
+  /// come back here and in its backend mirror without rebuilding the gates.
   static const Map<SellerPlan, PlanLimits> byPlan = <SellerPlan, PlanLimits>{
-    SellerPlan.free: PlanLimits(items: 50, orders: 30, workspaces: 1),
+    SellerPlan.free: PlanLimits(items: null, orders: null, workspaces: null),
     SellerPlan.premium: PlanLimits(items: null, orders: null, workspaces: null),
   };
 

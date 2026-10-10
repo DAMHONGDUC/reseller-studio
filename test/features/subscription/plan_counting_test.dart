@@ -6,12 +6,12 @@ import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_limits.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
-import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
 
 import '../../support/pump_app.dart';
 
-/// What the two Free ceilings actually count.
+/// What the two counts behind a Free ceiling measure. Free has no ceiling
+/// today; the counts stay so one can come back (`docs/rules/SUBSCRIPTION.md`).
 ///
 /// **They count differently on purpose.** Items are a lifetime total, so a
 /// sold row keeps its slot; orders are a rate, so a sale that falls out of the
@@ -81,28 +81,9 @@ void main() {
     );
   });
 
-  test('the gate follows the window rather than the history', () async {
-    // The ceiling is the one in the table, whatever it is set to: what this
-    // pins is that a full window blocks and an emptied one does not.
-    final int ceiling = PlanLimits.of(SellerPlan.free).orders!;
-
-    expect(
-      PlanGate.canAddOrder(SellerPlan.free, currentOrders: ceiling - 1),
-      PlanBlock.none,
-    );
-    expect(
-      PlanGate.canAddOrder(SellerPlan.free, currentOrders: ceiling),
-      PlanBlock.orderLimit,
-    );
-    expect(
-      PlanGate.canAddOrder(SellerPlan.premium, currentOrders: ceiling * 100),
-      PlanBlock.none,
-    );
-  });
-
   test('the window is a rate, and the app states it once', () {
     expect(PlanLimits.orderWindow, const Duration(days: 30));
-    expect(PlanLimits.of(SellerPlan.free).items, isNotNull);
+    expect(PlanLimits.of(SellerPlan.free).orders, isNull);
     expect(PlanLimits.of(SellerPlan.premium).orders, isNull);
   });
 }

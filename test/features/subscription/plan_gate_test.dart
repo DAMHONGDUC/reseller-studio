@@ -4,50 +4,32 @@ import 'package:reseller_studio/features/subscription/domain/enums/plan_feature.
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/domain/services/plan_gate.dart';
 
-/// Every boundary reads its expected ceiling from `PlanLimits`, so the test
-/// cannot keep passing against a stale number copied into prose.
+/// Every expectation reads `PlanLimits`, so the test cannot keep passing
+/// against a stale number copied into prose.
 void main() {
   final PlanLimits free = PlanLimits.of(SellerPlan.free);
 
-  test('Free counts items and orders, and the last slot is usable', () {
-    // The boundary, not the number: off by one here makes the advertised last
-    // item impossible to create. See `PlanLimits.byPlan` for why the ceilings
-    // are back.
-    expect(free.items, isNotNull);
-    expect(free.orders, isNotNull);
+  test('Free has no ceiling: everything is free except export', () {
+    // Owner's rule (`docs/rules/SUBSCRIPTION.md`): no count refuses Free.
+    expect(free.items, isNull);
+    expect(free.orders, isNull);
+    expect(free.workspaces, isNull);
     expect(
-      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items! - 1),
+      PlanGate.canAddItem(SellerPlan.free, currentItems: 100000),
       PlanBlock.none,
     );
     expect(
-      PlanGate.canAddItem(SellerPlan.free, currentItems: free.items!),
-      PlanBlock.itemLimit,
-    );
-    expect(
-      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders! - 1),
+      PlanGate.canAddOrder(SellerPlan.free, currentOrders: 100000),
       PlanBlock.none,
     );
     expect(
-      PlanGate.canAddOrder(SellerPlan.free, currentOrders: free.orders!),
-      PlanBlock.orderLimit,
+      PlanGate.canAddWorkspace(SellerPlan.free, currentWorkspaces: 100000),
+      PlanBlock.none,
     );
   });
 
-  test('a second business is still the one Free ceiling', () {
-    expect(
-      PlanGate.canAddWorkspace(
-        SellerPlan.free,
-        currentWorkspaces: free.workspaces! - 1,
-      ),
-      PlanBlock.none,
-    );
-    expect(
-      PlanGate.canAddWorkspace(
-        SellerPlan.free,
-        currentWorkspaces: free.workspaces!,
-      ),
-      PlanBlock.workspaceLimit,
-    );
+  test('export is the one capability Premium sells', () {
+    expect(PlanFeature.values, <PlanFeature>[PlanFeature.export]);
   });
 
   test('Premium removes every usage ceiling', () {
@@ -87,9 +69,8 @@ void main() {
   });
 
   test('Premium is what buys the answers, not permission to type', () {
-    // The paid line is a capability now. Every one of these is what a seller
-    // opens the app at year end or on payout day to do — and every one of
-    // them is refused somewhere, which `paywall_promises_test.dart` pins.
+    // The paid line is a capability, refused somewhere —
+    // `paywall_promises_test.dart` pins where.
     for (final PlanFeature capability in PlanFeature.values) {
       expect(PlanGate.has(SellerPlan.free, capability), isFalse);
       expect(PlanGate.has(SellerPlan.premium, capability), isTrue);
