@@ -30,7 +30,6 @@ final class SubscriptionLabels {
   /// everywhere the seller can read it.
   static String feature(PlanFeature feature) => switch (feature) {
     PlanFeature.export => 'Exports and tax pack',
-    PlanFeature.payoutReconciliation => 'Payout chasing',
   };
 
   static String period(BillingPeriod period) => switch (period) {

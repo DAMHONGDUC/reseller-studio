@@ -20,7 +20,6 @@ void main() {
   const Map<PlanFeature, String> gatedAt = <PlanFeature, String>{
     PlanFeature.export:
         'tax_screen_export.dart, and every row on the Reports screen',
-    PlanFeature.payoutReconciliation: 'payouts_screen.dart',
   };
 
   test('every sold capability names a gate', () {
