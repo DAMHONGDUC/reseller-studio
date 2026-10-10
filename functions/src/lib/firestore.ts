@@ -120,7 +120,9 @@ export const paths = {
  * `null` means unlimited.
  */
 export const seatsByPlan: Record<string, number | null> = {
-  free: 1,
+  // Free gets Premium's seats: everything is free except export
+  // (`docs/rules/SUBSCRIPTION.md`).
+  free: 10,
   premium: 10,
 };
 
@@ -135,17 +137,13 @@ export const seatsByPlan: Record<string, number | null> = {
  * `null` means unlimited.
  */
 export const ceilingsByPlan: Record<string, { items: number | null; orders: number | null }> = {
-  // **Free counts records, and these two numbers are the mirror.** They must
-  // equal `PlanLimits.byPlan[SellerPlan.free]` in the app; a plan with nothing
-  // to count also has nothing to show, which is why the ceilings came back.
-  // Premium still sells the answers — `PlanFeature.taxExport` and
-  // `payoutReconciliation`.
+  // **These must equal `PlanLimits.byPlan` in the app.** Free has no ceiling:
+  // everything is free except export (`docs/rules/SUBSCRIPTION.md`). The rows
+  // stay so a ceiling can come back here without rebuilding the trigger.
   //
-  // **The two are counted differently, and that is deliberate**: items are
-  // every row ever created and kept, orders are only those inside
-  // `orderWindowDays`. `countedItemsProvider` and `countedOrdersProvider` in
-  // the app spell the same two rules.
-  free: { items: 50, orders: 30 },
+  // **If one comes back, the two are counted differently**: items are every
+  // row ever created and kept, orders only those inside `orderWindowDays`.
+  free: { items: null, orders: null },
   premium: { items: null, orders: null },
 };
 

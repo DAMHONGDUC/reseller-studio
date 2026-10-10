@@ -17,15 +17,12 @@ import { atCeiling } from '../lib/subscription/usage.js';
 const ceiling = 50;
 
 describe('when the rules refuse one more', () => {
-  it('never refuses a plan with no ceiling, and refuses one past its own', () => {
-    // Premium counts no records, so nothing about a count can refuse it.
+  it('never refuses a plan with no ceiling', () => {
+    // Neither plan counts records any more: everything is free except export.
     assert.equal(atCeiling('premium', 100000, 'items'), false);
     assert.equal(atCeiling('premium', 100000, 'orders'), false);
-
-    // Free does, and a count far past it is the client that ignored its gate.
-    assert.equal(atCeiling('free', 100000, 'items'), true);
-    assert.equal(atCeiling('free', 100000, 'orders'), true);
-    assert.equal(atCeiling('free', 0, 'items'), false);
+    assert.equal(atCeiling('free', 100000, 'items'), false);
+    assert.equal(atCeiling('free', 100000, 'orders'), false);
   });
 
   it('reads a plan it does not know as Free', () => {
@@ -57,18 +54,18 @@ describe('when the rules refuse one more', () => {
     assert.ok('orders' in ceilingsByPlan.free);
   });
 
-  it('mirrors the app ceilings that Free actually holds', () => {
+  it('mirrors the app ceilings, which Free no longer has', () => {
     // The app renders the paywall from `PlanLimits.byPlan`; this file is what
     // the backend refuses on. Changing one means changing the other, and this
     // is the assertion that says so out loud.
-    assert.equal(ceilingsByPlan.free.items, 50);
-    assert.equal(ceilingsByPlan.free.orders, 30);
+    assert.equal(ceilingsByPlan.free.items, null);
+    assert.equal(ceilingsByPlan.free.orders, null);
     assert.equal(ceilingsByPlan.premium.items, null);
     assert.equal(ceilingsByPlan.premium.orders, null);
   });
 
   it('mirrors the window the app counts orders over', () => {
-    // The orders ceiling is a rate, not a total: 30 orders every 30 days.
+    // The orders ceiling is a rate, not a total, if one comes back.
     // `PlanLimits.orderWindow` says the same thing in the app, and a backend
     // counting a lifetime while the client counts a month would refuse
     // exactly the write the client had just offered.
