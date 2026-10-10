@@ -15,26 +15,26 @@ any action that can be blocked by an entitlement.
     consumable, and selling that as "forever" is a claim the receipt breaks.
   - **The Premium entitlement must be attached to the lifetime product in
     RevenueCat.** Without it the purchase succeeds and the seller stays Free.
-- **Free counts records, and the two counts are counted differently.** Owner's
-  rule.
-  - **Items are a lifetime total**: every row ever created and kept holds its
-    slot, and only deleting one gives a slot back.
-  - **Orders are a rate**: those inside `PlanLimits.orderWindow`, so a sale
-    that falls out of the window returns its slot on its own. A lifetime count
-    walled a seller in at their thirty-first sale with no action that could
-    free one — it punished the seller who used the app properly.
-  - **Businesses stay a standing count of one**: a second business is a second
-    business, not a bigger one.
-  - **`functions/src/subscription/usage.ts` counts the same two sets**, and a
-    scheduled recount clears a window that emptied with no write. A client
-    counting a month while the backend counts a lifetime offers what the rules
-    refuse.
+- **Everything is free except export.** Owner's rule, and it reverses "Free
+  counts records". Free has no ceiling on items, orders, businesses or team
+  seats, and payout chasing is free; the one thing Premium sells is
+  `PlanFeature.export`.
+  - **The ceiling machinery stays, with Free's row set to unlimited** —
+    `PlanLimits.byPlan`, `PlanGate`, `PlanLimitMeters`, and the backend mirror
+    in `functions/src/lib/firestore.ts` (`ceilingsByPlan`, `seatsByPlan`).
+    Putting a ceiling back is a change to those two tables, not a rebuild.
+  - **If a ceiling comes back, the two counts are counted differently.** Items
+    are a lifetime total; orders are a rate over `PlanLimits.orderWindow`, so a
+    sale that falls out of the window returns its slot on its own.
+    `functions/src/subscription/usage.ts` counts the same two sets.
+  - **A plan with no ceiling draws no meter**, and the paywall lists only what
+    Premium adds over Free — an "Unlimited items" line Free also has is a
+    promise of nothing.
 - **Every capability on the paywall is refused somewhere.** Owner's rule.
-  `PlanFeature` holds `export` — every CSV and the tax pack — and
-  `payoutReconciliation`. Six values that nothing gated were removed:
-  advanced analytics, CSV reports, automation, team, multiple businesses and
-  roles. Two of them had no code at all, one was free one screen over, and one
-  was the workspace ceiling sold a second time under another name.
+  `PlanFeature` holds `export` and nothing else. A value with no gate behind
+  it is a promise the product does not keep — that is why advanced analytics,
+  CSV reports, automation, team, multiple businesses and roles were removed,
+  and why `payoutReconciliation` went when payout chasing became free.
   `test/features/subscription/paywall_promises_test.dart` fails when a value
   has no gate named against it.
 - **Every export is paid, and it is one capability.** Owner's rule. Reading a
@@ -43,25 +43,18 @@ any action that can be blocked by an entitlement.
   and all four CSVs, because "may this seller take their figures out" has one
   answer. Two names for that rule is how the tax summary came to be free on
   Reports while the identical tax pack was sold on Tax.
-  - The numbers still live only in `PlanLimits.byPlan`, with the one
-    deliberate mirror in `functions/src/lib/firestore.ts`. Documents and UI
-    copy read those fields and never repeat a value — the paywall's allowance
-    list reads them, which is why it already says "Unlimited items".
 - **A locked capability shows the figure and gates the tool.** Owner's rule,
-  and Payouts is the shape to copy: a Free seller sees *how much* is late,
-  because that number is the whole argument for paying, and Premium is what
-  breaks it down by marketplace and by order so they know which sale to quote
-  when they chase it. A locked screen that says only "upgrade to see this" is
-  one nobody opens twice.
-  - Same on Tax: the summary is free to read, the one-action pack is Premium.
-- **A downgrade never deletes existing records**, and now it never blocks a
-  create either. What a lapsed seller loses is the export and the breakdown,
-  not their inventory or their history.
+  and Tax is the shape to copy: the summary is free to read, the one-action
+  pack is Premium. A locked screen that says only "upgrade to see this" is one
+  nobody opens twice.
+- **A downgrade never deletes existing records and never blocks a create.**
+  What a lapsed seller loses is the export, not their inventory or their
+  history.
 - **Feature gates are the UI's, not the backend's, and that is deliberate
-  here.** Both paid capabilities are derived from records the seller can
-  already read, so a server boundary would add nothing a modified client could
-  not do anyway by reading its own data. The gates that *do* grant something —
-  the team seat limit — stay enforced in the callable (`seatsByPlan`).
+  here.** Export reads records the seller can already read, so a server
+  boundary would add nothing a modified client could not do anyway. The seat
+  limit stays enforced in the callable (`seatsByPlan`), even with Free given
+  Premium's count, so a future ceiling there needs no new boundary.
 - **RevenueCat client configuration is build-time environment data.** Owner's
   rule. `AppEnv` is the only reader of `REVENUECAT_API_KEY_IOS`,
   `REVENUECAT_API_KEY_ANDROID`, `REVENUECAT_ENTITLEMENT`, and
