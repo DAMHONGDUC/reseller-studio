@@ -43,6 +43,6 @@ reasoning lives where the next session will look: bundles in
 | Decision | What to watch |
 |---|---|
 | An order may name several items | Lines that belong to no item are still unbuilt and still need raising. A bundle's split is a judgement `BundleAllocation` makes, so watch whether sellers disagree with it often enough to want to edit a line. |
-| Free counts no records; Premium sells capabilities | Reverting is one line in `PlanLimits.byPlan` plus its mirror in `functions/src/lib/firestore.ts`. Watch conversion: the argument is that a seller now reaches the tax and payout moments at all, and those are what the paywall is now sold on. |
+| Everything is free except export | Free has no ceiling on items, orders, businesses or seats, and payout chasing is free. Reverting is `PlanLimits.byPlan` plus its mirror in `functions/src/lib/firestore.ts`. Watch conversion: export at tax time is now the only reason to pay. |
 
 Keep this file synchronized with [`DONE_WORK.md`](DONE_WORK.md).
