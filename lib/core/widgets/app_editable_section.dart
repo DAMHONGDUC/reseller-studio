@@ -29,6 +29,7 @@ class AppEditableSection extends StatefulWidget {
     this.canSave = true,
     this.first = false,
     this.summary,
+    this.initiallyExpanded = false,
     super.key,
   });
 
@@ -60,12 +61,16 @@ class AppEditableSection extends StatefulWidget {
   /// being edited, so Edit never edits a section the seller cannot see.
   final String? summary;
 
+  /// Whether a folding section starts open — Shipping, while the parcel is
+  /// still the next thing to do.
+  final bool initiallyExpanded;
+
   @override
   State<AppEditableSection> createState() => _AppEditableSectionState();
 }
 
 class _AppEditableSectionState extends State<AppEditableSection> {
-  bool _open = false;
+  late bool _open = widget.initiallyExpanded;
 
   @override
   Widget build(BuildContext context) {

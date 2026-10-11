@@ -7395,5 +7395,9 @@
         "type": "int"
       }
     }
+  },
+  "orderNotShippedYet": "Not shipped yet",
+  "@orderNotShippedYet": {
+    "description": "Folded Shipping section on order detail when there is no carrier or tracking yet."
   }
 }

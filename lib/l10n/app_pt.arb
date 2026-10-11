@@ -1643,5 +1643,6 @@
   "receiptKindSupplierOrder": "Pedido ao fornecedor",
   "receiptOpenSale": "Abrir a venda",
   "supplierProductRecheck": "Confira preço e estoque",
-  "itemSummaryOnHand": "{count, plural, =0{Nenhum em estoque} other{{count} em estoque}}"
+  "itemSummaryOnHand": "{count, plural, =0{Nenhum em estoque} other{{count} em estoque}}",
+  "orderNotShippedYet": "Ainda não enviado"
 }

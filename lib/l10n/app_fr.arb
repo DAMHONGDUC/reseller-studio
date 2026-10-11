@@ -1643,5 +1643,6 @@
   "receiptKindSupplierOrder": "Commande fournisseur",
   "receiptOpenSale": "Ouvrir la vente",
   "supplierProductRecheck": "Vérifiez prix et stock",
-  "itemSummaryOnHand": "{count, plural, =0{Aucun en stock} other{{count} en stock}}"
+  "itemSummaryOnHand": "{count, plural, =0{Aucun en stock} other{{count} en stock}}",
+  "orderNotShippedYet": "Pas encore expédié"
 }
