@@ -37,8 +37,14 @@ decide it, and they are listed in the order they outrank each other.
      `PayoutReconciliation.overdueAfterDays` for its warning. A warning that
      is always there is one the eye learns to skip, which is what the rest of
      this section exists to prevent.
-   - Adding a sixth tile is a product decision — ask. The block works because
-     it is short enough that every tile still reads as urgent.
+   - **The sixth tile is dropship work: "To order from supplier"** — owner's
+     call, approved with `docs/DROPSHIPPING_PLAN.md`. It sits second, beside
+     orders to ship, because a dropship sale cannot ship until it is ordered:
+     the same clock one step earlier. It counts sold dropship lines with no
+     supplier order, and turns urgent when a placed supplier order has waited
+     past `SupplierOrderConstant.lateAfterDays` for tracking.
+   - A seventh tile is a product decision — ask. The block works because it
+     is short enough that every tile still reads as urgent.
 2. **The shortcut row follows it: Add stock, Quick Action, Record sale.**
    Owner's rule, and it **reverses "Quick add, Scan and Record sale"**.
    - **Add stock is the filled button, and it opens `AddStockSheet`** —
