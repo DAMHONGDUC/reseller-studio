@@ -14,6 +14,7 @@ class _ProfitTrend extends ConsumerWidget {
     final List<TrendBucket> buckets = ref.watch(profitTrendProvider);
     final TrendGrain grain = AnalyticsPeriodWindow.grainOf(
       ref.watch(analyticsPeriodProvider),
+      custom: ref.watch(analyticsCustomRangeProvider),
     );
 
     return AppSection(

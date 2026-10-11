@@ -7423,5 +7423,21 @@
   "supplierProductReferences": "Supplier references",
   "@supplierProductReferences": {
     "description": "Folded group on the supplier product form: link, product and variant IDs."
+  },
+  "analyticsPeriodCustom": "Custom",
+  "@analyticsPeriodCustom": {
+    "description": "Analytics period chip: pick a range of days."
+  },
+  "analyticsPeriodRange": "{from} – {to}",
+  "@analyticsPeriodRange": {
+    "description": "Analytics period chip once a custom range is picked.",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
   }
 }

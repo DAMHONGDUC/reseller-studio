@@ -1650,5 +1650,7 @@
   "itemFormMoreDetails": "更多详情",
   "itemFormFewerDetails": "收起详情",
   "itemFormDetails": "详情",
-  "supplierProductReferences": "供应商信息"
+  "supplierProductReferences": "供应商信息",
+  "analyticsPeriodCustom": "自定义",
+  "analyticsPeriodRange": "{from} – {to}"
 }

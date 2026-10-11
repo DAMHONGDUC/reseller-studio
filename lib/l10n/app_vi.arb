@@ -1650,5 +1650,7 @@
   "itemFormMoreDetails": "Thêm chi tiết",
   "itemFormFewerDetails": "Thu gọn chi tiết",
   "itemFormDetails": "Chi tiết",
-  "supplierProductReferences": "Thông tin tham chiếu"
+  "supplierProductReferences": "Thông tin tham chiếu",
+  "analyticsPeriodCustom": "Tuỳ chọn",
+  "analyticsPeriodRange": "{from} – {to}"
 }

@@ -1650,5 +1650,7 @@
   "itemFormMoreDetails": "Mehr Details",
   "itemFormFewerDetails": "Weniger Details",
   "itemFormDetails": "Details",
-  "supplierProductReferences": "Lieferantenangaben"
+  "supplierProductReferences": "Lieferantenangaben",
+  "analyticsPeriodCustom": "Benutzerdefiniert",
+  "analyticsPeriodRange": "{from} – {to}"
 }

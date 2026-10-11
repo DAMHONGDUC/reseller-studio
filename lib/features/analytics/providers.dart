@@ -23,6 +23,7 @@ import '../orders/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/analytics_breakdowns.dart';
+import 'domain/entities/analytics_date_range.dart';
 import 'domain/entities/analytics_summary.dart';
 import 'domain/entities/trend_bucket.dart';
 import 'domain/enums/analytics_period.dart';
@@ -68,26 +69,61 @@ analyticsPeriodProvider =
       AnalyticsPeriodController.new,
     );
 
+/// The days the seller picked for the Custom period; null until they pick.
+class AnalyticsCustomRangeController extends Notifier<AnalyticsDateRange?> {
+  @override
+  AnalyticsDateRange? build() => null;
+
+  /// Records the range and switches the tab to it, in one move.
+  void pick(AnalyticsDateRange range) {
+    SdLogger.action(
+      LogTagConstant.analytics,
+      'Pick custom period',
+      <String, String>{
+        'from': range.from.toIso8601String(),
+        'to': range.to.toIso8601String(),
+      },
+    );
+
+    state = range;
+    ref.read(analyticsPeriodProvider.notifier).select(AnalyticsPeriod.custom);
+  }
+}
+
+final NotifierProvider<AnalyticsCustomRangeController, AnalyticsDateRange?>
+analyticsCustomRangeProvider =
+    NotifierProvider<AnalyticsCustomRangeController, AnalyticsDateRange?>(
+      AnalyticsCustomRangeController.new,
+    );
+
 /// [analyticsSummaryProvider] over the selected period only.
 ///
 /// Orders by when they were placed, expenses by their own date; what is on
 /// the shelf is a snapshot and is not windowed.
 final Provider<AnalyticsSummary> periodSummaryProvider =
     Provider<AnalyticsSummary>((Ref ref) {
-      final DateTime? start = AnalyticsPeriodWindow.startOf(
-        ref.watch(analyticsPeriodProvider),
-        ref.watch(clockProvider).now(),
+      final AnalyticsPeriod period = ref.watch(analyticsPeriodProvider);
+      final AnalyticsDateRange? custom = ref.watch(
+        analyticsCustomRangeProvider,
       );
+      final DateTime? start = AnalyticsPeriodWindow.startOf(
+        period,
+        ref.watch(clockProvider).now(),
+        custom: custom,
+      );
+      final DateTime? end = AnalyticsPeriodWindow.endOf(period, custom: custom);
 
       return AnalyticsSummary.from(
         orders: AnalyticsPeriodWindow.orders(
           ref.watch(ordersProvider).value ?? const <Order>[],
           start,
+          end: end,
         ),
         items: ref.watch(itemsProvider).value ?? const <Item>[],
         expenses: AnalyticsPeriodWindow.expenses(
           ref.watch(expensesProvider).value ?? const <Expense>[],
           start,
+          end: end,
         ),
         currency: ref.watch(workspaceCurrencyProvider),
       );
@@ -97,13 +133,17 @@ final Provider<AnalyticsSummary> periodSummaryProvider =
 final Provider<List<TrendBucket>> profitTrendProvider =
     Provider<List<TrendBucket>>((Ref ref) {
       final AnalyticsPeriod period = ref.watch(analyticsPeriodProvider);
+      final AnalyticsDateRange? custom = ref.watch(
+        analyticsCustomRangeProvider,
+      );
       final DateTime now = ref.watch(clockProvider).now();
 
       return ProfitTrend.build(
         orders: ref.watch(ordersProvider).value ?? const <Order>[],
-        start: AnalyticsPeriodWindow.startOf(period, now),
+        start: AnalyticsPeriodWindow.startOf(period, now, custom: custom),
+        end: AnalyticsPeriodWindow.endOf(period, custom: custom),
         now: now,
-        grain: AnalyticsPeriodWindow.grainOf(period),
+        grain: AnalyticsPeriodWindow.grainOf(period, custom: custom),
         currency: ref.watch(workspaceCurrencyProvider),
       );
     });
