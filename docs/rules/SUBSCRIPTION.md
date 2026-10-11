@@ -30,6 +30,19 @@ any action that can be blocked by an entitlement.
   - **A plan with no ceiling draws no meter**, and the paywall lists only what
     Premium adds over Free — an "Unlimited items" line Free also has is a
     promise of nothing.
+- **Marketplace and supplier connections are Premium.** Owner's rule, and the
+  one exception to "everything is free except export": a connection is the
+  first feature with a running cost per seller — every poll, monitor run and
+  supplier call is server time (`docs/DROPSHIPPING_PLAN.md`).
+  - **Gated in the backend as well as the UI**, unlike export. A Function that
+    syncs, monitors or places an order reads the workspace's entitlement
+    first; a gate in the app alone would let a modified client run the
+    servers for free.
+  - **A lapse pauses connections and deletes nothing.** Status goes to paused,
+    the records already synced stay, and the manual workflow keeps working —
+    the downgrade rule below, applied to connections.
+  - `PlanFeature` gains `connections` when Phase 2 ships, not before: the rule
+    below forbids a paywall line with no gate behind it.
 - **Every capability on the paywall is refused somewhere.** Owner's rule.
   `PlanFeature` holds `export` and nothing else. A value with no gate behind
   it is a promise the product does not keep — that is why advanced analytics,

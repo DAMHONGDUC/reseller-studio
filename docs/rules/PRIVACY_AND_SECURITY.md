@@ -121,6 +121,13 @@ personal data in this app that is not the seller's own.
   key, a CSV filename, or a test fixture committed to the repo.
 - `AppAnalytics` takes no free-text parameter for this reason — every event
   parameter is an id, an enum or a count.
+- **A buyer address read from a connected marketplace passes through and is
+  never stored.** Owner's call. The Function placing a supplier order reads it
+  at that moment, hands it to the supplier and keeps nothing — no Firestore
+  field, no log line, no retry payload. The cost, accepted knowingly: an order
+  with no connection is never placed automatically, and a supplier that
+  refuses the address fails the order for the seller to fix at the
+  marketplace.
 
 ## The `app_config` email lists
 
