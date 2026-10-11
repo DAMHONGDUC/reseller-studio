@@ -150,7 +150,7 @@ hand-created document gets a sample in `sample_data/`, and
 
 | Table | Change | Why |
 |---|---|---|
-| `items` | `fulfilment`: `stocked` (default) or `dropship` | A dropship item has no location and no shelf count; optional at create (hard rule 2) |
+| `items` | `fulfilment`: `stocked` (default) or `dropship` | A dropship item has no location; optional at create (hard rule 2) |
 | `sources` | New `SourceType.supplier`; `connectionId` when connected | A supplier *is* where stock comes from — Sourcing's ROI by source then covers suppliers with no new screen |
 | `orders` | `origin`: `manual` or `synced`; `connectionId` | A synced order's id is `SdId.owned(connectionId, externalOrderId)`, so a re-poll can never create it twice |
 | `listings` | `connectionId`, `externalListingId` already exists | A listing the app may revise on the platform |
@@ -162,8 +162,7 @@ hand-created document gets a sample in `sample_data/`, and
 
 | Table | Fields | Notes |
 |---|---|---|
-| `supplier_products` | `sourceId`, `externalProductId`, `externalVariantId`, `url`, `title` (snapshot), `supplierPrice`, `supplierShipping`, `supplierTax`, `shippingDays`, `stock` (nullable), `availability`, `lastCheckedAt`, `deletedAt` | Soft-deleted (hard rule 15): items and supplier orders point at it |
-| `item_suppliers` | `itemId`, `supplierProductId`, `rank` | An item's suppliers in order of preference; rank 1 is ordered first, the rest are backups |
+| `supplier_products` | `sourceId`, `externalProductId`, `externalVariantId`, `url`, `title` (snapshot), `supplierPrice`, `supplierShipping`, `supplierTax`, `shippingDays`, `stock` (nullable), `lastCheckedAt`, `itemId`, `rank`, `deletedAt` | Soft-deleted (hard rule 15): supplier orders point at it. `itemId` + `rank` replace the planned `item_suppliers` join table — one item per supplier variant (11.7) means a product stocks exactly one item, so a join table would hold nothing a column does not |
 | `supplier_price_changes` | `supplierProductId`, `from`, `to`, `stockFrom`, `stockTo`, `observedAt` | Append-only history; what a repricing decision is explained by |
 | `listing_price_changes` | `listingId`, `from`, `to`, `reason` (`manual`, `bulk`, `rule`, `supplierChange`), `ruleId`, `changedAt` | Plan §12 "listing history" and §15 "price history" |
 | `pricing_rules` | `name`, `scope` (all / marketplace / category), `multiplier`, `fixedAdd`, `rounding` (`none`, `.99`, `.00`), `minProfit`, `minSupplierStock`, `staleDays`, `staleDropPercent`, `applyOnSupplierChange` | Floor uses `Workspace.planningFeeRate` — the one place a rate survives (hard rule 3) |

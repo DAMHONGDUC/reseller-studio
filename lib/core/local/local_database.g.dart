@@ -2304,6 +2304,183 @@ class LocalListingPriceChangesCompanion extends UpdateCompanion<LocalRow> {
   }
 }
 
+class $LocalSupplierProductsTable extends LocalSupplierProducts
+    with TableInfo<$LocalSupplierProductsTable, LocalRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalSupplierProductsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<String> data = GeneratedColumn<String>(
+    'data',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, createdAt, data];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_supplier_products';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+        _dataMeta,
+        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      data: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}data'],
+      )!,
+    );
+  }
+
+  @override
+  $LocalSupplierProductsTable createAlias(String alias) {
+    return $LocalSupplierProductsTable(attachedDatabase, alias);
+  }
+}
+
+class LocalSupplierProductsCompanion extends UpdateCompanion<LocalRow> {
+  final Value<String> id;
+  final Value<int> createdAt;
+  final Value<String> data;
+  final Value<int> rowid;
+  const LocalSupplierProductsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalSupplierProductsCompanion.insert({
+    required String id,
+    required int createdAt,
+    required String data,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       data = Value(data);
+  static Insertable<LocalRow> custom({
+    Expression<String>? id,
+    Expression<int>? createdAt,
+    Expression<String>? data,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (data != null) 'data': data,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalSupplierProductsCompanion copyWith({
+    Value<String>? id,
+    Value<int>? createdAt,
+    Value<String>? data,
+    Value<int>? rowid,
+  }) {
+    return LocalSupplierProductsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      data: data ?? this.data,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<String>(data.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalSupplierProductsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('data: $data, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $LocalWorkspacesTable extends LocalWorkspaces
     with TableInfo<$LocalWorkspacesTable, LocalRow> {
   @override
@@ -2736,6 +2913,8 @@ abstract class _$LocalDatabase extends GeneratedDatabase {
       $LocalPricingRulesTable(this);
   late final $LocalListingPriceChangesTable localListingPriceChanges =
       $LocalListingPriceChangesTable(this);
+  late final $LocalSupplierProductsTable localSupplierProducts =
+      $LocalSupplierProductsTable(this);
   late final $LocalWorkspacesTable localWorkspaces = $LocalWorkspacesTable(
     this,
   );
@@ -2758,6 +2937,7 @@ abstract class _$LocalDatabase extends GeneratedDatabase {
     localCarriers,
     localPricingRules,
     localListingPriceChanges,
+    localSupplierProducts,
     localWorkspaces,
     drainStates,
   ];
@@ -4898,6 +5078,183 @@ typedef $$LocalListingPriceChangesTableProcessedTableManager =
       LocalRow,
       PrefetchHooks Function()
     >;
+typedef $$LocalSupplierProductsTableCreateCompanionBuilder =
+    LocalSupplierProductsCompanion Function({
+      required String id,
+      required int createdAt,
+      required String data,
+      Value<int> rowid,
+    });
+typedef $$LocalSupplierProductsTableUpdateCompanionBuilder =
+    LocalSupplierProductsCompanion Function({
+      Value<String> id,
+      Value<int> createdAt,
+      Value<String> data,
+      Value<int> rowid,
+    });
+
+class $$LocalSupplierProductsTableFilterComposer
+    extends Composer<_$LocalDatabase, $LocalSupplierProductsTable> {
+  $$LocalSupplierProductsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalSupplierProductsTableOrderingComposer
+    extends Composer<_$LocalDatabase, $LocalSupplierProductsTable> {
+  $$LocalSupplierProductsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalSupplierProductsTableAnnotationComposer
+    extends Composer<_$LocalDatabase, $LocalSupplierProductsTable> {
+  $$LocalSupplierProductsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+}
+
+class $$LocalSupplierProductsTableTableManager
+    extends
+        RootTableManager<
+          _$LocalDatabase,
+          $LocalSupplierProductsTable,
+          LocalRow,
+          $$LocalSupplierProductsTableFilterComposer,
+          $$LocalSupplierProductsTableOrderingComposer,
+          $$LocalSupplierProductsTableAnnotationComposer,
+          $$LocalSupplierProductsTableCreateCompanionBuilder,
+          $$LocalSupplierProductsTableUpdateCompanionBuilder,
+          (
+            LocalRow,
+            BaseReferences<
+              _$LocalDatabase,
+              $LocalSupplierProductsTable,
+              LocalRow
+            >,
+          ),
+          LocalRow,
+          PrefetchHooks Function()
+        > {
+  $$LocalSupplierProductsTableTableManager(
+    _$LocalDatabase db,
+    $LocalSupplierProductsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalSupplierProductsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$LocalSupplierProductsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LocalSupplierProductsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<String> data = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalSupplierProductsCompanion(
+                id: id,
+                createdAt: createdAt,
+                data: data,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int createdAt,
+                required String data,
+                Value<int> rowid = const Value.absent(),
+              }) => LocalSupplierProductsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                data: data,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalSupplierProductsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$LocalDatabase,
+      $LocalSupplierProductsTable,
+      LocalRow,
+      $$LocalSupplierProductsTableFilterComposer,
+      $$LocalSupplierProductsTableOrderingComposer,
+      $$LocalSupplierProductsTableAnnotationComposer,
+      $$LocalSupplierProductsTableCreateCompanionBuilder,
+      $$LocalSupplierProductsTableUpdateCompanionBuilder,
+      (
+        LocalRow,
+        BaseReferences<_$LocalDatabase, $LocalSupplierProductsTable, LocalRow>,
+      ),
+      LocalRow,
+      PrefetchHooks Function()
+    >;
 typedef $$LocalWorkspacesTableCreateCompanionBuilder =
     LocalWorkspacesCompanion Function({
       required String id,
@@ -5240,6 +5597,8 @@ class $LocalDatabaseManager {
         _db,
         _db.localListingPriceChanges,
       );
+  $$LocalSupplierProductsTableTableManager get localSupplierProducts =>
+      $$LocalSupplierProductsTableTableManager(_db, _db.localSupplierProducts);
   $$LocalWorkspacesTableTableManager get localWorkspaces =>
       $$LocalWorkspacesTableTableManager(_db, _db.localWorkspaces);
   $$DrainStatesTableTableManager get drainStates =>

@@ -89,6 +89,7 @@ class WorkspaceCollections {
   WorkspaceTable get carriers => table('carriers');
   WorkspaceTable get pricingRules => table('pricing_rules');
   WorkspaceTable get listingPriceChanges => table('listing_price_changes');
+  WorkspaceTable get supplierProducts => table('supplier_products');
   WorkspaceTable get activity => table('activity');
 
   /// Every table this workspace owns rows in, for anything that has to sweep
@@ -112,6 +113,7 @@ class WorkspaceCollections {
     'carriers',
     'pricing_rules',
     'listing_price_changes',
+    'supplier_products',
     'activity',
   ];
 

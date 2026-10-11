@@ -25,6 +25,7 @@ import 'package:reseller_studio/features/pricing/domain/entities/pricing_rule.da
 import 'package:reseller_studio/features/pricing/domain/repositories/pricing_rule_repository.dart';
 import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart';
 import 'package:reseller_studio/features/sourcing/domain/entities/source.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/supplier_product.dart';
 import 'package:reseller_studio/features/sourcing/domain/repositories/sourcing_repository.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_intro_offer.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_offering.dart';
@@ -81,6 +82,7 @@ class MockStore {
   final List<Carrier> carriers;
   final List<PricingRule> pricingRules = <PricingRule>[];
   final List<ListingPriceChange> listingPriceChanges = <ListingPriceChange>[];
+  final List<SupplierProduct> supplierProducts = <SupplierProduct>[];
 
   /// The demo business itself, mutable because Settings can now change it.
   ///
@@ -142,6 +144,7 @@ class MockStore {
       offers,
       pricingRules,
       listingPriceChanges,
+      supplierProducts,
       if (!keepDefaults) ...<List<Object>>[marketplaces, carriers],
     ];
 
@@ -507,6 +510,43 @@ class InMemoryPricingRuleRepository implements PricingRuleRepository {
     if (index == -1) return;
 
     _store.pricingRules[index] = _store.pricingRules[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
+class InMemorySupplierProductRepository implements SupplierProductRepository {
+  const InMemorySupplierProductRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<SupplierProduct>> watchProducts() =>
+      _store.watch(() => List<SupplierProduct>.of(_store.supplierProducts));
+
+  @override
+  Future<void> save(SupplierProduct product) async => _store.upsert(
+    _store.supplierProducts,
+    product,
+    (SupplierProduct other) => other.id == product.id,
+  );
+
+  @override
+  Future<void> saveAll(List<SupplierProduct> products) async {
+    for (final SupplierProduct product in products) {
+      await save(product);
+    }
+  }
+
+  @override
+  Future<void> delete(String productId) async {
+    final int index = _store.supplierProducts.indexWhere(
+      (SupplierProduct product) => product.id == productId,
+    );
+    if (index == -1) return;
+
+    _store.supplierProducts[index] = _store.supplierProducts[index].copyWith(
       deletedAt: DateTime.now(),
     );
     _store.notifyChanged();

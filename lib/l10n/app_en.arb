@@ -6924,5 +6924,197 @@
   "priceChangeReasonSupplierChange": "Supplier price moved",
   "@priceChangeReasonSupplierChange": {
     "description": "Price history reason: the supplier's price moved."
+  },
+  "fulfilmentStocked": "Stocked",
+  "@fulfilmentStocked": {
+    "description": "Fulfilment tag: the seller holds and ships the item."
+  },
+  "fulfilmentDropship": "Dropship",
+  "@fulfilmentDropship": {
+    "description": "Fulfilment tag: a supplier ships the item to the buyer."
+  },
+  "suppliersTitle": "Suppliers",
+  "@suppliersTitle": {
+    "description": "Title of the dropship suppliers list."
+  },
+  "sourcingSuppliersSubtitle": "Products a supplier ships for you",
+  "@sourcingSuppliersSubtitle": {
+    "description": "Sourcing hub row subtitle for dropship suppliers."
+  },
+  "supplierAdd": "Add supplier",
+  "@supplierAdd": {
+    "description": "Action and sheet title for adding a dropship supplier."
+  },
+  "supplierNameHint": "For example, CJdropshipping",
+  "@supplierNameHint": {
+    "description": "Example in the supplier name field."
+  },
+  "suppliersEmptyTitle": "No suppliers yet",
+  "@suppliersEmptyTitle": {
+    "description": "Title when there are no dropship suppliers."
+  },
+  "suppliersEmptyBody": "Add the wholesale suppliers that ship to your buyers for you.",
+  "@suppliersEmptyBody": {
+    "description": "Message when there are no dropship suppliers."
+  },
+  "supplierProductCount": "{count, plural, =0{No products} =1{1 product} other{{count} products}}",
+  "@supplierProductCount": {
+    "description": "How many products a supplier has.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supplierListedCount": "{count} listed",
+  "@supplierListedCount": {
+    "description": "How many of a supplier's products are listed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supplierProductsEmptyTitle": "No products yet",
+  "@supplierProductsEmptyTitle": {
+    "description": "Title when a supplier has no products."
+  },
+  "supplierProductsEmptyBody": "Add a product from this supplier, then list it.",
+  "@supplierProductsEmptyBody": {
+    "description": "Message when a supplier has no products."
+  },
+  "supplierProductAdd": "Add product",
+  "@supplierProductAdd": {
+    "description": "Action and screen title for adding a supplier product."
+  },
+  "supplierProductEditTitle": "Supplier product",
+  "@supplierProductEditTitle": {
+    "description": "Title for an existing supplier product."
+  },
+  "supplierProductTitleLabel": "Product title",
+  "@supplierProductTitleLabel": {
+    "description": "Label for the supplier's product title."
+  },
+  "supplierProductCleanTitle": "Clean up",
+  "@supplierProductCleanTitle": {
+    "description": "Button that strips supplier filler from the title."
+  },
+  "supplierProductUrlLabel": "Product link",
+  "@supplierProductUrlLabel": {
+    "description": "Label for the product's link at the supplier."
+  },
+  "supplierProductIdLabel": "Product ID",
+  "@supplierProductIdLabel": {
+    "description": "Label for the supplier's product id."
+  },
+  "supplierProductVariantLabel": "Variant ID",
+  "@supplierProductVariantLabel": {
+    "description": "Label for the supplier's variant id."
+  },
+  "supplierProductPriceLabel": "Supplier price",
+  "@supplierProductPriceLabel": {
+    "description": "Label for what the supplier charges for the product."
+  },
+  "supplierProductShippingLabel": "Shipping to buyer",
+  "@supplierProductShippingLabel": {
+    "description": "Label for what the supplier charges to ship to the buyer."
+  },
+  "supplierProductTaxLabel": "Sales tax",
+  "@supplierProductTaxLabel": {
+    "description": "Label for sales tax the supplier adds."
+  },
+  "supplierProductShippingDaysLabel": "Delivery days",
+  "@supplierProductShippingDaysLabel": {
+    "description": "Label for how many days delivery takes."
+  },
+  "supplierProductStockLabel": "Supplier stock",
+  "@supplierProductStockLabel": {
+    "description": "Label for units the supplier has in stock."
+  },
+  "supplierProductLandedCost": "Cost per order",
+  "@supplierProductLandedCost": {
+    "description": "Label for price plus shipping plus tax — what one order costs."
+  },
+  "supplierProductListIt": "List it",
+  "@supplierProductListIt": {
+    "description": "Action that creates a dropship item from a supplier product and lists it."
+  },
+  "supplierProductOpenItem": "Open item",
+  "@supplierProductOpenItem": {
+    "description": "Action that opens the item a supplier product stocks."
+  },
+  "supplierProductMarkChecked": "Checked today",
+  "@supplierProductMarkChecked": {
+    "description": "Action recording that price and stock were checked at the supplier today."
+  },
+  "supplierProductCheckedOn": "Checked {date}",
+  "@supplierProductCheckedOn": {
+    "description": "When price and stock were last checked.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "supplierProductNeverChecked": "Never checked",
+  "@supplierProductNeverChecked": {
+    "description": "Shown when price and stock were never checked."
+  },
+  "supplierProductListed": "Listed",
+  "@supplierProductListed": {
+    "description": "Badge: the product has an item."
+  },
+  "supplierProductNotListed": "Not listed",
+  "@supplierProductNotListed": {
+    "description": "Badge: the product has no item yet."
+  },
+  "supplierProductStockValue": "{count, plural, =0{Out of stock} other{{count} in stock}}",
+  "@supplierProductStockValue": {
+    "description": "Supplier stock count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supplierProductDeleteTitle": "Delete product?",
+  "@supplierProductDeleteTitle": {
+    "description": "Confirmation title before deleting a supplier product."
+  },
+  "supplierProductDeleteBody": "Its item stays, and orders already placed keep their supplier.",
+  "@supplierProductDeleteBody": {
+    "description": "Confirmation message before deleting a supplier product."
+  },
+  "itemSupplierSection": "Supplier",
+  "@itemSupplierSection": {
+    "description": "Item detail section heading for a dropshipped item's suppliers."
+  },
+  "itemSupplierPrimary": "Primary",
+  "@itemSupplierPrimary": {
+    "description": "Badge on the supplier an item is ordered from first."
+  },
+  "itemSupplierBackup": "Backup",
+  "@itemSupplierBackup": {
+    "description": "Badge on a backup supplier."
+  },
+  "itemSupplierMakePrimary": "Make primary",
+  "@itemSupplierMakePrimary": {
+    "description": "Action that makes a backup supplier the primary one."
+  },
+  "itemSupplierAddBackup": "Add backup supplier",
+  "@itemSupplierAddBackup": {
+    "description": "Action that links another supplier product to the item as a backup."
+  },
+  "itemSupplierNone": "No supplier linked yet.",
+  "@itemSupplierNone": {
+    "description": "Shown on a dropshipped item with no supplier product linked."
+  },
+  "supplierProductPickTitle": "Pick a product",
+  "@supplierProductPickTitle": {
+    "description": "Title of the sheet picking a supplier product to link."
+  },
+  "supplierProductNoneUnlinked": "Every product is already listed. Add one to a supplier first.",
+  "@supplierProductNoneUnlinked": {
+    "description": "Shown when every supplier product already has an item."
   }
 }

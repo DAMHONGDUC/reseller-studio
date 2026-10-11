@@ -38,6 +38,7 @@ export const workspaceTables = [
   'carriers',
   'pricing_rules',
   'listing_price_changes',
+  'supplier_products',
   'receipts',
   'activity',
 ];

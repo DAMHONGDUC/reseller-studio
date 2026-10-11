@@ -105,9 +105,9 @@ the relationship chain supports workflows and analytics, not item validity.
 | `invites/{id}` | Invitee email, workspace, role, status and timestamps | Functions own writes; invitee access is rule-scoped |
 | `workspaces/{id}` | `name`, `ownerId`, `country`, `currency`, `timezone`, `businessType`, `logoUrl` | Required creation fields are name, country and currency |
 | `members/{uid}` | `role`, `displayName`, `email`, `joinedAt` | Membership is the only ACL; identity is denormalized for safe team reads |
-| `sources/{id}` | Source details, address, `deletedAt` | Soft-delete because purchases reference sources |
+| `sources/{id}` | Source details, `type` (`dropshipSupplier` for a dropship supplier), address, `deletedAt` | Soft-delete because purchases reference sources |
 | `purchases/{id}` | Source, date, costs, receipt links, `deletedAt` | Parent of acquired items |
-| `items/{id}` | Title, quantity, status, pricing, purchase/source/category/location fields, `listedAt`, `deletedAt` | Status is `draft`, `inStock`, `sold` or `archived`; stale is a query, not a status |
+| `items/{id}` | Title, quantity, status, `fulfilment` (`stocked` or `dropship`), pricing, purchase/source/category/location fields, `listedAt`, `deletedAt` | Status is `draft`, `inStock`, `sold` or `archived`; stale is a query, not a status |
 | `categories/{id}` | `name`, `parentId`, `description`, `deletedAt` | Seller-owned hierarchy with editable defaults |
 | `locations/{id}` | Warehouse/shelf/bin identity and `deletedAt` | Seller-owned storage hierarchy |
 | `listings/{id}` | Item, `marketplaceId` + `marketplaceName`, price, status, external IDs/URL | One record per item per marketplace; the marketplace is the seller's own record, not a fixed platform; external fields remain null without integration |
@@ -116,6 +116,7 @@ the relationship chain supports workflows and analytics, not item validity.
 | `carriers/{id}` | `name`, `deletedAt` | Business-owned shipping choices |
 | `pricing_rules/{id}` | `name`, `scope`, `scopeId`, `multiplier`, `currency`, `fixedAddMinor`, `rounding`, `minProfitMinor`, `minSupplierStock`, `staleDays`, `staleDropPercent`, `applyOnSupplierChange`, `deletedAt` | How a cost becomes an asking price; configuration, never a stored figure about a sale (hard rule 3). Soft-deleted because price history names rules |
 | `listing_price_changes/{id}` | `listingId`, `itemId`, `currency`, `fromMinor`, `toMinor`, `reason`, `ruleId`, `createdAt` | One row per price move, written in the same batch as the listing; create-only, never updated |
+| `supplier_products/{id}` | `sourceId`, `title`, `itemId`, `rank`, `url`, `externalProductId`, `externalVariantId`, `currency`, `supplierPriceMinor`, `supplierShippingMinor`, `supplierTaxMinor`, `shippingDays`, `stock`, `lastCheckedAt`, `deletedAt` | One supplier variant; `itemId` + `rank` say which item it stocks and in what order of preference. Soft-deleted because supplier orders name it |
 | `orders/{id}` | Prices/costs, status, marketplace snapshot, lifecycle timestamps, `lines` | Order facts and embedded immutable sale-time lines |
 | `expenses/{id}` | Category, amount, date, recurrence link | One document per occurrence |
 | `receipts/{id}` | File metadata and parent reference | Metadata in Firestore; file in Storage |

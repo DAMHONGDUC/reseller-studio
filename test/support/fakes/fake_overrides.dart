@@ -58,6 +58,8 @@ final class FakeOverrides {
       ),
       pricingRuleRepositoryProvider: pricingRuleRepositoryProvider
           .overrideWithValue(InMemoryPricingRuleRepository(store)),
+      supplierProductRepositoryProvider: supplierProductRepositoryProvider
+          .overrideWithValue(InMemorySupplierProductRepository(store)),
       sourceRepositoryProvider: sourceRepositoryProvider.overrideWithValue(
         InMemorySourceRepository(store),
       ),

@@ -12,11 +12,14 @@ import '../../core/providers/repository_providers.dart';
 import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
+import '../listings/domain/enums/listing_status.dart';
 import '../orders/domain/entities/order.dart';
 import '../orders/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/purchase.dart';
 import 'domain/entities/source.dart';
+import 'domain/entities/supplier_product.dart';
+import 'domain/services/supplier_cost.dart';
 
 final StreamProvider<List<Source>> sourcesProvider =
     StreamProvider<List<Source>>((Ref ref) {
@@ -158,3 +161,73 @@ final Provider<List<SourcePerformance>> sourcePerformanceProvider =
         );
       }).toList();
     });
+
+/// Every supplier product, deleted ones included — supplier orders name them.
+final StreamProvider<List<SupplierProduct>> supplierProductsProvider =
+    StreamProvider<List<SupplierProduct>>((Ref ref) {
+      return WorkspaceGuard.listOrEmpty<SupplierProduct>(
+        ref,
+        () => ref.watch(supplierProductRepositoryProvider).watchProducts(),
+      );
+    });
+
+/// The live products, oldest first.
+final Provider<List<SupplierProduct>> activeSupplierProductsProvider =
+    Provider<List<SupplierProduct>>((Ref ref) {
+      return <SupplierProduct>[
+        for (final SupplierProduct product
+            in ref.watch(supplierProductsProvider).value ??
+                const <SupplierProduct>[])
+          if (!product.isDeleted) product,
+      ];
+    });
+
+/// The sources that are dropship suppliers.
+final Provider<List<Source>> suppliersProvider = Provider<List<Source>>((
+  Ref ref,
+) {
+  return <Source>[
+    for (final Source source
+        in ref.watch(sourcesProvider).value ?? const <Source>[])
+      if (source.type == SourceType.dropshipSupplier && !source.isDeleted)
+        source,
+  ];
+});
+
+/// One supplier's live products.
+final supplierProductsForSourceProvider =
+    Provider.family<List<SupplierProduct>, String>((Ref ref, String sourceId) {
+      return <SupplierProduct>[
+        for (final SupplierProduct product in ref.watch(
+          activeSupplierProductsProvider,
+        ))
+          if (product.sourceId == sourceId) product,
+      ];
+    });
+
+/// One item's live supplier products, primary first.
+final supplierProductsForItemProvider =
+    Provider.family<List<SupplierProduct>, String>((Ref ref, String itemId) {
+      return <SupplierProduct>[
+        for (final SupplierProduct product in ref.watch(
+          activeSupplierProductsProvider,
+        ))
+          if (product.itemId == itemId) product,
+      ]..sort(
+        (SupplierProduct a, SupplierProduct b) => a.rank.compareTo(b.rank),
+      );
+    });
+
+/// What a dropshipped item costs to order from its primary supplier, or null
+/// when it has none or its price is unknown (hard rule 5).
+final dropshipCostProvider = Provider.family<Money?, String>((
+  Ref ref,
+  String itemId,
+) {
+  final SupplierProduct? primary = SupplierCost.primaryFor(
+    itemId,
+    ref.watch(activeSupplierProductsProvider),
+  );
+
+  return primary == null ? null : SupplierCost.landed(primary);
+});

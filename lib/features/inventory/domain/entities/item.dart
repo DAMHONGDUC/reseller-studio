@@ -1,4 +1,5 @@
 import '../../../../core/money/money.dart';
+import '../enums/item_fulfilment.dart';
 import '../enums/item_status.dart';
 
 /// A single piece of inventory — the centre of the whole product.
@@ -37,6 +38,7 @@ class Item {
     this.listedAt,
     this.soldAt,
     this.deletedAt,
+    this.fulfilment = ItemFulfilment.stocked,
   });
 
   final String id;
@@ -101,7 +103,13 @@ class Item {
   /// still joinable by the purchases and orders that reference it.
   final DateTime? deletedAt;
 
+  /// Who ships it. A dropshipped item's cost lives on its supplier product,
+  /// not in [purchasePrice] (`docs/DROPSHIPPING_PLAN.md`).
+  final ItemFulfilment fulfilment;
+
   bool get isDeleted => deletedAt != null;
+
+  bool get isDropship => fulfilment == ItemFulfilment.dropship;
 
   /// How many are still on the shelf.
   ///
@@ -170,6 +178,7 @@ class Item {
     DateTime? soldAt,
     DateTime? deletedAt,
     DateTime? updatedAt,
+    ItemFulfilment? fulfilment,
     bool clearSoldAt = false,
     bool clearPurchasePrice = false,
     bool clearExpectedPrice = false,
@@ -205,5 +214,6 @@ class Item {
     listedAt: listedAt ?? this.listedAt,
     soldAt: clearSoldAt ? null : soldAt ?? this.soldAt,
     deletedAt: deletedAt ?? this.deletedAt,
+    fulfilment: fulfilment ?? this.fulfilment,
   );
 }

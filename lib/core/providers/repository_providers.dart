@@ -49,7 +49,9 @@ import '../../features/pricing/data/repositories/local_pricing_rule_repository.d
 import '../../features/pricing/domain/repositories/pricing_rule_repository.dart';
 import '../../features/seed_data/domain/services/seed_data_seeder.dart';
 import '../../features/sourcing/data/repositories/firestore_sourcing_repositories.dart';
+import '../../features/sourcing/data/repositories/firestore_supplier_product_repository.dart';
 import '../../features/sourcing/data/repositories/local_sourcing_repositories.dart';
+import '../../features/sourcing/data/repositories/local_supplier_product_repository.dart';
 import '../../features/sourcing/domain/repositories/sourcing_repository.dart';
 import '../../features/subscription/data/repositories/revenue_cat_subscription_repository.dart';
 import '../../features/subscription/data/repositories/unconfigured_subscription_repository.dart';
@@ -181,6 +183,17 @@ final Provider<PricingRuleRepository> pricingRuleRepositoryProvider =
         guest: (LocalDatabase db, String currency) =>
             LocalPricingRuleRepository(db, currency: currency),
         linked: FirestorePricingRuleRepository.new,
+      ),
+    );
+
+final Provider<SupplierProductRepository> supplierProductRepositoryProvider =
+    Provider<SupplierProductRepository>(
+      (Ref ref) => RepositoryChoice.between<SupplierProductRepository>(
+        ref,
+        name: 'SupplierProductRepository',
+        guest: (LocalDatabase db, String currency) =>
+            LocalSupplierProductRepository(db, currency: currency),
+        linked: FirestoreSupplierProductRepository.new,
       ),
     );
 

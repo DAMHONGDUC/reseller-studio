@@ -11,6 +11,7 @@ import '../../../features/offers/data/dtos/offer_dto.dart';
 import '../../../features/orders/data/dtos/order_dto.dart';
 import '../../../features/pricing/data/dtos/pricing_rule_dto.dart';
 import '../../../features/sourcing/data/dtos/sourcing_dtos.dart';
+import '../../../features/sourcing/data/dtos/supplier_product_dto.dart';
 import '../local_database.dart';
 import '../local_row.dart';
 
@@ -121,6 +122,21 @@ class DrainTable {
           (String id, Map<String, Object?> data, String currency, String uid) =>
               ItemDto.toMap(
                 ItemDto.fromMap(id, data, fallbackCurrency: currency),
+                createdBy: uid,
+              ),
+    ),
+    DrainTable(
+      name: 'supplier_products',
+      rows: db.localSupplierProducts,
+      rebuild:
+          (String id, Map<String, Object?> data, String currency, String uid) =>
+              SupplierProductDto.toMap(
+                SupplierProductDto.fromMap(
+                  id,
+                  data,
+                  fallbackCurrency: currency,
+                ),
+                currency: currency,
                 createdBy: uid,
               ),
     ),

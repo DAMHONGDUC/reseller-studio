@@ -502,6 +502,21 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "//": "A business's supplier products, in the order they were added \u2014 the supplier screens and an item's supplier section.",
+      "collectionGroup": "supplier_products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []
