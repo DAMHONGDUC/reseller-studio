@@ -1642,5 +1642,6 @@
   "supplierProductSampleDone": "Muster als Ausgabe erfasst",
   "receiptKindSupplierOrder": "Lieferantenbestellung",
   "receiptOpenSale": "Verkauf öffnen",
-  "supplierProductRecheck": "Preis und Bestand prüfen"
+  "supplierProductRecheck": "Preis und Bestand prüfen",
+  "itemSummaryOnHand": "{count, plural, =0{Keiner vorrätig} other{{count} vorrätig}}"
 }

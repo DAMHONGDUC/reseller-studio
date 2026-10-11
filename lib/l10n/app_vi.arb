@@ -1642,5 +1642,6 @@
   "supplierProductSampleDone": "Đã ghi hàng mẫu vào chi phí",
   "receiptKindSupplierOrder": "Đơn nhà cung cấp",
   "receiptOpenSale": "Mở đơn bán",
-  "supplierProductRecheck": "Cần kiểm tra giá và tồn kho"
+  "supplierProductRecheck": "Cần kiểm tra giá và tồn kho",
+  "itemSummaryOnHand": "{count, plural, =0{Hết hàng} other{Còn {count}}}"
 }

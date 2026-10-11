@@ -98,11 +98,17 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
     );
     final String currency = ref.watch(workspaceCurrencyProvider);
     final List<ItemWarning> warnings = ItemConsistency.warnings(item);
+    final String? sourceName = ref.watch(sourceNamesProvider)[item.sourceId];
+    final String? locationName = ref.watch(
+      locationPathsProvider,
+    )[item.locationId];
 
     return ListView(
       padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
+        _SummaryBlock(item: item),
+        SizedBox(height: SdContentPaddingV3.sectionGap),
         if (warnings.isNotEmpty) ...<Widget>[
           ItemWarningLines(item: item, warnings: warnings),
           SizedBox(height: SdContentPaddingV3.sectionGap),
@@ -113,6 +119,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         ],
         _Section(
           section: ItemDetailSection.overview,
+          summary: ItemDetailSummary.overview(context, item),
           title: context.l10n.itemOverview,
           edit: edit,
           first: item.photoUrls.isEmpty,
@@ -161,6 +168,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.quantity,
+          summary: ItemDetailSummary.quantity(context, item),
           title: context.l10n.commonQuantity,
           edit: edit,
           onEdit: _startEdit,
@@ -180,6 +188,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.status,
+          summary: ItemDetailSummary.status(context, item),
           title: context.l10n.itemStatus,
           edit: edit,
           onEdit: _startEdit,
@@ -194,6 +203,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.pricing,
+          summary: ItemDetailSummary.pricing(context, item),
           title: context.l10n.itemPricing,
           edit: edit,
           onEdit: _startEdit,
@@ -242,6 +252,10 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.provenance,
+          summary: ItemDetailSummary.provenance(
+            source: sourceName,
+            location: locationName,
+          ),
           title: context.l10n.itemProvenance,
           edit: edit,
           onEdit: _startEdit,
@@ -286,6 +300,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.description,
+          summary: ItemDetailSummary.text(item.description),
           title: context.l10n.commonDescription,
           edit: edit,
           onEdit: _startEdit,
@@ -306,6 +321,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.notes,
+          summary: ItemDetailSummary.text(item.notes),
           title: context.l10n.commonNotes,
           edit: edit,
           onEdit: _startEdit,
@@ -341,6 +357,7 @@ class _Section extends StatelessWidget {
     required this.onSave,
     required this.reading,
     required this.editing,
+    this.summary,
     this.canSave = true,
     this.first = false,
   });
@@ -353,6 +370,9 @@ class _Section extends StatelessWidget {
   final VoidCallback onSave;
   final Widget reading;
   final Widget editing;
+
+  /// The folded line (`docs/UI_POLISH_PLAN.md`).
+  final String? summary;
   final bool canSave;
   final bool first;
 
@@ -363,6 +383,7 @@ class _Section extends StatelessWidget {
     return AppEditableSection(
       title: title,
       first: first,
+      summary: summary,
       isEditing: isOpen,
       isSaving: isOpen && edit.isSaving,
       canSave: canSave,

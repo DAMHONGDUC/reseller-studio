@@ -7386,5 +7386,14 @@
   "supplierProductRecheck": "Check price and stock",
   "@supplierProductRecheck": {
     "description": "Shown on a supplier product not checked recently."
+  },
+  "itemSummaryOnHand": "{count, plural, =0{None on hand} other{{count} on hand}}",
+  "@itemSummaryOnHand": {
+    "description": "Folded Quantity section on item detail: how many are on hand.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
