@@ -468,6 +468,40 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "//": "A business's pricing rules, in the order they were made \u2014 the rules screen and the apply-rule picker.",
+      "collectionGroup": "pricing_rules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "One item's price history, newest first \u2014 Item detail.",
+      "collectionGroup": "listing_price_changes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "itemId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

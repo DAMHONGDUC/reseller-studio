@@ -114,6 +114,8 @@ the relationship chain supports workflows and analytics, not item validity.
 | `offers/{id}` | Listing/order references, `marketplaceId` + `marketplaceName`, amount, status and timestamps | Offer state drives accept/decline/counter workflows; the marketplace is the seller's own record, as on a listing |
 | `marketplaces/{id}` | `name`, `hue`, `deletedAt` | Seller-owned; carries no fee rate — a platform's cut is measured per order |
 | `carriers/{id}` | `name`, `deletedAt` | Business-owned shipping choices |
+| `pricing_rules/{id}` | `name`, `scope`, `scopeId`, `multiplier`, `currency`, `fixedAddMinor`, `rounding`, `minProfitMinor`, `minSupplierStock`, `staleDays`, `staleDropPercent`, `applyOnSupplierChange`, `deletedAt` | How a cost becomes an asking price; configuration, never a stored figure about a sale (hard rule 3). Soft-deleted because price history names rules |
+| `listing_price_changes/{id}` | `listingId`, `itemId`, `currency`, `fromMinor`, `toMinor`, `reason`, `ruleId`, `createdAt` | One row per price move, written in the same batch as the listing; create-only, never updated |
 | `orders/{id}` | Prices/costs, status, marketplace snapshot, lifecycle timestamps, `lines` | Order facts and embedded immutable sale-time lines |
 | `expenses/{id}` | Category, amount, date, recurrence link | One document per occurrence |
 | `receipts/{id}` | File metadata and parent reference | Metadata in Firestore; file in Storage |

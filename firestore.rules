@@ -265,6 +265,9 @@ service cloud.firestore {
     match /categories/{categoryId}       { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
     match /marketplaces/{marketplaceId}  { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
     match /carriers/{carrierId}          { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    match /pricing_rules/{ruleId}        { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
+    // A price move is history: written once, never edited. Delete stays for the workspace sweep.
+    match /listing_price_changes/{changeId} { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if false; allow delete: if canDeleteRow(); }
     match /receipts/{receiptId}          { allow read: if canReadRow(); allow create: if canCreateRow(); allow update: if canUpdateRow(); allow delete: if canDeleteRow(); }
 
     // --- Audit log --------------------------------------------------------

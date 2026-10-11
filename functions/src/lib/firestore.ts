@@ -36,6 +36,8 @@ export const workspaceTables = [
   'locations',
   'marketplaces',
   'carriers',
+  'pricing_rules',
+  'listing_price_changes',
   'receipts',
   'activity',
 ];

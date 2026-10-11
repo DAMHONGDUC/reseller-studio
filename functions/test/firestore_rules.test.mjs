@@ -218,6 +218,25 @@ describe('what only a Cloud Function may write', () => {
     );
   });
 
+  it('lets a member keep pricing rules', async () => {
+    await assertSucceeds(
+      as(OWNER).doc(`pricing_rules/${WORKSPACE}_rule-1`).set({
+        workspaceId: WORKSPACE,
+        name: 'Double it',
+        multiplier: 2,
+      }),
+    );
+  });
+
+  it('records a price move once and never rewrites it', async () => {
+    const change = as(OWNER).doc(`listing_price_changes/${WORKSPACE}_pc-1`);
+
+    await assertSucceeds(
+      change.set({ workspaceId: WORKSPACE, listingId: 'l-1', fromMinor: 4500, toMinor: 3999 }),
+    );
+    await assertFails(change.update({ toMinor: 100 }));
+  });
+
   it('refuses a client granting itself a plan', async () => {
     await assertFails(
       as(OWNER).doc(`subscription/${WORKSPACE}_current`).set({ plan: 'premium' }),

@@ -65,6 +65,12 @@ class LocalMarketplaces extends LocalRows {}
 @UseRowClass(LocalRow)
 class LocalCarriers extends LocalRows {}
 
+@UseRowClass(LocalRow)
+class LocalPricingRules extends LocalRows {}
+
+@UseRowClass(LocalRow)
+class LocalListingPriceChanges extends LocalRows {}
+
 /// The guest's own business document. One row, keyed the same way.
 @UseRowClass(LocalRow)
 class LocalWorkspaces extends LocalRows {}
@@ -109,6 +115,8 @@ class DrainStates extends Table {
     LocalLocations,
     LocalMarketplaces,
     LocalCarriers,
+    LocalPricingRules,
+    LocalListingPriceChanges,
     LocalWorkspaces,
     DrainStates,
   ],
@@ -123,8 +131,21 @@ class LocalDatabase extends _$LocalDatabase {
 
   static const String drainStateKey = 'drain';
 
+  /// Version 2 added pricing rules and listing price history.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  /// Every version only ever adds tables, so an upgrade creates the ones the
+  /// device does not have yet and touches no existing row.
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (Migrator migrator, int from, int to) async {
+      if (from < 2) {
+        await migrator.createTable(localPricingRules);
+        await migrator.createTable(localListingPriceChanges);
+      }
+    },
+  );
 
   /// The business tables, in the order the drain must push them.
   ///
@@ -140,8 +161,10 @@ class LocalDatabase extends _$LocalDatabase {
         localLocations,
         localMarketplaces,
         localCarriers,
+        localPricingRules,
         localItems,
         localListings,
+        localListingPriceChanges,
         localOrders,
         localOffers,
         localExpenses,

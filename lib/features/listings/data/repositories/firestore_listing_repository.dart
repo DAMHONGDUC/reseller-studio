@@ -6,8 +6,10 @@ import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
 import '../../domain/entities/listing.dart';
+import '../../domain/entities/listing_price_change.dart';
 import '../../domain/repositories/listing_repository.dart';
 import '../dtos/listing_dto.dart';
+import '../dtos/listing_price_change_dto.dart';
 
 /// Listings, in Firestore. One document per item per marketplace.
 class FirestoreListingRepository implements ListingRepository {
@@ -48,33 +50,56 @@ class FirestoreListingRepository implements ListingRepository {
       });
 
   @override
-  Future<void> saveAll(List<Listing> listings) => FailureMapper.guard(
-    'publish listings',
-    () async {
-      if (listings.isEmpty) return;
+  Future<void> saveAll(
+    List<Listing> listings, {
+    List<ListingPriceChange> priceChanges = const <ListingPriceChange>[],
+  }) => FailureMapper.guard('publish listings', () async {
+    if (listings.isEmpty) return;
 
-      // Cross-listing is one user intent and must not half-succeed
-      // silently (plan §13): the batch either lands or it does not, and a
-      // failure is reported once rather than as four separate errors.
-      final WriteBatch batch = _context.collections.listings.firestore.batch();
+    // Cross-listing is one user intent and must not half-succeed
+    // silently (plan §13): the batch either lands or it does not, and a
+    // failure is reported once rather than as four separate errors.
+    final WriteBatch batch = _context.collections.listings.firestore.batch();
 
-      for (final Listing listing in listings) {
-        batch.set(
-          _context.collections.listings.doc(listing.id),
-          ListingDto.toMap(listing, createdBy: _context.uid),
-          SetOptions(merge: true),
-        );
-      }
-
-      await batch.commit();
-
-      SdLogger.info(
-        LogTagConstant.listing,
-        'Listings saved in bulk',
-        <String, Object>{'count': listings.length},
+    for (final Listing listing in listings) {
+      batch.set(
+        _context.collections.listings.doc(listing.id),
+        ListingDto.toMap(listing, createdBy: _context.uid),
+        SetOptions(merge: true),
       );
-    },
-  );
+    }
+    for (final ListingPriceChange change in priceChanges) {
+      batch.set(
+        _context.collections.listingPriceChanges.doc(change.id),
+        ListingPriceChangeDto.toMap(change, createdBy: _context.uid),
+      );
+    }
+
+    await batch.commit();
+
+    SdLogger.info(
+      LogTagConstant.listing,
+      'Listings saved in bulk',
+      <String, Object>{
+        'count': listings.length,
+        'priceChanges': priceChanges.length,
+      },
+    );
+  });
+
+  @override
+  Stream<List<ListingPriceChange>> watchPriceChangesForItem(String itemId) =>
+      FirestoreStream.collection(
+        _context.collections.listingPriceChanges.query
+            .where('itemId', isEqualTo: itemId)
+            .orderBy('createdAt', descending: true),
+        (DocumentSnapshot<Map<String, Object?>> doc) =>
+            ListingPriceChangeDto.toEntity(
+              doc,
+              fallbackCurrency: _context.currency,
+            ),
+        operation: 'load listing price history',
+      );
 
   Listing _toEntity(DocumentSnapshot<Map<String, Object?>> doc) =>
       ListingDto.toEntity(doc, fallbackCurrency: _context.currency);
