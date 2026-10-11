@@ -77,6 +77,12 @@ class SourcingScreen extends ConsumerWidget {
                 onTap: () => context.push(AppRoutes.sources),
               ),
               AppListRow(
+                title: context.l10n.suppliersTitle,
+                subtitle: context.l10n.sourcingSuppliersSubtitle,
+                icon: AppIconConstant.localShipping,
+                onTap: () => context.push(AppRoutes.suppliers),
+              ),
+              AppListRow(
                 title: context.l10n.sourcingShouldIBuyThis,
                 subtitle: context.l10n.sourcingWorkOutProfitRoiAndThe,
                 icon: AppIconConstant.calculate,

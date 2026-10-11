@@ -236,6 +236,8 @@ void main() {
       'marketplaces_screen': '/more/marketplaces',
       'carriers_screen': '/more/carriers',
       'pricing_rules_screen': '/more/pricing-rules',
+      'suppliers_screen': '/more/sourcing/suppliers',
+      'supplier_detail_screen': '/more/sourcing/suppliers',
       'team_screen': '/more/team',
     };
 

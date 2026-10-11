@@ -59,6 +59,9 @@ import '../../features/sourcing/presentation/screens/purchase_evaluator_screen/p
 import '../../features/sourcing/presentation/screens/purchases_screen/purchases_screen.dart';
 import '../../features/sourcing/presentation/screens/sources_screen/sources_screen.dart';
 import '../../features/sourcing/presentation/screens/sourcing_screen/sourcing_screen.dart';
+import '../../features/sourcing/presentation/screens/supplier_detail_screen/supplier_detail_screen.dart';
+import '../../features/sourcing/presentation/screens/supplier_product_screen/supplier_product_screen.dart';
+import '../../features/sourcing/presentation/screens/suppliers_screen/suppliers_screen.dart';
 import '../../features/subscription/presentation/screens/paywall_screen/paywall_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen/subscription_screen.dart';
 import '../../features/tax/presentation/screens/tax_screen/tax_screen.dart';
@@ -492,6 +495,52 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         path: 'sources',
                         builder: (BuildContext context, GoRouterState state) =>
                             const SourcesScreen(),
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'suppliers',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const SuppliersScreen(),
+                        routes: <RouteBase>[
+                          GoRoute(
+                            parentNavigatorKey: AppNavigatorKey.root,
+                            path: ':sourceId',
+                            builder:
+                                (BuildContext context, GoRouterState state) =>
+                                    SupplierDetailScreen(
+                                      sourceId:
+                                          state.pathParameters['sourceId']!,
+                                    ),
+                            routes: <RouteBase>[
+                              GoRoute(
+                                parentNavigatorKey: AppNavigatorKey.root,
+                                path: 'products/new',
+                                builder:
+                                    (
+                                      BuildContext context,
+                                      GoRouterState state,
+                                    ) => SupplierProductScreen(
+                                      sourceId:
+                                          state.pathParameters['sourceId']!,
+                                    ),
+                              ),
+                              GoRoute(
+                                parentNavigatorKey: AppNavigatorKey.root,
+                                path: 'products/:productId',
+                                builder:
+                                    (
+                                      BuildContext context,
+                                      GoRouterState state,
+                                    ) => SupplierProductScreen(
+                                      sourceId:
+                                          state.pathParameters['sourceId']!,
+                                      productId:
+                                          state.pathParameters['productId'],
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       GoRoute(
                         parentNavigatorKey: AppNavigatorKey.root,

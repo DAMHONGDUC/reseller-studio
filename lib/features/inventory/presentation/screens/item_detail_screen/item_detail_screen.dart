@@ -14,11 +14,15 @@ import '../../../../../core/widgets/app_photo.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/item_warning_lines.dart';
 import '../../../../../core/widgets/money_field.dart';
+import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../listings/domain/entities/listing.dart';
 import '../../../../listings/domain/entities/listing_price_change.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
 import '../../../../listings/domain/enums/price_change_reason.dart';
 import '../../../../listings/providers.dart';
+import '../../../../sourcing/domain/entities/supplier_product.dart';
+import '../../../../sourcing/domain/services/supplier_cost.dart';
+import '../../../../sourcing/presentation/controllers/supplier_product_controller.dart';
 import '../../../../sourcing/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
@@ -43,6 +47,7 @@ part 'item_detail_screen_photos.dart';
 part 'item_detail_screen_price_history.dart';
 part 'item_detail_screen_pinned_actions.dart';
 part 'item_detail_screen_provenance.dart';
+part 'item_detail_screen_suppliers.dart';
 
 /// Item detail (plan §7).
 ///

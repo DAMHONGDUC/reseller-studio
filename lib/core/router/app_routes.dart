@@ -124,6 +124,8 @@ final class AppRoutes {
   static const String purchaseDetail = '/more/sourcing/purchases/:purchaseId';
   static const String addPurchase = '/more/sourcing/purchases/new';
   static const String sources = '/more/sourcing/sources';
+  static const String suppliers = '/more/sourcing/suppliers';
+  static const String supplierDetailPath = '/more/sourcing/suppliers/:sourceId';
 
   /// The calculation a reseller does standing in a shop (plan §11). Its own
   /// route because it is reached mid-hunt, not from a record.
@@ -252,6 +254,12 @@ final class AppRoutes {
   /// same way.
   static String purchasesFrom(String sourceId) =>
       '$purchases?source=${Uri.encodeComponent(sourceId)}';
+  static String supplier(String sourceId) =>
+      '/more/sourcing/suppliers/$sourceId';
+  static String addSupplierProduct(String sourceId) =>
+      '/more/sourcing/suppliers/$sourceId/products/new';
+  static String supplierProduct(String sourceId, String productId) =>
+      '/more/sourcing/suppliers/$sourceId/products/$productId';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';
 }

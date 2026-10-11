@@ -8,6 +8,7 @@ import '../../../../core/providers/repository_providers.dart';
 import '../../../inventory/domain/entities/item.dart';
 import '../../../inventory/providers.dart';
 import '../../../pricing/domain/entities/pricing_rule.dart';
+import '../../../sourcing/providers.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/listing.dart';
 import '../../domain/entities/listing_price_change.dart';
@@ -56,7 +57,9 @@ class ListingActionsController extends Notifier<bool> {
       listings: listings,
       rule: rule,
       feeRate: ref.read(planningFeeRateProvider),
-      costOf: (Listing listing) => items[listing.itemId]?.purchasePrice,
+      costOf: (Listing listing) => items[listing.itemId]?.isDropship ?? false
+          ? ref.read(dropshipCostProvider(listing.itemId))
+          : items[listing.itemId]?.purchasePrice,
       categoryOf: (Listing listing) => items[listing.itemId]?.categoryId,
     );
     final Map<String, Listing> next = <String, Listing>{
