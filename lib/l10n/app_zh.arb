@@ -1611,5 +1611,15 @@
   "homeSupplierOrdersLate": "{count, plural, other{{count} 个供应商延迟}}",
   "listingsToEndTitle": "{count, plural, other{{count} 个已售商品的刊登仍在线}}",
   "listingsToEndDetail": "在第二位买家付款前将其下架。",
-  "listingsEndAll": "全部下架"
+  "listingsEndAll": "全部下架",
+  "titleBuilderOpen": "生成标题",
+  "titleBuilderTitle": "生成标题",
+  "titleBuilderBrand": "品牌",
+  "titleBuilderType": "商品类型",
+  "titleBuilderAttributes": "细节，用逗号分隔",
+  "titleBuilderColor": "颜色",
+  "titleBuilderSize": "尺码",
+  "titleBuilderFor": "适配平台",
+  "titleBuilderLength": "{used}/{limit} 个字符",
+  "titleBuilderUse": "使用此标题"
 }

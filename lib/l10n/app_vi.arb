@@ -1611,5 +1611,15 @@
   "homeSupplierOrdersLate": "{count, plural, other{{count} đơn nhà cung cấp trễ}}",
   "listingsToEndTitle": "{count, plural, other{{count} tin đăng vẫn còn mở cho hàng đã bán}}",
   "listingsToEndDetail": "Gỡ ngay trước khi có người mua thứ hai thanh toán.",
-  "listingsEndAll": "Gỡ tất cả"
+  "listingsEndAll": "Gỡ tất cả",
+  "titleBuilderOpen": "Ghép tiêu đề",
+  "titleBuilderTitle": "Ghép tiêu đề",
+  "titleBuilderBrand": "Thương hiệu",
+  "titleBuilderType": "Loại sản phẩm",
+  "titleBuilderAttributes": "Chi tiết, cách nhau bằng dấu phẩy",
+  "titleBuilderColor": "Màu",
+  "titleBuilderSize": "Size",
+  "titleBuilderFor": "Vừa với sàn",
+  "titleBuilderLength": "{used}/{limit} ký tự",
+  "titleBuilderUse": "Dùng tiêu đề này"
 }

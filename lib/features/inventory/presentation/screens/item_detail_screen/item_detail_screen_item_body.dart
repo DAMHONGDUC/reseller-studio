@@ -132,7 +132,25 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
                 textInputAction: TextInputAction.next,
                 onChanged: (String _) => setState(() {}),
               ),
-              SizedBox(height: SdSpacingConstant.h16),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: SdButtonV3(
+                  variant: SdButtonVariantV3.text,
+                  label: context.l10n.titleBuilderOpen,
+                  icon: AppIconConstant.bolt,
+                  size: SdButtonSizeV3.small,
+                  onPressed: () async {
+                    final String? built = await TitleBuilderSheet.show(
+                      context,
+                      condition: edit.condition?.label(context),
+                    );
+
+                    if (built == null) return;
+                    setState(() => _title.text = built);
+                  },
+                ),
+              ),
+              SizedBox(height: SdSpacingConstant.h8),
               ItemConditionField(
                 selected: edit.condition,
                 onSelected: controller.selectCondition,

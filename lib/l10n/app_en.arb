@@ -7244,5 +7244,53 @@
   "listingsEndAll": "End all",
   "@listingsEndAll": {
     "description": "Action ending every listing still live on a sold item."
+  },
+  "titleBuilderOpen": "Build title",
+  "@titleBuilderOpen": {
+    "description": "Button opening the title builder beside an item's title."
+  },
+  "titleBuilderTitle": "Build a title",
+  "@titleBuilderTitle": {
+    "description": "Title of the title builder sheet."
+  },
+  "titleBuilderBrand": "Brand",
+  "@titleBuilderBrand": {
+    "description": "Title builder field: brand."
+  },
+  "titleBuilderType": "What it is",
+  "@titleBuilderType": {
+    "description": "Title builder field: what the item is."
+  },
+  "titleBuilderAttributes": "Details, comma-separated",
+  "@titleBuilderAttributes": {
+    "description": "Title builder field: model, material, style, comma-separated."
+  },
+  "titleBuilderColor": "Colour",
+  "@titleBuilderColor": {
+    "description": "Title builder field: colour."
+  },
+  "titleBuilderSize": "Size",
+  "@titleBuilderSize": {
+    "description": "Title builder field: size."
+  },
+  "titleBuilderFor": "Fit it to",
+  "@titleBuilderFor": {
+    "description": "Label above the marketplace whose title limit applies."
+  },
+  "titleBuilderLength": "{used} of {limit} characters",
+  "@titleBuilderLength": {
+    "description": "Characters used out of the marketplace's limit.",
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "titleBuilderUse": "Use this title",
+  "@titleBuilderUse": {
+    "description": "Button putting the built title into the field."
   }
 }

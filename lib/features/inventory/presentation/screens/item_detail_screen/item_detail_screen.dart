@@ -38,6 +38,7 @@ import '../../controllers/item_detail_edit_controller.dart';
 import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_field.dart';
 import '../../widgets/item_quick_actions.dart';
+import '../../widgets/title_builder_sheet.dart';
 
 part 'item_detail_screen_detail_row.dart';
 part 'item_detail_screen_item_body.dart';

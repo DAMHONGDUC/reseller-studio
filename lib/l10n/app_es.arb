@@ -1611,5 +1611,15 @@
   "homeSupplierOrdersLate": "{count, plural, =1{1 con retraso en el proveedor} other{{count} con retraso en el proveedor}}",
   "listingsToEndTitle": "{count, plural, =1{1 anuncio sigue activo en un artículo vendido} other{{count} anuncios siguen activos en artículos vendidos}}",
   "listingsToEndDetail": "Finalízalos antes de que pague un segundo comprador.",
-  "listingsEndAll": "Finalizar todos"
+  "listingsEndAll": "Finalizar todos",
+  "titleBuilderOpen": "Crear título",
+  "titleBuilderTitle": "Crea un título",
+  "titleBuilderBrand": "Marca",
+  "titleBuilderType": "Qué es",
+  "titleBuilderAttributes": "Detalles, separados por comas",
+  "titleBuilderColor": "Color",
+  "titleBuilderSize": "Talla",
+  "titleBuilderFor": "Ajustar a",
+  "titleBuilderLength": "{used} de {limit} caracteres",
+  "titleBuilderUse": "Usar este título"
 }

@@ -1611,5 +1611,15 @@
   "homeSupplierOrdersLate": "{count, plural, =1{1 beim Lieferanten verspätet} other{{count} beim Lieferanten verspätet}}",
   "listingsToEndTitle": "{count, plural, =1{1 Angebot noch aktiv für einen verkauften Artikel} other{{count} Angebote noch aktiv für verkaufte Artikel}}",
   "listingsToEndDetail": "Beende sie, bevor ein zweiter Käufer bezahlt.",
-  "listingsEndAll": "Alle beenden"
+  "listingsEndAll": "Alle beenden",
+  "titleBuilderOpen": "Titel erstellen",
+  "titleBuilderTitle": "Titel erstellen",
+  "titleBuilderBrand": "Marke",
+  "titleBuilderType": "Was es ist",
+  "titleBuilderAttributes": "Details, durch Kommas getrennt",
+  "titleBuilderColor": "Farbe",
+  "titleBuilderSize": "Größe",
+  "titleBuilderFor": "Passend für",
+  "titleBuilderLength": "{used} von {limit} Zeichen",
+  "titleBuilderUse": "Diesen Titel verwenden"
 }

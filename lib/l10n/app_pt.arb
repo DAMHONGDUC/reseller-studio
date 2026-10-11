@@ -1611,5 +1611,15 @@
   "homeSupplierOrdersLate": "{count, plural, =1{1 atrasado no fornecedor} other{{count} atrasados no fornecedor}}",
   "listingsToEndTitle": "{count, plural, =1{1 anúncio ainda ativo de item vendido} other{{count} anúncios ainda ativos de itens vendidos}}",
   "listingsToEndDetail": "Encerre antes que um segundo comprador pague.",
-  "listingsEndAll": "Encerrar todos"
+  "listingsEndAll": "Encerrar todos",
+  "titleBuilderOpen": "Montar título",
+  "titleBuilderTitle": "Monte um título",
+  "titleBuilderBrand": "Marca",
+  "titleBuilderType": "O que é",
+  "titleBuilderAttributes": "Detalhes, separados por vírgula",
+  "titleBuilderColor": "Cor",
+  "titleBuilderSize": "Tamanho",
+  "titleBuilderFor": "Ajustar para",
+  "titleBuilderLength": "{used} de {limit} caracteres",
+  "titleBuilderUse": "Usar este título"
 }
