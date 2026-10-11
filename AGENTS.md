@@ -123,6 +123,9 @@ FIND PRODUCT → LIST → SELL → ORDER FROM SUPPLIER → TRACK → PROFIT → 
 - **The dropshipping work is built on its own branch, `feat/dropshipping`,
   never on `master`.** Owner's rule. A multi-phase change reaches `master` as
   one reviewed merge, not as a stream of half-features.
+- **The app-wide UI polish follows dropshipping Phase 1, on the same
+  branch.** Owner's rule. `docs/UI_POLISH_PLAN.md` is the approved scope —
+  every screen in it — and none of it starts before Phase 1 is done.
 - It runs on marketplace and supplier connections, which hard rule 10 now
   allows.
 
