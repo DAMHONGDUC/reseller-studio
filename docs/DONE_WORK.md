@@ -8,7 +8,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Onboarding and auth | One-time intro, Apple/Google sign-in, guest mode with a local store, sign-out, account deletion | Firebase and provider setup |
 | Home | Attention queue, overview, recent activity, Quick Access, Premium banner | Functions for live notifications |
 | Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, categories and locations created inline, buying-trip link, bulk actions including bulk listing and filing under a trip | Firebase Storage for uploads |
-| Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import | None for manual records |
+| Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import, supplier orders for dropship sales with tracking, refunds, days waiting and estimated arrival | None for manual records |
 | Sourcing | Sources, purchases, items filed under a purchase, receipt apportioned across them, ROI ranking, buy calculator, dropship suppliers and their products, List it as a dropship item, primary and backup supplier per item | None |
 | Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end, pricing rules applied in bulk, price history per item | No marketplace publishing yet; see `DROPSHIPPING_PLAN.md` |
 | Marketplaces | Seller-owned records, fee estimate, defaults, soft delete | None |
