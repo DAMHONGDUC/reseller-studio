@@ -438,6 +438,28 @@ past nine fields they were not changing, and popped back — for one number.
 - **The create form stays a screen.** Creating has no record to show sections
   of, and hard rule 2 keeps that form's requirements to a title.
 
+## A detail screen opens on a summary, and its other sections fold
+
+Owner's call, approved with `docs/UI_POLISH_PLAN.md`, and it sits on top of
+the in-place editing rule above rather than replacing it.
+
+- **Item detail opens on a summary block** — photo, title, state, and three
+  figures (cost, expected price, on hand). Every editable section below it
+  folds to one line (`ItemDetailSummary`); Listings, Supplier and Price
+  history stay open, because they are what a seller opens the item to check.
+- **Order detail keeps its Order section open** — status, buyer, platform —
+  and its pinned next move (`lib/features/orders/CLAUDE.md`). Profit folds
+  to its figure; Shipping folds to carrier and tracking and **starts open
+  while the parcel is the next thing to do**; the Timeline folds to the step
+  the order reached last.
+- **A create form asks for what every record needs and folds the rest behind
+  More details.** The item form shows Title and Quantity (hard rule 2 and the
+  quantity rule). The rest **opens on its own when something in it is already
+  filled** — a remembered category or bin, a scanned barcode — so a prefill
+  is never hidden.
+- **More is not folded.** It is a list of places to go, and a fold there
+  would put a tap in front of every destination.
+
 ## Search
 
 - **Search is a mode of the header, not a widget parked above the list.**

@@ -786,6 +786,38 @@ means, the thing underneath owns it.
   Animations must be calm — fade/scale/slide, short, gentle curves. Never
   flashing or strobing.
 
+## Folding, swiping and motion
+
+Owner's call, approved with `docs/UI_POLISH_PLAN.md`. Every screen shows
+what the decision needs and folds the rest to one line.
+
+- **A secondary group is `SdCollapsibleSectionV3`, and it always carries a
+  `summary`.** A fold that hides what it holds makes the seller open it to
+  find out; the one line says it ("Goodwill · B2"), and `—` when there is
+  nothing (hard rule 5).
+  - **A folded body is not built** — nothing hidden is laid out, measured or
+    found by a test.
+  - **An editable section folds through `AppEditableSection.summary`**, and
+    it is always open while it is being edited: Edit never edits a section
+    the seller cannot see.
+- **A swipe is `SdSwipeRowV3`, at most one action each way, and it never
+  removes the row.** It acts and springs back; whether the row leaves the list
+  is decided by the data it changed. **Every swipe action is also reachable
+  without swiping** — the row's menu or the detail screen — because a swipe
+  is invisible. Today: Inventory sells and reprices, Orders ships, Listings
+  ends.
+- **Every animation reads its timing through `SdMotionV3.of(context, …)`**,
+  which answers zero when the system asks for reduced motion. The one switch
+  a user needs is the one in Settings.
+- **What moves, and how:** a section folds on `normal`/`emphasized`, its
+  chevron turns and its summary fades; a changed figure cross-fades on
+  `fast` (`SdStatTileV3`, Item detail's summary); a new row fades and grows
+  in (`AppAppear`) only when its record is newer than
+  `ListMotionConstant.newRecordWindow`, so scrolling never replays an
+  arrival; a button settles to `SdButtonV3.pressedScale` under the finger;
+  Inventory's thumbnail flies to Item detail (`ItemCard.photoHeroTag`); the
+  trend bars grow from the axis and move between periods.
+
 ## Dimensions and colour
 
 - **Responsive sizing via `flutter_screenutil`** (design size 390×844,

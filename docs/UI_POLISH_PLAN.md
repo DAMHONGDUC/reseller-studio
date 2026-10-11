@@ -1,5 +1,7 @@
 # UI polish plan
 
+**Status: built on `feat/dropshipping`; the rules it leaves are in `docs/rules/DESIGN_SYSTEM.md` (Folding, swiping and motion) and `docs/rules/SCREENS.md` (A detail screen opens on a summary).**
+
 The app-wide pass that makes every screen calmer: less shown at once, the
 rest one tap away, and short motion that says what changed. Approved by the
 owner on 2026-10-11 — **every screen below is in scope** — and built on
@@ -27,7 +29,7 @@ section order (`lib/features/home/CLAUDE.md`).
 | Add item form | Every field shown | Title only, then "More details" opens the optional fields — hard rule 2 made visible |
 | Lists (Inventory, Orders and the rest) | Tap a row, then a sheet | Swipe actions for the common transition; rows fade and resize in and out |
 | Analytics | Static charts | Charts draw in on first show; switching period animates |
-| More, Settings, the remaining screens | As built | The same collapsible section and summary line wherever a screen holds secondary groups |
+| More, Settings, the remaining screens | As built | The same collapsible section and summary line wherever a screen holds secondary groups — the supplier product form's references; More stays unfolded, being a list of destinations |
 
 ## Motion
 
