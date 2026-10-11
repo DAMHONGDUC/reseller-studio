@@ -87,23 +87,20 @@ decide it, and they are listed in the order they outrank each other.
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
 
-## What starts folded
+## Every section starts open
 
-Owner's call, approved with `docs/UI_POLISH_PLAN.md`. The order above is
-unchanged; what changed is how much of each section shows before a tap.
+Owner's rule, and it **reverses "What starts folded"**: Home is the dashboard,
+and a dashboard that opens on folded blocks makes the seller tap to see the
+state of their own business. Every section opens expanded; the fold is still
+there for a seller who wants a shorter screen.
 
-- **Performance shows the profit hero; Revenue, Sold and Stock sit behind
-  Show more.** The one loud element stays on screen, and the three quiet
-  tiles are a tap away rather than a scroll past.
-- **Recent Activity folds to the latest sale** (`SdCollapsibleSectionV3`,
-  the summary naming it), and still owns its header and is absent on a new
-  account.
-- **Quick Action starts folded.** The shortcut row's Quick Action button
-  opens it first and then scrolls there, so it never lands on a closed block.
-- **Flow overview stays its own open card.** The plan grouped it with Recent
-  Activity, but a new account has no activity, and that is exactly when the
-  overview matters most — folding it inside a block that is absent then
-  would hide it from the seller it is for.
+- **Performance shows the profit hero and Revenue, Sold and Stock**, with
+  Show less to fold the three tiles away.
+- **Recent Activity and Quick Action open expanded**, each still a
+  `SdCollapsibleSectionV3` with its summary line for when it is folded.
+- **The Quick Action shortcut still opens the section before scrolling**, so
+  a seller who folded it is not sent to a closed block.
+- **Flow overview stays its own open card.**
 
 **A section-order test reads the order sections come into view in, not
 pixels.** Home was a lazy `ListView` whose estimated extent made

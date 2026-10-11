@@ -25,7 +25,7 @@ section order (`lib/features/home/CLAUDE.md`).
 |---|---|---|
 | Item detail | Eight sections open; Listings is below the fold | Summary block; Listings open; Pricing, Provenance, Description and Notes collapsed with a summary ("Goodwill · B2"); Edit opens its section |
 | Order detail | Full timeline and every section always shown | Status and **one next-step button** on top; timeline collapsed to the current stage; Shipping collapses once delivered |
-| Home | Seven sections stacked | Same order; Performance compact with "Show more"; Recent activity folded to the latest sale, Flow overview kept open for new accounts; Quick Action collapsed by default |
+| Home | Seven sections stacked | Same order, **every section open by default** (owner, 2026-10-11) and each foldable: Performance's tiles behind Show less, Recent activity and Quick Action collapsible; Flow overview its own card |
 | Add item form | Every field shown | Title only, then "More details" opens the optional fields — hard rule 2 made visible |
 | Lists (Inventory, Orders and the rest) | Tap a row, then a sheet | Swipe actions for the common transition; rows fade and resize in and out |
 | Analytics | Static charts | Charts draw in on first show; switching period animates |
