@@ -7,7 +7,6 @@ import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/widgets/app_list_row.dart';
 import 'package:reseller_studio/features/home/home_constant.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
-import 'package:system_design/index.dart';
 
 import '../../support/pump_app.dart';
 
@@ -20,22 +19,7 @@ import '../../support/pump_app.dart';
 void main() {
   /// Quick Action sits at the bottom, so its rows are scrolled to before they
   /// are measured.
-  ///
-  /// It starts folded (`lib/features/home/CLAUDE.md`), so it is opened first
-  /// — by its header, the way a seller opens it.
   Future<void> toEnd(WidgetTester tester) async {
-    for (int i = 0; i < 12; i++) {
-      await tester.drag(find.byType(Scrollable).first, const Offset(0, -600));
-      await tester.pump();
-    }
-    await tester.pumpAndSettle();
-    await tester.tap(
-      find.descendant(
-        of: find.byType(SdCollapsibleSectionV3),
-        matching: find.text('Quick Action'),
-      ),
-    );
-    await tester.pumpAndSettle();
     for (int i = 0; i < 12; i++) {
       await tester.drag(find.byType(Scrollable).first, const Offset(0, -600));
       await tester.pump();

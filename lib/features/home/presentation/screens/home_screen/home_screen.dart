@@ -83,9 +83,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// The Quick Action section's header — what the shortcut scrolls to.
   final GlobalKey _quickActionKey = GlobalKey();
 
-  /// Quick Action starts folded (`docs/UI_POLISH_PLAN.md`); the shortcut
-  /// opens it before scrolling there, so it never lands on a closed block.
-  bool _quickActionOpen = false;
+  /// Quick Action starts open (`lib/features/home/CLAUDE.md`); a seller may
+  /// fold it, and the shortcut opens it again before scrolling there.
+  bool _quickActionOpen = true;
 
   void _scrollToQuickAction() {
     setState(() => _quickActionOpen = true);

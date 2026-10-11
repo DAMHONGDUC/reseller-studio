@@ -8,10 +8,10 @@ class _PerformanceBlock extends ConsumerStatefulWidget {
   ConsumerState<_PerformanceBlock> createState() => _PerformanceBlockState();
 }
 
-/// The profit hero always; the three quiet tiles behind Show more, so the
-/// block is a glance until the seller asks for more (`docs/UI_POLISH_PLAN.md`).
+/// The profit hero always; the three quiet tiles open by default and folded
+/// by Show less (`lib/features/home/CLAUDE.md` — every section starts open).
 class _PerformanceBlockState extends ConsumerState<_PerformanceBlock> {
-  bool _more = false;
+  bool _more = true;
 
   @override
   Widget build(BuildContext context) {

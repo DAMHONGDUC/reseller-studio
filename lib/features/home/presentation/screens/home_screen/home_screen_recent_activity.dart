@@ -26,10 +26,11 @@ class _RecentActivity extends ConsumerWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-      // Folded to the latest sale; the rest one tap away
-      // (`docs/UI_POLISH_PLAN.md`).
+      // Open by default (`lib/features/home/CLAUDE.md`); folded, it reads
+      // as the latest sale.
       child: SdCollapsibleSectionV3(
         title: context.l10n.homeRecentActivity,
+        initiallyExpanded: true,
         summary: recent.first.lines.isEmpty
             ? null
             : '${recent.first.lines.first.title} · '
