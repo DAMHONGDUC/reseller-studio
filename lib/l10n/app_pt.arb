@@ -1608,5 +1608,8 @@
   "supplierOrderWaitingDays": "{count, plural, =0{Pedido hoje} =1{1 dia aguardando} other{{count} dias aguardando}}",
   "homeToOrderFromSupplier": "A pedir ao fornecedor",
   "homeToOrderFromSupplierDetail": "Enviados depois de pedidos",
-  "homeSupplierOrdersLate": "{count, plural, =1{1 atrasado no fornecedor} other{{count} atrasados no fornecedor}}"
+  "homeSupplierOrdersLate": "{count, plural, =1{1 atrasado no fornecedor} other{{count} atrasados no fornecedor}}",
+  "listingsToEndTitle": "{count, plural, =1{1 anúncio ainda ativo de item vendido} other{{count} anúncios ainda ativos de itens vendidos}}",
+  "listingsToEndDetail": "Encerre antes que um segundo comprador pague.",
+  "listingsEndAll": "Encerrar todos"
 }

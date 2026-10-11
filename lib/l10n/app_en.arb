@@ -7227,5 +7227,22 @@
         "type": "int"
       }
     }
+  },
+  "listingsToEndTitle": "{count, plural, =1{1 listing still live on a sold item} other{{count} listings still live on sold items}}",
+  "@listingsToEndTitle": {
+    "description": "Banner: listings still live on items that sold out or were withdrawn.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsToEndDetail": "End them before a second buyer pays.",
+  "@listingsToEndDetail": {
+    "description": "Banner detail under the live-on-sold-items title."
+  },
+  "listingsEndAll": "End all",
+  "@listingsEndAll": {
+    "description": "Action ending every listing still live on a sold item."
   }
 }

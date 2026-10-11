@@ -12,6 +12,7 @@ import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_status_card.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/price_entry_sheet.dart';
 import '../../../../pricing/domain/entities/pricing_rule.dart';
@@ -25,6 +26,7 @@ import '../../../providers.dart';
 import '../../controllers/listing_actions_controller.dart';
 
 part 'listings_screen_bulk_bar.dart';
+part 'listings_screen_to_end.dart';
 
 /// Listings — everything live, everywhere (plan §12).
 ///
@@ -73,6 +75,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
+          const _ToEndBanner(),
           AppFilterStrip(
             children: <Widget>[
               _StatusChip(

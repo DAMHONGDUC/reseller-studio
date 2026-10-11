@@ -1608,5 +1608,8 @@
   "supplierOrderWaitingDays": "{count, plural, =0{Đặt hôm nay} other{Đã chờ {count} ngày}}",
   "homeToOrderFromSupplier": "Cần đặt nhà cung cấp",
   "homeToOrderFromSupplierDetail": "Đặt xong mới giao được",
-  "homeSupplierOrdersLate": "{count, plural, other{{count} đơn nhà cung cấp trễ}}"
+  "homeSupplierOrdersLate": "{count, plural, other{{count} đơn nhà cung cấp trễ}}",
+  "listingsToEndTitle": "{count, plural, other{{count} tin đăng vẫn còn mở cho hàng đã bán}}",
+  "listingsToEndDetail": "Gỡ ngay trước khi có người mua thứ hai thanh toán.",
+  "listingsEndAll": "Gỡ tất cả"
 }

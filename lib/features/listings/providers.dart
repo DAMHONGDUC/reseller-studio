@@ -5,9 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/providers/repository_providers.dart';
 import '../../core/state/selection_controller.dart';
+import '../inventory/domain/entities/item.dart';
+import '../inventory/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/listing.dart';
 import 'domain/entities/listing_price_change.dart';
+import 'domain/services/listings_to_end.dart';
 
 final StreamProvider<List<Listing>> listingsProvider =
     StreamProvider<List<Listing>>((Ref ref) {
@@ -98,3 +101,16 @@ final priceChangesForItemProvider =
             ),
       );
     });
+
+/// Listings still live on an item that sold out or was withdrawn.
+final Provider<List<Listing>> listingsToEndProvider = Provider<List<Listing>>((
+  Ref ref,
+) {
+  return ListingsToEnd.after(
+    listings: ref.watch(listingsProvider).value ?? const <Listing>[],
+    items: <String, Item>{
+      for (final Item item in ref.watch(itemsProvider).value ?? const <Item>[])
+        item.id: item,
+    },
+  );
+});
