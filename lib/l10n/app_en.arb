@@ -7382,5 +7382,9 @@
   "receiptOpenSale": "Open the sale",
   "@receiptOpenSale": {
     "description": "Button opening the sale a supplier invoice belongs to."
+  },
+  "supplierProductRecheck": "Check price and stock",
+  "@supplierProductRecheck": {
+    "description": "Shown on a supplier product not checked recently."
   }
 }

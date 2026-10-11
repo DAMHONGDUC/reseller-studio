@@ -1,4 +1,5 @@
 import '../../../../core/money/money.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../entities/supplier_product.dart';
 
 /// What a dropshipped item costs to fulfil, read off its supplier products.
@@ -22,6 +23,19 @@ final class SupplierCost {
     }
 
     return price + shipping + tax;
+  }
+
+  /// Whether [product]'s figures are older than [afterDays], or were never
+  /// checked at all.
+  static bool needsRecheck(
+    SupplierProduct product,
+    DateTime now, {
+    required int afterDays,
+  }) {
+    final DateTime? checked = product.lastCheckedAt;
+
+    return checked == null ||
+        DateTimeUtils.daysBetween(checked, now) > afterDays;
   }
 
   /// The supplier an item is ordered from first: the live product with the

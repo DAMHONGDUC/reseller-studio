@@ -1641,5 +1641,6 @@
   "supplierProductSampleHelp": "Enregistré comme dépense, pas comme coût d'une vente.",
   "supplierProductSampleDone": "Échantillon enregistré comme dépense",
   "receiptKindSupplierOrder": "Commande fournisseur",
-  "receiptOpenSale": "Ouvrir la vente"
+  "receiptOpenSale": "Ouvrir la vente",
+  "supplierProductRecheck": "Vérifiez prix et stock"
 }

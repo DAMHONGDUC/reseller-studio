@@ -6,12 +6,14 @@ import 'package:system_design/index.dart';
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../domain/entities/source.dart';
 import '../../../domain/entities/supplier_product.dart';
 import '../../../domain/services/supplier_cost.dart';
 import '../../../providers.dart';
+import '../../../supplier_product_constant.dart';
 
 /// One supplier's products, each with what an order costs and whether it is
 /// listed yet.
@@ -62,14 +64,19 @@ class SupplierDetailScreen extends ConsumerWidget {
   }
 }
 
-class _ProductRow extends StatelessWidget {
+class _ProductRow extends ConsumerWidget {
   const _ProductRow({required this.product});
 
   final SupplierProduct product;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final int? stock = product.stock;
+    final bool recheck = SupplierCost.needsRecheck(
+      product,
+      ref.watch(clockProvider).now(),
+      afterDays: SupplierProductConstant.recheckAfterDays,
+    );
 
     return AppListRow(
       title: product.title,
@@ -79,6 +86,7 @@ class _ProductRow extends StatelessWidget {
         else
           context.l10n.supplierProductListed,
         if (stock != null) context.l10n.supplierProductStockValue(stock),
+        if (recheck) context.l10n.supplierProductRecheck,
       ].join(' · '),
       trailingText: context.money(SupplierCost.landed(product)),
       onTap: () =>

@@ -1641,5 +1641,6 @@
   "supplierProductSampleHelp": "Registrado como despesa, não como custo de uma venda.",
   "supplierProductSampleDone": "Amostra registrada como despesa",
   "receiptKindSupplierOrder": "Pedido ao fornecedor",
-  "receiptOpenSale": "Abrir a venda"
+  "receiptOpenSale": "Abrir a venda",
+  "supplierProductRecheck": "Confira preço e estoque"
 }

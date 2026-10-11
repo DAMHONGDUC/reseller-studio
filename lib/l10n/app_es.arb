@@ -1641,5 +1641,6 @@
   "supplierProductSampleHelp": "Se registra como gasto, no como coste de una venta.",
   "supplierProductSampleDone": "Muestra registrada como gasto",
   "receiptKindSupplierOrder": "Pedido al proveedor",
-  "receiptOpenSale": "Abrir la venta"
+  "receiptOpenSale": "Abrir la venta",
+  "supplierProductRecheck": "Revisa precio y stock"
 }

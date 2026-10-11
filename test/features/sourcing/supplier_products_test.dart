@@ -49,6 +49,20 @@ void main() {
       expect(SupplierCost.landed(product(price: null)), isNull);
     });
 
+    test('figures older than the window, or never checked, need a recheck', () {
+      final DateTime now = DateTime(2026, 10, 30);
+
+      expect(SupplierCost.needsRecheck(product(), now, afterDays: 14), isTrue);
+      expect(
+        SupplierCost.needsRecheck(
+          product().copyWith(lastCheckedAt: DateTime(2026, 10, 20)),
+          now,
+          afterDays: 14,
+        ),
+        isFalse,
+      );
+    });
+
     test('the primary is the lowest live rank', () {
       expect(
         SupplierCost.primaryFor('itm', <SupplierProduct>[

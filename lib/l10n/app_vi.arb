@@ -1641,5 +1641,6 @@
   "supplierProductSampleHelp": "Ghi là chi phí, không phải giá vốn đơn bán.",
   "supplierProductSampleDone": "Đã ghi hàng mẫu vào chi phí",
   "receiptKindSupplierOrder": "Đơn nhà cung cấp",
-  "receiptOpenSale": "Mở đơn bán"
+  "receiptOpenSale": "Mở đơn bán",
+  "supplierProductRecheck": "Cần kiểm tra giá và tồn kho"
 }

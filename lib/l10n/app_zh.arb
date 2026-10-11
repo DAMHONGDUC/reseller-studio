@@ -1641,5 +1641,6 @@
   "supplierProductSampleHelp": "记为费用，而非销售成本。",
   "supplierProductSampleDone": "样品已记为费用",
   "receiptKindSupplierOrder": "供应商订单",
-  "receiptOpenSale": "打开订单"
+  "receiptOpenSale": "打开订单",
+  "supplierProductRecheck": "请核对价格和库存"
 }
