@@ -13,7 +13,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end, pricing rules applied in bulk, price history per item | No marketplace publishing yet; see `DROPSHIPPING_PLAN.md` |
 | Marketplaces | Seller-owned records, fee estimate, defaults, soft delete | None |
 | Carriers | Business-owned records, defaults, soft delete | None |
-| Analytics | Sales, profit, inventory, marketplace, category and source views | None |
+| Analytics | Sales, profit, inventory, marketplace, category and source views; a dropship view splitting stocked from dropshipped, ranking dropship products and timing suppliers | None |
 | Expenses and receipts | Add/list/delete, category totals, file upload | Firebase Storage for uploads |
 | Reports and tax | CSV exports and the one-action tax pack, both Premium; US and UK summaries and mileage; Close the books | Rates require seasonal review |
 | Search | Items, orders, listings and sources | None |

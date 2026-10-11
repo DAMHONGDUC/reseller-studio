@@ -1626,5 +1626,13 @@
   "filterSupplier": "供应商",
   "supplierStageToOrder": "待下单",
   "supplierStageAwaitingTracking": "等待物流单号",
-  "supplierStageLate": "延迟"
+  "supplierStageLate": "延迟",
+  "analyticsDropship": "代发货",
+  "analyticsDropshipSubtitle": "自有库存与代发货对比、商品与供应商",
+  "analyticsDropshipEmptyTitle": "还没有代发货商品",
+  "analyticsDropshipEmptyBody": "上架供应商商品后，销售数据会显示在这里。",
+  "analyticsDropshipProducts": "商品（按利润排序）",
+  "analyticsSupplierShipTime": "供应商发货速度",
+  "analyticsDaysAverage": "平均 {days} 天",
+  "analyticsShipments": "{count, plural, other{{count} 次发货}}"
 }

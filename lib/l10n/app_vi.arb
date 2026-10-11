@@ -1626,5 +1626,13 @@
   "filterSupplier": "Nhà cung cấp",
   "supplierStageToOrder": "Cần đặt",
   "supplierStageAwaitingTracking": "Chờ mã vận đơn",
-  "supplierStageLate": "Trễ"
+  "supplierStageLate": "Trễ",
+  "analyticsDropship": "Dropship",
+  "analyticsDropshipSubtitle": "Hàng có sẵn so với dropship, sản phẩm và nhà cung cấp",
+  "analyticsDropshipEmptyTitle": "Chưa có sản phẩm dropship",
+  "analyticsDropshipEmptyBody": "Đăng bán sản phẩm của nhà cung cấp, doanh số sẽ hiện ở đây.",
+  "analyticsDropshipProducts": "Sản phẩm, tốt nhất trước",
+  "analyticsSupplierShipTime": "Tốc độ giao của nhà cung cấp",
+  "analyticsDaysAverage": "Trung bình {days} ngày",
+  "analyticsShipments": "{count, plural, other{{count} lần giao}}"
 }

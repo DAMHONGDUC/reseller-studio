@@ -7312,5 +7312,47 @@
   "supplierStageLate": "Late",
   "@supplierStageLate": {
     "description": "Supplier filter option: ordered and waiting too long for tracking."
+  },
+  "analyticsDropship": "Dropship",
+  "@analyticsDropship": {
+    "description": "Analytics drill-down title for dropshipping."
+  },
+  "analyticsDropshipSubtitle": "Stocked against dropshipped, products and suppliers",
+  "@analyticsDropshipSubtitle": {
+    "description": "Analytics drill-down subtitle for dropshipping."
+  },
+  "analyticsDropshipEmptyTitle": "No dropshipped products yet",
+  "@analyticsDropshipEmptyTitle": {
+    "description": "Empty state title on the dropship analytics screen."
+  },
+  "analyticsDropshipEmptyBody": "List a supplier's product and its sales show up here.",
+  "@analyticsDropshipEmptyBody": {
+    "description": "Empty state message on the dropship analytics screen."
+  },
+  "analyticsDropshipProducts": "Products, best first",
+  "@analyticsDropshipProducts": {
+    "description": "Section heading over dropshipped products ranked by profit."
+  },
+  "analyticsSupplierShipTime": "How fast suppliers ship",
+  "@analyticsSupplierShipTime": {
+    "description": "Section heading over each supplier's dispatch time."
+  },
+  "analyticsDaysAverage": "{days} days on average",
+  "@analyticsDaysAverage": {
+    "description": "Average days from order to dispatch.",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsShipments": "{count, plural, =1{1 shipment} other{{count} shipments}}",
+  "@analyticsShipments": {
+    "description": "How many shipments the average is over.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

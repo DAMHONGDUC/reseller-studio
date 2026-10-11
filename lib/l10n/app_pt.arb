@@ -1626,5 +1626,13 @@
   "filterSupplier": "Fornecedor",
   "supplierStageToOrder": "A pedir",
   "supplierStageAwaitingTracking": "Aguardando rastreio",
-  "supplierStageLate": "Atrasado"
+  "supplierStageLate": "Atrasado",
+  "analyticsDropship": "Dropshipping",
+  "analyticsDropshipSubtitle": "Estoque próprio contra dropshipping, produtos e fornecedores",
+  "analyticsDropshipEmptyTitle": "Nenhum produto em dropshipping ainda",
+  "analyticsDropshipEmptyBody": "Anuncie um produto de fornecedor e as vendas aparecem aqui.",
+  "analyticsDropshipProducts": "Produtos, os melhores primeiro",
+  "analyticsSupplierShipTime": "Rapidez de envio dos fornecedores",
+  "analyticsDaysAverage": "{days} dias em média",
+  "analyticsShipments": "{count, plural, =1{1 envio} other{{count} envios}}"
 }

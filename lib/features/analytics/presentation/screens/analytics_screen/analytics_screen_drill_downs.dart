@@ -45,6 +45,12 @@ class _DrillDowns extends StatelessWidget {
         onTap: () => context.push(AppRoutes.analyticsCategories),
       ),
       AppListRow(
+        title: context.l10n.analyticsDropship,
+        subtitle: context.l10n.analyticsDropshipSubtitle,
+        icon: AppIconConstant.localShipping,
+        onTap: () => context.push(AppRoutes.analyticsDropship),
+      ),
+      AppListRow(
         title: context.l10n.analyticsSources,
         subtitle: context.l10n.analyticsWhereToGoBackToRanked,
         icon: AppIconConstant.storefront,

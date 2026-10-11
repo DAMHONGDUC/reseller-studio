@@ -5,6 +5,7 @@ import 'package:system_design/common.dart';
 
 import '../../features/activity/presentation/screens/activity_screen/activity_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_categories_screen/analytics_categories_screen.dart';
+import '../../features/analytics/presentation/screens/analytics_dropship_screen/analytics_dropship_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_inventory_screen/analytics_inventory_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_marketplace_screen/analytics_marketplace_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_profit_screen/analytics_profit_screen.dart';
@@ -436,6 +437,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     path: 'categories',
                     builder: (BuildContext context, GoRouterState state) =>
                         const AnalyticsCategoriesScreen(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'dropship',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const AnalyticsDropshipScreen(),
                   ),
                   GoRoute(
                     parentNavigatorKey: AppNavigatorKey.root,

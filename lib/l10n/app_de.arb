@@ -1626,5 +1626,13 @@
   "filterSupplier": "Lieferant",
   "supplierStageToOrder": "Zu bestellen",
   "supplierStageAwaitingTracking": "Warten auf Sendungsnummer",
-  "supplierStageLate": "Verspätet"
+  "supplierStageLate": "Verspätet",
+  "analyticsDropship": "Dropshipping",
+  "analyticsDropshipSubtitle": "Eigener Bestand gegen Dropshipping, Produkte und Lieferanten",
+  "analyticsDropshipEmptyTitle": "Noch keine Dropshipping-Produkte",
+  "analyticsDropshipEmptyBody": "Liste ein Lieferantenprodukt, dann erscheinen seine Verkäufe hier.",
+  "analyticsDropshipProducts": "Produkte, die besten zuerst",
+  "analyticsSupplierShipTime": "Wie schnell Lieferanten versenden",
+  "analyticsDaysAverage": "Durchschnittlich {days} Tage",
+  "analyticsShipments": "{count, plural, =1{1 Sendung} other{{count} Sendungen}}"
 }

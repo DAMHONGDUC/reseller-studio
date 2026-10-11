@@ -18,6 +18,7 @@ import '../inventory/domain/entities/item.dart';
 import '../inventory/domain/enums/item_status.dart';
 import '../inventory/providers.dart';
 import '../orders/domain/entities/order.dart';
+import '../orders/domain/entities/supplier_order.dart';
 import '../orders/providers.dart';
 import '../pricing/domain/services/profit_calculator.dart';
 import '../workspace/providers.dart';
@@ -26,6 +27,7 @@ import 'domain/entities/analytics_summary.dart';
 import 'domain/entities/trend_bucket.dart';
 import 'domain/enums/analytics_period.dart';
 import 'domain/services/analytics_period_window.dart';
+import 'domain/services/dropship_performance.dart';
 import 'domain/services/profit_trend.dart';
 
 /// The headline figures — Home's overview tiles and the top of Analytics.
@@ -288,3 +290,36 @@ final Provider<Money?> inventoryValueProvider = Provider<Money?>((Ref ref) {
       .where((Money? value) => value != null)
       .totalOfKnown();
 });
+
+/// The business split by who ships it.
+final Provider<({FulfilmentFigures stocked, FulfilmentFigures dropship})>
+fulfilmentSplitProvider =
+    Provider<({FulfilmentFigures stocked, FulfilmentFigures dropship})>((
+      Ref ref,
+    ) {
+      return DropshipPerformance.split(
+        orders: ref.watch(ordersProvider).value ?? const <Order>[],
+        items: <String, Item>{
+          for (final Item item
+              in ref.watch(itemsProvider).value ?? const <Item>[])
+            item.id: item,
+        },
+      );
+    });
+
+/// Dropshipped products, best gross profit first.
+final Provider<List<DropshipProductPerformance>> dropshipProductsProvider =
+    Provider<List<DropshipProductPerformance>>((Ref ref) {
+      return DropshipPerformance.products(
+        orders: ref.watch(ordersProvider).value ?? const <Order>[],
+        items: ref.watch(itemsProvider).value ?? const <Item>[],
+      );
+    });
+
+/// Each supplier's average days from order to dispatch, quickest first.
+final Provider<List<SupplierShipTime>> supplierShipTimesProvider =
+    Provider<List<SupplierShipTime>>((Ref ref) {
+      return DropshipPerformance.shipTimes(
+        ref.watch(supplierOrdersProvider).value ?? const <SupplierOrder>[],
+      );
+    });

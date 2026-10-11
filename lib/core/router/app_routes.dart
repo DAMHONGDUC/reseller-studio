@@ -115,6 +115,7 @@ final class AppRoutes {
   static const String analyticsMarketplace = '/analytics/marketplace';
   static const String analyticsCategories = '/analytics/categories';
   static const String analyticsSources = '/analytics/sources';
+  static const String analyticsDropship = '/analytics/dropship';
 
   // --- Shell branch 5: More ---
 
