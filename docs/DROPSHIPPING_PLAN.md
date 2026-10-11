@@ -3,7 +3,8 @@
 The whole plan for bringing dropshipping — and the AutoDS-style automation it
 runs on — into Reseller Studio. **Nothing in it is built until this file is
 finished and the open decisions in §11 are answered** (`CLAUDE.md`, "What this
-project is").
+project is"). **Status: finished — every decision in §11 answered by the owner
+on 2026-10-11.**
 
 Written 2026-10-11. Platform facts in §3 come from vendor docs and third-party
 guides read that day; each one is re-checked against the vendor's own
@@ -94,8 +95,9 @@ Checked against AutoDS's own features page and its Orders help article on
 |---|---|---|
 | ✅ Several stores and platforms | Connections per workspace; eBay, Shopify, Etsy, TikTok Shop | 2, 3, 6 |
 | ✅ Profit dashboard | Existing analytics, split by fulfilment, costs from supplier orders | 1 |
+| ✅ eBay title builder | The title builder above | 1 |
 | ✅ eBay fee calculator | The existing buy calculator, with supplier cost as the buy price | 1 |
-| ✅ AI title and description rewrite, single and bulk | Through a Cloud Function — a new third-party service, decision 11.9 | 6 |
+| ➕ AI title and description rewrite | Replaced by two on-device tools, no AI and no new service (decision 11.9): a **title builder** that assembles brand, product type, key attributes, size and condition and trims to each platform's limit; and a **supplier text cleaner** that strips filler ("2026 New Hot Sale"), emoji and repeated words. Single and bulk | 1 |
 | ✅ Print on demand | A supplier adapter for a POD supplier, same interface | 6 |
 | ❌ Auto-order through the seller's buyer account | §10 | — |
 | ❌ Fulfilled by AutoDS (managed balance) | §10 | — |
@@ -241,7 +243,7 @@ inside existing features.
 | Supplier product → "List it" | Creates a dropship item and its listings at the price a pricing rule gives, shows the expected profit before saving |
 | Inventory | Filter by fulfilment; a dropship row shows supplier price, supplier stock and margin at the current price |
 | Listings → Pricing rules | Create, edit and delete rules; bulk "apply rule" on a selection (hard rule 16) |
-| Listing detail | Price history with reasons |
+| Listing detail | Price history with reasons; "Build title" and "Clean supplier text", previewed before they replace anything |
 | Order detail | Supplier order card: one tap "Order from supplier" when connected; "open supplier page" and fields for the supplier order number and cost when not. Shows DAS, estimated arrival, failure reason, "Try again", "Place anyway", "Switch supplier", cancel both sides, supplier refund, attach supplier invoice |
 | Shipping queue | Gains "to order from supplier" ahead of "to ship" |
 | Home → Needs attention | Orders to place with a supplier; supplier orders past the DAS threshold; synced orders or listings not linked to a supplier; supplier orders that failed; supplier out of stock while listed; margin below a rule's floor after a supplier price rise; listings still live elsewhere after a sale; a connection that needs reconnecting |
@@ -285,13 +287,13 @@ rulebook and `docs/DATA_MODEL.md` current, `docs/DONE_WORK.md` and
 
 | Phase | Builds | Needs from the owner | Done when |
 |---|---|---|---|
-| 0 — Access | Developer accounts and approvals: eBay developer keys, CJ API key, Shopify Partner app, Etsy app; a Cloud KMS key; secrets in Secret Manager | Accounts in the business's name; `RELEASE_ACTIONS.md` entries | Each platform answers a sandbox call from a deployed Function |
-| 1 — Manual dropshipping | Fulfilment kind on items, variants, suppliers as sources, supplier products with tax and shipping days, manual supplier orders with DAS, estimated arrival, samples, supplier refunds and invoices, pricing rules, bulk apply, listing price history, delist-after-sale attention, listing templates, order filters, analytics split with winners and losers | Answers in §11 | A guest runs the whole lifecycle with no connection and every number is right or `—` |
-| 2 — Connection foundation | `connections`, `connection_tokens`, `sync_runs`, OAuth round trip, adapter interfaces, Connections screen, `refreshTokens`, rules and their emulator tests | Phase 0 | A seller connects and disconnects a sandbox account; a token never appears in a client read or a log |
+| 0 — Access | Developer accounts and approvals: eBay developer keys, CJ API key, Shopify Partner app, Etsy app; a Cloud KMS key; secrets in Secret Manager; RevenueCat offering text for connections | Accounts in the business's name; `RELEASE_ACTIONS.md` entries | Each platform answers a sandbox call from a deployed Function |
+| 1 — Manual dropshipping | Fulfilment kind on items, variants, suppliers as sources, supplier products with tax and shipping days, manual supplier orders with DAS, estimated arrival, samples, supplier refunds and invoices, pricing rules, bulk apply, title builder and supplier text cleaner, listing price history, delist-after-sale attention, listing templates, order filters, analytics split with winners and losers | Answers in §11 | A guest runs the whole lifecycle with no connection and every number is right or `—` |
+| 2 — Connection foundation | `connections`, `connection_tokens`, `sync_runs`, OAuth round trip, adapter interfaces, Connections screen, `refreshTokens`, `PlanFeature.connections` with its server-side gate and pause on lapse, rules and their emulator tests | Phase 0 | A seller connects and disconnects a sandbox account; a token never appears in a client read or a log |
 | 3 — eBay | Orders in by polling, tracking out, price and quantity push for API-managed listings | eBay production keys | A real eBay sale appears as an order with no typing, and tracking lands on eBay |
 | 4 — CJ | Product import, hourly monitor, webhooks, one-tap supplier order, retry and place anyway, backup suppliers and switch, default phone, shipped trigger, auto-deliver, order log, tracking back | CJ account with balance | A synced eBay sale becomes a placed CJ order in one tap, and its tracking reaches eBay |
 | 5 — Automation | Auto repricing, stale repricing, minimum-stock guard and restock, auto ordering behind the three protections | Decision 11.2 | A supplier price rise reprices the listing, and a sale is ordered with no tap, within the cap |
-| 6 — More platforms and extras | Shopify, then Etsy, then TikTok Shop and AliExpress as access allows; a POD supplier; eBay buyer messages; AI rewrite if approved | Each platform's review | Each adapter passes the same contract tests as eBay or CJ |
+| 6 — More platforms and extras | Shopify, then Etsy, then TikTok Shop and AliExpress as access allows; a POD supplier; eBay buyer messages | Each platform's review | Each adapter passes the same contract tests as eBay or CJ |
 
 Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
 
@@ -318,19 +320,23 @@ Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
 | A managed balance (Fulfilled by AutoDS) | The app would hold the seller's money and buy on their behalf — a payment service, not a seller tool |
 | Product research, "winning products", trend scraping, ads spy | Needs market data this app does not own; scraping breaks platform terms |
 | AI image generator | Generated product photos misrepresent the item a buyer receives |
+| AI text generation | Owner chose the title builder and the text cleaner instead (11.9); no model, no new service |
 | Store builder | Shopify already is one; the app connects to the store the seller has |
 | Storing buyer addresses | §4; passed through only |
 
-## 11. Open decisions
+## 11. Decisions
 
-| # | Question | Default if unanswered |
-|---|---|---|
-| 11.1 | Are connections free, or Premium? Today only export is paid, and sync costs server time per seller | Premium — the first feature with a running cost |
-| 11.2 | Is auto-ordering allowed at all, and with what default cap? | Allowed, off by default, cap required |
-| 11.3 | `GUEST_MODE.md` forbids any sync indicator. Confirm that rule covers only the device store, so a connection's status and errors may be shown | Yes — a connection error is something the seller can act on (reconnect) |
-| 11.4 | First marketplace eBay, first supplier CJ? | Yes |
-| 11.5 | Buyer address passed through, never stored, so a manual order is never placed automatically? | Yes |
-| 11.6 | Should the `Marketplace` enum (orders) and the connection platform enum be one list or two? Vinted is in the seller records but has no API | Two — what a seller sells on is not what the app can connect to |
-| 11.7 | Variants: one item per supplier variant, or a variant table under one item? One item per variant fits today's model; eBay's multi-variation listing needs the table | One item per variant in Phase 1; the table when multi-variation listings are built |
-| 11.8 | Automatic buyer messages on eBay — build them? | Yes, every type off by default |
-| 11.9 | AI rewrite of titles and descriptions needs a new third-party service (an LLM API, server-side). Approve? | Not until approved |
+All answered by the owner on 2026-10-11. Where a rule file now carries one,
+it is named; the rest are carried by this plan.
+
+| # | Question | Decision | Carried by |
+|---|---|---|---|
+| 11.1 | Connections free or Premium? | **Premium**, gated in the backend too; a lapse pauses and deletes nothing | `docs/rules/SUBSCRIPTION.md` |
+| 11.2 | Auto-ordering allowed, and with what cap? | **Allowed, off by default**; turning it on requires a daily cap; the first auto order still asks | §7 |
+| 11.3 | Does `GUEST_MODE.md`'s ban on sync indicators cover connections? | **No** — it covers the device store only; a connection's status and last error are shown | `docs/rules/GUEST_MODE.md` |
+| 11.4 | First marketplace and supplier? | **eBay, then CJdropshipping** | §3, §8 |
+| 11.5 | Buyer address stored? | **Never** — passed through to the supplier at placement | `docs/rules/PRIVACY_AND_SECURITY.md` |
+| 11.6 | One platform list or two? | **Two**: what a seller sells on (`Marketplace`) and what the app can connect to (a connection platform enum) | §4 |
+| 11.7 | Variants? | **One item per supplier variant** in Phase 1; a variant table when multi-variation listings are built | §4 |
+| 11.8 | Automatic eBay buyer messages? | **Built, every type off by default** | §2, Phase 6 |
+| 11.9 | AI rewrite through a new service? | **No.** A rule-based title builder and a supplier text cleaner, on device, in Phase 1 | §2, §6 |
