@@ -1634,5 +1634,12 @@
   "analyticsDropshipProducts": "Sản phẩm, tốt nhất trước",
   "analyticsSupplierShipTime": "Tốc độ giao của nhà cung cấp",
   "analyticsDaysAverage": "Trung bình {days} ngày",
-  "analyticsShipments": "{count, plural, other{{count} lần giao}}"
+  "analyticsShipments": "{count, plural, other{{count} lần giao}}",
+  "supplierOrderInvoice": "Hoá đơn nhà cung cấp",
+  "supplierProductOrderSample": "Đặt hàng mẫu",
+  "supplierProductSampleCost": "Giá hàng mẫu",
+  "supplierProductSampleHelp": "Ghi là chi phí, không phải giá vốn đơn bán.",
+  "supplierProductSampleDone": "Đã ghi hàng mẫu vào chi phí",
+  "receiptKindSupplierOrder": "Đơn nhà cung cấp",
+  "receiptOpenSale": "Mở đơn bán"
 }

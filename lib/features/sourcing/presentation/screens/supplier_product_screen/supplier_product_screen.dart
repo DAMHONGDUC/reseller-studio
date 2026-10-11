@@ -14,7 +14,9 @@ import '../../../../../core/utils/text_input_utils.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/app_section.dart';
 import '../../../../../core/widgets/money_field.dart';
+import '../../../../../core/widgets/price_entry_sheet.dart';
 import '../../../../listings/domain/services/supplier_text_cleaner.dart';
+import '../../../../orders/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/supplier_product.dart';
 import '../../../domain/services/supplier_cost.dart';
@@ -83,6 +85,31 @@ class _SupplierProductScreenState extends ConsumerState<SupplierProductScreen>
 
     if (mounted) await context.push(AppRoutes.crossList(itemId));
   });
+
+  /// A sample is bought at the supplier and costed as an expense.
+  Future<void> _orderSample(SupplierProduct product) => PriceEntrySheet.show(
+    context,
+    title: context.l10n.supplierProductOrderSample,
+    fieldLabel: context.l10n.supplierProductSampleCost,
+    submitLabel: context.l10n.actionSave,
+    initialPrice: SupplierCost.landed(product),
+    helperText: context.l10n.supplierProductSampleHelp,
+    onSubmit: (Money cost) async {
+      await ref
+          .read(supplierOrderControllerProvider.notifier)
+          .orderSample(
+            product: product,
+            cost: cost,
+            supplierName: ref.read(sourceNamesProvider)[product.sourceId],
+          );
+      if (mounted) {
+        SdSnackBarUtilsV3.success(
+          context,
+          context.l10n.supplierProductSampleDone,
+        );
+      }
+    },
+  );
 
   Future<void> _delete(String productId) {
     final NavigatorState navigator = Navigator.of(context);
@@ -162,6 +189,7 @@ class _SupplierProductScreenState extends ConsumerState<SupplierProductScreen>
                           .read(supplierProductControllerProvider.notifier)
                           .markChecked(existing),
                     ),
+                    onSample: () => _orderSample(existing),
                   ),
                   SizedBox(height: SdContentPaddingV3.sectionGap),
                 ],

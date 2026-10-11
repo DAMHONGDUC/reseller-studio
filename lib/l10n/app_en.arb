@@ -7354,5 +7354,33 @@
         "type": "int"
       }
     }
+  },
+  "supplierOrderInvoice": "Supplier invoice",
+  "@supplierOrderInvoice": {
+    "description": "Label above the supplier invoice attachment."
+  },
+  "supplierProductOrderSample": "Order a sample",
+  "@supplierProductOrderSample": {
+    "description": "Action and sheet title for buying a sample from the supplier."
+  },
+  "supplierProductSampleCost": "Sample cost",
+  "@supplierProductSampleCost": {
+    "description": "Label for what the sample cost."
+  },
+  "supplierProductSampleHelp": "Recorded as an expense, not a sale's cost.",
+  "@supplierProductSampleHelp": {
+    "description": "Helper under the sample cost."
+  },
+  "supplierProductSampleDone": "Sample recorded as an expense",
+  "@supplierProductSampleDone": {
+    "description": "Confirmation after a sample is recorded."
+  },
+  "receiptKindSupplierOrder": "Supplier order",
+  "@receiptKindSupplierOrder": {
+    "description": "Receipt kind: an invoice on a supplier order."
+  },
+  "receiptOpenSale": "Open the sale",
+  "@receiptOpenSale": {
+    "description": "Button opening the sale a supplier invoice belongs to."
   }
 }

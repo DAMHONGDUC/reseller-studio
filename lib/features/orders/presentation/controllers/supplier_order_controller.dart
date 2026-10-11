@@ -3,7 +3,14 @@ import 'package:system_design/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/permissions/permission_blocked.dart';
 import '../../../../core/providers/repository_providers.dart';
+import '../../../../core/providers/system_permissions_provider.dart';
+import '../../../../core/storage/document_picker.dart';
+import '../../../../core/storage/file_uploader.dart';
+import '../../../expenses/domain/entities/expense.dart';
+import '../../../listings/domain/enums/listing_status.dart';
+import '../../../sourcing/domain/entities/supplier_product.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/entities/supplier_order.dart';
 import '../../domain/enums/order_status.dart';
@@ -124,6 +131,99 @@ class SupplierOrderController extends Notifier<bool> {
     );
   }
 
+  /// The seller bought one to check its quality. A sample is no sale's
+  /// cost, so it lands as an expense beside the supplier order.
+  Future<void> orderSample({
+    required SupplierProduct product,
+    required Money cost,
+    String? supplierName,
+  }) async {
+    final DateTime now = DateTime.now();
+    final SupplierOrder sample = SupplierOrder(
+      id: SdId.unique(),
+      sourceId: product.sourceId,
+      status: SupplierOrderStatus.placed,
+      createdAt: now,
+      itemId: product.itemId,
+      supplierProductId: product.id,
+      productCost: cost,
+      isSample: true,
+      placedAt: now,
+    );
+
+    await _write('Order a sample', sample);
+    try {
+      await ref
+          .read(expenseRepositoryProvider)
+          .save(
+            Expense(
+              id: SdId.unique(),
+              category: ExpenseCategory.other,
+              amount: cost,
+              date: now,
+              createdAt: now,
+              vendor: supplierName,
+              notes: product.title,
+              supplierOrderId: sample.id,
+            ),
+          );
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.dropship,
+        'Failed to record the sample as an expense',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'supplierOrderId': sample.id},
+      );
+      rethrow;
+    }
+  }
+
+  /// Photograph or choose the supplier's invoice and keep it on the order.
+  /// Null when the seller cancelled, which is not an error.
+  Future<void> attachInvoice(
+    SupplierOrder supplierOrder, {
+    required bool fromCamera,
+  }) async {
+    final String? url;
+
+    state = true;
+    try {
+      url = await DocumentPicker.pickAndUpload(
+        uploader: ref.read(fileUploaderProvider),
+        permissions: ref.read(systemPermissionsProvider),
+        folder: FileFolder.receipts,
+        recordId: supplierOrder.id,
+        fromCamera: fromCamera,
+      );
+    } on PermissionBlocked {
+      // Logged by the picker: a refusal is the seller's call, not a failure.
+      rethrow;
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.dropship,
+        'Failed to attach a supplier invoice',
+        error: error,
+        stackTrace: stackTrace,
+        data: <String, Object>{'supplierOrderId': supplierOrder.id},
+      );
+      rethrow;
+    } finally {
+      state = false;
+    }
+
+    if (url == null) return;
+    await _write(
+      'Attach supplier invoice',
+      supplierOrder.copyWith(invoiceUrl: url),
+    );
+  }
+
+  Future<void> removeInvoice(SupplierOrder supplierOrder) => _write(
+    'Remove supplier invoice',
+    supplierOrder.copyWith(clearInvoiceUrl: true),
+  );
+
   Future<void> _write(
     String describe,
     SupplierOrder supplierOrder, {
@@ -157,9 +257,3 @@ class SupplierOrderController extends Notifier<bool> {
     }
   }
 }
-
-final NotifierProvider<SupplierOrderController, bool>
-supplierOrderControllerProvider =
-    NotifierProvider<SupplierOrderController, bool>(
-      SupplierOrderController.new,
-    );

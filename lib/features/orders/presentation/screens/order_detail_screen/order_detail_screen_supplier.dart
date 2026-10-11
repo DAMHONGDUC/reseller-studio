@@ -267,6 +267,18 @@ class _Ordered extends ConsumerWidget {
               ),
           ],
         ),
+        SizedBox(height: SdSpacingConstant.h12),
+        SdFieldLabelV3(label: context.l10n.supplierOrderInvoice),
+        SizedBox(height: SdSpacingConstant.h6),
+        ReceiptField(
+          url: supplierOrder.invoiceUrl,
+          isBusy: ref.watch(supplierOrderControllerProvider),
+          onCamera: () =>
+              controller.attachInvoice(supplierOrder, fromCamera: true),
+          onLibrary: () =>
+              controller.attachInvoice(supplierOrder, fromCamera: false),
+          onRemove: () => controller.removeInvoice(supplierOrder),
+        ),
       ],
     );
   }

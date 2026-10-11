@@ -1634,5 +1634,12 @@
   "analyticsDropshipProducts": "Produkte, die besten zuerst",
   "analyticsSupplierShipTime": "Wie schnell Lieferanten versenden",
   "analyticsDaysAverage": "Durchschnittlich {days} Tage",
-  "analyticsShipments": "{count, plural, =1{1 Sendung} other{{count} Sendungen}}"
+  "analyticsShipments": "{count, plural, =1{1 Sendung} other{{count} Sendungen}}",
+  "supplierOrderInvoice": "Lieferantenrechnung",
+  "supplierProductOrderSample": "Muster bestellen",
+  "supplierProductSampleCost": "Musterkosten",
+  "supplierProductSampleHelp": "Wird als Ausgabe erfasst, nicht als Kosten eines Verkaufs.",
+  "supplierProductSampleDone": "Muster als Ausgabe erfasst",
+  "receiptKindSupplierOrder": "Lieferantenbestellung",
+  "receiptOpenSale": "Verkauf öffnen"
 }

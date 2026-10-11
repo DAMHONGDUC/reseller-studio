@@ -64,6 +64,7 @@ final class SupplierOrderDto {
       shippedAt: FirestoreMapper.dateOrNull(data['shippedAt']),
       deliveredAt: FirestoreMapper.dateOrNull(data['deliveredAt']),
       failureCode: FirestoreMapper.stringOrNull(data['failureCode']),
+      invoiceUrl: FirestoreMapper.stringOrNull(data['invoiceUrl']),
     );
   }
 
@@ -90,6 +91,7 @@ final class SupplierOrderDto {
     'shippedAt': _timestampOrNull(order.shippedAt),
     'deliveredAt': _timestampOrNull(order.deliveredAt),
     'failureCode': order.failureCode,
+    'invoiceUrl': order.invoiceUrl,
     'createdAt': Timestamp.fromDate(order.createdAt),
     'updatedAt': FirestoreMapper.serverTimestamp,
     'createdBy': createdBy,

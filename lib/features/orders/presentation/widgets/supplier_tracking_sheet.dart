@@ -7,7 +7,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/text_input_utils.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/entities/supplier_order.dart';
-import '../controllers/supplier_order_controller.dart';
+import '../../providers.dart';
 
 /// The tracking number the supplier sent. Saving it ships the supplier order
 /// and, while the sale is still waiting, the sale with it.

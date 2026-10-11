@@ -19,6 +19,7 @@ class Expense {
     this.receiptUrl,
     this.mileage,
     this.orderId,
+    this.supplierOrderId,
     this.isRecurring = false,
     this.recurringSeriesId,
     this.deletedAt,
@@ -46,6 +47,9 @@ class Expense {
   /// Set when this cost belongs to one sale — a shipping label, say. Null for
   /// a general overhead. What lets `Order.profit` take an `otherExpenses`.
   final String? orderId;
+
+  /// The sample supplier order this cost was, when it was one.
+  final String? supplierOrderId;
 
   final bool isRecurring;
 

@@ -21,6 +21,7 @@ import 'domain/enums/order_supplier_stage.dart';
 import 'domain/services/payout_reconciliation.dart';
 import 'domain/services/supplier_orders.dart';
 import 'presentation/controllers/record_sale_controller.dart';
+import 'presentation/controllers/supplier_order_controller.dart';
 import 'supplier_order_constant.dart';
 
 final StreamProvider<List<Order>> ordersProvider = StreamProvider<List<Order>>((
@@ -389,3 +390,11 @@ lateSupplierOrdersProvider = Provider<List<SupplierOrder>>((Ref ref) {
         so,
   ];
 });
+
+/// Recording orders placed with a dropship supplier — here so another
+/// feature can reach it without importing this one's `presentation/`.
+final NotifierProvider<SupplierOrderController, bool>
+supplierOrderControllerProvider =
+    NotifierProvider<SupplierOrderController, bool>(
+      SupplierOrderController.new,
+    );

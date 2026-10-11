@@ -1634,5 +1634,12 @@
   "analyticsDropshipProducts": "Produtos, os melhores primeiro",
   "analyticsSupplierShipTime": "Rapidez de envio dos fornecedores",
   "analyticsDaysAverage": "{days} dias em média",
-  "analyticsShipments": "{count, plural, =1{1 envio} other{{count} envios}}"
+  "analyticsShipments": "{count, plural, =1{1 envio} other{{count} envios}}",
+  "supplierOrderInvoice": "Nota do fornecedor",
+  "supplierProductOrderSample": "Pedir uma amostra",
+  "supplierProductSampleCost": "Custo da amostra",
+  "supplierProductSampleHelp": "Registrado como despesa, não como custo de uma venda.",
+  "supplierProductSampleDone": "Amostra registrada como despesa",
+  "receiptKindSupplierOrder": "Pedido ao fornecedor",
+  "receiptOpenSale": "Abrir a venda"
 }

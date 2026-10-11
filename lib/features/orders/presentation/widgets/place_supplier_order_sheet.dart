@@ -10,7 +10,7 @@ import '../../../../core/widgets/money_field.dart';
 import '../../../sourcing/domain/entities/supplier_product.dart';
 import '../../../workspace/providers.dart';
 import '../../domain/entities/order.dart';
-import '../controllers/supplier_order_controller.dart';
+import '../../providers.dart';
 
 /// Record an order placed at the supplier for one sold line.
 ///

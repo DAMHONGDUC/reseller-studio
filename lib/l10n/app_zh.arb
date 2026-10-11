@@ -1634,5 +1634,12 @@
   "analyticsDropshipProducts": "商品（按利润排序）",
   "analyticsSupplierShipTime": "供应商发货速度",
   "analyticsDaysAverage": "平均 {days} 天",
-  "analyticsShipments": "{count, plural, other{{count} 次发货}}"
+  "analyticsShipments": "{count, plural, other{{count} 次发货}}",
+  "supplierOrderInvoice": "供应商发票",
+  "supplierProductOrderSample": "订购样品",
+  "supplierProductSampleCost": "样品成本",
+  "supplierProductSampleHelp": "记为费用，而非销售成本。",
+  "supplierProductSampleDone": "样品已记为费用",
+  "receiptKindSupplierOrder": "供应商订单",
+  "receiptOpenSale": "打开订单"
 }

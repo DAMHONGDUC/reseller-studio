@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/core/providers/repository_providers.dart';
+import 'package:reseller_studio/features/expenses/domain/entities/expense.dart';
+import 'package:reseller_studio/features/expenses/providers.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_fulfilment.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
@@ -15,6 +17,8 @@ import 'package:reseller_studio/features/orders/domain/enums/supplier_order_stat
 import 'package:reseller_studio/features/orders/domain/services/supplier_orders.dart';
 import 'package:reseller_studio/features/orders/presentation/controllers/supplier_order_controller.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
+import 'package:reseller_studio/features/receipts/providers.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/supplier_product.dart';
 
 import '../../support/pump_app.dart';
 
@@ -179,6 +183,76 @@ void main() {
           .value!
           .firstWhere((Order o) => o.id == id);
     }
+
+    test(
+      'a sample is a supplier order and an expense, not a sale cost',
+      () async {
+        container.listen(expensesProvider, (_, _) {}, fireImmediately: true);
+        await Future<void>.delayed(Duration.zero);
+
+        await container
+            .read(supplierOrderControllerProvider.notifier)
+            .orderSample(
+              product: SupplierProduct(
+                id: 'sp-1',
+                sourceId: 'cj',
+                title: 'Jacket',
+                createdAt: sold,
+              ),
+              cost: const Money(900, 'USD'),
+              supplierName: 'CJ',
+            );
+        await Future<void>.delayed(Duration.zero);
+
+        final SupplierOrder sample = container
+            .read(supplierOrdersProvider)
+            .value!
+            .single;
+        final Expense expense = container
+            .read(expensesProvider)
+            .value!
+            .firstWhere((Expense e) => e.supplierOrderId == sample.id);
+
+        expect(sample.isSample, isTrue);
+        expect(expense.amount, const Money(900, 'USD'));
+        expect(container.read(supplierOrdersToPlaceProvider), isEmpty);
+      },
+    );
+
+    test(
+      'an invoice on a supplier order is listed with the receipts',
+      () async {
+        final Order sale = await sell();
+
+        await container
+            .read(supplierOrderControllerProvider.notifier)
+            .place(
+              order: sale,
+              line: sale.lines.single,
+              sourceId: 'cj',
+              productCost: const Money(1200, 'USD'),
+            );
+        await Future<void>.delayed(Duration.zero);
+
+        final SupplierOrder so = container
+            .read(supplierOrdersForOrderProvider(sale.id))
+            .single;
+
+        await container
+            .read(supplierOrderRepositoryProvider)
+            .save(so.copyWith(invoiceUrl: 'file://invoice.jpg'));
+        await Future<void>.delayed(Duration.zero);
+
+        expect(
+          container
+              .read(receiptsProvider)
+              .where((ReceiptEntry r) => r.kind == ReceiptKind.supplierOrder)
+              .single
+              .recordId,
+          sale.id,
+        );
+      },
+    );
 
     test('stays for sale, and waits to be ordered', () async {
       await sell();

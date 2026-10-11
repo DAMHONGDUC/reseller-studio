@@ -9,6 +9,7 @@ class _StatusCard extends StatelessWidget {
     required this.onListIt,
     required this.onOpenItem,
     required this.onChecked,
+    required this.onSample,
   });
 
   final SupplierProduct product;
@@ -16,6 +17,7 @@ class _StatusCard extends StatelessWidget {
   final VoidCallback onListIt;
   final VoidCallback onOpenItem;
   final VoidCallback onChecked;
+  final VoidCallback onSample;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +69,14 @@ class _StatusCard extends StatelessWidget {
             size: SdButtonSizeV3.small,
             expand: true,
             onPressed: isBusy ? null : onChecked,
+          ),
+          SizedBox(height: SdSpacingConstant.h8),
+          SdButtonV3(
+            variant: SdButtonVariantV3.text,
+            label: context.l10n.supplierProductOrderSample,
+            size: SdButtonSizeV3.small,
+            expand: true,
+            onPressed: isBusy ? null : onSample,
           ),
         ],
       ),

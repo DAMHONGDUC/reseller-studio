@@ -23,6 +23,7 @@ import '../../../../../core/widgets/money_field.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/picker_field.dart';
 import '../../../../../core/widgets/price_entry_sheet.dart';
+import '../../../../../core/widgets/receipt_field.dart';
 import '../../../../carriers/domain/entities/carrier.dart';
 import '../../../../carriers/providers.dart';
 import '../../../../expenses/domain/entities/expense.dart';

@@ -41,20 +41,22 @@ class _ReceiptPreview extends StatelessWidget {
         SizedBox(height: SdSpacingConstant.h16),
         SdButtonV3(
           variant: SdButtonVariantV3.secondary,
-          label: receipt.kind == ReceiptKind.purchase
-              ? 'Open the purchase'
-              : 'Open expenses',
+          label: switch (receipt.kind) {
+            ReceiptKind.purchase => 'Open the purchase',
+            ReceiptKind.expense => 'Open expenses',
+            ReceiptKind.supplierOrder => context.l10n.receiptOpenSale,
+          },
           expand: true,
           onPressed: () {
             Navigator.of(context).pop();
 
             // An expense has no detail screen of its own — the list is where
             // it is edited — so the two kinds land in different places.
-            context.push(
-              receipt.kind == ReceiptKind.purchase
-                  ? AppRoutes.purchase(receipt.recordId)
-                  : AppRoutes.expenses,
-            );
+            context.push(switch (receipt.kind) {
+              ReceiptKind.purchase => AppRoutes.purchase(receipt.recordId),
+              ReceiptKind.expense => AppRoutes.expenses,
+              ReceiptKind.supplierOrder => AppRoutes.order(receipt.recordId),
+            });
           },
         ),
       ],

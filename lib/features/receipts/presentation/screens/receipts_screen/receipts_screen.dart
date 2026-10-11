@@ -101,9 +101,12 @@ class _ReceiptRow extends StatelessWidget {
               SizedBox(height: SdSpacingConstant.h2),
               Text(
                 context.l10n.receiptSubtitle(
-                  receipt.kind == ReceiptKind.purchase
-                      ? context.l10n.receiptKindPurchase
-                      : context.l10n.receiptKindExpense,
+                  switch (receipt.kind) {
+                    ReceiptKind.purchase => context.l10n.receiptKindPurchase,
+                    ReceiptKind.expense => context.l10n.receiptKindExpense,
+                    ReceiptKind.supplierOrder =>
+                      context.l10n.receiptKindSupplierOrder,
+                  },
                   DateTimeUtils.mediumDate(
                     receipt.date,
                     locale: context.localeTag,

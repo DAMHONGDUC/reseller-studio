@@ -23,7 +23,7 @@ class LocalListingRepository implements ListingRepository {
         logTag: LogTagConstant.listing,
         label: 'listing',
       ),
-      _priceChanges = LocalCollection<ListingPriceChange>(
+      _collectionOfPriceChanges = LocalCollection<ListingPriceChange>(
         table: LocalTable(_db, _db.localListingPriceChanges),
         fromMap: (String id, Map<String, Object?> data) =>
             ListingPriceChangeDto.fromMap(id, data, fallbackCurrency: currency),
@@ -37,7 +37,7 @@ class LocalListingRepository implements ListingRepository {
 
   final LocalDatabase _db;
   final LocalCollection<Listing> _collection;
-  final LocalCollection<ListingPriceChange> _priceChanges;
+  final LocalCollection<ListingPriceChange> _collectionOfPriceChanges;
 
   @override
   Stream<List<Listing>> watchListings() => _collection.watchAll();
@@ -56,12 +56,12 @@ class LocalListingRepository implements ListingRepository {
     List<ListingPriceChange> priceChanges = const <ListingPriceChange>[],
   }) => _db.transaction(() async {
     await _collection.saveAll(listings);
-    await _priceChanges.saveAll(priceChanges);
+    await _collectionOfPriceChanges.saveAll(priceChanges);
   });
 
   @override
   Stream<List<ListingPriceChange>> watchPriceChangesForItem(String itemId) =>
-      _priceChanges.watchWhere(
+      _collectionOfPriceChanges.watchWhere(
         (ListingPriceChange change) => change.itemId == itemId,
       );
 }

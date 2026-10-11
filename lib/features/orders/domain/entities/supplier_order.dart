@@ -28,6 +28,7 @@ class SupplierOrder {
     this.shippedAt,
     this.deliveredAt,
     this.failureCode,
+    this.invoiceUrl,
   });
 
   final String id;
@@ -66,6 +67,9 @@ class SupplierOrder {
   /// Why a connected supplier refused it (Phase 4).
   final String? failureCode;
 
+  /// The supplier's invoice — a marketplace may ask for proof of supply.
+  final String? invoiceUrl;
+
   SupplierOrder copyWith({
     SupplierOrderStatus? status,
     String? externalSupplierOrderId,
@@ -78,6 +82,8 @@ class SupplierOrder {
     DateTime? placedAt,
     DateTime? shippedAt,
     DateTime? deliveredAt,
+    String? invoiceUrl,
+    bool clearInvoiceUrl = false,
   }) => SupplierOrder(
     id: id,
     sourceId: sourceId,
@@ -99,5 +105,6 @@ class SupplierOrder {
     shippedAt: shippedAt ?? this.shippedAt,
     deliveredAt: deliveredAt ?? this.deliveredAt,
     failureCode: failureCode,
+    invoiceUrl: clearInvoiceUrl ? null : invoiceUrl ?? this.invoiceUrl,
   );
 }
