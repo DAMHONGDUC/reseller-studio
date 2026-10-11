@@ -120,6 +120,9 @@ FIND PRODUCT → LIST → SELL → ORDER FROM SUPPLIER → TRACK → PROFIT → 
 - **The dropshipping work is planned whole before any of it is built.**
   Owner's rule. `docs/DROPSHIPPING_PLAN.md` is finished first; no code lands
   against a half-written plan.
+- **The dropshipping work is built on its own branch, `feat/dropshipping`,
+  never on `master`.** Owner's rule. A multi-phase change reaches `master` as
+  one reviewed merge, not as a stream of half-features.
 - It runs on marketplace and supplier connections, which hard rule 10 now
   allows.
 
