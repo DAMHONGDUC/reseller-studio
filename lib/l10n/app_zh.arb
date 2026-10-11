@@ -1644,5 +1644,7 @@
   "receiptOpenSale": "打开订单",
   "supplierProductRecheck": "请核对价格和库存",
   "itemSummaryOnHand": "{count, plural, =0{无库存} other{库存 {count}}}",
-  "orderNotShippedYet": "尚未发货"
+  "orderNotShippedYet": "尚未发货",
+  "homeShowMore": "显示更多",
+  "homeShowLess": "收起"
 }

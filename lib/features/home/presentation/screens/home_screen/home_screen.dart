@@ -83,18 +83,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// The Quick Action section's header — what the shortcut scrolls to.
   final GlobalKey _quickActionKey = GlobalKey();
 
+  /// Quick Action starts folded (`docs/UI_POLISH_PLAN.md`); the shortcut
+  /// opens it before scrolling there, so it never lands on a closed block.
+  bool _quickActionOpen = false;
+
   void _scrollToQuickAction() {
-    final BuildContext? section = _quickActionKey.currentContext;
+    setState(() => _quickActionOpen = true);
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      final BuildContext? section = _quickActionKey.currentContext;
 
-    if (section == null) return;
+      if (section == null || !mounted) return;
 
-    unawaited(
-      Scrollable.ensureVisible(
-        section,
-        duration: SdMotionV3.slow,
-        curve: SdMotionV3.emphasized,
-      ),
-    );
+      unawaited(
+        Scrollable.ensureVisible(
+          section,
+          duration: SdMotionV3.of(context, SdMotionV3.slow),
+          curve: SdMotionV3.emphasized,
+        ),
+      );
+    });
   }
 
   @override
@@ -181,12 +188,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: EdgeInsets.symmetric(
                 horizontal: SdContentPaddingV3.horizontal,
               ),
-              child: SdSectionHeaderV3(
+              child: SdCollapsibleSectionV3(
                 title: context.l10n.homeQuickAction,
-                subtitle: context.l10n.homeQuickActionSubtitle,
+                summary: context.l10n.homeQuickActionSubtitle,
+                expanded: _quickActionOpen,
+                onExpandedChanged: (bool open) =>
+                    setState(() => _quickActionOpen = open),
+                child: const _QuickAction(),
               ),
             ),
-            const _QuickAction(),
           ],
         ),
       ),

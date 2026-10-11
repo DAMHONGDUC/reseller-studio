@@ -169,7 +169,10 @@ void main() {
       expect(find.text('Stale inventory'), findsOneWidget);
       // Compact currency must render a symbol, not the ISO code — the bug
       // `NumberFormat.compactCurrency` introduced. The tiles sit below Needs
-      // Attention and the shortcut row, so they are scrolled to first.
+      // Attention and the shortcut row, behind Performance's Show more.
+      await tester.scrollUntilVisible(find.text('Show more'), 200);
+      await tester.tap(find.text('Show more'));
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.text(r'$439'), 200);
 
       expect(find.text(r'$439'), findsOneWidget);

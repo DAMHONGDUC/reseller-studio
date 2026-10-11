@@ -26,25 +26,33 @@ class _RecentActivity extends ConsumerWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-      child: AppSection(
+      // Folded to the latest sale; the rest one tap away
+      // (`docs/UI_POLISH_PLAN.md`).
+      child: SdCollapsibleSectionV3(
         title: context.l10n.homeRecentActivity,
-        padding: EdgeInsets.zero,
-        child: Column(
-          children: <Widget>[
-            for (int i = 0; i < recent.length; i++) ...<Widget>[
-              _ActivityRow(order: recent[i]),
-              if (i != recent.length - 1)
-                Padding(
-                  padding: EdgeInsets.only(
-                    left:
-                        SdSpacingConstant.w16 +
-                        SdIconTileSizeV3.small.box +
-                        SdSpacingConstant.w12,
+        summary: recent.first.lines.isEmpty
+            ? null
+            : '${recent.first.lines.first.title} · '
+                  '${context.money(recent.first.salePrice)}',
+        child: SdCardV3(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: <Widget>[
+              for (int i = 0; i < recent.length; i++) ...<Widget>[
+                _ActivityRow(order: recent[i]),
+                if (i != recent.length - 1)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left:
+                          SdSpacingConstant.w16 +
+                          SdIconTileSizeV3.small.box +
+                          SdSpacingConstant.w12,
+                    ),
+                    child: const SdDividerV3(),
                   ),
-                  child: const SdDividerV3(),
-                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

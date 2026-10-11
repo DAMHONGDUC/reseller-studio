@@ -1644,5 +1644,7 @@
   "receiptOpenSale": "Mở đơn bán",
   "supplierProductRecheck": "Cần kiểm tra giá và tồn kho",
   "itemSummaryOnHand": "{count, plural, =0{Hết hàng} other{Còn {count}}}",
-  "orderNotShippedYet": "Chưa gửi hàng"
+  "orderNotShippedYet": "Chưa gửi hàng",
+  "homeShowMore": "Xem thêm",
+  "homeShowLess": "Thu gọn"
 }

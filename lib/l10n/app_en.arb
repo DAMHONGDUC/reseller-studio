@@ -7399,5 +7399,13 @@
   "orderNotShippedYet": "Not shipped yet",
   "@orderNotShippedYet": {
     "description": "Folded Shipping section on order detail when there is no carrier or tracking yet."
+  },
+  "homeShowMore": "Show more",
+  "@homeShowMore": {
+    "description": "Button revealing the rest of Home's performance figures."
+  },
+  "homeShowLess": "Show less",
+  "@homeShowLess": {
+    "description": "Button hiding the rest of Home's performance figures."
   }
 }

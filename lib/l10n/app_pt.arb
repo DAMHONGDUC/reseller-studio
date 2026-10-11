@@ -1644,5 +1644,7 @@
   "receiptOpenSale": "Abrir a venda",
   "supplierProductRecheck": "Confira preço e estoque",
   "itemSummaryOnHand": "{count, plural, =0{Nenhum em estoque} other{{count} em estoque}}",
-  "orderNotShippedYet": "Ainda não enviado"
+  "orderNotShippedYet": "Ainda não enviado",
+  "homeShowMore": "Ver mais",
+  "homeShowLess": "Ver menos"
 }
