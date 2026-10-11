@@ -1649,5 +1649,6 @@
   "homeShowLess": "Weniger anzeigen",
   "itemFormMoreDetails": "Mehr Details",
   "itemFormFewerDetails": "Weniger Details",
-  "itemFormDetails": "Details"
+  "itemFormDetails": "Details",
+  "supplierProductReferences": "Lieferantenangaben"
 }

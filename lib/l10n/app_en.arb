@@ -7419,5 +7419,9 @@
   "itemFormDetails": "Details",
   "@itemFormDetails": {
     "description": "Item form section heading over status, condition and category."
+  },
+  "supplierProductReferences": "Supplier references",
+  "@supplierProductReferences": {
+    "description": "Folded group on the supplier product form: link, product and variant IDs."
   }
 }

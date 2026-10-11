@@ -1649,5 +1649,6 @@
   "homeShowLess": "收起",
   "itemFormMoreDetails": "更多详情",
   "itemFormFewerDetails": "收起详情",
-  "itemFormDetails": "详情"
+  "itemFormDetails": "详情",
+  "supplierProductReferences": "供应商信息"
 }
