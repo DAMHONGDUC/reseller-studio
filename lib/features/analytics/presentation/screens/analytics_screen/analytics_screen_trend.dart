@@ -38,7 +38,11 @@ class _ProfitTrend extends ConsumerWidget {
 }
 
 /// The bars themselves, drawn by `fl_chart`.
-class _TrendChart extends StatelessWidget {
+///
+/// **They grow in from the axis the first time they are drawn, and move to
+/// a new period rather than jumping** (`docs/UI_POLISH_PLAN.md`) — the
+/// chart's own tween, on `SdMotionV3` timing, and none under reduced motion.
+class _TrendChart extends StatefulWidget {
   const _TrendChart({required this.buckets, required this.grain});
 
   /// Revenue is the brand colour washed out, profit the brand colour itself:
@@ -53,6 +57,22 @@ class _TrendChart extends StatelessWidget {
   final List<TrendBucket> buckets;
   final TrendGrain grain;
 
+  @override
+  State<_TrendChart> createState() => _TrendChartState();
+}
+
+class _TrendChartState extends State<_TrendChart> {
+  /// False for the first frame, so the bars have a zero to grow from.
+  bool _drawn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      if (mounted) setState(() => _drawn = true);
+    });
+  }
+
   /// The axis label for a bucket: a weekday, a date or a month.
   static String _label(DateTime start, TrendGrain grain, String locale) =>
       switch (grain) {
@@ -63,6 +83,9 @@ class _TrendChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<TrendBucket> buckets = widget.buckets;
+    final TrendGrain grain = widget.grain;
+    final double grow = _drawn ? 1 : 0;
     final Color revenue = _TrendChart.revenueColor(context);
     final Color profit = context.colorScheme3.primary;
     final Color loss = context.sdTheme3.loss;
@@ -76,10 +99,12 @@ class _TrendChart extends StatelessWidget {
       label: context.l10n.analyticsTrendSemantics,
       excludeSemantics: true,
       child: SizedBox(
-        height: height,
+        height: _TrendChart.height,
         child: BarChart(
+          duration: SdMotionV3.of(context, SdMotionV3.slow),
+          curve: SdMotionV3.standard,
           BarChartData(
-            minY: lowest,
+            minY: lowest * grow,
             barTouchData: BarTouchData(enabled: false),
             borderData: FlBorderData(show: false),
             gridData: FlGridData(
@@ -102,9 +127,7 @@ class _TrendChart extends StatelessWidget {
                         meta: meta,
                         child: Text(
                           _label(buckets[value.toInt()].start, grain, locale),
-                          style: context.textTheme3.labelSmall!.faint3(
-                            context,
-                          ),
+                          style: context.textTheme3.labelSmall!.faint3(context),
                         ),
                       ),
                 ),
@@ -117,13 +140,13 @@ class _TrendChart extends StatelessWidget {
                   barsSpace: SdSpacingConstant.w2,
                   barRods: <BarChartRodData>[
                     BarChartRodData(
-                      toY: buckets[i].revenue.major,
+                      toY: buckets[i].revenue.major * grow,
                       color: revenue,
                       width: barWidth,
                       borderRadius: SdRadiusV3.chipAll,
                     ),
                     BarChartRodData(
-                      toY: buckets[i].profit?.major ?? 0,
+                      toY: (buckets[i].profit?.major ?? 0) * grow,
                       color: (buckets[i].profit?.isNegative ?? false)
                           ? loss
                           : profit,
