@@ -87,6 +87,24 @@ decide it, and they are listed in the order they outrank each other.
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
 
+## What starts folded
+
+Owner's call, approved with `docs/UI_POLISH_PLAN.md`. The order above is
+unchanged; what changed is how much of each section shows before a tap.
+
+- **Performance shows the profit hero; Revenue, Sold and Stock sit behind
+  Show more.** The one loud element stays on screen, and the three quiet
+  tiles are a tap away rather than a scroll past.
+- **Recent Activity folds to the latest sale** (`SdCollapsibleSectionV3`,
+  the summary naming it), and still owns its header and is absent on a new
+  account.
+- **Quick Action starts folded.** The shortcut row's Quick Action button
+  opens it first and then scrolls there, so it never lands on a closed block.
+- **Flow overview stays its own open card.** The plan grouped it with Recent
+  Activity, but a new account has no activity, and that is exactly when the
+  overview matters most — folding it inside a block that is absent then
+  would hide it from the seller it is for.
+
 **A section-order test reads the order sections come into view in, not
 pixels.** Home was a lazy `ListView` whose estimated extent made
 `position.pixels` a moving target and once reported the wrong order outright.
