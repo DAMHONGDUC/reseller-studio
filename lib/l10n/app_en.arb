@@ -7296,5 +7296,21 @@
   "filterFulfilment": "Fulfilment",
   "@filterFulfilment": {
     "description": "Inventory filter group: stocked or dropshipped."
+  },
+  "filterSupplier": "Supplier",
+  "@filterSupplier": {
+    "description": "Order filter group: where a dropship sale stands with its supplier."
+  },
+  "supplierStageToOrder": "To order",
+  "@supplierStageToOrder": {
+    "description": "Supplier filter option: a sold dropship line not yet ordered."
+  },
+  "supplierStageAwaitingTracking": "Waiting for tracking",
+  "@supplierStageAwaitingTracking": {
+    "description": "Supplier filter option: ordered, waiting for tracking."
+  },
+  "supplierStageLate": "Late",
+  "@supplierStageLate": {
+    "description": "Supplier filter option: ordered and waiting too long for tracking."
   }
 }

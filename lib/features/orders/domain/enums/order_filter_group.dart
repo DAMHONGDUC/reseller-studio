@@ -14,6 +14,7 @@ enum OrderFilterGroup {
   payout,
   tracking,
   saleRange,
+  supplier,
 }
 
 /// How a group is titled lives on the enum — owner's rule.
@@ -26,5 +27,6 @@ extension OrderFilterGroupDisplay on OrderFilterGroup {
     OrderFilterGroup.payout => context.l10n.filterPayout,
     OrderFilterGroup.tracking => context.l10n.filterTracking,
     OrderFilterGroup.saleRange => context.l10n.filterSaleRange,
+    OrderFilterGroup.supplier => context.l10n.filterSupplier,
   };
 }

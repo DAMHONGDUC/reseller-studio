@@ -4,6 +4,7 @@ import '../../../inventory/domain/entities/item.dart';
 import '../entities/order.dart';
 import '../entities/supplier_order.dart';
 import '../enums/order_status.dart';
+import '../enums/order_supplier_stage.dart';
 import '../enums/supplier_order_status.dart';
 
 /// One sold dropship line still waiting to be ordered from its supplier.
@@ -44,6 +45,42 @@ final class SupplierOrders {
       (SupplierOrderToPlace a, SupplierOrderToPlace b) =>
           a.order.orderedAt.compareTo(b.order.orderedAt),
     );
+  }
+
+  /// Where each dropship sale stands with its supplier, by order id. An
+  /// order with no dropship line, or one fully shipped, has no entry.
+  ///
+  /// The most pressing stage wins: a line still to order outranks one that
+  /// is late, which outranks one merely waiting.
+  static Map<String, OrderSupplierStage> stagesByOrder({
+    required List<Order> orders,
+    required Map<String, Item> items,
+    required List<SupplierOrder> supplierOrders,
+    required DateTime now,
+    required int lateAfterDays,
+  }) {
+    final Map<String, OrderSupplierStage> stages =
+        <String, OrderSupplierStage>{};
+
+    for (final SupplierOrder so in supplierOrders) {
+      final String? orderId = so.orderId;
+
+      if (orderId == null || so.status != SupplierOrderStatus.placed) continue;
+      final OrderSupplierStage stage = isLate(so, now, lateAfterDays)
+          ? OrderSupplierStage.late
+          : OrderSupplierStage.awaitingTracking;
+
+      if (stages[orderId] != OrderSupplierStage.late) stages[orderId] = stage;
+    }
+    for (final SupplierOrderToPlace pending in toPlace(
+      orders: orders,
+      items: items,
+      supplierOrders: supplierOrders,
+    )) {
+      stages[pending.order.id] = OrderSupplierStage.toOrder;
+    }
+
+    return stages;
   }
 
   /// Days a placed order has waited for its tracking number (AutoDS's DAS),

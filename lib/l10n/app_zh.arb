@@ -1622,5 +1622,9 @@
   "titleBuilderFor": "适配平台",
   "titleBuilderLength": "{used}/{limit} 个字符",
   "titleBuilderUse": "使用此标题",
-  "filterFulfilment": "发货方式"
+  "filterFulfilment": "发货方式",
+  "filterSupplier": "供应商",
+  "supplierStageToOrder": "待下单",
+  "supplierStageAwaitingTracking": "等待物流单号",
+  "supplierStageLate": "延迟"
 }

@@ -1622,5 +1622,9 @@
   "titleBuilderFor": "Passend für",
   "titleBuilderLength": "{used} von {limit} Zeichen",
   "titleBuilderUse": "Diesen Titel verwenden",
-  "filterFulfilment": "Versand"
+  "filterFulfilment": "Versand",
+  "filterSupplier": "Lieferant",
+  "supplierStageToOrder": "Zu bestellen",
+  "supplierStageAwaitingTracking": "Warten auf Sendungsnummer",
+  "supplierStageLate": "Verspätet"
 }

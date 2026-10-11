@@ -7,8 +7,10 @@ import 'package:reseller_studio/features/inventory/domain/enums/item_fulfilment.
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/entities/order_filter_criteria.dart';
 import 'package:reseller_studio/features/orders/domain/entities/supplier_order.dart';
 import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
+import 'package:reseller_studio/features/orders/domain/enums/order_supplier_stage.dart';
 import 'package:reseller_studio/features/orders/domain/enums/supplier_order_status.dart';
 import 'package:reseller_studio/features/orders/domain/services/supplier_orders.dart';
 import 'package:reseller_studio/features/orders/presentation/controllers/supplier_order_controller.dart';
@@ -101,6 +103,36 @@ void main() {
         ),
         isNull,
       );
+    });
+
+    test('stages: to order outranks late, late outranks waiting', () {
+      final DateTime now = DateTime(2026, 10, 10);
+      final Map<String, OrderSupplierStage> stages =
+          SupplierOrders.stagesByOrder(
+            orders: <Order>[order('o1', 'd1'), order('o2', 'd1')],
+            items: <String, Item>{'d1': dropship('d1')},
+            supplierOrders: <SupplierOrder>[placed()],
+            now: now,
+            lateAfterDays: 7,
+          );
+
+      expect(stages['o1'], OrderSupplierStage.late);
+      expect(stages['o2'], OrderSupplierStage.toOrder);
+    });
+
+    test('the supplier filter keeps only orders at a picked stage', () {
+      final OrderFilterCriteria criteria = OrderFilterCriteria.none
+          .withSupplierStageToggled(OrderSupplierStage.toOrder);
+
+      expect(
+        criteria.matches(
+          order('o2', 'd1'),
+          now: sold,
+          supplierStage: OrderSupplierStage.toOrder,
+        ),
+        isTrue,
+      );
+      expect(criteria.matches(order('o3', 'x'), now: sold), isFalse);
     });
 
     test('the net cost subtracts a supplier refund', () {

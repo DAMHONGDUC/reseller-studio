@@ -1622,5 +1622,9 @@
   "titleBuilderFor": "Ajustar para",
   "titleBuilderLength": "{used} de {limit} caracteres",
   "titleBuilderUse": "Usar este título",
-  "filterFulfilment": "Envio"
+  "filterFulfilment": "Envio",
+  "filterSupplier": "Fornecedor",
+  "supplierStageToOrder": "A pedir",
+  "supplierStageAwaitingTracking": "Aguardando rastreio",
+  "supplierStageLate": "Atrasado"
 }

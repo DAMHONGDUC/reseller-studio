@@ -17,6 +17,7 @@ import 'domain/entities/order.dart';
 import 'domain/entities/order_filter_criteria.dart';
 import 'domain/entities/supplier_order.dart';
 import 'domain/enums/order_status.dart';
+import 'domain/enums/order_supplier_stage.dart';
 import 'domain/services/payout_reconciliation.dart';
 import 'domain/services/supplier_orders.dart';
 import 'presentation/controllers/record_sale_controller.dart';
@@ -108,11 +109,34 @@ final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
   final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
   final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
   final DateTime now = ref.watch(clockProvider).now();
+  final Map<String, OrderSupplierStage> stages = ref.watch(
+    orderSupplierStagesProvider,
+  );
 
   return orders
-      .where((Order order) => criteria.matches(order, now: now))
+      .where(
+        (Order order) =>
+            criteria.matches(order, now: now, supplierStage: stages[order.id]),
+      )
       .toList();
 });
+
+/// Where each dropship sale stands with its supplier, by order id.
+final Provider<Map<String, OrderSupplierStage>> orderSupplierStagesProvider =
+    Provider<Map<String, OrderSupplierStage>>((Ref ref) {
+      return SupplierOrders.stagesByOrder(
+        orders: ref.watch(ordersProvider).value ?? const <Order>[],
+        items: <String, Item>{
+          for (final Item item
+              in ref.watch(itemsProvider).value ?? const <Item>[])
+            item.id: item,
+        },
+        supplierOrders:
+            ref.watch(supplierOrdersProvider).value ?? const <SupplierOrder>[],
+        now: ref.watch(clockProvider).now(),
+        lateAfterDays: SupplierOrderConstant.lateAfterDays,
+      );
+    });
 
 /// Orders still waiting on the seller, most urgent first.
 ///

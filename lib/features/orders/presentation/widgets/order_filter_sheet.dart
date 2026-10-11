@@ -16,6 +16,7 @@ import '../../domain/entities/order_filter_criteria.dart';
 import '../../domain/enums/order_deadline_filter.dart';
 import '../../domain/enums/order_filter_group.dart';
 import '../../domain/enums/order_status.dart';
+import '../../domain/enums/order_supplier_stage.dart';
 import '../../providers.dart';
 import '../order_status_label.dart';
 

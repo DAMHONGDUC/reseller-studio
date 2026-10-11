@@ -1622,5 +1622,9 @@
   "titleBuilderFor": "Vừa với sàn",
   "titleBuilderLength": "{used}/{limit} ký tự",
   "titleBuilderUse": "Dùng tiêu đề này",
-  "filterFulfilment": "Hình thức giao"
+  "filterFulfilment": "Hình thức giao",
+  "filterSupplier": "Nhà cung cấp",
+  "supplierStageToOrder": "Cần đặt",
+  "supplierStageAwaitingTracking": "Chờ mã vận đơn",
+  "supplierStageLate": "Trễ"
 }
