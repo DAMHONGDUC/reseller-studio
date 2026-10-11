@@ -84,7 +84,14 @@ List<_Query> _repositoryQueries() {
     for (final RegExpMatch match in chain.allMatches(
       entity.readAsStringSync(),
     )) {
-      final String table = match.group(1)!;
+      // The getter is camelCase and the table snake_case — `pricingRules`
+      // reads `pricing_rules` — so the name is converted before it is compared.
+      final String table = match
+          .group(1)!
+          .replaceAllMapped(
+            RegExp('[A-Z]'),
+            (Match letter) => '_${letter[0]!.toLowerCase()}',
+          );
       final String rest = match.group(2)!;
       final List<String> fields = <String>['workspaceId:ASCENDING'];
 
