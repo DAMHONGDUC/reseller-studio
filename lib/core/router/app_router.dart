@@ -48,6 +48,8 @@ import '../../features/orders/presentation/screens/payouts_screen/payouts_screen
 import '../../features/orders/presentation/screens/record_payouts_screen/record_payouts_screen.dart';
 import '../../features/orders/presentation/screens/record_sale_screen/record_sale_screen.dart';
 import '../../features/orders/presentation/screens/shipping_queue_screen/shipping_queue_screen.dart';
+import '../../features/pricing/presentation/screens/pricing_rule_detail_screen/pricing_rule_detail_screen.dart';
+import '../../features/pricing/presentation/screens/pricing_rules_screen/pricing_rules_screen.dart';
 import '../../features/receipts/presentation/screens/receipts_screen/receipts_screen.dart';
 import '../../features/reports/presentation/screens/books_screen/books_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen/reports_screen.dart';
@@ -609,6 +611,28 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                         builder: (BuildContext context, GoRouterState state) =>
                             CarrierDetailScreen(
                               carrierId: state.pathParameters['carrierId'],
+                            ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: AppNavigatorKey.root,
+                    path: 'pricing-rules',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        const PricingRulesScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: 'new',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            const PricingRuleDetailScreen(),
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: AppNavigatorKey.root,
+                        path: ':ruleId',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            PricingRuleDetailScreen(
+                              ruleId: state.pathParameters['ruleId'],
                             ),
                       ),
                     ],

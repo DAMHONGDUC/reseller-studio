@@ -6728,5 +6728,201 @@
   "scanResultNothingHere": "Nothing is stored here right now.",
   "@scanResultNothingHere": {
     "description": "Shown under a scanned location that holds no items right now."
+  },
+  "pricingRulesTitle": "Pricing rules",
+  "@pricingRulesTitle": {
+    "description": "Title of the pricing rules list, and its More row."
+  },
+  "pricingRuleAdd": "Add pricing rule",
+  "@pricingRuleAdd": {
+    "description": "Action and screen title for creating a pricing rule."
+  },
+  "pricingRuleEditTitle": "Edit pricing rule",
+  "@pricingRuleEditTitle": {
+    "description": "Title for editing an existing pricing rule."
+  },
+  "pricingRulesEmptyTitle": "No pricing rules yet",
+  "@pricingRulesEmptyTitle": {
+    "description": "Title when a business has no pricing rules."
+  },
+  "pricingRulesEmptyBody": "A rule turns what an item cost into an asking price, so a whole selection is priced in one tap.",
+  "@pricingRulesEmptyBody": {
+    "description": "Message when a business has no pricing rules."
+  },
+  "pricingRuleNameLabel": "Rule name",
+  "@pricingRuleNameLabel": {
+    "description": "Label for the pricing rule name field."
+  },
+  "pricingRuleNameHint": "For example, Double plus five",
+  "@pricingRuleNameHint": {
+    "description": "Example shown in an empty pricing rule name field."
+  },
+  "pricingRuleScopeLabel": "Applies to",
+  "@pricingRuleScopeLabel": {
+    "description": "Label above the choice of which listings a rule applies to."
+  },
+  "pricingRuleScopeAll": "Every listing",
+  "@pricingRuleScopeAll": {
+    "description": "Scope option: the rule applies to every listing."
+  },
+  "pricingRuleScopeMarketplace": "One marketplace",
+  "@pricingRuleScopeMarketplace": {
+    "description": "Scope option: the rule applies to one marketplace."
+  },
+  "pricingRuleScopeCategory": "One category",
+  "@pricingRuleScopeCategory": {
+    "description": "Scope option: the rule applies to one category."
+  },
+  "pricingRuleScopeTargetMarketplace": "Marketplace",
+  "@pricingRuleScopeTargetMarketplace": {
+    "description": "Label of the picker for the marketplace a rule applies to."
+  },
+  "pricingRuleScopeTargetCategory": "Category",
+  "@pricingRuleScopeTargetCategory": {
+    "description": "Label of the picker for the category a rule applies to."
+  },
+  "pricingRuleMultiplierLabel": "Multiply the cost by",
+  "@pricingRuleMultiplierLabel": {
+    "description": "Label for the number the cost is multiplied by."
+  },
+  "pricingRuleMultiplierError": "Enter a number above zero.",
+  "@pricingRuleMultiplierError": {
+    "description": "Error under the multiplier when it is empty, zero or not a number."
+  },
+  "pricingRuleFixedAddLabel": "Then add",
+  "@pricingRuleFixedAddLabel": {
+    "description": "Label for the amount added after the multiplier."
+  },
+  "pricingRuleRoundingLabel": "Round the price",
+  "@pricingRuleRoundingLabel": {
+    "description": "Label above the rounding choice."
+  },
+  "pricingRuleRoundingNone": "Exact",
+  "@pricingRuleRoundingNone": {
+    "description": "Rounding option: keep the exact computed price."
+  },
+  "pricingRuleRoundingNinetyNine": "Ends in .99",
+  "@pricingRuleRoundingNinetyNine": {
+    "description": "Rounding option: the price ends in .99."
+  },
+  "pricingRuleRoundingWhole": "Whole number",
+  "@pricingRuleRoundingWhole": {
+    "description": "Rounding option: a whole number with no cents."
+  },
+  "pricingRuleMinProfitLabel": "Least profit to keep",
+  "@pricingRuleMinProfitLabel": {
+    "description": "Label for the least profit a rule must leave."
+  },
+  "pricingRuleMinProfitHelper": "After the planning fee. No price this rule gives goes under it.",
+  "@pricingRuleMinProfitHelper": {
+    "description": "Helper under the minimum profit field."
+  },
+  "pricingRulePreviewTitle": "Try it",
+  "@pricingRulePreviewTitle": {
+    "description": "Section heading over the live price preview on the rule form."
+  },
+  "pricingRulePreviewCostLabel": "An item that cost",
+  "@pricingRulePreviewCostLabel": {
+    "description": "Label for the sample cost typed into the preview."
+  },
+  "pricingRulePreviewResult": "Lists at {price} · about {profit} profit",
+  "@pricingRulePreviewResult": {
+    "description": "Preview line: the price the rule gives and the estimated profit.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "profit": {
+        "type": "String"
+      }
+    }
+  },
+  "pricingRulePreviewEmpty": "Type a cost to see the price this rule gives.",
+  "@pricingRulePreviewEmpty": {
+    "description": "Preview hint before a cost is typed, or when the rule cannot price it."
+  },
+  "pricingRuleDeleteTitle": "Delete pricing rule?",
+  "@pricingRuleDeleteTitle": {
+    "description": "Confirmation title before deleting a pricing rule."
+  },
+  "pricingRuleDeleteBody": "Listings keep their prices, and their price history still names this rule.",
+  "@pricingRuleDeleteBody": {
+    "description": "Confirmation message before deleting a pricing rule."
+  },
+  "pricingRuleSummaryMultiply": "Cost × {multiplier}",
+  "@pricingRuleSummaryMultiply": {
+    "description": "Rule summary fragment: the multiplier.",
+    "placeholders": {
+      "multiplier": {
+        "type": "String"
+      }
+    }
+  },
+  "pricingRuleSummaryAdd": "+ {amount}",
+  "@pricingRuleSummaryAdd": {
+    "description": "Rule summary fragment: the fixed amount added.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pricingRuleSummaryMinProfit": "at least {amount} profit",
+  "@pricingRuleSummaryMinProfit": {
+    "description": "Rule summary fragment: the minimum profit kept.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "listingRepriceTypePrice": "Type a new price",
+  "@listingRepriceTypePrice": {
+    "description": "Option in the reprice picker: type one new price for the whole selection."
+  },
+  "listingRuleApplied": "{count, plural, =1{1 listing repriced with {rule}} other{{count} listings repriced with {rule}}}",
+  "@listingRuleApplied": {
+    "description": "Confirmation after a pricing rule repriced listings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "rule": {
+        "type": "String"
+      }
+    }
+  },
+  "listingRuleSkipped": "{count, plural, =1{1 kept its price: no cost recorded, or outside the rule} other{{count} kept their price: no cost recorded, or outside the rule}}",
+  "@listingRuleSkipped": {
+    "description": "Second line after applying a rule: listings left alone because they have no cost or are outside the rule.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemPriceHistory": "Price history",
+  "@itemPriceHistory": {
+    "description": "Section heading over an item's listing price moves."
+  },
+  "priceChangeReasonManual": "Edited",
+  "@priceChangeReasonManual": {
+    "description": "Price history reason: the seller typed a new price."
+  },
+  "priceChangeReasonBulk": "Bulk reprice",
+  "@priceChangeReasonBulk": {
+    "description": "Price history reason: a bulk reprice."
+  },
+  "priceChangeReasonRule": "Pricing rule",
+  "@priceChangeReasonRule": {
+    "description": "Price history reason: a pricing rule was applied."
+  },
+  "priceChangeReasonStale": "Unsold too long",
+  "@priceChangeReasonStale": {
+    "description": "Price history reason: lowered because it had not sold."
+  },
+  "priceChangeReasonSupplierChange": "Supplier price moved",
+  "@priceChangeReasonSupplierChange": {
+    "description": "Price history reason: the supplier's price moved."
   }
 }

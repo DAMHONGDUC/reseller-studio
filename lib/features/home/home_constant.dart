@@ -95,6 +95,7 @@ enum QuickActionKind {
   recordPurchase,
   addExpense,
   addSource,
+  addPricingRule,
   addCategory,
   addLocation,
   addWorkspace,
@@ -203,6 +204,11 @@ final class QuickActionConstant {
           icon: AppIconConstant.storefront,
           route: AppRoutes.sources,
         ),
+        QuickAction(
+          kind: QuickActionKind.addPricingRule,
+          icon: AppIconConstant.sell,
+          route: AppRoutes.pricingRules,
+        ),
       ],
     ),
     QuickActionSection(
@@ -265,6 +271,7 @@ final class QuickActionLabel {
         QuickActionKind.recordPurchase => context.l10n.homeQuickRecordPurchase,
         QuickActionKind.addExpense => context.l10n.homeQuickAddExpense,
         QuickActionKind.addSource => context.l10n.homeQuickAddSource,
+        QuickActionKind.addPricingRule => context.l10n.pricingRuleAdd,
         QuickActionKind.addCategory => context.l10n.categoryAdd,
         QuickActionKind.addLocation => context.l10n.locationAdd,
         QuickActionKind.addWorkspace => context.l10n.workspaceAddTitle,

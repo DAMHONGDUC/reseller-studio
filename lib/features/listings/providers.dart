@@ -7,6 +7,7 @@ import '../../core/providers/repository_providers.dart';
 import '../../core/state/selection_controller.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/listing.dart';
+import 'domain/entities/listing_price_change.dart';
 
 final StreamProvider<List<Listing>> listingsProvider =
     StreamProvider<List<Listing>>((Ref ref) {
@@ -75,4 +76,25 @@ final Provider<List<Listing>> selectedListingsProvider =
       return listings
           .where((Listing listing) => ids.contains(listing.id))
           .toList();
+    });
+
+/// One item's listing price moves, newest first.
+final priceChangesForItemProvider =
+    StreamProvider.family<List<ListingPriceChange>, String>((
+      Ref ref,
+      String itemId,
+    ) {
+      return WorkspaceGuard.listOrEmpty<ListingPriceChange>(
+        ref,
+        () => ref
+            .watch(listingRepositoryProvider)
+            .watchPriceChangesForItem(itemId)
+            .map(
+              (List<ListingPriceChange> changes) =>
+                  <ListingPriceChange>[...changes]..sort(
+                    (ListingPriceChange a, ListingPriceChange b) =>
+                        b.changedAt.compareTo(a.changedAt),
+                  ),
+            ),
+      );
     });

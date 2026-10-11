@@ -219,6 +219,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _ListingsSection(item: item),
+        _PriceHistorySection(item: item),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.provenance,

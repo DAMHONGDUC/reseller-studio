@@ -159,6 +159,9 @@ final class AppRoutes {
   static const String carriers = '/more/carriers';
   static const String addCarrier = '/more/carriers/new';
   static const String carrierDetailPath = '/more/carriers/:carrierId';
+  static const String pricingRules = '/more/pricing-rules';
+  static const String addPricingRule = '/more/pricing-rules/new';
+  static const String pricingRuleDetailPath = '/more/pricing-rules/:ruleId';
 
   /// Every business the seller belongs to, with the plan's ceiling on how
   /// many. Under More rather than in Settings: a business is a record, and
@@ -208,6 +211,7 @@ final class AppRoutes {
       '/more/marketplaces/$marketplaceId';
 
   static String carrier(String carrierId) => '/more/carriers/$carrierId';
+  static String pricingRule(String ruleId) => '/more/pricing-rules/$ruleId';
 
   static String item(String itemId) => '/inventory/item/$itemId';
   static String crossList(String itemId) =>

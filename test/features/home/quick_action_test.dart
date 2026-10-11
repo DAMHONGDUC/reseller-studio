@@ -235,6 +235,7 @@ void main() {
       'workspaces_screen': '/more/businesses',
       'marketplaces_screen': '/more/marketplaces',
       'carriers_screen': '/more/carriers',
+      'pricing_rules_screen': '/more/pricing-rules',
       'team_screen': '/more/team',
     };
 
