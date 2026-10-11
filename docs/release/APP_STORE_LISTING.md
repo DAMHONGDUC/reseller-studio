@@ -49,8 +49,8 @@ reselling,inventory,flipping,thrift,profit,sourcing,sales tracker,ROI,bookkeepin
 ```
 
 Marketplace names are deliberately absent. A competitor's or a marketplace's
-trademark in the keyword field is a metadata rejection, and this app does not
-connect to any platform (hard rule 10).
+trademark in the keyword field is a metadata rejection, even once the app
+connects to platforms (hard rule 10).
 
 ### Description
 

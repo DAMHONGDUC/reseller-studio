@@ -10,7 +10,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, categories and locations created inline, buying-trip link, bulk actions including bulk listing and filing under a trip | Firebase Storage for uploads |
 | Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import | None for manual records |
 | Sourcing | Sources, purchases, items filed under a purchase, receipt apportioned across them, ROI ranking, buy calculator | None |
-| Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end | No marketplace publishing by decision |
+| Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end | No marketplace publishing yet; see `DROPSHIPPING_PLAN.md` |
 | Marketplaces | Seller-owned records, fee estimate, defaults, soft delete | None |
 | Carriers | Business-owned records, defaults, soft delete | None |
 | Analytics | Sales, profit, inventory, marketplace, category and source views | None |

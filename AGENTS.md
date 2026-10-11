@@ -107,6 +107,22 @@ same interface**, never by widening an `if` at a call site. Anything that
 hardcodes one country's category names, its tax year boundary or its mileage
 rate is the bug this rule exists to stop.
 
+**Reseller Studio serves dropshippers too, not only resellers.** Owner's rule.
+A dropshipper never holds the stock: they list a supplier's product, sell it,
+then order it from the supplier straight to the buyer. That business runs in
+this app, beside reselling or instead of it, and is judged against its own
+lifecycle:
+
+```text
+FIND PRODUCT → LIST → SELL → ORDER FROM SUPPLIER → TRACK → PROFIT → ANALYZE → FIND BETTER
+```
+
+- **The dropshipping work is planned whole before any of it is built.**
+  Owner's rule. `docs/DROPSHIPPING_PLAN.md` is finished first; no code lands
+  against a half-written plan.
+- It runs on marketplace and supplier connections, which hard rule 10 now
+  allows.
+
 ## Tech stack
 
 - **Flutter** 3.44.5, pinned in `.fvmrc`. Always run through `fvm` —
@@ -413,10 +429,27 @@ behind it.
    *shape* of a failure ('marketplace token refresh failed'), never its
    contents. `SdCrashReporter.setUserId` takes a Firebase UID and nothing else.
 
-10. **No secret ships in the Flutter binary.** Plan §14 and §32. Marketplace
-    OAuth, and every call that uses a token, happens in a Cloud Function.
-    The app asks the backend; the backend asks eBay. `marketplaces/{id}` in
-    Firestore holds connection *status* only and is `allow write: if false`.
+10. **No secret ships in the Flutter binary.** Plan §14 and §32. Any call that
+    uses a token happens in a Cloud Function — the app asks the backend, the
+    backend asks the platform. Nothing in the app reads or stores one.
+    **Connecting a marketplace or a supplier is a feature of this app.**
+    Owner's rule, and it **reverses "marketplace connection is not a feature
+    of this app"**: OAuth, order and listing sync, and placing an order with a
+    supplier are built, because dropshipping runs on them. They are built
+    under this rule:
+    - **The token never leaves the server.** The OAuth exchange, the token
+      and every call that uses it live in Cloud Functions; the token sits in
+      a store no client rule can read. What the app reads about a connection
+      is its status, never its credential.
+    - **A connection needs a server, so it sits behind hard rule 1's one
+      guard.** A guest has none; no screen decides that for itself.
+    - **A file the seller exports is not a connection.** `PayoutCsvImport`
+      reads a payout report the seller downloaded and handed over — no token,
+      no account, nothing leaving the device. It stays for every platform no
+      connection reaches.
+    - **An importer reads the columns it needs and no others.** A marketplace
+      export carries buyer names and addresses; two values are taken from each
+      row and the rest is never held or logged (hard rule 9).
 
 11. **Workspace membership is the only ACL, and nobody edits their own
     membership document.** `firestore.rules` decides everything from
