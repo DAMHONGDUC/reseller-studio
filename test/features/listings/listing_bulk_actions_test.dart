@@ -2,8 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing_price_change.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/listings/domain/enums/price_change_reason.dart';
 import 'package:reseller_studio/features/listings/presentation/controllers/listing_actions_controller.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/listings_screen/listings_screen.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
@@ -71,6 +74,27 @@ void main() {
       }
     },
   );
+
+  test('a bulk reprice leaves a history row per listing it moved', () async {
+    final ProviderContainer container = await withListings();
+    final Listing picked = listingsIn(container).first;
+    final Money price = Money(picked.price.minor + 100, picked.price.currency);
+
+    await container.read(listingActionsControllerProvider.notifier).reprice(
+      <Listing>[picked],
+      price,
+    );
+
+    final List<ListingPriceChange> history = await container
+        .read(listingRepositoryProvider)
+        .watchPriceChangesForItem(picked.itemId)
+        .first;
+
+    expect(history, hasLength(1));
+    expect(history.single.from, picked.price);
+    expect(history.single.to, price);
+    expect(history.single.reason, PriceChangeReason.bulk);
+  });
 
   test('ending stamps the date, pausing leaves it alone', () async {
     final ProviderContainer container = await withListings();

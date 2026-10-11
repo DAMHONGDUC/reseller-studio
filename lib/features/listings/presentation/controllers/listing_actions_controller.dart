@@ -6,7 +6,10 @@ import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/listing.dart';
+import '../../domain/entities/listing_price_change.dart';
 import '../../domain/enums/listing_status.dart';
+import '../../domain/enums/price_change_reason.dart';
+import '../../domain/services/listing_price_changes.dart';
 
 /// Everything a seller does to listings once they exist: cut the price, pause
 /// them, end them — one at a time or forty at once (plan §12).
@@ -89,6 +92,14 @@ class ListingActionsController extends Notifier<bool> {
     Map<String, Object> data,
     Listing Function(Listing) change,
   ) async {
+    final List<Listing> changed = listings.map(change).toList();
+    final List<ListingPriceChange> priceChanges = ListingPriceChanges.between(
+      before: listings,
+      after: changed,
+      reason: PriceChangeReason.bulk,
+      at: DateTime.now(),
+    );
+
     if (listings.isEmpty) return;
 
     SdLogger.action(LogTagConstant.listing, describe, <String, Object>{
@@ -102,7 +113,7 @@ class ListingActionsController extends Notifier<bool> {
     try {
       await ref
           .read(listingRepositoryProvider)
-          .saveAll(listings.map(change).toList());
+          .saveAll(changed, priceChanges: priceChanges);
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.listing,

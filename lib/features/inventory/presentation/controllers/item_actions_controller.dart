@@ -7,8 +7,10 @@ import '../../../../core/money/money.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../listings/domain/entities/listing.dart';
 import '../../../listings/domain/enums/listing_status.dart';
+import '../../../listings/domain/enums/price_change_reason.dart';
 import '../../../listings/domain/repositories/listing_repository.dart';
 import '../../../listings/domain/services/bulk_listing_plan.dart';
+import '../../../listings/domain/services/listing_price_changes.dart';
 import '../../../listings/providers.dart';
 import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../../../marketplaces/providers.dart';
@@ -110,30 +112,38 @@ class ItemActionsController extends Notifier<bool> {
       // its own must not re-stamp `listedAt` and reset the staleness clock.
       final bool isNew = prices.isNotEmpty;
 
-      await listings.saveAll(<Listing>[
-        // One batch for both halves: a seller who added Depop and cut the
-        // eBay price pressed one button, and half of that landing is a state
-        // nobody can read back.
-        ...reprice,
-        for (final MapEntry<String, Money> entry in prices.entries)
-          Listing(
-            id: SdId.unique(),
-            itemId: item.id,
-            marketplaceId: entry.key,
-            // Frozen here, at the one moment the record is in hand: renaming
-            // the marketplace later must not rewrite what was posted today.
-            marketplaceName: _marketplaceName(entry.key),
-            // Per-marketplace titles are the point of the entity, but they
-            // diverge when a seller optimises one — not at creation, where a
-            // second box per platform would be four boxes for one intent.
-            title: item.title,
-            price: entry.value,
-            // Draft, not active: nothing is integrated yet, so claiming the
-            // listing is live on eBay would be a lie the app cannot back up.
-            status: ListingStatus.draft,
-            createdAt: now,
-          ),
-      ]);
+      await listings.saveAll(
+        <Listing>[
+          // One batch for both halves: a seller who added Depop and cut the
+          // eBay price pressed one button, and half of that landing is a state
+          // nobody can read back.
+          ...reprice,
+          for (final MapEntry<String, Money> entry in prices.entries)
+            Listing(
+              id: SdId.unique(),
+              itemId: item.id,
+              marketplaceId: entry.key,
+              // Frozen here, at the one moment the record is in hand: renaming
+              // the marketplace later must not rewrite what was posted today.
+              marketplaceName: _marketplaceName(entry.key),
+              // Per-marketplace titles are the point of the entity, but they
+              // diverge when a seller optimises one — not at creation, where a
+              // second box per platform would be four boxes for one intent.
+              title: item.title,
+              price: entry.value,
+              // Draft, not active: nothing is integrated yet, so claiming the
+              // listing is live on eBay would be a lie the app cannot back up.
+              status: ListingStatus.draft,
+              createdAt: now,
+            ),
+        ],
+        priceChanges: ListingPriceChanges.between(
+          before: ref.read(listingsProvider).value ?? const <Listing>[],
+          after: reprice,
+          reason: PriceChangeReason.manual,
+          at: now,
+        ),
+      );
 
       // Going live stamps the staleness clock and makes a draft stock; it is
       // not a status of its own any more.
@@ -279,11 +289,13 @@ class ItemActionsController extends Notifier<bool> {
   /// putting the item on sale again, and the staleness clock must not reset.
   Future<void> reprice(List<Item> items, Money price) async {
     final Set<String> itemIds = items.map((Item item) => item.id).toSet();
-    final List<Listing> repriced =
+    final List<Listing> current =
         (ref.read(listingsProvider).value ?? const <Listing>[])
             .where((Listing listing) => itemIds.contains(listing.itemId))
-            .map((Listing listing) => listing.copyWith(price: price))
             .toList(growable: false);
+    final List<Listing> repriced = current
+        .map((Listing listing) => listing.copyWith(price: price))
+        .toList(growable: false);
     final Map<String, Object> data = <String, Object>{
       'items': items.length,
       'listings': repriced.length,
@@ -301,7 +313,17 @@ class ItemActionsController extends Notifier<bool> {
     state = true;
 
     try {
-      await ref.read(listingRepositoryProvider).saveAll(repriced);
+      await ref
+          .read(listingRepositoryProvider)
+          .saveAll(
+            repriced,
+            priceChanges: ListingPriceChanges.between(
+              before: current,
+              after: repriced,
+              reason: PriceChangeReason.bulk,
+              at: DateTime.now(),
+            ),
+          );
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.listing,
