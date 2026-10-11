@@ -296,9 +296,9 @@ rulebook and `docs/DATA_MODEL.md` current, `docs/DONE_WORK.md` and
 
 Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
 
-**Progress.** Phase 1 is built on `feat/dropshipping` except listing
-templates, which wait on an owner decision — there is no screen where a
-listing's own description is edited yet, so a template has nowhere to apply.
+**Progress.** Phase 1 is built on `feat/dropshipping`. Listing templates are
+**deferred** (owner, 2026-10-11): no screen edits a listing's own description
+yet, so a template has nowhere to apply. They come back with a listing editor.
 
 ## 9. Tests
 
