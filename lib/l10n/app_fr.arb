@@ -1621,5 +1621,6 @@
   "titleBuilderSize": "Taille",
   "titleBuilderFor": "Adapter à",
   "titleBuilderLength": "{used} sur {limit} caractères",
-  "titleBuilderUse": "Utiliser ce titre"
+  "titleBuilderUse": "Utiliser ce titre",
+  "filterFulfilment": "Expédition"
 }

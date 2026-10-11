@@ -1621,5 +1621,6 @@
   "titleBuilderSize": "尺码",
   "titleBuilderFor": "适配平台",
   "titleBuilderLength": "{used}/{limit} 个字符",
-  "titleBuilderUse": "使用此标题"
+  "titleBuilderUse": "使用此标题",
+  "filterFulfilment": "发货方式"
 }

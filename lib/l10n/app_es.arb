@@ -1621,5 +1621,6 @@
   "titleBuilderSize": "Talla",
   "titleBuilderFor": "Ajustar a",
   "titleBuilderLength": "{used} de {limit} caracteres",
-  "titleBuilderUse": "Usar este título"
+  "titleBuilderUse": "Usar este título",
+  "filterFulfilment": "Envío"
 }

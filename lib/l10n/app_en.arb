@@ -7292,5 +7292,9 @@
   "titleBuilderUse": "Use this title",
   "@titleBuilderUse": {
     "description": "Button putting the built title into the field."
+  },
+  "filterFulfilment": "Fulfilment",
+  "@filterFulfilment": {
+    "description": "Inventory filter group: stocked or dropshipped."
   }
 }

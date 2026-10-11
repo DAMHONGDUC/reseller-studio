@@ -4,6 +4,7 @@ import 'package:reseller_studio/core/filters/presence_filter.dart';
 import 'package:reseller_studio/core/money/money.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
 import 'package:reseller_studio/features/inventory/domain/entities/item_filter_criteria.dart';
+import 'package:reseller_studio/features/inventory/domain/enums/item_fulfilment.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart';
 import 'package:reseller_studio/features/inventory/domain/enums/item_status_filter.dart';
 import 'package:reseller_studio/features/inventory/item_filter_constant.dart';
@@ -54,6 +55,44 @@ void main() {
       expect(ItemFilterCriteria.none.activeCount, 0);
       expect(ItemFilterCriteria.none.isActive, isFalse);
     });
+  });
+
+  test('fulfilment narrows to stocked or dropshipped items', () {
+    final Item stocked = Item(
+      id: 's',
+      title: 's',
+      quantity: 1,
+      status: ItemStatus.inStock,
+      createdAt: DateTime(2026, 10, 1),
+    );
+    final Item dropship = Item(
+      id: 'd',
+      title: 'd',
+      quantity: 1,
+      status: ItemStatus.inStock,
+      createdAt: DateTime(2026, 10, 1),
+      fulfilment: ItemFulfilment.dropship,
+    );
+    final ItemFilterCriteria criteria = ItemFilterCriteria.none
+        .withFulfilmentToggled(ItemFulfilment.dropship);
+
+    expect(
+      criteria.matches(
+        dropship,
+        now: DateTime(2026, 10, 11),
+        staleThreshold: const Duration(days: 30),
+      ),
+      isTrue,
+    );
+    expect(
+      criteria.matches(
+        stocked,
+        now: DateTime(2026, 10, 11),
+        staleThreshold: const Duration(days: 30),
+      ),
+      isFalse,
+    );
+    expect(criteria.activeCount, 1);
   });
 
   group('id groups', () {

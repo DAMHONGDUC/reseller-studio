@@ -14,6 +14,7 @@ import '../../domain/entities/item.dart';
 import '../../domain/entities/item_category.dart';
 import '../../domain/entities/item_filter_criteria.dart';
 import '../../domain/enums/item_filter_group.dart';
+import '../../domain/enums/item_fulfilment.dart';
 import '../../domain/enums/item_status.dart';
 import '../../domain/enums/item_status_filter.dart';
 import '../../item_filter_constant.dart';

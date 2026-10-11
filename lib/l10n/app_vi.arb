@@ -1621,5 +1621,6 @@
   "titleBuilderSize": "Size",
   "titleBuilderFor": "Vừa với sàn",
   "titleBuilderLength": "{used}/{limit} ký tự",
-  "titleBuilderUse": "Dùng tiêu đề này"
+  "titleBuilderUse": "Dùng tiêu đề này",
+  "filterFulfilment": "Hình thức giao"
 }

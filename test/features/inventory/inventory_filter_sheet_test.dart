@@ -62,8 +62,8 @@ void main() {
     expect(inSheet('Stale'), findsOneWidget);
     expect(inSheet('Category'), findsOneWidget);
     expect(inSheet('Source'), findsOneWidget);
-    // Nine groups, eight rules between them.
-    expect(find.byType(AppFilterGroupDivider), findsNWidgets(8));
+    // Ten groups, nine rules between them.
+    expect(find.byType(AppFilterGroupDivider), findsNWidgets(9));
   });
 
   testWidgets('a ticked chip is pending, and closing applies nothing', (
