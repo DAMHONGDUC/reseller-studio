@@ -196,17 +196,31 @@ class _ListingRow extends ConsumerWidget {
       listingSelectionProvider.notifier,
     );
 
-    return AppListRow(
-      title: listing.title,
-      subtitle: subtitle,
-      icon: isSelected ? AppIconConstant.checkCircle : AppIconConstant.sell,
-      iconTint: isSelected ? context.colorScheme3.primary : tint,
-      trailingText: context.money(listing.price),
-      showChevron: !isSelecting,
-      onTap: () => isSelecting
-          ? selection.toggle(listing.id)
-          : context.push(AppRoutes.item(listing.itemId)),
-      onLongPress: () => selection.toggle(listing.id),
+    // End one live listing with a swipe; the bulk bar ends many.
+    return SdSwipeRowV3(
+      rowKey: ValueKey<String>('swipe-${listing.id}'),
+      endAction: isSelecting || !listing.status.isLive
+          ? null
+          : SdSwipeActionV3(
+              icon: AppIconConstant.close,
+              label: context.l10n.listingEnd,
+              color: context.sdTheme3.danger,
+              onTriggered: () => ref
+                  .read(listingActionsControllerProvider.notifier)
+                  .setStatus(<Listing>[listing], ListingStatus.ended),
+            ),
+      child: AppListRow(
+        title: listing.title,
+        subtitle: subtitle,
+        icon: isSelected ? AppIconConstant.checkCircle : AppIconConstant.sell,
+        iconTint: isSelected ? context.colorScheme3.primary : tint,
+        trailingText: context.money(listing.price),
+        showChevron: !isSelecting,
+        onTap: () => isSelecting
+            ? selection.toggle(listing.id)
+            : context.push(AppRoutes.item(listing.itemId)),
+        onLongPress: () => selection.toggle(listing.id),
+      ),
     );
   }
 }

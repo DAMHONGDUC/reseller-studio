@@ -40,10 +40,24 @@ class _OrderList extends ConsumerWidget {
 
               final Order order = orders[index - header];
 
-              return _OrderCard(
-                order: order,
-                now: now,
-                onTap: () => context.push(AppRoutes.order(order.id)),
+              // Ship it, without opening the order — the same sheet the card's
+              // own button and the detail screen open.
+              return SdSwipeRowV3(
+                rowKey: ValueKey<String>('swipe-${order.id}'),
+                borderRadius: SdRadiusV3.cardAll,
+                startAction: order.status != OrderStatus.toShip
+                    ? null
+                    : SdSwipeActionV3(
+                        icon: AppIconConstant.localShipping,
+                        label: context.l10n.orderShipIt,
+                        color: context.colorScheme3.primary,
+                        onTriggered: () => ShipOrderSheet.show(context, order),
+                      ),
+                child: _OrderCard(
+                  order: order,
+                  now: now,
+                  onTap: () => context.push(AppRoutes.order(order.id)),
+                ),
               );
             },
           ),

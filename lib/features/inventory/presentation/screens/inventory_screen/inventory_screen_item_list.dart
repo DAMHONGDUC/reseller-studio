@@ -38,30 +38,62 @@ class _ItemList extends ConsumerWidget {
             SizedBox(height: SdContentPaddingV3.listItemGap),
         itemBuilder: (BuildContext context, int index) {
           final Item item = items[index];
+          final Duration age = now.difference(item.createdAt);
 
-          return ItemCard(
-            item: item,
-            listings: listings[item.id] ?? const <Listing>[],
-            now: now,
-            staleThreshold: staleThreshold,
-            isSelecting: isSelecting,
-            isSelected: selected.contains(item.id),
-            // While a selection is open a tap ticks rather than opens: a
-            // seller mid-bulk-edit who lands on a detail screen has lost the
-            // forty rows they had just picked.
-            onTap: isSelecting
-                ? () => ref
-                      .read(inventorySelectionProvider.notifier)
-                      .toggle(item.id)
-                : () => context.push(AppRoutes.item(item.id)),
-            onLongPress: () =>
-                ref.read(inventorySelectionProvider.notifier).toggle(item.id),
-            // The same sheet the detail screen opens — one list of verbs, so
-            // an action added there cannot go missing here.
-            onActions: () => ItemActionsSheet.show(context, item),
-            // The row shows no price per marketplace; this is where they are.
-            onMarketPrices: () => context.push(AppRoutes.crossList(item.id)),
-            onReprice: () => ItemQuickActions.reprice(context, ref, item),
+          return AppAppear(
+            key: ValueKey<String>('appear-${item.id}'),
+            animate:
+                !age.isNegative && age < ListMotionConstant.newRecordWindow,
+            // A swipe is the common move without opening the row; both are in
+            // the actions sheet too, since a swipe is invisible.
+            child: SdSwipeRowV3(
+              rowKey: ValueKey<String>('swipe-${item.id}'),
+              borderRadius: SdRadiusV3.cardAll,
+              startAction: isSelecting || !item.status.isOnHand
+                  ? null
+                  : SdSwipeActionV3(
+                      icon: AppIconConstant.payments,
+                      label: context.l10n.itemActionMarkSold,
+                      color: context.sdTheme3.profit,
+                      onTriggered: () =>
+                          ItemQuickActions.markSold(context, ref, item),
+                    ),
+              endAction: isSelecting || !item.status.isOnHand
+                  ? null
+                  : SdSwipeActionV3(
+                      icon: AppIconConstant.sell,
+                      label: context.l10n.itemActionReprice,
+                      color: context.colorScheme3.primary,
+                      onTriggered: () =>
+                          ItemQuickActions.reprice(context, ref, item),
+                    ),
+              child: ItemCard(
+                item: item,
+                listings: listings[item.id] ?? const <Listing>[],
+                now: now,
+                staleThreshold: staleThreshold,
+                isSelecting: isSelecting,
+                isSelected: selected.contains(item.id),
+                // While a selection is open a tap ticks rather than opens: a
+                // seller mid-bulk-edit who lands on a detail screen has lost the
+                // forty rows they had just picked.
+                onTap: isSelecting
+                    ? () => ref
+                          .read(inventorySelectionProvider.notifier)
+                          .toggle(item.id)
+                    : () => context.push(AppRoutes.item(item.id)),
+                onLongPress: () => ref
+                    .read(inventorySelectionProvider.notifier)
+                    .toggle(item.id),
+                // The same sheet the detail screen opens — one list of verbs, so
+                // an action added there cannot go missing here.
+                onActions: () => ItemActionsSheet.show(context, item),
+                // The row shows no price per marketplace; this is where they are.
+                onMarketPrices: () =>
+                    context.push(AppRoutes.crossList(item.id)),
+                onReprice: () => ItemQuickActions.reprice(context, ref, item),
+              ),
+            ),
           );
         },
       ),
