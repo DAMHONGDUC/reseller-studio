@@ -29,18 +29,78 @@ documentation before the phase that depends on it starts.
 
 ## 2. AutoDS features, mapped
 
+Checked against AutoDS's own features page and its Orders help article on
+2026-10-11. ✅ is copied, ➕ is copied and goes further, ❌ is refused (§10).
+
+### Products and monitoring
+
 | AutoDS feature | Here | Phase |
 |---|---|---|
-| Product import from a supplier | Supplier product by URL or id; details fetched when connected, typed when not | 1 manual, 4 connected |
-| Supplier price and stock monitoring | Scheduled check per supplier product; history kept | 1 manual reminder, 4 automatic |
-| Automatic repricing | Pricing rules applied on demand, then on every supplier price change | 1 on demand, 5 automatic |
-| Out-of-stock protection | Listing quantity set to zero on the platform when the supplier runs out | 5 |
-| Automatic order placement | Supplier order requested in one tap; optional auto mode with a daily cap | 1 manual record, 4 one tap, 5 auto |
-| Tracking sync | Supplier tracking flows to the order and up to the marketplace | 3 marketplace side, 4 supplier side |
-| Multi-store, multi-platform | Connections per workspace; several platforms per business | 2, 3, 6 |
-| Profit dashboard | Existing analytics, split by fulfilment, costs from supplier orders | 1 |
-| Product research ("winning products") | **Not built** — see §10 | — |
-| Store builder, buyer messaging | **Not built** — see §10 | — |
+| ✅ Product import from a supplier | Supplier product by URL or id; details fetched when connected, typed when not | 1 manual, 4 connected |
+| ✅ Variants mapped to the supplier's | Each variant maps to a supplier variant id; decision 11.7 | 1 |
+| ✅ Price and stock monitoring (AutoDS scans every 30–60 min) | Scheduled check per supplier product, plus supplier webhooks where offered; history kept | 1 manual reminder, 4 automatic |
+| ✅ Minimum quantity: out of stock below a threshold, not only at zero | `minSupplierStock` on the pricing rule | 5 |
+| ✅ Restock: listing comes back when the supplier does | Back-in-stock restores the platform quantity | 5 |
+| ✅ Untracked products found and re-linked in one tap | A synced order or listing with no supplier product becomes attention, with "link to supplier" | 3 |
+| ✅ Backup supplier, switched per product or per order | An item may hold several supplier products in order of preference | 4 |
+| ✅ Winners and losers | Analytics ranks dropship items by profit and days to sell; "drop this product" from the losing end | 1 |
+
+### Pricing
+
+| AutoDS feature | Here | Phase |
+|---|---|---|
+| ✅ Profit rule: markup, fixed add, `.99` rounding | `pricing_rules` | 1 |
+| ✅ Break-even that includes supplier sales tax (eBay US) | Supplier tax is a cost line on the supplier product and on the supplier order | 1 |
+| ✅ Supplier shipping added to cost | `supplierShipping` | 1 |
+| ✅ Automatic repricing on a supplier change | Rule-driven, logged in listing price history | 5 |
+| ➕ Price optimisation by performance | Rule step: unsold for N days → lower by X%, never below the floor; uses the existing stale query | 5 |
+| ✅ Bulk edit across listings | Bulk apply rule, reprice, pause, end — existing bar extended | 1 |
+
+### Orders
+
+| AutoDS feature | Here | Phase |
+|---|---|---|
+| ✅ Order statuses (pending → ordered → shipped → delivered, failed, cancelled) | `supplier_orders.status` | 1 |
+| ✅ Automatic order placement | One tap, or auto with protections | 4 one tap, 5 auto |
+| ✅ Maximum purchase price per supplier | Auto order stops with a reason when the supplier price is above it | 5 |
+| ✅ Maximum loss per order | Auto order stops when the order would lose more than this | 5 |
+| ➕ Daily spending cap | Not in AutoDS; added because auto-order spends the seller's money | 5 |
+| ✅ Retry a failed order; force resend past the protections | "Try again" and "Place anyway", the second only from `failed` | 4 |
+| ✅ Switch supplier for one order | Picks a backup supplier product before placing | 4 |
+| ✅ Default phone number when the buyer gave none | Workspace setting, passed to the supplier | 4 |
+| ✅ Shipped trigger: tracking added, or supplier processed | Per supplier connection | 4 |
+| ✅ Mark delivered automatically N days after shipped | Per supplier connection, for suppliers that never report delivery | 4 |
+| ✅ Days awaiting shipment (DAS) | Shown on the order; past a threshold it becomes attention | 1 |
+| ✅ Estimated arrival | From the supplier product's shipping days | 1 |
+| ✅ Sample order (seller buys one to check quality) | A supplier order with no sale; its cost goes to expenses | 1 |
+| ✅ Cancel on the marketplace with a reason, and at the supplier | One action cancels both while the supplier order is not shipped | 3, 4 |
+| ✅ Returns and refunds | Supplier refund recorded on the supplier order, so profit stays right | 1 |
+| ✅ Order log | Each supplier order step is written to the activity log (hard rule 12) | 4 |
+| ✅ Supplier invoice for marketplace proof of supply | Attached through the existing receipts feature | 1 |
+| ✅ Filters: supplier, buy/sell price, profit, DAS, status, tracking; saved filters | Extends the existing order filters | 1 |
+| ✅ Export | Existing CSV export (Premium) | 1 |
+
+### Tracking and buyers
+
+| AutoDS feature | Here | Phase |
+|---|---|---|
+| ✅ Tracking sync | Supplier tracking flows to the order and up to the marketplace | 3 marketplace side, 4 supplier side |
+| ✅ Automatic buyer messages on eBay: order placed, tracking, delivered, feedback request | Templated, per message type, off by default — decision 11.8 | 6 |
+| ❌ Tracking number conversion (QTrack and the like) | §10 | — |
+
+### Channels, AI and everything else
+
+| AutoDS feature | Here | Phase |
+|---|---|---|
+| ✅ Several stores and platforms | Connections per workspace; eBay, Shopify, Etsy, TikTok Shop | 2, 3, 6 |
+| ✅ Profit dashboard | Existing analytics, split by fulfilment, costs from supplier orders | 1 |
+| ✅ eBay fee calculator | The existing buy calculator, with supplier cost as the buy price | 1 |
+| ✅ AI title and description rewrite, single and bulk | Through a Cloud Function — a new third-party service, decision 11.9 | 6 |
+| ✅ Print on demand | A supplier adapter for a POD supplier, same interface | 6 |
+| ❌ Auto-order through the seller's buyer account | §10 | — |
+| ❌ Fulfilled by AutoDS (managed balance) | §10 | — |
+| ❌ Product research marketplace, ads spy, trending products | §10 | — |
+| ❌ AI store builder, AI image generator | §10 | — |
 
 Pricing rules, price history, delist-after-sale and listing templates help
 resellers as much as dropshippers, so they ship in Phase 1 for both.
@@ -88,22 +148,26 @@ hand-created document gets a sample in `sample_data/`, and
 
 | Table | Change | Why |
 |---|---|---|
-| `items` | `fulfilment`: `stocked` (default) or `dropship`; `supplierProductId` | A dropship item has no location and no shelf count; optional at create (hard rule 2) |
+| `items` | `fulfilment`: `stocked` (default) or `dropship` | A dropship item has no location and no shelf count; optional at create (hard rule 2) |
 | `sources` | New `SourceType.supplier`; `connectionId` when connected | A supplier *is* where stock comes from — Sourcing's ROI by source then covers suppliers with no new screen |
 | `orders` | `origin`: `manual` or `synced`; `connectionId` | A synced order's id is `SdId.owned(connectionId, externalOrderId)`, so a re-poll can never create it twice |
 | `listings` | `connectionId`, `externalListingId` already exists | A listing the app may revise on the platform |
+| `expenses` | `supplierOrderId` on a sample order's expense | A sample is a cost with no sale |
+| `workspaces` | `defaultBuyerPhone` | Suppliers refuse an order with no phone |
 | `notificationPrefs` | One switch per new type in §6 | Every type has a switch, as today |
 
 ### New tables
 
 | Table | Fields | Notes |
 |---|---|---|
-| `supplier_products` | `sourceId`, `externalProductId`, `externalVariantId`, `url`, `title` (snapshot), `supplierPrice`, `supplierShipping`, `stock` (nullable), `availability`, `lastCheckedAt`, `deletedAt` | Soft-deleted (hard rule 15): items and supplier orders point at it |
+| `supplier_products` | `sourceId`, `externalProductId`, `externalVariantId`, `url`, `title` (snapshot), `supplierPrice`, `supplierShipping`, `supplierTax`, `shippingDays`, `stock` (nullable), `availability`, `lastCheckedAt`, `deletedAt` | Soft-deleted (hard rule 15): items and supplier orders point at it |
+| `item_suppliers` | `itemId`, `supplierProductId`, `rank` | An item's suppliers in order of preference; rank 1 is ordered first, the rest are backups |
 | `supplier_price_changes` | `supplierProductId`, `from`, `to`, `stockFrom`, `stockTo`, `observedAt` | Append-only history; what a repricing decision is explained by |
 | `listing_price_changes` | `listingId`, `from`, `to`, `reason` (`manual`, `bulk`, `rule`, `supplierChange`), `ruleId`, `changedAt` | Plan §12 "listing history" and §15 "price history" |
-| `pricing_rules` | `name`, `scope` (all / marketplace / category), `multiplier`, `fixedAdd`, `rounding` (`none`, `.99`, `.00`), `minProfit`, `applyOnSupplierChange` | Floor uses `Workspace.planningFeeRate` — the one place a rate survives (hard rule 3) |
-| `supplier_orders` | `orderId`, `itemId` (the order line it fulfils), `sourceId`, `supplierProductId`, `externalSupplierOrderId`, `productCost`, `shippingCost`, `status`, `trackingNumber`, `carrier`, `requestedAt`, `placedAt`, `shippedAt`, `failureCode` | One per supplier shipment; an order may have several. Its cost becomes the line's `unitCost` |
-| `connections` | `platform`, `kind` (marketplace / supplier), `accountLabel`, `status` (`active`, `needsReauth`, `error`, `disconnected`), `connectedAt`, `lastSuccessAt`, `lastErrorCode`, `automation` | Client may read; `allow write: if false` |
+| `pricing_rules` | `name`, `scope` (all / marketplace / category), `multiplier`, `fixedAdd`, `rounding` (`none`, `.99`, `.00`), `minProfit`, `minSupplierStock`, `staleDays`, `staleDropPercent`, `applyOnSupplierChange` | Floor uses `Workspace.planningFeeRate` — the one place a rate survives (hard rule 3) |
+| `supplier_orders` | `orderId`, `itemId` (the order line it fulfils), `sourceId`, `supplierProductId`, `externalSupplierOrderId`, `productCost`, `shippingCost`, `tax`, `supplierRefund`, `isSample`, `status`, `trackingNumber`, `carrier`, `requestedAt`, `placedAt`, `shippedAt`, `deliveredAt`, `failureCode` | One per supplier shipment; an order may have several. Its cost less any supplier refund becomes the line's `unitCost`; a sample has no `orderId` |
+| `connections` | `platform`, `kind` (marketplace / supplier), `accountLabel`, `status` (`active`, `needsReauth`, `error`, `disconnected`), `connectedAt`, `lastSuccessAt`, `lastErrorCode` | Client may read; `allow write: if false` |
+| `connection_settings` | `connectionId`, `automation`, `maxPurchasePrice`, `maxLossPerOrder`, `dailySpendCap`, `shippedTrigger`, `autoDeliverAfterDays`, `buyerMessages` | The seller's choices, so the client may write them; split from `connections` so status stays server-only |
 | `connection_tokens` | Encrypted access and refresh tokens, expiry | `allow read, write: if false`; encrypted with a Cloud KMS key the Functions service account alone may use |
 | `sync_runs` | `connectionId`, `job`, `startedAt`, `finishedAt`, `result`, `counts`, `errorCode` | Plan §14 "sync history" and "sync errors" |
 
@@ -118,7 +182,9 @@ stored**: the Function placing the order reads it from the marketplace at that
 moment, hands it to the supplier and keeps nothing. It is never written to
 Firestore and never logged (hard rule 9). Consequence: only a synced order can
 be placed automatically — a manual order's address is typed at the supplier's
-own site by the seller.
+own site by the seller. AutoDS lets a seller edit the address in its own app;
+here a supplier refusing an address fails the supplier order with that reason,
+and the seller corrects it on the marketplace or places it by hand.
 
 ## 5. Server
 
@@ -146,7 +212,11 @@ Everything that holds a token lives in `functions/src/integrations/`.
   | `supplierWebhook` | `onRequest` per supplier | Acknowledges at once, then applies stock, price and tracking |
   | `pushTrackingToMarketplace` | Trigger on tracking written to a `supplier_order` | Calls `pushTracking`; sets the order's `shippedAt` |
   | `applyRepricing` | Trigger on a supplier price change, when a rule allows it | Computes the new price, writes the listing and `listing_price_changes`, calls `setPrice` |
-  | `outOfStockGuard` | Trigger on stock reaching zero | Calls `setQuantity(0)` on every live listing of that item |
+  | `outOfStockGuard` | Trigger on stock falling below the rule's `minSupplierStock` | Calls `setQuantity(0)` on every live listing of that item; restores it when stock returns |
+| `checkOrderProtections` | Inside `onSupplierOrderRequested`, before `placeOrder` | Stops with a reason on max purchase price, max loss or the daily cap — unless the seller chose "Place anyway" |
+| `autoDeliver` | Scheduler, daily | Marks supplier orders delivered N days after shipped, where the supplier never reports it |
+| `findUnlinked` | After each order and listing sync | Flags synced rows with no supplier product, for "link to supplier" |
+| `staleRepricing` | Scheduler, daily | Lowers unsold dropship listings by the rule's step, never below the floor |
   | `refreshTokens` | Scheduler | Refreshes before expiry; a refusal sets `needsReauth` and notifies |
 
 - **Rules from `docs/rules/BACKEND.md` that bite hardest here:** idempotent on
@@ -172,10 +242,10 @@ inside existing features.
 | Inventory | Filter by fulfilment; a dropship row shows supplier price, supplier stock and margin at the current price |
 | Listings → Pricing rules | Create, edit and delete rules; bulk "apply rule" on a selection (hard rule 16) |
 | Listing detail | Price history with reasons |
-| Order detail | Supplier order card: one tap "Order from supplier" when connected; "open supplier page" and fields for the supplier order number and cost when not |
+| Order detail | Supplier order card: one tap "Order from supplier" when connected; "open supplier page" and fields for the supplier order number and cost when not. Shows DAS, estimated arrival, failure reason, "Try again", "Place anyway", "Switch supplier", cancel both sides, supplier refund, attach supplier invoice |
 | Shipping queue | Gains "to order from supplier" ahead of "to ship" |
-| Home → Needs attention | Orders to place with a supplier; supplier orders that failed; supplier out of stock while listed; margin below a rule's floor after a supplier price rise; listings still live elsewhere after a sale; a connection that needs reconnecting |
-| Analytics | Split by fulfilment; supplier ship time; supplier ROI through the existing source view |
+| Home → Needs attention | Orders to place with a supplier; supplier orders past the DAS threshold; synced orders or listings not linked to a supplier; supplier orders that failed; supplier out of stock while listed; margin below a rule's floor after a supplier price rise; listings still live elsewhere after a sale; a connection that needs reconnecting |
+| Analytics | Split by fulfilment; winners and losers; supplier ship time; supplier ROI through the existing source view |
 
 **New notification types**, one switch each: `supplierOrderNeeded`,
 `supplierOrderFailed`, `supplierOutOfStock`, `supplierPriceChanged`,
@@ -201,6 +271,9 @@ Per connection, chosen by the seller; the default is the most manual.
 - Auto-ordering spends the seller's money, so it is off until the seller turns
   it on, the cap is required when they do, and the first auto order still
   asks.
+- Three protections stop an auto order with a reason, as AutoDS's do: maximum
+  purchase price per supplier, maximum loss per order, and the daily cap.
+  "Place anyway" overrides them for one order, by hand only.
 - The supplier charges the seller's own account at the supplier. The app
   never sees a card or a wallet.
 
@@ -213,12 +286,12 @@ rulebook and `docs/DATA_MODEL.md` current, `docs/DONE_WORK.md` and
 | Phase | Builds | Needs from the owner | Done when |
 |---|---|---|---|
 | 0 — Access | Developer accounts and approvals: eBay developer keys, CJ API key, Shopify Partner app, Etsy app; a Cloud KMS key; secrets in Secret Manager | Accounts in the business's name; `RELEASE_ACTIONS.md` entries | Each platform answers a sandbox call from a deployed Function |
-| 1 — Manual dropshipping | Fulfilment kind on items, suppliers as sources, supplier products, manual supplier orders, pricing rules, bulk apply, listing price history, delist-after-sale attention, listing templates, analytics split | Answers in §11 | A guest runs the whole lifecycle with no connection and every number is right or `—` |
+| 1 — Manual dropshipping | Fulfilment kind on items, variants, suppliers as sources, supplier products with tax and shipping days, manual supplier orders with DAS, estimated arrival, samples, supplier refunds and invoices, pricing rules, bulk apply, listing price history, delist-after-sale attention, listing templates, order filters, analytics split with winners and losers | Answers in §11 | A guest runs the whole lifecycle with no connection and every number is right or `—` |
 | 2 — Connection foundation | `connections`, `connection_tokens`, `sync_runs`, OAuth round trip, adapter interfaces, Connections screen, `refreshTokens`, rules and their emulator tests | Phase 0 | A seller connects and disconnects a sandbox account; a token never appears in a client read or a log |
 | 3 — eBay | Orders in by polling, tracking out, price and quantity push for API-managed listings | eBay production keys | A real eBay sale appears as an order with no typing, and tracking lands on eBay |
-| 4 — CJ | Product import, hourly monitor, webhooks, one-tap supplier order, tracking back | CJ account with balance | A synced eBay sale becomes a placed CJ order in one tap, and its tracking reaches eBay |
-| 5 — Automation | Auto repricing, out-of-stock guard, auto ordering with the daily cap | Decision 11.2 | A supplier price rise reprices the listing, and a sale is ordered with no tap, within the cap |
-| 6 — More platforms | Shopify, then Etsy, then TikTok Shop and AliExpress as access allows | Each platform's review | Each adapter passes the same contract tests as eBay or CJ |
+| 4 — CJ | Product import, hourly monitor, webhooks, one-tap supplier order, retry and place anyway, backup suppliers and switch, default phone, shipped trigger, auto-deliver, order log, tracking back | CJ account with balance | A synced eBay sale becomes a placed CJ order in one tap, and its tracking reaches eBay |
+| 5 — Automation | Auto repricing, stale repricing, minimum-stock guard and restock, auto ordering behind the three protections | Decision 11.2 | A supplier price rise reprices the listing, and a sale is ordered with no tap, within the cap |
+| 6 — More platforms and extras | Shopify, then Etsy, then TikTok Shop and AliExpress as access allows; a POD supplier; eBay buyer messages; AI rewrite if approved | Each platform's review | Each adapter passes the same contract tests as eBay or CJ |
 
 Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
 
@@ -240,9 +313,12 @@ Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
 | Item | Why |
 |---|---|
 | Buying from Amazon, Walmart or any retailer after a sale | eBay prohibits it and suspends accounts; retailers' terms forbid automated buying |
-| Product research, "winning products", trend scraping | Needs market data this app does not own; scraping breaks platform terms |
+| Auto-order through the seller's buyer account (AutoDS logs into the seller's AliExpress or Amazon account) | Means holding the seller's supplier password and driving a website as them — a credential this app must never hold (hard rules 9, 10) and a breach of those sites' terms. Official APIs only |
+| Tracking number conversion | Replaces the real carrier's number with a relabelled one so the buyer does not see where it ships from; a marketplace may treat it as invalid tracking, and it misleads the buyer |
+| A managed balance (Fulfilled by AutoDS) | The app would hold the seller's money and buy on their behalf — a payment service, not a seller tool |
+| Product research, "winning products", trend scraping, ads spy | Needs market data this app does not own; scraping breaks platform terms |
+| AI image generator | Generated product photos misrepresent the item a buyer receives |
 | Store builder | Shopify already is one; the app connects to the store the seller has |
-| Automatic buyer messaging | Platform policies differ and a wrong message costs feedback; out of the lifecycle |
 | Storing buyer addresses | §4; passed through only |
 
 ## 11. Open decisions
@@ -255,3 +331,6 @@ Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
 | 11.4 | First marketplace eBay, first supplier CJ? | Yes |
 | 11.5 | Buyer address passed through, never stored, so a manual order is never placed automatically? | Yes |
 | 11.6 | Should the `Marketplace` enum (orders) and the connection platform enum be one list or two? Vinted is in the seller records but has no API | Two — what a seller sells on is not what the app can connect to |
+| 11.7 | Variants: one item per supplier variant, or a variant table under one item? One item per variant fits today's model; eBay's multi-variation listing needs the table | One item per variant in Phase 1; the table when multi-variation listings are built |
+| 11.8 | Automatic buyer messages on eBay — build them? | Yes, every type off by default |
+| 11.9 | AI rewrite of titles and descriptions needs a new third-party service (an LLM API, server-side). Approve? | Not until approved |
