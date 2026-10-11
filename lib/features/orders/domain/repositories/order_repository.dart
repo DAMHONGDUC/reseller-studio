@@ -1,5 +1,6 @@
 import '../../../inventory/domain/entities/item.dart';
 import '../entities/order.dart';
+import '../entities/supplier_order.dart';
 
 /// Reading and writing orders. See `ItemRepository` for why these are
 /// streams and why failures never cross this line as Firebase types.
@@ -23,4 +24,13 @@ abstract interface class OrderRepository {
 
   /// Writes the returned order and restores line quantities as one commit.
   Future<void> closeReturn(Order order, {required bool restock});
+}
+
+/// Orders placed with dropship suppliers (`docs/DROPSHIPPING_PLAN.md`).
+abstract interface class SupplierOrderRepository {
+  Stream<List<SupplierOrder>> watchSupplierOrders();
+
+  /// Writes [supplierOrder] and, in the same commit, [order] when given — the
+  /// sold line's cost moves with the supplier order that measures it.
+  Future<void> save(SupplierOrder supplierOrder, {Order? order});
 }

@@ -11,6 +11,7 @@ import '../../../../core/local/local_collection.dart';
 import '../../../../core/local/local_database.dart';
 import '../../../../core/local/local_table.dart';
 import '../../../inventory/domain/entities/item.dart';
+import '../../../inventory/domain/enums/item_fulfilment.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/repositories/order_repository.dart';
 import '../dtos/order_dto.dart';
@@ -98,6 +99,10 @@ class LocalOrderRepository implements OrderRepository {
                 ? data['quantity']! as int
                 : item.quantity;
             final int left = quantity - 1;
+
+            // A supplier ships every sale of a dropshipped item; there is no
+            // shelf to empty, so the item stays for sale.
+            if (data['fulfilment'] == ItemFulfilment.dropship.name) continue;
 
             await _items.put(item.id, item.createdAt, <String, Object?>{
               'quantity': left,

@@ -149,6 +149,7 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         _OrderSectionTitle(title: context.l10n.commonItems),
         SizedBox(height: SdSpacingConstant.h8),
         _OrderLines(order: order),
+        _SupplierSection(order: order),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSection(
           section: OrderDetailSection.profit,

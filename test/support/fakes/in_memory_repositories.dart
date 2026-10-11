@@ -20,6 +20,7 @@ import 'package:reseller_studio/features/marketplaces/domain/repositories/market
 import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/offers/domain/repositories/offer_repository.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/entities/supplier_order.dart';
 import 'package:reseller_studio/features/orders/domain/repositories/order_repository.dart';
 import 'package:reseller_studio/features/pricing/domain/entities/pricing_rule.dart';
 import 'package:reseller_studio/features/pricing/domain/repositories/pricing_rule_repository.dart';
@@ -83,6 +84,7 @@ class MockStore {
   final List<PricingRule> pricingRules = <PricingRule>[];
   final List<ListingPriceChange> listingPriceChanges = <ListingPriceChange>[];
   final List<SupplierProduct> supplierProducts = <SupplierProduct>[];
+  final List<SupplierOrder> supplierOrders = <SupplierOrder>[];
 
   /// The demo business itself, mutable because Settings can now change it.
   ///
@@ -145,6 +147,7 @@ class MockStore {
       pricingRules,
       listingPriceChanges,
       supplierProducts,
+      supplierOrders,
       if (!keepDefaults) ...<List<Object>>[marketplaces, carriers],
     ];
 
@@ -303,6 +306,8 @@ class InMemoryOrderRepository implements OrderRepository {
     for (final MapEntry<String, int> entry in found.entries) {
       final Item current = _store.items[entry.value];
       final int left = current.quantity - 1;
+
+      if (current.isDropship) continue;
 
       _store.items[entry.value] = current.copyWith(
         quantity: left,
@@ -550,6 +555,31 @@ class InMemorySupplierProductRepository implements SupplierProductRepository {
       deletedAt: DateTime.now(),
     );
     _store.notifyChanged();
+  }
+}
+
+class InMemorySupplierOrderRepository implements SupplierOrderRepository {
+  const InMemorySupplierOrderRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<SupplierOrder>> watchSupplierOrders() =>
+      _store.watch(() => List<SupplierOrder>.of(_store.supplierOrders));
+
+  @override
+  Future<void> save(SupplierOrder supplierOrder, {Order? order}) async {
+    if (order != null) {
+      final int index = _store.orders.indexWhere(
+        (Order other) => other.id == order.id,
+      );
+      if (index != -1) _store.orders[index] = order;
+    }
+    _store.upsert(
+      _store.supplierOrders,
+      supplierOrder,
+      (SupplierOrder other) => other.id == supplierOrder.id,
+    );
   }
 }
 

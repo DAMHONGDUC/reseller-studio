@@ -7,6 +7,7 @@ import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/firestore/firestore_stream.dart';
 import '../../../../core/firestore/workspace_context.dart';
 import '../../../inventory/domain/entities/item.dart';
+import '../../../inventory/domain/enums/item_fulfilment.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/repositories/order_repository.dart';
 import '../dtos/order_dto.dart';
@@ -125,6 +126,10 @@ class FirestoreOrderRepository implements OrderRepository {
               ? data['quantity']! as int
               : item.quantity;
           final int left = quantity - 1;
+
+          // A supplier ships every sale of a dropshipped item; there is no
+          // shelf to empty, so the item stays for sale.
+          if (data['fulfilment'] == ItemFulfilment.dropship.name) continue;
 
           transaction.update(itemRefs[item.id]!, <String, Object?>{
             'quantity': left,

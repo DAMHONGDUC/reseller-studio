@@ -74,6 +74,9 @@ class LocalListingPriceChanges extends LocalRows {}
 @UseRowClass(LocalRow)
 class LocalSupplierProducts extends LocalRows {}
 
+@UseRowClass(LocalRow)
+class LocalSupplierOrders extends LocalRows {}
+
 /// The guest's own business document. One row, keyed the same way.
 @UseRowClass(LocalRow)
 class LocalWorkspaces extends LocalRows {}
@@ -121,6 +124,7 @@ class DrainStates extends Table {
     LocalPricingRules,
     LocalListingPriceChanges,
     LocalSupplierProducts,
+    LocalSupplierOrders,
     LocalWorkspaces,
     DrainStates,
   ],
@@ -135,8 +139,8 @@ class LocalDatabase extends _$LocalDatabase {
 
   static const String drainStateKey = 'drain';
 
-  /// Version 2 added pricing rules, listing price history and supplier
-  /// products.
+  /// Version 2 added pricing rules, listing price history, supplier products
+  /// and supplier orders.
   @override
   int get schemaVersion => 2;
 
@@ -149,6 +153,7 @@ class LocalDatabase extends _$LocalDatabase {
         await migrator.createTable(localPricingRules);
         await migrator.createTable(localListingPriceChanges);
         await migrator.createTable(localSupplierProducts);
+        await migrator.createTable(localSupplierOrders);
       }
     },
   );
@@ -173,6 +178,7 @@ class LocalDatabase extends _$LocalDatabase {
         localListings,
         localListingPriceChanges,
         localOrders,
+        localSupplierOrders,
         localOffers,
         localExpenses,
       ];

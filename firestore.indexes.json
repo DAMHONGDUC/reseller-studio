@@ -517,6 +517,21 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "//": "A business's supplier orders, oldest first \u2014 the order detail's supplier card and Home's dropship work.",
+      "collectionGroup": "supplier_orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

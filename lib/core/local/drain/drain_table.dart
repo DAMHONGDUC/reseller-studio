@@ -9,6 +9,7 @@ import '../../../features/listings/data/dtos/listing_price_change_dto.dart';
 import '../../../features/marketplaces/data/dtos/marketplace_dto.dart';
 import '../../../features/offers/data/dtos/offer_dto.dart';
 import '../../../features/orders/data/dtos/order_dto.dart';
+import '../../../features/orders/data/dtos/supplier_order_dto.dart';
 import '../../../features/pricing/data/dtos/pricing_rule_dto.dart';
 import '../../../features/sourcing/data/dtos/sourcing_dtos.dart';
 import '../../../features/sourcing/data/dtos/supplier_product_dto.dart';
@@ -171,6 +172,17 @@ class DrainTable {
           (String id, Map<String, Object?> data, String currency, String uid) =>
               OrderDto.toMap(
                 OrderDto.fromMap(id, data, fallbackCurrency: currency),
+                createdBy: uid,
+              ),
+    ),
+    DrainTable(
+      name: 'supplier_orders',
+      rows: db.localSupplierOrders,
+      rebuild:
+          (String id, Map<String, Object?> data, String currency, String uid) =>
+              SupplierOrderDto.toMap(
+                SupplierOrderDto.fromMap(id, data, fallbackCurrency: currency),
+                currency: currency,
                 createdBy: uid,
               ),
     ),

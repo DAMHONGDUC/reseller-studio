@@ -42,7 +42,9 @@ import '../../features/offers/data/repositories/firestore_offer_repository.dart'
 import '../../features/offers/data/repositories/local_offer_repository.dart';
 import '../../features/offers/domain/repositories/offer_repository.dart';
 import '../../features/orders/data/repositories/firestore_order_repository.dart';
+import '../../features/orders/data/repositories/firestore_supplier_order_repository.dart';
 import '../../features/orders/data/repositories/local_order_repository.dart';
+import '../../features/orders/data/repositories/local_supplier_order_repository.dart';
 import '../../features/orders/domain/repositories/order_repository.dart';
 import '../../features/pricing/data/repositories/firestore_pricing_rule_repository.dart';
 import '../../features/pricing/data/repositories/local_pricing_rule_repository.dart';
@@ -130,6 +132,17 @@ final Provider<OrderRepository> orderRepositoryProvider =
         guest: (LocalDatabase db, String currency) =>
             LocalOrderRepository(db, currency: currency),
         linked: FirestoreOrderRepository.new,
+      ),
+    );
+
+final Provider<SupplierOrderRepository> supplierOrderRepositoryProvider =
+    Provider<SupplierOrderRepository>(
+      (Ref ref) => RepositoryChoice.between<SupplierOrderRepository>(
+        ref,
+        name: 'SupplierOrderRepository',
+        guest: (LocalDatabase db, String currency) =>
+            LocalSupplierOrderRepository(db, currency: currency),
+        linked: FirestoreSupplierOrderRepository.new,
       ),
     );
 

@@ -7116,5 +7116,116 @@
   "supplierProductNoneUnlinked": "Every product is already listed. Add one to a supplier first.",
   "@supplierProductNoneUnlinked": {
     "description": "Shown when every supplier product already has an item."
+  },
+  "supplierOrderRequested": "Requested",
+  "@supplierOrderRequested": {
+    "description": "Supplier order status: asked of a connected supplier."
+  },
+  "supplierOrderPlaced": "Ordered",
+  "@supplierOrderPlaced": {
+    "description": "Supplier order status: placed and paid at the supplier."
+  },
+  "supplierOrderShipped": "Shipped",
+  "@supplierOrderShipped": {
+    "description": "Supplier order status: the supplier shipped it."
+  },
+  "supplierOrderDelivered": "Delivered",
+  "@supplierOrderDelivered": {
+    "description": "Supplier order status: it reached the buyer."
+  },
+  "supplierOrderFailed": "Failed",
+  "@supplierOrderFailed": {
+    "description": "Supplier order status: the supplier refused it."
+  },
+  "supplierOrderCancelled": "Cancelled",
+  "@supplierOrderCancelled": {
+    "description": "Supplier order status: called off before it shipped."
+  },
+  "supplierOrderPlaceTitle": "Order from supplier",
+  "@supplierOrderPlaceTitle": {
+    "description": "Action and sheet title for recording an order placed at the supplier."
+  },
+  "supplierOrderNumberLabel": "Supplier order number",
+  "@supplierOrderNumberLabel": {
+    "description": "Label for the supplier's own order number."
+  },
+  "supplierOrderCostHelp": "What the supplier charged at checkout.",
+  "@supplierOrderCostHelp": {
+    "description": "Helper under the supplier price when recording an order."
+  },
+  "supplierOrderPlaceSubmit": "Save order",
+  "@supplierOrderPlaceSubmit": {
+    "description": "Button that saves an order placed at the supplier."
+  },
+  "supplierOrderTrackingTitle": "Add tracking",
+  "@supplierOrderTrackingTitle": {
+    "description": "Action and sheet title for adding the supplier's tracking number."
+  },
+  "supplierOrderTrackingLabel": "Tracking number",
+  "@supplierOrderTrackingLabel": {
+    "description": "Label for the tracking number the supplier sent."
+  },
+  "supplierOrderCarrierLabel": "Carrier",
+  "@supplierOrderCarrierLabel": {
+    "description": "Label for the carrier the supplier shipped with."
+  },
+  "supplierOrderNotYet": "Not ordered from the supplier yet.",
+  "@supplierOrderNotYet": {
+    "description": "Shown on a dropship line nobody has ordered from the supplier yet."
+  },
+  "supplierOrderOpenSupplier": "Open supplier page",
+  "@supplierOrderOpenSupplier": {
+    "description": "Button that opens the product's page at the supplier."
+  },
+  "supplierOrderRefundTitle": "Supplier refund",
+  "@supplierOrderRefundTitle": {
+    "description": "Action and sheet title for recording money the supplier gave back."
+  },
+  "supplierOrderRefundLabel": "Amount refunded",
+  "@supplierOrderRefundLabel": {
+    "description": "Label for the amount the supplier refunded."
+  },
+  "supplierOrderMarkDelivered": "Mark delivered",
+  "@supplierOrderMarkDelivered": {
+    "description": "Action marking a supplier order delivered."
+  },
+  "supplierOrderCancel": "Cancel order",
+  "@supplierOrderCancel": {
+    "description": "Action cancelling a supplier order before it ships."
+  },
+  "supplierOrderArrival": "Arrives {date}",
+  "@supplierOrderArrival": {
+    "description": "Estimated arrival of a supplier order.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "supplierOrderWaitingDays": "{count, plural, =0{Ordered today} =1{1 day waiting} other{{count} days waiting}}",
+  "@supplierOrderWaitingDays": {
+    "description": "Days a placed supplier order has waited for tracking.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeToOrderFromSupplier": "To order from supplier",
+  "@homeToOrderFromSupplier": {
+    "description": "Home tile: dropship sales still to be ordered from the supplier."
+  },
+  "homeToOrderFromSupplierDetail": "They ship once they are ordered",
+  "@homeToOrderFromSupplierDetail": {
+    "description": "Home tile detail when nothing is late."
+  },
+  "homeSupplierOrdersLate": "{count, plural, =1{1 late at the supplier} other{{count} late at the supplier}}",
+  "@homeSupplierOrdersLate": {
+    "description": "Home tile detail: supplier orders waiting too long for tracking.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
