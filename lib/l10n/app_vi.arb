@@ -1646,5 +1646,8 @@
   "itemSummaryOnHand": "{count, plural, =0{Hết hàng} other{Còn {count}}}",
   "orderNotShippedYet": "Chưa gửi hàng",
   "homeShowMore": "Xem thêm",
-  "homeShowLess": "Thu gọn"
+  "homeShowLess": "Thu gọn",
+  "itemFormMoreDetails": "Thêm chi tiết",
+  "itemFormFewerDetails": "Thu gọn chi tiết",
+  "itemFormDetails": "Chi tiết"
 }

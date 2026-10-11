@@ -1646,5 +1646,8 @@
   "itemSummaryOnHand": "{count, plural, =0{Sin existencias} other{{count} en existencia}}",
   "orderNotShippedYet": "Aún no enviado",
   "homeShowMore": "Ver más",
-  "homeShowLess": "Ver menos"
+  "homeShowLess": "Ver menos",
+  "itemFormMoreDetails": "Más detalles",
+  "itemFormFewerDetails": "Menos detalles",
+  "itemFormDetails": "Detalles"
 }

@@ -7407,5 +7407,17 @@
   "homeShowLess": "Show less",
   "@homeShowLess": {
     "description": "Button hiding the rest of Home's performance figures."
+  },
+  "itemFormMoreDetails": "More details",
+  "@itemFormMoreDetails": {
+    "description": "Button revealing the item form's optional fields."
+  },
+  "itemFormFewerDetails": "Fewer details",
+  "@itemFormFewerDetails": {
+    "description": "Button hiding the item form's optional fields."
+  },
+  "itemFormDetails": "Details",
+  "@itemFormDetails": {
+    "description": "Item form section heading over status, condition and category."
   }
 }

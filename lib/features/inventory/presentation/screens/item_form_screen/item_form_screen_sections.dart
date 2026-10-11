@@ -54,3 +54,28 @@ class _StatusField extends ConsumerWidget {
         ref.read(itemFormControllerProvider.notifier).selectStatus(status),
   );
 }
+
+/// The switch between the two fields every item needs and everything else.
+class _MoreDetailsToggle extends StatelessWidget {
+  const _MoreDetailsToggle({required this.open, required this.onToggle});
+
+  final bool open;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.symmetric(vertical: SdSpacingConstant.h8),
+    child: Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: SdButtonV3(
+        variant: SdButtonVariantV3.text,
+        label: open
+            ? context.l10n.itemFormFewerDetails
+            : context.l10n.itemFormMoreDetails,
+        icon: open ? AppIconConstant.expandLess : AppIconConstant.expandMore,
+        size: SdButtonSizeV3.small,
+        onPressed: onToggle,
+      ),
+    ),
+  );
+}
