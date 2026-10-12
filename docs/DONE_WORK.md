@@ -6,21 +6,21 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Area | Included | External dependency |
 |---|---|---|
 | Onboarding and auth | One-time intro, Apple/Google sign-in, guest mode with a local store, sign-out, account deletion | Firebase and provider setup |
-| Home | Attention queue, overview, recent activity, Quick Access, Premium banner | Functions for live notifications |
+| Home | Attention queue, overview, recent activity, Quick Access, Premium banner, an info button opening About | Functions for live notifications |
 | Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, categories and locations created inline, buying-trip link, bulk actions including bulk listing and filing under a trip | Firebase Storage for uploads |
-| Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import, supplier orders for dropship sales with tracking, refunds, days waiting and estimated arrival | None for manual records |
+| Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import, supplier orders for dropship sales with tracking, refunds, days waiting and estimated arrival, search by item, buyer, order number, tracking or platform | None for manual records |
 | Sourcing | Sources, purchases, items filed under a purchase, receipt apportioned across them, ROI ranking, buy calculator, dropship suppliers and their products, List it as a dropship item, primary and backup supplier per item | None |
 | Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end, pricing rules applied in bulk, price history per item | No marketplace publishing yet; see `DROPSHIPPING_PLAN.md` |
 | Marketplaces | Seller-owned records, fee estimate, defaults, soft delete | None |
 | Carriers | Business-owned records, defaults, soft delete | None |
-| Analytics | Sales, profit, inventory, marketplace, category and source views; a dropship view splitting stocked from dropshipped, ranking dropship products and timing suppliers | None |
+| Analytics | Sales, profit, inventory, marketplace, category and source views; a dropship view splitting stocked from dropshipped, ranking dropship products and timing suppliers; a custom range of days beside the fixed periods | None |
 | Expenses and receipts | Add/list/delete, category totals, file upload | Firebase Storage for uploads |
 | Reports and tax | CSV exports and the one-action tax pack, both Premium; US and UK summaries and mileage; Close the books | Rates require seasonal review |
 | Search | Items, orders, listings and sources | None |
 | Workspace and team | Create, switch, delete, invite, role and member management | Team actions require deployed Functions |
 | Notifications | Inbox, unread state, FCM registration, event pushes, per-workspace-timezone digest, twelve types with a switch each | Functions, APNs and Scheduler |
 | Subscription | Everything free except export (every CSV and the tax pack); ceiling machinery kept with Free set to unlimited; monthly/yearly/lifetime paywall, restore, management screen | RevenueCat and webhook setup |
-| More → General | One section, first on More, replacing the Settings screen: account / sign in, subscription, theme, language, notifications, about, contact support, sign out, delete account; seed demo data and delete all data in dev mode | None |
+| More → General | One section, first on More, replacing the Settings screen: account / sign in, subscription, theme, language, notifications, about (a reselling and a dropshipping guide), contact support, sign out, delete account; seed demo data and delete all data in dev mode | None |
 | More → Sync status | Card heading More: synced, syncing (writes still queued), or on this device only for a guest | None |
 
 ## Platform foundations
