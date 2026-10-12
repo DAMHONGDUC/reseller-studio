@@ -180,7 +180,7 @@ class SupplierOrderController extends Notifier<bool> {
   }
 
   /// Photograph or choose the supplier's invoice and keep it on the order.
-  /// Null when the seller cancelled, which is not an error.
+  /// Writes nothing when the seller cancels, which is not an error.
   Future<void> attachInvoice(
     SupplierOrder supplierOrder, {
     required bool fromCamera,

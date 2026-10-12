@@ -64,10 +64,8 @@ class _Tiles extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     children: <Widget>[
-      // No icons on these three. At a third of the width the glyph costs
-      // about 26px, which is exactly what turned "Revenue" into
-      // "Reven…" — and the label is the tile's identity, so the label
-      // wins.
+      // No icons on these three: at a third of the width the glyph turned
+      // "Revenue" into "Reven…", and the label is the tile's identity.
       Row(
         children: <Widget>[
           Expanded(

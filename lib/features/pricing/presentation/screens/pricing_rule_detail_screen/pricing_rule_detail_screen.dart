@@ -110,6 +110,7 @@ class _PricingRuleDetailScreenState
       if (id == null || !mounted) return;
       navigator.pop();
     } catch (error) {
+      // Already logged by the controller.
       if (!mounted) return;
       SdSnackBarUtilsV3.error(
         context,
@@ -126,6 +127,7 @@ class _PricingRuleDetailScreenState
       if (!mounted) return;
       navigator.pop();
     } catch (error) {
+      // Already logged by the controller.
       if (!mounted) return;
       SdSnackBarUtilsV3.error(
         context,
