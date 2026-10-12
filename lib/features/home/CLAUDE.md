@@ -179,8 +179,10 @@ an `unknown`.
 
 ## Where Home sends the seller
 
-- **The app bar carries Search and Scan**, both `push`ed: each is a place to
-  go looking, and neither is a section of Home.
+- **The app bar carries Search, Scan and About**, all `push`ed: each is a
+  place to go looking, and none is a section of Home. About is the info
+  button — owner's rule — because it is the guide to both loops, reselling
+  and dropshipping (`docs/rules/SCREENS.md`).
 - **Search is `push`; Analytics is `go`.** Search lives outside the shell and
   comes back here. Analytics is a tab, and pushing a branch root over Home
   leaves the seller on the wrong tab with a back button they should not have.

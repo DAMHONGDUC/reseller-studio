@@ -586,3 +586,21 @@ The order carries the meaning. `test/features/more/about_screen_test.dart`
 pins the sequence against the lifecycle and fails on a step pointing at a
 parameterised route, which cannot be pushed and would be a dead link inside
 the one screen that exists to explain the app.
+
+**About is the guide to both businesses, and Home's app bar opens it.**
+Owner's rule. An info button sits beside Search and Scan, because "how does
+this work?" is asked on the first screen a seller sees, not five rows down
+More.
+
+- **Two guides, one rail.** A Reselling / Dropshipping switch picks
+  `WorkflowConstant.steps` or `WorkflowConstant.dropshipSteps`. Sell, Profit
+  and Analyze are shared kinds — one sale, one profit, one tab — and the
+  supplier's steps replace Purchase, Inventory and Ship.
+- **Every step carries its how-lines**, the same `WorkflowLabel.how` Home's
+  flow overview spells out, so About is a guide rather than a map. Both draw
+  them with `AppBulletLine`.
+- **Home's flow overview stays the reseller's loop.** It answers "how do I
+  use this" for the chain `CLAUDE.md` writes; the dropship loop lives on
+  About alone until the owner says otherwise.
+- `test/features/more/about_screen_test.dart` pins the dropship order and
+  `home_shortcuts_test.dart` the info button's route.
