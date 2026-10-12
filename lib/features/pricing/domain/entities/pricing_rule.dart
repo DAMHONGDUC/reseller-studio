@@ -20,10 +20,6 @@ class PricingRule {
     this.fixedAdd,
     this.rounding = PriceRounding.none,
     this.minProfit,
-    this.minSupplierStock,
-    this.staleDays,
-    this.staleDropPercent,
-    this.applyOnSupplierChange = false,
     this.deletedAt,
   });
 
@@ -48,29 +44,9 @@ class PricingRule {
   /// price this rule gives may go under. Null means break-even.
   final Money? minProfit;
 
-  /// Supplier stock under which a dropship listing is taken to zero.
-  final int? minSupplierStock;
-
-  /// Days unsold before [staleDropPercent] lowers the price.
-  final int? staleDays;
-
-  /// How much a stale listing is lowered by, as a fraction — 0.05 is 5%.
-  final double? staleDropPercent;
-
-  /// Whether a supplier price change re-applies this rule on its own.
-  final bool applyOnSupplierChange;
-
   final DateTime? deletedAt;
 
   bool get isDeleted => deletedAt != null;
-
-  /// Whether stale repricing is switched on for this rule.
-  bool get dropsWhenStale {
-    final int? days = staleDays;
-    final double? percent = staleDropPercent;
-
-    return days != null && days > 0 && percent != null && percent > 0;
-  }
 
   PricingRule copyWith({
     String? name,
@@ -80,10 +56,6 @@ class PricingRule {
     Money? fixedAdd,
     PriceRounding? rounding,
     Money? minProfit,
-    int? minSupplierStock,
-    int? staleDays,
-    double? staleDropPercent,
-    bool? applyOnSupplierChange,
     DateTime? deletedAt,
   }) => PricingRule(
     id: id,
@@ -95,10 +67,6 @@ class PricingRule {
     fixedAdd: fixedAdd ?? this.fixedAdd,
     rounding: rounding ?? this.rounding,
     minProfit: minProfit ?? this.minProfit,
-    minSupplierStock: minSupplierStock ?? this.minSupplierStock,
-    staleDays: staleDays ?? this.staleDays,
-    staleDropPercent: staleDropPercent ?? this.staleDropPercent,
-    applyOnSupplierChange: applyOnSupplierChange ?? this.applyOnSupplierChange,
     deletedAt: deletedAt ?? this.deletedAt,
   );
 }

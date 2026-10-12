@@ -1540,8 +1540,6 @@
   "priceChangeReasonManual": "手动修改",
   "priceChangeReasonBulk": "批量改价",
   "priceChangeReasonRule": "定价规则",
-  "priceChangeReasonStale": "长期未售出",
-  "priceChangeReasonSupplierChange": "供应商价格变动",
   "fulfilmentStocked": "自有库存",
   "fulfilmentDropship": "代发货",
   "suppliersTitle": "供应商",

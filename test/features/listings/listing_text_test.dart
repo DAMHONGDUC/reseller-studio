@@ -102,23 +102,4 @@ void main() {
       );
     });
   });
-
-  group('SupplierTextCleaner.cleanDescription', () {
-    test('turns markup into plain lines and drops reseller-only lines', () {
-      expect(
-        SupplierTextCleaner.cleanDescription(
-          '<p>Soft cotton &amp; linen.</p><br>Wholesale and dropship welcome!'
-          '<br><br><br><br>Machine washable 😊',
-        ),
-        'Soft cotton & linen.\n\nMachine washable',
-      );
-    });
-
-    test('removes filler inside a line and keeps the rest', () {
-      expect(
-        SupplierTextCleaner.cleanDescription('High quality steel. In stock.'),
-        'Steel.',
-      );
-    });
-  });
 }

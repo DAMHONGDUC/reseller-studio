@@ -6917,14 +6917,6 @@
   "@priceChangeReasonRule": {
     "description": "Price history reason: a pricing rule was applied."
   },
-  "priceChangeReasonStale": "Unsold too long",
-  "@priceChangeReasonStale": {
-    "description": "Price history reason: lowered because it had not sold."
-  },
-  "priceChangeReasonSupplierChange": "Supplier price moved",
-  "@priceChangeReasonSupplierChange": {
-    "description": "Price history reason: the supplier's price moved."
-  },
   "fulfilmentStocked": "Stocked",
   "@fulfilmentStocked": {
     "description": "Fulfilment tag: the seller holds and ships the item."

@@ -1540,8 +1540,6 @@
   "priceChangeReasonManual": "Editado",
   "priceChangeReasonBulk": "Cambio en bloque",
   "priceChangeReasonRule": "Regla de precio",
-  "priceChangeReasonStale": "Sin vender demasiado tiempo",
-  "priceChangeReasonSupplierChange": "Cambió el precio del proveedor",
   "fulfilmentStocked": "En stock propio",
   "fulfilmentDropship": "Dropshipping",
   "suppliersTitle": "Proveedores",

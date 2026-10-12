@@ -296,7 +296,11 @@ rulebook and `docs/DATA_MODEL.md` current, `docs/DONE_WORK.md` and
 
 Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
 
-**Progress.** Phase 1 is built on `feat/dropshipping`. Listing templates are
+**Progress.** Phase 1 is built on `feat/dropshipping`. The rule fields
+only Phase 5 reads — `minSupplierStock`, `staleDays`, `staleDropPercent`,
+`applyOnSupplierChange` — and the description cleaner were taken back out
+before review (owner, 2026-10-12): nothing in Phase 1 set or read them, so
+they land with the automation that uses them. Listing templates are
 **deferred** (owner, 2026-10-11): no screen edits a listing's own description
 yet, so a template has nowhere to apply. They come back with a listing editor.
 

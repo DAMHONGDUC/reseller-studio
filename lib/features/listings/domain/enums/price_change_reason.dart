@@ -14,12 +14,6 @@ enum PriceChangeReason {
 
   /// A pricing rule was applied.
   rule,
-
-  /// A rule lowered a listing that had not sold.
-  stale,
-
-  /// A supplier's price moved and a rule followed it.
-  supplierChange,
 }
 
 /// How a reason reads in a price history row.
@@ -28,8 +22,5 @@ extension PriceChangeReasonDisplay on PriceChangeReason {
     PriceChangeReason.manual => context.l10n.priceChangeReasonManual,
     PriceChangeReason.bulk => context.l10n.priceChangeReasonBulk,
     PriceChangeReason.rule => context.l10n.priceChangeReasonRule,
-    PriceChangeReason.stale => context.l10n.priceChangeReasonStale,
-    PriceChangeReason.supplierChange =>
-      context.l10n.priceChangeReasonSupplierChange,
   };
 }

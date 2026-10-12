@@ -1540,8 +1540,6 @@
   "priceChangeReasonManual": "Bearbeitet",
   "priceChangeReasonBulk": "Sammeländerung",
   "priceChangeReasonRule": "Preisregel",
-  "priceChangeReasonStale": "Zu lange unverkauft",
-  "priceChangeReasonSupplierChange": "Lieferantenpreis geändert",
   "fulfilmentStocked": "Eigener Bestand",
   "fulfilmentDropship": "Dropshipping",
   "suppliersTitle": "Lieferanten",

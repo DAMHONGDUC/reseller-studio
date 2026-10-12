@@ -43,13 +43,6 @@ final class PricingRuleDto {
           FirestoreMapper.enumOrNull(PriceRounding.values, data['rounding']) ??
           PriceRounding.none,
       minProfit: FirestoreMapper.moneyOrNull(data['minProfitMinor'], currency),
-      minSupplierStock: FirestoreMapper.intOrNull(data['minSupplierStock']),
-      staleDays: FirestoreMapper.intOrNull(data['staleDays']),
-      staleDropPercent: FirestoreMapper.doubleOrNull(data['staleDropPercent']),
-      applyOnSupplierChange: FirestoreMapper.boolOr(
-        data['applyOnSupplierChange'],
-        fallback: false,
-      ),
       deletedAt: FirestoreMapper.dateOrNull(data['deletedAt']),
     );
   }
@@ -67,10 +60,6 @@ final class PricingRuleDto {
     'fixedAddMinor': FirestoreMapper.minorOrNull(rule.fixedAdd),
     'rounding': rule.rounding.name,
     'minProfitMinor': FirestoreMapper.minorOrNull(rule.minProfit),
-    'minSupplierStock': rule.minSupplierStock,
-    'staleDays': rule.staleDays,
-    'staleDropPercent': rule.staleDropPercent,
-    'applyOnSupplierChange': rule.applyOnSupplierChange,
     'deletedAt': rule.deletedAt == null
         ? null
         : Timestamp.fromDate(rule.deletedAt!),

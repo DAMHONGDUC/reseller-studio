@@ -1540,8 +1540,6 @@
   "priceChangeReasonManual": "Sửa tay",
   "priceChangeReasonBulk": "Đổi giá hàng loạt",
   "priceChangeReasonRule": "Quy tắc giá",
-  "priceChangeReasonStale": "Lâu chưa bán được",
-  "priceChangeReasonSupplierChange": "Giá nhà cung cấp thay đổi",
   "fulfilmentStocked": "Hàng có sẵn",
   "fulfilmentDropship": "Dropship",
   "suppliersTitle": "Nhà cung cấp",

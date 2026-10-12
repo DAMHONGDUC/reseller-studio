@@ -15,7 +15,7 @@ final class ListingTextConstant {
   /// fits almost anywhere.
   static const int defaultTitleLength = 80;
 
-  /// Phrases a supplier pads a title or description with, matched whole and
+  /// Phrases a supplier pads a title with, matched whole and
   /// case-insensitively. The cleaner tries the longest first.
   static const List<String> fillerPhrases = <String>[
     'factory direct sale',
@@ -38,18 +38,5 @@ final class ListingTextConstant {
     'wholesale',
     'in stock',
     'promotion',
-  ];
-
-  /// A description line containing any of these speaks to resellers, not to
-  /// the buyer, and is dropped whole.
-  static const List<String> sellerOnlyLines = <String>[
-    'dropship',
-    'wholesale',
-    'aliexpress',
-    'contact us',
-    'contact me',
-    'positive feedback',
-    '5 star',
-    'five star',
   ];
 }

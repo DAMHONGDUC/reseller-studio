@@ -49,44 +49,6 @@ final class PricingRuleCalculator {
     required double feeRate,
   }) => price - price.applyRate(feeRate) - cost;
 
-  /// The lower price a stale listing moves to, or null when it should not
-  /// move — the rule does not drop, the floor cannot be known, or the step
-  /// would not go below [current].
-  static Money? staleDrop({
-    required Money current,
-    required Money? cost,
-    required PricingRule rule,
-    required double feeRate,
-  }) {
-    final double? percent = rule.staleDropPercent;
-
-    if (!rule.dropsWhenStale || percent == null || cost == null) return null;
-    if (current.currency != cost.currency) return null;
-    if (!_appliesTo(rule, cost.currency, feeRate)) return null;
-
-    final Money floor = roundUp(
-      floorFor(cost: cost, rule: rule, feeRate: feeRate),
-      rule.rounding,
-    );
-    final Money dropped = roundDown(
-      current.applyRate(1 - percent),
-      rule.rounding,
-    );
-    final Money next = dropped < floor ? floor : dropped;
-
-    return next < current ? next : null;
-  }
-
-  /// Whether supplier [stock] is under what [rule] will sell from.
-  ///
-  /// Unknown stock is not "out": a supplier that reports no count has not
-  /// said it has none.
-  static bool belowMinimumStock({required int? stock, PricingRule? rule}) {
-    final int minimum = rule?.minSupplierStock ?? 1;
-
-    return stock != null && stock < minimum;
-  }
-
   /// [amount] rounded up to [rounding] — never below what it was.
   static Money roundUp(Money amount, PriceRounding rounding) {
     final int unit = CurrencyDecimals.factorFor(amount.currency);
@@ -105,22 +67,6 @@ final class PricingRuleCalculator {
         amount.currency,
       ),
     };
-  }
-
-  /// [amount] rounded down to [rounding] — never above what it was.
-  static Money roundDown(Money amount, PriceRounding rounding) {
-    final int unit = CurrencyDecimals.factorFor(amount.currency);
-    final int minor = amount.minor;
-
-    if (unit == 1 || minor <= 0) return amount;
-
-    final int rounded = switch (rounding) {
-      PriceRounding.none => minor,
-      PriceRounding.whole => (minor ~/ unit) * unit,
-      PriceRounding.ninetyNine => ((minor + 1) ~/ unit) * unit - 1,
-    };
-
-    return rounded > 0 ? Money(rounded, amount.currency) : amount;
   }
 
   static bool _appliesTo(PricingRule rule, String currency, double feeRate) {
