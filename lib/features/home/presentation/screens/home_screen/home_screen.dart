@@ -142,6 +142,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             tooltip: context.l10n.inventoryScan,
             onPressed: () => context.push(AppRoutes.scanner),
           ),
+          // About doubles as the guide to both loops, and a seller asking
+          // "how does this work?" asks it here first.
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.info,
+            tooltip: context.l10n.homeAboutTooltip,
+            onPressed: () => context.push(AppRoutes.about),
+          ),
           SizedBox(width: SdSpacingConstant.w8),
         ],
       ),

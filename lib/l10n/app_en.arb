@@ -549,7 +549,7 @@
   "@aboutTitle": {
     "description": "App bar title of the About screen."
   },
-  "aboutTagline": "The operating system for resellers",
+  "aboutTagline": "The operating system for resellers and dropshippers",
   "@aboutTagline": {
     "description": "One-line description of the app, under its name."
   },
@@ -7447,5 +7447,129 @@
   "ordersClearSearch": "Clear search",
   "@ordersClearSearch": {
     "description": "Tooltip on the button clearing Orders' search."
+  },
+  "workflowFindProduct": "Find a product",
+  "@workflowFindProduct": {
+    "description": "Dropship guide step: find a product."
+  },
+  "workflowFindProductDetail": "Add a wholesale supplier and the products it ships for you.",
+  "@workflowFindProductDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowFindProductHow1": "Open Sourcing, then Suppliers, and add the supplier by name.",
+  "@workflowFindProductHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindProductHow2": "Add each product with its price, shipping, tax and delivery days.",
+  "@workflowFindProductHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindProductHow3": "Use Clean up to strip the supplier's filler from the title.",
+  "@workflowFindProductHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowListProduct": "List it",
+  "@workflowListProduct": {
+    "description": "Dropship guide step: list it."
+  },
+  "workflowListProductDetail": "List it turns a supplier product into a dropship item and opens its marketplaces.",
+  "@workflowListProductDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowListProductHow1": "Tap List it on the supplier product; the item is created for you.",
+  "@workflowListProductHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowListProductHow2": "Price each marketplace by hand, or apply a pricing rule to many at once.",
+  "@workflowListProductHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowListProductHow3": "Build title fits the title to each platform's limit.",
+  "@workflowListProductHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowOrderFromSupplier": "Order from supplier",
+  "@workflowOrderFromSupplier": {
+    "description": "Dropship guide step: order from the supplier."
+  },
+  "workflowOrderFromSupplierDetail": "Once it sells, order it at the supplier — Home counts the sales still waiting.",
+  "@workflowOrderFromSupplierDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowOrderFromSupplierHow1": "Open the sale and tap Order from supplier; open the supplier page if you need it.",
+  "@workflowOrderFromSupplierHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowOrderFromSupplierHow2": "Confirm what the supplier charged; it becomes the sale's cost.",
+  "@workflowOrderFromSupplierHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowOrderFromSupplierHow3": "Attach the supplier's invoice; a marketplace may ask for proof of supply.",
+  "@workflowOrderFromSupplierHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowTrack": "Track it",
+  "@workflowTrack": {
+    "description": "Dropship guide step: track it."
+  },
+  "workflowTrackDetail": "The supplier's tracking ships the sale; late orders turn red.",
+  "@workflowTrackDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowTrackHow1": "Add tracking when the supplier sends it; the sale is marked shipped.",
+  "@workflowTrackHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowTrackHow2": "Filter Orders by Supplier to see what is waiting or late.",
+  "@workflowTrackHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowTrackHow3": "Record a supplier refund if a parcel goes wrong; profit follows it.",
+  "@workflowTrackHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindBetter": "Find better",
+  "@workflowFindBetter": {
+    "description": "Dropship guide step: find better products."
+  },
+  "workflowFindBetterDetail": "See which products earn and which suppliers ship fast, then drop the rest.",
+  "@workflowFindBetterDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowFindBetterHow1": "Analytics, then Dropship, ranks your products by profit.",
+  "@workflowFindBetterHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindBetterHow2": "Compare how fast each supplier ships; give a backup supplier to slow ones.",
+  "@workflowFindBetterHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindBetterHow3": "Check prices and stock every two weeks; the app reminds you.",
+  "@workflowFindBetterHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "aboutGuideReselling": "Reselling",
+  "@aboutGuideReselling": {
+    "description": "About guide selector: reselling."
+  },
+  "aboutGuideDropshipping": "Dropshipping",
+  "@aboutGuideDropshipping": {
+    "description": "About guide selector: dropshipping."
+  },
+  "aboutDropshipSubtitle": "Eight steps — the supplier ships, you run the business",
+  "@aboutDropshipSubtitle": {
+    "description": "About guide subtitle for dropshipping."
+  },
+  "aboutDropshipLoop": "Better products are the point of everything above it. What sold, at what margin, from which supplier — that is what makes the next listing a decision.",
+  "@aboutDropshipLoop": {
+    "description": "Line under the dropship guide."
+  },
+  "aboutIntroDropship": "It runs dropshipping too: list a supplier's product, sell it, order it from the supplier and track it — with the profit measured from what the supplier actually charged.",
+  "@aboutIntroDropship": {
+    "description": "Second intro paragraph on About."
+  },
+  "homeAboutTooltip": "About and guide",
+  "@homeAboutTooltip": {
+    "description": "Tooltip on Home's info button that opens About."
   }
 }

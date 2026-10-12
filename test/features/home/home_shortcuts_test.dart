@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reseller_studio/core/extensions/context_extensions.dart';
 import 'package:reseller_studio/core/router/app_routes.dart';
 import 'package:reseller_studio/core/widgets/option_picker_sheet.dart';
 import 'package:reseller_studio/features/home/home_constant.dart';
@@ -159,6 +160,22 @@ void main() {
 
       expect(router.state.uri.toString(), route, reason: '$what went astray');
     }
+  });
+
+  testWidgets('the app bar’s info button opens About', (
+    WidgetTester tester,
+  ) async {
+    final GoRouter router = await pumpRoutedScreen(
+      tester,
+      const HomeScreen(),
+      overrides: premiumSubscription(),
+    );
+    final BuildContext context = tester.element(find.byType(HomeScreen));
+
+    await tester.tap(find.byTooltip(context.l10n.homeAboutTooltip));
+    await tester.pumpAndSettle();
+
+    expect(router.state.uri.toString(), AppRoutes.about);
   });
 
   test('three shortcuts, Add stock first', () {

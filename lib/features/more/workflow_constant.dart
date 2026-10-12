@@ -44,7 +44,15 @@ enum WorkflowKind {
   profit,
   analyze,
   sourceBetter,
+  findProduct,
+  listProduct,
+  orderFromSupplier,
+  track,
+  findBetter,
 }
+
+/// The two businesses the app runs, each with its own guide on About.
+enum WorkflowGuide { reselling, dropshipping }
 
 /// The chain the whole product is judged against, as data.
 ///
@@ -113,6 +121,59 @@ final class WorkflowConstant {
       route: AppRoutes.analyticsSources,
     ),
   ];
+
+  /// The same loop for a seller who never holds the stock: the supplier
+  /// ships, so Purchase, Inventory and Ship give way to the supplier's steps.
+  /// Sell, Profit and Analyze are shared — one sale, one profit, one tab.
+  static const List<WorkflowStep> dropshipSteps = <WorkflowStep>[
+    WorkflowStep(
+      kind: WorkflowKind.findProduct,
+      icon: AppIconConstant.warehouse,
+      route: AppRoutes.suppliers,
+    ),
+    WorkflowStep(
+      kind: WorkflowKind.listProduct,
+      icon: AppIconConstant.sell,
+      route: AppRoutes.suppliers,
+    ),
+    WorkflowStep(
+      kind: WorkflowKind.sell,
+      icon: AppIconConstant.pointOfSale,
+      route: AppRoutes.orders,
+    ),
+    WorkflowStep(
+      kind: WorkflowKind.orderFromSupplier,
+      icon: AppIconConstant.shoppingBag,
+      route: AppRoutes.orders,
+    ),
+    WorkflowStep(
+      kind: WorkflowKind.track,
+      icon: AppIconConstant.localShipping,
+      route: AppRoutes.orders,
+    ),
+    WorkflowStep(
+      kind: WorkflowKind.profit,
+      icon: AppIconConstant.savings,
+      route: AppRoutes.analyticsProfit,
+    ),
+    WorkflowStep(
+      kind: WorkflowKind.analyze,
+      isOptional: true,
+      icon: AppIconConstant.barChart,
+      route: AppRoutes.analytics,
+    ),
+    WorkflowStep(
+      kind: WorkflowKind.findBetter,
+      isOptional: true,
+      icon: AppIconConstant.restartAlt,
+      route: AppRoutes.analyticsDropship,
+    ),
+  ];
+
+  static List<WorkflowStep> of(WorkflowGuide guide) => switch (guide) {
+    WorkflowGuide.reselling => steps,
+    WorkflowGuide.dropshipping => dropshipSteps,
+  };
 }
 
 /// The words for a workflow step.
@@ -128,6 +189,12 @@ final class WorkflowLabel {
         WorkflowKind.profit => context.l10n.workflowProfit,
         WorkflowKind.analyze => context.l10n.workflowAnalyze,
         WorkflowKind.sourceBetter => context.l10n.workflowSourceBetter,
+        WorkflowKind.findProduct => context.l10n.workflowFindProduct,
+        WorkflowKind.listProduct => context.l10n.workflowListProduct,
+        WorkflowKind.orderFromSupplier =>
+          context.l10n.workflowOrderFromSupplier,
+        WorkflowKind.track => context.l10n.workflowTrack,
+        WorkflowKind.findBetter => context.l10n.workflowFindBetter,
       };
 
   /// What the seller actually does at this step, in the order they do it.
@@ -184,6 +251,31 @@ final class WorkflowLabel {
           context.l10n.workflowSourceBetterHow2,
           context.l10n.workflowSourceBetterHow3,
         ],
+        WorkflowKind.findProduct => <String>[
+          context.l10n.workflowFindProductHow1,
+          context.l10n.workflowFindProductHow2,
+          context.l10n.workflowFindProductHow3,
+        ],
+        WorkflowKind.listProduct => <String>[
+          context.l10n.workflowListProductHow1,
+          context.l10n.workflowListProductHow2,
+          context.l10n.workflowListProductHow3,
+        ],
+        WorkflowKind.orderFromSupplier => <String>[
+          context.l10n.workflowOrderFromSupplierHow1,
+          context.l10n.workflowOrderFromSupplierHow2,
+          context.l10n.workflowOrderFromSupplierHow3,
+        ],
+        WorkflowKind.track => <String>[
+          context.l10n.workflowTrackHow1,
+          context.l10n.workflowTrackHow2,
+          context.l10n.workflowTrackHow3,
+        ],
+        WorkflowKind.findBetter => <String>[
+          context.l10n.workflowFindBetterHow1,
+          context.l10n.workflowFindBetterHow2,
+          context.l10n.workflowFindBetterHow3,
+        ],
       };
 
   static String detail(BuildContext context, WorkflowKind kind) =>
@@ -197,5 +289,11 @@ final class WorkflowLabel {
         WorkflowKind.profit => context.l10n.workflowProfitDetail,
         WorkflowKind.analyze => context.l10n.workflowAnalyzeDetail,
         WorkflowKind.sourceBetter => context.l10n.workflowSourceBetterDetail,
+        WorkflowKind.findProduct => context.l10n.workflowFindProductDetail,
+        WorkflowKind.listProduct => context.l10n.workflowListProductDetail,
+        WorkflowKind.orderFromSupplier =>
+          context.l10n.workflowOrderFromSupplierDetail,
+        WorkflowKind.track => context.l10n.workflowTrackDetail,
+        WorkflowKind.findBetter => context.l10n.workflowFindBetterDetail,
       };
 }
