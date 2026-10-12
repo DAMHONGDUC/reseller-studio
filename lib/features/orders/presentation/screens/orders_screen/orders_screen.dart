@@ -13,6 +13,7 @@ import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
+import '../../../../../core/widgets/app_pinned_filter_band.dart';
 import '../../../../../core/widgets/app_row_chevron.dart';
 import '../../../../../core/widgets/plan_limit_meters.dart';
 import '../../../../subscription/domain/enums/plan_allowance.dart';
@@ -47,8 +48,30 @@ part 'orders_screen_order_progress.dart';
 /// **The create button records a sale** — the second of the two ways an order
 /// exists (`lib/features/orders/CLAUDE.md`). Until it was here, the one screen
 /// about selling was the one screen a seller could not record a sale on.
-class OrdersScreen extends ConsumerWidget {
+///
+/// **Search is the header's mode, as on Inventory** (`docs/rules/SCREENS.md`):
+/// `SdSearchHeaderV3` docks the field into the title row as the list scrolls,
+/// and the filter strip pins under it through `AppPinnedFilterBand`. The
+/// query lives in `orderSearchProvider`, so it survives a tab switch.
+class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
+
+  @override
+  ConsumerState<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends ConsumerState<OrdersScreen> {
+  /// Owned here rather than in the header: the field sits in a sliver that
+  /// rebuilds on every scroll frame.
+  late final TextEditingController _search = TextEditingController(
+    text: ref.read(orderSearchProvider),
+  );
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   Future<void> _recordSale(BuildContext context, WidgetRef ref) async {
     final PlanBlock block = ref.read(addOrderBlockProvider);
@@ -69,7 +92,7 @@ class OrdersScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final List<Order> orders = ref.watch(visibleOrdersProvider);
     final AsyncValue<List<Order>> source = ref.watch(ordersProvider);
 
@@ -78,37 +101,54 @@ class OrdersScreen extends ConsumerWidget {
       floatingNav: true,
       addLabel: context.l10n.recordSaleTitle,
       onAdd: () => _recordSale(context, ref),
-      appBar: SdAppBarV3(
-        title: context.l10n.navOrders,
-        actions: <Widget>[
-          SdAppBarActionButtonV3(
-            icon: AppIconConstant.localOffer,
-            tooltip: context.l10n.offersTitle,
-            onPressed: () => context.push(AppRoutes.offers),
+      // No `appBar`: the search header is a sliver and docks inside the scroll.
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SdSearchHeaderV3(
+            title: context.l10n.navOrders,
+            controller: _search,
+            hint: context.l10n.ordersSearchHint,
+            clearTooltip: context.l10n.ordersClearSearch,
+            onChanged: (String value) =>
+                ref.read(orderSearchProvider.notifier).update(value),
+            actions: <SdAppBarActionV3>[
+              SdAppBarActionV3(
+                icon: AppIconConstant.localOffer,
+                tooltip: context.l10n.offersTitle,
+                onPressed: () => context.push(AppRoutes.offers),
+              ),
+              SdAppBarActionV3(
+                icon: AppIconConstant.localShipping,
+                tooltip: context.l10n.shippingQueueTitle,
+                onPressed: () => context.push(AppRoutes.shippingQueue),
+              ),
+            ],
           ),
-          SdAppBarActionButtonV3(
-            icon: AppIconConstant.localShipping,
-            tooltip: context.l10n.shippingQueueTitle,
-            onPressed: () => context.push(AppRoutes.shippingQueue),
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: AppPinnedFilterBand(
+              strip: const _OrderFilterStrip(),
+              activeFilters: const _ActiveFilters(),
+              showActiveFilters: ref.watch(orderActiveFilterCountProvider) > 0,
+            ),
           ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          SizedBox(height: SdContentPaddingV3.topGap),
-          const _OrderFilterStrip(),
-          const _ActiveFilters(),
-          SizedBox(height: SdContentPaddingV3.topGap),
-          Expanded(
-            child: switch (source) {
-              AsyncLoading<List<Order>>() when !source.hasValue =>
-                const SdLoadingV3Page(),
-              AsyncError<List<Order>>() => SdEmptyStateV3(
+          switch (source) {
+            AsyncLoading<List<Order>>() when !source.hasValue =>
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: SdLoadingV3Page(),
+              ),
+            AsyncError<List<Order>>() => SliverFillRemaining(
+              hasScrollBody: false,
+              child: SdEmptyStateV3(
                 icon: AppIconConstant.error,
                 title: context.l10n.ordersLoadFailed,
                 message: context.l10n.commonCouldNotLoad,
               ),
-              _ when orders.isEmpty => AppListEmptyState(
+            ),
+            _ when orders.isEmpty => SliverFillRemaining(
+              hasScrollBody: false,
+              child: AppListEmptyState(
                 hasAny: (source.value ?? const <Order>[]).isNotEmpty,
                 noMatchMessage: context.l10n.ordersNoMatch,
                 emptyIcon: AppIconConstant.receiptLong,
@@ -123,9 +163,9 @@ class OrdersScreen extends ConsumerWidget {
                   onPressed: () => _recordSale(context, ref),
                 ),
               ),
-              _ => _OrderList(orders: orders),
-            },
-          ),
+            ),
+            _ => _OrderList(orders: orders),
+          },
         ],
       ),
     );

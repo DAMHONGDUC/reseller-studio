@@ -1652,5 +1652,7 @@
   "itemFormDetails": "Chi tiết",
   "supplierProductReferences": "Thông tin tham chiếu",
   "analyticsPeriodCustom": "Tuỳ chọn",
-  "analyticsPeriodRange": "{from} – {to}"
+  "analyticsPeriodRange": "{from} – {to}",
+  "ordersSearchHint": "Tìm hàng, người mua, mã đơn, mã vận đơn",
+  "ordersClearSearch": "Xoá tìm kiếm"
 }

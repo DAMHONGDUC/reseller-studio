@@ -1652,5 +1652,7 @@
   "itemFormDetails": "详情",
   "supplierProductReferences": "供应商信息",
   "analyticsPeriodCustom": "自定义",
-  "analyticsPeriodRange": "{from} – {to}"
+  "analyticsPeriodRange": "{from} – {to}",
+  "ordersSearchHint": "搜索商品、买家、订单号或物流单号",
+  "ordersClearSearch": "清除搜索"
 }

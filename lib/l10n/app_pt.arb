@@ -1652,5 +1652,7 @@
   "itemFormDetails": "Detalhes",
   "supplierProductReferences": "Referências do fornecedor",
   "analyticsPeriodCustom": "Personalizado",
-  "analyticsPeriodRange": "{from} – {to}"
+  "analyticsPeriodRange": "{from} – {to}",
+  "ordersSearchHint": "Buscar item, comprador, pedido ou rastreio",
+  "ordersClearSearch": "Limpar busca"
 }

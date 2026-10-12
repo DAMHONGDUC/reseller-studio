@@ -21,48 +21,44 @@ class _OrderList extends ConsumerWidget {
         ? 0
         : 1;
 
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverPadding(
-          // Clears the create button as well as the glass bar; without it the
-          // last order sits under the button and cannot be tapped.
-          padding: AppAddFabScaffold.listPadding(context, floatingNav: true),
-          sliver: SliverList.separated(
-            itemCount: orders.length + header,
-            // The separator between the meter and the first card is the same
-            // gap as between two cards, and it belongs to neither of them.
-            separatorBuilder: (BuildContext context, int index) =>
-                SizedBox(height: SdContentPaddingV3.listItemGap),
-            itemBuilder: (BuildContext context, int index) {
-              if (index < header) {
-                return const PlanLimitMeters(allowances: _meterAllowances);
-              }
+    return SliverPadding(
+      // Clears the create button as well as the glass bar; without it the
+      // last order sits under the button and cannot be tapped.
+      padding: AppAddFabScaffold.listPadding(context, floatingNav: true),
+      sliver: SliverList.separated(
+        itemCount: orders.length + header,
+        // The separator between the meter and the first card is the same
+        // gap as between two cards, and it belongs to neither of them.
+        separatorBuilder: (BuildContext context, int index) =>
+            SizedBox(height: SdContentPaddingV3.listItemGap),
+        itemBuilder: (BuildContext context, int index) {
+          if (index < header) {
+            return const PlanLimitMeters(allowances: _meterAllowances);
+          }
 
-              final Order order = orders[index - header];
+          final Order order = orders[index - header];
 
-              // Ship it, without opening the order — the same sheet the card's
-              // own button and the detail screen open.
-              return SdSwipeRowV3(
-                rowKey: ValueKey<String>('swipe-${order.id}'),
-                borderRadius: SdRadiusV3.cardAll,
-                startAction: order.status != OrderStatus.toShip
-                    ? null
-                    : SdSwipeActionV3(
-                        icon: AppIconConstant.localShipping,
-                        label: context.l10n.orderShipIt,
-                        color: context.colorScheme3.primary,
-                        onTriggered: () => ShipOrderSheet.show(context, order),
-                      ),
-                child: _OrderCard(
-                  order: order,
-                  now: now,
-                  onTap: () => context.push(AppRoutes.order(order.id)),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+          // Ship it, without opening the order — the same sheet the card's
+          // own button and the detail screen open.
+          return SdSwipeRowV3(
+            rowKey: ValueKey<String>('swipe-${order.id}'),
+            borderRadius: SdRadiusV3.cardAll,
+            startAction: order.status != OrderStatus.toShip
+                ? null
+                : SdSwipeActionV3(
+                    icon: AppIconConstant.localShipping,
+                    label: context.l10n.orderShipIt,
+                    color: context.colorScheme3.primary,
+                    onTriggered: () => ShipOrderSheet.show(context, order),
+                  ),
+            child: _OrderCard(
+              order: order,
+              now: now,
+              onTap: () => context.push(AppRoutes.order(order.id)),
+            ),
+          );
+        },
+      ),
     );
   }
 }

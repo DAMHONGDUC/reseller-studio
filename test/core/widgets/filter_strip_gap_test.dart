@@ -50,21 +50,28 @@ void main() {
     });
   }
 
-  testWidgets('the screen places topGap above the strip and below it', (
+  testWidgets('the pinned band places topGap above the strip and below it', (
     WidgetTester tester,
   ) async {
     await pumpScreen(tester, const OrdersScreen());
 
-    final Rect bar = tester.getRect(find.byType(SdAppBarV3).first);
+    // The band is `AppPinnedFilterBand`'s opaque box around the strip.
+    final Rect band = tester.getRect(
+      find
+          .ancestor(
+            of: find.byType(AppFilterStrip),
+            matching: find.byType(ColoredBox),
+          )
+          .first,
+    );
     final Rect strip = stripRect(tester);
-    final Rect list = tester.getRect(find.byType(CustomScrollView).first);
 
     expect(
-      strip.top - bar.bottom,
+      strip.top - band.top,
       moreOrLessEquals(SdContentPaddingV3.topGap, epsilon: 0.5),
     );
     expect(
-      list.top - strip.bottom,
+      band.bottom - strip.bottom,
       moreOrLessEquals(SdContentPaddingV3.topGap, epsilon: 0.5),
     );
   });
@@ -74,15 +81,14 @@ void main() {
   ) async {
     await pumpScreen(tester, const OrdersScreen());
 
+    // Both measured from the search field: neither has an `appBar`, because
+    // `SdSearchHeaderV3` is a sliver that docks inside the scroll.
     final double orders =
         chipRect(tester).top -
-        tester.getRect(find.byType(SdAppBarV3).first).bottom;
+        tester.getRect(find.byType(SdSearchFieldV3)).bottom;
 
     await pumpScreen(tester, const InventoryScreen());
 
-    // Measured from the search field rather than an app bar: Inventory has no
-    // `appBar`, because `SdSearchHeaderV3` is a sliver that has to live in the
-    // scroll view to dock as the list moves.
     expect(
       chipRect(tester).top -
           tester.getRect(find.byType(SdSearchFieldV3)).bottom,
@@ -128,7 +134,19 @@ void main() {
   testWidgets('pinned, Inventory holds its chips where Orders holds theirs', (
     WidgetTester tester,
   ) async {
+    Future<void> scrollDown() async {
+      await tester.drag(
+        find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is Scrollable && widget.axis == Axis.vertical,
+        ),
+        const Offset(0, -600),
+      );
+      await tester.pumpAndSettle();
+    }
+
     await pumpScreen(tester, const OrdersScreen());
+    await scrollDown();
 
     final double orders = stripRect(tester).top;
 
@@ -141,8 +159,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Both are `topGap` under a full app-bar row — one screen reaches it by
-    // docking a search field, the other was always there.
+    // Both dock their search field into the title row and pin the same band
+    // under it (`AppPinnedFilterBand`).
     expect(stripRect(tester).top, moreOrLessEquals(orders, epsilon: 0.5));
   });
 }

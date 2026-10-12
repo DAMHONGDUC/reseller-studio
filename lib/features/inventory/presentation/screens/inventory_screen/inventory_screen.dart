@@ -18,6 +18,7 @@ import '../../../../../core/widgets/app_add_fab_scaffold.dart';
 import '../../../../../core/widgets/app_appear.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
+import '../../../../../core/widgets/app_pinned_filter_band.dart';
 import '../../../../../core/widgets/item_card.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/plan_limit_meters.dart';
@@ -135,7 +136,9 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
           // its own topGap above and below, so the screen places neither.
           SliverPersistentHeader(
             pinned: true,
-            delegate: _PinnedFilterStrip(
+            delegate: AppPinnedFilterBand(
+              strip: const _FilterStrip(),
+              activeFilters: const _ActiveFilters(),
               showActiveFilters:
                   ref.watch(inventoryActiveFilterCountProvider) > 0,
             ),

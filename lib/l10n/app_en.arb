@@ -7439,5 +7439,13 @@
         "type": "String"
       }
     }
+  },
+  "ordersSearchHint": "Search item, buyer, order or tracking no.",
+  "@ordersSearchHint": {
+    "description": "Hint in Orders' search field."
+  },
+  "ordersClearSearch": "Clear search",
+  "@ordersClearSearch": {
+    "description": "Tooltip on the button clearing Orders' search."
   }
 }

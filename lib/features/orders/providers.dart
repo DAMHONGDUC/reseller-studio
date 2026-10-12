@@ -18,6 +18,7 @@ import 'domain/entities/order_filter_criteria.dart';
 import 'domain/entities/supplier_order.dart';
 import 'domain/enums/order_status.dart';
 import 'domain/enums/order_supplier_stage.dart';
+import 'domain/services/order_search.dart';
 import 'domain/services/payout_reconciliation.dart';
 import 'domain/services/supplier_orders.dart';
 import 'presentation/controllers/record_sale_controller.dart';
@@ -104,11 +105,24 @@ final Provider<Map<String, String>> orderMarketplaceNamesProvider =
       };
     });
 
+/// The free-text search in Orders' header (`docs/rules/SCREENS.md` — the
+/// query lives here, not in the widget, so it survives a tab switch).
+class OrderSearchController extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void update(String query) => state = query;
+}
+
+final NotifierProvider<OrderSearchController, String> orderSearchProvider =
+    NotifierProvider<OrderSearchController, String>(OrderSearchController.new);
+
 final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
   Ref ref,
 ) {
   final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
   final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
+  final String query = ref.watch(orderSearchProvider);
   final DateTime now = ref.watch(clockProvider).now();
   final Map<String, OrderSupplierStage> stages = ref.watch(
     orderSupplierStagesProvider,
@@ -117,7 +131,12 @@ final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
   return orders
       .where(
         (Order order) =>
-            criteria.matches(order, now: now, supplierStage: stages[order.id]),
+            criteria.matches(
+              order,
+              now: now,
+              supplierStage: stages[order.id],
+            ) &&
+            OrderSearch.matches(order, query),
       )
       .toList();
 });
