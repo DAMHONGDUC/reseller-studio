@@ -1,11 +1,20 @@
 part of 'home_screen.dart';
 
 /// Profit as a filled hero, then three quiet tiles.
-class _PerformanceBlock extends ConsumerWidget {
+class _PerformanceBlock extends ConsumerStatefulWidget {
   const _PerformanceBlock();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PerformanceBlock> createState() => _PerformanceBlockState();
+}
+
+/// The profit hero always; the three quiet tiles open by default and folded
+/// by Show less (`lib/features/home/CLAUDE.md` — every section starts open).
+class _PerformanceBlockState extends ConsumerState<_PerformanceBlock> {
+  bool _more = true;
+
+  @override
+  Widget build(BuildContext context) {
     final AnalyticsSummary summary = ref.watch(analyticsSummaryProvider);
 
     return Padding(
@@ -16,41 +25,75 @@ class _PerformanceBlock extends ConsumerWidget {
             summary: summary,
             onTap: () => context.go(AppRoutes.analytics),
           ),
-          SizedBox(height: SdContentPaddingV3.listItemGap),
-          // No icons on these three. At a third of the width the glyph costs
-          // about 26px, which is exactly what turned "Revenue" into
-          // "Reven…" — and the label is the tile's identity, so the label
-          // wins.
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.commonRevenue,
-                  value: summary.revenue == null
-                      ? null
-                      : context.money(summary.revenue, compact: true),
-                ),
-              ),
-              SizedBox(width: SdContentPaddingV3.listItemGap),
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.itemStatusSold,
-                  value: '${summary.unitsSold}',
-                ),
-              ),
-              SizedBox(width: SdContentPaddingV3.listItemGap),
-              Expanded(
-                child: SdStatTileV3(
-                  label: context.l10n.homeStock,
-                  value: summary.inventoryValue == null
-                      ? null
-                      : context.money(summary.inventoryValue, compact: true),
-                ),
-              ),
-            ],
+          AnimatedSize(
+            duration: SdMotionV3.of(context, SdMotionV3.normal),
+            curve: SdMotionV3.emphasized,
+            alignment: Alignment.topCenter,
+            child: _more
+                ? Padding(
+                    padding: EdgeInsets.only(
+                      top: SdContentPaddingV3.listItemGap,
+                    ),
+                    child: _Tiles(summary: summary),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: SdButtonV3(
+              variant: SdButtonVariantV3.text,
+              label: _more
+                  ? context.l10n.homeShowLess
+                  : context.l10n.homeShowMore,
+              size: SdButtonSizeV3.small,
+              onPressed: () => setState(() => _more = !_more),
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+/// Revenue, units sold and stock value — the quiet half of Performance.
+class _Tiles extends StatelessWidget {
+  const _Tiles({required this.summary});
+
+  final AnalyticsSummary summary;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: <Widget>[
+      // No icons on these three: at a third of the width the glyph turned
+      // "Revenue" into "Reven…", and the label is the tile's identity.
+      Row(
+        children: <Widget>[
+          Expanded(
+            child: SdStatTileV3(
+              label: context.l10n.commonRevenue,
+              value: summary.revenue == null
+                  ? null
+                  : context.money(summary.revenue, compact: true),
+            ),
+          ),
+          SizedBox(width: SdContentPaddingV3.listItemGap),
+          Expanded(
+            child: SdStatTileV3(
+              label: context.l10n.itemStatusSold,
+              value: '${summary.unitsSold}',
+            ),
+          ),
+          SizedBox(width: SdContentPaddingV3.listItemGap),
+          Expanded(
+            child: SdStatTileV3(
+              label: context.l10n.homeStock,
+              value: summary.inventoryValue == null
+                  ? null
+                  : context.money(summary.inventoryValue, compact: true),
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
 }

@@ -16,6 +16,8 @@ import '../../../../core/storage/file_uploader.dart';
 import '../../../../core/storage/photo_picker.dart';
 import '../../../../core/utils/text_input_utils.dart';
 import '../../../listings/domain/entities/listing.dart';
+import '../../../listings/domain/enums/price_change_reason.dart';
+import '../../../listings/domain/services/listing_price_changes.dart';
 import '../../../sourcing/domain/entities/purchase.dart';
 import '../../../sourcing/domain/services/purchase_item_count.dart';
 import '../../../sourcing/providers.dart';
@@ -411,7 +413,17 @@ class ItemFormController extends Notifier<ItemFormState> {
 
     if (changed.isEmpty) return;
 
-    await ref.read(listingRepositoryProvider).saveAll(changed);
+    await ref
+        .read(listingRepositoryProvider)
+        .saveAll(
+          changed,
+          priceChanges: ListingPriceChanges.between(
+            before: listings,
+            after: changed,
+            reason: PriceChangeReason.manual,
+            at: DateTime.now(),
+          ),
+        );
   }
 
   /// Reprice one of the item's live listings. Null puts it back to whatever

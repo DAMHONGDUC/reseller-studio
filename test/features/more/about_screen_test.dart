@@ -21,6 +21,7 @@ void main() {
 
     expect(find.text(context.l10n.aboutTagline), findsOneWidget);
     expect(find.text(context.l10n.aboutIntro), findsOneWidget);
+    expect(find.text(context.l10n.aboutIntroDropship), findsOneWidget);
     expect(find.text(context.l10n.aboutPrinciple), findsOneWidget);
   });
 
@@ -48,6 +49,66 @@ void main() {
     }
   });
 
+  testWidgets(
+    'the dropshipping guide swaps the rail and spells out each step',
+    (WidgetTester tester) async {
+      await pumpScreen(tester, const AboutScreen());
+
+      final BuildContext context = tester.element(find.byType(AboutScreen));
+
+      // The masthead pushes the picker below the fold on a phone.
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(context.l10n.aboutGuideDropshipping));
+      await tester.pumpAndSettle();
+
+      expect(find.text(context.l10n.aboutDropshipSubtitle), findsOneWidget);
+      // Purchase belongs to the reseller's loop only.
+      expect(
+        find.text(
+          WorkflowLabel.title(context, WorkflowKind.purchase),
+          skipOffstage: false,
+        ),
+        findsNothing,
+      );
+
+      for (final WorkflowStep step in WorkflowConstant.dropshipSteps) {
+        final String lastHow = WorkflowLabel.how(context, step.kind).last;
+
+        await tester.scrollUntilVisible(
+          find.text(lastHow),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+
+        expect(
+          find.text(WorkflowLabel.title(context, step.kind)),
+          findsOneWidget,
+          reason: '${step.kind.name} is missing from the dropship guide',
+        );
+        expect(find.text(lastHow), findsOneWidget);
+      }
+    },
+  );
+
+  test('the dropship loop runs from supplier to a better product', () {
+    expect(
+      WorkflowConstant.dropshipSteps
+          .map((WorkflowStep step) => step.kind)
+          .toList(),
+      <WorkflowKind>[
+        WorkflowKind.findProduct,
+        WorkflowKind.listProduct,
+        WorkflowKind.sell,
+        WorkflowKind.orderFromSupplier,
+        WorkflowKind.track,
+        WorkflowKind.profit,
+        WorkflowKind.analyze,
+        WorkflowKind.findBetter,
+      ],
+    );
+  });
+
   test('the diagram matches the lifecycle, in order', () {
     // The chain `CLAUDE.md` writes as one line. Order is the whole meaning
     // here — a diagram that lists the same nine steps shuffled says something
@@ -69,7 +130,10 @@ void main() {
   });
 
   test('every step opens somewhere real', () {
-    for (final WorkflowStep step in WorkflowConstant.steps) {
+    for (final WorkflowStep step in <WorkflowStep>[
+      ...WorkflowConstant.steps,
+      ...WorkflowConstant.dropshipSteps,
+    ]) {
       expect(step.route, startsWith('/'));
       // A parameterised path cannot be pushed without its argument, so no
       // step may point at one — the diagram is a way in, and a dead link in

@@ -4,6 +4,7 @@ import 'package:system_design/index.dart';
 
 import '../../../../core/constants/app_icon_constant.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/widgets/app_bullet_line.dart';
 import '../../../more/workflow_constant.dart';
 
 /// How a seller runs their week with this app, step by step and spelled out.
@@ -236,7 +237,7 @@ class _FlowStepDetails extends StatelessWidget {
           index++
         ) ...<Widget>[
           if (index > 0) SizedBox(height: SdSpacingConstant.h6),
-          _FlowStepLine(text: WorkflowLabel.how(context, step.kind)[index]),
+          AppBulletLine(text: WorkflowLabel.how(context, step.kind)[index]),
         ],
         SizedBox(height: SdSpacingConstant.h8),
         SdButtonV3(
@@ -252,48 +253,5 @@ class _FlowStepDetails extends StatelessWidget {
         ),
       ],
     ),
-  );
-}
-
-/// One instruction under a step.
-///
-/// A dot rather than a bullet glyph, and hidden from screen readers: the
-/// sentence beside it is the content, and "bullet" read out three times a step
-/// is nine words of noise per screen.
-class _FlowStepLine extends StatelessWidget {
-  const _FlowStepLine({required this.text});
-
-  final String text;
-
-  /// The marker's own size and the space it is centred in.
-  static double get dotSize => SdSpacingConstant.r4;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      ExcludeSemantics(
-        child: Container(
-          width: dotSize,
-          height: dotSize,
-          // Lines the dot up with the middle of the first line of text
-          // rather than with the top of its box.
-          margin: EdgeInsets.only(top: SdSpacingConstant.h8),
-          decoration: BoxDecoration(
-            color: context.sdTheme3.textTertiary,
-            shape: BoxShape.circle,
-          ),
-        ),
-      ),
-      SizedBox(width: SdSpacingConstant.w8),
-      Expanded(
-        child: Text(
-          text,
-          style: context.textTheme3.bodySmall!.copyWith(
-            color: context.sdTheme3.textPrimary,
-          ),
-        ),
-      ),
-    ],
   );
 }

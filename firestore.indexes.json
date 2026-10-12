@@ -468,6 +468,70 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "//": "A business's pricing rules, in the order they were made \u2014 the rules screen and the apply-rule picker.",
+      "collectionGroup": "pricing_rules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "One item's price history, newest first \u2014 Item detail.",
+      "collectionGroup": "listing_price_changes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "itemId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "//": "A business's supplier products, in the order they were added \u2014 the supplier screens and an item's supplier section.",
+      "collectionGroup": "supplier_products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "A business's supplier orders, oldest first \u2014 the order detail's supplier card and Home's dropship work.",
+      "collectionGroup": "supplier_orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "workspaceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

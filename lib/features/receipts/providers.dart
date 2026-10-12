@@ -16,11 +16,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/money/money.dart';
 import '../expenses/domain/entities/expense.dart';
 import '../expenses/providers.dart';
+import '../orders/domain/entities/supplier_order.dart';
+import '../orders/domain/services/supplier_orders.dart';
+import '../orders/providers.dart';
 import '../sourcing/domain/entities/purchase.dart';
 import '../sourcing/providers.dart';
 
 /// What a stored document belongs to.
-enum ReceiptKind { purchase, expense }
+enum ReceiptKind { purchase, expense, supplierOrder }
 
 /// One piece of paperwork, wherever it is attached.
 class ReceiptEntry {
@@ -35,7 +38,8 @@ class ReceiptEntry {
 
   final ReceiptKind kind;
 
-  /// The purchase or expense this is attached to — what a tap opens.
+  /// The purchase, expense or sale this is attached to — what a tap opens.
+  /// A supplier invoice opens the sale its supplier order fulfils.
   final String recordId;
 
   final String url;
@@ -54,6 +58,8 @@ final Provider<List<ReceiptEntry>> receiptsProvider =
       final List<Expense> expenses =
           ref.watch(expensesProvider).value ?? const <Expense>[];
       final Map<String, String> sourceNames = ref.watch(sourceNamesProvider);
+      final List<SupplierOrder> supplierOrders =
+          ref.watch(supplierOrdersProvider).value ?? const <SupplierOrder>[];
 
       final List<ReceiptEntry> entries = <ReceiptEntry>[
         for (final Purchase purchase in purchases)
@@ -75,6 +81,16 @@ final Provider<List<ReceiptEntry>> receiptsProvider =
               date: expense.date,
               title: expense.vendor ?? 'Expense',
               amount: expense.amount,
+            ),
+        for (final SupplierOrder so in supplierOrders)
+          if (so.invoiceUrl != null && so.orderId != null)
+            ReceiptEntry(
+              kind: ReceiptKind.supplierOrder,
+              recordId: so.orderId!,
+              url: so.invoiceUrl!,
+              date: so.placedAt ?? so.createdAt,
+              title: sourceNames[so.sourceId] ?? so.sourceId,
+              amount: SupplierOrders.netCost(so),
             ),
       ]..sort((ReceiptEntry a, ReceiptEntry b) => b.date.compareTo(a.date));
 

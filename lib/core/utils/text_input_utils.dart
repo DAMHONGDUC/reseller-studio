@@ -24,4 +24,18 @@ final class TextInputUtils {
 
     return next < 0 ? 0 : next;
   }
+
+  /// [value] read as a decimal, or null when it is not one.
+  ///
+  /// Accepts a comma as the decimal point, because the keyboard follows the
+  /// device's locale and a seller in Lyon types `2,5`.
+  static double? decimalOrNull(String value) =>
+      double.tryParse(value.trim().replaceAll(',', '.'));
+
+  /// [value] as a seller would type it — `2`, not `2.0`; `2.5`, not `2.50`.
+  static String decimalText(double value) {
+    final String fixed = value.toStringAsFixed(2);
+
+    return fixed.replaceFirst(RegExp(r'\.?0+$'), '');
+  }
 }

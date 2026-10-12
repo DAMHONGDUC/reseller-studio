@@ -5,10 +5,14 @@ import '../../../features/expenses/data/dtos/expense_dto.dart';
 import '../../../features/inventory/data/dtos/catalog_dtos.dart';
 import '../../../features/inventory/data/dtos/item_dto.dart';
 import '../../../features/listings/data/dtos/listing_dto.dart';
+import '../../../features/listings/data/dtos/listing_price_change_dto.dart';
 import '../../../features/marketplaces/data/dtos/marketplace_dto.dart';
 import '../../../features/offers/data/dtos/offer_dto.dart';
 import '../../../features/orders/data/dtos/order_dto.dart';
+import '../../../features/orders/data/dtos/supplier_order_dto.dart';
+import '../../../features/pricing/data/dtos/pricing_rule_dto.dart';
 import '../../../features/sourcing/data/dtos/sourcing_dtos.dart';
+import '../../../features/sourcing/data/dtos/supplier_product_dto.dart';
 import '../local_database.dart';
 import '../local_row.dart';
 
@@ -102,12 +106,38 @@ class DrainTable {
           CarrierDto.toMap(CarrierDto.fromMap(id, data), createdBy: uid),
     ),
     DrainTable(
+      name: 'pricing_rules',
+      rows: db.localPricingRules,
+      rebuild:
+          (String id, Map<String, Object?> data, String currency, String uid) =>
+              PricingRuleDto.toMap(
+                PricingRuleDto.fromMap(id, data, fallbackCurrency: currency),
+                currency: currency,
+                createdBy: uid,
+              ),
+    ),
+    DrainTable(
       name: 'items',
       rows: db.localItems,
       rebuild:
           (String id, Map<String, Object?> data, String currency, String uid) =>
               ItemDto.toMap(
                 ItemDto.fromMap(id, data, fallbackCurrency: currency),
+                createdBy: uid,
+              ),
+    ),
+    DrainTable(
+      name: 'supplier_products',
+      rows: db.localSupplierProducts,
+      rebuild:
+          (String id, Map<String, Object?> data, String currency, String uid) =>
+              SupplierProductDto.toMap(
+                SupplierProductDto.fromMap(
+                  id,
+                  data,
+                  fallbackCurrency: currency,
+                ),
+                currency: currency,
                 createdBy: uid,
               ),
     ),
@@ -122,12 +152,37 @@ class DrainTable {
               ),
     ),
     DrainTable(
+      name: 'listing_price_changes',
+      rows: db.localListingPriceChanges,
+      rebuild:
+          (String id, Map<String, Object?> data, String currency, String uid) =>
+              ListingPriceChangeDto.toMap(
+                ListingPriceChangeDto.fromMap(
+                  id,
+                  data,
+                  fallbackCurrency: currency,
+                ),
+                createdBy: uid,
+              ),
+    ),
+    DrainTable(
       name: 'orders',
       rows: db.localOrders,
       rebuild:
           (String id, Map<String, Object?> data, String currency, String uid) =>
               OrderDto.toMap(
                 OrderDto.fromMap(id, data, fallbackCurrency: currency),
+                createdBy: uid,
+              ),
+    ),
+    DrainTable(
+      name: 'supplier_orders',
+      rows: db.localSupplierOrders,
+      rebuild:
+          (String id, Map<String, Object?> data, String currency, String uid) =>
+              SupplierOrderDto.toMap(
+                SupplierOrderDto.fromMap(id, data, fallbackCurrency: currency),
+                currency: currency,
                 createdBy: uid,
               ),
     ),

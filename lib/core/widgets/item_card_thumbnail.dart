@@ -13,8 +13,11 @@ class _Thumbnail extends StatelessWidget {
   static double get size => ItemCardMetricConstant.thumbnail;
 
   @override
-  Widget build(BuildContext context) => AppPhoto(
-    url: item.photoUrls.isEmpty ? null : item.photoUrls.first,
-    size: size,
+  Widget build(BuildContext context) => Hero(
+    tag: ItemCard.photoHeroTag(item.id),
+    child: AppPhoto(
+      url: item.photoUrls.isEmpty ? null : item.photoUrls.first,
+      size: size,
+    ),
   );
 }

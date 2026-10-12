@@ -403,3 +403,22 @@ and they stay in the pinned next move and the actions sheet where the domain
 rules can run (`Order transitions are domain rules, never button rules`,
 above). A dropdown that set `status` alone would produce an order that says
 delivered with nothing to show for it.
+
+## A dropship sale moves no stock, and its cost comes from the supplier order
+
+Owner's call, from `docs/DROPSHIPPING_PLAN.md`.
+
+- **Recording a sale of a dropshipped item leaves the item as it was.** A
+  supplier ships every sale, so there is no shelf to empty and the item stays
+  for sale. `recordSale` skips the item write for `fulfilment == dropship`, in
+  both stores.
+- **The line's cost is unknown until the supplier order is placed**, so the
+  sale's profit is `—` until then (hard rule 5) — never the supplier
+  product's quoted price.
+- **Every supplier order write that changes what was charged re-costs the
+  line in the same commit**: placing it, a supplier refund, cancelling it.
+  `SupplierOrderRepository.save` takes the order beside it for exactly this.
+- **"To order from supplier" is a query, not a status** — a sold dropship line
+  with no live supplier order (`SupplierOrders.toPlace`), the way stale is.
+- **Adding the supplier's tracking ships the sale** while it is still waiting
+  to ship: the buyer's parcel is the supplier's.

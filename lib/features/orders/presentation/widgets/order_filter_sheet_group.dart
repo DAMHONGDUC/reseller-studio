@@ -80,6 +80,19 @@ class _OrderFilterGroupView extends ConsumerWidget {
         onSelected: (OrderDeadlineFilter value) =>
             onEdit(draft.withDeadline(value)),
       ),
+      OrderFilterGroup.supplier => AppFilterChipGroup<OrderSupplierStage>(
+        title: title,
+        options: <AppFilterOption<OrderSupplierStage>>[
+          for (final OrderSupplierStage stage in OrderSupplierStage.values)
+            AppFilterOption<OrderSupplierStage>(
+              value: stage,
+              label: stage.label(context),
+            ),
+        ],
+        selected: draft.supplierStages,
+        onSelected: (OrderSupplierStage value) =>
+            onEdit(draft.withSupplierStageToggled(value)),
+      ),
       OrderFilterGroup.payout => AppFilterChipGroup<PresenceFilter>(
         title: title,
         options: _presence(
@@ -191,6 +204,7 @@ class _StatusGroup extends ConsumerWidget {
     final Map<OrderStatus, int> counts = draft.statusCounts(
       ref.watch(ordersProvider).value ?? const <Order>[],
       now: ref.watch(clockProvider).now(),
+      supplierStages: ref.watch(orderSupplierStagesProvider),
     );
 
     return AppFilterChipGroup<OrderStatus>(

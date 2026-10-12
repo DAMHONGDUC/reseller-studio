@@ -133,6 +133,9 @@ final class AppIconConstant {
   /// Expand a collapsed control.
   static const IconData expandMore = Symbols.expand_more_rounded;
 
+  /// Collapse an expanded control.
+  static const IconData expandLess = Symbols.expand_less_rounded;
+
   /// Open the filter sheet.
   static const IconData filterAlt = Symbols.filter_alt_rounded;
 

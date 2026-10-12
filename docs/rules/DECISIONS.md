@@ -68,7 +68,7 @@ neighbouring v2 patterns were not, and this is the standing answer:
   opaque bar, and nothing pins a strip over a list anyway.
 - **`SdFloatingBarScopeV2`.** This one *was* ported, and is the exception that
   proves the rest are deliberate. See below.
-- **Two search entry points on purpose.** Inventory uses `SdSearchHeaderV3`,
+- **Two kinds of search entry on purpose.** Inventory and Orders use `SdSearchHeaderV3`,
   whose field docks into the title row as the list scrolls. The Search screen
   builds a plain field with `autofocus` and no collapse, because that screen
   exists to be typed into immediately and collapsing chrome buys nothing when
@@ -635,3 +635,25 @@ and no way back but finding the app's page in Settings themselves.
 and `MainActivity.kt`, the same trade as the Apple sheet above. The package
 would also become a second thing requesting the same permissions the plugins
 already request, and the two can disagree about what was asked.
+
+## Marketplace connection came back, because dropshipping needs it
+
+Owner's call. Explains the dropshipping paragraph under "What this project
+is" in the root `CLAUDE.md` and the current form of hard rule 10. Recorded
+because two decisions were taken together, and a reversal read as an accident
+gets quietly undone.
+
+**What the old rule said.** Marketplace connection was not a feature of this
+app: no OAuth, no sync, no client talking to a platform. Listings were records
+the seller kept, and `PayoutCsvImport` was the only import.
+
+**Why that gave way.** The owner widened the product from reselling to
+reselling and dropshipping. A reseller can live with typing a sale in by hand;
+a dropshipper's whole margin is the minutes between a sale and the supplier
+order, and the supplier's price moving under a live listing. Neither is
+served by records the seller keeps by hand, so the connections came back with
+the scope.
+
+**What did not change.** No secret ships in the binary, and the backend is
+still the only thing that talks to a platform. The rule kept its number and
+its first sentence; only the clause forbidding the feature went.

@@ -68,6 +68,20 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
   final TextEditingController _description = TextEditingController();
   final TextEditingController _notes = TextEditingController();
 
+  /// The seller's own choice about More details; null until they make one.
+  bool? _moreChosen;
+
+  /// Title and quantity are the form (hard rule 2 and the quantity rule);
+  /// the rest waits behind More details (`docs/UI_POLISH_PLAN.md`). It opens
+  /// on its own when something in it is already filled — a remembered
+  /// category or bin, a scanned barcode — so a prefill is never hidden.
+  bool _showMore(ItemFormState state) =>
+      _moreChosen ??
+      (widget.itemId != null ||
+          state.categoryId != null ||
+          state.locationId != null ||
+          _barcode.text.isNotEmpty);
+
   @override
   void initState() {
     super.initState();
@@ -226,121 +240,148 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.next,
                     ),
-                    _StatusField(state: state),
-                    ItemConditionField(
-                      selected: state.condition,
-                      onSelected: ref
-                          .read(itemFormControllerProvider.notifier)
-                          .selectCondition,
-                    ),
-                    ItemCategoryField(
-                      selected: state.categoryId,
-                      onSelected: ref
-                          .read(itemFormControllerProvider.notifier)
-                          .selectCategory,
-                    ),
                   ],
+                ),
+                _MoreDetailsToggle(
+                  open: _showMore(state),
+                  onToggle: () =>
+                      setState(() => _moreChosen = !_showMore(state)),
+                ),
+                AnimatedSize(
+                  duration: SdMotionV3.of(context, SdMotionV3.normal),
+                  curve: SdMotionV3.emphasized,
+                  alignment: Alignment.topCenter,
+                  child: !_showMore(state)
+                      ? const SizedBox(width: double.infinity)
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            _FormSection(
+                              title: context.l10n.itemFormDetails,
+                              children: <Widget>[
+                                _StatusField(state: state),
+                                ItemConditionField(
+                                  selected: state.condition,
+                                  onSelected: ref
+                                      .read(itemFormControllerProvider.notifier)
+                                      .selectCondition,
+                                ),
+                                ItemCategoryField(
+                                  selected: state.categoryId,
+                                  onSelected: ref
+                                      .read(itemFormControllerProvider.notifier)
+                                      .selectCategory,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: SdContentPaddingV3.sectionGap),
+                            _FormSection(
+                              title: context.l10n.itemPricing,
+                              children: <Widget>[
+                                MoneyField(
+                                  label: context.l10n.itemCost,
+                                  controller: _cost,
+                                  currency: currency,
+                                  helperText: context.l10n.itemCostHelp,
+                                  textInputAction: TextInputAction.next,
+                                ),
+                                MoneyField(
+                                  label: context.l10n.itemExpectedPrice,
+                                  controller: _expected,
+                                  currency: currency,
+                                  helperText:
+                                      context.l10n.itemExpectedPriceHelp,
+                                  textInputAction: TextInputAction.next,
+                                ),
+                                MoneyField(
+                                  label: context.l10n.itemMinimumPrice,
+                                  controller: _minimum,
+                                  currency: currency,
+                                  helperText: context.l10n.itemMinimumPriceHelp,
+                                  textInputAction: TextInputAction.next,
+                                ),
+                                // Only when editing: a create form has no listings to
+                                // price yet, and no item id to find them by.
+                                if (editingId != null)
+                                  _MarketplacePrices(
+                                    itemId: editingId,
+                                    currency: currency,
+                                  ),
+                              ],
+                            ),
+                            SizedBox(height: SdContentPaddingV3.sectionGap),
+                            _FormSection(
+                              title: context.l10n.itemFormWhereFrom,
+                              children: <Widget>[
+                                ItemPurchaseField(
+                                  selected: state.purchaseId,
+                                  onSelected: ref
+                                      .read(itemFormControllerProvider.notifier)
+                                      .selectPurchase,
+                                ),
+                                SizedBox(height: SdSpacingConstant.h16),
+                                ItemSourceField(
+                                  selected: state.sourceId,
+                                  onSelected: ref
+                                      .read(itemFormControllerProvider.notifier)
+                                      .selectSource,
+                                ),
+                                ItemPurchaseDateField(
+                                  selected: state.purchaseDate,
+                                  onSelected: ref
+                                      .read(itemFormControllerProvider.notifier)
+                                      .selectPurchaseDate,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: SdContentPaddingV3.sectionGap),
+                            _FormSection(
+                              title: context.l10n.itemFormWhereIs,
+                              children: <Widget>[
+                                ItemLocationField(
+                                  selected: state.locationId,
+                                  onSelected: ref
+                                      .read(itemFormControllerProvider.notifier)
+                                      .selectLocation,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: SdContentPaddingV3.sectionGap),
+                            _FormSection(
+                              title: context.l10n.itemFormIdentifiers,
+                              children: <Widget>[
+                                SdTextFieldV3(
+                                  label: context.l10n.commonSku,
+                                  controller: _sku,
+                                  textInputAction: TextInputAction.next,
+                                ),
+                                SdTextFieldV3(
+                                  label: context.l10n.commonBarcode,
+                                  controller: _barcode,
+                                  textInputAction: TextInputAction.next,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: SdContentPaddingV3.sectionGap),
+                            _FormSection(
+                              title: context.l10n.commonNotes,
+                              children: <Widget>[
+                                SdTextFieldV3(
+                                  label: context.l10n.commonDescription,
+                                  controller: _description,
+                                  maxLines: 3,
+                                ),
+                                SdTextFieldV3(
+                                  label: context.l10n.itemFormPrivateNotes,
+                                  controller: _notes,
+                                  maxLines: 3,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                 ),
                 SizedBox(height: SdContentPaddingV3.sectionGap),
-                _FormSection(
-                  title: context.l10n.itemPricing,
-                  children: <Widget>[
-                    MoneyField(
-                      label: context.l10n.itemCost,
-                      controller: _cost,
-                      currency: currency,
-                      helperText: context.l10n.itemCostHelp,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    MoneyField(
-                      label: context.l10n.itemExpectedPrice,
-                      controller: _expected,
-                      currency: currency,
-                      helperText: context.l10n.itemExpectedPriceHelp,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    MoneyField(
-                      label: context.l10n.itemMinimumPrice,
-                      controller: _minimum,
-                      currency: currency,
-                      helperText: context.l10n.itemMinimumPriceHelp,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    // Only when editing: a create form has no listings to
-                    // price yet, and no item id to find them by.
-                    if (editingId != null)
-                      _MarketplacePrices(itemId: editingId, currency: currency),
-                  ],
-                ),
-                SizedBox(height: SdContentPaddingV3.sectionGap),
-                _FormSection(
-                  title: context.l10n.itemFormWhereFrom,
-                  children: <Widget>[
-                    ItemPurchaseField(
-                      selected: state.purchaseId,
-                      onSelected: ref
-                          .read(itemFormControllerProvider.notifier)
-                          .selectPurchase,
-                    ),
-                    SizedBox(height: SdSpacingConstant.h16),
-                    ItemSourceField(
-                      selected: state.sourceId,
-                      onSelected: ref
-                          .read(itemFormControllerProvider.notifier)
-                          .selectSource,
-                    ),
-                    ItemPurchaseDateField(
-                      selected: state.purchaseDate,
-                      onSelected: ref
-                          .read(itemFormControllerProvider.notifier)
-                          .selectPurchaseDate,
-                    ),
-                  ],
-                ),
-                SizedBox(height: SdContentPaddingV3.sectionGap),
-                _FormSection(
-                  title: context.l10n.itemFormWhereIs,
-                  children: <Widget>[
-                    ItemLocationField(
-                      selected: state.locationId,
-                      onSelected: ref
-                          .read(itemFormControllerProvider.notifier)
-                          .selectLocation,
-                    ),
-                  ],
-                ),
-                SizedBox(height: SdContentPaddingV3.sectionGap),
-                _FormSection(
-                  title: context.l10n.itemFormIdentifiers,
-                  children: <Widget>[
-                    SdTextFieldV3(
-                      label: context.l10n.commonSku,
-                      controller: _sku,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    SdTextFieldV3(
-                      label: context.l10n.commonBarcode,
-                      controller: _barcode,
-                      textInputAction: TextInputAction.next,
-                    ),
-                  ],
-                ),
-                SizedBox(height: SdContentPaddingV3.sectionGap),
-                _FormSection(
-                  title: context.l10n.commonNotes,
-                  children: <Widget>[
-                    SdTextFieldV3(
-                      label: context.l10n.commonDescription,
-                      controller: _description,
-                      maxLines: 3,
-                    ),
-                    SdTextFieldV3(
-                      label: context.l10n.itemFormPrivateNotes,
-                      controller: _notes,
-                      maxLines: 3,
-                    ),
-                  ],
-                ),
               ],
             ),
           ),

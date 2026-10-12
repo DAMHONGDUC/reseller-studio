@@ -46,6 +46,8 @@ class _NeedsAttention extends ConsumerWidget {
     final List<Order> unpaid = ref.watch(ordersAwaitingPayoutListProvider);
     final int overduePayouts = ref.watch(overduePayoutsProvider).length;
     final DateTime now = ref.watch(clockProvider).now();
+    final int toOrder = ref.watch(supplierOrdersToPlaceProvider).length;
+    final int lateAtSupplier = ref.watch(lateSupplierOrdersProvider).length;
 
     final int overdue = pending
         .where((Order order) => order.isOverdue(now) ?? false)
@@ -67,6 +69,22 @@ class _NeedsAttention extends ConsumerWidget {
               ? context.sdTheme3.danger
               : context.sdTheme3.warning,
           isUrgent: overdue > 0,
+          onTap: () => context.go(AppRoutes.orders),
+        ),
+      // Beside orders to ship: a dropship sale cannot ship until it is
+      // ordered, so this is the same clock one step earlier.
+      if (toOrder > 0 || lateAtSupplier > 0)
+        _AttentionTile(
+          icon: AppIconConstant.localShipping,
+          label: context.l10n.homeToOrderFromSupplier,
+          count: toOrder,
+          detail: lateAtSupplier > 0
+              ? context.l10n.homeSupplierOrdersLate(lateAtSupplier)
+              : context.l10n.homeToOrderFromSupplierDetail,
+          tint: lateAtSupplier > 0
+              ? context.sdTheme3.danger
+              : context.sdTheme3.warning,
+          isUrgent: lateAtSupplier > 0,
           onTap: () => context.go(AppRoutes.orders),
         ),
       // Second, not last: an offer has somebody else's clock on it, and it is

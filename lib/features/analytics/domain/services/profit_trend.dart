@@ -19,6 +19,7 @@ final class ProfitTrend {
     required List<Order> orders,
     required DateTime? start,
     required DateTime now,
+    DateTime? end,
     required TrendGrain grain,
     required String currency,
   }) {
@@ -26,7 +27,7 @@ final class ProfitTrend {
         .where(
           (Order order) =>
               order.status.countsAsRevenue &&
-              DateTimeUtils.isWithin(order.orderedAt, from: start),
+              DateTimeUtils.isWithin(order.orderedAt, from: start, to: end),
         )
         .toList();
     final DateTime? earliest = counted.isEmpty
@@ -39,7 +40,11 @@ final class ProfitTrend {
 
     final List<DateTime> starts = _starts(
       bucketStart(start ?? earliest, grain),
-      bucketStart(now, grain),
+      // A closed window stops at its own last day, not at today.
+      bucketStart(
+        end == null ? now : end.subtract(const Duration(microseconds: 1)),
+        grain,
+      ),
       grain,
     );
 

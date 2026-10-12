@@ -185,15 +185,18 @@ void main() {
     // their arrow in the same column.
     await openSheet(tester);
 
+    // Only the sheet's own arrows: Home behind it folds sections too.
+    final Finder arrows = find.descendant(
+      of: find.byType(FlowOverviewSheet),
+      matching: find.byType(AnimatedRotation),
+    );
     final List<double> rights = tester
-        .widgetList<AnimatedRotation>(find.byType(AnimatedRotation))
+        .widgetList<AnimatedRotation>(arrows)
         .take(4)
         .toList()
         .asMap()
         .keys
-        .map(
-          (int i) => tester.getRect(find.byType(AnimatedRotation).at(i)).right,
-        )
+        .map((int i) => tester.getRect(arrows.at(i)).right)
         .toList();
 
     expect(rights.length, greaterThan(1));

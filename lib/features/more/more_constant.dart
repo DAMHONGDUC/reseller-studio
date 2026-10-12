@@ -35,6 +35,7 @@ enum MoreDestinationKind {
   books,
   sourcing,
   listings,
+  pricingRules,
   expenses,
   payouts,
   reports,
@@ -60,6 +61,7 @@ final class MoreLabel {
         MoreDestinationKind.books => context.l10n.booksTitle,
         MoreDestinationKind.sourcing => context.l10n.moreSourcing,
         MoreDestinationKind.listings => context.l10n.moreListings,
+        MoreDestinationKind.pricingRules => context.l10n.pricingRulesTitle,
         MoreDestinationKind.expenses => context.l10n.moreExpenses,
         MoreDestinationKind.payouts => context.l10n.payoutsTitle,
         MoreDestinationKind.reports => context.l10n.moreReports,
@@ -88,6 +90,7 @@ final class MoreHue {
   static AppTagHue of(MoreDestinationKind kind) => switch (kind) {
     MoreDestinationKind.sourcing => AppTagHue.indigo,
     MoreDestinationKind.listings => AppTagHue.blue,
+    MoreDestinationKind.pricingRules => AppTagHue.blue,
     MoreDestinationKind.categories => AppTagHue.violet,
     MoreDestinationKind.locations => AppTagHue.teal,
     MoreDestinationKind.businesses => AppTagHue.indigo,
@@ -171,6 +174,12 @@ final class MoreConstant {
           kind: MoreDestinationKind.listings,
           icon: AppIconConstant.sell,
           route: AppRoutes.listings,
+          isBuilt: true,
+        ),
+        MoreDestination(
+          kind: MoreDestinationKind.pricingRules,
+          icon: AppIconConstant.sell,
+          route: AppRoutes.pricingRules,
           isBuilt: true,
         ),
         MoreDestination(

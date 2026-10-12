@@ -6,7 +6,7 @@ Every figure is derived on read (hard rule 3) and a missing one is `—`
 
 ## A period strip windows the headline, the trend and the statement
 
-Owner's rule. All · 7D · 30D · 90D · YTD, on the shared `AppFilterStrip`,
+Owner's rule. All · 7D · 30D · 90D · YTD · Custom, on the shared `AppFilterStrip`,
 pinned above the scroll the way Orders' strip is.
 
 - **All time is the default**, because it is the figure Home's hero shows.
@@ -18,11 +18,19 @@ pinned above the scroll the way Orders' strip is.
   the shelf is a snapshot and is not windowed.
 - **The marketplace ranking and the drill-downs stay all-time**, as their own
   screens are. Windowing them is a separate decision.
+- **Custom is a range of whole days the seller picks** — owner's rule, added
+  for filtering by specific dates. Both ends are included (1–9 October
+  covers all of the 9th), the chip reads back the range once picked, and a
+  Custom with nothing picked reads as all time. The range lives in
+  `analyticsCustomRangeProvider`; `AnalyticsPeriodWindow.endOf` is the only
+  period with an end before today.
 
 ## The trend is revenue and the sales' own profit, bucketed
 
 - **Days for 7D, weeks for 30D and 90D, months for YTD and All**, at most
-  `ProfitTrend.maxBuckets` bars. Weeks start on Monday.
+  `ProfitTrend.maxBuckets` bars. Weeks start on Monday. **A Custom range
+  takes its bar width from its span** (`AnalyticsPeriodConstant`) and its
+  last bar is its last day, not today.
 - **Empty buckets are drawn**: a week with no sale is part of the story, and
   its revenue is a real zero.
 - **A bucket with any sale of unknown profit draws revenue alone.** A profit

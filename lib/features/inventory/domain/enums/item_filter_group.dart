@@ -8,6 +8,7 @@ import '../../../../core/extensions/context_extensions.dart';
 /// list**, so a new group cannot reach one of them without the others.
 enum ItemFilterGroup {
   status,
+  fulfilment,
   condition,
   category,
   location,
@@ -23,6 +24,7 @@ enum ItemFilterGroup {
 extension ItemFilterGroupDisplay on ItemFilterGroup {
   String label(BuildContext context) => switch (this) {
     ItemFilterGroup.status => context.l10n.filterStatus,
+    ItemFilterGroup.fulfilment => context.l10n.filterFulfilment,
     ItemFilterGroup.condition => context.l10n.itemCondition,
     ItemFilterGroup.category => context.l10n.filterCategory,
     ItemFilterGroup.location => context.l10n.filterLocation,

@@ -15,9 +15,15 @@ import '../inventory/providers.dart';
 import '../workspace/providers.dart';
 import 'domain/entities/order.dart';
 import 'domain/entities/order_filter_criteria.dart';
+import 'domain/entities/supplier_order.dart';
 import 'domain/enums/order_status.dart';
+import 'domain/enums/order_supplier_stage.dart';
+import 'domain/services/order_search.dart';
 import 'domain/services/payout_reconciliation.dart';
+import 'domain/services/supplier_orders.dart';
 import 'presentation/controllers/record_sale_controller.dart';
+import 'presentation/controllers/supplier_order_controller.dart';
+import 'supplier_order_constant.dart';
 
 final StreamProvider<List<Order>> ordersProvider = StreamProvider<List<Order>>((
   Ref ref,
@@ -99,17 +105,58 @@ final Provider<Map<String, String>> orderMarketplaceNamesProvider =
       };
     });
 
+/// The free-text search in Orders' header (`docs/rules/SCREENS.md` — the
+/// query lives here, not in the widget, so it survives a tab switch).
+class OrderSearchController extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void update(String query) => state = query;
+}
+
+final NotifierProvider<OrderSearchController, String> orderSearchProvider =
+    NotifierProvider<OrderSearchController, String>(OrderSearchController.new);
+
 final Provider<List<Order>> visibleOrdersProvider = Provider<List<Order>>((
   Ref ref,
 ) {
   final List<Order> orders = ref.watch(ordersProvider).value ?? const <Order>[];
   final OrderFilterCriteria criteria = ref.watch(orderCriteriaProvider);
+  final String query = ref.watch(orderSearchProvider);
   final DateTime now = ref.watch(clockProvider).now();
+  final Map<String, OrderSupplierStage> stages = ref.watch(
+    orderSupplierStagesProvider,
+  );
 
   return orders
-      .where((Order order) => criteria.matches(order, now: now))
+      .where(
+        (Order order) =>
+            criteria.matches(
+              order,
+              now: now,
+              supplierStage: stages[order.id],
+            ) &&
+            OrderSearch.matches(order, query),
+      )
       .toList();
 });
+
+/// Where each dropship sale stands with its supplier, by order id.
+final Provider<Map<String, OrderSupplierStage>> orderSupplierStagesProvider =
+    Provider<Map<String, OrderSupplierStage>>((Ref ref) {
+      return SupplierOrders.stagesByOrder(
+        orders: ref.watch(ordersProvider).value ?? const <Order>[],
+        items: <String, Item>{
+          for (final Item item
+              in ref.watch(itemsProvider).value ?? const <Item>[])
+            item.id: item,
+        },
+        supplierOrders:
+            ref.watch(supplierOrdersProvider).value ?? const <SupplierOrder>[],
+        now: ref.watch(clockProvider).now(),
+        lateAfterDays: SupplierOrderConstant.lateAfterDays,
+      );
+    });
 
 /// Orders still waiting on the seller, most urgent first.
 ///
@@ -309,3 +356,64 @@ final Provider<List<Item>> recordSaleSelectionItemsProvider =
           .where((Item item) => selected.contains(item.id))
           .toList();
     });
+
+/// Every order placed with a dropship supplier.
+final StreamProvider<List<SupplierOrder>> supplierOrdersProvider =
+    StreamProvider<List<SupplierOrder>>((Ref ref) {
+      return WorkspaceGuard.listOrEmpty<SupplierOrder>(
+        ref,
+        () => ref.watch(supplierOrderRepositoryProvider).watchSupplierOrders(),
+      );
+    });
+
+/// The supplier orders one sale has, newest first.
+final supplierOrdersForOrderProvider =
+    Provider.family<List<SupplierOrder>, String>((Ref ref, String orderId) {
+      return <SupplierOrder>[
+        for (final SupplierOrder so
+            in ref.watch(supplierOrdersProvider).value ??
+                const <SupplierOrder>[])
+          if (so.orderId == orderId) so,
+      ]..sort(
+        (SupplierOrder a, SupplierOrder b) =>
+            b.createdAt.compareTo(a.createdAt),
+      );
+    });
+
+/// Sold dropship lines still waiting to be ordered from a supplier — what
+/// Home's dropship tile counts.
+final Provider<List<SupplierOrderToPlace>> supplierOrdersToPlaceProvider =
+    Provider<List<SupplierOrderToPlace>>((Ref ref) {
+      return SupplierOrders.toPlace(
+        orders: ref.watch(ordersProvider).value ?? const <Order>[],
+        items: <String, Item>{
+          for (final Item item
+              in ref.watch(itemsProvider).value ?? const <Item>[])
+            item.id: item,
+        },
+        supplierOrders:
+            ref.watch(supplierOrdersProvider).value ?? const <SupplierOrder>[],
+      );
+    });
+
+/// Placed supplier orders still without tracking past
+/// `SupplierOrderConstant.lateAfterDays`.
+final Provider<List<SupplierOrder>>
+lateSupplierOrdersProvider = Provider<List<SupplierOrder>>((Ref ref) {
+  final DateTime now = ref.watch(clockProvider).now();
+
+  return <SupplierOrder>[
+    for (final SupplierOrder so
+        in ref.watch(supplierOrdersProvider).value ?? const <SupplierOrder>[])
+      if (SupplierOrders.isLate(so, now, SupplierOrderConstant.lateAfterDays))
+        so,
+  ];
+});
+
+/// Recording orders placed with a dropship supplier — here so another
+/// feature can reach it without importing this one's `presentation/`.
+final NotifierProvider<SupplierOrderController, bool>
+supplierOrderControllerProvider =
+    NotifierProvider<SupplierOrderController, bool>(
+      SupplierOrderController.new,
+    );

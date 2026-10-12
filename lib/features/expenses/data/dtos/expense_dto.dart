@@ -51,6 +51,7 @@ final class ExpenseDto {
       receiptUrl: FirestoreMapper.stringOrNull(data['receiptUrl']),
       mileage: FirestoreMapper.doubleOrNull(data['mileage']),
       orderId: FirestoreMapper.stringOrNull(data['orderId']),
+      supplierOrderId: FirestoreMapper.stringOrNull(data['supplierOrderId']),
       isRecurring: FirestoreMapper.boolOr(data['isRecurring'], fallback: false),
       recurringSeriesId: FirestoreMapper.stringOrNull(
         data['recurringSeriesId'],
@@ -74,6 +75,7 @@ final class ExpenseDto {
     // rate per mile is set by the tax authority and changes yearly.
     'mileage': expense.mileage,
     'orderId': expense.orderId,
+    'supplierOrderId': expense.supplierOrderId,
     'isRecurring': expense.isRecurring,
     // Points at the first occurrence. Null on the first one itself, and on
     // anything written before the field existed — `Expense.seriesId` reads

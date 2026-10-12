@@ -83,18 +83,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// The Quick Action section's header — what the shortcut scrolls to.
   final GlobalKey _quickActionKey = GlobalKey();
 
+  /// Quick Action starts open (`lib/features/home/CLAUDE.md`); a seller may
+  /// fold it, and the shortcut opens it again before scrolling there.
+  bool _quickActionOpen = true;
+
   void _scrollToQuickAction() {
-    final BuildContext? section = _quickActionKey.currentContext;
+    setState(() => _quickActionOpen = true);
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      final BuildContext? section = _quickActionKey.currentContext;
 
-    if (section == null) return;
+      if (section == null || !mounted) return;
 
-    unawaited(
-      Scrollable.ensureVisible(
-        section,
-        duration: SdMotionV3.slow,
-        curve: SdMotionV3.emphasized,
-      ),
-    );
+      unawaited(
+        Scrollable.ensureVisible(
+          section,
+          duration: SdMotionV3.of(context, SdMotionV3.slow),
+          curve: SdMotionV3.emphasized,
+        ),
+      );
+    });
   }
 
   @override
@@ -134,6 +141,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: AppIconConstant.barcodeScanner,
             tooltip: context.l10n.inventoryScan,
             onPressed: () => context.push(AppRoutes.scanner),
+          ),
+          // About doubles as the guide to both loops, and a seller asking
+          // "how does this work?" asks it here first.
+          SdAppBarActionButtonV3(
+            icon: AppIconConstant.info,
+            tooltip: context.l10n.homeAboutTooltip,
+            onPressed: () => context.push(AppRoutes.about),
           ),
           SizedBox(width: SdSpacingConstant.w8),
         ],
@@ -181,12 +195,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: EdgeInsets.symmetric(
                 horizontal: SdContentPaddingV3.horizontal,
               ),
-              child: SdSectionHeaderV3(
+              child: SdCollapsibleSectionV3(
                 title: context.l10n.homeQuickAction,
-                subtitle: context.l10n.homeQuickActionSubtitle,
+                summary: context.l10n.homeQuickActionSubtitle,
+                expanded: _quickActionOpen,
+                onExpandedChanged: (bool open) =>
+                    setState(() => _quickActionOpen = open),
+                child: const _QuickAction(),
               ),
             ),
-            const _QuickAction(),
           ],
         ),
       ),

@@ -10,8 +10,9 @@ engineering work only.
 |---|---|---|
 | 1 | Deploy and verify Cloud Functions | Team, notifications, deletion and server-side entitlement depend on them |
 | 2 | Move the strings still hardcoded in Dart into ARB | Seven locales ship; those strings render in English in all of them |
-| 3 | Add listing templates | Last unbuilt listing workflow from plan §12 |
-| 4 | Lock-screen actions for offers | An offer expires in hours; answering needs iOS notification categories, matching Android actions and an FCM payload change, none verifiable without a device |
+| 3 | Add listing templates | Deferred until a listing editor exists — no screen edits a listing's own description yet |
+| 4 | Dropshipping, with marketplace and supplier connections | Owner widened the product (`CLAUDE.md`); planned whole in `DROPSHIPPING_PLAN.md` before any build |
+| 5 | Lock-screen actions for offers | An offer expires in hours; answering needs iOS notification categories, matching Android actions and an FCM payload change, none verifiable without a device |
 
 ## Open verification
 
@@ -30,7 +31,6 @@ engineering work only.
 | Item | Decision |
 |---|---|
 | Vietnamese picker | Deferred until the full translation and review pass |
-| Marketplace OAuth and publishing | Dropped; listings remain seller-maintained records |
 | v2 collapsing chrome | Not ported; v3 owns a different screen model |
 
 ## Decided, built, and worth watching

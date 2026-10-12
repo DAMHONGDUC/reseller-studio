@@ -5,6 +5,7 @@ import '../../../../core/utils/set_utils.dart';
 import '../enums/order_deadline_filter.dart';
 import '../enums/order_filter_group.dart';
 import '../enums/order_status.dart';
+import '../enums/order_supplier_stage.dart';
 import 'order.dart';
 
 /// Everything Orders can be narrowed by: where it is, which platform, when,
@@ -22,6 +23,7 @@ class OrderFilterCriteria {
     this.deadline = OrderDeadlineFilter.any,
     this.minSale,
     this.maxSale,
+    this.supplierStages = const <OrderSupplierStage>{},
   });
 
   /// Nothing narrowed — what Orders opens on and what Reset restores.
@@ -46,6 +48,9 @@ class OrderFilterCriteria {
   final Money? minSale;
   final Money? maxSale;
 
+  /// Dropship sales at these stages with their supplier; any when empty.
+  final Set<OrderSupplierStage> supplierStages;
+
   /// How many groups are narrowing the list — counted by group, never by
   /// chip. See `ItemFilterCriteria.activeCount`.
   int get activeCount => OrderFilterGroup.values.where(narrows).length;
@@ -59,6 +64,7 @@ class OrderFilterCriteria {
     OrderFilterGroup.payout => payout.isActive,
     OrderFilterGroup.tracking => tracking.isActive,
     OrderFilterGroup.saleRange => minSale != null || maxSale != null,
+    OrderFilterGroup.supplier => supplierStages.isNotEmpty,
   };
 
   /// These criteria with [group] back to "not narrowed" — a one-group
@@ -76,11 +82,21 @@ class OrderFilterCriteria {
       clearMinSale: true,
       clearMaxSale: true,
     ),
+    OrderFilterGroup.supplier => copyWith(supplierStages: none.supplierStages),
   };
 
   bool get isActive => activeCount > 0;
 
-  bool matches(Order order, {required DateTime now}) {
+  /// [supplierStage] is where the order stands with its supplier, worked out
+  /// by the caller — this class sees one order and no supplier orders.
+  bool matches(
+    Order order, {
+    required DateTime now,
+    OrderSupplierStage? supplierStage,
+  }) {
+    if (supplierStages.isNotEmpty && !supplierStages.contains(supplierStage)) {
+      return false;
+    }
     if (statuses.isNotEmpty && !statuses.contains(order.status)) return false;
     if (marketplaceIds.isNotEmpty &&
         !marketplaceIds.contains(order.marketplaceId)) {
@@ -99,10 +115,18 @@ class OrderFilterCriteria {
   Map<OrderStatus, int> statusCounts(
     List<Order> orders, {
     required DateTime now,
+    Map<String, OrderSupplierStage> supplierStages =
+        const <String, OrderSupplierStage>{},
   }) {
     final OrderFilterCriteria others = cleared(OrderFilterGroup.status);
     final List<Order> pool = orders
-        .where((Order order) => others.matches(order, now: now))
+        .where(
+          (Order order) => others.matches(
+            order,
+            now: now,
+            supplierStage: supplierStages[order.id],
+          ),
+        )
         .toList();
 
     return <OrderStatus, int>{
@@ -121,6 +145,9 @@ class OrderFilterCriteria {
 
   OrderFilterCriteria withOrdered(DateRangeFilter value) =>
       copyWith(ordered: value);
+
+  OrderFilterCriteria withSupplierStageToggled(OrderSupplierStage value) =>
+      copyWith(supplierStages: SetUtils.toggled(supplierStages, value));
 
   OrderFilterCriteria withPayout(PresenceFilter value) =>
       copyWith(payout: value);
@@ -150,7 +177,9 @@ class OrderFilterCriteria {
     Money? maxSale,
     bool clearMinSale = false,
     bool clearMaxSale = false,
+    Set<OrderSupplierStage>? supplierStages,
   }) => OrderFilterCriteria(
+    supplierStages: supplierStages ?? this.supplierStages,
     statuses: statuses ?? this.statuses,
     marketplaceIds: marketplaceIds ?? this.marketplaceIds,
     ordered: ordered ?? this.ordered,

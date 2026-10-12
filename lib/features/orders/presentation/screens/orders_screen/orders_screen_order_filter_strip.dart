@@ -28,28 +28,16 @@ class _OrderFilterStrip extends ConsumerWidget {
   }
 }
 
-/// The count-and-reset line under the strip, and the gap above it.
-///
-/// It renders nothing at all when nothing is filtered, so the screen stacks it
-/// unconditionally rather than asking the question twice.
+/// The count-and-reset line under the strip. The pinned band decides when it
+/// shows, and owns the gap above it.
 class _ActiveFilters extends ConsumerWidget {
   const _ActiveFilters();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final int count = ref.watch(orderActiveFilterCountProvider);
-
-    if (count == 0) return const SizedBox.shrink();
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SizedBox(height: SdSpacingConstant.h8),
-        AppActiveFilterBar(
-          count: count,
-          onReset: ref.read(orderCriteriaProvider.notifier).reset,
-        ),
-      ],
+    return AppActiveFilterBar(
+      count: ref.watch(orderActiveFilterCountProvider),
+      onReset: ref.read(orderCriteriaProvider.notifier).reset,
     );
   }
 }

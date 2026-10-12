@@ -174,6 +174,9 @@ void main() {
 
       expect(find.text(r'$439'), findsOneWidget);
       expect(find.textContaining('USD4'), findsNothing);
+      // Every Home section starts open (`lib/features/home/CLAUDE.md`):
+      // the tiles are showing, and the fold is offered rather than taken.
+      expect(find.text('Show less'), findsOneWidget);
     });
 
     testWidgets('Inventory lists items, newest first', (

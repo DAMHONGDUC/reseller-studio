@@ -12,14 +12,21 @@ import '../../../../../core/time/app_clock.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
 import '../../../../../core/widgets/app_list_row.dart';
+import '../../../../../core/widgets/app_status_card.dart';
+import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/price_entry_sheet.dart';
+import '../../../../pricing/domain/entities/pricing_rule.dart';
+import '../../../../pricing/pricing_rule_label.dart';
+import '../../../../pricing/providers.dart';
 import '../../../domain/entities/listing.dart';
 import '../../../domain/enums/listing_status.dart';
+import '../../../domain/services/listing_rule_pricing.dart';
 import '../../../listing_label.dart';
 import '../../../providers.dart';
 import '../../controllers/listing_actions_controller.dart';
 
 part 'listings_screen_bulk_bar.dart';
+part 'listings_screen_to_end.dart';
 
 /// Listings — everything live, everywhere (plan §12).
 ///
@@ -68,6 +75,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
       body: Column(
         children: <Widget>[
           SizedBox(height: SdContentPaddingV3.topGap),
+          const _ToEndBanner(),
           AppFilterStrip(
             children: <Widget>[
               _StatusChip(
@@ -188,17 +196,31 @@ class _ListingRow extends ConsumerWidget {
       listingSelectionProvider.notifier,
     );
 
-    return AppListRow(
-      title: listing.title,
-      subtitle: subtitle,
-      icon: isSelected ? AppIconConstant.checkCircle : AppIconConstant.sell,
-      iconTint: isSelected ? context.colorScheme3.primary : tint,
-      trailingText: context.money(listing.price),
-      showChevron: !isSelecting,
-      onTap: () => isSelecting
-          ? selection.toggle(listing.id)
-          : context.push(AppRoutes.item(listing.itemId)),
-      onLongPress: () => selection.toggle(listing.id),
+    // End one live listing with a swipe; the bulk bar ends many.
+    return SdSwipeRowV3(
+      rowKey: ValueKey<String>('swipe-${listing.id}'),
+      endAction: isSelecting || !listing.status.isLive
+          ? null
+          : SdSwipeActionV3(
+              icon: AppIconConstant.close,
+              label: context.l10n.listingEnd,
+              color: context.sdTheme3.danger,
+              onTriggered: () => ref
+                  .read(listingActionsControllerProvider.notifier)
+                  .setStatus(<Listing>[listing], ListingStatus.ended),
+            ),
+      child: AppListRow(
+        title: listing.title,
+        subtitle: subtitle,
+        icon: isSelected ? AppIconConstant.checkCircle : AppIconConstant.sell,
+        iconTint: isSelected ? context.colorScheme3.primary : tint,
+        trailingText: context.money(listing.price),
+        showChevron: !isSelecting,
+        onTap: () => isSelecting
+            ? selection.toggle(listing.id)
+            : context.push(AppRoutes.item(listing.itemId)),
+        onLongPress: () => selection.toggle(listing.id),
+      ),
     );
   }
 }

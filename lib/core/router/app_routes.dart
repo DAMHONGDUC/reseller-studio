@@ -115,6 +115,7 @@ final class AppRoutes {
   static const String analyticsMarketplace = '/analytics/marketplace';
   static const String analyticsCategories = '/analytics/categories';
   static const String analyticsSources = '/analytics/sources';
+  static const String analyticsDropship = '/analytics/dropship';
 
   // --- Shell branch 5: More ---
 
@@ -124,6 +125,8 @@ final class AppRoutes {
   static const String purchaseDetail = '/more/sourcing/purchases/:purchaseId';
   static const String addPurchase = '/more/sourcing/purchases/new';
   static const String sources = '/more/sourcing/sources';
+  static const String suppliers = '/more/sourcing/suppliers';
+  static const String supplierDetailPath = '/more/sourcing/suppliers/:sourceId';
 
   /// The calculation a reseller does standing in a shop (plan §11). Its own
   /// route because it is reached mid-hunt, not from a record.
@@ -159,6 +162,9 @@ final class AppRoutes {
   static const String carriers = '/more/carriers';
   static const String addCarrier = '/more/carriers/new';
   static const String carrierDetailPath = '/more/carriers/:carrierId';
+  static const String pricingRules = '/more/pricing-rules';
+  static const String addPricingRule = '/more/pricing-rules/new';
+  static const String pricingRuleDetailPath = '/more/pricing-rules/:ruleId';
 
   /// Every business the seller belongs to, with the plan's ceiling on how
   /// many. Under More rather than in Settings: a business is a record, and
@@ -208,6 +214,7 @@ final class AppRoutes {
       '/more/marketplaces/$marketplaceId';
 
   static String carrier(String carrierId) => '/more/carriers/$carrierId';
+  static String pricingRule(String ruleId) => '/more/pricing-rules/$ruleId';
 
   static String item(String itemId) => '/inventory/item/$itemId';
   static String crossList(String itemId) =>
@@ -248,6 +255,12 @@ final class AppRoutes {
   /// same way.
   static String purchasesFrom(String sourceId) =>
       '$purchases?source=${Uri.encodeComponent(sourceId)}';
+  static String supplier(String sourceId) =>
+      '/more/sourcing/suppliers/$sourceId';
+  static String addSupplierProduct(String sourceId) =>
+      '/more/sourcing/suppliers/$sourceId/products/new';
+  static String supplierProduct(String sourceId, String productId) =>
+      '/more/sourcing/suppliers/$sourceId/products/$productId';
   static String purchase(String purchaseId) =>
       '/more/sourcing/purchases/$purchaseId';
 }

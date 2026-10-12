@@ -48,9 +48,13 @@ void main() {
 
     await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-11'));
 
-    final Color? detailColor = tester
-        .widget<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'In stock'))
-        .color;
+    // The summary block and the Status section both carry it; they agree.
+    final Iterable<Color?> detailColors = tester
+        .widgetList<SdBadgeV3>(find.widgetWithText(SdBadgeV3, 'In stock'))
+        .map((SdBadgeV3 badge) => badge.color);
+    final Color? detailColor = detailColors.first;
+
+    expect(detailColors.toSet(), hasLength(1));
 
     expect(inventoryColor, expected);
     expect(detailColor, expected);

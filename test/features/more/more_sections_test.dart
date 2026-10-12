@@ -33,6 +33,7 @@ void main() {
       MoreSectionKind.operations: <MoreDestinationKind>[
         MoreDestinationKind.sourcing,
         MoreDestinationKind.listings,
+        MoreDestinationKind.pricingRules,
         MoreDestinationKind.categories,
         MoreDestinationKind.locations,
       ],

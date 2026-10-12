@@ -3,6 +3,7 @@ import '../../../../core/filters/presence_filter.dart';
 import '../../../../core/utils/set_utils.dart';
 import '../../item_filter_constant.dart';
 import '../enums/item_filter_group.dart';
+import '../enums/item_fulfilment.dart';
 import '../enums/item_status.dart';
 import '../enums/item_status_filter.dart';
 import '../services/item_search.dart';
@@ -16,6 +17,7 @@ import 'item.dart';
 class ItemFilterCriteria {
   const ItemFilterCriteria({
     this.statuses = const <ItemStatusFilter>{},
+    this.fulfilments = const <ItemFulfilment>{},
     this.conditions = const <ItemCondition>{},
     this.categoryIds = const <String>{},
     this.locationIds = const <String>{},
@@ -31,6 +33,9 @@ class ItemFilterCriteria {
 
   /// The statuses ticked, Stale among them — ORed with each other.
   final Set<ItemStatusFilter> statuses;
+
+  /// Stocked, dropshipped, or both when empty.
+  final Set<ItemFulfilment> fulfilments;
   final Set<ItemCondition> conditions;
 
   /// Ids of the chosen categories, locations and sources, where
@@ -62,6 +67,7 @@ class ItemFilterCriteria {
   /// Whether [group] is narrowing the list — what lights its chip.
   bool narrows(ItemFilterGroup group) => switch (group) {
     ItemFilterGroup.status => statuses.isNotEmpty,
+    ItemFilterGroup.fulfilment => fulfilments.isNotEmpty,
     ItemFilterGroup.condition => conditions.isNotEmpty,
     ItemFilterGroup.category => categoryIds.isNotEmpty,
     ItemFilterGroup.location => locationIds.isNotEmpty,
@@ -76,6 +82,7 @@ class ItemFilterCriteria {
   /// sheet's Reset, which must leave every other group alone.
   ItemFilterCriteria cleared(ItemFilterGroup group) => switch (group) {
     ItemFilterGroup.status => copyWith(statuses: none.statuses),
+    ItemFilterGroup.fulfilment => copyWith(fulfilments: none.fulfilments),
     ItemFilterGroup.condition => copyWith(conditions: none.conditions),
     ItemFilterGroup.category => copyWith(categoryIds: none.categoryIds),
     ItemFilterGroup.location => copyWith(locationIds: none.locationIds),
@@ -101,6 +108,9 @@ class ItemFilterCriteria {
           (ItemStatusFilter status) =>
               status.matches(item, now: now, staleThreshold: staleThreshold),
         )) {
+      return false;
+    }
+    if (fulfilments.isNotEmpty && !fulfilments.contains(item.fulfilment)) {
       return false;
     }
     if (conditions.isNotEmpty && !conditions.contains(item.condition)) {
@@ -158,6 +168,9 @@ class ItemFilterCriteria {
   ItemFilterCriteria withStatusToggled(ItemStatusFilter value) =>
       copyWith(statuses: SetUtils.toggled(statuses, value));
 
+  ItemFilterCriteria withFulfilmentToggled(ItemFulfilment value) =>
+      copyWith(fulfilments: SetUtils.toggled(fulfilments, value));
+
   ItemFilterCriteria withConditionToggled(ItemCondition value) =>
       copyWith(conditions: SetUtils.toggled(conditions, value));
 
@@ -182,6 +195,7 @@ class ItemFilterCriteria {
 
   ItemFilterCriteria copyWith({
     Set<ItemStatusFilter>? statuses,
+    Set<ItemFulfilment>? fulfilments,
     Set<ItemCondition>? conditions,
     Set<String>? categoryIds,
     Set<String>? locationIds,
@@ -192,6 +206,7 @@ class ItemFilterCriteria {
     DateRangeFilter? added,
   }) => ItemFilterCriteria(
     statuses: statuses ?? this.statuses,
+    fulfilments: fulfilments ?? this.fulfilments,
     conditions: conditions ?? this.conditions,
     categoryIds: categoryIds ?? this.categoryIds,
     locationIds: locationIds ?? this.locationIds,

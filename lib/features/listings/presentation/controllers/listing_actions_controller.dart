@@ -5,8 +5,17 @@ import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/providers/repository_providers.dart';
+import '../../../inventory/domain/entities/item.dart';
+import '../../../inventory/providers.dart';
+import '../../../pricing/domain/entities/pricing_rule.dart';
+import '../../../sourcing/providers.dart';
+import '../../../workspace/providers.dart';
 import '../../domain/entities/listing.dart';
+import '../../domain/entities/listing_price_change.dart';
 import '../../domain/enums/listing_status.dart';
+import '../../domain/enums/price_change_reason.dart';
+import '../../domain/services/listing_price_changes.dart';
+import '../../domain/services/listing_rule_pricing.dart';
 
 /// Everything a seller does to listings once they exist: cut the price, pause
 /// them, end them — one at a time or forty at once (plan §12).
@@ -32,6 +41,42 @@ class ListingActionsController extends Notifier<bool> {
     <String, Object>{'priceMinor': price.minor},
     (Listing listing) => listing.copyWith(price: price),
   );
+
+  /// Apply [rule] to a selection: each listing is priced from its item's
+  /// cost, and one without a cost, or outside the rule's scope, keeps its
+  /// price. Returns what happened so the screen can say so.
+  Future<RuleRepricing> applyRule(
+    List<Listing> listings,
+    PricingRule rule,
+  ) async {
+    final Map<String, Item> items = <String, Item>{
+      for (final Item item in ref.read(itemsProvider).value ?? const <Item>[])
+        item.id: item,
+    };
+    final RuleRepricing result = ListingRulePricing.apply(
+      listings: listings,
+      rule: rule,
+      feeRate: ref.read(planningFeeRateProvider),
+      costOf: (Listing listing) => items[listing.itemId]?.isDropship ?? false
+          ? ref.read(dropshipCostProvider(listing.itemId))
+          : items[listing.itemId]?.purchasePrice,
+      categoryOf: (Listing listing) => items[listing.itemId]?.categoryId,
+    );
+    final Map<String, Listing> next = <String, Listing>{
+      for (final Listing listing in result.repriced) listing.id: listing,
+    };
+
+    await _bulk(
+      'Apply pricing rule',
+      listings.where((Listing l) => next.containsKey(l.id)).toList(),
+      <String, Object>{'ruleId': rule.id, 'skipped': result.skipped},
+      (Listing listing) => next[listing.id] ?? listing,
+      reason: PriceChangeReason.rule,
+      ruleId: rule.id,
+    );
+
+    return result;
+  }
 
   /// Mark listings as posted on the platform.
   ///
@@ -87,8 +132,19 @@ class ListingActionsController extends Notifier<bool> {
     String describe,
     List<Listing> listings,
     Map<String, Object> data,
-    Listing Function(Listing) change,
-  ) async {
+    Listing Function(Listing) change, {
+    PriceChangeReason reason = PriceChangeReason.bulk,
+    String? ruleId,
+  }) async {
+    final List<Listing> changed = listings.map(change).toList();
+    final List<ListingPriceChange> priceChanges = ListingPriceChanges.between(
+      before: listings,
+      after: changed,
+      reason: reason,
+      ruleId: ruleId,
+      at: DateTime.now(),
+    );
+
     if (listings.isEmpty) return;
 
     SdLogger.action(LogTagConstant.listing, describe, <String, Object>{
@@ -102,7 +158,7 @@ class ListingActionsController extends Notifier<bool> {
     try {
       await ref
           .read(listingRepositoryProvider)
-          .saveAll(listings.map(change).toList());
+          .saveAll(changed, priceChanges: priceChanges);
     } catch (error, stackTrace) {
       SdLogger.error(
         LogTagConstant.listing,

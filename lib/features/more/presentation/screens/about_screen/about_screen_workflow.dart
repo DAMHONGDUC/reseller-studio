@@ -8,17 +8,20 @@ part of 'about_screen.dart';
 /// discovers. Down the screen, each step gets room for the sentence that
 /// says why it is there.
 class _Workflow extends StatelessWidget {
-  const _Workflow();
+  const _Workflow({required this.steps});
+
+  final List<WorkflowStep> steps;
 
   @override
   Widget build(BuildContext context) => SdCardV3(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        for (int i = 0; i < WorkflowConstant.steps.length; i++)
+        for (int i = 0; i < steps.length; i++)
           _WorkflowRow(
-            step: WorkflowConstant.steps[i],
-            isLast: i == WorkflowConstant.steps.length - 1,
+            key: ValueKey<WorkflowKind>(steps[i].kind),
+            step: steps[i],
+            isLast: i == steps.length - 1,
           ),
         SizedBox(height: SdSpacingConstant.h8),
         Text(
@@ -32,14 +35,16 @@ class _Workflow extends StatelessWidget {
   );
 }
 
-/// One step: a node on the rail, and what that step is for.
+/// One step: a node on the rail, what that step is for, and how it is done.
 ///
+/// **The how-lines make it a guide, not a map** — they name the screen and the
+/// button, in the order the seller presses them.
 /// **Tapping it opens the screen that performs the step.** The diagram is a
 /// way into the app rather than a picture of it — a page explaining a
 /// workflow that cannot be entered from is the screen `CLAUDE.md` says will
 /// be redesigned.
 class _WorkflowRow extends StatelessWidget {
-  const _WorkflowRow({required this.step, required this.isLast});
+  const _WorkflowRow({required this.step, required this.isLast, super.key});
 
   final WorkflowStep step;
   final bool isLast;
@@ -123,6 +128,13 @@ class _WorkflowRow extends StatelessWidget {
                         color: context.sdTheme3.textSecondary,
                       ),
                     ),
+                    for (final String line in WorkflowLabel.how(
+                      context,
+                      step.kind,
+                    )) ...<Widget>[
+                      SizedBox(height: SdSpacingConstant.h4),
+                      AppBulletLine(text: line),
+                    ],
                   ],
                 ),
               ),

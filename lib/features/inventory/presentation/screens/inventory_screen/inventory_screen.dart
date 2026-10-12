@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/constants/list_motion_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -14,8 +15,10 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/add_stock_sheet.dart';
 import '../../../../../core/widgets/app_active_filter_bar.dart';
 import '../../../../../core/widgets/app_add_fab_scaffold.dart';
+import '../../../../../core/widgets/app_appear.dart';
 import '../../../../../core/widgets/app_filter_strip.dart';
 import '../../../../../core/widgets/app_list_empty_state.dart';
+import '../../../../../core/widgets/app_pinned_filter_band.dart';
 import '../../../../../core/widgets/item_card.dart';
 import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../../core/widgets/plan_limit_meters.dart';
@@ -133,7 +136,9 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
           // its own topGap above and below, so the screen places neither.
           SliverPersistentHeader(
             pinned: true,
-            delegate: _PinnedFilterStrip(
+            delegate: AppPinnedFilterBand(
+              strip: const _FilterStrip(),
+              activeFilters: const _ActiveFilters(),
               showActiveFilters:
                   ref.watch(inventoryActiveFilterCountProvider) > 0,
             ),

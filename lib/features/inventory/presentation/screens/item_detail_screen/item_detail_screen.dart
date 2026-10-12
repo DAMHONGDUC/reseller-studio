@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_design/index.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
+import '../../../../../core/constants/item_card_metric_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -12,33 +13,47 @@ import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_editable_section.dart';
 import '../../../../../core/widgets/app_photo.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
+import '../../../../../core/widgets/item_card.dart';
 import '../../../../../core/widgets/item_warning_lines.dart';
 import '../../../../../core/widgets/money_field.dart';
+import '../../../../../core/widgets/option_picker_sheet.dart';
 import '../../../../listings/domain/entities/listing.dart';
+import '../../../../listings/domain/entities/listing_price_change.dart';
 import '../../../../listings/domain/enums/listing_status.dart';
+import '../../../../listings/domain/enums/price_change_reason.dart';
 import '../../../../listings/providers.dart';
+import '../../../../sourcing/domain/entities/supplier_product.dart';
+import '../../../../sourcing/domain/services/supplier_cost.dart';
+import '../../../../sourcing/presentation/controllers/supplier_product_controller.dart';
 import '../../../../sourcing/providers.dart';
 import '../../../../workspace/providers.dart';
 import '../../../domain/entities/item.dart';
+import '../../../domain/enums/item_fulfilment.dart';
 import '../../../domain/enums/item_status.dart';
 import '../../../domain/enums/item_warning.dart';
 import '../../../domain/services/item_consistency.dart';
 import '../../../domain/services/item_transition.dart';
 import '../../../item_block_presenter.dart';
+import '../../../item_detail_constant.dart';
+import '../../../item_detail_summary.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
 import '../../controllers/item_detail_edit_controller.dart';
 import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_field.dart';
 import '../../widgets/item_quick_actions.dart';
+import '../../widgets/title_builder_sheet.dart';
 
 part 'item_detail_screen_detail_row.dart';
 part 'item_detail_screen_item_body.dart';
 part 'item_detail_screen_listing_row.dart';
 part 'item_detail_screen_listings.dart';
 part 'item_detail_screen_photos.dart';
+part 'item_detail_screen_price_history.dart';
 part 'item_detail_screen_pinned_actions.dart';
 part 'item_detail_screen_provenance.dart';
+part 'item_detail_screen_summary.dart';
+part 'item_detail_screen_suppliers.dart';
 
 /// Item detail (plan §7).
 ///

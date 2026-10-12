@@ -40,10 +40,10 @@ void main() {
   ) async {
     await pumpDetail(tester);
 
-    // Overview, Quantity, Status and Pricing are above the fold, which the
-    // pinned Mark as sold bar now shortens; Listings and everything under it
-    // are built as the list reaches them.
-    expect(find.text('Edit'), findsNWidgets(4));
+    // The sections fold to one line each (`docs/UI_POLISH_PLAN.md`), so
+    // five headers fit above the pinned Mark as sold bar, each with its Edit;
+    // the rest are built as the list reaches them.
+    expect(find.text('Edit'), findsNWidgets(5));
 
     await tester.scrollUntilVisible(
       find.text('Listings'),
@@ -81,7 +81,7 @@ void main() {
 
     await tester.tap(
       find.descendant(
-        of: find.widgetWithText(SdSectionHeaderV3, 'Pricing'),
+        of: find.widgetWithText(SdCollapsibleSectionV3, 'Pricing'),
         matching: find.text('Edit'),
       ),
     );
@@ -176,10 +176,13 @@ void main() {
     // still drawn but no longer takes a tap.
     expect(find.text('Save'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
+    // The open section pushed the others down; scroll to the next Edit.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -400));
+    await tester.pumpAndSettle();
     expect(
       tester
-          .widgetList<InkWell>(find.byType(InkWell))
-          .where((InkWell tap) => tap.onTap == null)
+          .widgetList<SdButtonV3>(find.widgetWithText(SdButtonV3, 'Edit'))
+          .where((SdButtonV3 button) => button.onPressed == null)
           .isNotEmpty,
       isTrue,
     );

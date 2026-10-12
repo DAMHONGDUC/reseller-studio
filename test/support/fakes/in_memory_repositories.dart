@@ -13,15 +13,20 @@ import 'package:reseller_studio/features/inventory/domain/enums/item_status.dart
 import 'package:reseller_studio/features/inventory/domain/repositories/catalog_repository.dart';
 import 'package:reseller_studio/features/inventory/domain/repositories/item_repository.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing_price_change.dart';
 import 'package:reseller_studio/features/listings/domain/repositories/listing_repository.dart';
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
 import 'package:reseller_studio/features/marketplaces/domain/repositories/marketplace_repository.dart';
 import 'package:reseller_studio/features/offers/domain/entities/offer.dart';
 import 'package:reseller_studio/features/offers/domain/repositories/offer_repository.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
+import 'package:reseller_studio/features/orders/domain/entities/supplier_order.dart';
 import 'package:reseller_studio/features/orders/domain/repositories/order_repository.dart';
+import 'package:reseller_studio/features/pricing/domain/entities/pricing_rule.dart';
+import 'package:reseller_studio/features/pricing/domain/repositories/pricing_rule_repository.dart';
 import 'package:reseller_studio/features/sourcing/domain/entities/purchase.dart';
 import 'package:reseller_studio/features/sourcing/domain/entities/source.dart';
+import 'package:reseller_studio/features/sourcing/domain/entities/supplier_product.dart';
 import 'package:reseller_studio/features/sourcing/domain/repositories/sourcing_repository.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_intro_offer.dart';
 import 'package:reseller_studio/features/subscription/domain/entities/plan_offering.dart';
@@ -76,6 +81,10 @@ class MockStore {
   final List<Offer> offers;
   final List<Marketplace> marketplaces;
   final List<Carrier> carriers;
+  final List<PricingRule> pricingRules = <PricingRule>[];
+  final List<ListingPriceChange> listingPriceChanges = <ListingPriceChange>[];
+  final List<SupplierProduct> supplierProducts = <SupplierProduct>[];
+  final List<SupplierOrder> supplierOrders = <SupplierOrder>[];
 
   /// The demo business itself, mutable because Settings can now change it.
   ///
@@ -135,6 +144,10 @@ class MockStore {
       categories,
       locations,
       offers,
+      pricingRules,
+      listingPriceChanges,
+      supplierProducts,
+      supplierOrders,
       if (!keepDefaults) ...<List<Object>>[marketplaces, carriers],
     ];
 
@@ -294,6 +307,8 @@ class InMemoryOrderRepository implements OrderRepository {
       final Item current = _store.items[entry.value];
       final int left = current.quantity - 1;
 
+      if (current.isDropship) continue;
+
       _store.items[entry.value] = current.copyWith(
         quantity: left,
         status: left == 0 ? ItemStatus.sold : ItemStatus.inStock,
@@ -442,7 +457,11 @@ class InMemoryListingRepository implements ListingRepository {
   );
 
   @override
-  Future<void> saveAll(List<Listing> listings) async {
+  Future<void> saveAll(
+    List<Listing> listings, {
+    List<ListingPriceChange> priceChanges = const <ListingPriceChange>[],
+  }) async {
+    _store.listingPriceChanges.addAll(priceChanges);
     for (final Listing listing in listings) {
       final int index = _store.listings.indexWhere(
         (Listing other) => other.id == listing.id,
@@ -456,6 +475,111 @@ class InMemoryListingRepository implements ListingRepository {
     }
 
     _store.notifyChanged();
+  }
+
+  @override
+  Stream<List<ListingPriceChange>> watchPriceChangesForItem(String itemId) =>
+      _store.watch(
+        () =>
+            _store.listingPriceChanges
+                .where((ListingPriceChange change) => change.itemId == itemId)
+                .toList()
+              ..sort(
+                (ListingPriceChange a, ListingPriceChange b) =>
+                    b.changedAt.compareTo(a.changedAt),
+              ),
+      );
+}
+
+class InMemoryPricingRuleRepository implements PricingRuleRepository {
+  const InMemoryPricingRuleRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<PricingRule>> watchRules() =>
+      _store.watch(() => List<PricingRule>.of(_store.pricingRules));
+
+  @override
+  Future<void> save(PricingRule rule) async => _store.upsert(
+    _store.pricingRules,
+    rule,
+    (PricingRule other) => other.id == rule.id,
+  );
+
+  @override
+  Future<void> delete(String ruleId) async {
+    final int index = _store.pricingRules.indexWhere(
+      (PricingRule rule) => rule.id == ruleId,
+    );
+    if (index == -1) return;
+
+    _store.pricingRules[index] = _store.pricingRules[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
+class InMemorySupplierProductRepository implements SupplierProductRepository {
+  const InMemorySupplierProductRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<SupplierProduct>> watchProducts() =>
+      _store.watch(() => List<SupplierProduct>.of(_store.supplierProducts));
+
+  @override
+  Future<void> save(SupplierProduct product) async => _store.upsert(
+    _store.supplierProducts,
+    product,
+    (SupplierProduct other) => other.id == product.id,
+  );
+
+  @override
+  Future<void> saveAll(List<SupplierProduct> products) async {
+    for (final SupplierProduct product in products) {
+      await save(product);
+    }
+  }
+
+  @override
+  Future<void> delete(String productId) async {
+    final int index = _store.supplierProducts.indexWhere(
+      (SupplierProduct product) => product.id == productId,
+    );
+    if (index == -1) return;
+
+    _store.supplierProducts[index] = _store.supplierProducts[index].copyWith(
+      deletedAt: DateTime.now(),
+    );
+    _store.notifyChanged();
+  }
+}
+
+class InMemorySupplierOrderRepository implements SupplierOrderRepository {
+  const InMemorySupplierOrderRepository(this._store);
+
+  final MockStore _store;
+
+  @override
+  Stream<List<SupplierOrder>> watchSupplierOrders() =>
+      _store.watch(() => List<SupplierOrder>.of(_store.supplierOrders));
+
+  @override
+  Future<void> save(SupplierOrder supplierOrder, {Order? order}) async {
+    if (order != null) {
+      final int index = _store.orders.indexWhere(
+        (Order other) => other.id == order.id,
+      );
+      if (index != -1) _store.orders[index] = order;
+    }
+    _store.upsert(
+      _store.supplierOrders,
+      supplierOrder,
+      (SupplierOrder other) => other.id == supplierOrder.id,
+    );
   }
 }
 

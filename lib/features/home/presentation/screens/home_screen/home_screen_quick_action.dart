@@ -29,14 +29,11 @@ class _QuickAction extends StatelessWidget {
   const _QuickAction();
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-    child: AppListCard(
-      children: <Widget>[
-        for (final QuickActionSection section in QuickActionConstant.sections)
-          _QuickActionSection(section: section),
-      ],
-    ),
+  Widget build(BuildContext context) => AppListCard(
+    children: <Widget>[
+      for (final QuickActionSection section in QuickActionConstant.sections)
+        _QuickActionSection(section: section),
+    ],
   );
 }
 

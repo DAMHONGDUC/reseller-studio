@@ -56,6 +56,12 @@ final class FakeOverrides {
       carrierRepositoryProvider: carrierRepositoryProvider.overrideWithValue(
         InMemoryCarrierRepository(store),
       ),
+      pricingRuleRepositoryProvider: pricingRuleRepositoryProvider
+          .overrideWithValue(InMemoryPricingRuleRepository(store)),
+      supplierProductRepositoryProvider: supplierProductRepositoryProvider
+          .overrideWithValue(InMemorySupplierProductRepository(store)),
+      supplierOrderRepositoryProvider: supplierOrderRepositoryProvider
+          .overrideWithValue(InMemorySupplierOrderRepository(store)),
       sourceRepositoryProvider: sourceRepositoryProvider.overrideWithValue(
         InMemorySourceRepository(store),
       ),

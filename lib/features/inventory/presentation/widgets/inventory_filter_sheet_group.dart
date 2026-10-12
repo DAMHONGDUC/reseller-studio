@@ -51,6 +51,19 @@ class _ItemFilterGroupView extends ConsumerWidget {
         draft: draft,
         onEdit: onEdit,
       ),
+      ItemFilterGroup.fulfilment => AppFilterChipGroup<ItemFulfilment>(
+        title: title,
+        options: <AppFilterOption<ItemFulfilment>>[
+          for (final ItemFulfilment fulfilment in ItemFulfilment.values)
+            AppFilterOption<ItemFulfilment>(
+              value: fulfilment,
+              label: fulfilment.label(context),
+            ),
+        ],
+        selected: draft.fulfilments,
+        onSelected: (ItemFulfilment value) =>
+            onEdit(draft.withFulfilmentToggled(value)),
+      ),
       ItemFilterGroup.condition => AppFilterChipGroup<ItemCondition>(
         title: title,
         options: <AppFilterOption<ItemCondition>>[

@@ -2,11 +2,18 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reseller_studio/core/money/money.dart';
+import 'package:reseller_studio/core/providers/repository_providers.dart';
+import 'package:reseller_studio/features/inventory/domain/entities/item.dart';
+import 'package:reseller_studio/features/inventory/providers.dart';
 import 'package:reseller_studio/features/listings/domain/entities/listing.dart';
+import 'package:reseller_studio/features/listings/domain/entities/listing_price_change.dart';
 import 'package:reseller_studio/features/listings/domain/enums/listing_status.dart';
+import 'package:reseller_studio/features/listings/domain/enums/price_change_reason.dart';
+import 'package:reseller_studio/features/listings/domain/services/listing_rule_pricing.dart';
 import 'package:reseller_studio/features/listings/presentation/controllers/listing_actions_controller.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/listings_screen/listings_screen.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
+import 'package:reseller_studio/features/pricing/domain/entities/pricing_rule.dart';
 
 import '../../support/pump_app.dart';
 
@@ -69,6 +76,65 @@ void main() {
 
         expect(listing.price, price);
       }
+    },
+  );
+
+  test('a bulk reprice leaves a history row per listing it moved', () async {
+    final ProviderContainer container = await withListings();
+    final Listing picked = listingsIn(container).first;
+    final Money price = Money(picked.price.minor + 100, picked.price.currency);
+
+    await container.read(listingActionsControllerProvider.notifier).reprice(
+      <Listing>[picked],
+      price,
+    );
+
+    final List<ListingPriceChange> history = await container
+        .read(listingRepositoryProvider)
+        .watchPriceChangesForItem(picked.itemId)
+        .first;
+
+    expect(history, hasLength(1));
+    expect(history.single.from, picked.price);
+    expect(history.single.to, price);
+    expect(history.single.reason, PriceChangeReason.bulk);
+  });
+
+  test(
+    'applying a rule prices from the item cost and records the rule',
+    () async {
+      final ProviderContainer container = await withListings();
+
+      container.listen(itemsProvider, (_, _) {}, fireImmediately: true);
+      await Future<void>.delayed(Duration.zero);
+
+      final Map<String, Item> items = <String, Item>{
+        for (final Item item in container.read(itemsProvider).value!)
+          item.id: item,
+      };
+      final Listing picked = listingsIn(container).firstWhere(
+        (Listing l) =>
+            items[l.itemId]?.purchasePrice?.currency == l.price.currency &&
+            items[l.itemId]!.purchasePrice!.minor * 3 != l.price.minor,
+      );
+      final PricingRule rule = PricingRule(
+        id: 'rule-triple',
+        name: 'Triple',
+        createdAt: DateTime(2026, 10, 1),
+        multiplier: 3,
+      );
+
+      final RuleRepricing result = await container
+          .read(listingActionsControllerProvider.notifier)
+          .applyRule(<Listing>[picked], rule);
+      final List<ListingPriceChange> history = await container
+          .read(listingRepositoryProvider)
+          .watchPriceChangesForItem(picked.itemId)
+          .first;
+
+      expect(result.repriced, hasLength(1));
+      expect(history.single.reason, PriceChangeReason.rule);
+      expect(history.single.ruleId, 'rule-triple');
     },
   );
 

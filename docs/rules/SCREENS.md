@@ -438,6 +438,28 @@ past nine fields they were not changing, and popped back — for one number.
 - **The create form stays a screen.** Creating has no record to show sections
   of, and hard rule 2 keeps that form's requirements to a title.
 
+## A detail screen opens on a summary, and its other sections fold
+
+Owner's call, approved with `docs/UI_POLISH_PLAN.md`, and it sits on top of
+the in-place editing rule above rather than replacing it.
+
+- **Item detail opens on a summary block** — photo, title, state, and three
+  figures (cost, expected price, on hand). Every editable section below it
+  folds to one line (`ItemDetailSummary`); Listings, Supplier and Price
+  history stay open, because they are what a seller opens the item to check.
+- **Order detail keeps its Order section open** — status, buyer, platform —
+  and its pinned next move (`lib/features/orders/CLAUDE.md`). Profit folds
+  to its figure; Shipping folds to carrier and tracking and **starts open
+  while the parcel is the next thing to do**; the Timeline folds to the step
+  the order reached last.
+- **A create form asks for what every record needs and folds the rest behind
+  More details.** The item form shows Title and Quantity (hard rule 2 and the
+  quantity rule). The rest **opens on its own when something in it is already
+  filled** — a remembered category or bin, a scanned barcode — so a prefill
+  is never hidden.
+- **More is not folded.** It is a list of places to go, and a fold there
+  would put a tap in front of every destination.
+
 ## Search
 
 - **Search is a mode of the header, not a widget parked above the list.**
@@ -467,9 +489,14 @@ past nine fields they were not changing, and popped back — for one number.
 - **Filtering is not the field's job.** The query lives in a controller, the
   matching is a `*Utils` method or a `domain/services/` class, and the field
   only reports `onChanged` (no business logic in widgets).
-- **There are two search entry points on purpose** — Inventory's docking header
-  and the Search screen's plain autofocused field. That is a recorded decision,
-  not a duplication to clean up: `DECISIONS.md`.
+- **There are two kinds of search entry on purpose** — the docking header
+  that Inventory and Orders share, and the Search screen's plain autofocused
+  field. That is a recorded decision, not a duplication to clean up:
+  `DECISIONS.md`.
+- **Orders searches what a seller has in hand for a sale** — the item, the
+  buyer, the platform's order number, the tracking number and the platform
+  (`OrderSearch`). Owner's request: a seller looking up one sale among
+  hundreds should not have to filter by date to find it.
 
 ## Home carries Quick Action, and it must stay complete
 
@@ -559,3 +586,21 @@ The order carries the meaning. `test/features/more/about_screen_test.dart`
 pins the sequence against the lifecycle and fails on a step pointing at a
 parameterised route, which cannot be pushed and would be a dead link inside
 the one screen that exists to explain the app.
+
+**About is the guide to both businesses, and Home's app bar opens it.**
+Owner's rule. An info button sits beside Search and Scan, because "how does
+this work?" is asked on the first screen a seller sees, not five rows down
+More.
+
+- **Two guides, one rail.** A Reselling / Dropshipping switch picks
+  `WorkflowConstant.steps` or `WorkflowConstant.dropshipSteps`. Sell, Profit
+  and Analyze are shared kinds — one sale, one profit, one tab — and the
+  supplier's steps replace Purchase, Inventory and Ship.
+- **Every step carries its how-lines**, the same `WorkflowLabel.how` Home's
+  flow overview spells out, so About is a guide rather than a map. Both draw
+  them with `AppBulletLine`.
+- **Home's flow overview stays the reseller's loop.** It answers "how do I
+  use this" for the chain `CLAUDE.md` writes; the dropship loop lives on
+  About alone until the owner says otherwise.
+- `test/features/more/about_screen_test.dart` pins the dropship order and
+  `home_shortcuts_test.dart` the info button's route.

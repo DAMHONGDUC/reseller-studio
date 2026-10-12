@@ -18,7 +18,83 @@ class _ListingBulkBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => Size.fromHeight(SdSpacingConstant.h108);
 
-  Future<void> _reprice(BuildContext context, WidgetRef ref) {
+  /// With rules on file, Reprice first asks how: one typed price, or a rule.
+  /// With none, it opens the price box directly — no extra step for a
+  /// business that never made a rule.
+  Future<void> _reprice(BuildContext context, WidgetRef ref) async {
+    final List<PricingRule> rules = ref.read(activePricingRulesProvider);
+
+    if (rules.isEmpty) return _typePrice(context, ref);
+
+    final String? picked = await OptionPickerSheet.show<String>(
+      context,
+      title: context.l10n.listingRepriceTitle(
+        ref.read(selectedListingsProvider).length,
+      ),
+      options: <PickerOption<String>>[
+        PickerOption<String>(
+          value: _typedPrice,
+          label: context.l10n.listingRepriceTypePrice,
+          icon: AppIconConstant.edit,
+        ),
+        for (final PricingRule rule in rules)
+          PickerOption<String>(
+            value: rule.id,
+            label: rule.name,
+            caption: PricingRuleLabel.summary(context, rule),
+            icon: AppIconConstant.sell,
+          ),
+      ],
+    );
+
+    if (picked == null || !context.mounted) return;
+    if (picked == _typedPrice) return _typePrice(context, ref);
+
+    final PricingRule? rule = rules
+        .where((PricingRule rule) => rule.id == picked)
+        .firstOrNull;
+
+    if (rule != null) return _applyRule(context, ref, rule);
+  }
+
+  /// The picker's value for "type a price" — no rule id is empty.
+  static const String _typedPrice = '';
+
+  Future<void> _applyRule(
+    BuildContext context,
+    WidgetRef ref,
+    PricingRule rule,
+  ) async {
+    final List<Listing> listings = ref.read(selectedListingsProvider);
+
+    try {
+      final RuleRepricing result = await ref
+          .read(listingActionsControllerProvider.notifier)
+          .applyRule(listings, rule);
+
+      if (!context.mounted) return;
+
+      ref.read(listingSelectionProvider.notifier).clear();
+      SdSnackBarUtilsV3.success(
+        context,
+        <String>[
+          context.l10n.listingRuleApplied(result.repriced.length, rule.name),
+          if (result.skipped > 0)
+            context.l10n.listingRuleSkipped(result.skipped),
+        ].join('\n'),
+      );
+    } catch (error) {
+      // Already logged by the controller.
+      if (!context.mounted) return;
+
+      SdSnackBarUtilsV3.error(
+        context,
+        FailurePresenter.message(context, error),
+      );
+    }
+  }
+
+  Future<void> _typePrice(BuildContext context, WidgetRef ref) {
     final List<Listing> listings = ref.read(selectedListingsProvider);
 
     return PriceEntrySheet.show(

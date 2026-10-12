@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/firestore/firestore_mapper.dart';
 import '../../../../core/firestore/workspace_collections.dart';
 import '../../domain/entities/item.dart';
+import '../../domain/enums/item_fulfilment.dart';
 import '../../domain/enums/item_status.dart';
 
 /// How an [Item] is stored, and how it comes back.
@@ -76,6 +77,12 @@ final class ItemDto {
         data['condition'],
       ),
       description: FirestoreMapper.stringOrNull(data['description']),
+      fulfilment:
+          FirestoreMapper.enumOrNull(
+            ItemFulfilment.values,
+            data['fulfilment'],
+          ) ??
+          ItemFulfilment.stocked,
       notes: FirestoreMapper.stringOrNull(data['notes']),
       photoUrls: FirestoreMapper.stringList(data['photoUrls']),
       purchaseDate: FirestoreMapper.dateOrNull(data['purchaseDate']),
@@ -119,6 +126,7 @@ final class ItemDto {
         'condition': item.condition?.name,
         'description': item.description,
         'notes': item.notes,
+        'fulfilment': item.fulfilment.name,
         'photoUrls': item.photoUrls,
         'purchaseDate': _timestampOrNull(item.purchaseDate),
         'listedAt': _timestampOrNull(item.listedAt),

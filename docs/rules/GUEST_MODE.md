@@ -168,6 +168,12 @@ The one sync state a widget may read is *the first push for this account is
 still running*, and only so a list can say it is putting the records up
 instead of claiming there are none (hard rule 5).
 
+**This list is about the device store's sync only.** Owner's call. A
+marketplace or supplier connection (hard rule 10) is a different thing, and
+its status and last error *are* shown — the seller can act on them: reconnect,
+fix the account at the platform. What stays forbidden there is the same as
+here: a manual "sync now" button, and any flow that waits on a sync.
+
 ## The invariant
 
 **No user-facing flow ever awaits the network.** A save, a delete or a screen

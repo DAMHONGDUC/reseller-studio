@@ -549,7 +549,7 @@
   "@aboutTitle": {
     "description": "App bar title of the About screen."
   },
-  "aboutTagline": "The operating system for resellers",
+  "aboutTagline": "The operating system for resellers and dropshippers",
   "@aboutTagline": {
     "description": "One-line description of the app, under its name."
   },
@@ -6728,5 +6728,840 @@
   "scanResultNothingHere": "Nothing is stored here right now.",
   "@scanResultNothingHere": {
     "description": "Shown under a scanned location that holds no items right now."
+  },
+  "pricingRulesTitle": "Pricing rules",
+  "@pricingRulesTitle": {
+    "description": "Title of the pricing rules list, and its More row."
+  },
+  "pricingRuleAdd": "Add pricing rule",
+  "@pricingRuleAdd": {
+    "description": "Action and screen title for creating a pricing rule."
+  },
+  "pricingRuleEditTitle": "Edit pricing rule",
+  "@pricingRuleEditTitle": {
+    "description": "Title for editing an existing pricing rule."
+  },
+  "pricingRulesEmptyTitle": "No pricing rules yet",
+  "@pricingRulesEmptyTitle": {
+    "description": "Title when a business has no pricing rules."
+  },
+  "pricingRulesEmptyBody": "A rule turns what an item cost into an asking price, so a whole selection is priced in one tap.",
+  "@pricingRulesEmptyBody": {
+    "description": "Message when a business has no pricing rules."
+  },
+  "pricingRuleNameLabel": "Rule name",
+  "@pricingRuleNameLabel": {
+    "description": "Label for the pricing rule name field."
+  },
+  "pricingRuleNameHint": "For example, Double plus five",
+  "@pricingRuleNameHint": {
+    "description": "Example shown in an empty pricing rule name field."
+  },
+  "pricingRuleScopeLabel": "Applies to",
+  "@pricingRuleScopeLabel": {
+    "description": "Label above the choice of which listings a rule applies to."
+  },
+  "pricingRuleScopeAll": "Every listing",
+  "@pricingRuleScopeAll": {
+    "description": "Scope option: the rule applies to every listing."
+  },
+  "pricingRuleScopeMarketplace": "One marketplace",
+  "@pricingRuleScopeMarketplace": {
+    "description": "Scope option: the rule applies to one marketplace."
+  },
+  "pricingRuleScopeCategory": "One category",
+  "@pricingRuleScopeCategory": {
+    "description": "Scope option: the rule applies to one category."
+  },
+  "pricingRuleScopeTargetMarketplace": "Marketplace",
+  "@pricingRuleScopeTargetMarketplace": {
+    "description": "Label of the picker for the marketplace a rule applies to."
+  },
+  "pricingRuleScopeTargetCategory": "Category",
+  "@pricingRuleScopeTargetCategory": {
+    "description": "Label of the picker for the category a rule applies to."
+  },
+  "pricingRuleMultiplierLabel": "Multiply the cost by",
+  "@pricingRuleMultiplierLabel": {
+    "description": "Label for the number the cost is multiplied by."
+  },
+  "pricingRuleMultiplierError": "Enter a number above zero.",
+  "@pricingRuleMultiplierError": {
+    "description": "Error under the multiplier when it is empty, zero or not a number."
+  },
+  "pricingRuleFixedAddLabel": "Then add",
+  "@pricingRuleFixedAddLabel": {
+    "description": "Label for the amount added after the multiplier."
+  },
+  "pricingRuleRoundingLabel": "Round the price",
+  "@pricingRuleRoundingLabel": {
+    "description": "Label above the rounding choice."
+  },
+  "pricingRuleRoundingNone": "Exact",
+  "@pricingRuleRoundingNone": {
+    "description": "Rounding option: keep the exact computed price."
+  },
+  "pricingRuleRoundingNinetyNine": "Ends in .99",
+  "@pricingRuleRoundingNinetyNine": {
+    "description": "Rounding option: the price ends in .99."
+  },
+  "pricingRuleRoundingWhole": "Whole number",
+  "@pricingRuleRoundingWhole": {
+    "description": "Rounding option: a whole number with no cents."
+  },
+  "pricingRuleMinProfitLabel": "Least profit to keep",
+  "@pricingRuleMinProfitLabel": {
+    "description": "Label for the least profit a rule must leave."
+  },
+  "pricingRuleMinProfitHelper": "After the planning fee. No price this rule gives goes under it.",
+  "@pricingRuleMinProfitHelper": {
+    "description": "Helper under the minimum profit field."
+  },
+  "pricingRulePreviewTitle": "Try it",
+  "@pricingRulePreviewTitle": {
+    "description": "Section heading over the live price preview on the rule form."
+  },
+  "pricingRulePreviewCostLabel": "An item that cost",
+  "@pricingRulePreviewCostLabel": {
+    "description": "Label for the sample cost typed into the preview."
+  },
+  "pricingRulePreviewResult": "Lists at {price} · about {profit} profit",
+  "@pricingRulePreviewResult": {
+    "description": "Preview line: the price the rule gives and the estimated profit.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "profit": {
+        "type": "String"
+      }
+    }
+  },
+  "pricingRulePreviewEmpty": "Type a cost to see the price this rule gives.",
+  "@pricingRulePreviewEmpty": {
+    "description": "Preview hint before a cost is typed, or when the rule cannot price it."
+  },
+  "pricingRuleDeleteTitle": "Delete pricing rule?",
+  "@pricingRuleDeleteTitle": {
+    "description": "Confirmation title before deleting a pricing rule."
+  },
+  "pricingRuleDeleteBody": "Listings keep their prices, and their price history still names this rule.",
+  "@pricingRuleDeleteBody": {
+    "description": "Confirmation message before deleting a pricing rule."
+  },
+  "pricingRuleSummaryMultiply": "Cost × {multiplier}",
+  "@pricingRuleSummaryMultiply": {
+    "description": "Rule summary fragment: the multiplier.",
+    "placeholders": {
+      "multiplier": {
+        "type": "String"
+      }
+    }
+  },
+  "pricingRuleSummaryAdd": "+ {amount}",
+  "@pricingRuleSummaryAdd": {
+    "description": "Rule summary fragment: the fixed amount added.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pricingRuleSummaryMinProfit": "at least {amount} profit",
+  "@pricingRuleSummaryMinProfit": {
+    "description": "Rule summary fragment: the minimum profit kept.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "listingRepriceTypePrice": "Type a new price",
+  "@listingRepriceTypePrice": {
+    "description": "Option in the reprice picker: type one new price for the whole selection."
+  },
+  "listingRuleApplied": "{count, plural, =1{1 listing repriced with {rule}} other{{count} listings repriced with {rule}}}",
+  "@listingRuleApplied": {
+    "description": "Confirmation after a pricing rule repriced listings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "rule": {
+        "type": "String"
+      }
+    }
+  },
+  "listingRuleSkipped": "{count, plural, =1{1 kept its price: no cost recorded, or outside the rule} other{{count} kept their price: no cost recorded, or outside the rule}}",
+  "@listingRuleSkipped": {
+    "description": "Second line after applying a rule: listings left alone because they have no cost or are outside the rule.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemPriceHistory": "Price history",
+  "@itemPriceHistory": {
+    "description": "Section heading over an item's listing price moves."
+  },
+  "priceChangeReasonManual": "Edited",
+  "@priceChangeReasonManual": {
+    "description": "Price history reason: the seller typed a new price."
+  },
+  "priceChangeReasonBulk": "Bulk reprice",
+  "@priceChangeReasonBulk": {
+    "description": "Price history reason: a bulk reprice."
+  },
+  "priceChangeReasonRule": "Pricing rule",
+  "@priceChangeReasonRule": {
+    "description": "Price history reason: a pricing rule was applied."
+  },
+  "fulfilmentStocked": "Stocked",
+  "@fulfilmentStocked": {
+    "description": "Fulfilment tag: the seller holds and ships the item."
+  },
+  "fulfilmentDropship": "Dropship",
+  "@fulfilmentDropship": {
+    "description": "Fulfilment tag: a supplier ships the item to the buyer."
+  },
+  "suppliersTitle": "Suppliers",
+  "@suppliersTitle": {
+    "description": "Title of the dropship suppliers list."
+  },
+  "sourcingSuppliersSubtitle": "Products a supplier ships for you",
+  "@sourcingSuppliersSubtitle": {
+    "description": "Sourcing hub row subtitle for dropship suppliers."
+  },
+  "supplierAdd": "Add supplier",
+  "@supplierAdd": {
+    "description": "Action and sheet title for adding a dropship supplier."
+  },
+  "supplierNameHint": "For example, CJdropshipping",
+  "@supplierNameHint": {
+    "description": "Example in the supplier name field."
+  },
+  "suppliersEmptyTitle": "No suppliers yet",
+  "@suppliersEmptyTitle": {
+    "description": "Title when there are no dropship suppliers."
+  },
+  "suppliersEmptyBody": "Add the wholesale suppliers that ship to your buyers for you.",
+  "@suppliersEmptyBody": {
+    "description": "Message when there are no dropship suppliers."
+  },
+  "supplierProductCount": "{count, plural, =0{No products} =1{1 product} other{{count} products}}",
+  "@supplierProductCount": {
+    "description": "How many products a supplier has.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supplierListedCount": "{count} listed",
+  "@supplierListedCount": {
+    "description": "How many of a supplier's products are listed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supplierProductsEmptyTitle": "No products yet",
+  "@supplierProductsEmptyTitle": {
+    "description": "Title when a supplier has no products."
+  },
+  "supplierProductsEmptyBody": "Add a product from this supplier, then list it.",
+  "@supplierProductsEmptyBody": {
+    "description": "Message when a supplier has no products."
+  },
+  "supplierProductAdd": "Add product",
+  "@supplierProductAdd": {
+    "description": "Action and screen title for adding a supplier product."
+  },
+  "supplierProductEditTitle": "Supplier product",
+  "@supplierProductEditTitle": {
+    "description": "Title for an existing supplier product."
+  },
+  "supplierProductTitleLabel": "Product title",
+  "@supplierProductTitleLabel": {
+    "description": "Label for the supplier's product title."
+  },
+  "supplierProductCleanTitle": "Clean up",
+  "@supplierProductCleanTitle": {
+    "description": "Button that strips supplier filler from the title."
+  },
+  "supplierProductUrlLabel": "Product link",
+  "@supplierProductUrlLabel": {
+    "description": "Label for the product's link at the supplier."
+  },
+  "supplierProductIdLabel": "Product ID",
+  "@supplierProductIdLabel": {
+    "description": "Label for the supplier's product id."
+  },
+  "supplierProductVariantLabel": "Variant ID",
+  "@supplierProductVariantLabel": {
+    "description": "Label for the supplier's variant id."
+  },
+  "supplierProductPriceLabel": "Supplier price",
+  "@supplierProductPriceLabel": {
+    "description": "Label for what the supplier charges for the product."
+  },
+  "supplierProductShippingLabel": "Shipping to buyer",
+  "@supplierProductShippingLabel": {
+    "description": "Label for what the supplier charges to ship to the buyer."
+  },
+  "supplierProductTaxLabel": "Sales tax",
+  "@supplierProductTaxLabel": {
+    "description": "Label for sales tax the supplier adds."
+  },
+  "supplierProductShippingDaysLabel": "Delivery days",
+  "@supplierProductShippingDaysLabel": {
+    "description": "Label for how many days delivery takes."
+  },
+  "supplierProductStockLabel": "Supplier stock",
+  "@supplierProductStockLabel": {
+    "description": "Label for units the supplier has in stock."
+  },
+  "supplierProductLandedCost": "Cost per order",
+  "@supplierProductLandedCost": {
+    "description": "Label for price plus shipping plus tax — what one order costs."
+  },
+  "supplierProductListIt": "List it",
+  "@supplierProductListIt": {
+    "description": "Action that creates a dropship item from a supplier product and lists it."
+  },
+  "supplierProductOpenItem": "Open item",
+  "@supplierProductOpenItem": {
+    "description": "Action that opens the item a supplier product stocks."
+  },
+  "supplierProductMarkChecked": "Checked today",
+  "@supplierProductMarkChecked": {
+    "description": "Action recording that price and stock were checked at the supplier today."
+  },
+  "supplierProductCheckedOn": "Checked {date}",
+  "@supplierProductCheckedOn": {
+    "description": "When price and stock were last checked.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "supplierProductNeverChecked": "Never checked",
+  "@supplierProductNeverChecked": {
+    "description": "Shown when price and stock were never checked."
+  },
+  "supplierProductListed": "Listed",
+  "@supplierProductListed": {
+    "description": "Badge: the product has an item."
+  },
+  "supplierProductNotListed": "Not listed",
+  "@supplierProductNotListed": {
+    "description": "Badge: the product has no item yet."
+  },
+  "supplierProductStockValue": "{count, plural, =0{Out of stock} other{{count} in stock}}",
+  "@supplierProductStockValue": {
+    "description": "Supplier stock count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supplierProductDeleteTitle": "Delete product?",
+  "@supplierProductDeleteTitle": {
+    "description": "Confirmation title before deleting a supplier product."
+  },
+  "supplierProductDeleteBody": "Its item stays, and orders already placed keep their supplier.",
+  "@supplierProductDeleteBody": {
+    "description": "Confirmation message before deleting a supplier product."
+  },
+  "itemSupplierSection": "Supplier",
+  "@itemSupplierSection": {
+    "description": "Item detail section heading for a dropshipped item's suppliers."
+  },
+  "itemSupplierPrimary": "Primary",
+  "@itemSupplierPrimary": {
+    "description": "Badge on the supplier an item is ordered from first."
+  },
+  "itemSupplierBackup": "Backup",
+  "@itemSupplierBackup": {
+    "description": "Badge on a backup supplier."
+  },
+  "itemSupplierMakePrimary": "Make primary",
+  "@itemSupplierMakePrimary": {
+    "description": "Action that makes a backup supplier the primary one."
+  },
+  "itemSupplierAddBackup": "Add backup supplier",
+  "@itemSupplierAddBackup": {
+    "description": "Action that links another supplier product to the item as a backup."
+  },
+  "itemSupplierNone": "No supplier linked yet.",
+  "@itemSupplierNone": {
+    "description": "Shown on a dropshipped item with no supplier product linked."
+  },
+  "supplierProductPickTitle": "Pick a product",
+  "@supplierProductPickTitle": {
+    "description": "Title of the sheet picking a supplier product to link."
+  },
+  "supplierProductNoneUnlinked": "Every product is already listed. Add one to a supplier first.",
+  "@supplierProductNoneUnlinked": {
+    "description": "Shown when every supplier product already has an item."
+  },
+  "supplierOrderRequested": "Requested",
+  "@supplierOrderRequested": {
+    "description": "Supplier order status: asked of a connected supplier."
+  },
+  "supplierOrderPlaced": "Ordered",
+  "@supplierOrderPlaced": {
+    "description": "Supplier order status: placed and paid at the supplier."
+  },
+  "supplierOrderShipped": "Shipped",
+  "@supplierOrderShipped": {
+    "description": "Supplier order status: the supplier shipped it."
+  },
+  "supplierOrderDelivered": "Delivered",
+  "@supplierOrderDelivered": {
+    "description": "Supplier order status: it reached the buyer."
+  },
+  "supplierOrderFailed": "Failed",
+  "@supplierOrderFailed": {
+    "description": "Supplier order status: the supplier refused it."
+  },
+  "supplierOrderCancelled": "Cancelled",
+  "@supplierOrderCancelled": {
+    "description": "Supplier order status: called off before it shipped."
+  },
+  "supplierOrderPlaceTitle": "Order from supplier",
+  "@supplierOrderPlaceTitle": {
+    "description": "Action and sheet title for recording an order placed at the supplier."
+  },
+  "supplierOrderNumberLabel": "Supplier order number",
+  "@supplierOrderNumberLabel": {
+    "description": "Label for the supplier's own order number."
+  },
+  "supplierOrderCostHelp": "What the supplier charged at checkout.",
+  "@supplierOrderCostHelp": {
+    "description": "Helper under the supplier price when recording an order."
+  },
+  "supplierOrderPlaceSubmit": "Save order",
+  "@supplierOrderPlaceSubmit": {
+    "description": "Button that saves an order placed at the supplier."
+  },
+  "supplierOrderTrackingTitle": "Add tracking",
+  "@supplierOrderTrackingTitle": {
+    "description": "Action and sheet title for adding the supplier's tracking number."
+  },
+  "supplierOrderTrackingLabel": "Tracking number",
+  "@supplierOrderTrackingLabel": {
+    "description": "Label for the tracking number the supplier sent."
+  },
+  "supplierOrderCarrierLabel": "Carrier",
+  "@supplierOrderCarrierLabel": {
+    "description": "Label for the carrier the supplier shipped with."
+  },
+  "supplierOrderNotYet": "Not ordered from the supplier yet.",
+  "@supplierOrderNotYet": {
+    "description": "Shown on a dropship line nobody has ordered from the supplier yet."
+  },
+  "supplierOrderOpenSupplier": "Open supplier page",
+  "@supplierOrderOpenSupplier": {
+    "description": "Button that opens the product's page at the supplier."
+  },
+  "supplierOrderRefundTitle": "Supplier refund",
+  "@supplierOrderRefundTitle": {
+    "description": "Action and sheet title for recording money the supplier gave back."
+  },
+  "supplierOrderRefundLabel": "Amount refunded",
+  "@supplierOrderRefundLabel": {
+    "description": "Label for the amount the supplier refunded."
+  },
+  "supplierOrderMarkDelivered": "Mark delivered",
+  "@supplierOrderMarkDelivered": {
+    "description": "Action marking a supplier order delivered."
+  },
+  "supplierOrderCancel": "Cancel order",
+  "@supplierOrderCancel": {
+    "description": "Action cancelling a supplier order before it ships."
+  },
+  "supplierOrderArrival": "Arrives {date}",
+  "@supplierOrderArrival": {
+    "description": "Estimated arrival of a supplier order.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "supplierOrderWaitingDays": "{count, plural, =0{Ordered today} =1{1 day waiting} other{{count} days waiting}}",
+  "@supplierOrderWaitingDays": {
+    "description": "Days a placed supplier order has waited for tracking.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeToOrderFromSupplier": "To order from supplier",
+  "@homeToOrderFromSupplier": {
+    "description": "Home tile: dropship sales still to be ordered from the supplier."
+  },
+  "homeToOrderFromSupplierDetail": "They ship once they are ordered",
+  "@homeToOrderFromSupplierDetail": {
+    "description": "Home tile detail when nothing is late."
+  },
+  "homeSupplierOrdersLate": "{count, plural, =1{1 late at the supplier} other{{count} late at the supplier}}",
+  "@homeSupplierOrdersLate": {
+    "description": "Home tile detail: supplier orders waiting too long for tracking.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsToEndTitle": "{count, plural, =1{1 listing still live on a sold item} other{{count} listings still live on sold items}}",
+  "@listingsToEndTitle": {
+    "description": "Banner: listings still live on items that sold out or were withdrawn.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsToEndDetail": "End them before a second buyer pays.",
+  "@listingsToEndDetail": {
+    "description": "Banner detail under the live-on-sold-items title."
+  },
+  "listingsEndAll": "End all",
+  "@listingsEndAll": {
+    "description": "Action ending every listing still live on a sold item."
+  },
+  "titleBuilderOpen": "Build title",
+  "@titleBuilderOpen": {
+    "description": "Button opening the title builder beside an item's title."
+  },
+  "titleBuilderTitle": "Build a title",
+  "@titleBuilderTitle": {
+    "description": "Title of the title builder sheet."
+  },
+  "titleBuilderBrand": "Brand",
+  "@titleBuilderBrand": {
+    "description": "Title builder field: brand."
+  },
+  "titleBuilderType": "What it is",
+  "@titleBuilderType": {
+    "description": "Title builder field: what the item is."
+  },
+  "titleBuilderAttributes": "Details, comma-separated",
+  "@titleBuilderAttributes": {
+    "description": "Title builder field: model, material, style, comma-separated."
+  },
+  "titleBuilderColor": "Colour",
+  "@titleBuilderColor": {
+    "description": "Title builder field: colour."
+  },
+  "titleBuilderSize": "Size",
+  "@titleBuilderSize": {
+    "description": "Title builder field: size."
+  },
+  "titleBuilderFor": "Fit it to",
+  "@titleBuilderFor": {
+    "description": "Label above the marketplace whose title limit applies."
+  },
+  "titleBuilderLength": "{used} of {limit} characters",
+  "@titleBuilderLength": {
+    "description": "Characters used out of the marketplace's limit.",
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "titleBuilderUse": "Use this title",
+  "@titleBuilderUse": {
+    "description": "Button putting the built title into the field."
+  },
+  "filterFulfilment": "Fulfilment",
+  "@filterFulfilment": {
+    "description": "Inventory filter group: stocked or dropshipped."
+  },
+  "filterSupplier": "Supplier",
+  "@filterSupplier": {
+    "description": "Order filter group: where a dropship sale stands with its supplier."
+  },
+  "supplierStageToOrder": "To order",
+  "@supplierStageToOrder": {
+    "description": "Supplier filter option: a sold dropship line not yet ordered."
+  },
+  "supplierStageAwaitingTracking": "Waiting for tracking",
+  "@supplierStageAwaitingTracking": {
+    "description": "Supplier filter option: ordered, waiting for tracking."
+  },
+  "supplierStageLate": "Late",
+  "@supplierStageLate": {
+    "description": "Supplier filter option: ordered and waiting too long for tracking."
+  },
+  "analyticsDropship": "Dropship",
+  "@analyticsDropship": {
+    "description": "Analytics drill-down title for dropshipping."
+  },
+  "analyticsDropshipSubtitle": "Stocked against dropshipped, products and suppliers",
+  "@analyticsDropshipSubtitle": {
+    "description": "Analytics drill-down subtitle for dropshipping."
+  },
+  "analyticsDropshipEmptyTitle": "No dropshipped products yet",
+  "@analyticsDropshipEmptyTitle": {
+    "description": "Empty state title on the dropship analytics screen."
+  },
+  "analyticsDropshipEmptyBody": "List a supplier's product and its sales show up here.",
+  "@analyticsDropshipEmptyBody": {
+    "description": "Empty state message on the dropship analytics screen."
+  },
+  "analyticsDropshipProducts": "Products, best first",
+  "@analyticsDropshipProducts": {
+    "description": "Section heading over dropshipped products ranked by profit."
+  },
+  "analyticsSupplierShipTime": "How fast suppliers ship",
+  "@analyticsSupplierShipTime": {
+    "description": "Section heading over each supplier's dispatch time."
+  },
+  "analyticsDaysAverage": "{days} days on average",
+  "@analyticsDaysAverage": {
+    "description": "Average days from order to dispatch.",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsShipments": "{count, plural, =1{1 shipment} other{{count} shipments}}",
+  "@analyticsShipments": {
+    "description": "How many shipments the average is over.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supplierOrderInvoice": "Supplier invoice",
+  "@supplierOrderInvoice": {
+    "description": "Label above the supplier invoice attachment."
+  },
+  "supplierProductOrderSample": "Order a sample",
+  "@supplierProductOrderSample": {
+    "description": "Action and sheet title for buying a sample from the supplier."
+  },
+  "supplierProductSampleCost": "Sample cost",
+  "@supplierProductSampleCost": {
+    "description": "Label for what the sample cost."
+  },
+  "supplierProductSampleHelp": "Recorded as an expense, not a sale's cost.",
+  "@supplierProductSampleHelp": {
+    "description": "Helper under the sample cost."
+  },
+  "supplierProductSampleDone": "Sample recorded as an expense",
+  "@supplierProductSampleDone": {
+    "description": "Confirmation after a sample is recorded."
+  },
+  "receiptKindSupplierOrder": "Supplier order",
+  "@receiptKindSupplierOrder": {
+    "description": "Receipt kind: an invoice on a supplier order."
+  },
+  "receiptOpenSale": "Open the sale",
+  "@receiptOpenSale": {
+    "description": "Button opening the sale a supplier invoice belongs to."
+  },
+  "supplierProductRecheck": "Check price and stock",
+  "@supplierProductRecheck": {
+    "description": "Shown on a supplier product not checked recently."
+  },
+  "itemSummaryOnHand": "{count, plural, =0{None on hand} other{{count} on hand}}",
+  "@itemSummaryOnHand": {
+    "description": "Folded Quantity section on item detail: how many are on hand.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderNotShippedYet": "Not shipped yet",
+  "@orderNotShippedYet": {
+    "description": "Folded Shipping section on order detail when there is no carrier or tracking yet."
+  },
+  "homeShowMore": "Show more",
+  "@homeShowMore": {
+    "description": "Button revealing the rest of Home's performance figures."
+  },
+  "homeShowLess": "Show less",
+  "@homeShowLess": {
+    "description": "Button hiding the rest of Home's performance figures."
+  },
+  "itemFormMoreDetails": "More details",
+  "@itemFormMoreDetails": {
+    "description": "Button revealing the item form's optional fields."
+  },
+  "itemFormFewerDetails": "Fewer details",
+  "@itemFormFewerDetails": {
+    "description": "Button hiding the item form's optional fields."
+  },
+  "itemFormDetails": "Details",
+  "@itemFormDetails": {
+    "description": "Item form section heading over status, condition and category."
+  },
+  "supplierProductReferences": "Supplier references",
+  "@supplierProductReferences": {
+    "description": "Folded group on the supplier product form: link, product and variant IDs."
+  },
+  "analyticsPeriodCustom": "Custom",
+  "@analyticsPeriodCustom": {
+    "description": "Analytics period chip: pick a range of days."
+  },
+  "analyticsPeriodRange": "{from} – {to}",
+  "@analyticsPeriodRange": {
+    "description": "Analytics period chip once a custom range is picked.",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "ordersSearchHint": "Search item, buyer, order or tracking no.",
+  "@ordersSearchHint": {
+    "description": "Hint in Orders' search field."
+  },
+  "ordersClearSearch": "Clear search",
+  "@ordersClearSearch": {
+    "description": "Tooltip on the button clearing Orders' search."
+  },
+  "workflowFindProduct": "Find a product",
+  "@workflowFindProduct": {
+    "description": "Dropship guide step: find a product."
+  },
+  "workflowFindProductDetail": "Add a wholesale supplier and the products it ships for you.",
+  "@workflowFindProductDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowFindProductHow1": "Open Sourcing, then Suppliers, and add the supplier by name.",
+  "@workflowFindProductHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindProductHow2": "Add each product with its price, shipping, tax and delivery days.",
+  "@workflowFindProductHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindProductHow3": "Use Clean up to strip the supplier's filler from the title.",
+  "@workflowFindProductHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowListProduct": "List it",
+  "@workflowListProduct": {
+    "description": "Dropship guide step: list it."
+  },
+  "workflowListProductDetail": "List it turns a supplier product into a dropship item and opens its marketplaces.",
+  "@workflowListProductDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowListProductHow1": "Tap List it on the supplier product; the item is created for you.",
+  "@workflowListProductHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowListProductHow2": "Price each marketplace by hand, or apply a pricing rule to many at once.",
+  "@workflowListProductHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowListProductHow3": "Build title fits the title to each platform's limit.",
+  "@workflowListProductHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowOrderFromSupplier": "Order from supplier",
+  "@workflowOrderFromSupplier": {
+    "description": "Dropship guide step: order from the supplier."
+  },
+  "workflowOrderFromSupplierDetail": "Once it sells, order it at the supplier — Home counts the sales still waiting.",
+  "@workflowOrderFromSupplierDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowOrderFromSupplierHow1": "Open the sale and tap Order from supplier; open the supplier page if you need it.",
+  "@workflowOrderFromSupplierHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowOrderFromSupplierHow2": "Confirm what the supplier charged; it becomes the sale's cost.",
+  "@workflowOrderFromSupplierHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowOrderFromSupplierHow3": "Attach the supplier's invoice; a marketplace may ask for proof of supply.",
+  "@workflowOrderFromSupplierHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowTrack": "Track it",
+  "@workflowTrack": {
+    "description": "Dropship guide step: track it."
+  },
+  "workflowTrackDetail": "The supplier's tracking ships the sale; late orders turn red.",
+  "@workflowTrackDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowTrackHow1": "Add tracking when the supplier sends it; the sale is marked shipped.",
+  "@workflowTrackHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowTrackHow2": "Filter Orders by Supplier to see what is waiting or late.",
+  "@workflowTrackHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowTrackHow3": "Record a supplier refund if a parcel goes wrong; profit follows it.",
+  "@workflowTrackHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindBetter": "Find better",
+  "@workflowFindBetter": {
+    "description": "Dropship guide step: find better products."
+  },
+  "workflowFindBetterDetail": "See which products earn and which suppliers ship fast, then drop the rest.",
+  "@workflowFindBetterDetail": {
+    "description": "Dropship guide step detail."
+  },
+  "workflowFindBetterHow1": "Analytics, then Dropship, ranks your products by profit.",
+  "@workflowFindBetterHow1": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindBetterHow2": "Compare how fast each supplier ships; give a backup supplier to slow ones.",
+  "@workflowFindBetterHow2": {
+    "description": "Dropship guide how-to line."
+  },
+  "workflowFindBetterHow3": "Check prices and stock every two weeks; the app reminds you.",
+  "@workflowFindBetterHow3": {
+    "description": "Dropship guide how-to line."
+  },
+  "aboutGuideReselling": "Reselling",
+  "@aboutGuideReselling": {
+    "description": "About guide selector: reselling."
+  },
+  "aboutGuideDropshipping": "Dropshipping",
+  "@aboutGuideDropshipping": {
+    "description": "About guide selector: dropshipping."
+  },
+  "aboutDropshipSubtitle": "Eight steps — the supplier ships, you run the business",
+  "@aboutDropshipSubtitle": {
+    "description": "About guide subtitle for dropshipping."
+  },
+  "aboutDropshipLoop": "Better products are the point of everything above it. What sold, at what margin, from which supplier — that is what makes the next listing a decision.",
+  "@aboutDropshipLoop": {
+    "description": "Line under the dropship guide."
+  },
+  "aboutIntroDropship": "It runs dropshipping too: list a supplier's product, sell it, order it from the supplier and track it — with the profit measured from what the supplier actually charged.",
+  "@aboutIntroDropship": {
+    "description": "Second intro paragraph on About."
+  },
+  "homeAboutTooltip": "About and guide",
+  "@homeAboutTooltip": {
+    "description": "Tooltip on Home's info button that opens About."
   }
 }

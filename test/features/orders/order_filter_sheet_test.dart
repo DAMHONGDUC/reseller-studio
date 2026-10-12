@@ -33,8 +33,8 @@ void main() {
     expect(inSheet('Marketplace'), findsOneWidget);
     expect(inSheet('Payout'), findsOneWidget);
     expect(inSheet('Cancelled'), findsOneWidget);
-    // Six chip groups and the sale range: seven blocks, six rules.
-    expect(find.byType(AppFilterGroupDivider), findsNWidgets(6));
+    // Seven chip groups and the sale range: eight blocks, seven rules.
+    expect(find.byType(AppFilterGroupDivider), findsNWidgets(7));
   });
 
   testWidgets('a ticked chip is pending until Apply, and Reset undoes it', (

@@ -37,8 +37,14 @@ decide it, and they are listed in the order they outrank each other.
      `PayoutReconciliation.overdueAfterDays` for its warning. A warning that
      is always there is one the eye learns to skip, which is what the rest of
      this section exists to prevent.
-   - Adding a sixth tile is a product decision — ask. The block works because
-     it is short enough that every tile still reads as urgent.
+   - **The sixth tile is dropship work: "To order from supplier"** — owner's
+     call, approved with `docs/DROPSHIPPING_PLAN.md`. It sits second, beside
+     orders to ship, because a dropship sale cannot ship until it is ordered:
+     the same clock one step earlier. It counts sold dropship lines with no
+     supplier order, and turns urgent when a placed supplier order has waited
+     past `SupplierOrderConstant.lateAfterDays` for tracking.
+   - A seventh tile is a product decision — ask. The block works because it
+     is short enough that every tile still reads as urgent.
 2. **The shortcut row follows it: Add stock, Quick Action, Record sale.**
    Owner's rule, and it **reverses "Quick add, Scan and Record sale"**.
    - **Add stock is the filled button, and it opens `AddStockSheet`** —
@@ -80,6 +86,21 @@ decide it, and they are listed in the order they outrank each other.
    scannable like Settings, while one outer card keeps it reading as one Quick
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
+
+## Every section starts open
+
+Owner's rule, and it **reverses "What starts folded"**: Home is the dashboard,
+and a dashboard that opens on folded blocks makes the seller tap to see the
+state of their own business. Every section opens expanded; the fold is still
+there for a seller who wants a shorter screen.
+
+- **Performance shows the profit hero and Revenue, Sold and Stock**, with
+  Show less to fold the three tiles away.
+- **Recent Activity and Quick Action open expanded**, each still a
+  `SdCollapsibleSectionV3` with its summary line for when it is folded.
+- **The Quick Action shortcut still opens the section before scrolling**, so
+  a seller who folded it is not sent to a closed block.
+- **Flow overview stays its own open card.**
 
 **A section-order test reads the order sections come into view in, not
 pixels.** Home was a lazy `ListView` whose estimated extent made
@@ -158,8 +179,10 @@ an `unknown`.
 
 ## Where Home sends the seller
 
-- **The app bar carries Search and Scan**, both `push`ed: each is a place to
-  go looking, and neither is a section of Home.
+- **The app bar carries Search, Scan and About**, all `push`ed: each is a
+  place to go looking, and none is a section of Home. About is the info
+  button — owner's rule — because it is the guide to both loops, reselling
+  and dropshipping (`docs/rules/SCREENS.md`).
 - **Search is `push`; Analytics is `go`.** Search lives outside the shell and
   comes back here. Analytics is a tab, and pushing a branch root over Home
   leaves the seller on the wrong tab with a back button they should not have.

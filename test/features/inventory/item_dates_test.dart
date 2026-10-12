@@ -78,6 +78,14 @@ void main() {
   ) async {
     await pumpScreen(tester, const ItemDetailScreen(itemId: 'itm-11'));
 
+    // Provenance folds to one line; the dates are inside it.
+    await tester.scrollUntilVisible(
+      find.text('Provenance'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Provenance'));
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Added'),
       300,

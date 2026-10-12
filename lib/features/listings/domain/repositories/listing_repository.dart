@@ -1,4 +1,5 @@
 import '../entities/listing.dart';
+import '../entities/listing_price_change.dart';
 
 /// Reading and writing listings.
 abstract interface class ListingRepository {
@@ -16,5 +17,14 @@ abstract interface class ListingRepository {
   /// not half-succeed silently: the implementation batches, and a partial
   /// failure is reported as one, not as four separate errors the seller has
   /// to reconcile.
-  Future<void> saveAll(List<Listing> listings);
+  ///
+  /// [priceChanges] land in the same write, so a price and its history can
+  /// never disagree — `ListingPriceChanges.between` works them out.
+  Future<void> saveAll(
+    List<Listing> listings, {
+    List<ListingPriceChange> priceChanges = const <ListingPriceChange>[],
+  });
+
+  /// Every price move of one item's listings, newest first.
+  Stream<List<ListingPriceChange>> watchPriceChangesForItem(String itemId);
 }

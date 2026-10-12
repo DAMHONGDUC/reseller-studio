@@ -49,6 +49,12 @@ final class LogTagConstant {
   static const String offer = 'Offer';
   static const String listing = 'Listing';
 
+  /// Pricing rules and what applying one does.
+  static const String pricing = 'Pricing';
+
+  /// Supplier products and orders placed with a dropship supplier.
+  static const String dropship = 'Dropship';
+
   /// Connecting a platform, and correcting what it charges.
   static const String marketplace = 'Marketplace';
   static const String expense = 'Expense';

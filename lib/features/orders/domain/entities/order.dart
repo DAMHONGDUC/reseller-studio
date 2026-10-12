@@ -212,6 +212,7 @@ class Order {
   /// cannot carry.
   Order copyWith({
     OrderStatus? status,
+    List<OrderLine>? lines,
     Money? salePrice,
     DateTime? orderedAt,
     Money? shippingCost,
@@ -241,7 +242,7 @@ class Order {
     status: status ?? this.status,
     marketplaceRecordId: marketplaceId,
     marketplaceNameSnapshot: marketplaceName,
-    lines: lines,
+    lines: lines ?? this.lines,
     salePrice: salePrice ?? this.salePrice,
     orderedAt: orderedAt ?? this.orderedAt,
     shippingCost: clearShippingCost ? null : shippingCost ?? this.shippingCost,

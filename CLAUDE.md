@@ -140,6 +140,28 @@ same interface**, never by widening an `if` at a call site. Anything that
 hardcodes one country's category names, its tax year boundary or its mileage
 rate is the bug this rule exists to stop.
 
+**Reseller Studio serves dropshippers too, not only resellers.** Owner's rule.
+A dropshipper never holds the stock: they list a supplier's product, sell it,
+then order it from the supplier straight to the buyer. That business runs in
+this app, beside reselling or instead of it, and is judged against its own
+lifecycle:
+
+```text
+FIND PRODUCT → LIST → SELL → ORDER FROM SUPPLIER → TRACK → PROFIT → ANALYZE → FIND BETTER
+```
+
+- **The dropshipping work is planned whole before any of it is built.**
+  Owner's rule. `docs/DROPSHIPPING_PLAN.md` is finished first; no code lands
+  against a half-written plan.
+- **The dropshipping work is built on its own branch, `feat/dropshipping`,
+  never on `master`.** Owner's rule. A multi-phase change reaches `master` as
+  one reviewed merge, not as a stream of half-features.
+- **The app-wide UI polish follows dropshipping Phase 1, on the same
+  branch.** Owner's rule. `docs/UI_POLISH_PLAN.md` is the approved scope —
+  every screen in it — and none of it starts before Phase 1 is done.
+- It runs on marketplace and supplier connections, which hard rule 10 now
+  allows.
+
 ## Tech stack
 
 - **Flutter** 3.44.5, pinned in `.fvmrc`. Always run through `fvm` —
@@ -482,15 +504,21 @@ behind it.
 10. **No secret ships in the Flutter binary.** Plan §14 and §32. Any call that
     uses a token happens in a Cloud Function — the app asks the backend, the
     backend asks the platform. Nothing in the app reads or stores one.
-    **Marketplace connection is not a feature of this app** (owner's rule):
-    there is no OAuth, no sync, and no client that talks to a platform.
-    Reinstating one is a product decision, and this rule is what it would have
-    to be built under.
+    **Connecting a marketplace or a supplier is a feature of this app.**
+    Owner's rule, and it **reverses "marketplace connection is not a feature
+    of this app"**: OAuth, order and listing sync, and placing an order with a
+    supplier are built, because dropshipping runs on them. They are built
+    under this rule:
+    - **The token never leaves the server.** The OAuth exchange, the token
+      and every call that uses it live in Cloud Functions; the token sits in
+      a store no client rule can read. What the app reads about a connection
+      is its status, never its credential.
+    - **A connection needs a server, so it sits behind hard rule 1's one
+      guard.** A guest has none; no screen decides that for itself.
     - **A file the seller exports is not a connection.** `PayoutCsvImport`
       reads a payout report the seller downloaded and handed over — no token,
-      no account, nothing leaving the device. It is the honest way to collect
-      the figures this app measures rather than guesses (hard rule 3), and it
-      is the only import there is.
+      no account, nothing leaving the device. It stays for every platform no
+      connection reaches.
     - **An importer reads the columns it needs and no others.** A marketplace
       export carries buyer names and addresses; two values are taken from each
       row and the rest is never held or logged (hard rule 9).
