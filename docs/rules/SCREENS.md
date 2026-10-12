@@ -489,9 +489,14 @@ the in-place editing rule above rather than replacing it.
 - **Filtering is not the field's job.** The query lives in a controller, the
   matching is a `*Utils` method or a `domain/services/` class, and the field
   only reports `onChanged` (no business logic in widgets).
-- **There are two search entry points on purpose** — Inventory's docking header
-  and the Search screen's plain autofocused field. That is a recorded decision,
-  not a duplication to clean up: `DECISIONS.md`.
+- **There are two kinds of search entry on purpose** — the docking header
+  that Inventory and Orders share, and the Search screen's plain autofocused
+  field. That is a recorded decision, not a duplication to clean up:
+  `DECISIONS.md`.
+- **Orders searches what a seller has in hand for a sale** — the item, the
+  buyer, the platform's order number, the tracking number and the platform
+  (`OrderSearch`). Owner's request: a seller looking up one sale among
+  hundreds should not have to filter by date to find it.
 
 ## Home carries Quick Action, and it must stay complete
 

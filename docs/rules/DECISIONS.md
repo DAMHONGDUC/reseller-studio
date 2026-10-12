@@ -68,7 +68,7 @@ neighbouring v2 patterns were not, and this is the standing answer:
   opaque bar, and nothing pins a strip over a list anyway.
 - **`SdFloatingBarScopeV2`.** This one *was* ported, and is the exception that
   proves the rest are deliberate. See below.
-- **Two search entry points on purpose.** Inventory uses `SdSearchHeaderV3`,
+- **Two kinds of search entry on purpose.** Inventory and Orders use `SdSearchHeaderV3`,
   whose field docks into the title row as the list scrolls. The Search screen
   builds a plain field with `autofocus` and no collapse, because that screen
   exists to be typed into immediately and collapsing chrome buys nothing when
