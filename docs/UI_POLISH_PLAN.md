@@ -1,6 +1,6 @@
 # UI polish plan
 
-**Status: built on `feat/dropshipping`; the rules it leaves are in `docs/rules/DESIGN_SYSTEM.md` (Folding, swiping and motion) and `docs/rules/SCREENS.md` (A detail screen opens on a summary).**
+**Status: built on `feat/dropshipping`; the rules it leaves are in `docs/rules/DESIGN_SYSTEM.md` (Swiping and motion) and `docs/rules/SCREENS.md` (A detail screen opens on a summary). The collapsible sections were removed afterwards by the owner (2026-10-13) — every section is open; the rows below that describe folding are history, not scope.**
 
 The app-wide pass that makes every screen calmer: less shown at once, the
 rest one tap away, and short motion that says what changed. Approved by the

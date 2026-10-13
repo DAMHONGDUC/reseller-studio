@@ -87,20 +87,19 @@ decide it, and they are listed in the order they outrank each other.
    Action block rather than four unrelated dashboard sections. At the bottom
    it costs the seller who came to read nothing.
 
-## Every section starts open
+## Every section is open, and nothing folds
 
-Owner's rule, and it **reverses "What starts folded"**: Home is the dashboard,
-and a dashboard that opens on folded blocks makes the seller tap to see the
-state of their own business. Every section opens expanded; the fold is still
-there for a seller who wants a shorter screen.
+Owner's rule, and it **reverses "every section opens expanded and can still be
+folded"**: Home is the dashboard, and a fold on it is a tap between the seller
+and the state of their own business. The rule itself is in
+`docs/rules/DESIGN_SYSTEM.md` (Swiping and motion).
 
-- **Performance shows the profit hero and Revenue, Sold and Stock**, with
-  Show less to fold the three tiles away.
-- **Recent Activity and Quick Action open expanded**, each still a
-  `SdCollapsibleSectionV3` with its summary line for when it is folded.
-- **The Quick Action shortcut still opens the section before scrolling**, so
-  a seller who folded it is not sent to a closed block.
-- **Flow overview stays its own open card.**
+- **Performance shows the profit hero and Revenue, Sold and Stock**, all
+  four, with no Show more/less.
+- **Recent Activity and Quick Action are plain sections** — a header over the
+  card, no chevron.
+- **Flow overview stays its own card**; its steps still expand one at a time
+  (below), which is a list of explanations, not a section fold.
 
 **A section-order test reads the order sections come into view in, not
 pixels.** Home was a lazy `ListView` whose estimated extent made

@@ -786,20 +786,19 @@ means, the thing underneath owns it.
   Animations must be calm — fade/scale/slide, short, gentle curves. Never
   flashing or strobing.
 
-## Folding, swiping and motion
+## Swiping and motion
 
-Owner's call, approved with `docs/UI_POLISH_PLAN.md`. Every screen shows
-what the decision needs and folds the rest to one line.
-
-- **A secondary group is `SdCollapsibleSectionV3`, and it always carries a
-  `summary`.** A fold that hides what it holds makes the seller open it to
-  find out; the one line says it ("Goodwill · B2"), and `—` when there is
-  nothing (hard rule 5).
-  - **A folded body is not built** — nothing hidden is laid out, measured or
-    found by a test.
-  - **An editable section folds through `AppEditableSection.summary`**, and
-    it is always open while it is being edited: Edit never edits a section
-    the seller cannot see.
+- **A screen's sections never fold.** Owner's rule, and it **reverses "a
+  secondary group is `SdCollapsibleSectionV3`"** from the UI polish pass.
+  Every section on Item detail, Order detail, Home and the supplier product
+  form is open, always — no chevron, no summary line standing in for it — and
+  Home's Performance tiles have no Show more/less. A seller who has to tap to
+  see what a block holds stops reading the block.
+  - A group is a plain `SdSectionHeaderV3` over its body.
+    `SdCollapsibleSectionV3` stays in the design kit, unused by the app.
+  - **Three toggles are not section folds and stay:** the item create form's
+    More details (hard rule 2 made visible), Flow overview's steps
+    (`lib/features/home/CLAUDE.md`) and the tablet navigation panel.
 - **A swipe is `SdSwipeRowV3`, at most one action each way, and it never
   removes the row.** It acts and springs back; whether the row leaves the list
   is decided by the data it changed. **Every swipe action is also reachable
@@ -809,8 +808,7 @@ what the decision needs and folds the rest to one line.
 - **Every animation reads its timing through `SdMotionV3.of(context, …)`**,
   which answers zero when the system asks for reduced motion. The one switch
   a user needs is the one in Settings.
-- **What moves, and how:** a section folds on `normal`/`emphasized`, its
-  chevron turns and its summary fades; a changed figure cross-fades on
+- **What moves, and how:** a changed figure cross-fades on
   `fast` (`SdStatTileV3`, Item detail's summary); a new row fades and grows
   in (`AppAppear`) only when its record is newer than
   `ListMotionConstant.newRecordWindow`, so scrolling never replays an
