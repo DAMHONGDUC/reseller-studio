@@ -458,6 +458,11 @@ motion). It sits on top of the in-place editing rule above.
 - **Item detail opens on a summary block** — photo, title, state, and three
   figures (cost, expected price, on hand) spread across the row. Every
   section below it is open.
+- **The item's title is on screen once, never twice.** Owner's rule. While
+  the summary block is in view the app bar reads the generic "Item" over the
+  SKU; once it scrolls away the item's title fades into the bar. A title in
+  the bar and again in the block directly under it spent two lines saying one
+  thing.
 - **Order detail keeps its pinned next move** (`lib/features/orders/CLAUDE.md`);
   Order, Profit, Shipping and the Timeline are all open.
 - **A create form asks for what every record needs and puts the rest behind
