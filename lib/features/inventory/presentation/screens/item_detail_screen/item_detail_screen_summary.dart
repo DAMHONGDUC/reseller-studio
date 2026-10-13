@@ -6,7 +6,7 @@ part of 'item_detail_screen.dart';
 /// Quiet on purpose — no hero, no tint: the screen keeps its one loud
 /// element for whatever needs attention.
 class _SummaryBlock extends StatelessWidget {
-  const _SummaryBlock({required this.item});
+  const _SummaryBlock({required this.item, super.key});
 
   final Item item;
 

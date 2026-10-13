@@ -10,9 +10,12 @@ part of 'item_detail_screen.dart';
 /// screen's, the way every other form in this app does it; which section is
 /// open and what a save writes belong to `ItemDetailEditController`.
 class _ItemBody extends ConsumerStatefulWidget {
-  const _ItemBody({required this.item});
+  const _ItemBody({required this.item, required this.summaryKey});
 
   final Item item;
+
+  /// Handed to the summary block so the screen can tell when it is gone.
+  final GlobalKey summaryKey;
 
   @override
   ConsumerState<_ItemBody> createState() => _ItemBodyState();
@@ -103,7 +106,7 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
       padding: SdContentPaddingV3.screen(context),
       children: <Widget>[
         SizedBox(height: SdContentPaddingV3.topGap),
-        _SummaryBlock(item: item),
+        _SummaryBlock(key: widget.summaryKey, item: item),
         SizedBox(height: SdContentPaddingV3.sectionGap),
         if (warnings.isNotEmpty) ...<Widget>[
           ItemWarningLines(item: item, warnings: warnings),

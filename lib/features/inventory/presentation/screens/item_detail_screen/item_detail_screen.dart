@@ -45,6 +45,7 @@ import '../../widgets/item_field.dart';
 import '../../widgets/item_quick_actions.dart';
 import '../../widgets/title_builder_sheet.dart';
 
+part 'item_detail_screen_app_bar.dart';
 part 'item_detail_screen_detail_row.dart';
 part 'item_detail_screen_item_body.dart';
 part 'item_detail_screen_listing_row.dart';
@@ -69,14 +70,40 @@ part 'item_detail_screen_suppliers.dart';
 ///
 /// **The two a seller came for are also pinned** — Mark as sold and Reprice
 /// hold the bottom edge while the item is on hand (`_PinnedActions`).
-class ItemDetailScreen extends ConsumerWidget {
+class ItemDetailScreen extends ConsumerStatefulWidget {
   const ItemDetailScreen({required this.itemId, super.key});
 
   final String itemId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<Item?> item = ref.watch(itemProvider(itemId));
+  ConsumerState<ItemDetailScreen> createState() => _ItemDetailScreenState();
+}
+
+class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
+  /// The summary block, measured to know when it has scrolled away.
+  final GlobalKey _summaryKey = GlobalKey();
+
+  /// Whether the item's title has moved into the bar (`_ItemAppBar`).
+  bool _titleInBar = false;
+
+  bool _onScroll(ScrollNotification notification) {
+    final RenderObject? summary = _summaryKey.currentContext
+        ?.findRenderObject();
+    final double summaryHeight = summary is RenderBox ? summary.size.height : 0;
+    final bool past =
+        notification.metrics.pixels > SdContentPaddingV3.topGap + summaryHeight;
+
+    // Depth 0 only: the photo strip scrolls sideways inside the list.
+    if (notification.depth == 0 && past != _titleInBar) {
+      setState(() => _titleInBar = past);
+    }
+
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AsyncValue<Item?> item = ref.watch(itemProvider(widget.itemId));
     final Item? value = item.value;
     final ItemDetailSection? editing = ref.watch(
       itemDetailEditControllerProvider.select(
@@ -106,21 +133,7 @@ class ItemDetailScreen extends ConsumerWidget {
                 recordTitle: value.title,
                 onCancel: cancel,
               )
-            : SdAppBarV3(
-                title: value?.title ?? context.l10n.itemTitleFallback,
-                subtitle: value?.sku,
-                actions: <Widget>[
-                  if (value != null)
-                    AppDetailActionButton(
-                      label: context.l10n.commonActions,
-                      onPressed: () => ItemActionsSheet.show(
-                        context,
-                        value,
-                        isOnDetail: true,
-                      ),
-                    ),
-                ],
-              ),
+            : _ItemAppBar(item: value, titleInBar: _titleInBar),
         bottomNavigationBar: value != null && value.status.isOnHand
             ? _PinnedActions(item: value)
             : null,
@@ -138,7 +151,10 @@ class ItemDetailScreen extends ConsumerWidget {
             title: context.l10n.itemNotFound,
             message: context.l10n.commonMayHaveBeenDeleted,
           ),
-          _ => _ItemBody(item: item.value!),
+          _ => NotificationListener<ScrollNotification>(
+            onNotification: _onScroll,
+            child: _ItemBody(item: item.value!, summaryKey: _summaryKey),
+          ),
         },
       ),
     );
