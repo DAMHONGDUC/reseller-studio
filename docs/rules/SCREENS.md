@@ -437,6 +437,17 @@ past nine fields they were not changing, and popped back — for one number.
   of the write — the same rule the workspace detail screen already follows.
 - **The create form stays a screen.** Creating has no record to show sections
   of, and hard rule 2 keeps that form's requirements to a title.
+- **While a section is open, the app bar says so.** Owner's rule. A seller
+  scrolled away from the open section had nothing on screen telling them a
+  draft was waiting, and the back arrow threw it away without a word.
+  `AppEditingAppBar` (`core/widgets/`) replaces the screen's bar for as long
+  as a section is open:
+  - the title reads "Editing <section>", the record's own title moves to the
+    subtitle;
+  - the back arrow becomes a close that cancels the draft, and **a system
+    back does the same** — it leaves edit mode, never the screen;
+  - the actions control is gone: a state transition mid-draft is a second
+    write racing the first.
 
 ## A detail screen opens on a summary, and every section stays open
 
