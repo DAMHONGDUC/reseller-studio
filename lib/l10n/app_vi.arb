@@ -1678,5 +1678,6 @@
   "aboutDropshipSubtitle": "Tám bước — nhà cung cấp giao hàng, bạn lo kinh doanh",
   "aboutDropshipLoop": "Mọi bước trên đều để tìm sản phẩm tốt hơn. Món nào bán được, lãi bao nhiêu, từ nhà cung cấp nào — đó là căn cứ cho lần đăng bán tiếp theo.",
   "aboutIntroDropship": "App cũng chạy được dropshipping: đăng bán sản phẩm nhà cung cấp, bán, đặt hàng và theo dõi giao — lãi tính theo số tiền nhà cung cấp thực sự thu.",
-  "homeAboutTooltip": "Giới thiệu và hướng dẫn"
+  "homeAboutTooltip": "Giới thiệu và hướng dẫn",
+  "editingSectionTitle": "Đang sửa {section}"
 }

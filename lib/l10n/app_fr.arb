@@ -1678,5 +1678,6 @@
   "aboutDropshipSubtitle": "Huit étapes — le fournisseur expédie, vous gérez",
   "aboutDropshipLoop": "De meilleurs produits sont le but de tout ce qui précède. Ce qui s'est vendu, à quelle marge, chez quel fournisseur — voilà ce qui fait de la prochaine annonce une décision.",
   "aboutIntroDropship": "Il gère aussi le dropshipping : mettez en vente le produit d'un fournisseur, vendez-le, commandez-le et suivez-le — avec un bénéfice mesuré sur ce que le fournisseur a réellement facturé.",
-  "homeAboutTooltip": "À propos et guide"
+  "homeAboutTooltip": "À propos et guide",
+  "editingSectionTitle": "Modification : {section}"
 }

@@ -11,6 +11,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_editable_section.dart';
+import '../../../../../core/widgets/app_editing_app_bar.dart';
 import '../../../../../core/widgets/app_photo.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
 import '../../../../../core/widgets/item_card.dart';
@@ -38,6 +39,7 @@ import '../../../item_detail_constant.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
 import '../../controllers/item_detail_edit_controller.dart';
+import '../../item_detail_section_label.dart';
 import '../../widgets/item_actions_sheet.dart';
 import '../../widgets/item_field.dart';
 import '../../widgets/item_quick_actions.dart';
@@ -76,39 +78,69 @@ class ItemDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Item?> item = ref.watch(itemProvider(itemId));
     final Item? value = item.value;
-
-    return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: value?.title ?? context.l10n.itemTitleFallback,
-        subtitle: value?.sku,
-        actions: <Widget>[
-          if (value != null)
-            AppDetailActionButton(
-              label: context.l10n.commonActions,
-              onPressed: () =>
-                  ItemActionsSheet.show(context, value, isOnDetail: true),
-            ),
-        ],
+    final ItemDetailSection? editing = ref.watch(
+      itemDetailEditControllerProvider.select(
+        (ItemDetailEditState state) => state.editing,
       ),
-      bottomNavigationBar: value != null && value.status.isOnHand
-          ? _PinnedActions(item: value)
-          : null,
-      body: switch (item) {
-        AsyncLoading<Item?>() when !item.hasValue => const SdLoadingV3Page(),
-        AsyncError<Item?>() => SdEmptyStateV3(
-          icon: AppIconConstant.error,
-          title: context.l10n.itemLoadFailed,
-          message: context.l10n.commonCouldNotLoad,
-        ),
-        // Null rather than an error: the row may have been deleted by a
-        // teammate while this screen was open, which is not a failure.
-        AsyncData<Item?>(value: null) => SdEmptyStateV3(
-          icon: AppIconConstant.searchOff,
-          title: context.l10n.itemNotFound,
-          message: context.l10n.commonMayHaveBeenDeleted,
-        ),
-        _ => _ItemBody(item: item.value!),
+    );
+    final bool isSaving = ref.watch(
+      itemDetailEditControllerProvider.select(
+        (ItemDetailEditState state) => state.isSaving,
+      ),
+    );
+    final ItemDetailEditController edit = ref.read(
+      itemDetailEditControllerProvider.notifier,
+    );
+    final VoidCallback? cancel = isSaving ? null : edit.cancel;
+
+    // Back leaves edit mode first, never the screen (`docs/rules/SCREENS.md`).
+    return PopScope(
+      canPop: editing == null,
+      onPopInvokedWithResult: (bool didPop, Object? _) {
+        if (!didPop) cancel?.call();
       },
+      child: SdScaffoldV3(
+        appBar: editing != null && value != null
+            ? AppEditingAppBar(
+                section: ItemDetailSectionLabel.of(context, editing),
+                recordTitle: value.title,
+                onCancel: cancel,
+              )
+            : SdAppBarV3(
+                title: value?.title ?? context.l10n.itemTitleFallback,
+                subtitle: value?.sku,
+                actions: <Widget>[
+                  if (value != null)
+                    AppDetailActionButton(
+                      label: context.l10n.commonActions,
+                      onPressed: () => ItemActionsSheet.show(
+                        context,
+                        value,
+                        isOnDetail: true,
+                      ),
+                    ),
+                ],
+              ),
+        bottomNavigationBar: value != null && value.status.isOnHand
+            ? _PinnedActions(item: value)
+            : null,
+        body: switch (item) {
+          AsyncLoading<Item?>() when !item.hasValue => const SdLoadingV3Page(),
+          AsyncError<Item?>() => SdEmptyStateV3(
+            icon: AppIconConstant.error,
+            title: context.l10n.itemLoadFailed,
+            message: context.l10n.commonCouldNotLoad,
+          ),
+          // Null rather than an error: the row may have been deleted by a
+          // teammate while this screen was open, which is not a failure.
+          AsyncData<Item?>(value: null) => SdEmptyStateV3(
+            icon: AppIconConstant.searchOff,
+            title: context.l10n.itemNotFound,
+            message: context.l10n.commonMayHaveBeenDeleted,
+          ),
+          _ => _ItemBody(item: item.value!),
+        },
+      ),
     );
   }
 }

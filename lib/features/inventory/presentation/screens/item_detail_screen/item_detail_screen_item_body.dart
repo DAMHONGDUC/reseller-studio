@@ -115,7 +115,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         ],
         _Section(
           section: ItemDetailSection.overview,
-          title: context.l10n.itemOverview,
           edit: edit,
           first: item.photoUrls.isEmpty,
           onEdit: _startEdit,
@@ -163,7 +162,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.quantity,
-          title: context.l10n.commonQuantity,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -182,7 +180,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.status,
-          title: context.l10n.itemStatus,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -196,7 +193,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.pricing,
-          title: context.l10n.itemPricing,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -244,7 +240,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.provenance,
-          title: context.l10n.itemProvenance,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -288,7 +283,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.description,
-          title: context.l10n.commonDescription,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -308,7 +302,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _Section(
           section: ItemDetailSection.notes,
-          title: context.l10n.commonNotes,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -336,7 +329,6 @@ class _ItemBodyState extends ConsumerState<_ItemBody> {
 class _Section extends StatelessWidget {
   const _Section({
     required this.section,
-    required this.title,
     required this.edit,
     required this.onEdit,
     required this.onCancel,
@@ -348,7 +340,6 @@ class _Section extends StatelessWidget {
   });
 
   final ItemDetailSection section;
-  final String title;
   final ItemDetailEditState edit;
   final ValueChanged<ItemDetailSection> onEdit;
   final VoidCallback onCancel;
@@ -363,7 +354,7 @@ class _Section extends StatelessWidget {
     final bool isOpen = edit.isOpen(section);
 
     return AppEditableSection(
-      title: title,
+      title: ItemDetailSectionLabel.of(context, section),
       first: first,
       isEditing: isOpen,
       isSaving: isOpen && edit.isSaving,

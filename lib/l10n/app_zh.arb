@@ -1678,5 +1678,6 @@
   "aboutDropshipSubtitle": "八个步骤——供应商发货，你负责经营",
   "aboutDropshipLoop": "以上一切都是为了找到更好的商品。卖了什么、利润多少、来自哪个供应商——这让下一次上架有据可依。",
   "aboutIntroDropship": "它也支持代发货：上架供应商商品、售出、向供应商下单并跟踪物流——利润按供应商实际收费计算。",
-  "homeAboutTooltip": "关于与指南"
+  "homeAboutTooltip": "关于与指南",
+  "editingSectionTitle": "正在编辑{section}"
 }

@@ -1678,5 +1678,6 @@
   "aboutDropshipSubtitle": "Acht Schritte — der Lieferant versendet, du führst das Geschäft",
   "aboutDropshipLoop": "Bessere Produkte sind der Zweck von allem oben. Was sich verkauft hat, mit welcher Marge, von welchem Lieferanten — das macht das nächste Angebot zur Entscheidung.",
   "aboutIntroDropship": "Es kann auch Dropshipping: Lieferantenprodukt listen, verkaufen, beim Lieferanten bestellen und verfolgen — mit Gewinn aus dem, was der Lieferant wirklich berechnet hat.",
-  "homeAboutTooltip": "Über und Anleitung"
+  "homeAboutTooltip": "Über und Anleitung",
+  "editingSectionTitle": "{section} bearbeiten"
 }

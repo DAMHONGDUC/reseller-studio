@@ -1678,5 +1678,6 @@
   "aboutDropshipSubtitle": "Oito passos — o fornecedor envia, você toca o negócio",
   "aboutDropshipLoop": "Produtos melhores são o objetivo de tudo acima. O que vendeu, com que margem, de qual fornecedor — é isso que faz do próximo anúncio uma decisão.",
   "aboutIntroDropship": "Ele também cuida de dropshipping: anuncie o produto do fornecedor, venda, peça e acompanhe — com o lucro medido pelo que o fornecedor cobrou de fato.",
-  "homeAboutTooltip": "Sobre e guia"
+  "homeAboutTooltip": "Sobre e guia",
+  "editingSectionTitle": "Editando {section}"
 }

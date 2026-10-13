@@ -21,7 +21,10 @@ class _SummaryBlock extends StatelessWidget {
           children: <Widget>[
             Hero(
               tag: ItemCard.photoHeroTag(item.id),
-              child: AppPhoto(url: photo, size: ItemCardMetricConstant.thumbnail),
+              child: AppPhoto(
+                url: photo,
+                size: ItemCardMetricConstant.thumbnail,
+              ),
             ),
             SizedBox(width: SdSpacingConstant.w12),
             Expanded(
@@ -96,7 +99,11 @@ class _SummaryBlock extends StatelessWidget {
 ///
 /// The row spreads them edge to edge, so each lines up with its own edge.
 class _Figure extends StatelessWidget {
-  const _Figure({required this.label, required this.value, required this.align});
+  const _Figure({
+    required this.label,
+    required this.value,
+    required this.align,
+  });
 
   final String label;
   final String value;

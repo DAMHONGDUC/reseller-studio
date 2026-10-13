@@ -97,7 +97,6 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         SizedBox(height: SdContentPaddingV3.topGap),
         _OrderSection(
           section: OrderDetailSection.order,
-          title: context.l10n.orderSectionOrder,
           edit: edit,
           first: true,
           onEdit: _startEdit,
@@ -153,7 +152,6 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSection(
           section: OrderDetailSection.profit,
-          title: context.l10n.commonProfit,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -179,7 +177,6 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         SizedBox(height: SdContentPaddingV3.sectionGap),
         _OrderSection(
           section: OrderDetailSection.shipping,
-          title: context.l10n.commonShipping,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -234,7 +231,6 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
 class _OrderSection extends StatelessWidget {
   const _OrderSection({
     required this.section,
-    required this.title,
     required this.edit,
     required this.onEdit,
     required this.onCancel,
@@ -245,7 +241,6 @@ class _OrderSection extends StatelessWidget {
   });
 
   final OrderDetailSection section;
-  final String title;
   final OrderDetailEditState edit;
   final ValueChanged<OrderDetailSection> onEdit;
   final VoidCallback onCancel;
@@ -259,7 +254,7 @@ class _OrderSection extends StatelessWidget {
     final bool isOpen = edit.isOpen(section);
 
     return AppEditableSection(
-      title: title,
+      title: OrderDetailSectionLabel.of(context, section),
       first: first,
       isEditing: isOpen,
       isSaving: isOpen && edit.isSaving,

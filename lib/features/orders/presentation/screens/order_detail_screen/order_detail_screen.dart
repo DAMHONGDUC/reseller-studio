@@ -15,6 +15,7 @@ import '../../../../../core/utils/date_time_utils.dart';
 import '../../../../../core/utils/link_utils.dart';
 import '../../../../../core/widgets/app_detail_action_button.dart';
 import '../../../../../core/widgets/app_editable_section.dart';
+import '../../../../../core/widgets/app_editing_app_bar.dart';
 import '../../../../../core/widgets/app_list_row.dart';
 import '../../../../../core/widgets/app_marketplace_tag.dart';
 import '../../../../../core/widgets/app_pinned_action.dart';
@@ -46,6 +47,7 @@ import '../../../supplier_order_constant.dart';
 import '../../controllers/order_actions_controller.dart';
 import '../../controllers/order_detail_edit_controller.dart';
 import '../../controllers/supplier_order_controller.dart';
+import '../../order_detail_section_label.dart';
 import '../../order_status_label.dart';
 import '../../widgets/order_actions_sheet.dart';
 import '../../widgets/place_supplier_order_sheet.dart';
@@ -85,39 +87,67 @@ class OrderDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Order?> order = ref.watch(orderProvider(orderId));
     final Order? value = order.value;
-
-    return SdScaffoldV3(
-      appBar: SdAppBarV3(
-        title: value == null
-            ? context.l10n.orderTitleFallback
-            : context.l10n.orderTitle(value.marketplaceName),
-        subtitle: value?.externalOrderId,
-        actions: <Widget>[
-          if (value != null)
-            AppDetailActionButton(
-              label: context.l10n.commonActions,
-              onPressed: () => OrderActionsSheet.show(context, value),
-            ),
-        ],
+    final OrderDetailSection? editing = ref.watch(
+      orderDetailEditControllerProvider.select(
+        (OrderDetailEditState state) => state.editing,
       ),
-      // Outside the body, so the button holds the bottom edge whatever the
-      // list is scrolled to — and absent entirely when the order has no move
-      // left, because a button that leads nowhere is worse than none.
-      bottomNavigationBar: value == null ? null : _NextMove(order: value),
-      body: switch (order) {
-        AsyncLoading<Order?>() when !order.hasValue => const SdLoadingV3Page(),
-        AsyncError<Order?>() => SdEmptyStateV3(
-          icon: AppIconConstant.error,
-          title: context.l10n.orderLoadFailed,
-          message: context.l10n.commonCouldNotLoad,
-        ),
-        AsyncData<Order?>(value: null) => SdEmptyStateV3(
-          icon: AppIconConstant.searchOff,
-          title: context.l10n.orderNotFound,
-          message: context.l10n.commonMayHaveBeenDeleted,
-        ),
-        _ => _OrderBody(order: value!),
+    );
+    final bool isSaving = ref.watch(
+      orderDetailEditControllerProvider.select(
+        (OrderDetailEditState state) => state.isSaving,
+      ),
+    );
+    final OrderDetailEditController edit = ref.read(
+      orderDetailEditControllerProvider.notifier,
+    );
+    final VoidCallback? cancel = isSaving ? null : edit.cancel;
+
+    // Back leaves edit mode first, never the screen (`docs/rules/SCREENS.md`).
+    return PopScope(
+      canPop: editing == null,
+      onPopInvokedWithResult: (bool didPop, Object? _) {
+        if (!didPop) cancel?.call();
       },
+      child: SdScaffoldV3(
+        appBar: editing != null && value != null
+            ? AppEditingAppBar(
+                section: OrderDetailSectionLabel.of(context, editing),
+                recordTitle: context.l10n.orderTitle(value.marketplaceName),
+                onCancel: cancel,
+              )
+            : SdAppBarV3(
+                title: value == null
+                    ? context.l10n.orderTitleFallback
+                    : context.l10n.orderTitle(value.marketplaceName),
+                subtitle: value?.externalOrderId,
+                actions: <Widget>[
+                  if (value != null)
+                    AppDetailActionButton(
+                      label: context.l10n.commonActions,
+                      onPressed: () => OrderActionsSheet.show(context, value),
+                    ),
+                ],
+              ),
+        // Outside the body, so the button holds the bottom edge whatever the
+        // list is scrolled to — and absent entirely when the order has no move
+        // left, because a button that leads nowhere is worse than none.
+        bottomNavigationBar: value == null ? null : _NextMove(order: value),
+        body: switch (order) {
+          AsyncLoading<Order?>() when !order.hasValue =>
+            const SdLoadingV3Page(),
+          AsyncError<Order?>() => SdEmptyStateV3(
+            icon: AppIconConstant.error,
+            title: context.l10n.orderLoadFailed,
+            message: context.l10n.commonCouldNotLoad,
+          ),
+          AsyncData<Order?>(value: null) => SdEmptyStateV3(
+            icon: AppIconConstant.searchOff,
+            title: context.l10n.orderNotFound,
+            message: context.l10n.commonMayHaveBeenDeleted,
+          ),
+          _ => _OrderBody(order: value!),
+        },
+      ),
     );
   }
 }

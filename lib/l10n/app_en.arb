@@ -7538,5 +7538,15 @@
   "homeAboutTooltip": "About and guide",
   "@homeAboutTooltip": {
     "description": "Tooltip on Home's info button that opens About."
+  },
+  "editingSectionTitle": "Editing {section}",
+  "@editingSectionTitle": {
+    "description": "App bar title on a detail screen while one section is open for editing.",
+    "placeholders": {
+      "section": {
+        "type": "String",
+        "example": "Pricing"
+      }
+    }
   }
 }
