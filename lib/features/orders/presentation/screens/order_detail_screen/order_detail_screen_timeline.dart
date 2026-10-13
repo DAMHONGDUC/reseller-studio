@@ -32,31 +32,19 @@ class _Timeline extends StatelessWidget {
         _TimelineEntry(context.l10n.settleTitle, order.settledAt!),
     ];
 
-    final _TimelineEntry latest = entries.reduce(
-      (_TimelineEntry a, _TimelineEntry b) => b.at.isAfter(a.at) ? b : a,
-    );
-
-    // Folded to the step the order reached last — the full run is one tap
-    // away (`docs/UI_POLISH_PLAN.md`).
-    return SdCollapsibleSectionV3(
-      title: context.l10n.orderTimeline,
-      summary:
-          '${latest.label} · '
-          '${DateTimeUtils.mediumDate(latest.at, locale: context.localeTag)}',
-      child: SdCardV3(
-        child: Column(
-          children: entries
-              .map(
-                (_TimelineEntry entry) => _OrderDetailRow(
-                  label: entry.label,
-                  value: DateTimeUtils.dateTime(
-                    entry.at,
-                    locale: context.localeTag,
-                  ),
+    return SdCardV3(
+      child: Column(
+        children: entries
+            .map(
+              (_TimelineEntry entry) => _OrderDetailRow(
+                label: entry.label,
+                value: DateTimeUtils.dateTime(
+                  entry.at,
+                  locale: context.localeTag,
                 ),
-              )
-              .toList(),
-        ),
+              ),
+            )
+            .toList(),
       ),
     );
   }

@@ -35,7 +35,6 @@ import '../../../domain/services/item_consistency.dart';
 import '../../../domain/services/item_transition.dart';
 import '../../../item_block_presenter.dart';
 import '../../../item_detail_constant.dart';
-import '../../../item_detail_summary.dart';
 import '../../../providers.dart';
 import '../../controllers/item_actions_controller.dart';
 import '../../controllers/item_detail_edit_controller.dart';

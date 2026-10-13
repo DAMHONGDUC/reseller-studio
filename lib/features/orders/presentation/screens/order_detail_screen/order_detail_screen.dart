@@ -46,7 +46,6 @@ import '../../../supplier_order_constant.dart';
 import '../../controllers/order_actions_controller.dart';
 import '../../controllers/order_detail_edit_controller.dart';
 import '../../controllers/supplier_order_controller.dart';
-import '../../order_detail_summary.dart';
 import '../../order_status_label.dart';
 import '../../widgets/order_actions_sheet.dart';
 import '../../widgets/place_supplier_order_sheet.dart';

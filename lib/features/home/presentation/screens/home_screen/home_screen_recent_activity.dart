@@ -26,34 +26,25 @@ class _RecentActivity extends ConsumerWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SdContentPaddingV3.horizontal),
-      // Open by default (`lib/features/home/CLAUDE.md`); folded, it reads
-      // as the latest sale.
-      child: SdCollapsibleSectionV3(
+      child: AppSection(
         title: context.l10n.homeRecentActivity,
-        initiallyExpanded: true,
-        summary: recent.first.lines.isEmpty
-            ? null
-            : '${recent.first.lines.first.title} · '
-                  '${context.money(recent.first.salePrice)}',
-        child: SdCardV3(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: <Widget>[
-              for (int i = 0; i < recent.length; i++) ...<Widget>[
-                _ActivityRow(order: recent[i]),
-                if (i != recent.length - 1)
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left:
-                          SdSpacingConstant.w16 +
-                          SdIconTileSizeV3.small.box +
-                          SdSpacingConstant.w12,
-                    ),
-                    child: const SdDividerV3(),
+        padding: EdgeInsets.zero,
+        child: Column(
+          children: <Widget>[
+            for (int i = 0; i < recent.length; i++) ...<Widget>[
+              _ActivityRow(order: recent[i]),
+              if (i != recent.length - 1)
+                Padding(
+                  padding: EdgeInsets.only(
+                    left:
+                        SdSpacingConstant.w16 +
+                        SdIconTileSizeV3.small.box +
+                        SdSpacingConstant.w12,
                   ),
-              ],
+                  child: const SdDividerV3(),
+                ),
             ],
-          ),
+          ],
         ),
       ),
     );

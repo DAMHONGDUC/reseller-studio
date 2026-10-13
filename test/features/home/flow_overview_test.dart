@@ -185,7 +185,7 @@ void main() {
     // their arrow in the same column.
     await openSheet(tester);
 
-    // Only the sheet's own arrows: Home behind it folds sections too.
+    // Only the sheet's own arrows, not anything on Home behind it.
     final Finder arrows = find.descendant(
       of: find.byType(FlowOverviewSheet),
       matching: find.byType(AnimatedRotation),

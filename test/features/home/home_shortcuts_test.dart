@@ -123,7 +123,7 @@ void main() {
 
     final BuildContext context = tester.element(find.byType(HomeScreen));
     final Finder header = find.widgetWithText(
-      SdCollapsibleSectionV3,
+      SdSectionHeaderV3,
       'Quick Action',
     );
     final double viewport =

@@ -40,10 +40,9 @@ void main() {
   ) async {
     await pumpDetail(tester);
 
-    // The sections fold to one line each (`docs/UI_POLISH_PLAN.md`), so
-    // five headers fit above the pinned Mark as sold bar, each with its Edit;
-    // the rest are built as the list reaches them.
-    expect(find.text('Edit'), findsNWidgets(5));
+    // Every section is open, so only the first few fit above the pinned
+    // Mark as sold bar; the rest are built as the list reaches them.
+    expect(find.text('Edit'), findsWidgets);
 
     await tester.scrollUntilVisible(
       find.text('Listings'),
@@ -79,9 +78,10 @@ void main() {
     // required (hard rule 2).
     final ProviderContainer container = await pumpDetail(tester);
 
+    await revealText(tester, 'Pricing');
     await tester.tap(
       find.descendant(
-        of: find.widgetWithText(SdCollapsibleSectionV3, 'Pricing'),
+        of: find.widgetWithText(SdSectionHeaderV3, 'Pricing'),
         matching: find.text('Edit'),
       ),
     );
@@ -107,6 +107,9 @@ void main() {
     // so both are measured in the list's own coordinates: on-screen y plus
     // how far the list had scrolled when each was read.
     final ScrollableState list = tester.state(find.byType(Scrollable).last);
+
+    await revealText(tester, 'Pricing');
+
     final double pricingTop =
         tester.getTopLeft(find.text('Pricing')).dy + list.position.pixels;
 

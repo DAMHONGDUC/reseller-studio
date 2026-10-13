@@ -154,7 +154,6 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         _OrderSection(
           section: OrderDetailSection.profit,
           title: context.l10n.commonProfit,
-          summary: context.money(profit.netProfit),
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -181,11 +180,6 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
         _OrderSection(
           section: OrderDetailSection.shipping,
           title: context.l10n.commonShipping,
-          summary: OrderDetailSummary.shipping(context, order),
-          // Open while the parcel is the next thing to do; folded after.
-          initiallyExpanded:
-              order.status == OrderStatus.toShip ||
-              order.status == OrderStatus.shipped,
           edit: edit,
           onEdit: _startEdit,
           onCancel: controller.cancel,
@@ -227,6 +221,8 @@ class _OrderBodyState extends ConsumerState<_OrderBody> {
           ),
         ),
         SizedBox(height: SdContentPaddingV3.sectionGap),
+        _OrderSectionTitle(title: context.l10n.orderTimeline),
+        SizedBox(height: SdSpacingConstant.h8),
         _Timeline(order: order),
         SizedBox(height: SdContentPaddingV3.bottomGap),
       ],
@@ -246,8 +242,6 @@ class _OrderSection extends StatelessWidget {
     required this.reading,
     required this.editing,
     this.first = false,
-    this.summary,
-    this.initiallyExpanded = false,
   });
 
   final OrderDetailSection section;
@@ -260,10 +254,6 @@ class _OrderSection extends StatelessWidget {
   final Widget editing;
   final bool first;
 
-  /// The folded line (`docs/UI_POLISH_PLAN.md`); null keeps it always open.
-  final String? summary;
-  final bool initiallyExpanded;
-
   @override
   Widget build(BuildContext context) {
     final bool isOpen = edit.isOpen(section);
@@ -271,8 +261,6 @@ class _OrderSection extends StatelessWidget {
     return AppEditableSection(
       title: title,
       first: first,
-      summary: summary,
-      initiallyExpanded: initiallyExpanded,
       isEditing: isOpen,
       isSaving: isOpen && edit.isSaving,
       // Null while another block is open: one draft at a time.

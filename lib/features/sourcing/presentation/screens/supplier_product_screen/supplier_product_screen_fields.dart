@@ -86,10 +86,6 @@ class _FieldsForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final Widget gap = SizedBox(height: SdContentPaddingV3.listItemGap);
     const TextInputType wholeNumber = TextInputType.number;
-    final String references = <String>[
-      fields.url.text.trim(),
-      fields.productId.text.trim(),
-    ].where((String part) => part.isNotEmpty).join(' · ');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -142,31 +138,21 @@ class _FieldsForm extends StatelessWidget {
           controller: fields.stock,
           keyboardType: wholeNumber,
         ),
-        // How to find it at the supplier — set once, rarely read again, so
-        // it folds (`docs/UI_POLISH_PLAN.md`) and says what it holds.
-        SdCollapsibleSectionV3(
-          title: context.l10n.supplierProductReferences,
-          summary: references.isEmpty ? '—' : references,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SdTextFieldV3(
-                label: context.l10n.supplierProductUrlLabel,
-                controller: fields.url,
-                keyboardType: TextInputType.url,
-              ),
-              gap,
-              SdTextFieldV3(
-                label: context.l10n.supplierProductIdLabel,
-                controller: fields.productId,
-              ),
-              gap,
-              SdTextFieldV3(
-                label: context.l10n.supplierProductVariantLabel,
-                controller: fields.variantId,
-              ),
-            ],
-          ),
+        gap,
+        SdTextFieldV3(
+          label: context.l10n.supplierProductUrlLabel,
+          controller: fields.url,
+          keyboardType: TextInputType.url,
+        ),
+        gap,
+        SdTextFieldV3(
+          label: context.l10n.supplierProductIdLabel,
+          controller: fields.productId,
+        ),
+        gap,
+        SdTextFieldV3(
+          label: context.l10n.supplierProductVariantLabel,
+          controller: fields.variantId,
         ),
       ],
     );

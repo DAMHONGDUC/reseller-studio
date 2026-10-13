@@ -22,6 +22,14 @@ void main() {
 
     expect(heading, findsNothing);
 
+    // Every section is open, so Listings is below the screen; building it is
+    // what starts the stream the read below waits on.
+    await tester.scrollUntilVisible(
+      find.text('Listings'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+
     final ProviderContainer container = ProviderScope.containerOf(
       tester.element(find.byType(ItemDetailScreen)),
     );

@@ -17,7 +17,7 @@ import '../extensions/context_extensions.dart';
 /// **It holds no state and decides nothing.** Which section is open and what
 /// a save writes belong to a controller; this widget is the header, the two
 /// buttons and whichever body it was handed.
-class AppEditableSection extends StatefulWidget {
+class AppEditableSection extends StatelessWidget {
   const AppEditableSection({
     required this.title,
     required this.isEditing,
@@ -28,8 +28,6 @@ class AppEditableSection extends StatefulWidget {
     this.isSaving = false,
     this.canSave = true,
     this.first = false,
-    this.summary,
-    this.initiallyExpanded = false,
     super.key,
   });
 
@@ -56,74 +54,41 @@ class AppEditableSection extends StatefulWidget {
 
   final bool first;
 
-  /// One line of what the section holds. Given, the section folds to it
-  /// (`docs/UI_POLISH_PLAN.md`) and opens on a tap — and always while it is
-  /// being edited, so Edit never edits a section the seller cannot see.
-  final String? summary;
-
-  /// Whether a folding section starts open — Shipping, while the parcel is
-  /// still the next thing to do.
-  final bool initiallyExpanded;
-
   @override
-  State<AppEditableSection> createState() => _AppEditableSectionState();
-}
-
-class _AppEditableSectionState extends State<AppEditableSection> {
-  late bool _open = widget.initiallyExpanded;
-
-  @override
-  Widget build(BuildContext context) {
-    final String? summary = widget.summary;
-    final Widget action = widget.isEditing
-        ? Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              SdButtonV3(
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      SdSectionHeaderV3(
+        title: title,
+        first: first,
+        action: isEditing
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SdButtonV3(
+                    variant: SdButtonVariantV3.text,
+                    label: context.l10n.actionCancel,
+                    size: SdButtonSizeV3.small,
+                    onPressed: isSaving ? null : onCancel,
+                  ),
+                  SdButtonV3(
+                    variant: SdButtonVariantV3.text,
+                    label: context.l10n.actionSave,
+                    size: SdButtonSizeV3.small,
+                    busy: isSaving,
+                    onPressed: canSave ? onSave : null,
+                  ),
+                ],
+              )
+            : SdButtonV3(
                 variant: SdButtonVariantV3.text,
-                label: context.l10n.actionCancel,
+                label: context.l10n.actionEdit,
+                icon: AppIconConstant.edit,
                 size: SdButtonSizeV3.small,
-                onPressed: widget.isSaving ? null : widget.onCancel,
+                onPressed: onEdit,
               ),
-              SdButtonV3(
-                variant: SdButtonVariantV3.text,
-                label: context.l10n.actionSave,
-                size: SdButtonSizeV3.small,
-                busy: widget.isSaving,
-                onPressed: widget.canSave ? widget.onSave : null,
-              ),
-            ],
-          )
-        : SdButtonV3(
-            variant: SdButtonVariantV3.text,
-            label: context.l10n.actionEdit,
-            icon: AppIconConstant.edit,
-            size: SdButtonSizeV3.small,
-            onPressed: widget.onEdit,
-          );
-
-    if (summary == null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SdSectionHeaderV3(
-            title: widget.title,
-            first: widget.first,
-            action: action,
-          ),
-          widget.child,
-        ],
-      );
-    }
-
-    return SdCollapsibleSectionV3(
-      title: widget.title,
-      summary: summary,
-      first: widget.first,
-      action: action,
-      expanded: widget.isEditing || _open,
-      onExpandedChanged: (bool open) => setState(() => _open = open),
-      child: widget.child,
-    );
-  }
+      ),
+      child,
+    ],
+  );
 }

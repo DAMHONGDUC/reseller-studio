@@ -83,25 +83,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// The Quick Action section's header — what the shortcut scrolls to.
   final GlobalKey _quickActionKey = GlobalKey();
 
-  /// Quick Action starts open (`lib/features/home/CLAUDE.md`); a seller may
-  /// fold it, and the shortcut opens it again before scrolling there.
-  bool _quickActionOpen = true;
-
   void _scrollToQuickAction() {
-    setState(() => _quickActionOpen = true);
-    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      final BuildContext? section = _quickActionKey.currentContext;
+    final BuildContext? section = _quickActionKey.currentContext;
 
-      if (section == null || !mounted) return;
+    if (section == null) return;
 
-      unawaited(
-        Scrollable.ensureVisible(
-          section,
-          duration: SdMotionV3.of(context, SdMotionV3.slow),
-          curve: SdMotionV3.emphasized,
-        ),
-      );
-    });
+    unawaited(
+      Scrollable.ensureVisible(
+        section,
+        duration: SdMotionV3.of(context, SdMotionV3.slow),
+        curve: SdMotionV3.emphasized,
+      ),
+    );
   }
 
   @override
@@ -195,15 +188,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: EdgeInsets.symmetric(
                 horizontal: SdContentPaddingV3.horizontal,
               ),
-              child: SdCollapsibleSectionV3(
+              child: SdSectionHeaderV3(
                 title: context.l10n.homeQuickAction,
-                summary: context.l10n.homeQuickActionSubtitle,
-                expanded: _quickActionOpen,
-                onExpandedChanged: (bool open) =>
-                    setState(() => _quickActionOpen = open),
-                child: const _QuickAction(),
+                subtitle: context.l10n.homeQuickActionSubtitle,
               ),
             ),
+            const _QuickAction(),
           ],
         ),
       ),

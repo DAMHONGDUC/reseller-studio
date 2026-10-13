@@ -1,20 +1,11 @@
 part of 'home_screen.dart';
 
 /// Profit as a filled hero, then three quiet tiles.
-class _PerformanceBlock extends ConsumerStatefulWidget {
+class _PerformanceBlock extends ConsumerWidget {
   const _PerformanceBlock();
 
   @override
-  ConsumerState<_PerformanceBlock> createState() => _PerformanceBlockState();
-}
-
-/// The profit hero always; the three quiet tiles open by default and folded
-/// by Show less (`lib/features/home/CLAUDE.md` — every section starts open).
-class _PerformanceBlockState extends ConsumerState<_PerformanceBlock> {
-  bool _more = true;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AnalyticsSummary summary = ref.watch(analyticsSummaryProvider);
 
     return Padding(
@@ -25,30 +16,8 @@ class _PerformanceBlockState extends ConsumerState<_PerformanceBlock> {
             summary: summary,
             onTap: () => context.go(AppRoutes.analytics),
           ),
-          AnimatedSize(
-            duration: SdMotionV3.of(context, SdMotionV3.normal),
-            curve: SdMotionV3.emphasized,
-            alignment: Alignment.topCenter,
-            child: _more
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      top: SdContentPaddingV3.listItemGap,
-                    ),
-                    child: _Tiles(summary: summary),
-                  )
-                : const SizedBox(width: double.infinity),
-          ),
-          Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: SdButtonV3(
-              variant: SdButtonVariantV3.text,
-              label: _more
-                  ? context.l10n.homeShowLess
-                  : context.l10n.homeShowMore,
-              size: SdButtonSizeV3.small,
-              onPressed: () => setState(() => _more = !_more),
-            ),
-          ),
+          SizedBox(height: SdContentPaddingV3.listItemGap),
+          _Tiles(summary: summary),
         ],
       ),
     );
