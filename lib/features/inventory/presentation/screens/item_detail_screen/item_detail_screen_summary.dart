@@ -67,18 +67,23 @@ class _SummaryBlock extends StatelessWidget {
         ),
         SizedBox(height: SdSpacingConstant.h12),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _Figure(
               label: context.l10n.itemCost,
               value: context.money(item.purchasePrice),
+              align: CrossAxisAlignment.start,
             ),
             _Figure(
               label: context.l10n.itemExpectedPrice,
               value: context.money(item.expectedPrice),
+              align: CrossAxisAlignment.center,
             ),
             _Figure(
               label: context.l10n.commonQuantity,
               value: '${item.quantityOnHand}',
+              align: CrossAxisAlignment.end,
             ),
           ],
         ),
@@ -87,17 +92,20 @@ class _SummaryBlock extends StatelessWidget {
   }
 }
 
-/// One figure in the summary: a label over its value, a third of the row.
+/// One figure in the summary: a label over its value.
+///
+/// The row spreads them edge to edge, so each lines up with its own edge.
 class _Figure extends StatelessWidget {
-  const _Figure({required this.label, required this.value});
+  const _Figure({required this.label, required this.value, required this.align});
 
   final String label;
   final String value;
+  final CrossAxisAlignment align;
 
   @override
-  Widget build(BuildContext context) => Expanded(
+  Widget build(BuildContext context) => Flexible(
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: align,
       children: <Widget>[
         Text(label, style: context.textTheme3.bodySmall!.muted3(context)),
         SizedBox(height: SdSpacingConstant.h2),
