@@ -130,10 +130,24 @@ ios/fastlane/report.xml
 ios/fastlane/Preview.html
 ios/fastlane/ExportOptions.plist
 
-# GitNexus local index and generated editor skills.
+# AI tooling — agent instructions, settings, skills and indexes. Owner's rule:
+# these stay on the machine that uses them and are never committed.
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.claude/
+.agents/
 .gitnexus/
-.claude/skills/gitnexus-*/
-.agents/skills/gitnexus-*/
+.gitnexusignore
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.codex/
+.gemini/
+.aider*
+.mcp.json
+.github/copilot-instructions.md
 
 # Scratch work that must never reach CI.
 #
