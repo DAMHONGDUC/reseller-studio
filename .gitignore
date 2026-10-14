@@ -130,27 +130,8 @@ ios/fastlane/report.xml
 ios/fastlane/Preview.html
 ios/fastlane/ExportOptions.plist
 
-# Tooling — agent instructions, settings, skills and indexes. Owner's rule:
-# they live in `tooling/`, stay on this machine and are never committed.
-# The names below are the symlinks left at the paths each tool reads, so no
-# trailing slash: a symlink to a folder is a file to git.
-tooling/
-CLAUDE.md
-AGENTS.md
-GEMINI.md
-.claude
-.agents
-.gitnexus
-.gitnexusignore
-.cursor
-.cursorrules
-.windsurf
-.windsurfrules
-.codex
-.gemini
-.aider*
-.mcp.json
-.github/copilot-instructions.md
+# Local tool files. Owner's rule: never committed.
+tooling/**
 
 # Scratch work that must never reach CI.
 #
