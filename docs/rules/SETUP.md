@@ -1,7 +1,6 @@
 # Pending setup
 
-Read this before treating missing Firebase, signing or store infrastructure as
-a code defect. The owner completes every row with external access.
+Read before treating missing Firebase, signing or store setup as a code defect. The owner does every row; each needs external access.
 
 | Area | Repository state | Owner action |
 |---|---|---|
@@ -14,8 +13,6 @@ a code defect. The owner completes every row with external access.
 | iOS release | Fastlane workflow exists | Add App Store Connect and Match credentials |
 | Android release | App configuration exists | Add Play listing and release signing |
 
-Without Firebase, the app resolves to signed out and remains usable only with
-seed a workspace from More → General → Seed demo data. There is no auth bypass
-(hard rule 1).
+Without Firebase the app resolves to signed out and runs as a guest; More → General → Seed demo data fills it. No auth bypass exists (hard rule 1).
 
-The full owner checklist is [`docs/release/RELEASE_ACTIONS.md`](../release/RELEASE_ACTIONS.md).
+Full owner checklist: [`RELEASE_ACTIONS.md`](../release/RELEASE_ACTIONS.md).
