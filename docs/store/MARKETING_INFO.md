@@ -11,7 +11,8 @@ Fill each platform top to bottom: the sections follow the order the platform's o
 Values no file in the project holds. Each one is a `TODO(owner)` further down, in the field that needs it.
 
 - [ ] Privacy Policy URL, hosted and re-hosted after the guest-mode rewrite — B14, B23, C5, C18 (`docs/release/RELEASE_ACTIONS.md` step 8)
-- [ ] Terms of Use URL, or Apple's standard EULA — B11, B23, C18
+- [ ] Build carries `TERMS_OF_SERVICE_URL` = Apple's standard EULA (the link in B23), so the paywall's Terms row opens the same page — set in the prod env file
+- [ ] Paste B23 into **every** localization the listing has, not only English — App Review rejected build 49 under 3.1.2(c) for a missing EULA link
 - [ ] Support URL and support email — B25, C14, C15
 - [ ] SKU — B5
 - [ ] Product IDs for monthly, yearly and lifetime, matching the RevenueCat offering — B17, C23 (`docs/release/RELEASE_ACTIONS.md` step 7)
@@ -113,7 +114,7 @@ None for every content question; Unrestricted Web Access: No; Gambling: No → 4
 ### B11. App Information — License agreement
 <!-- from: lib/core/config/app_env.dart TERMS_OF_SERVICE_URL -->
 ```text
-TODO(owner): leave empty to use Apple's standard EULA, or paste the custom Terms of Use text
+Leave empty — the app uses Apple's standard EULA, linked in the description (B23)
 ```
 
 ### B12. Pricing and Availability — Price
@@ -187,6 +188,7 @@ Know what needs attention today: items to list, orders to ship, payouts a market
 ```
 
 ### B23. Version — Description · max 4000
+<!-- Paste into every localization of the listing: 3.1.2(c) asks for the EULA link in each one. -->
 <!-- from: docs/status/DONE_WORK.md, lib/l10n/app_en.arb about/onboarding, docs/store/STORE_PRIVACY.md; marketplace connection absent from functions/src -->
 ```text
 Reseller Studio is the operating system for your reselling business. It follows one chain from end to end: source, purchase, inventory, list, sell, ship, profit, analyze — then source better.
@@ -231,7 +233,7 @@ Reseller Studio does not connect to your marketplace accounts, does not sell you
 
 Reseller Studio Premium is available as a monthly or yearly auto-renewing subscription, or as a one-time lifetime purchase, at the price shown in the app. Payment is charged to your Apple Account at confirmation. A subscription renews automatically unless turned off at least 24 hours before the period ends; manage or cancel it in your Apple Account settings. Lifetime never renews.
 Privacy Policy: TODO(owner) privacy URL
-Terms of Use (EULA): TODO(owner) terms URL, or https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 ```
 
 ### B24. Version — Keywords · max 100 bytes
@@ -282,6 +284,10 @@ The app works without an account: a signed-out user's records stay on the device
 Everything is free except exports. The paywall opens from More → General → Subscription and from the Go Premium banner on Home; it shows each plan's title, length and price with the Privacy Policy and Terms of Use links. The description carries the same links.
 
 The app does not connect to any marketplace account. Payout reports are imported from a file the seller downloads.
+
+Guideline 3.1.2(c): the description in every localization now ends with a functional link to the Terms of Use (Apple's standard EULA) and to the Privacy Policy; the paywall shows both links too.
+
+Guideline 2.1(a): Sign in with Apple no longer loads indefinitely. On a first sign-in from a fresh install the app waited for a business that only its first sync creates; it now creates that business itself, and a failed sync lands on the business setup screen instead of the loading screen.
 ```
 
 ### B32. Version — What's New · max 4000
