@@ -500,7 +500,7 @@ First release of Reseller Studio.
 
 ### D1. Title · max 100
 ```text
-Reseller Studio — inventory, orders and real profit for resellers | App demo
+Reseller Studio — inventory, orders and real profit for resellers
 ```
 
 ### D2. Description · max 5000
@@ -536,7 +536,7 @@ assets/mkt/reseller-studio-youtube-thumbnail-1280x720.png
 
 ### D5. Playlist
 ```text
-Optional — leave empty or add to your app demos playlist
+Optional — leave empty
 ```
 
 ### D6. Audience
