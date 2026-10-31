@@ -16,8 +16,6 @@ Values no file in the project holds. Each one is a `TODO(owner)` further down, i
 - [ ] SKU — B5
 - [ ] Product IDs for monthly, yearly and lifetime, matching the RevenueCat offering — B17, C23 (`RELEASE_ACTIONS.md` step 7)
 - [ ] App Review demo account with seeded data, and the review contact — B29, B30
-- [ ] Re-shoot the store screenshots: the ones in `assets/store_mtk_screenshot/` date from 2026-09-18, before the UI polish — B21, C22
-- [ ] Google Play screenshots no longer than 2:1 — the iPhone set is 1242 x 2688, which Play rejects — C22
 - [ ] Google Play feature graphic, 1024 x 500 — C20
 - [ ] YouTube URL, once the video is uploaded — C21, E6
 
@@ -28,9 +26,10 @@ Values no file in the project holds. Each one is a `TODO(owner)` further down, i
 | `assets/mkt/reseller-studio-video-1920x1080.mp4` | YouTube upload (D) |
 | `assets/mkt/reseller-studio-youtube-thumbnail-1280x720.png` | YouTube thumbnail (D4) |
 | `assets/mkt/reseller-studio-upwork-cover-1600x1200.png` | Upwork cover (E5) |
-| `assets/mkt/reseller-studio-store-image-1024x1024.png` | Upwork images (E7); any promo slot that takes a square |
-| `assets/store_mtk_screenshot/iphone/` (5, 1242 x 2688) | App Store iPhone 6.5" (B21) |
-| `assets/store_mtk_screenshot/ipad/` (5, 2064 x 2752) | App Store iPad 13" (B21), Play tablet (C22) |
+| `assets/mkt/store-mkt-assets/reseller-studio-store-image-1024x1024.png` | Upwork images (E7); any promo slot that takes a square |
+| `assets/mkt/store-mkt-assets/reseller-studio-iphone-1…5-1320x2868.png` | App Store iPhone 6.9" (B21) |
+| `assets/mkt/store-mkt-assets/reseller-studio-ipad-1…5-2064x2752.png` | App Store iPad 13" (B21), Play tablet (C22) |
+| `assets/mkt/store-mkt-assets/reseller-studio-android-1…5-1080x1920.png` | Play phone (C22) |
 | `assets/icon/app_icon.png` (1024 x 1024) | Play app icon, scaled to 512 (C19) |
 
 ---
@@ -176,11 +175,10 @@ The paywall opens from More → General → Subscription, and from the Go Premiu
 ```
 
 ### B21. Version — Screenshots (files, sizes, order)
-<!-- from: assets/store_mtk_screenshot/ -->
+<!-- from: assets/mkt/store-mkt-assets/ -->
 ```text
-iPhone 6.5" (1242 x 2688): assets/store_mtk_screenshot/iphone/, 5 files in name order
-iPad 13" (2064 x 2752): assets/store_mtk_screenshot/ipad/, 5 files in name order
-TODO(owner): both sets predate the UI polish (2026-09-18) — re-shoot before submitting
+iPhone 6.9" (1320 x 2868): assets/mkt/store-mkt-assets/reseller-studio-iphone-1…5-1320x2868.png, in number order
+iPad 13" (2064 x 2752): assets/mkt/store-mkt-assets/reseller-studio-ipad-1…5-2064x2752.png, in number order
 ```
 
 ### B22. Version — Promotional text · max 170
@@ -468,9 +466,10 @@ TODO(owner): the YouTube URL of the video uploaded in D
 ```
 
 ### C22. Main store listing — Phone and tablet screenshots
+<!-- from: assets/mkt/store-mkt-assets/ -->
 ```text
-Phone: TODO(owner): 2–8 screenshots no longer than 2:1 (e.g. 1080 x 2160); the iPhone set at 1242 x 2688 is rejected
-7" and 10" tablet: assets/store_mtk_screenshot/ipad/ (2064 x 2752), after the re-shoot in B21
+Phone (1080 x 1920): assets/mkt/store-mkt-assets/reseller-studio-android-1…5-1080x1920.png, in number order
+7" and 10" tablet (2064 x 2752): assets/mkt/store-mkt-assets/reseller-studio-ipad-1…5-2064x2752.png, in number order
 ```
 
 ### C23. Monetize — Subscription product IDs and names
@@ -606,7 +605,7 @@ TODO(owner): the YouTube URL from D
 
 ### E7. Content — images
 ```text
-assets/mkt/reseller-studio-store-image-1024x1024.png, then the iPhone screenshots after the re-shoot
+assets/mkt/store-mkt-assets/reseller-studio-store-image-1024x1024.png, then reseller-studio-iphone-1…5-1320x2868.png
 ```
 
 ### E8. Content — link
