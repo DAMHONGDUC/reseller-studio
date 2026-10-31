@@ -1,17 +1,12 @@
 # Data model
 
-Authority for what Firestore stores and what each field means. Product behavior
-belongs to `docs/plans/SELLER_OS_FINAL_MASTER_PLAN.md`; access belongs to
-`firestore.rules`.
+Authority on what Firestore stores and what each field means. Product behavior is `docs/plans/SELLER_OS_FINAL_MASTER_PLAN.md`; access is `firestore.rules`.
 
-**Before anyone signs in there is a second store, and it holds these same
-records.** A guest's rows live in a local Drift database and are drained into
-Firestore at sign-in (hard rule 1). It is deliberately not a second data
-model: every row is the **same DTO map** this file describes, JSON-encoded,
-so a field means here exactly what it means there and a field added below
-needs nothing added to the local schema. What the local store keys on, how
-the drain restamps a row, and why there are no sync columns are all in
-`docs/rules/GUEST_MODE.md`.
+**Before sign-in a second store holds these same records.** A guest's rows live in a local Drift database and drain into Firestore at sign-in (hard rule 1). It is not a second data model:
+
+- every row is the **same DTO map** this file describes, JSON-encoded;
+- so a field means the same in both, and a field added below needs nothing in the local schema;
+- the local key, how the drain restamps a row, and why there are no sync columns: `docs/rules/GUEST_MODE.md`.
 
 ## Layout
 
@@ -44,45 +39,35 @@ subscription/{workspaceId}
 usage/{workspaceId}
 ```
 
-**Every business table is flat and top-level, modelled the way SQL would model
-it** (hard rule 14). Each row carries a `workspaceId` column and is keyed by a
-composite `{workspaceId}_{id}`, which is how SQL spells a composite primary
-key — without it every business's `ebay` marketplace, `usps` carrier and
-`{uid}` membership would be the same row.
+**Every business table is flat and top-level, shaped like SQL** (hard rule 14). Each row has a `workspaceId` column and the key `{workspaceId}_{id}` — SQL's composite primary key. Without it every business's `ebay` marketplace, `usps` carrier and `{uid}` membership would be one row.
 
-| | Where it is enforced |
+| | Enforced in |
 |---|---|
-| Every read filters on `workspaceId` | `WorkspaceTable.query` — there is no accessor that returns an unfiltered collection |
-| Every write stamps `workspaceId` | the converter in `WorkspaceCollections._table`, so no DTO carries the column |
-| A row cannot be moved between businesses | `canUpdateRow()` in `firestore.rules` compares the stored column with the incoming one |
-| An unfiltered query is denied, not leaked | a `list` rule runs per row, so foreign rows fail it and take the query down |
+| Every read filters on `workspaceId` | `WorkspaceTable.query` — no accessor returns an unfiltered collection |
+| Every write stamps `workspaceId` | The converter in `WorkspaceCollections._table`, so no DTO carries the column |
+| A row cannot move between businesses | `canUpdateRow()` in `firestore.rules` compares stored and incoming column |
+| An unfiltered query is denied, not leaked | A `list` rule runs per row; foreign rows fail it and fail the query |
 | Deleting a business sweeps every table | `WorkspaceCollections.tableNames` / `workspaceTables` in `functions/` |
 
-`subscription` and `usage` are keyed by the workspace id alone: there is
-exactly one row of each per business, so the id *is* the key.
-
-`users/{uid}` keeps its two subcollections. They belong to a person rather than
-a business, and a device token is addressed to whoever holds the phone.
-
-**Migrating existing data is `functions/src/scripts/flattenTables.ts`** — it
-copies every nested record into its flat table, and only sweeps the originals
-when told to, so a half-finished run loses nothing.
+- `subscription` and `usage` are keyed by the workspace id alone: one row each per business, so the id *is* the key.
+- `users/{uid}` keeps its two subcollections: they belong to a person, not a business, and a device token addresses whoever holds the phone.
+- **Migration is `functions/src/scripts/flattenTables.ts`**: it copies every nested record into its flat table and sweeps originals only when told, so a half-finished run loses nothing.
 
 ## Shared contracts
 
 | Rule | Contract |
 |---|---|
-| Identity | Document ID is the identity; do not store a duplicate `id` field |
+| Identity | Document ID is the identity; no duplicate `id` field |
 | Audit fields | Business records carry `createdAt`, `updatedAt`, `createdBy` |
-| Timestamps | Use server timestamps for persisted audit fields |
+| Timestamps | Server timestamps for persisted audit fields |
 | Money | Integer minor units; field names end in `Minor` |
-| Currency | Store beside money or inherit the workspace currency |
-| Missing money | `null` means unknown; it is not zero |
-| Derived finance | Never store profit, margin or ROI — and never estimate a fee |
-| Payout exception | `orders.payoutMinor` is stored because it is a reported fact |
+| Currency | Stored beside money, or inherited from the workspace |
+| Missing money | `null` means unknown, not zero |
+| Derived finance | Never store profit, margin or ROI — never estimate a fee |
+| Payout exception | `orders.payoutMinor` is stored: a reported fact |
 | Platform fee | Derived: `salePrice - refund - payout - shippingCost`; null until a payout is recorded |
 | Planning rate | `workspaces/{id}.planningFeeRate` — one assumption for Sourcing, never written to an order |
-| Deletion | Referenced records are soft-deleted with `deletedAt` |
+| Deletion | Referenced records soft-delete with `deletedAt` |
 
 ## Relationships
 
@@ -92,8 +77,7 @@ Source ──< Purchase ──< Item ──< Listing ──< Offer
                                    └──< Order ──> derived Profit
 ```
 
-Child references are nullable. Quick Add can create an item with only a title;
-the relationship chain supports workflows and analytics, not item validity.
+Child references are nullable. Quick Add creates an item from a title alone; the chain serves workflows and analytics, not item validity.
 
 ## Collections
 
@@ -101,223 +85,141 @@ the relationship chain supports workflows and analytics, not item validity.
 |---|---|---|
 | `users/{uid}` | `displayName`, `email`, `avatarUrl`, `locale`, `lastWorkspaceId`, `workspaceIds`, `notificationPrefs` | Person and workspace pointers only; no business records |
 | `users/{uid}/devices/{token}` | `token`, `platform`, `updatedAt` | Token is also the document ID; never log it |
-| `users/{uid}/notifications/{id}` | `type`, `workspaceId`, `entityId`, `count`, `route`, `title`, `body`, `readAt`, `createdAt` | Functions create; client may update only `readAt`; ID is the dedupe key |
-| `invites/{id}` | Invitee email, workspace, role, status and timestamps | Functions own writes; invitee access is rule-scoped |
-| `workspaces/{id}` | `name`, `ownerId`, `country`, `currency`, `timezone`, `businessType`, `logoUrl` | Required creation fields are name, country and currency |
-| `members/{uid}` | `role`, `displayName`, `email`, `joinedAt` | Membership is the only ACL; identity is denormalized for safe team reads |
-| `sources/{id}` | Source details, `type` (`dropshipSupplier` for a dropship supplier), address, `deletedAt` | Soft-delete because purchases reference sources |
+| `users/{uid}/notifications/{id}` | `type`, `workspaceId`, `entityId`, `count`, `route`, `title`, `body`, `readAt`, `createdAt` | Functions create; client updates only `readAt`; ID is the dedupe key |
+| `invites/{id}` | Invitee email, workspace, role, status, timestamps | Functions write; invitee access is rule-scoped |
+| `workspaces/{id}` | `name`, `ownerId`, `country`, `currency`, `timezone`, `businessType`, `logoUrl` | Required at creation: name, country, currency |
+| `members/{uid}` | `role`, `displayName`, `email`, `joinedAt` | Membership is the only ACL; identity denormalized for safe team reads |
+| `sources/{id}` | Source details, `type` (`dropshipSupplier` for a dropship supplier), address, `deletedAt` | Soft-delete: purchases reference sources |
 | `purchases/{id}` | Source, date, costs, receipt links, `deletedAt` | Parent of acquired items |
 | `items/{id}` | Title, quantity, status, `fulfilment` (`stocked` or `dropship`), pricing, purchase/source/category/location fields, `listedAt`, `deletedAt` | Status is `draft`, `inStock`, `sold` or `archived`; stale is a query, not a status |
-| `categories/{id}` | `name`, `parentId`, `description`, `deletedAt` | Seller-owned hierarchy with editable defaults |
-| `locations/{id}` | Warehouse/shelf/bin identity and `deletedAt` | Seller-owned storage hierarchy |
-| `listings/{id}` | Item, `marketplaceId` + `marketplaceName`, price, status, external IDs/URL | One record per item per marketplace; the marketplace is the seller's own record, not a fixed platform; external fields remain null without integration |
-| `offers/{id}` | Listing/order references, `marketplaceId` + `marketplaceName`, amount, status and timestamps | Offer state drives accept/decline/counter workflows; the marketplace is the seller's own record, as on a listing |
-| `marketplaces/{id}` | `name`, `hue`, `deletedAt` | Seller-owned; carries no fee rate — a platform's cut is measured per order |
+| `categories/{id}` | `name`, `parentId`, `description`, `deletedAt` | Seller-owned hierarchy, editable defaults |
+| `locations/{id}` | Warehouse/shelf/bin identity, `deletedAt` | Seller-owned storage hierarchy |
+| `listings/{id}` | Item, `marketplaceId` + `marketplaceName`, price, status, external IDs/URL | One per item per marketplace; the marketplace is the seller's own record, not a fixed platform; external fields stay null without integration |
+| `offers/{id}` | Listing/order references, `marketplaceId` + `marketplaceName`, amount, status, timestamps | State drives accept/decline/counter; marketplace is the seller's record, as on a listing |
+| `marketplaces/{id}` | `name`, `hue`, `deletedAt` | Seller-owned; no fee rate — a platform's cut is measured per order |
 | `carriers/{id}` | `name`, `deletedAt` | Business-owned shipping choices |
-| `pricing_rules/{id}` | `name`, `scope`, `scopeId`, `multiplier`, `currency`, `fixedAddMinor`, `rounding`, `minProfitMinor`, `deletedAt` | How a cost becomes an asking price; configuration, never a stored figure about a sale (hard rule 3). Soft-deleted because price history names rules |
-| `listing_price_changes/{id}` | `listingId`, `itemId`, `currency`, `fromMinor`, `toMinor`, `reason`, `ruleId`, `createdAt` | One row per price move, written in the same batch as the listing; create-only, never updated |
-| `supplier_products/{id}` | `sourceId`, `title`, `itemId`, `rank`, `url`, `externalProductId`, `externalVariantId`, `currency`, `supplierPriceMinor`, `supplierShippingMinor`, `supplierTaxMinor`, `shippingDays`, `stock`, `lastCheckedAt`, `deletedAt` | One supplier variant; `itemId` + `rank` say which item it stocks and in what order of preference. Soft-deleted because supplier orders name it |
-| `supplier_orders/{id}` | `sourceId`, `status`, `orderId`, `itemId`, `supplierProductId`, `externalSupplierOrderId`, `currency`, `productCostMinor`, `shippingCostMinor`, `taxMinor`, `supplierRefundMinor`, `isSample`, `trackingNumber`, `carrier`, `placedAt`, `shippedAt`, `deliveredAt`, `failureCode`, `invoiceUrl` | One order placed with a dropship supplier for one sold line. Its net cost is written onto that line's `unitCost` in the same commit; "to order" is a query, never a status |
-| `orders/{id}` | Prices/costs, status, marketplace snapshot, lifecycle timestamps, `lines` | Order facts and embedded immutable sale-time lines |
+| `pricing_rules/{id}` | `name`, `scope`, `scopeId`, `multiplier`, `currency`, `fixedAddMinor`, `rounding`, `minProfitMinor`, `deletedAt` | How a cost becomes an asking price; config, never a stored sale figure (hard rule 3). Soft-deleted: price history names rules |
+| `listing_price_changes/{id}` | `listingId`, `itemId`, `currency`, `fromMinor`, `toMinor`, `reason`, `ruleId`, `createdAt` | One row per price move, same batch as the listing; create-only |
+| `supplier_products/{id}` | `sourceId`, `title`, `itemId`, `rank`, `url`, `externalProductId`, `externalVariantId`, `currency`, `supplierPriceMinor`, `supplierShippingMinor`, `supplierTaxMinor`, `shippingDays`, `stock`, `lastCheckedAt`, `deletedAt` | One supplier variant; `itemId` + `rank` name the item it stocks and its preference order. Soft-deleted: supplier orders name it |
+| `supplier_orders/{id}` | `sourceId`, `status`, `orderId`, `itemId`, `supplierProductId`, `externalSupplierOrderId`, `currency`, `productCostMinor`, `shippingCostMinor`, `taxMinor`, `supplierRefundMinor`, `isSample`, `trackingNumber`, `carrier`, `placedAt`, `shippedAt`, `deliveredAt`, `failureCode`, `invoiceUrl` | One order with a dropship supplier for one sold line. Its net cost goes onto that line's `unitCost` in the same commit; "to order" is a query, never a status |
+| `orders/{id}` | Prices/costs, status, marketplace snapshot, lifecycle timestamps, `lines` | Order facts plus embedded, immutable sale-time lines |
 | `expenses/{id}` | Category, amount, date, recurrence link, `supplierOrderId` for a dropship sample | One document per occurrence |
-| `receipts/{id}` | File metadata and parent reference | Metadata in Firestore; file in Storage |
-| `activity/{id}` | `entityType`, `entityId`, `action`, `actorId`, `before`, `after`, `createdAt` | Append-only and Functions-written |
-| `subscription/{id}` | Plan/entitlement state and timestamps | Webhook-written; backend source for Premium enforcement |
-| `usage/current` | `items`, `orders`, `itemsAtCeiling`, `ordersAtCeiling` | Trigger-written; the only thing `firestore.rules` can read to enforce a Free ceiling, because a rule cannot count a collection. `items` is every row ever created and kept; `orders` counts only the last 30 days, so a scheduled recount clears a window that emptied with no write |
+| `receipts/{id}` | File metadata, parent reference | Metadata in Firestore; file in Storage |
+| `activity/{id}` | `entityType`, `entityId`, `action`, `actorId`, `before`, `after`, `createdAt` | Append-only, Functions-written |
+| `subscription/{id}` | Plan/entitlement state, timestamps | Webhook-written; backend source for Premium enforcement |
+| `usage/current` | `items`, `orders`, `itemsAtCeiling`, `ordersAtCeiling` | Trigger-written; the only thing `firestore.rules` can read to enforce a Free ceiling — a rule cannot count a collection. `items` counts every row created and kept; `orders` only the last 30 days, so a scheduled recount clears a window that emptied with no write |
 
-## Important snapshots and denormalization
+## Snapshots and denormalization
 
-| Field | Why it is copied |
+| Field | Why copied |
 |---|---|
 | Item `purchaseDate`, `sourceId` | Firestore cannot sort/filter through a referenced purchase |
-| Member `displayName`, `email` | Team cannot read another user's private profile document |
-| Order `marketplaceName` | Marketplace rename/delete must not rewrite sale history |
-| Listing `marketplaceName` | The same, for what was posted: a listing keeps the name the platform had when it went up |
-| Offer `marketplaceName` | The same again, for an offer: the platform it arrived on keeps the name it had then |
-| Item `purchaseId` | Sourcing joins a receipt to what it bought; apportioning a purchase writes each item's share of it |
-| Order line title, price and cost | Repricing an item must not rewrite an existing sale |
-| Notification `title`, `body` | Push delivery needs text; the app renders inbox copy from `type` and `count` |
+| Member `displayName`, `email` | Team cannot read another user's private profile |
+| Order `marketplaceName` | A marketplace rename/delete must not rewrite sale history |
+| Listing `marketplaceName` | Same, for what was posted: the name the platform had when it went up |
+| Offer `marketplaceName` | Same, for an offer: the name its platform had when it arrived |
+| Item `purchaseId` | Sourcing joins a receipt to what it bought; apportioning writes each item's share |
+| Order line title, price, cost | Repricing an item must not rewrite a sale |
+| Notification `title`, `body` | Push needs text; the inbox renders from `type` and `count` |
 
 ## Notification preferences
 
-`users/{uid}.notificationPrefs` maps a `NotificationType` name to whether that
-reminder is wanted. **Only the mutes are stored**: an absent key is on, so a
-type added in a later build arrives switched on rather than silently off for
-everyone who upgraded into it.
+`users/{uid}.notificationPrefs` maps a `NotificationType` name to whether it is wanted.
 
-It hangs off the person rather than the workspace because two people sharing a
-business do not want the same reminders. **A mute silences the push only** —
-`notifyWorkspace` still writes the inbox row, because the row is the
-notification and the push is a copy of it.
+- **Only mutes are stored**: an absent key is on, so a type added later arrives on, not silently off for everyone who upgraded.
+- It hangs off the person, not the workspace: two people sharing a business want different reminders.
+- **A mute silences the push only** — `notifyWorkspace` still writes the inbox row. The row is the notification; the push is a copy.
 
 ## Order contract
 
 | Group | Fields |
 |---|---|
-| Money | `salePriceMinor`, `shippingCostMinor`, `refundMinor`, `payoutMinor` (a legacy `feesMinor` is read back as the payout it implies) |
+| Money | `salePriceMinor`, `shippingCostMinor`, `refundMinor`, `payoutMinor` (a legacy `feesMinor` reads back as the payout it implies) |
 | Marketplace | `marketplaceId`, `marketplaceName`, `externalOrderId` |
 | Lifecycle | `orderedAt`, `shipByDate`, `shippedAt`, `deliveredAt`, `returnRequestedAt`, `returnedAt`, `refundedAt`, `settledAt` |
 | Lines | `{itemId, title, quantity, unitPriceMinor, unitCostMinor}` |
 
-Lifecycle timestamps remain facts even after status changes. Lines are embedded
-because they are small, always read with the order, and immutable after sale.
+Lifecycle timestamps stay facts after status changes. Lines are embedded: small, always read with the order, immutable after sale.
 
 ## App config
 
-`app_config/current` is one document for the whole product, read by every
-client and written by none. **It is not a business record**, so it is not
-nested under a workspace — nothing in it belongs to a seller, and two
-businesses on the same build read the same answer.
+`app_config/current` is one document for the whole product, read by every client, written by none.
 
-**It is the one public read in `firestore.rules`**, because the forced update
-is read before anyone has signed in. That makes the three email lists below
-world-readable, which is the boundary on what may be added here —
-`docs/rules/BACKEND.md` carries the rule.
+- **It is not a business record**, so it sits under no workspace: nothing in it is a seller's, and two businesses on one build read the same answer.
+- **It is the one public read in `firestore.rules`**: the forced update is read before sign-in. So the three email lists below are world-readable — that limits what may go here (`docs/rules/BACKEND.md`).
 
 | Field | Type | Meaning |
 |---|---|---|
 | `force_update` | map | One block per store — `ios` and `android` |
-| `premium_emails` | string[] | Accounts handed Premium without buying it |
-| `dev_mode_emails` | string[] | Accounts that get the developer affordances in a release build |
+| `premium_emails` | string[] | Accounts given Premium without buying it |
+| `dev_mode_emails` | string[] | Accounts with developer affordances in a release build |
 | `blocked_emails` | string[] | Accounts refused the app |
 | `error_view` | map | A screen shown in place of the whole app |
 
 ## The error view
 
-`error_view` is the owner's remote notice: a screen the app is told to show
-instead of itself, for the hour between a problem and a release that fixes it
-— a migration, an outage, a marketplace that stopped answering. The seller
-reads a sentence somebody wrote rather than five tabs of numbers that are
-quietly untrue.
+`error_view` is the owner's remote notice: a screen the app shows instead of itself, for the hour between a problem and the release that fixes it — a migration, an outage, a marketplace that stopped answering. The seller reads a sentence someone wrote, not five tabs of quietly wrong numbers.
 
 | Field | Type | Meaning |
 |---|---|---|
 | `enable` | bool | The switch. Anything but `true` leaves the app running |
-| `title` | string | The line read first. **Empty shows nothing, switch or no switch** |
+| `title` | string | Read first. **Empty shows nothing, switch or not** |
 | `subtitle_1` | string | What it means for the seller |
-| `subtitle_2` | string | A second, quieter line — what to do, or when to come back. Empty draws no row |
+| `subtitle_2` | string | A quieter second line — what to do, or when to return. Empty draws no row |
 | `type` | string | `warning` or `error`. Anything else reads as `error` |
 
-**It is not about an account.** No email is matched, and no seller is exempt:
-every client on every build shows it, the same way a forced update is about
-the binary rather than the person.
-
-**It is the most dangerous field in the document, and every default is chosen
-for that.** A mistake here blanks the app for everyone at once and there is no
-way to ship them out of it — so a missing block, a block of the wrong type, a
-switch that is not a bool and a title that is not a string all read as
-*showing nothing*. Only `true` beside a non-empty title puts a screen in front
-of anybody; `AppErrorNotice.shows` is where those two conditions are asked,
-once.
-
-**A title on its own is deliberately not enough to be blank.** A notice with
-no words is a screen with no way out, which is worse than the state it was
-turned on to explain.
-
-**Its words are world-readable**, like everything else in this document, and
-that is not a cost here: they are written to be shown to every seller. The
-rule about what may be added is unchanged — `docs/rules/BACKEND.md`.
-
-**It outranks the forced update.** `ErrorNoticeGate` sits above
-`ForceUpdateGate` and replaces its child rather than covering it, so with a
-notice up the router is not built at all.
+- **Not about an account.** No email is matched, no seller exempt: every client on every build shows it — like a forced update, it targets the binary, not the person.
+- **The most dangerous field here; every default reflects that.** A mistake blanks the app for everyone, with no way to ship them out. A missing block, a wrong-typed block, a non-bool switch or a non-string title all mean *show nothing*. Only `true` plus a non-empty title shows a screen; `AppErrorNotice.shows` asks both, once.
+- **A switch with no title shows nothing, on purpose.** A notice with no words is a screen with no way out — worse than the state it explains.
+- **Its words are world-readable**, like the whole document — no cost here, they are written for every seller. What may be added is still `docs/rules/BACKEND.md`.
+- **It outranks the forced update.** `ErrorNoticeGate` sits above `ForceUpdateGate` and replaces its child, so with a notice up the router is never built.
 
 ## The forced update
 
-`force_update` holds one block per store, `ios` and `android`, each the same
-four fields. They are nested under one field rather than sitting loose at the
-top level: a document with `ios` and `android` in it reads as a config *about
-platforms*, when what it holds is one feature that happens to be configured per
-store.
+`force_update` holds one block per store, `ios` and `android`, each with the same four fields.
 
-There is one block per store because the two are never in step: `41` on the App Store and `41` on
-Google Play are different binaries reviewed at different times, so a single
-ceiling for both either stops a release that shipped or lets an old one
-through. The app reads the block for the platform it is running on and never
-looks at the other.
+- Nested under one field, not loose at top level: top-level `ios`/`android` reads as config *about platforms*, when it is one feature configured per store.
+- One block per store because the stores never align: build `41` on the App Store and on Google Play are different binaries reviewed at different times. One ceiling would block a shipped release or let an old one through. The app reads its own platform's block only.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `enable_force_update` | bool | The master switch for this store |
-| `build_number` | int | The build the store is on — the `+41` of `1.4.0+41` |
+| `enable_force_update` | bool | Master switch for this store |
+| `build_number` | int | The store's build — the `+41` of `1.4.0+41` |
 | `build_name` | string | The version the seller recognises. Shown, never compared |
-| `store_link` | string | Where the seller is sent to update |
+| `store_link` | string | Where the seller goes to update |
 
-**The switch is checked before the number, and that is the point of having
-both.** The owner keeps `build_number` current as a matter of routine and
-turns `enable_force_update` on deliberately, once, when a build really cannot
-be left running. Raising the build alone forces nothing.
+- **The switch is checked before the number — that is why both exist.** The owner keeps `build_number` current routinely and turns `enable_force_update` on once, when a build truly cannot keep running. Raising the build alone forces nothing.
+- **A build number, never a version string**: the stores already order by this monotonic integer, so the check is `<` alone. `1.10.0` vs `1.9.0` is exactly where a hand-written semver comparator fails. `build_name` is display only; the app never parses it.
+- `store_link` is configured, not compiled in: a broken link must be fixable without a release — the one thing a forced-update prompt cannot ask for. Null draws no button rather than a dead one.
+- **The UI is an undismissable bottom sheet, not a route.** `ForceUpdateGate` wraps the app and draws over whatever is on screen: no `/update-required` path, no redirect, no modal route, no back stack to unwind when config is fixed. Why: `docs/rules/DECISIONS.md` § The forced update is a sheet.
 
-**A build number, never a version string**: it is the monotonic integer the
-stores already order by, so the comparison is `<` and nothing else, where
-`1.10.0` against `1.9.0` is exactly where a hand-written semver comparator is
-wrong. `build_name` is display only — the sheet names a version the seller
-recognises, and the app never parses it.
+**A missing document, missing field, mistyped value or failed read all resolve to `AppConfig.fallback`.** The document is hand-edited, so a typo is the likely failure; each field falls back the safe way:
 
-`store_link` is configured rather than compiled in, because a broken store
-link must be fixable without shipping a release — which is the one thing a
-forced-update prompt cannot ask for. Null leaves the sheet without a button
-rather than drawing one that does nothing.
-
-**The UI is a bottom sheet nothing dismisses, and it is not a route at all.**
-`ForceUpdateGate` wraps the whole app and draws it over whatever is on screen;
-there is no `/update-required` path, no redirect, no modal route and no back
-stack to unwind when the config is corrected. `docs/rules/DECISIONS.md` § The forced update is a sheet
-carries why.
-
-**A missing document, a missing field, a mistyped value or a failed read all
-resolve to `AppConfig.fallback`.** The document is edited by hand, so a typo
-is the likely failure — and each field falls back in the safe direction for
-what it controls:
-
-| Field | Falls back to | Why that way |
+| Field | Falls back to | Why |
 |---|---|---|
-| `force_update` | forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out of it |
-| every email list | empty | Nobody is refused the app over a read that failed, and nobody is handed a grant the owner did not type |
+| `force_update` | Forcing nothing | A wrong answer locks every seller out of an app they cannot fix, with no way to ship them out |
+| Every email list | Empty | Nobody is refused over a failed read; nobody gets a grant the owner did not type |
 
-The forced-update and blocked gates also have **no loading state**: until an
-answer arrives the build counts as new enough and the account counts as
-allowed, so neither check can be the reason the app will not start. A build the
-platform plugin could not name counts as newer than any ceiling, for the same
-reason.
+The forced-update and blocked gates have **no loading state**: until an answer arrives the build counts as new enough and the account as allowed, so neither check can stop the app starting. A build the platform plugin cannot name counts as newer than any ceiling, for the same reason.
 
 ## The three email lists
 
-Each is an array of plain addresses, **lowercased and trimmed on read** — the
-document is typed by hand, so ` Owner@Gmail.com ` is the expected shape of a
-correct entry and a case-sensitive comparison would silently match nobody.
-Anything that is not a list of non-empty strings reads as no entries.
+Each is an array of plain addresses, **lowercased and trimmed on read**: the document is hand-typed, so ` Owner@Gmail.com ` is a normal correct entry and a case-sensitive match would silently hit nobody. Anything but a list of non-empty strings reads as no entries.
 
-| List | What it changes | Where |
+| List | Effect | Where |
 |---|---|---|
-| `premium_emails` | `currentPlanProvider` answers Premium, so every ceiling and capability opens | `premiumGrantedByEmailProvider` |
-| `dev_mode_emails` | More's dev rows, mock data and the demo seed appear in a **release** build | `devModeEnabledProvider` |
-| `blocked_emails` | The account is sent to `/blocked` and can do nothing but sign out | `accountBlockedProvider` |
+| `premium_emails` | `currentPlanProvider` answers Premium; every ceiling and capability opens | `premiumGrantedByEmailProvider` |
+| `dev_mode_emails` | More's dev rows, mock data and demo seed appear in a **release** build | `devModeEnabledProvider` |
+| `blocked_emails` | The account goes to `/blocked` and can only sign out | `accountBlockedProvider` |
 
-`premium_emails` is a **grant, never a record of a purchase**: the
-`subscription` row stays the honest answer to what the seller actually bought,
-so a screen saying so on screen reads that and not this.
+- `premium_emails` is a **grant, never a purchase record**: the `subscription` row stays the true answer to what the seller bought, and a screen showing that reads the row.
+- `dev_mode_emails` broke an old guarantee: a `const` used to tree-shake the mock branch out of release binaries; now it ships, because an email list is a release-build grant by definition. See `docs/rules/DECISIONS.md` § Dev mode is granted by email.
+- `blocked_emails` is a **UI gate, not a permission**. A blocked account still holds a valid token; `firestore.rules` does not know the list. Anything that must be refused is refused there, or by disabling the account in the Firebase console.
+- **Every signed-in account can read all three**: the rule allows any signed-in read, a rule cannot filter fields, and a client must check its own address. Keep the lists short and nothing in them that must stay private — `docs/rules/DECISIONS.md` § The block list is a UI gate has the reasoning and the alternative.
 
-`dev_mode_emails` is the one that changed an existing guarantee — the mock
-branch used to be tree-shaken out of a release binary by a `const` and now is
-not, because an email list is a release-build grant by definition. See
-`docs/rules/DECISIONS.md` § Dev mode is granted by email.
+`firestore.rules` allows any signed-in read and no write — a client that could write this could switch off its own paywall.
 
-`blocked_emails` is a **UI gate, not a permission**. A blocked account still
-holds a valid token; `firestore.rules` does not know the list exists. Anything
-that must actually be refused is refused there, or by disabling the account in
-the Firebase console.
-
-**Every signed-in account can read all three**, because the rule below allows
-any signed-in read, a rule cannot filter fields, and a client has to be able to
-check its own address. Keep the lists short and do not put anything in them
-that must not be public — `docs/rules/DECISIONS.md` § The block list is a UI
-gate carries the reasoning and what was chosen over it.
-
-`firestore.rules` allows any signed-in read and no write at all — a client
-that could write this could switch off its own paywall.
-
-The whole document, with every field filled in:
+The whole document, every field filled in:
 
 ```json
 {
@@ -341,13 +243,8 @@ The whole document, with every field filled in:
 }
 ```
 
-Every field is optional. An absent one reads as the fallback above, so the
-smallest document that does anything is a single key.
-
-The same document is kept as a file at `sample_data/app_config/current.json`,
-which is what to copy when creating it in the console.
+Every field is optional; an absent one reads as its fallback, so the smallest useful document is one key. The same document is `sample_data/app_config/current.json` — copy it when creating the document in the console.
 
 ## Indexes
 
-`firestore.indexes.json` is the index authority. Add an index in the same
-change as the query that requires it.
+`firestore.indexes.json` is the index authority. Add an index in the same change as the query that needs it.

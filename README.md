@@ -17,8 +17,7 @@ SOURCE → PURCHASE → INVENTORY → LIST → SELL → SHIP → PROFIT → ANAL
 
 ## Setup
 
-Requirements: [FVM](https://fvm.app) and `make`. Commands come from the
-`packages/script-tools` submodule; `make` lists them.
+Needs [FVM](https://fvm.app) and `make`. Commands come from the `packages/script-tools` submodule; `make` lists them.
 
 ```sh
 git submodule update --init
@@ -26,8 +25,7 @@ fvm install
 make set-up
 ```
 
-Firebase and store accounts are not included in the repository. See
-[`docs/release/RELEASE_ACTIONS.md`](docs/release/RELEASE_ACTIONS.md) before connecting a real backend.
+Firebase and store accounts are not in the repo. Read [`docs/release/RELEASE_ACTIONS.md`](docs/release/RELEASE_ACTIONS.md) before connecting a real backend.
 
 ## Daily commands
 
@@ -38,7 +36,7 @@ Firebase and store accounts are not included in the repository. See
 | Test one file | `make test TEST=<path>` |
 | Build checks | `make pre-build` |
 
-Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
+Every command in detail: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 
 ## App identifiers
 
@@ -68,8 +66,6 @@ make release-dev
 make release-prod
 ```
 
-Config, Firebase and TestFlight in that order, and it stops at the first
-failure. Add a TestFlight note with `make release-prod NOTE="what changed"`.
+Runs config, Firebase, then TestFlight, and stops at the first failure. Add a TestFlight note with `make release-prod NOTE="what changed"`.
 
-Do not archive from Xcode. The release lane supplies the build-time
-configuration required by Firebase.
+Never archive from Xcode: only the release lane supplies the build-time config Firebase needs.

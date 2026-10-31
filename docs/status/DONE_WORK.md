@@ -1,41 +1,40 @@
 # Built
 
-“Built” means implemented and covered by the mock or Firestore repository. It
-does not mean production-verified; see [`docs/release/RELEASE_ACTIONS.md`](../release/RELEASE_ACTIONS.md).
+“Built” means implemented and backed by the mock or Firestore repository — not verified in production ([`RELEASE_ACTIONS.md`](../release/RELEASE_ACTIONS.md)).
 
 | Area | Included | External dependency |
 |---|---|---|
-| Onboarding and auth | One-time intro, Apple/Google sign-in, guest mode with a local store, sign-out, account deletion | Firebase and provider setup |
-| Home | Attention queue, overview, recent activity, Quick Access, Premium banner, an info button opening About | Functions for live notifications |
-| Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, categories and locations created inline, buying-trip link, bulk actions including bulk listing and filing under a trip | Firebase Storage for uploads |
-| Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import, supplier orders for dropship sales with tracking, refunds, days waiting and estimated arrival, search by item, buyer, order number, tracking or platform | None for manual records |
-| Sourcing | Sources, purchases, items filed under a purchase, receipt apportioned across them, ROI ranking, buy calculator, dropship suppliers and their products, List it as a dropship item, primary and backup supplier per item | None |
-| Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end, pricing rules applied in bulk, price history per item | No marketplace publishing yet; see `docs/plans/DROPSHIPPING_PLAN.md` |
+| Onboarding and auth | One-time intro, Apple/Google sign-in, guest mode on a local store, sign-out, account deletion | Firebase and provider setup |
+| Home | Attention queue, overview, recent activity, Quick Access, Premium banner, info button to About | Functions for live notifications |
+| Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, inline categories and locations, buying-trip link, bulk actions incl. bulk listing and filing under a trip | Firebase Storage for uploads |
+| Orders | Record a sale with platform order number and optional payout; bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import; dropship supplier orders with tracking, refunds, days waiting, estimated arrival; search by item, buyer, order number, tracking or platform | None for manual records |
+| Sourcing | Sources, purchases, items filed under a purchase, receipt split across them, ROI ranking, buy calculator, dropship suppliers and products, List it as a dropship item, primary and backup supplier per item | None |
+| Listings | Marketplace prices, cross-listing onto the business's marketplaces, bulk mark-live/reprice/pause/end, bulk pricing rules, price history per item | No marketplace publishing yet (`docs/plans/DROPSHIPPING_PLAN.md`) |
 | Marketplaces | Seller-owned records, fee estimate, defaults, soft delete | None |
 | Carriers | Business-owned records, defaults, soft delete | None |
-| Analytics | Sales, profit, inventory, marketplace, category and source views; a dropship view splitting stocked from dropshipped, ranking dropship products and timing suppliers; a custom range of days beside the fixed periods | None |
+| Analytics | Sales, profit, inventory, marketplace, category and source views; dropship view (stocked vs dropshipped, product ranking, supplier timing); custom day range beside fixed periods | None |
 | Expenses and receipts | Add/list/delete, category totals, file upload | Firebase Storage for uploads |
-| Reports and tax | CSV exports and the one-action tax pack, both Premium; US and UK summaries and mileage; Close the books | Rates require seasonal review |
-| Search | Items, orders, listings and sources | None |
-| Workspace and team | Create, switch, delete, invite, role and member management | Team actions require deployed Functions |
-| Notifications | Inbox, unread state, FCM registration, event pushes, per-workspace-timezone digest, twelve types with a switch each | Functions, APNs and Scheduler |
-| Subscription | Everything free except export (every CSV and the tax pack); ceiling machinery kept with Free set to unlimited; monthly/yearly/lifetime paywall, restore, management screen | RevenueCat and webhook setup |
-| More → General | One section, first on More, replacing the Settings screen: account / sign in, subscription, theme, language, notifications, about (a reselling and a dropshipping guide), contact support, sign out, delete account; seed demo data and delete all data in dev mode | None |
-| More → Sync status | Card heading More: synced, syncing (writes still queued), or on this device only for a guest | None |
+| Reports and tax | CSV exports and one-action tax pack, both Premium; US and UK summaries and mileage; Close the books | Rates need seasonal review |
+| Search | Items, orders, listings, sources | None |
+| Workspace and team | Create, switch, delete, invite, roles, members | Team actions need deployed Functions |
+| Notifications | Inbox, unread state, FCM registration, event pushes, digest in the workspace's timezone, twelve types each with a switch | Functions, APNs, Scheduler |
+| Subscription | All free except export (every CSV and the tax pack); ceiling machinery kept, Free set to unlimited; monthly/yearly/lifetime paywall, restore, management screen | RevenueCat and webhook setup |
+| More → General | First section on More, replaces Settings: account / sign in, subscription, theme, language, notifications, about (reselling and dropshipping guides), support, sign out, delete account; dev mode adds seed demo data and delete all data | None |
+| More → Sync status | Card at the top of More: synced, syncing (writes queued), or this device only for a guest | None |
 
 ## Platform foundations
 
 | Foundation | State |
 |---|---|
-| Money | Integer minor units; derived profit, margin and ROI; an unreported platform fee leaves the order's profit blank — never estimated, never zeroed (hard rule 3) |
+| Money | Integer minor units; profit, margin, ROI derived; an unreported platform fee leaves profit blank — never estimated, never zeroed (hard rule 3) |
 | Missing values | Render as `—`, never `0` |
 | Errors | Mapped to `AppFailure`; technical messages stay out of UI |
-| Localization | Seven locales ship — en, es, fr, de, pt, zh, vi — every ARB complete and pinned by a test |
+| Localization | Seven locales — en, es, fr, de, pt, zh, vi — every ARB complete, pinned by a test |
 | Design system | v3, light/dark themes, shared spacing and chrome |
-| Backend | Firestore repositories, rules, indexes and Cloud Functions written |
+| Backend | Firestore repositories, rules, indexes, Cloud Functions written |
 | Deep links | `selleros://` registered on iOS and Android |
-| CI | App analysis/tests plus Functions lint/build/rules tests |
-| Store assets | App icons, launch screen and iOS permission descriptions |
+| CI | App analyze/tests; Functions lint/build/rules tests |
+| Store assets | App icons, launch screen, iOS permission strings |
 
 ## Manual release checks
 
@@ -43,9 +42,9 @@ does not mean production-verified; see [`docs/release/RELEASE_ACTIONS.md`](../re
 |---|---|
 | Apple and Google sign-in | Store-signed real devices |
 | Fresh workspace creation | Real Firebase project |
-| Invite, role change and removal | Two real accounts after Functions deploy |
+| Invite, role change, removal | Two real accounts after Functions deploy |
 | Push delivery and deep-link tap | Real iOS and Android devices |
-| Offline write behavior | Airplane mode |
-| Missing-cost financial display | Any build |
-| Bulk actions with 20+ records | Any build |
+| Offline writes | Airplane mode |
+| Missing-cost figures | Any build |
+| Bulk actions on 20+ records | Any build |
 | Dark cold start | Real device in dark mode |

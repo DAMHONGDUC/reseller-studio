@@ -37,5 +37,4 @@ bundle exec fastlane preflight
 CI=true bundle exec fastlane preflight
 ```
 
-The first checks the local path; the second checks CI-only behavior without
-uploading a build.
+The first checks the local path; the second checks CI-only behavior with no upload.

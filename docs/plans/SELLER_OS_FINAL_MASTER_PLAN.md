@@ -8,7 +8,7 @@
 
 ## 1. Product Vision
 
-Reseller Studio is a seller operating system, not just an inventory tracker.
+Reseller Studio is a seller operating system, not an inventory tracker.
 
 Core lifecycle:
 
