@@ -1,25 +1,17 @@
 # Design system — `system_design` v3
 
-Read this when touching `packages/flutter-system-design-kit/`, or when building any screen
-or widget that renders `Sd*` v3 components.
+Read when touching `packages/flutter-system-design-kit/`, or building any screen or widget that renders `Sd*` v3 components.
 
 ## `system_design` — the design system is a separate package
 
-Tokens and string-free widgets live in `packages/flutter-system-design-kit`, a **separate
-git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired
-in as a path dependency. There are two imports and no others — the index for
-anything with a look, and `common.dart` for the shared app infrastructure that
-has none:
+Tokens and string-free widgets live in `packages/flutter-system-design-kit`, a **separate git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired in as a path dependency. Two imports, no others — the index for anything with a look, `common.dart` for shared app infrastructure with none:
 
 ```dart
 import 'package:system_design/index.dart';   // tokens and widgets
 import 'package:system_design/common.dart';  // SdLogger, SdCrashReporter
 ```
 
-**`common.dart` is pure Dart on purpose** — it exports no widget, so a
-feature's `domain/` can log without importing Flutter. `index.dart` re-exports
-it, so a widget file that already imports the index has `SdLogger` and never
-needs both lines.
+**`common.dart` is pure Dart on purpose** — it exports no widget, so a feature's `domain/` can log without importing Flutter. `index.dart` re-exports it, so a widget file importing the index already has `SdLogger` and never needs both lines.
 
 **The package holds two generations and Reseller Studio renders on v3.**
 
@@ -33,69 +25,23 @@ needs both lines.
 
 ### The tab bar is liquid glass and that makes its geometry layout
 
-`SdBottomNavigationV3` is the complete tab frame: it owns the extended
-scaffold, `SdFloatingBarScopeV3`, swipe handling and `SdGlassNavBarV3`.
-`AppShell` supplies app routes and localized labels only; rebuilding the frame
-there would leave swipe and glass clearance as app-specific behaviour.
+`SdBottomNavigationV3` is the complete tab frame: it owns the extended scaffold, `SdFloatingBarScopeV3`, swipe handling and `SdGlassNavBarV3`. `AppShell` supplies only app routes and localized labels; rebuilding the frame there would make swipe and glass clearance app-specific.
 
-Horizontal swipes move one adjacent tab. A horizontal scrollable inside a tab
-wins Flutter's gesture arena, so filter strips and carousels keep their own
-gesture; a swipe at either end does nothing. Taps and swipes call the same
-`onSelected` callback, which keeps routing and analytics on one path.
+A horizontal swipe moves one adjacent tab. A horizontal scrollable inside a tab wins Flutter's gesture arena, so filter strips and carousels keep their gesture; a swipe at either end does nothing. Taps and swipes call the same `onSelected`, keeping routing and analytics on one path.
 
-`SdGlassNavBarV3` floats over the content in the iOS 26 idiom — a detached
-superellipse pill the body scrolls behind and refracts through. Three things
-follow, and missing any one of them looks like a bug:
+`SdGlassNavBarV3` floats over content in the iOS 26 idiom — a detached superellipse pill the body scrolls behind and refracts through. Three things follow; missing any looks like a bug:
 
-1. **`SdScaffoldV3` must be given `extendBody: true`** wherever that bar is
-   used, or the scaffold reserves its height and the glass refracts a blank
-   strip of page.
-2. **Every tab screen pads by `floatingNav: true`** —
-   `SdContentPaddingV3.screen(context, floatingNav: true)` or `.fullBleed(…)`.
-   That number is `floatingBarInset`, and it lives in one place because a bar
-   and the padding beneath it drifting apart is exactly what happens
-   otherwise. Pushed detail routes have nothing floating over them and must
-   *not* pass it.
-3. **A FAB needs lifting by `floatingBarInset` itself.** `extendBody` keeps
-   the FAB in the body's coordinate space rather than stacking it above the
-   bottom slot, so without the lift it renders *behind* the glass.
+1. **Give `SdScaffoldV3` `extendBody: true`** wherever that bar is used, or the scaffold reserves its height and the glass refracts a blank strip of page.
+2. **Every tab screen pads by `floatingNav: true`** — `SdContentPaddingV3.screen(context, floatingNav: true)` or `.fullBleed(…)`. That number is `floatingBarInset`, kept in one place because otherwise a bar and the padding beneath it drift apart. Pushed detail routes have nothing floating over them and must *not* pass it.
+3. **A FAB must be lifted by `floatingBarInset` itself.** `extendBody` keeps the FAB in the body's coordinate space instead of stacking it above the bottom slot, so unlifted it renders *behind* the glass.
 
-**A detail screen has no bottom nav at all.** Owner's rule. A route nested in
-a `StatefulShellBranch` is pushed onto that *branch's* navigator by default,
-so the shell and its bar stay drawn over it — "pushed route" is not the same
-as "no bar", and that is exactly why Expenses and Categories had rows sitting
-under the glass. Every route under a tab therefore names
-`parentNavigatorKey: AppNavigatorKey.root`, which pushes it above the shell.
-Only the five branch roots keep the bar.
-`test/core/router/detail_routes_leave_the_shell_test.dart` walks the route
-tree and names any route that forgot.
+**A detail screen has no bottom nav at all.** Owner's rule. A route nested in a `StatefulShellBranch` is pushed onto that *branch's* navigator by default, so the shell and its bar stay drawn over it — "pushed route" is not "no bar", which is why Expenses and Categories had rows under the glass. So every route under a tab names `parentNavigatorKey: AppNavigatorKey.root`, pushing it above the shell. Only the five branch roots keep the bar. `test/core/router/detail_routes_leave_the_shell_test.dart` walks the route tree and names any route that forgot.
 
-**No content in this app is ever covered by the bottom nav — the screens with
-the floating add button included.** Owner's rule, and it is the *outcome* the
-three points above exist to produce, stated separately because they are the
-mechanism and this is the promise. The clearance under the last row is
-`bottomGap`, which is the same value `SdContentPaddingV2.bottomGap` uses so
-the two generations end a list with identical air.
+**The bottom nav never covers content — screens with the floating add button included.** Owner's rule: the *outcome* the three points above produce, stated apart because they are the mechanism and this is the promise. The clearance under the last row is `bottomGap`, the same value as `SdContentPaddingV2.bottomGap`, so both generations end a list with identical air.
 
-- A screen with the FAB clears the button **as well as** whatever is under it,
-  through `AppAddFabScaffold.listPadding` — every such screen uses it rather
-  than padding by hand, Inventory's sliver included.
-  **`kFloatingActionButtonMargin` is a term in that sum, not a rounding
-  error.** `Scaffold` adds its own margin under a FAB whatever the caller
-  does, so a clearance of `inset + SdFabV3.size` is short by exactly 16 — that
-  is what put the last row of Expenses behind the button while four sibling
-  screens with shorter lists looked fine.
-- **A centred widget has to be told too.** `SdEmptyStateV3` centres itself,
-  and on a tab screen the body it centres in runs under the glass — so it
-  reads `SdFloatingBarScopeV3` and pads its own bottom by `floatingBarInset`.
-  Nothing centred in a tab body may skip this; centring against a height the
-  seller cannot fully see puts the message low and its last line behind the
-  bar.
-- `test/core/widgets/content_clears_nav_bar_test.dart` scrolls all five tabs
-  to the end and measures the last row. **It picks the *vertical* `Scrollable`
-  on purpose** — Orders and Inventory put a horizontal chip row above the
-  list, so `find.byType(Scrollable).first` is that strip, dragging it
-  vertically scrolls nothing, and the assertion passes for the wrong reason.
+- A screen with the FAB clears the button **and** whatever is under it, through `AppAddFabScaffold.listPadding` — every such screen uses it instead of padding by hand, Inventory's sliver included. **`kFloatingActionButtonMargin` is a term in that sum, not a rounding error.** `Scaffold` adds its own margin under a FAB whatever the caller does, so `inset + SdFabV3.size` falls short by exactly 16 — what put Expenses' last row behind the button while four sibling screens with shorter lists looked fine.
+- **A centred widget must be told too.** `SdEmptyStateV3` centres itself, and on a tab screen its body runs under the glass — so it reads `SdFloatingBarScopeV3` and pads its own bottom by `floatingBarInset`. Nothing centred in a tab body may skip this: centring against a height the seller cannot fully see puts the message low and its last line behind the bar.
+- `test/core/widgets/content_clears_nav_bar_test.dart` scrolls all five tabs to the end and measures the last row. **It picks the *vertical* `Scrollable` on purpose** — Orders and Inventory put a horizontal chip row above the list, so `find.byType(Scrollable).first` is that strip; dragging it vertically scrolls nothing, and the assertion passes for the wrong reason.
 
 **The bar follows the iOS system Liquid Glass tab bar** — owner's rule, and it
 decides the arguments the look would otherwise keep re-opening:
@@ -175,24 +121,12 @@ to say what the seller learned on their second launch.
 
 #### The selected capsule is a tinted thumb inside the glass bar
 
-Owner's rule, taken from the reference switcher. The bar is the one Liquid
-Glass surface; the selected segment is a **tinted `DecoratedBox`** sliding
-inside it. A second Liquid Glass layer made the active segment too subtle over
-light content, so it stopped reading as a switcher.
+Owner's rule, from the reference switcher. The bar is the one Liquid Glass surface; the selected segment is a **tinted `DecoratedBox`** sliding inside it. A second Liquid Glass layer made the active segment too subtle over light content, so it stopped reading as a switcher.
 
-Two things follow:
+Three things follow:
 
-- **The thumb uses the primary colour at `selectedThumbOpacity`.** It is clear
-  enough to mark the selected icon without becoming a solid Material button.
-  The filled glyph is the second signal, so colour is never the only one.
-- **It slides; it does not fade in and out.** One thumb moving is what says the
-  tabs are one control. `SdMotionV3.normal` on `SdMotionV3.emphasized` moves
-  it from the current segment to the next, and a re-tap does nothing.
-- **It slides; it does not fade in and out.** One capsule moving is what says
-  the tabs are one row. `SdMotionV3.normal` on `SdMotionV3.emphasized` — the
-  motion enters and leaves in one animation, so `standard` would land it
-  abruptly. Tapping mid-flight redirects the capsule from where it *is*, not
-  from the tab it was heading to.
+- **The thumb is the primary colour at `selectedThumbOpacity`.** Clear enough to mark the selected icon without becoming a solid Material button. The filled glyph is the second signal, so colour is never the only one.
+- **It slides; it never fades in and out.** One thumb moving says the tabs are one control. `SdMotionV3.normal` on `SdMotionV3.emphasized` — the motion enters and leaves in one animation, so `standard` would land it abruptly. A re-tap does nothing; a tap mid-flight redirects the thumb from where it *is*, not the tab it was heading to.
 - **It stays one segment wide while it slides.** The icon-only bar has no
   label to make room for, so a stretch is unrelated motion. `AnimatedAlign`
   moves the capsule; `FractionallySizedBox` keeps it at `1 / count` of the
@@ -207,13 +141,7 @@ visible pill from the screen edges while every equal segment remains a full
 touch target. Compactness comes from the chrome's height, never from shrinking
 the icon or its tappable region.
 
-**The glass is tuned sheer and refractive, not frosted** — owner's rule, and
-it is the one that decides how the bar is read at a glance. A high-alpha fill
-with a heavy blur is a frosted panel: it says "surface", and the page under it
-stops existing. The tuning is the other way — a low `glassColor` alpha, a
-thick pane at a real `refractiveIndex`, and enough `lightIntensity` for the
-specular rim to draw the shape's edge. What keeps the labels legible is the
-blur plus that rim, never opacity.
+**The glass is tuned sheer and refractive, not frosted** — owner's rule, deciding how the bar reads at a glance. A high-alpha fill with heavy blur is a frosted panel: it says "surface", and the page under it stops existing. The tuning goes the other way — low `glassColor` alpha, a thick pane at a real `refractiveIndex`, enough `lightIntensity` for the specular rim to draw the edge. Blur plus that rim keep the labels legible, never opacity.
 
 **`chromaticAberration` stays 0 on this bar.** It sits over columns of money,
 and colour fringing on small tabular figures is the fastest way to make a
@@ -228,23 +156,10 @@ clearance for a tighter bar; that trade is documented on the getter.
 
 Owner's rules, all of them read from one place so no screen types them:
 
-- **The gap from the app bar down to the content under it is
-  `SdContentPaddingV3.topGap`.** Owner's rule. The bar already carries a band
-  of empty space at its own bottom edge, the more so now it is a full
-  `kToolbarHeight` — anything more under it reads as a hole between the chrome
-  and the page.
-- **`topGap` is a `SizedBox` the screen places, never padding and never added
-  to a bar's height.** Owner's rule. `screen()` and `fullBleed()` therefore
-  carry **no top inset**, and `SdAppBarV3.toolbarHeight + topGap` is a sum
-  that must not appear anywhere. A gap folded into an `EdgeInsets` is
-  invisible at the call site; a gap added to the toolbar height makes the bar
-  *measure* taller than it *draws*, which is how a docked control ends up
-  mis-set in a row whose height nobody can point at. A box in the tree can be
-  seen, moved and skipped. `SdSearchHeaderV3` keeps its own internal spacing
-  on `SdSearchHeaderMetricsV3` for the same reason — the distance between two
-  things **the header itself draws** is not the screen's `topGap`, even at the
-  same value. Read the emphasis: it once carried a `stripGap` for the filter
-  strip, which the header does *not* draw, and that gap was then placed twice.
+- **The gap from the app bar to the content under it is `SdContentPaddingV3.topGap`.** Owner's rule. The bar already carries a band of empty space at its bottom edge, more so at a full `kToolbarHeight` — anything more reads as a hole between chrome and page.
+- **`topGap` is a `SizedBox` the screen places — never padding, never added to a bar's height.** Owner's rule. So `screen()` and `fullBleed()` carry **no top inset**, and the sum `SdAppBarV3.toolbarHeight + topGap` must appear nowhere.
+  - A gap folded into an `EdgeInsets` is invisible at the call site; one added to the toolbar height makes the bar *measure* taller than it *draws* — how a docked control ends up mis-set in a row whose height nobody can point at. A box in the tree can be seen, moved and skipped.
+  - `SdSearchHeaderV3` keeps its internal spacing on `SdSearchHeaderMetricsV3` for the same reason: the distance between two things **the header itself draws** is not the screen's `topGap`, even at the same value. Note the emphasis: it once carried a `stripGap` for the filter strip, which the header does *not* draw, and that gap was placed twice.
 - **A filter strip is never part of the app bar, and it stays put while the
   list scrolls.** Owner's rules, and they are not in tension: the strip is its
   own widget below the chrome with the body's background, and it is *pinned*
@@ -264,17 +179,7 @@ Owner's rules, all of them read from one place so no screen types them:
   - **This reverses the earlier "a filter row is content, and content
     scrolls".** Chips a seller cannot reach 300 rows down are chips they
     scroll back up for, which is the cost the docking header exists to avoid.
-- **A filter strip carries no gap of its own and fits its chips exactly, and
-  the screen places `topGap` above it and the same below.** Owner's rule, and
-  it is the one-owner rule applied to the one widget that kept breaking it.
-  `AppFilterStrip` (`core/widgets/`) is that strip — every screen uses it,
-  none builds its own. There is **no `filterStrip` height and no
-  `filterStripGap`**: both were deleted, because a fixed-height box with an
-  internal vertical inset means the daylight above a chip is built from two
-  numbers owned by two files. A `Row` inside a horizontal scroll view has
-  exactly the height of its chips and no opinion about what is above or below
-  it. `test/core/widgets/filter_strip_gap_test.dart` measures the chip
-  against the strip's own edges, so any padding creeping back in fails.
+- **A filter strip has no gap of its own and fits its chips exactly; the screen places `topGap` above it and the same below.** Owner's rule — the one-owner rule applied to the one widget that kept breaking it. `AppFilterStrip` (`core/widgets/`) is that strip; every screen uses it, none builds its own. **No `filterStrip` height or `filterStripGap` exists**: both were deleted, because a fixed-height box with an internal vertical inset builds the daylight above a chip from two numbers in two files. A `Row` in a horizontal scroll view is exactly its chips' height, with no opinion on what is above or below. `test/core/widgets/filter_strip_gap_test.dart` measures the chip against the strip's edges, so creeping padding fails.
 - **The app bar follows the system, `kToolbarHeight`** —
   `SdAppBarV3.toolbarHeight`. Owner's rule. It was shorter for a while, on the
   reasoning that every point of chrome on every route is a row of inventory;
@@ -551,16 +456,9 @@ below for why they are not repeated here.
 | `button` | the one padding every button variant wears, so filled, outlined and text buttons never come out different sizes next to each other |
 | `card`, `row` | the inside of a card, and of a list row that is not one |
 | `rowNoGutter` | a row inside something that already carries the gutter — the vertical rhythm only, derived from `row` so the two cannot drift |
-| `filterStrip`, `filterStripGap` | the chip strip's height and its internal air |
 | `pinnedActionsGap` | above a pinned bottom action. Its own field, not `bottomGap`: that one is the air *below* the last item, and pinning created a second edge on the side the content arrives from |
 
-**A section heading sits on its card's left edge, and the bottom of
-`sectionHeader` holds it off that card.** Owner's rule, and it replaces the
-old `gutter` flag. The heading used to pay the screen's gutter itself, so in
-every list that already held one it sat 16 further in than the card under
-it — a caller had to remember `gutter: false`, and most did not.
-`SdSectionHeaderV3` now carries no horizontal inset at all and follows the
-next section's rule: whatever pads the card pads the heading.
+**A section heading sits on its card's left edge; the bottom of `sectionHeader` holds it off that card.** Owner's rule, replacing the old `gutter` flag. The heading used to pay the screen's gutter itself, so in every list already holding one it sat 16 further in than its card — callers had to remember `gutter: false`, and most did not. `SdSectionHeaderV3` now has no horizontal inset and follows the next section's rule: whatever pads the card pads the heading.
 
 - **A heading over one card is `AppSection`, never the two assembled by
   hand.** Owner's rule. `AppSection.rows` for a card of `AppListRow`s, the
@@ -616,10 +514,7 @@ cost a real bug: see the snackbar entry under "Snackbars, dialogs and sheets".
 
 ### Every spacing refers to one value, and exactly one owner places it
 
-Owner's rule, and the widest of the spacing rules — the ones below sharpen it
-rather than compete with it. **No gap is ever built by adding two numbers
-that both mean "the space here".** A distance with two owners is a distance
-that drifts, and it drifts invisibly: each file looks right on its own.
+Owner's rule, the widest spacing rule — those below sharpen it. **No gap is ever built by adding two numbers that both mean "the space here".** A distance with two owners drifts, invisibly: each file looks right alone.
 
 - **A boundary belongs to one side of it.** The filter strip sits in the
   body, so the *screen* places `topGap` in front of it.
@@ -636,11 +531,7 @@ that drifts, and it drifts invisibly: each file looks right on its own.
 
 ### A shared widget carries no gutter — the screen placing it does
 
-Owner's rule, and it is what killed `PlanLimitMeters.hasHorizontalPadding`. A
-widget that pads its own sides sits at twice `horizontal` inside a list that
-already holds a gutter, and flush against the edge inside one that does not —
-and no flag makes one widget right in both places. `ItemCard` and `AppListRow`
-have always worked this way; anything reusable follows them.
+Owner's rule; it killed `PlanLimitMeters.hasHorizontalPadding`. A widget padding its own sides sits at twice `horizontal` in a list that already holds a gutter, and flush against the edge in one that does not — no flag makes one widget right in both. `ItemCard` and `AppListRow` always worked so; anything reusable follows them.
 
 - **A scroll view gives everything below the chrome ONE gutter.** Inventory
   wraps its content slivers in a single `SliverPadding` over a
@@ -657,10 +548,7 @@ have always worked this way; anything reusable follows them.
 
 ### A gap belongs to the item BELOW it, never the one above
 
-Owner's rule, and it is the sharper half of "a boundary belongs to one side of
-it" — it says *which* side. **A widget never pads its own bottom to hold a
-sibling off.** `topGap`, `listItemGap`, `sectionGap`: whatever the distance
-means, the thing underneath owns it.
+Owner's rule, the sharper half of "a boundary belongs to one side" — it says *which*. **A widget never pads its own bottom to hold a sibling off.** `topGap`, `listItemGap`, `sectionGap`: whatever the distance means, the thing underneath owns it.
 
 - **`padding: EdgeInsets.only(bottom: gap)` on an upper sibling is the shape
   this rule forbids.** `PlanLimitMeters` padded its own bottom to stand off
@@ -833,16 +721,9 @@ means, the thing underneath owns it.
 
 ## Forms and input
 
-Owner's rules. Every one of them is something a seller read wrong, so each is
-fixed in a single owner rather than at the call sites that got it wrong.
+Owner's rules. Each is something a seller read wrong, so each is fixed in one owner, not at the call sites that got it wrong.
 
-- **Every field that accepts money formats grouping separators while the
-  seller types.** `MoneyField` owns that behavior for the whole app: call
-  sites provide the currency and parse its normalized text with `Money`, but
-  never implement their own formatter. Existing values are formatted when
-  loaded as well, so an edit form and a create form do not display the same
-  amount differently. The formatter preserves the currency's decimal limit,
-  cursor position and the distinction between an empty value and zero.
+- **Every money field formats grouping separators as the seller types.** `MoneyField` owns this app-wide: call sites give the currency and parse its normalized text with `Money`, never writing their own formatter. Loaded values are formatted too, so edit and create forms show the same amount alike. The formatter keeps the currency's decimal limit, the cursor position, and the difference between empty and zero.
 
 - **Anywhere a keyboard can open, a tap outside the field closes it.** Wired
   once in `SdKeyboardDismissV3`, which `SdScaffoldV3` and `SdBottomSheetV3`
@@ -882,28 +763,15 @@ fixed in a single owner rather than at the call sites that got it wrong.
 
 ## Snackbars, dialogs and sheets
 
-All three are built in `v3/` and in use across the app. **Never reach into
-`v2/` for them** (hard rule 17), and never call the raw Flutter API as a
-stopgap — a stopgap is how the app ends up with two snackbar looks.
-`WIDGET_RULES.md` governs how to build a new one.
+All three are built in `v3/` and used app-wide. **Never reach into `v2/` for them** (hard rule 17), and never call the raw Flutter API as a stopgap — that is how the app gets two snackbar looks. `WIDGET_RULES.md` governs building a new one.
 
-- **A message comes from the top, and it never takes a tap.** Owner's rule,
-  and both halves are one decision: a card at the bottom sits under the
-  thumb that just pressed the button, and a card anywhere that swallows
-  touches makes the seller wait out an animation before they can carry on.
-  `SdSnackBarPlacementV3.top` is the default, and the host wraps the card in
-  an `IgnorePointer` — so tap-to-dismiss is gone on purpose, and the timer is
-  the only thing that takes a message away.
+- **A message comes from the top and never takes a tap.** Owner's rule; both halves are one decision: a bottom card sits under the thumb that just pressed the button, and a card that swallows touches makes the seller wait out an animation. `SdSnackBarPlacementV3.top` is the default, and the host wraps the card in an `IgnorePointer` — tap-to-dismiss is gone on purpose; only the timer removes a message.
 - **A top message starts below the app bar, never over it.** Owner's rule.
   Back and app-bar actions are primary navigation controls; a transient
   message may not obscure them even though it ignores taps. The shared host
   clears the status bar plus `kToolbarHeight`, so every call site gets the
   same safe position without screen-specific offsets.
-- **An add that worked says nothing.** Owner's rule. A sheet closing and the
-  new row appearing behind it is the confirmation; a card on top of it is the
-  app telling the seller what they can already see, and it costs the top of
-  the screen for two seconds every time they add a row. So no
-  `SdSnackBarUtilsV3.success` on a create or add flow.
+- **An add that worked says nothing.** Owner's rule. The sheet closing and the new row appearing behind it is the confirmation; a card on top tells the seller what they already see, and costs the top of the screen for two seconds per row added. So no `SdSnackBarUtilsV3.success` on a create or add flow.
   - **Failure always speaks**, on every flow, because nothing on screen says
     it (hard rule 6 decides the words).
   - **A result the seller cannot see still speaks.** A bulk action on forty
@@ -990,9 +858,7 @@ stopgap — a stopgap is how the app ends up with two snackbar looks.
 
 ## The rest of the primitives
 
-One widget per job, and feature code never reaches past it to the raw Flutter
-one. All of these are built and in use; the rules are here so a screen does not
-quietly re-invent one.
+One widget per job; feature code never reaches past it to the raw Flutter one. All are built and in use; the rules stop a screen quietly re-inventing one.
 
 - **Cards: `SdCardV3`, never Material's `Card`.** Material's carries an
   invisible `EdgeInsets.all(4)` of margin, which is how a list whose separator
@@ -1085,17 +951,11 @@ quietly re-invent one.
 - Every `Text` carries an explicit `style:` — root `CLAUDE.md`, Syntax. Not
   repeated here.
 
-**A design mockup is reference, not authority.** Where a mockup and these rules
-disagree, the rules win silently: build what the rules say and say what was
-overridden. Every colour comes from the palette, every dimension from
-`SdSpacingConstant`, every text style from the text theme. What a mockup *is*
-for is hierarchy, rhythm, density and where the eye lands — take that, leave
-the tokens.
+**A design mockup is reference, not authority.** Where a mockup and these rules disagree, the rules win silently: build what they say and report what was overridden. Every colour comes from the palette, every dimension from `SdSpacingConstant`, every text style from the text theme. A mockup *is* for hierarchy, rhythm, density and where the eye lands — take that, leave its tokens.
 
 ## Working inside the package
 
-`WIDGET_RULES.md` in the submodule is the authority. These are the ones that
-get broken from this side.
+`WIDGET_RULES.md` in the submodule is the authority. These are the ones broken from this side.
 
 - **Every generation-scoped name carries its suffix, including extension
   members.** `context.sdTheme3`, `.tabular3` — the suffix is why a file
@@ -1119,11 +979,8 @@ get broken from this side.
 - **One folder per widget, flat — never a grouping folder.** No `buttons/`, no
   `charts/`. The flat list with one folder each is what keeps adding a widget a
   folder, a file and one `export` line.
-- **Four greps catch almost every violation** before a commit, and they are
-  faster than reading the diff: a literal colour (`Color(0x`, `Colors.`), a raw
+- **Four greps catch almost every violation** before a commit, faster than reading the diff: a literal colour (`Color(0x`, `Colors.`), a raw
   number in a widget (`\.w\b|\.h\b|\.r\b|\.sp\b` outside `SdSpacingConstant`), a
   quoted user-facing string, and an import that starts with anything other than
   the framework, a declared dependency, or a sibling widget folder.
-- **The package analyzes standalone** — `make analyze` does it first and
-  from outside the app, on purpose. If it only analyzes from inside, an app
-  dependency has leaked in.
+- **The package analyzes standalone** — `make analyze` does it first, from outside the app, on purpose. If it analyzes only from inside, an app dependency has leaked in.
