@@ -1,7 +1,7 @@
 import '../../../../core/money/money.dart';
 
 /// One product — one variant — a dropship supplier sells
-/// (`docs/DROPSHIPPING_PLAN.md`).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// **One item per supplier variant** (decision 11.7), so a product points at
 /// the item it stocks through [itemId], ranked by [rank] when an item has a

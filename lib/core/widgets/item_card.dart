@@ -62,7 +62,7 @@ class ItemCard extends StatelessWidget {
   final Item item;
 
   /// The thumbnail's Hero tag, shared with Item detail's summary so the photo
-  /// flies from the row to the screen it opens (`docs/UI_POLISH_PLAN.md`).
+  /// flies from the row to the screen it opens (`docs/plans/UI_POLISH_PLAN.md`).
   static String photoHeroTag(String itemId) => 'item-photo-$itemId';
 
   /// This item's live listings, for the distinct marketplace count.

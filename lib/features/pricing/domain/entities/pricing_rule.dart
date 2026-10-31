@@ -3,7 +3,7 @@ import '../enums/price_rounding.dart';
 import '../enums/pricing_rule_scope.dart';
 
 /// How a business turns a cost into an asking price (plan §15 "pricing
-/// rules", `docs/DROPSHIPPING_PLAN.md`).
+/// rules", `docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// The rule is configuration and the price is derived from it at the moment a
 /// seller applies it. Nothing it produces is stored as a figure about a sale

@@ -17,7 +17,7 @@ import '../../../providers.dart';
 import '../../controllers/sourcing_controller.dart';
 
 /// The dropship suppliers — sources that ship to the buyer for the seller
-/// (`docs/DROPSHIPPING_PLAN.md`). Only a name is asked for (plan §28).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`). Only a name is asked for (plan §28).
 class SuppliersScreen extends ConsumerWidget {
   const SuppliersScreen({super.key});
 

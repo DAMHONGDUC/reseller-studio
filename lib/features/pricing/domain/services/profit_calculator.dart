@@ -177,7 +177,7 @@ class PurchaseEvaluation {
 
 /// Whether a listed item has gone stale.
 ///
-/// **Stale is a query, not a stored status** (see `docs/DATA_MODEL.md`). An
+/// **Stale is a query, not a stored status** (see `docs/architecture/DATA_MODEL.md`). An
 /// item is stale if it is still listed and has been for longer than the
 /// workspace's threshold. Storing it would mean a nightly job flipping
 /// thousands of documents, and a seller who reprices would have to wait for

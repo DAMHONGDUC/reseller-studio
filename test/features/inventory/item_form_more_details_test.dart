@@ -5,7 +5,7 @@ import 'package:reseller_studio/features/inventory/presentation/screens/item_for
 import '../../support/pump_app.dart';
 
 /// The create form asks for what every item needs and folds the rest
-/// behind More details (`docs/UI_POLISH_PLAN.md`).
+/// behind More details (`docs/plans/UI_POLISH_PLAN.md`).
 void main() {
   testWidgets('title and quantity first; More details opens the rest', (
     WidgetTester tester,

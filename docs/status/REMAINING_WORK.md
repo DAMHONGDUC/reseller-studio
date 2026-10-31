@@ -1,7 +1,7 @@
 # Remaining work
 
 Account, credential and store tasks live in
-[`../RELEASE_ACTIONS.md`](../RELEASE_ACTIONS.md). This file tracks product and
+[`docs/release/RELEASE_ACTIONS.md`](../release/RELEASE_ACTIONS.md). This file tracks product and
 engineering work only.
 
 ## Priority
@@ -11,7 +11,7 @@ engineering work only.
 | 1 | Deploy and verify Cloud Functions | Team, notifications, deletion and server-side entitlement depend on them |
 | 2 | Move the strings still hardcoded in Dart into ARB | Seven locales ship; those strings render in English in all of them |
 | 3 | Add listing templates | Deferred until a listing editor exists — no screen edits a listing's own description yet |
-| 4 | Dropshipping, with marketplace and supplier connections | Owner widened the product (`CLAUDE.md`); planned whole in `DROPSHIPPING_PLAN.md` before any build |
+| 4 | Dropshipping, with marketplace and supplier connections | Owner widened the product (`CLAUDE.md`); planned whole in `docs/plans/DROPSHIPPING_PLAN.md` before any build |
 | 5 | Lock-screen actions for offers | An offer expires in hours; answering needs iOS notification categories, matching Android actions and an FCM payload change, none verifiable without a device |
 
 ## Open verification
@@ -45,4 +45,4 @@ reasoning lives where the next session will look: bundles in
 | An order may name several items | Lines that belong to no item are still unbuilt and still need raising. A bundle's split is a judgement `BundleAllocation` makes, so watch whether sellers disagree with it often enough to want to edit a line. |
 | Everything is free except export | Free has no ceiling on items, orders, businesses or seats, and payout chasing is free. Reverting is `PlanLimits.byPlan` plus its mirror in `functions/src/lib/firestore.ts`. Watch conversion: export at tax time is now the only reason to pay. |
 
-Keep this file synchronized with [`DONE_WORK.md`](DONE_WORK.md).
+Keep this file synchronized with [`docs/status/DONE_WORK.md`](DONE_WORK.md).

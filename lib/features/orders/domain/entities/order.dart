@@ -96,7 +96,7 @@ class Order {
 
   /// What the marketplace actually paid out.
   ///
-  /// **The one stored figure that is not derived** (see `docs/DATA_MODEL.md`)
+  /// **The one stored figure that is not derived** (see `docs/architecture/DATA_MODEL.md`)
   /// — it is a fact the platform reported, not a calculation, and it is what
   /// the seller reconciles their bank against.
   final Money? payout;

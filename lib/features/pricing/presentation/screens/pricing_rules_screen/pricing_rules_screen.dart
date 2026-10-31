@@ -12,7 +12,7 @@ import '../../../domain/entities/pricing_rule.dart';
 import '../../../pricing_rule_label.dart';
 import '../../../providers.dart';
 
-/// Every pricing rule the business keeps (plan §15, `docs/DROPSHIPPING_PLAN.md`).
+/// Every pricing rule the business keeps (plan §15, `docs/plans/DROPSHIPPING_PLAN.md`).
 class PricingRulesScreen extends ConsumerWidget {
   const PricingRulesScreen({super.key});
 

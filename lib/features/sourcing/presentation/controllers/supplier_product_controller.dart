@@ -9,7 +9,7 @@ import '../../../inventory/domain/enums/item_status.dart';
 import '../../domain/entities/supplier_product.dart';
 
 /// Everything a seller does to a supplier product: save it, check it, list
-/// it, rank it against a backup (`docs/DROPSHIPPING_PLAN.md`).
+/// it, rank it against a backup (`docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// True while a write is in flight.
 class SupplierProductController extends Notifier<bool> {

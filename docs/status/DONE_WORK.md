@@ -1,7 +1,7 @@
 # Built
 
 “Built” means implemented and covered by the mock or Firestore repository. It
-does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTIONS.md).
+does not mean production-verified; see [`docs/release/RELEASE_ACTIONS.md`](../release/RELEASE_ACTIONS.md).
 
 | Area | Included | External dependency |
 |---|---|---|
@@ -10,7 +10,7 @@ does not mean production-verified; see [`../RELEASE_ACTIONS.md`](../RELEASE_ACTI
 | Inventory | Add/edit/detail, Quick Add, intake session, scanner, photos, categories and locations created inline, buying-trip link, bulk actions including bulk listing and filing under a trip | Firebase Storage for uploads |
 | Orders | Record sale with the platform's order number and an optional payout, bundles, detail, shipping queue, settlement, returns, refunds, overdue payout chasing, payout report import, supplier orders for dropship sales with tracking, refunds, days waiting and estimated arrival, search by item, buyer, order number, tracking or platform | None for manual records |
 | Sourcing | Sources, purchases, items filed under a purchase, receipt apportioned across them, ROI ranking, buy calculator, dropship suppliers and their products, List it as a dropship item, primary and backup supplier per item | None |
-| Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end, pricing rules applied in bulk, price history per item | No marketplace publishing yet; see `DROPSHIPPING_PLAN.md` |
+| Listings | Marketplace prices, cross-listing onto the business's own marketplaces, bulk mark-live/reprice/pause/end, pricing rules applied in bulk, price history per item | No marketplace publishing yet; see `docs/plans/DROPSHIPPING_PLAN.md` |
 | Marketplaces | Seller-owned records, fee estimate, defaults, soft delete | None |
 | Carriers | Business-owned records, defaults, soft delete | None |
 | Analytics | Sales, profit, inventory, marketplace, category and source views; a dropship view splitting stocked from dropshipped, ranking dropship products and timing suppliers; a custom range of days beside the fixed periods | None |

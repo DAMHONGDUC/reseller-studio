@@ -63,7 +63,7 @@ this checklist. A downgrade keeps existing records and blocks only new creates.
 | App Store Connect | Create an App Manager API key and keep the `.p8` outside the repo |
 | Signing | Create a private certificates repo and a read-only fine-grained PAT |
 | Local Fastlane | Fill `ios/fastlane/.env`, then run `bundle exec fastlane certificates` |
-| GitHub Actions | Add the secrets listed in [`docs/release/CREDENTIALS.md`](docs/release/CREDENTIALS.md) |
+| GitHub Actions | Add the secrets listed in [`docs/release/CREDENTIALS.md`](CREDENTIALS.md) |
 | Rehearsal | From `ios/`, run `bundle exec fastlane preflight`, then `CI=true bundle exec fastlane preflight` |
 | First upload | Use `bump:false` with a known-free build number |
 
@@ -74,9 +74,9 @@ binary without Firebase configuration.
 
 | Area | Required action |
 |---|---|
-| Legal | Review and host [`docs/STORE_PRIVACY.md`](docs/STORE_PRIVACY.md); host Terms of Use |
+| Legal | Review and host [`docs/store/STORE_PRIVACY.md`](../store/STORE_PRIVACY.md); host Terms of Use |
 | Privacy forms | Submit the App Store and Play answers from the privacy document |
-| Listing | Paste every field from [`docs/MARKETING_INFO.md`](docs/MARKETING_INFO.md), top to bottom, and close its `TODO(owner)` list |
+| Listing | Paste every field from [`docs/store/MARKETING_INFO.md`](../store/MARKETING_INFO.md), top to bottom, and close its `TODO(owner)` list |
 | Hardware checks | Auth, push, camera, photo picker, deep links and dark cold start |
 | Billing checks | Monthly purchase, yearly purchase, lifetime purchase, cancellation state and restore |
 | Translations | Native read-through of `es`, `fr`, `de`, `pt`, `zh` and `vi` — every one is unreviewed machine work (hard rule 7) |
@@ -88,4 +88,4 @@ binary without Firebase configuration.
 make release-prod NOTE="release notes"
 ```
 
-Detailed pipeline behavior: [`docs/release/PIPELINE.md`](docs/release/PIPELINE.md).
+Detailed pipeline behavior: [`docs/release/PIPELINE.md`](PIPELINE.md).

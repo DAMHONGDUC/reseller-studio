@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/theme/app_tag_hue.dart';
 
-/// Who ships an item when it sells (`docs/DROPSHIPPING_PLAN.md`).
+/// Who ships an item when it sells (`docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// Stored by [name], so a case is never renamed once written.
 enum ItemFulfilment {

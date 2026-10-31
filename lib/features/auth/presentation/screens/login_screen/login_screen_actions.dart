@@ -28,7 +28,7 @@ part of 'login_screen.dart';
 /// take the only way into the app down with it. Google's real file exists and
 /// is deliberately not used: two buttons drawn two different ways is the state
 /// where only one of them can break. Both swap to `leading` at once, before an
-/// external build — `RELEASE_ACTIONS.md` blocker 5.
+/// external build — `docs/release/RELEASE_ACTIONS.md` blocker 5.
 class _LoginActions extends ConsumerWidget {
   const _LoginActions({required this.onSignIn});
 

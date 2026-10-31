@@ -77,7 +77,7 @@ class Item {
   /// accept offers automatically without watching them.
   final Money? minimumPrice;
 
-  /// Denormalised from the purchase — see `docs/DATA_MODEL.md`. Inventory
+  /// Denormalised from the purchase — see `docs/architecture/DATA_MODEL.md`. Inventory
   /// sorts and filters by these, and Firestore cannot order by a field on a
   /// referenced document.
   final String? purchaseId;
@@ -104,7 +104,7 @@ class Item {
   final DateTime? deletedAt;
 
   /// Who ships it. A dropshipped item's cost lives on its supplier product,
-  /// not in [purchasePrice] (`docs/DROPSHIPPING_PLAN.md`).
+  /// not in [purchasePrice] (`docs/plans/DROPSHIPPING_PLAN.md`).
   final ItemFulfilment fulfilment;
 
   bool get isDeleted => deletedAt != null;

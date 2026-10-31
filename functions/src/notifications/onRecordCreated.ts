@@ -29,7 +29,7 @@ export const onOrderCreated = onDocumentCreated(
 
     if (workspaceId === null || orderId === '') return;
 
-    // The line items are embedded (`docs/DATA_MODEL.md`), and `get()` cannot
+    // The line items are embedded (`docs/architecture/DATA_MODEL.md`), and `get()` cannot
     // index into an array — so the array is read whole and the first line's
     // title is what names the push.
     const lines = event.data?.get('lines');

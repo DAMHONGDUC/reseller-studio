@@ -65,6 +65,6 @@ them here would make each one worse:
   need to be readable from a unit test without a build flag.
 - **The stale threshold in particular is per-workspace data in Firestore**
   (`Workspace.staleThresholdDays`). Freezing it into a build file would
-  contradict the data model — see `docs/DATA_MODEL.md`.
+  contradict the data model — see `docs/architecture/DATA_MODEL.md`.
 - **Route paths** — `AppRoutes`. Changing one is a code change, not a
   configuration change.

@@ -1,6 +1,6 @@
 import '../../listing_text_constant.dart';
 
-/// Strips the padding supplier copy arrives with (`docs/DROPSHIPPING_PLAN.md`,
+/// Strips the padding supplier copy arrives with (`docs/plans/DROPSHIPPING_PLAN.md`,
 /// decision 11.9 — rules, not a model).
 ///
 /// It only removes: nothing is reworded and nothing is invented, so a cleaned

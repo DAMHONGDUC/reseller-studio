@@ -27,7 +27,7 @@ part 'supplier_product_screen_fields.dart';
 part 'supplier_product_screen_status.dart';
 
 /// Add or edit one supplier product, and list it as a dropship item
-/// (`docs/DROPSHIPPING_PLAN.md`). Only the title is required (hard rule 2).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`). Only the title is required (hard rule 2).
 class SupplierProductScreen extends ConsumerStatefulWidget {
   const SupplierProductScreen({
     required this.sourceId,

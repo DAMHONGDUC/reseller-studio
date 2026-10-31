@@ -14,7 +14,7 @@ import '../../domain/enums/order_status.dart';
 ///
 /// **Line items are embedded, not a subcollection.** An order has a handful of
 /// lines, they are always read with the order, and they never change after the
-/// sale — exactly when embedding wins (`docs/DATA_MODEL.md`).
+/// sale — exactly when embedding wins (`docs/architecture/DATA_MODEL.md`).
 final class OrderDto {
   static Order toEntity(
     DocumentSnapshot<Map<String, Object?>> doc, {

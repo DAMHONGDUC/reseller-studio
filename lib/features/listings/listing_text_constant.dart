@@ -1,5 +1,5 @@
 /// Platform title limits and the supplier filler the text cleaner removes
-/// (`docs/DROPSHIPPING_PLAN.md`, decision 11.9).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`, decision 11.9).
 final class ListingTextConstant {
   /// Title limits by marketplace record id, as the platforms enforced them in
   /// 2026-10. A record the app does not know takes [defaultTitleLength].

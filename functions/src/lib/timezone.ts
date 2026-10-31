@@ -1,7 +1,7 @@
 /**
  * What time it is where a business is, rather than where the scheduler runs.
  *
- * **A workspace stores an IANA `timezone`** (`docs/DATA_MODEL.md`) and nothing
+ * **A workspace stores an IANA `timezone`** (`docs/architecture/DATA_MODEL.md`) and nothing
  * was reading it: the digest fired at 08:00 UTC for everybody, which is 1am in
  * California. A reminder that arrives in the middle of the night is one the
  * seller turns off, and it takes the notifications that matter with it.

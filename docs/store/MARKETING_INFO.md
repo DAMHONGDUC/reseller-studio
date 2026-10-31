@@ -10,11 +10,11 @@ Fill each platform top to bottom: the sections follow the order the platform's o
 
 Values no file in the project holds. Each one is a `TODO(owner)` further down, in the field that needs it.
 
-- [ ] Privacy Policy URL, hosted and re-hosted after the guest-mode rewrite — B14, B23, C5, C18 (`RELEASE_ACTIONS.md` step 8)
+- [ ] Privacy Policy URL, hosted and re-hosted after the guest-mode rewrite — B14, B23, C5, C18 (`docs/release/RELEASE_ACTIONS.md` step 8)
 - [ ] Terms of Use URL, or Apple's standard EULA — B11, B23, C18
 - [ ] Support URL and support email — B25, C14, C15
 - [ ] SKU — B5
-- [ ] Product IDs for monthly, yearly and lifetime, matching the RevenueCat offering — B17, C23 (`RELEASE_ACTIONS.md` step 7)
+- [ ] Product IDs for monthly, yearly and lifetime, matching the RevenueCat offering — B17, C23 (`docs/release/RELEASE_ACTIONS.md` step 7)
 - [ ] App Review demo account with seeded data, and the review contact — B29, B30
 - [ ] Google Play feature graphic, 1024 x 500 — C20
 - [ ] YouTube URL, once the video is uploaded — C21, E6
@@ -134,7 +134,7 @@ TODO(owner): the same URL the build carries in PRIVACY_POLICY_URL
 ```
 
 ### B15. App Privacy — Data collection answers
-<!-- from: docs/STORE_PRIVACY.md § App Store Connect -->
+<!-- from: docs/store/STORE_PRIVACY.md § App Store Connect -->
 ```text
 Contact Info — Name, Email: collected, linked, App Functionality
 User Content — Photos, Other User Content: collected, linked, App Functionality
@@ -169,7 +169,7 @@ Export every CSV and your tax pack
 ```
 
 ### B20. Subscriptions — Review notes
-<!-- from: docs/DONE_WORK.md Subscription, More → General -->
+<!-- from: docs/status/DONE_WORK.md Subscription, More → General -->
 ```text
 The paywall opens from More → General → Subscription, and from the Go Premium banner on Home. Everything is free except exports: every CSV and the tax pack need Premium. Monthly and yearly renew automatically; lifetime is a one-time purchase.
 ```
@@ -187,7 +187,7 @@ Know what needs attention today: items to list, orders to ship, payouts a market
 ```
 
 ### B23. Version — Description · max 4000
-<!-- from: docs/DONE_WORK.md, lib/l10n/app_en.arb about/onboarding, docs/STORE_PRIVACY.md; marketplace connection absent from functions/src -->
+<!-- from: docs/status/DONE_WORK.md, lib/l10n/app_en.arb about/onboarding, docs/store/STORE_PRIVACY.md; marketplace connection absent from functions/src -->
 ```text
 Reseller Studio is the operating system for your reselling business. It follows one chain from end to end: source, purchase, inventory, list, sell, ship, profit, analyze — then source better.
 
@@ -275,7 +275,7 @@ TODO(owner): first name, last name, phone, email
 ```
 
 ### B31. App Review — Notes · max 4000
-<!-- from: CLAUDE.md hard rules 1 and 10, docs/DONE_WORK.md, lib/l10n/app_en.arb -->
+<!-- from: CLAUDE.md hard rules 1 and 10, docs/status/DONE_WORK.md, lib/l10n/app_en.arb -->
 ```text
 The app works without an account: a signed-out user's records stay on the device. The only ways to sign in are Sign in with Apple and Google Sign-In, offered from More → General and from the banner on Home. Account deletion is in More → General → Delete account.
 
@@ -290,7 +290,7 @@ Not asked on the first version. For an update, write what changed here.
 ```
 
 ### B33. Version — Release option
-<!-- from: the backend must be live first (RELEASE_ACTIONS.md step 5) -->
+<!-- from: the backend must be live first (docs/release/RELEASE_ACTIONS.md step 5) -->
 ```text
 Manually release this version
 ```
@@ -350,7 +350,7 @@ Category: All other app types. No to violence, sexuality, language, controlled s
 ```
 
 ### C10. App content — Data safety answers
-<!-- from: docs/STORE_PRIVACY.md § Google Play -->
+<!-- from: docs/store/STORE_PRIVACY.md § Google Play -->
 ```text
 Collects or shares data: Yes (collects); shares: No
 Personal info — Name, Email address: account management, app functionality
@@ -575,7 +575,7 @@ Mobile dev, backend dev, UI/UX
 ```
 
 ### E3. Project description · max 600
-<!-- from: docs/DONE_WORK.md, pubspec.yaml, functions/package.json -->
+<!-- from: docs/status/DONE_WORK.md, pubspec.yaml, functions/package.json -->
 ```text
 - Seller operating system for resellers and dropshippers
 - Home opens on what needs attention today

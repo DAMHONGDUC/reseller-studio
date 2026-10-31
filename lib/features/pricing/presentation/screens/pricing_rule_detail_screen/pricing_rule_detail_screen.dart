@@ -31,7 +31,7 @@ part 'pricing_rule_detail_screen_preview.dart';
 part 'pricing_rule_detail_screen_scope.dart';
 
 /// Create or edit one pricing rule, with the price it gives shown as the
-/// seller types (`docs/DROPSHIPPING_PLAN.md`).
+/// seller types (`docs/plans/DROPSHIPPING_PLAN.md`).
 class PricingRuleDetailScreen extends ConsumerStatefulWidget {
   const PricingRuleDetailScreen({this.ruleId, super.key});
 

@@ -73,7 +73,7 @@ flutter:
 
   # Vendor brand marks for the two sign-in buttons, shipped as the vendors
   # publish them. Apple and Google each forbid a redrawn substitute, so these
-  # files are copied in, never authored here. See RELEASE_ACTIONS.md.
+  # files are copied in, never authored here. See docs/release/RELEASE_ACTIONS.md.
   assets:
     - assets/brand/
 

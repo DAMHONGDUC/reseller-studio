@@ -45,7 +45,7 @@ class UnconfiguredSubscriptionRepository implements SubscriptionRepository {
 
     throw const AppFailure(
       AppFailureKind.invalidData,
-      technicalMessage: 'RevenueCat is not configured — see RELEASE_ACTIONS.md',
+      technicalMessage: 'RevenueCat is not configured — see docs/release/RELEASE_ACTIONS.md',
     );
   }
 

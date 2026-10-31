@@ -80,7 +80,7 @@ enum SourceType {
   donation,
 
   /// A wholesale dropship supplier that ships to the buyer on the seller's
-  /// behalf (`docs/DROPSHIPPING_PLAN.md`). Its products are
+  /// behalf (`docs/plans/DROPSHIPPING_PLAN.md`). Its products are
   /// `SupplierProduct`s.
   dropshipSupplier,
   other,

@@ -27,7 +27,7 @@ make set-up
 ```
 
 Firebase and store accounts are not included in the repository. See
-[`RELEASE_ACTIONS.md`](RELEASE_ACTIONS.md) before connecting a real backend.
+[`docs/release/RELEASE_ACTIONS.md`](docs/release/RELEASE_ACTIONS.md) before connecting a real backend.
 
 ## Daily commands
 
@@ -52,11 +52,11 @@ Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 | Need | Read |
 |---|---|
 | Documentation index | [`docs/README.md`](docs/README.md) |
-| Product authority | [`SELLER_OS_FINAL_MASTER_PLAN.md`](SELLER_OS_FINAL_MASTER_PLAN.md) |
+| Product authority | [`docs/plans/SELLER_OS_FINAL_MASTER_PLAN.md`](docs/plans/SELLER_OS_FINAL_MASTER_PLAN.md) |
 | Engineering rules | [`AGENTS.md`](AGENTS.md) |
-| Stored data contract | [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) |
-| Built and pending work | [`docs/DONE_WORK.md`](docs/DONE_WORK.md), [`docs/REMAINING_WORK.md`](docs/REMAINING_WORK.md) |
-| Release checklist | [`RELEASE_ACTIONS.md`](RELEASE_ACTIONS.md) |
+| Stored data contract | [`docs/architecture/DATA_MODEL.md`](docs/architecture/DATA_MODEL.md) |
+| Built and pending work | [`docs/status/DONE_WORK.md`](docs/status/DONE_WORK.md), [`docs/status/REMAINING_WORK.md`](docs/status/REMAINING_WORK.md) |
+| Release checklist | [`docs/release/RELEASE_ACTIONS.md`](docs/release/RELEASE_ACTIONS.md) |
 
 ## Release
 

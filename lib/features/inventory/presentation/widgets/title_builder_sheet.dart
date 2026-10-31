@@ -9,7 +9,7 @@ import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../../../marketplaces/providers.dart';
 
 /// Builds a title from its parts, inside a marketplace's limit
-/// (`docs/DROPSHIPPING_PLAN.md`, decision 11.9 — rules, not a model).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`, decision 11.9 — rules, not a model).
 ///
 /// Returns the title, or null when the sheet is closed; the caller puts it
 /// in its own field, so nothing is saved until the seller saves the section.

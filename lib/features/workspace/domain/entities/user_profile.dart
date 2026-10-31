@@ -1,6 +1,6 @@
 /// The person, not their business.
 ///
-/// Deliberately thin (`docs/DATA_MODEL.md`): a name, an email, and which
+/// Deliberately thin (`docs/architecture/DATA_MODEL.md`): a name, an email, and which
 /// workspaces they belong to. **No business data lives here** — a user is not
 /// a workspace, and treating them as one is what makes adding a team member a
 /// migration later.

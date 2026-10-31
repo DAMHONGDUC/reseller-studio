@@ -6,7 +6,7 @@ import '../../domain/entities/activity_entry.dart';
 
 /// How an [ActivityEntry] is stored. Read only — see the repository.
 ///
-/// `before` and `after` are in the document (`docs/DATA_MODEL.md`) and are
+/// `before` and `after` are in the document (`docs/architecture/DATA_MODEL.md`) and are
 /// deliberately **not** mapped: they are arbitrary record snapshots, the
 /// screen shows what changed rather than the values, and pulling a buyer name
 /// into the client through this path would be a leak nobody was looking for.

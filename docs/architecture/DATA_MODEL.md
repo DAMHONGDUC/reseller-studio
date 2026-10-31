@@ -1,7 +1,7 @@
 # Data model
 
 Authority for what Firestore stores and what each field means. Product behavior
-belongs to `SELLER_OS_FINAL_MASTER_PLAN.md`; access belongs to
+belongs to `docs/plans/SELLER_OS_FINAL_MASTER_PLAN.md`; access belongs to
 `firestore.rules`.
 
 **Before anyone signs in there is a second store, and it holds these same

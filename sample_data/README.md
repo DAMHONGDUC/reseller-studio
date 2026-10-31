@@ -9,7 +9,7 @@ not a test, not a seeding script. They exist so a document that is created by
 hand in the Firebase console can be copied rather than remembered, and so the
 shape of one is reviewable in a diff.
 
-- **`docs/DATA_MODEL.md` is still the authority** on what a field means and
+- **`docs/architecture/DATA_MODEL.md` is still the authority** on what a field means and
   which way it fails. A sample says what a correct document looks like; it does
   not say what happens when a field is missing, and that is the half that
   matters.

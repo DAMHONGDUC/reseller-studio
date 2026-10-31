@@ -1,43 +1,60 @@
 # Documentation
 
-Use the smallest document that answers the question. Authority documents are
-intentionally detailed; operational documents are short checklists.
+Open the smallest doc that answers the question. Rule docs run long; checklists stay short.
 
-## Product and status
+## plans/ — what will be built
 
-| Question | Document |
+| Question | Doc |
 |---|---|
-| What should the product do? | [`../SELLER_OS_FINAL_MASTER_PLAN.md`](../SELLER_OS_FINAL_MASTER_PLAN.md) |
-| What is stored? | [`DATA_MODEL.md`](DATA_MODEL.md) |
-| What is built? | [`DONE_WORK.md`](DONE_WORK.md) |
-| What remains? | [`REMAINING_WORK.md`](REMAINING_WORK.md) |
-| What blocks release? | [`../RELEASE_ACTIONS.md`](../RELEASE_ACTIONS.md) |
-| What do stores need for privacy? | [`STORE_PRIVACY.md`](STORE_PRIVACY.md) |
-| What does the published privacy policy say? | [`PRIVACY_POLICY.json`](PRIVACY_POLICY.json) — the source copy, rendered by the website repo; `icon` is a path on that site |
+| What should the product do? | [`plans/SELLER_OS_FINAL_MASTER_PLAN.md`](plans/SELLER_OS_FINAL_MASTER_PLAN.md) |
+| How does dropshipping work? | [`plans/DROPSHIPPING_PLAN.md`](plans/DROPSHIPPING_PLAN.md) |
+| What does the UI polish cover? | [`plans/UI_POLISH_PLAN.md`](plans/UI_POLISH_PLAN.md) |
 
-## Engineering rules
+## status/ — what is built, what is left
 
-Start with [`../AGENTS.md`](../AGENTS.md). Read one topic file only when its
-trigger matches the work.
+| Question | Doc |
+|---|---|
+| What is built? | [`status/DONE_WORK.md`](status/DONE_WORK.md) |
+| What remains? | [`status/REMAINING_WORK.md`](status/REMAINING_WORK.md) |
 
-| Topic | Document |
+## architecture/ — what is stored
+
+| Question | Doc |
+|---|---|
+| Which tables and fields exist, and what they mean? | [`architecture/DATA_MODEL.md`](architecture/DATA_MODEL.md) |
+
+## release/ — shipping a build
+
+| Question | Doc |
+|---|---|
+| What blocks release? | [`release/RELEASE_ACTIONS.md`](release/RELEASE_ACTIONS.md) |
+| Which credentials exist, and where? | [`release/CREDENTIALS.md`](release/CREDENTIALS.md) |
+| How does the pipeline run, and why did it fail? | [`release/PIPELINE.md`](release/PIPELINE.md) |
+
+## store/ — listings and privacy
+
+| Question | Doc |
+|---|---|
+| Every App Store, Google Play, YouTube and Upwork field, ready to paste | [`store/MARKETING_INFO.md`](store/MARKETING_INFO.md) |
+| What do stores need for privacy? | [`store/STORE_PRIVACY.md`](store/STORE_PRIVACY.md) |
+| What does the published privacy policy say? | [`store/PRIVACY_POLICY.json`](store/PRIVACY_POLICY.json) — source copy the website repo renders; `icon` is a path on that site |
+
+## rules/ — engineering rules
+
+Start with [`../AGENTS.md`](../AGENTS.md). Open a topic only when its trigger matches the work.
+
+| Topic | Doc |
 |---|---|
 | Backend and Firestore | [`rules/BACKEND.md`](rules/BACKEND.md) |
 | Commands | [`rules/COMMANDS.md`](rules/COMMANDS.md) |
 | Decisions and reversals | [`rules/DECISIONS.md`](rules/DECISIONS.md) |
 | Design system | [`rules/DESIGN_SYSTEM.md`](rules/DESIGN_SYSTEM.md) |
-| Build-time configuration | [`rules/ENV.md`](rules/ENV.md) |
+| Build-time config | [`rules/ENV.md`](rules/ENV.md) |
+| Guest mode and local store | [`rules/GUEST_MODE.md`](rules/GUEST_MODE.md) |
 | Privacy and secrets | [`rules/PRIVACY_AND_SECURITY.md`](rules/PRIVACY_AND_SECURITY.md) |
 | Release | [`rules/RELEASE.md`](rules/RELEASE.md) |
+| Wide windows | [`rules/RESPONSIVE.md`](rules/RESPONSIVE.md) |
 | Screens | [`rules/SCREENS.md`](rules/SCREENS.md) |
 | Missing setup | [`rules/SETUP.md`](rules/SETUP.md) |
 | Premium and paywall | [`rules/SUBSCRIPTION.md`](rules/SUBSCRIPTION.md) |
 | Tests | [`rules/TESTING.md`](rules/TESTING.md) |
-
-## Release operations
-
-| Need | Document |
-|---|---|
-| Credential names and locations | [`release/CREDENTIALS.md`](release/CREDENTIALS.md) |
-| Release flow and failure lookup | [`release/PIPELINE.md`](release/PIPELINE.md) |
-| Every App Store, Google Play, YouTube and Upwork field, ready to paste | [`MARKETING_INFO.md`](MARKETING_INFO.md) |

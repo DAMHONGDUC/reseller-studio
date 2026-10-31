@@ -31,7 +31,7 @@ part 'login_screen_header.dart';
 /// Apple is not optional beside Google: App Store guideline 4.8 requires it
 /// wherever a third-party sign-in is offered. Both marks come from
 /// `SimpleIcons` (owner's rule); swapping them for the vendors' own artwork is
-/// a submission task, not a build one — `RELEASE_ACTIONS.md` blocker 9, and
+/// a submission task, not a build one — `docs/release/RELEASE_ACTIONS.md` blocker 9, and
 /// `SdVendorButtonV3.leading` is the slot that takes them.
 ///
 /// **On success it asks the router to re-decide, and nothing more.** This

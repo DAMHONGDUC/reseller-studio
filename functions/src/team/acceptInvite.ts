@@ -63,7 +63,7 @@ export const acceptInvite = onCall(clientFacing, async (request) => {
     {
       role,
       // Denormalised so the Team screen renders without reading anyone
-      // else's user document, which the rules forbid (`docs/DATA_MODEL.md`).
+      // else's user document, which the rules forbid (`docs/architecture/DATA_MODEL.md`).
       displayName: request.auth?.token.name ?? null,
       email: tokenEmail,
       joinedAt: FieldValue.serverTimestamp(),

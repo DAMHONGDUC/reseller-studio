@@ -144,7 +144,7 @@ Both are owner-confirmable in §11.
 All tables are flat, top-level and keyed by id with `workspaceId` as a field
 (hard rule 14). Every composite index leads with `workspaceId`. Every
 hand-created document gets a sample in `sample_data/`, and
-`docs/DATA_MODEL.md` is updated in the same change as each table.
+`docs/architecture/DATA_MODEL.md` is updated in the same change as each table.
 
 ### Changed tables
 
@@ -281,12 +281,12 @@ Per connection, chosen by the seller; the default is the most manual.
 ## 8. Phases
 
 Each phase ends with `make analyze` clean, the full test suite green, the
-rulebook and `docs/DATA_MODEL.md` current, `docs/DONE_WORK.md` and
-`docs/REMAINING_WORK.md` in step, and samples in `sample_data/`.
+rulebook and `docs/architecture/DATA_MODEL.md` current, `docs/status/DONE_WORK.md` and
+`docs/status/REMAINING_WORK.md` in step, and samples in `sample_data/`.
 
 | Phase | Builds | Needs from the owner | Done when |
 |---|---|---|---|
-| 0 — Access | Developer accounts and approvals: eBay developer keys, CJ API key, Shopify Partner app, Etsy app; a Cloud KMS key; secrets in Secret Manager; RevenueCat offering text for connections | Accounts in the business's name; `RELEASE_ACTIONS.md` entries | Each platform answers a sandbox call from a deployed Function |
+| 0 — Access | Developer accounts and approvals: eBay developer keys, CJ API key, Shopify Partner app, Etsy app; a Cloud KMS key; secrets in Secret Manager; RevenueCat offering text for connections | Accounts in the business's name; `docs/release/RELEASE_ACTIONS.md` entries | Each platform answers a sandbox call from a deployed Function |
 | 1 — Manual dropshipping | Fulfilment kind on items, variants, suppliers as sources, supplier products with tax and shipping days, manual supplier orders with DAS, estimated arrival, samples, supplier refunds and invoices, pricing rules, bulk apply, title builder and supplier text cleaner, listing price history, delist-after-sale attention, listing templates, order filters, analytics split with winners and losers | Answers in §11 | A guest runs the whole lifecycle with no connection and every number is right or `—` |
 | 2 — Connection foundation | `connections`, `connection_tokens`, `sync_runs`, OAuth round trip, adapter interfaces, Connections screen, `refreshTokens`, `PlanFeature.connections` with its server-side gate and pause on lapse, rules and their emulator tests | Phase 0 | A seller connects and disconnects a sandbox account; a token never appears in a client read or a log |
 | 3 — eBay | Orders in by polling, tracking out, price and quantity push for API-managed listings | eBay production keys | A real eBay sale appears as an order with no typing, and tracking lands on eBay |

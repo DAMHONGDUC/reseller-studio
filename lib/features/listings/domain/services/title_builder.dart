@@ -2,7 +2,7 @@ import '../../listing_text_constant.dart';
 import '../entities/title_parts.dart';
 
 /// Assembles a listing title from its parts, inside a platform's limit
-/// (`docs/DROPSHIPPING_PLAN.md`, decision 11.9 — rules, not a model).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`, decision 11.9 — rules, not a model).
 ///
 /// - Order: brand, product type, attributes, colour, size, condition.
 /// - A word already used is not repeated, whatever its case.

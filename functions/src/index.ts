@@ -89,4 +89,4 @@ export {
 export { refreshUsageDaily } from './subscription/refreshUsageDaily';
 
 // Marketplace OAuth and sync are dropped, not pending — see CLAUDE.md
-// hard rule 10 and docs/REMAINING_WORK.md.
+// hard rule 10 and docs/status/REMAINING_WORK.md.
