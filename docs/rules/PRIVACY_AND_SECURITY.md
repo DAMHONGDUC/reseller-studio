@@ -65,9 +65,9 @@ Hard rule 9 in root `CLAUDE.md`, repeated here because this is the file people r
 
 ## Buyer data
 
-An order holds a real person's name and shipping address — the only personal data here that is not the seller's own.
+An order may hold a real person's name — `Order.buyerName`, optional — the only personal data here that is not the seller's own. No order stores a shipping address.
 
-- It renders on screen and is stored in Firestore. Nowhere else.
+- The name renders on screen and is stored in Firestore. Nowhere else.
 - Never in a log line, analytics parameter, Crashlytics key, CSV filename, or committed test fixture.
 - So `AppAnalytics` takes no free-text parameter: every event parameter is an id, an enum or a count.
 - **A buyer address read from a connected marketplace passes through and is never stored.** Owner's call. The Function placing a supplier order reads it then, hands it to the supplier, keeps nothing — no Firestore field, log line or retry payload. The accepted cost: an order with no connection is never placed automatically, and a supplier refusing the address fails the order for the seller to fix on the marketplace.
