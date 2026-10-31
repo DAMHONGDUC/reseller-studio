@@ -52,7 +52,8 @@ Values no file in the project holds. Each one is a `TODO(owner)` further down, i
 
 ---
 
-## B. App Store Connect
+<details>
+<summary><h2>B. App Store Connect</h2></summary>
 
 ### B1. New App — Platforms
 <!-- from: ios/Runner.xcodeproj/project.pbxproj -->
@@ -297,9 +298,12 @@ Not asked on the first version. For an update, write what changed here.
 Manually release this version
 ```
 
+</details>
+
 ---
 
-## C. Google Play Console
+<details>
+<summary><h2>C. Google Play Console</h2></summary>
 
 ### C1. Create app — App name · max 30
 <!-- from: android/app/src/main/AndroidManifest.xml android:label -->
@@ -487,9 +491,12 @@ First release of Reseller Studio.
 </en-US>
 ```
 
+</details>
+
 ---
 
-## D. YouTube
+<details>
+<summary><h2>D. YouTube</h2></summary>
 
 ### D1. Title · max 100
 ```text
@@ -552,9 +559,12 @@ Language: English; Category: Science & Technology
 Public
 ```
 
+</details>
+
 ---
 
-## E. Upwork portfolio
+<details>
+<summary><h2>E. Upwork portfolio</h2></summary>
 
 ### E1. Project title · max 70
 ```text
@@ -596,3 +606,5 @@ assets/mkt/reseller-studio-store-image-1024x1024.png, then the iPhone screenshot
 ```text
 Leave empty until the App Store or Play listing is live
 ```
+
+</details>
