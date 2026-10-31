@@ -40,3 +40,4 @@ trigger matches the work.
 |---|---|
 | Credential names and locations | [`release/CREDENTIALS.md`](release/CREDENTIALS.md) |
 | Release flow and failure lookup | [`release/PIPELINE.md`](release/PIPELINE.md) |
+| Every App Store, Google Play, YouTube and Upwork field, ready to paste | [`../MARKETING_INFO.md`](../MARKETING_INFO.md) |
