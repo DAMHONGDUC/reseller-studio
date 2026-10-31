@@ -10,8 +10,6 @@ Fill each platform top to bottom: the sections follow the order the platform's o
 
 Values no file in the project holds. Each one is a `TODO(owner)` further down, in the field that needs it.
 
-- [ ] Privacy Policy URL, hosted and re-hosted after the guest-mode rewrite — B14, B23, C5, C18 (`docs/release/RELEASE_ACTIONS.md` step 8)
-- [ ] Build carries `TERMS_OF_SERVICE_URL` = Apple's standard EULA (the link in B23), so the paywall's Terms row opens the same page — set in the prod env file
 - [ ] Paste B23 into **every** localization the listing has, not only English — App Review rejected build 49 under 3.1.2(c) for a missing EULA link
 - [ ] Support URL and support email — B25, C14, C15
 - [ ] SKU — B5
@@ -129,9 +127,9 @@ United States, United Kingdom
 ```
 
 ### B14. App Privacy — Privacy Policy URL
-<!-- from: env/env.example.json PRIVACY_POLICY_URL -->
+<!-- from: the build's PRIVACY_POLICY_URL, given by the owner -->
 ```text
-TODO(owner): the same URL the build carries in PRIVACY_POLICY_URL
+https://damhongduc.github.io/personal-work-space/apps/reseller-studio/privacy_policy/
 ```
 
 ### B15. App Privacy — Data collection answers
@@ -232,7 +230,7 @@ Everything is free except exports. Premium unlocks every CSV export and the tax 
 Reseller Studio does not connect to your marketplace accounts, does not sell your data and does not use it for advertising.
 
 Reseller Studio Premium is available as a monthly or yearly auto-renewing subscription, or as a one-time lifetime purchase, at the price shown in the app. Payment is charged to your Apple Account at confirmation. A subscription renews automatically unless turned off at least 24 hours before the period ends; manage or cancel it in your Apple Account settings. Lifetime never renews.
-Privacy Policy: TODO(owner) privacy URL
+Privacy Policy: https://damhongduc.github.io/personal-work-space/apps/reseller-studio/privacy_policy/
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 ```
 
@@ -330,8 +328,9 @@ Free
 ```
 
 ### C5. App content — Privacy policy URL
+<!-- from: the build's PRIVACY_POLICY_URL, given by the owner -->
 ```text
-TODO(owner): the same URL as B14
+https://damhongduc.github.io/personal-work-space/apps/reseller-studio/privacy_policy/
 ```
 
 ### C6. App content — App access
@@ -452,8 +451,8 @@ Everything is free except exports. Premium unlocks every CSV export and the tax 
 
 Reseller Studio does not connect to your marketplace accounts, does not sell your data and does not use it for advertising.
 
-Privacy Policy: TODO(owner) privacy URL
-Terms of Use: TODO(owner) terms URL
+Privacy Policy: https://damhongduc.github.io/personal-work-space/apps/reseller-studio/privacy_policy/
+Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 ```
 
 ### C19. Main store listing — App icon (512 x 512 PNG)
