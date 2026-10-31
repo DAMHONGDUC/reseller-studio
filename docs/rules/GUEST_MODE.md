@@ -43,6 +43,7 @@ sources → purchases → categories → locations → marketplaces → carriers
 - **Restamp, do not rewrite.** A pushed row keeps its local id and gains the real `workspaceId` and `createdBy`. Every foreign key between two local rows stays valid, since only the column changed — the clean property hard rule 14 bought.
 - **Drop a local row only once the server confirms it.** A kill mid-push costs a re-push, never a record.
 - **The push is not a screen.** It runs behind the splash with the same gate `AppFreshInstall` uses; nothing in the app waits on it afterwards.
+- **The splash never waits on a push that cannot finish.** An account with no workspace starts the push itself — it creates the workspace, so waiting for one first held the splash forever (App Review, Sign in with Apple, build 49). A push that fails lands on workspace setup; the rows stay on the device and the next launch tries again.
 
 ### Which workspace it lands in
 
