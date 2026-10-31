@@ -163,8 +163,10 @@ final Provider<WorkspaceStatus> workspaceStatusProvider =
       // and `GuestDrainGate` is about to create one from it — putting the
       // form in front of them first would ask for what they have already
       // given (`docs/rules/GUEST_MODE.md`). Loading holds the splash for the
-      // moment that takes.
-      if ((ref.watch(guestRowsOwedProvider).value ?? 0) > 0) {
+      // moment that takes — and only while the drain can still finish: once
+      // it has failed, the form is the screen the seller can act on.
+      if ((ref.watch(guestRowsOwedProvider).value ?? 0) > 0 &&
+          !ref.watch(guestDrainFailedProvider)) {
         return WorkspaceStatus.loading;
       }
 
@@ -173,6 +175,41 @@ final Provider<WorkspaceStatus> workspaceStatusProvider =
       // that never resolves.
       return WorkspaceStatus.none;
     });
+
+/// True once the signed-in account's profile has arrived and lists no business.
+///
+/// The drain's cue on a first sign-in: with nothing to choose between, the
+/// guest's own business becomes the account's. Without it the drain waited for
+/// a business that only the drain creates, and the splash held forever — App
+/// Review's "loaded indefinitely" on Sign in with Apple.
+///
+/// **A profile still loading, or one that failed, is not "none".** A
+/// returning seller whose list is merely slow must never be handed a second
+/// business.
+final Provider<bool> accountHasNoWorkspaceProvider = Provider<bool>((
+  Ref ref,
+) {
+  final AsyncValue<UserProfile?> profile = ref.watch(userProfileProvider);
+
+  if (profile.isLoading || profile.hasError) return false;
+
+  return profile.value?.workspaceIds.isEmpty ?? true;
+});
+
+/// Whether the guest drain failed on this launch.
+///
+/// Read by [workspaceStatusProvider] so a failed drain ends on the setup form
+/// rather than a splash waiting for rows that will not move. The records stay
+/// on the device and the drain is tried again on the next launch.
+class GuestDrainFailed extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void record() => state = true;
+}
+
+final NotifierProvider<GuestDrainFailed, bool> guestDrainFailedProvider =
+    NotifierProvider<GuestDrainFailed, bool>(GuestDrainFailed.new);
 
 /// What the six business repositories are pointed at, or null when there is
 /// nothing to point them at yet.

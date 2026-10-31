@@ -66,6 +66,9 @@ class _GuestDrainGateState extends ConsumerState<GuestDrainGate> {
       // either way, so this is a message rather than a failure state.
       if (!mounted) return;
 
+      // Lets the router leave the splash for the setup form.
+      ref.read(guestDrainFailedProvider.notifier).record();
+
       SdSnackBarUtilsV3.error(
         context,
         FailurePresenter.message(context, error),
@@ -83,7 +86,11 @@ class _GuestDrainGateState extends ConsumerState<GuestDrainGate> {
   @override
   Widget build(BuildContext context) {
     final bool linked = ref.watch(accountKindProvider) == AccountKind.linked;
-    final bool ready = ref.watch(currentWorkspaceIdProvider) != null;
+    // A business to drain into, or a first sign-in with none — the drain
+    // creates that one itself, so waiting for it would wait forever.
+    final bool ready =
+        ref.watch(currentWorkspaceIdProvider) != null ||
+        ref.watch(accountHasNoWorkspaceProvider);
 
     if (linked && ready) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _maybeDrain());

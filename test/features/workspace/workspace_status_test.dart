@@ -120,4 +120,72 @@ void main() {
       WorkspaceStatus.none,
     );
   });
+
+  group('a first sign-in with guest records on the device', () {
+    // App Review's "loaded indefinitely" on Sign in with Apple: a new account
+    // has no business, the device always holds guest rows (the seeded
+    // defaults), so the splash held while the drain waited for a business
+    // that only the drain creates.
+    ProviderContainer containerFor(AsyncValue<UserProfile?> profile) {
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          userProfileProvider.overrideWithValue(profile),
+          guestRowsOwedProvider.overrideWithValue(const AsyncData<int>(3)),
+        ],
+      );
+
+      addTearDown(container.dispose);
+
+      return container;
+    }
+
+    test('the drain is cued once the profile lists no business', () {
+      final ProviderContainer container = containerFor(
+        AsyncData<UserProfile?>(_profile(workspaceIds: const <String>[])),
+      );
+
+      expect(container.read(accountHasNoWorkspaceProvider), isTrue);
+    });
+
+    test('an account with no profile document yet cues it too', () {
+      final ProviderContainer container = containerFor(
+        const AsyncData<UserProfile?>(null),
+      );
+
+      expect(container.read(accountHasNoWorkspaceProvider), isTrue);
+    });
+
+    test('a slow or failed profile never cues a second business', () {
+      expect(
+        containerFor(
+          const AsyncLoading<UserProfile?>(),
+        ).read(accountHasNoWorkspaceProvider),
+        isFalse,
+      );
+      expect(
+        containerFor(
+          AsyncError<UserProfile?>(Exception('denied'), StackTrace.empty),
+        ).read(accountHasNoWorkspaceProvider),
+        isFalse,
+      );
+      expect(
+        containerFor(
+          AsyncData<UserProfile?>(_profile()),
+        ).read(accountHasNoWorkspaceProvider),
+        isFalse,
+      );
+    });
+
+    test('the splash holds while the drain runs, and lets go if it fails', () {
+      final ProviderContainer container = containerFor(
+        AsyncData<UserProfile?>(_profile(workspaceIds: const <String>[])),
+      );
+
+      expect(container.read(workspaceStatusProvider), WorkspaceStatus.loading);
+
+      container.read(guestDrainFailedProvider.notifier).record();
+
+      expect(container.read(workspaceStatusProvider), WorkspaceStatus.none);
+    });
+  });
 }
