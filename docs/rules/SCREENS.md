@@ -451,7 +451,7 @@ past nine fields they were not changing, and popped back — for one number.
 
 ## A detail screen opens on a summary, and every section stays open
 
-Owner's call, approved with `docs/UI_POLISH_PLAN.md`; the folding half was
+Owner's call, approved with `docs/plans/UI_POLISH_PLAN.md`; the folding half was
 taken back out by the owner (`docs/rules/DESIGN_SYSTEM.md`, Swiping and
 motion). It sits on top of the in-place editing rule above.
 

@@ -4,7 +4,7 @@ Read this when touching `firestore.rules`, `firestore.indexes.json`, anything
 under `functions/`, or any `data/` method that queries Firestore or calls a
 marketplace.
 
-What is stored, and what a field means, is `docs/DATA_MODEL.md`. This file is
+What is stored, and what a field means, is `docs/architecture/DATA_MODEL.md`. This file is
 about how the backend is written.
 
 ## Security rules

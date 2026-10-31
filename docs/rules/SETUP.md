@@ -18,4 +18,4 @@ Without Firebase, the app resolves to signed out and remains usable only with
 seed a workspace from More → General → Seed demo data. There is no auth bypass
 (hard rule 1).
 
-The full owner checklist is [`../../RELEASE_ACTIONS.md`](../../RELEASE_ACTIONS.md).
+The full owner checklist is [`docs/release/RELEASE_ACTIONS.md`](../release/RELEASE_ACTIONS.md).

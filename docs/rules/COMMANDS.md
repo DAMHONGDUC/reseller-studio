@@ -153,7 +153,7 @@ Everything a release depends on except the build, and the app owns it: the
 installed config matches the flavour, the App Store Connect key is accepted,
 the build number settles against what TestFlight already has, and on CI the
 profiles resolve and carry the entitlements. It fails loudly, so it is the
-check `RELEASE_ACTIONS.md` cannot be.
+check `docs/release/RELEASE_ACTIONS.md` cannot be.
 
 **`flavor:` is optional and skipped rather than defaulted** — defaulting to
 prod would fail a rehearsal on a dev machine over the one question it was not
@@ -210,7 +210,7 @@ Its contract, in order:
 
 **The script is the one place that list is written.** Never copy the
 `firebase deploy` line into a document: `storage` once went missing from the
-script while `RELEASE_ACTIONS.md` still named it, and the bucket the app
+script while `docs/release/RELEASE_ACTIONS.md` still named it, and the bucket the app
 uploads to was the one nobody was deploying rules for.
 
 ### `release-*` — the three steps that are always run together

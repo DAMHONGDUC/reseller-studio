@@ -33,7 +33,7 @@ any action that can be blocked by an entitlement.
 - **Marketplace and supplier connections are Premium.** Owner's rule, and the
   one exception to "everything is free except export": a connection is the
   first feature with a running cost per seller — every poll, monitor run and
-  supplier call is server time (`docs/DROPSHIPPING_PLAN.md`).
+  supplier call is server time (`docs/plans/DROPSHIPPING_PLAN.md`).
   - **Gated in the backend as well as the UI**, unlike export. A Function that
     syncs, monitors or places an order reads the workspace's entitlement
     first; a gate in the app alone would let a modified client run the

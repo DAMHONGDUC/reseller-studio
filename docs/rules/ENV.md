@@ -117,7 +117,7 @@ twice, and the copy nothing read. What stayed:
 nothing in the binary — on iOS the app presents Apple's sheet itself and hands
 the token to Firebase, elsewhere `FirebaseAuth.signInWithProvider` runs the web
 flow — and the Services ID is configured in the Firebase console. See
-`RELEASE_ACTIONS.md`.
+`docs/release/RELEASE_ACTIONS.md`.
 
 **Theme is a preference, not a build flag.** `ThemeModeController` reads
 `PrefsKeyConstant.themeMode` and is device-local on purpose: a seller on a
@@ -151,7 +151,7 @@ secrets". They are not repeated here.
 `Marketplace.estimatedFeeRate`. They do not vary per build, and they must be
 readable from a unit test without a build flag. The stale threshold especially:
 it is per-workspace data in Firestore (`Workspace.staleThresholdDays`), so
-freezing it into a build file would contradict `docs/DATA_MODEL.md`.
+freezing it into a build file would contradict `docs/architecture/DATA_MODEL.md`.
 `env/README.md` has the full list and the reasoning.
 
 **The privacy policy and terms URLs are env keys, not constants** — owner's

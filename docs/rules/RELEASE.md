@@ -247,5 +247,5 @@ a push. What is load-bearing in `.github/workflows/release.yml`:
 
 `docs/release/PIPELINE.md` is the shape of a run; `docs/release/CREDENTIALS.md`
 is what each credential is and where it lives. Everything not configured yet is
-in `RELEASE_ACTIONS.md` — that file is the one place "it doesn't work" is
+in `docs/release/RELEASE_ACTIONS.md` — that file is the one place "it doesn't work" is
 answered, and this pipeline did not get a second one.
