@@ -76,7 +76,7 @@ binary without Firebase configuration.
 |---|---|
 | Legal | Review and host [`docs/STORE_PRIVACY.md`](docs/STORE_PRIVACY.md); host Terms of Use |
 | Privacy forms | Submit the App Store and Play answers from the privacy document |
-| Listing | Paste every field from [`MARKETING_INFO.md`](MARKETING_INFO.md), top to bottom, and close its `TODO(owner)` list |
+| Listing | Paste every field from [`docs/MARKETING_INFO.md`](docs/MARKETING_INFO.md), top to bottom, and close its `TODO(owner)` list |
 | Hardware checks | Auth, push, camera, photo picker, deep links and dark cold start |
 | Billing checks | Monthly purchase, yearly purchase, lifetime purchase, cancellation state and restore |
 | Translations | Native read-through of `es`, `fr`, `de`, `pt`, `zh` and `vi` — every one is unreviewed machine work (hard rule 7) |
