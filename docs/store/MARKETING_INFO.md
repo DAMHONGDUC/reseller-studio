@@ -27,7 +27,7 @@ Values no file in the project holds. Each one is a `TODO(owner)` further down, i
 | `assets/mkt/reseller-studio-youtube-thumbnail-1280x720.png` | YouTube thumbnail (D4) |
 | `assets/mkt/reseller-studio-upwork-cover-1600x1200.png` | Upwork cover (E5) |
 | `assets/mkt/store-mkt-assets/reseller-studio-store-image-1024x1024.png` | Upwork images (E7); any promo slot that takes a square |
-| `assets/mkt/store-mkt-assets/ios/reseller-studio-iphone-1…5-1320x2868.png` | App Store iPhone 6.9" (B21) |
+| `assets/mkt/store-mkt-assets/ios/reseller-studio-iphone-1…5-1206x2622.png` | App Store iPhone 6.1"/6.3" (B21) |
 | `assets/mkt/store-mkt-assets/ipad/reseller-studio-ipad-1…5-2064x2752.png` | App Store iPad 13" (B21), Play tablet (C22) |
 | `assets/mkt/store-mkt-assets/android/reseller-studio-android-1…5-1080x1920.png` | Play phone (C22) |
 | `assets/icon/app_icon.png` (1024 x 1024) | Play app icon, scaled to 512 (C19) |
@@ -177,7 +177,7 @@ The paywall opens from More → General → Subscription, and from the Go Premiu
 ### B21. Version — Screenshots (files, sizes, order)
 <!-- from: assets/mkt/store-mkt-assets/ -->
 ```text
-iPhone 6.9" (1320 x 2868): assets/mkt/store-mkt-assets/ios/reseller-studio-iphone-1…5-1320x2868.png, in number order
+iPhone 6.1"/6.3" (1206 x 2622): assets/mkt/store-mkt-assets/ios/reseller-studio-iphone-1…5-1206x2622.png, in number order
 iPad 13" (2064 x 2752): assets/mkt/store-mkt-assets/ipad/reseller-studio-ipad-1…5-2064x2752.png, in number order
 ```
 
@@ -605,7 +605,7 @@ TODO(owner): the YouTube URL from D
 
 ### E7. Content — images
 ```text
-assets/mkt/store-mkt-assets/reseller-studio-store-image-1024x1024.png, then ios/reseller-studio-iphone-1…5-1320x2868.png
+assets/mkt/store-mkt-assets/reseller-studio-store-image-1024x1024.png, then ios/reseller-studio-iphone-1…5-1206x2622.png
 ```
 
 ### E8. Content — link
