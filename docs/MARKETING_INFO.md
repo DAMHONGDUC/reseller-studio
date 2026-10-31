@@ -20,7 +20,6 @@ Values no file in the project holds. Each one is a `TODO(owner)` further down, i
 - [ ] Google Play screenshots no longer than 2:1 — the iPhone set is 1242 x 2688, which Play rejects — C22
 - [ ] Google Play feature graphic, 1024 x 500 — C20
 - [ ] YouTube URL, once the video is uploaded — C21, E6
-- [ ] Your role on Upwork — E2
 
 ## Assets
 
@@ -573,18 +572,26 @@ Reseller Studio — iOS & Android app for resellers (Flutter, Firebase)
 
 ### E2. Your role · max 100
 ```text
-TODO(owner): e.g. Product designer and Flutter developer, app and backend
+Mobile dev, backend dev, UI/UX
 ```
 
 ### E3. Project description · max 600
-<!-- from: docs/DONE_WORK.md, pubspec.yaml, CLAUDE.md tech stack -->
+<!-- from: docs/DONE_WORK.md, pubspec.yaml, functions/package.json -->
 ```text
-A seller operating system for resellers and dropshippers. It opens on what needs attention today, adds an item with just a title, runs bulk actions across many items, and measures real profit from what each platform actually paid — never an estimate. Works without an account on a local Drift database; signing in moves the records to Firestore with team roles. Seven languages, US and UK tax summaries. Built with Flutter, Riverpod, Drift, Firebase (Auth, Firestore, Storage, Cloud Functions) and RevenueCat.
+- Seller operating system for resellers and dropshippers
+- Home opens on what needs attention today
+- Add an item with just a title; barcode scan
+- Bulk reprice, list and archive
+- Real profit from what each platform paid, never estimated
+- Works offline with no account; sign in to sync and share with a team
+- 7 languages, US and UK tax summaries
+- Flutter, Riverpod, Drift, Firebase, Cloud Functions, RevenueCat
+- Test build (TestFlight) ready — ping me if you want to try it
 ```
 
 ### E4. Skills and deliverables · max 5 items
 ```text
-Flutter, Dart, Firebase, Mobile App Development, iOS Development
+Flutter, Firebase, Node.js, Figma
 ```
 
 ### E5. Content — cover image
