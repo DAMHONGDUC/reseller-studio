@@ -500,7 +500,7 @@ First release of Reseller Studio.
 
 ### D1. Title · max 100
 ```text
-Reseller Studio — inventory, orders and real profit for resellers
+Mobile App | Reseller Studio — inventory, orders and real profit for resellers
 ```
 
 ### D2. Description · max 5000
