@@ -73,14 +73,9 @@ class PaywallFooterLinks extends StatelessWidget {
   }
 }
 
-/// One underlined link in the paywall's footer row.
-///
-/// **A [TextButton], not [SdButtonV3].** The design system's button is a
-/// control with a fill, a border and a full-size padding on every variant; a
-/// legal link is type with a rule under it, and dressing three of them as
-/// buttons is what made the old footer read as an action bar. The Material
-/// button is used only for its ink and focus handling, with its own minimum
-/// size and tap-target padding taken off.
+/// One underlined link in the paywall's footer row — the design system's
+/// link variant, which is type with a rule under it rather than a control,
+/// so three of them do not read as an action bar.
 class PaywallFooterLink extends StatelessWidget {
   const PaywallFooterLink({
     required this.label,
@@ -94,44 +89,12 @@ class PaywallFooterLink extends StatelessWidget {
   final bool busy;
 
   @override
-  Widget build(BuildContext context) {
-    final TextStyle style = context.textTheme3.bodySmall!.copyWith(
-      color: context.sdTheme3.textSecondary,
-      decoration: TextDecoration.underline,
-    );
-
-    return TextButton(
-      onPressed: busy ? null : onPressed,
-      style: TextButton.styleFrom(
-        minimumSize: Size.zero,
-        padding: EdgeInsets.symmetric(
-          horizontal: SdSpacingConstant.w8,
-          vertical: SdSpacingConstant.h10,
-        ),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          if (busy) ...<Widget>[
-            SdLoadingV3(
-              size: SdLoadingV3.inlineSize,
-              color: context.sdTheme3.textSecondary,
-            ),
-            SizedBox(width: SdSpacingConstant.w6),
-          ],
-          Flexible(
-            child: Text(
-              label,
-              style: style,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => SdButtonV3(
+    variant: SdButtonVariantV3.link,
+    label: label,
+    busy: busy,
+    onPressed: onPressed,
+  );
 }
 
 /// The separator between two footer links. Decorative, so it says nothing to
