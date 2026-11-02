@@ -92,12 +92,3 @@ make release-android-prod
 `deploy-be` ships the backend (Firebase rules, indexes, functions), `release-ios` the IPA to TestFlight, `release-android` the APK and AAB into `Release/`. A build that needs new rules goes after `deploy-be`. Use `dev` for the dev environment.
 
 Never archive from Xcode: only the release lane supplies the build-time config Firebase needs.
-
-Combo cmd:
-```sh
-make deploy-be-dev && make release-ios-dev && make deploy-be-prod && make release-ios-prod
-```
-
-```sh
-make release-android-dev && make release-android-prod
-```
