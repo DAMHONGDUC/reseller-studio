@@ -18,10 +18,9 @@ Every command is `make <name>`; bare `make` lists them. The root `Makefile` incl
 |---|---|---|
 | `setup` | `set_up.sh` | Wipe, then everything a fresh clone needs. Idempotent. |
 | `setup-deep` | `set_up.sh --deep` | `setup` plus Xcode's derived data. Costs a cold build. |
-| `clean` | `clean_build.sh` | Build outputs only — no `pub get`, no codegen. |
 | `env-dev` / `env-prod` | `prepare_env.sh <flavour>` | Install that flavour's config — env files + native files. |
-| `gen` | `generate_code.sh` | Localizations and codegen, nothing else. |
-| `analyze` | `analyze_code.sh` | Zero findings, or fail. What CI runs. |
+| `gen` | `generate_code.sh` | Localizations and codegen, nothing else. Off the shared list, still runs. |
+| `analyze` | `analyze_code.sh` | Zero findings, or fail. What CI runs. Off the shared list, still runs — the definition of done types it. |
 | `test` | `run_tests.sh` | `TEST=<path>` scopes it to one file or folder. |
 | `run-dev` / `run-prod` | `run_app.sh <flavour>` | `flutter run` in debug, with that flavour's config. |
 | `pre-build` | fastlane `preflight` | The app's own gate — config, signing, build number. |
@@ -37,7 +36,7 @@ Recurring shapes, and the pattern to copy:
 - **One script serves every flavour, taking it as `$1`.** `flutter.mk` has one pattern rule per command; nothing is duplicated per flavour.
 - **A chaining command calls the other scripts, never their steps.** `release_ios.sh` runs `prepare_env.sh`, `deploy_firebase.sh` and the beta lane in order, re-implementing none — so the confirm prompt and every check are the ones each step gets alone.
 
-`apk-*` and `aab-*` are on the shared list and say there is no Flutter Android release script yet; the old names (`set-up`, `build-ipa-*`, `app-icon`, …) still run and stay out of `make help`.
+**The shared list stays minimal** (owner's rule), so `gen` and `analyze` are off it and out of `make help`, and still run; `clean` is gone. `apk-*` and `aab-*` are on the shared list and say there is no Flutter Android release script yet; the old names (`set-up`, `build-ipa-*`, `app-icon`, …) still run and stay out of `make help`.
 
 **`run-*` is back, with the shared list** — it was deleted here once, and returned when every platform took the same commands. **No `test-rules` or `_url-scheme` command exists, and no `pre-build` script.** Both were deleted. `pre-build` is the one command whose body is not a shared script: a gate naming this app's bundle ids, entitlements and store rules cannot live in a folder every app shares, so it is the `preflight` lane, reached through this app's `Makefile`. **`release-*` does not run it** — `release_ios.sh` names no app — so run `pre-build` before a release; the release does not run it for you.
 
