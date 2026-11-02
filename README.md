@@ -59,14 +59,20 @@ Every command in detail: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 
 ## Release
 
+Three parts; each deploy and release installs the flavor's config first, by itself.
+
 ```sh
-make release-dev
+make deploy-be-prod
 ```
 
 ```sh
-make release-prod
+make release-ios-prod NOTE="what changed"
 ```
 
-Runs config, Firebase, then TestFlight, and stops at the first failure. Add a TestFlight note with `make release-prod NOTE="what changed"`.
+```sh
+make release-android-prod
+```
+
+`deploy-be` ships the backend (Firebase rules, indexes, functions), `release-ios` the IPA to TestFlight, `release-android` the APK and AAB into `Release/`. A build that needs new rules goes after `deploy-be`. Use `dev` for the dev environment.
 
 Never archive from Xcode: only the release lane supplies the build-time config Firebase needs.

@@ -28,7 +28,7 @@ Internal TestFlight can start before external Beta App Review; production auth, 
 | Firebase services | Enable Auth, Firestore, Storage, Crashlytics, Analytics and Messaging |
 | Google | Register debug/release SHA-1 and SHA-256; test a release-signed Android build |
 | Apple | Enable Sign in with Apple on the App ID and configure Firebase's Apple provider |
-| Deploy | Use `make deploy-dev` or `make deploy-prod` |
+| Deploy | Use `make deploy-be-dev` or `make deploy-be-prod` |
 
 No auth bypass exists. Until Firebase is configured, use More → General → Seed demo data.
 
@@ -77,8 +77,14 @@ Never archive from Xcode: it skips `--dart-define-from-file` and can ship a bina
 
 ## Release command
 
+Backend first when the build needs new rules, then the app:
+
 ```sh
-make release-prod NOTE="release notes"
+make deploy-be-prod
+```
+
+```sh
+make release-ios-prod NOTE="release notes"
 ```
 
 Pipeline details: [`PIPELINE.md`](PIPELINE.md).
