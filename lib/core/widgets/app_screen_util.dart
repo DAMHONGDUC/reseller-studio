@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// `ScreenUtilInit` with the clamp that stops a tablet scaling every token.
 ///

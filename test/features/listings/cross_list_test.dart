@@ -15,7 +15,7 @@ import 'package:reseller_studio/features/listings/domain/enums/listing_status.da
 import 'package:reseller_studio/features/listings/presentation/controllers/cross_list_controller.dart';
 import 'package:reseller_studio/features/listings/presentation/screens/cross_list_screen/cross_list_screen.dart';
 import 'package:reseller_studio/features/listings/providers.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

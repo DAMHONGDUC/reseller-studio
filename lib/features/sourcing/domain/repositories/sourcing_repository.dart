@@ -33,7 +33,7 @@ abstract interface class PurchaseRepository {
   Future<void> delete(String id);
 }
 
-/// A dropship supplier's products (`docs/DROPSHIPPING_PLAN.md`).
+/// A dropship supplier's products (`docs/plans/DROPSHIPPING_PLAN.md`).
 abstract interface class SupplierProductRepository {
   /// Every product, soft-deleted ones included — orders point at them.
   Stream<List<SupplierProduct>> watchProducts();

@@ -26,7 +26,7 @@ abstract interface class OrderRepository {
   Future<void> closeReturn(Order order, {required bool restock});
 }
 
-/// Orders placed with dropship suppliers (`docs/DROPSHIPPING_PLAN.md`).
+/// Orders placed with dropship suppliers (`docs/plans/DROPSHIPPING_PLAN.md`).
 abstract interface class SupplierOrderRepository {
   Stream<List<SupplierOrder>> watchSupplierOrders();
 

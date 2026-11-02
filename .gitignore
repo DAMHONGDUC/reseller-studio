@@ -152,3 +152,6 @@ tmp/
 # Made before a large rewrite so the original can be diffed against the
 # result; git already holds the committed history, so these never belong in it.
 *.orig.bak
+
+# Release APK/AAB from make release-android-<flavor>
+/Release/

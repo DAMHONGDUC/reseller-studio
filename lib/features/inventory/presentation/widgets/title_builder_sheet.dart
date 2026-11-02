@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../listings/domain/entities/title_parts.dart';
@@ -9,7 +9,7 @@ import '../../../marketplaces/domain/entities/marketplace.dart';
 import '../../../marketplaces/providers.dart';
 
 /// Builds a title from its parts, inside a marketplace's limit
-/// (`docs/DROPSHIPPING_PLAN.md`, decision 11.9 — rules, not a model).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`, decision 11.9 — rules, not a model).
 ///
 /// Returns the title, or null when the sheet is closed; the caller puts it
 /// in its own field, so nothing is saved until the seller saves the section.

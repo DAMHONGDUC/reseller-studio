@@ -4,7 +4,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/theme/app_tag_hue.dart';
 
 /// Where an order placed with a dropship supplier is
-/// (`docs/DROPSHIPPING_PLAN.md`).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// "To order" is not a status: a sold dropship line with no supplier order is
 /// a query, the way stale is (`SupplierOrders.toPlace`). Stored by [name].

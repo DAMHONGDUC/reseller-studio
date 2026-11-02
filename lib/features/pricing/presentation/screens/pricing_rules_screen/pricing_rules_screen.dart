@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
@@ -12,7 +12,7 @@ import '../../../domain/entities/pricing_rule.dart';
 import '../../../pricing_rule_label.dart';
 import '../../../providers.dart';
 
-/// Every pricing rule the business keeps (plan §15, `docs/DROPSHIPPING_PLAN.md`).
+/// Every pricing rule the business keeps (plan §15, `docs/plans/DROPSHIPPING_PLAN.md`).
 class PricingRulesScreen extends ConsumerWidget {
   const PricingRulesScreen({super.key});
 

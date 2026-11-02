@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../constants/log_tag_constant.dart';
 import '../money/money.dart';
@@ -19,7 +19,7 @@ final class FirestoreMapper {
   /// What Firestore writes into `createdAt` / `updatedAt`.
   ///
   /// **Never a client clock** — a phone with a wrong date would otherwise
-  /// sort itself to the top of every list forever (`docs/DATA_MODEL.md`).
+  /// sort itself to the top of every list forever (`docs/architecture/DATA_MODEL.md`).
   static FieldValue get serverTimestamp => FieldValue.serverTimestamp();
 
   /// A `Timestamp`, an ISO string, or null.

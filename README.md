@@ -17,28 +17,43 @@ SOURCE → PURCHASE → INVENTORY → LIST → SELL → SHIP → PROFIT → ANAL
 
 ## Setup
 
-Requirements: [FVM](https://fvm.app) and `make`. Commands come from the
-`packages/script-tools` submodule; `make` lists them.
+Needs [FVM](https://fvm.app) and `make`. Commands come from the `packages/script-tools` submodule; `make` lists them.
 
 ```sh
 git submodule update --init
 fvm install
-make set-up
+make setup
 ```
 
-Firebase and store accounts are not included in the repository. See
-[`RELEASE_ACTIONS.md`](RELEASE_ACTIONS.md) before connecting a real backend.
+Firebase and store accounts are not in the repo. Read [`docs/release/RELEASE_ACTIONS.md`](docs/release/RELEASE_ACTIONS.md) before connecting a real backend.
 
 ## Daily commands
 
 | Task | Command |
 |---|---|
+| Run the app | `make run-dev` |
 | Generate localization | `make gen` |
 | Analyze | `make analyze` |
 | Test one file | `make test TEST=<path>` |
 | Build checks | `make pre-build` |
 
-Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
+Every command in detail: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
+
+### Combo commands
+
+Dev first, then prod. `&&` stops at the first step that fails.
+
+Backend and iOS:
+
+```sh
+make deploy-be-dev && make release-ios-dev && make deploy-be-prod && make release-ios-prod
+```
+
+Android:
+
+```sh
+make release-android-dev && make release-android-prod
+```
 
 ## App identifiers
 
@@ -52,24 +67,28 @@ Full command behavior: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 | Need | Read |
 |---|---|
 | Documentation index | [`docs/README.md`](docs/README.md) |
-| Product authority | [`SELLER_OS_FINAL_MASTER_PLAN.md`](SELLER_OS_FINAL_MASTER_PLAN.md) |
+| Product authority | [`docs/plans/SELLER_OS_FINAL_MASTER_PLAN.md`](docs/plans/SELLER_OS_FINAL_MASTER_PLAN.md) |
 | Engineering rules | [`AGENTS.md`](AGENTS.md) |
-| Stored data contract | [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) |
-| Built and pending work | [`docs/DONE_WORK.md`](docs/DONE_WORK.md), [`docs/REMAINING_WORK.md`](docs/REMAINING_WORK.md) |
-| Release checklist | [`RELEASE_ACTIONS.md`](RELEASE_ACTIONS.md) |
+| Stored data contract | [`docs/architecture/DATA_MODEL.md`](docs/architecture/DATA_MODEL.md) |
+| Built and pending work | [`docs/status/DONE_WORK.md`](docs/status/DONE_WORK.md), [`docs/status/REMAINING_WORK.md`](docs/status/REMAINING_WORK.md) |
+| Release checklist | [`docs/release/RELEASE_ACTIONS.md`](docs/release/RELEASE_ACTIONS.md) |
 
 ## Release
 
+Three parts; each deploy and release installs the flavor's config first, by itself.
+
 ```sh
-make release-dev
+make deploy-be-prod
 ```
 
 ```sh
-make release-prod
+make release-ios-prod NOTE="what changed"
 ```
 
-Config, Firebase and TestFlight in that order, and it stops at the first
-failure. Add a TestFlight note with `make release-prod NOTE="what changed"`.
+```sh
+make release-android-prod
+```
 
-Do not archive from Xcode. The release lane supplies the build-time
-configuration required by Firebase.
+`deploy-be` ships the backend (Firebase rules, indexes, functions), `release-ios` the IPA to TestFlight, `release-android` the APK and AAB into `Release/`. A build that needs new rules goes after `deploy-be`. Use `dev` for the dev environment.
+
+Never archive from Xcode: only the release lane supplies the build-time config Firebase needs.

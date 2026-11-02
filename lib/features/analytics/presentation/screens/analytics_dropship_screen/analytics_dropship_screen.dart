@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/extensions/context_extensions.dart';
@@ -10,7 +10,7 @@ import '../../../domain/services/dropship_performance.dart';
 import '../../../providers.dart';
 import '../../widgets/metric_card.dart';
 
-/// Dropship analytics (`docs/DROPSHIPPING_PLAN.md`, §6): the business split
+/// Dropship analytics (`docs/plans/DROPSHIPPING_PLAN.md`, §6): the business split
 /// by who ships, products ranked best first — so the losing end is where a
 /// product to drop is found — and how fast each supplier dispatches.
 ///

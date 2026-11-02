@@ -13,7 +13,7 @@ import '../../domain/enums/item_status.dart';
 ///
 /// Field names carry their unit — `purchasePriceMinor`, not `purchasePrice` —
 /// so a reader of the console or the Firestore dashboard cannot mistake 1999
-/// for nineteen hundred dollars (`docs/DATA_MODEL.md`).
+/// for nineteen hundred dollars (`docs/architecture/DATA_MODEL.md`).
 final class ItemDto {
   /// The document's own currency, falling back to the workspace's.
   ///

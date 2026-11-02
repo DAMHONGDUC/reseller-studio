@@ -1,7 +1,7 @@
 part of 'item_detail_screen.dart';
 
 /// The top of Item detail: what the item is and the three figures a seller
-/// opens it for, before any section (`docs/UI_POLISH_PLAN.md`).
+/// opens it for, before any section (`docs/plans/UI_POLISH_PLAN.md`).
 ///
 /// Quiet on purpose — no hero, no tint: the screen keeps its one loud
 /// element for whatever needs attention.

@@ -1,5 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../../../core/analytics/app_analytics.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -56,22 +56,45 @@ class GuestDrainController extends Notifier<bool> {
   /// from a form: the seller already answered those, implicitly, by using the
   /// app — asking again would be the setup screen hard rule 2 exists to avoid.
   Future<void> intoNewWorkspace() async {
-    final Workspace? guest = ref.read(guestWorkspaceProvider).value;
-    final String? uid = ref.read(currentUidProvider);
+    final String workspaceId;
 
-    if (guest == null || uid == null) return;
+    try {
+      // Awaited, not read: right after sign-in the local store may not have
+      // answered yet, and returning quietly here left the splash holding.
+      final Workspace? guest = await ref.read(guestWorkspaceProvider.future);
+      final String? uid = ref.read(currentUidProvider);
 
-    final String workspaceId = await ref
-        .read(workspaceRepositoryProvider)
-        .createWorkspace(
-          name: guest.name,
-          country: guest.country,
-          currency: guest.currency,
-          ownerId: uid,
-          marketplaces: ref.read(defaultMarketplacesProvider),
-          categories: ref.read(defaultItemCategoriesProvider),
-          carriers: ref.read(defaultCarriersProvider),
-        );
+      if (guest == null || uid == null) {
+        throw StateError('No guest business or no account to drain into');
+      }
+
+      SdLogger.action(
+        LogTagConstant.workspace,
+        'Create business from guest records',
+        <String, Object>{'country': guest.country, 'currency': guest.currency},
+      );
+
+      workspaceId = await ref
+          .read(workspaceRepositoryProvider)
+          .createWorkspace(
+            name: guest.name,
+            country: guest.country,
+            currency: guest.currency,
+            ownerId: uid,
+            marketplaces: ref.read(defaultMarketplacesProvider),
+            categories: ref.read(defaultItemCategoriesProvider),
+            carriers: ref.read(defaultCarriersProvider),
+          );
+    } catch (error, stackTrace) {
+      SdLogger.error(
+        LogTagConstant.workspace,
+        'Could not create a business from guest records',
+        error: error,
+        stackTrace: stackTrace,
+      );
+
+      rethrow;
+    }
 
     await intoWorkspace(workspaceId);
   }

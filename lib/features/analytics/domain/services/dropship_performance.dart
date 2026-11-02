@@ -49,7 +49,7 @@ class SupplierShipTime {
   final int shipments;
 }
 
-/// The dropship breakdown (`docs/DROPSHIPPING_PLAN.md`, §6 Analytics): the
+/// The dropship breakdown (`docs/plans/DROPSHIPPING_PLAN.md`, §6 Analytics): the
 /// business split by who ships, products ranked, suppliers timed.
 final class DropshipPerformance {
   /// Every revenue-counting line, split into stocked and dropshipped by the

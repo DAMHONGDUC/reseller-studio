@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../features/activity/presentation/screens/activity_screen/activity_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_categories_screen/analytics_categories_screen.dart';

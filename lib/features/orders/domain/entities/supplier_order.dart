@@ -2,7 +2,7 @@ import '../../../../core/money/money.dart';
 import '../enums/supplier_order_status.dart';
 
 /// One order placed with a dropship supplier for one sold line
-/// (`docs/DROPSHIPPING_PLAN.md`).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// Its costs are facts — what the supplier charged and refunded — and they
 /// become the sold line's cost, which is how a dropship sale's profit is

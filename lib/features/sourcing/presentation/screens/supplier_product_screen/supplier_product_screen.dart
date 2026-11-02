@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
@@ -27,7 +27,7 @@ part 'supplier_product_screen_fields.dart';
 part 'supplier_product_screen_status.dart';
 
 /// Add or edit one supplier product, and list it as a dropship item
-/// (`docs/DROPSHIPPING_PLAN.md`). Only the title is required (hard rule 2).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`). Only the title is required (hard rule 2).
 class SupplierProductScreen extends ConsumerStatefulWidget {
   const SupplierProductScreen({
     required this.sourceId,

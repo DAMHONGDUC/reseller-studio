@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 /// One flat table, scoped to one workspace.
 ///
@@ -35,7 +35,7 @@ class WorkspaceTable {
   /// The stored document id is `{workspaceId}_{id}`, which is how SQL spells
   /// a composite primary key. Without it every workspace's `ebay` marketplace,
   /// `usps` carrier and `{uid}` membership would be the same document
-  /// (`docs/DATA_MODEL.md`).
+  /// (`docs/architecture/DATA_MODEL.md`).
   DocumentReference<Map<String, Object?>> doc(String id) =>
       _collection.doc(documentId(workspaceId, id));
 

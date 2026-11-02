@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// Finds a screen's add button by what it does.
 ///

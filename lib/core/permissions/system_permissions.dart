@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../constants/log_tag_constant.dart';
 import 'app_permission.dart';

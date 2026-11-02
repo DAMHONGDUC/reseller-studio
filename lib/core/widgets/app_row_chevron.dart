@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 import '../constants/app_icon_constant.dart';
 
 /// The glyph at the end of a row-shaped card that opens something.

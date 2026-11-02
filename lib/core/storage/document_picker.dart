@@ -1,5 +1,5 @@
 import 'package:image_picker/image_picker.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../constants/log_tag_constant.dart';
 import '../permissions/system_permissions.dart';

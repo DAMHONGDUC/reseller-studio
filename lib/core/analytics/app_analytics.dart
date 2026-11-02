@@ -1,5 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../constants/log_tag_constant.dart';
 import 'analytics_parameter_utils.dart';

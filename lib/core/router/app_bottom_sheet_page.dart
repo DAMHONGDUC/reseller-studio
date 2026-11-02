@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// A declarative route that keeps bottom sheets addressable by GoRouter.
 class AppBottomSheetPage<T> extends Page<T> {

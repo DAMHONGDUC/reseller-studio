@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
@@ -17,7 +17,7 @@ import '../../../providers.dart';
 import '../../controllers/sourcing_controller.dart';
 
 /// The dropship suppliers — sources that ship to the buyer for the seller
-/// (`docs/DROPSHIPPING_PLAN.md`). Only a name is asked for (plan §28).
+/// (`docs/plans/DROPSHIPPING_PLAN.md`). Only a name is asked for (plan §28).
 class SuppliersScreen extends ConsumerWidget {
   const SuppliersScreen({super.key});
 

@@ -1,7 +1,7 @@
 part of 'item_detail_screen.dart';
 
 /// Who ships a dropshipped item, primary first, and what an order costs at
-/// each (`docs/DROPSHIPPING_PLAN.md`). Absent on a stocked item.
+/// each (`docs/plans/DROPSHIPPING_PLAN.md`). Absent on a stocked item.
 class _SuppliersSection extends ConsumerWidget {
   const _SuppliersSection({required this.item});
 

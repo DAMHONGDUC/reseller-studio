@@ -1,5 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/money/money.dart';
@@ -19,7 +19,7 @@ import '../../domain/services/supplier_orders.dart';
 import 'order_actions_controller.dart';
 
 /// Recording what happens to an order placed with a dropship supplier, by
-/// hand (`docs/DROPSHIPPING_PLAN.md`, Phase 1).
+/// hand (`docs/plans/DROPSHIPPING_PLAN.md`, Phase 1).
 ///
 /// Every write that changes what the supplier charged also re-costs the sold
 /// line in the same commit, so the sale's profit is always measured from the

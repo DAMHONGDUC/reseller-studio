@@ -9,7 +9,7 @@ import 'package:reseller_studio/features/home/presentation/screens/home_screen/h
 import 'package:reseller_studio/features/subscription/domain/entities/subscription_status.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

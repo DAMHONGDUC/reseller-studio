@@ -3,7 +3,7 @@ import 'package:reseller_studio/core/widgets/app_pinned_action.dart';
 import 'package:reseller_studio/core/widgets/mark_sold_sheet.dart';
 import 'package:reseller_studio/core/widgets/price_entry_sheet.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

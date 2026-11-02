@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
@@ -31,7 +31,7 @@ part 'pricing_rule_detail_screen_preview.dart';
 part 'pricing_rule_detail_screen_scope.dart';
 
 /// Create or edit one pricing rule, with the price it gives shown as the
-/// seller types (`docs/DROPSHIPPING_PLAN.md`).
+/// seller types (`docs/plans/DROPSHIPPING_PLAN.md`).
 class PricingRuleDetailScreen extends ConsumerStatefulWidget {
   const PricingRuleDetailScreen({this.ruleId, super.key});
 

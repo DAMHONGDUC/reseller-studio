@@ -3,7 +3,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

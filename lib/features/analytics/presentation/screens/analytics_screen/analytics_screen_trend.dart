@@ -41,7 +41,7 @@ class _ProfitTrend extends ConsumerWidget {
 /// The bars themselves, drawn by `fl_chart`.
 ///
 /// **They grow in from the axis the first time they are drawn, and move to
-/// a new period rather than jumping** (`docs/UI_POLISH_PLAN.md`) — the
+/// a new period rather than jumping** (`docs/plans/UI_POLISH_PLAN.md`) — the
 /// chart's own tween, on `SdMotionV3` timing, and none under reduced motion.
 class _TrendChart extends StatefulWidget {
   const _TrendChart({required this.buckets, required this.grain});

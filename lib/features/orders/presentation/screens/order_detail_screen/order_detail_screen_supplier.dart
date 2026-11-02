@@ -1,7 +1,7 @@
 part of 'order_detail_screen.dart';
 
 /// The supplier half of a dropship sale: whether it has been ordered, what
-/// it cost, and where the parcel is (`docs/DROPSHIPPING_PLAN.md`).
+/// it cost, and where the parcel is (`docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// **It owns its header and is absent on a sale with no dropship line.**
 class _SupplierSection extends ConsumerWidget {

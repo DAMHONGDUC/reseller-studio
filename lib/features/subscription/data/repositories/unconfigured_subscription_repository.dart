@@ -1,4 +1,4 @@
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../../../core/config/app_env.dart';
 import '../../../../core/constants/log_tag_constant.dart';
@@ -45,7 +45,7 @@ class UnconfiguredSubscriptionRepository implements SubscriptionRepository {
 
     throw const AppFailure(
       AppFailureKind.invalidData,
-      technicalMessage: 'RevenueCat is not configured — see RELEASE_ACTIONS.md',
+      technicalMessage: 'RevenueCat is not configured — see docs/release/RELEASE_ACTIONS.md',
     );
   }
 

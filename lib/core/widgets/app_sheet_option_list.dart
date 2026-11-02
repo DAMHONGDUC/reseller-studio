@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// The rows of choices inside a bottom sheet: one card, a rule between rows.
 ///

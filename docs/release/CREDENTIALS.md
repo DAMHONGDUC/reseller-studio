@@ -1,6 +1,6 @@
 # Release credentials
 
-Never place credential values in this document.
+Never put a credential value here.
 
 ## Local
 
@@ -11,8 +11,7 @@ Never place credential values in this document.
 | External `.p8` file | App Store Connect private key |
 | Private certificates repo | Match-managed signing certificate and profile |
 
-`ios/fastlane/.env.example` is the key list. Keep the real file gitignored and
-newline-terminated.
+`ios/fastlane/.env.example` is the key list. Keep the real file gitignored and newline-terminated.
 
 ## GitHub Actions secrets
 
@@ -26,8 +25,7 @@ newline-terminated.
 | `MATCH_GIT_BASIC_AUTHORIZATION` | Base64 `user:PAT` | Read-only repository authorization |
 | `FIREBASE_APP_ID_IOS` | Plain, optional | Crashlytics dSYM upload |
 
-Set exactly one Match authorization mechanism. Two authorization headers make
-Git reject the request.
+Set exactly one Match authorization: two headers make Git reject the request.
 
 ## Rotation
 
@@ -38,5 +36,4 @@ Git reject the request.
 | `MATCH_PASSWORD` | Match cannot decrypt | Reissue signing material and update every machine |
 | Distribution certificate | Archive export fails | Run `bundle exec fastlane certificates` on a Mac |
 
-Build-time fields compiled into the app are not secrets. Backend OAuth secrets
-and webhook tokens belong in Secret Manager, never in Flutter configuration.
+Build-time fields compiled into the app are not secrets. Backend OAuth secrets and webhook tokens live in Secret Manager, never in Flutter config.

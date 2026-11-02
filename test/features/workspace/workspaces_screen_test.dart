@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
 import 'package:reseller_studio/features/workspace/presentation/screens/workspaces_screen/workspaces_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

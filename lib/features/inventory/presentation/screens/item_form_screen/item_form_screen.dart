@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../../../core/constants/app_icon_constant.dart';
 import '../../../../../core/error/failure_presenter.dart';
@@ -72,7 +72,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen>
   bool? _moreChosen;
 
   /// Title and quantity are the form (hard rule 2 and the quantity rule);
-  /// the rest waits behind More details (`docs/UI_POLISH_PLAN.md`). It opens
+  /// the rest waits behind More details (`docs/plans/UI_POLISH_PLAN.md`). It opens
   /// on its own when something in it is already filled — a remembered
   /// category or bin, a scanned barcode — so a prefill is never hidden.
   bool _showMore(ItemFormState state) =>

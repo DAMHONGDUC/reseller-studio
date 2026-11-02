@@ -1,220 +1,107 @@
 # Responsive — one app, three widths
 
-Read this before changing any layout that has to survive a window wider than
-a phone: the shell, a screen's frame, a panel, or anything that reads a width.
+Read before changing any layout that must survive a window wider than a phone: the shell, a screen's frame, a panel, anything that reads a width.
 
-Spacing values are not in this file. Every dimension named here lives in
-`SdBreakpointConstant`, `SdScreenScale` or `SdContentPaddingV3` —
-`DESIGN_SYSTEM.md` § Spacing is the authority on which, and this file only
-says when a width changes what the app does.
+No spacing values here. Every dimension named lives in `SdBreakpointConstant`, `SdScreenScale` or `SdContentPaddingV3` — `DESIGN_SYSTEM.md` § Spacing says which; this file says only when a width changes what the app does.
 
-**The one invariant: every rule here is a no-op at phone width.** If applying
-any of it moves a single pixel on an iPhone, something is wrong — and a test
-asserts it rather than a person checking. That invariant is what makes the
-whole of this shippable without re-verifying the phone build by hand.
+**The one invariant: every rule here is a no-op at phone width.** If any of it moves one pixel on an iPhone, something is wrong — and a test asserts it, not a person. That invariant is why all of this ships without re-checking the phone build by hand.
 
 ## What this replaces
 
-The app shipped one layout, drawn for one phone, and the design system
-resolves every dimension through `flutter_screenutil` against
-`AppScreenUtil.designSize`. On a phone that is the point: a dimension chosen
-on a 6.1" canvas holds its proportion on a 5.4" one. On a tablet it is the
-bug — the canvas is roughly half the window, so every padding, icon, radius
-and font is scaled up by the ratio and a seller with twice the screen gets the
-same six rows, twice as large.
+The app shipped one layout for one phone, and the design system resolves every dimension through `flutter_screenutil` against `AppScreenUtil.designSize`.
 
-Worse than large: screenutil resolves the four token ladders through
-different ratios, so a window shorter than the design canvas renders the app
-stretched on one axis and shrunk on the other — grown gutters and type beside
-icons and tap targets smaller than the phone's. Nothing overflows and no test
-fails; every number is simply wrong. `minTextAdapt` does not enter into it:
-`ScreenUtilInit` defaults `fontSizeResolver` to the width, and a resolver is
-consulted before the flag.
+- On a phone that is the point: a dimension chosen on a 6.1" canvas keeps its proportion on a 5.4" one.
+- On a tablet it is the bug: the canvas is about half the window, so every padding, icon, radius and font scales up by the ratio — twice the screen, the same six rows, twice as large.
+- Worse than large: screenutil resolves its four token ladders through different ratios, so a window shorter than the canvas renders stretched on one axis and shrunk on the other — grown gutters and type beside icons and tap targets smaller than the phone's. Nothing overflows, no test fails; every number is just wrong.
+- `minTextAdapt` plays no part: `ScreenUtilInit` defaults `fontSizeResolver` to the width, and a resolver is consulted before the flag.
 
-**So the first rule is about scale, not about columns.** A tablet layout that
-adds a second column on top of inflated tokens is two problems stacked.
+**So the first rule is about scale, not columns.** A second column on top of inflated tokens is two problems stacked.
 
 ## The three widths
 
-- **`SdBreakpoint` is a named enum — `compact`, `medium`, `expanded` — and a
-  width comparison never appears at a call site.** Same argument as "never
-  index a palette by number" in `CLAUDE.md`: `width > 600` says nothing about
-  what 600 was, and the second call site to type it is the one that types a
-  different number. The thresholds live in `SdBreakpointConstant` and nowhere
-  else.
-- **The thresholds are Material's, and are not ours to invent.** They sit
-  where the hardware is; a boundary chosen by taste lands in the middle of a
-  device and puts one iPad in two classes depending on how it is held.
-- **They are raw logical pixels, never a `SdSpacingConstant` value.** They are
-  compared against the window, which screenutil knows nothing about — a scaled
-  threshold moves every time the design scales, which is the one thing a
-  threshold may not do.
-- **Read it through `context.sdBreakpoint3`, which reads `MediaQuery.sizeOf`.**
-  The `3` suffix is `SdContextV3X`'s own convention and its reason is on that
-  extension.
-- **Measure the window, never the device.** Never `shortestSide`, never
-  `Platform.isIOS` and a model check, never `defaultTargetPlatform`. An iPad in
-  Split View hands the app a window narrower than a phone's while every
-  device-shaped question still answers "tablet" — so available window width remains the layout input even when the
-  platform overrides an orientation request.
-- **Never cache it, and never read it once at route entry**, for the same
-  reason: Split View and Stage Manager resize a live window.
+- **`SdBreakpoint` is a named enum — `compact`, `medium`, `expanded` — and no call site compares a width.** Same argument as "never index a palette by number" in `CLAUDE.md`: `width > 600` says nothing about what 600 was, and the second call site types a different number. Thresholds live in `SdBreakpointConstant` alone.
+- **The thresholds are Material's, not ours to invent.** They sit where the hardware is; a boundary chosen by taste lands mid-device and puts one iPad in two classes by how it is held.
+- **They are raw logical pixels, never a `SdSpacingConstant` value.** They are compared against the window, which screenutil knows nothing about — a scaled threshold moves whenever the design scales, the one thing a threshold may not do.
+- **Read it through `context.sdBreakpoint3`, which reads `MediaQuery.sizeOf`.** The `3` suffix is `SdContextV3X`'s convention; its reason is on that extension.
+- **Measure the window, never the device.** Never `shortestSide`, never `Platform.isIOS` plus a model check, never `defaultTargetPlatform`. An iPad in Split View gives the app a window narrower than a phone while every device-shaped question still says "tablet" — so window width stays the layout input even when the platform overrides an orientation request.
+- **Never cache it or read it once at route entry**, for the same reason: Split View and Stage Manager resize a live window.
 
-  | Width | The hardware it is really about | What the app does |
+  | Width | Hardware it is really about | What the app does |
   |---|---|---|
-  | `compact` | every phone, and a narrow split view | exactly what ships today, unchanged |
-  | `medium` | tablet portrait | the nav becomes a labelled panel at the leading edge |
-  | `expanded` | wider tablet window | the same, and where a second column would go if one ever does |
+  | `compact` | Every phone, a narrow split view | Exactly what ships today |
+  | `medium` | Tablet portrait | Nav becomes a labelled panel at the leading edge |
+  | `expanded` | Wider tablet window | The same, and where a second column would go if one ever does |
 
 ## Tokens scale on a phone and stop at the clamp
 
-- **The design size stays the phone canvas; what changes is that the scale is
-  clamped at `SdScreenScale.maxScale`.** The canvas is grown to match the
-  window rather than the ratio being allowed to grow, which is why the clamp
-  is a size and not a factor.
-- **One class owns the ceiling, and it is not `SdBreakpointConstant`.** A
-  width class is a layout decision taken at a threshold; the scale is a ratio
-  that never steps at one. They were two fields answering "how big is this
-  tablet?" and they gave different answers — the app read one, the sibling app
-  the other.
-- **All four of screenutil's ladders stop at it, not just the width.** `.w`
-  and `.sp` take the width ratio, `.h` the height, and `.r` — every icon,
-  radius and square tap target — the smaller of the two. Floored at a phone's
-  design height, a window shorter than that canvas drove `.r` below 1 and drew
-  icons and tap targets *smaller* than the phone they were scaled up from,
-  under Apple's minimum, beside grown gutters and type. So once the width
-  clamp engages the height follows the same ceiling rather than a phone's
-  floor: past that point the window is a tablet, and a tablet renders one
-  scale.
-- **A framework constant is not on a ladder and will not move.**
-  `kToolbarHeight` is a raw 56 whatever the window is, so anything measuring
-  against the app bar reads `SdAppBarV3.toolbarHeight` — the same number,
-  scaled. The one that did not overlapped the bar it was meant to sit below.
-- **The clamp is above every phone the app ships to**, so a phone resolves
-  exactly the dimension it resolved before the clamp existed. That is not a
-  happy accident to be re-derived each time the value is touched: it is the
-  safety property, and `test/core/responsive/` asserts it.
-- **Clamped, never switched.** Switching the canvas at a threshold makes every
-  dimension in the app jump at one width — invisible on a device that cannot
-  change size, and a lurch on the one device that can.
-- **The value means "the same app at arm's length."** Not "as big as it
-  fits": a tablet is held further away, so type and touch targets earn a
-  little growth and nothing earns more. A clamp of 1 is the opposite mistake —
-  it strands a phone-sized app in the middle of a big screen.
-- **One place resolves it: `AppScreenUtil`.** It is the only `ScreenUtilInit`
-  in the app *or its tests*, so no tree can pass a raw canvas and quietly opt
-  out of the clamp — which would be the one tree that never sees the bug.
+- **The design size stays the phone canvas; the scale is clamped at `SdScreenScale.maxScale`.** The canvas grows to match the window instead of the ratio growing — which is why the clamp is a size, not a factor.
+- **One class owns the ceiling, and it is not `SdBreakpointConstant`.** A width class is a layout decision at a threshold; the scale is a ratio that never steps. They were two fields answering "how big is this tablet?" with different answers — the app read one, the sibling app the other.
+- **All four of screenutil's ladders stop at it, not just width.** `.w` and `.sp` take the width ratio, `.h` the height, `.r` — every icon, radius and square tap target — the smaller of the two. Floored at a phone's design height, a window shorter than the canvas drove `.r` below 1: icons and tap targets *smaller* than the phone, under Apple's minimum, beside grown gutters and type. So once the width clamp engages, height follows the same ceiling, not a phone's floor: past that point the window is a tablet, and a tablet renders one scale.
+- **A framework constant is on no ladder and will not move.** `kToolbarHeight` is a raw 56 at any window, so anything measured against the app bar reads `SdAppBarV3.toolbarHeight` — same number, scaled. The one that did not overlapped the bar it should sit below.
+- **The clamp sits above every phone the app ships to**, so a phone resolves exactly what it resolved before the clamp. Not a happy accident to re-derive each time: it is the safety property, and `test/core/responsive/` asserts it.
+- **Clamped, never switched.** Switching the canvas at a threshold makes every dimension jump at one width — invisible on a fixed-size device, a lurch on the one that resizes.
+- **The value means "the same app at arm's length,"** not "as big as it fits": a tablet is held further away, so type and touch targets earn a little growth and nothing more. A clamp of 1 is the opposite mistake — a phone-sized app stranded mid-screen.
+- **One place resolves it: `AppScreenUtil`.** The only `ScreenUtilInit` in the app *or its tests*, so no tree can pass a raw canvas and quietly skip the clamp — the one tree that would never see the bug.
 
 ## Proportional columns and centred content
 
-**The tablet panel expands and collapses.** Owner's rule, replacing the fixed
-panel width and the earlier ban on collapsing. The seller can trade visible
-navigation labels for more working space without changing destinations.
+**The tablet panel expands and collapses.** Owner's rule, replacing the fixed panel width and the old ban on collapsing. The seller trades visible nav labels for working space without changing destinations.
 
-- **The expanded sidebar occupies the share defined by
-  `SdNavPanelV3.expandedPanelFlex` beside
-  `SdNavPanelV3.expandedContentFlex`.** The owner's revised share supersedes
-  the previous expanded and collapsed proportions.
-- **Its surface spans the full shell height and meets the content directly.**
-  Owner's correction: use the joined sidebar/content composition of iPad
-  Settings, not a detached glass capsule. No outer panel margin, rounded outer
-  surface, or gap between the panel and the content scaffold.
-- Expanded destinations use `SdNavCellShapeV3.row`. Collapsed, the panel is
-  hidden outright and the content takes the full window — there is no narrow
-  rail.
-- **Collapsed, the reopen control is the screen's own leading control.**
-  Owner's rule. The panel draws nothing at all and publishes
-  `SdNavPanelScopeV3` instead; whichever chrome the screen already wears takes
-  the menu — `SdAppBarV3` in its `leading` slot, `SdSearchHeaderV3` in the
-  matching place, because Inventory wears no app bar and would otherwise be
-  the one tab with no way back. A screen never places the control itself: a
-  screen that could place it is one that could forget to.
-- **Content fills its available region**: beside the panel when open, across
-  the window when closed. The screen's own gutter is the only inset either
-  side, and it is symmetric.
-- The toggle is separate from the destinations. Hard rule 13 applies to both
-  states; there is no business header and no destination promoted from More.
-- The default is expanded. Toggling keeps the selected tab and its state.
-- **Expansion and collapse animate the joined panel and content widths.**
-  Owner's rule: the transition should show where the working space moves. Use
-  `SdMotionV3.normal` and `SdMotionV3.emphasized`; reduced motion skips it.
-  Preserve the owner-selected menu icon; localized tooltips and expanded
-  semantics distinguish its action.
-- **Collapsed content starts where it would with no sidebar at all**, which
-  is what moving the control into the chrome bought: there is no strip above
-  the screen, so the top safe inset has one owner in both states — the
-  screen's own chrome — and nothing has to be told not to reserve it twice.
-  The control keeps its tap target and its localized tooltip.
-- Phone widths keep `SdBottomNavigationV3` without a panel toggle.
-- **A pushed route fills the window, and no page carries an outer margin at
-  any width.** Owner's rule, replacing the tablet page margin: a route that is
-  a sibling of the shell has no panel beside it and nothing to leave room for,
-  so a margin there is a strip the shape of a chrome that is not there. It
-  once existed to land a detail on the same width as the tab screen it was
-  opened from; a collapsible panel has no single width for it to match, and
-  the gutter inside each screen is the whole of the inset.
+- **Expanded, the sidebar takes `SdNavPanelV3.expandedPanelFlex` beside `SdNavPanelV3.expandedContentFlex`.** The owner's revised share supersedes the old expanded and collapsed proportions.
+- **Its surface spans the full shell height and meets the content directly.** Owner's correction: the joined sidebar/content of iPad Settings, not a detached glass capsule. No outer panel margin, rounded outer surface, or gap to the content scaffold.
+- Expanded destinations use `SdNavCellShapeV3.row`. Collapsed, the panel is hidden outright and content takes the whole window — no narrow rail.
+- **Collapsed, the reopen control is the screen's own leading control.** Owner's rule. The panel draws nothing and publishes `SdNavPanelScopeV3`; the chrome the screen already wears takes the menu — `SdAppBarV3` in its `leading` slot, `SdSearchHeaderV3` in the matching place, since Inventory wears no app bar and would be the one tab with no way back. A screen never places the control itself: a screen that could place it could forget to.
+- **Content fills its region**: beside the open panel, across the window when closed. The screen's own gutter is the only inset either side, and it is symmetric.
+- The toggle is separate from the destinations. Hard rule 13 applies in both states: no business header, no destination promoted from More.
+- Default is expanded. Toggling keeps the selected tab and its state.
+- **Expanding and collapsing animate the joined panel and content widths.** Owner's rule: the transition shows where the working space moves. `SdMotionV3.normal` and `SdMotionV3.emphasized`; reduced motion skips it. Keep the owner-chosen menu icon; localized tooltips and expanded semantics tell its action apart.
+- **Collapsed content starts where it would with no sidebar**, which moving the control into the chrome bought: no strip above the screen, so the top safe inset has one owner in both states — the screen's chrome — and nothing must be told not to reserve it twice. The control keeps its tap target and localized tooltip.
+- Phone widths keep `SdBottomNavigationV3`, with no panel toggle.
+- **A pushed route fills the window; no page has an outer margin at any width.** Owner's rule, replacing the tablet page margin. A route beside the shell has no panel next to it and nothing to leave room for, so a margin there is a strip shaped like absent chrome. It once landed a detail at the width of the tab it came from; a collapsible panel has no single width to match, and each screen's gutter is the whole inset.
 
 ## Portrait policy
 
-**The app requests portrait-up throughout**, on phones and tablets. Owner's
-rule: orientation must not create a second navigation layout to learn.
-`AppBootstrap` registers a guarded orientation step before the first frame.
-Native iPhone and iPad orientation lists match it; `UIRequiresFullScreen`
-disables iPad multitasking so the orientation request can take effect.
-Android's main activity declares portrait and opts out of the large-screen
-orientation override where the target SDK permits it. Operating-system
-restrictions can override these requests; wider-window tests remain defensive
-coverage, not a landscape product mode.
+**The app requests portrait-up everywhere, phones and tablets.** Owner's rule: orientation must not create a second nav layout to learn.
+
+- `AppBootstrap` registers a guarded orientation step before the first frame.
+- Native iPhone and iPad orientation lists match it; `UIRequiresFullScreen` disables iPad multitasking so the request takes effect.
+- Android's main activity declares portrait and opts out of the large-screen orientation override where the target SDK allows.
+- The OS can override these requests; wider-window tests stay as defensive coverage, not a landscape product mode.
 
 ### Pages take gutters; panels keep ceilings
 
 | Kind | Rule | What it is |
 |---|---|---|
-| page — fills the window | its own gutter, nothing outside it | every screen |
-| panel — floats over a page | a max width, centred | a sheet, a dialog, the paywall, onboarding |
+| Page — fills the window | Its own gutter, nothing outside it | Every screen |
+| Panel — floats over a page | A max width, centred | A sheet, a dialog, the paywall, onboarding |
 
-A sheet spanning a landscape tablet is a slab with a column of controls lost
-in the middle of it. Each panel carries its own ceiling on
-`SdContentPaddingV3`, and they stay **separate fields holding the same number
-rather than one shared constant** — they are different things that happen to
-measure alike today.
+A sheet spanning a landscape tablet is a slab with a column of controls lost in its middle. Each panel has its own ceiling on `SdContentPaddingV3`, kept as **separate fields holding the same number, not one shared constant** — different things that happen to measure alike today.
 
 ## The nav becomes a panel
 
-The shell chooses the chrome through `context.sdBreakpoint3`. The phone
-keeps its floating glyph-only pill; a tablet uses the proportional panel
-specified above. Both share `SdNavCellV3`, its selected capsule, semantics,
-and tap targets.
+The shell picks the chrome through `context.sdBreakpoint3`: the phone keeps its floating glyph-only pill; a tablet uses the proportional panel above. Both share `SdNavCellV3`, its selected capsule, semantics and tap targets.
 
-The panel is a real column and publishes `SdFloatingBarEdgeV3.leading`.
-Screens still pass `floatingNav: true`; `SdContentPaddingV3.bottom` reclaims
-the bottom inset because there is no bar below them. There is no adjacent-tab
-swipe on a tablet, where horizontal drags belong to the content.
+The panel is a real column and publishes `SdFloatingBarEdgeV3.leading`. Screens still pass `floatingNav: true`; `SdContentPaddingV3.bottom` reclaims the bottom inset, since no bar sits below. No adjacent-tab swipe on a tablet: horizontal drags belong to the content.
 
 ## Do not reflexively widen the grids
 
-**Measure before adding a column.** With content filling the window, a card on
-a tablet in portrait is roughly two thirds again a phone's, and in landscape
-more than double — so a third column is only right if its cell stays wider
-than the phone's *in both orientations*. Under a capped column it would not
-have been; filling the window it may be. The answer depends on the margin
-rule above, so that is settled first, then measured, then decided — never
-assumed from the fact that there is room.
+**Measure before adding a column.** With content filling the window, a tablet card in portrait is about two thirds again a phone's, in landscape more than double — so a third column is right only if its cell stays wider than the phone's *in both orientations*. Under a capped column it would not have been; filling the window it may be. That depends on the margin rule above: settle it, measure, then decide — never assume from spare room.
 
 ## Tests
 
-`test/core/responsive/tablet_layout_test.dart` measures rendered panel and
-content regions in both expansion states, symmetric content gutters, a pushed
-route reaching both window edges, the shared app-bar edges, destination semantics and switching, and phone bottom
-navigation. Shell tests verify the real router retains the selected tab and
-state through toggles. Orientation tests verify Flutter's platform request
-and the matching native declarations.
+`test/core/responsive/tablet_layout_test.dart` measures:
 
-Keep phone token scaling and insets unchanged. Test wider windows defensively
-because operating systems can override orientation requests.
+- rendered panel and content regions in both expansion states;
+- symmetric content gutters;
+- a pushed route reaching both window edges;
+- the shared app-bar edges;
+- destination semantics and switching;
+- phone bottom navigation.
 
-## What is deliberately not here
+Shell tests check the real router keeps the selected tab and state through toggles. Orientation tests check Flutter's platform request and the matching native declarations.
 
-No two-column page, list-and-detail router, or desktop-specific breakpoint is
-introduced by the navigation toggle. Grid column counts still require actual
-content measurements before changing them.
+Keep phone token scaling and insets unchanged. Test wider windows defensively: the OS can override orientation requests.
+
+## Deliberately not here
+
+The nav toggle adds no two-column page, list-and-detail router, or desktop breakpoint. Grid column counts change only after real content measurements.

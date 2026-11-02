@@ -18,7 +18,7 @@ import 'package:reseller_studio/features/inventory/domain/entities/item_category
 import 'package:reseller_studio/features/marketplaces/domain/entities/marketplace.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// **A guest gets the whole app** — hard rule 1, after
 /// `docs/rules/GUEST_MODE.md` reversed it.

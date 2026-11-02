@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// A row that fades and grows in the first time it is drawn, when [animate]
-/// says it is new (`docs/UI_POLISH_PLAN.md`) — a Quick Add landing in the
+/// says it is new (`docs/plans/UI_POLISH_PLAN.md`) — a Quick Add landing in the
 /// list is seen arriving rather than found later.
 ///
 /// Only new rows animate: a row rebuilt by scrolling must not fade in again,

@@ -21,7 +21,7 @@ import '../../../../core/theme/app_tag_hue.dart';
 /// and listed a long time ago — not a state something transitions into. As a
 /// status it would need a nightly job flipping thousands of documents, and a
 /// seller who repriced would wait for that job before the item left the Stale
-/// tab. See `StaleInventoryPolicy` and `docs/DATA_MODEL.md`.
+/// tab. See `StaleInventoryPolicy` and `docs/architecture/DATA_MODEL.md`.
 enum ItemStatus {
   /// Created but not yet part of sellable inventory. What Quick Add produces
   /// when only a title was given.

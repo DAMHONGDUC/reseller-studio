@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import 'barcode_camera_view.dart';
 

@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:reseller_studio/core/analytics/app_analytics.dart';
 import 'package:reseller_studio/core/analytics/app_screen_tracker.dart';
 import 'package:reseller_studio/core/router/app_routes.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 /// **A screen view is a route template, and a tab's root is not one of them.**
 ///

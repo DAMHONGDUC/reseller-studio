@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

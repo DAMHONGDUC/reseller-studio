@@ -1,18 +1,14 @@
 # Store privacy
 
-Code-audited disclosure for App Store Connect, Google Play and the hosted
-privacy policy. This is a draft for legal review, not legal advice.
+Code-audited disclosure for App Store Connect, Google Play and the hosted privacy policy. A draft for legal review, not legal advice.
 
 ## Data inventory
 
-**The app works without an account, and what it holds then never leaves the
-device** — so the first row is not a disclosure of collection, it is the
-absence of one. Every other row describes what happens once the seller has
-signed in.
+**The app works without an account, and what it holds then never leaves the device** — so the first row discloses no collection; it records its absence. Every other row applies once the seller signs in.
 
 | Data | Source | Storage/processor | Purpose |
 |---|---|---|---|
-| Inventory, purchases, listings, orders, expenses, photos — **before sign-in** | Seller input | **On device only**, in the app's own sandboxed database and file storage | App functionality. Never transmitted, never received by us, and deleted with the app |
+| Inventory, purchases, listings, orders, expenses, photos — **before sign-in** | Seller input | **On device only**, in the app's own sandboxed database and file storage | App functionality. Never sent, never received by us, deleted with the app |
 | Name, email, avatar | Apple or Google sign-in | Firebase Auth and Firestore | Account and team identity |
 | Inventory, purchases, listings, orders, expenses | Seller input | Firestore | App functionality |
 | Item, receipt and workspace images | Seller upload | Firebase Storage | App functionality |
@@ -22,9 +18,7 @@ signed in.
 | Product interactions | Automatic | Firebase Analytics | Product analytics |
 | Subscription state | Store purchase | RevenueCat | Premium access |
 
-The app does not store buyer addresses, passwords, contacts, health data,
-precise location, browsing history or advertising identifiers. It does not
-sell data or use data for cross-app tracking.
+The app stores no buyer addresses, passwords, contacts, health data, precise location, browsing history or advertising identifiers. It sells no data and does no cross-app tracking.
 
 ## App Store Connect
 
@@ -38,8 +32,7 @@ sell data or use data for cross-app tracking.
 | Diagnostics: Crash Data | Yes | Yes | App Functionality |
 | Purchases: Purchase History | Yes | Yes | App Functionality |
 
-“Used for tracking” is **No** for every row. No ATT prompt is required unless
-the data flow changes.
+“Used for tracking” is **No** for every row. No ATT prompt is needed unless the data flow changes.
 
 ## Google Play
 
@@ -60,8 +53,7 @@ the data flow changes.
 
 ## Hosted privacy policy draft
 
-Fill every bracket, obtain legal review, and host this text at a stable public
-URL.
+Fill every bracket, get legal review, host this text at a stable public URL. The policy text below is legal copy: change it only through that review.
 
 ### Privacy Policy — Reseller Studio
 
@@ -109,9 +101,9 @@ under 18.
 
 | Task | Owner |
 |---|---|
-| Confirm the store privacy answers still say "data not collected" for the pre-sign-in case | Business owner |
+| Confirm store privacy answers still say "data not collected" before sign-in | Business owner |
 | Fill controller, contact, region, safeguards and retention | Business owner |
-| Obtain legal review | Business owner |
+| Get legal review | Business owner |
 | Host Privacy Policy and Terms of Use | Business owner |
 | Add both URLs to store listings and build configuration | Release owner |
 | Re-audit analytics and SDKs | Engineer |

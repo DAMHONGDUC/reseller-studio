@@ -1,37 +1,24 @@
 # Dropshipping plan
 
-The whole plan for bringing dropshipping — and the AutoDS-style automation it
-runs on — into Reseller Studio. **Nothing in it is built until this file is
-finished and the open decisions in §11 are answered** (`CLAUDE.md`, "What this
-project is"). **Status: finished — every decision in §11 answered by the owner
-on 2026-10-11.**
+The whole plan for dropshipping — and the AutoDS-style automation it runs on — in Reseller Studio. **Nothing is built until this file is finished and §11 is answered** (`CLAUDE.md`, "What this project is"). **Status: finished — owner answered every §11 decision on 2026-10-11.**
 
-Written 2026-10-11. Platform facts in §3 come from vendor docs and third-party
-guides read that day; each one is re-checked against the vendor's own
-documentation before the phase that depends on it starts.
+Written 2026-10-11. §3's platform facts come from vendor docs and third-party guides read that day; each is re-checked against the vendor's own docs before the phase that needs it.
 
 ## 1. Scope
 
-- **Same app, same records.** A dropshipped product is an item, its sale is an
-  order, its price on a platform is a listing. What differs is what the item
-  has (a supplier, a supplier price) and what it lacks (stock on a shelf, a
-  storage location). No parallel set of screens.
-- **The lifecycle it is judged against:**
+- **Same app, same records.** A dropshipped product is an item, its sale an order, its platform price a listing. Only what the item has (a supplier, a supplier price) and lacks (shelf stock, a location) differ. No parallel screens.
+- **The lifecycle it is judged by:**
 
   ```text
   FIND PRODUCT → LIST → SELL → ORDER FROM SUPPLIER → TRACK → PROFIT → ANALYZE → FIND BETTER
   ```
 
-- **Manual first, connected second.** Every step works by hand before any
-  connection automates it. A connection saves typing; it is never the only way
-  in, and a seller on a platform with no API still runs the whole loop.
-- **US and UK only**, as everywhere else. A platform or a supplier is added as
-  an adapter behind one interface, never as an `if` at a call site.
+- **Manual first, connected second.** Every step works by hand before a connection automates it. A connection saves typing; it is never the only way in, and a seller on a platform with no API still runs the whole loop.
+- **US and UK only**, as everywhere. A platform or supplier is an adapter behind one interface, never an `if` at a call site.
 
 ## 2. AutoDS features, mapped
 
-Checked against AutoDS's own features page and its Orders help article on
-2026-10-11. ✅ is copied, ➕ is copied and goes further, ❌ is refused (§10).
+Checked against AutoDS's features page and Orders help article on 2026-10-11. ✅ copied, ➕ copied and extended, ❌ refused (§10).
 
 ### Products and monitoring
 
@@ -104,12 +91,11 @@ Checked against AutoDS's own features page and its Orders help article on
 | ❌ Product research marketplace, ads spy, trending products | §10 | — |
 | ❌ AI store builder, AI image generator | §10 | — |
 
-Pricing rules, price history, delist-after-sale and listing templates help
-resellers as much as dropshippers, so they ship in Phase 1 for both.
+Pricing rules, price history, delist-after-sale and listing templates help resellers as much as dropshippers, so they ship in Phase 1 for both.
 
 ## 3. Platform reality
 
-What the platforms allow decides the order of the phases.
+What platforms allow sets the phase order.
 
 ### Marketplaces
 
@@ -122,11 +108,7 @@ What the platforms allow decides the order of the phases.
 | TikTok Shop (US, UK) | Partner API | Orders, fulfilment | Access status is contradictory across sources; confirm with TikTok before scheduling |
 | Depop, Poshmark, Mercari, Vinted | None public | — | Stay manual, plus payout CSV import (hard rule 10) |
 
-**eBay policy decides the supplier list.** eBay allows dropshipping only from
-a wholesaler or manufacturer. Buying the item from another retailer (Amazon,
-Walmart) after the sale is prohibited and gets accounts suspended. This app
-therefore connects to **wholesale dropship suppliers only** and never
-automates a retail purchase (§10).
+**eBay policy sets the supplier list.** eBay allows dropshipping only from a wholesaler or manufacturer. Buying from another retailer (Amazon, Walmart) after the sale is prohibited and gets accounts suspended. So the app connects to **wholesale dropship suppliers only** and never automates a retail purchase (§10).
 
 ### Suppliers
 
@@ -135,16 +117,13 @@ automates a retail purchase (§10).
 | CJdropshipping | API v2, token from an API key | Product list and detail, real-time stock, orders, webhooks for product, stock, order and logistics | Webhooks time out after 3 seconds, so acknowledge first and process later |
 | AliExpress | Open Platform, "DS" app category | Product, order, logistics | Order placement needs a separate approval, typically for established partners; request signing differs between sources |
 
-**First marketplace: eBay. First supplier: CJdropshipping.** eBay has the
-widest US/UK reach and an API with no review wait; CJ has the most open API.
-Both are owner-confirmable in §11.
+**First marketplace: eBay. First supplier: CJdropshipping.** eBay has the widest US/UK reach and an API with no review wait; CJ has the most open API. Owner confirms both in §11.
 
 ## 4. Data model
 
-All tables are flat, top-level and keyed by id with `workspaceId` as a field
-(hard rule 14). Every composite index leads with `workspaceId`. Every
-hand-created document gets a sample in `sample_data/`, and
-`docs/DATA_MODEL.md` is updated in the same change as each table.
+- Every table is flat, top-level, keyed by id, with `workspaceId` as a field (hard rule 14).
+- Every composite index leads with `workspaceId`.
+- Every hand-created document gets a sample in `sample_data/`; `docs/architecture/DATA_MODEL.md` changes with each table.
 
 ### Changed tables
 
@@ -172,37 +151,27 @@ hand-created document gets a sample in `sample_data/`, and
 | `connection_tokens` | Encrypted access and refresh tokens, expiry | `allow read, write: if false`; encrypted with a Cloud KMS key the Functions service account alone may use |
 | `sync_runs` | `connectionId`, `job`, `startedAt`, `finishedAt`, `result`, `counts`, `errorCode` | Plan §14 "sync history" and "sync errors" |
 
-`supplier_orders.status`:
-`toOrder → requested → placed → shipped → delivered`, with `failed` and
-`cancelled` off any step before `shipped`.
+`supplier_orders.status`: `toOrder → requested → placed → shipped → delivered`; `failed` and `cancelled` branch off any step before `shipped`.
 
 ### Buyer address
 
-A supplier order needs the buyer's address. **It is passed through, never
-stored**: the Function placing the order reads it from the marketplace at that
-moment, hands it to the supplier and keeps nothing. It is never written to
-Firestore and never logged (hard rule 9). Consequence: only a synced order can
-be placed automatically — a manual order's address is typed at the supplier's
-own site by the seller. AutoDS lets a seller edit the address in its own app;
-here a supplier refusing an address fails the supplier order with that reason,
-and the seller corrects it on the marketplace or places it by hand.
+A supplier order needs the buyer's address. **It is passed through, never stored.**
+
+- The placing Function reads it from the marketplace at that moment, hands it to the supplier, keeps nothing. Never in Firestore, never logged (hard rule 9).
+- So only a synced order can be placed automatically; for a manual order the seller types the address on the supplier's site.
+- AutoDS lets a seller edit the address in-app. Here a refused address fails the supplier order with that reason; the seller fixes it on the marketplace or places it by hand.
 
 ## 5. Server
 
-Everything that holds a token lives in `functions/src/integrations/`.
+Everything holding a token lives in `functions/src/integrations/`.
 
 - **Two interfaces, one adapter per platform.**
   - `MarketplaceAdapter`: `listOrdersSince`, `pushTracking`, `setPrice`,
     `setQuantity`, `endListing`, `buyerAddress`.
   - `SupplierAdapter`: `getProduct`, `getStock`, `placeOrder`,
     `getOrderStatus`, `parseWebhook`.
-  - A new platform is a new adapter and a new enum case — never a branch in a
-    job.
-- **OAuth without a new package.** A callable `startConnection` returns the
-  platform's consent URL; the app opens it with `url_launcher`; the platform
-  redirects to an `onRequest` `oauthCallback`, which exchanges the code,
-  stores the token and redirects to `selleros:///more/connections`. The
-  existing deep-link scheme brings the seller back.
+  - A new platform is a new adapter and enum case — never a branch in a job.
+- **OAuth with no new package.** Callable `startConnection` returns the platform's consent URL; the app opens it with `url_launcher`; the platform redirects to `onRequest` `oauthCallback`, which exchanges the code, stores the token and redirects to `selleros:///more/connections`. The existing deep-link scheme brings the seller back.
 - **Jobs.**
 
   | Job | Trigger | Does |
@@ -214,26 +183,22 @@ Everything that holds a token lives in `functions/src/integrations/`.
   | `pushTrackingToMarketplace` | Trigger on tracking written to a `supplier_order` | Calls `pushTracking`; sets the order's `shippedAt` |
   | `applyRepricing` | Trigger on a supplier price change, when a rule allows it | Computes the new price, writes the listing and `listing_price_changes`, calls `setPrice` |
   | `outOfStockGuard` | Trigger on stock falling below the rule's `minSupplierStock` | Calls `setQuantity(0)` on every live listing of that item; restores it when stock returns |
-| `checkOrderProtections` | Inside `onSupplierOrderRequested`, before `placeOrder` | Stops with a reason on max purchase price, max loss or the daily cap — unless the seller chose "Place anyway" |
-| `autoDeliver` | Scheduler, daily | Marks supplier orders delivered N days after shipped, where the supplier never reports it |
-| `findUnlinked` | After each order and listing sync | Flags synced rows with no supplier product, for "link to supplier" |
-| `staleRepricing` | Scheduler, daily | Lowers unsold dropship listings by the rule's step, never below the floor |
+  | `checkOrderProtections` | Inside `onSupplierOrderRequested`, before `placeOrder` | Stops with a reason on max purchase price, max loss or the daily cap — unless the seller chose "Place anyway" |
+  | `autoDeliver` | Scheduler, daily | Marks supplier orders delivered N days after shipped, where the supplier never reports it |
+  | `findUnlinked` | After each order and listing sync | Flags synced rows with no supplier product, for "link to supplier" |
+  | `staleRepricing` | Scheduler, daily | Lowers unsold dropship listings by the rule's step, never below the floor |
   | `refreshTokens` | Scheduler | Refreshes before expiry; a refusal sets `needsReauth` and notifies |
 
-- **Rules from `docs/rules/BACKEND.md` that bite hardest here:** idempotent on
-  retry (a repeated `placeOrder` must not buy twice — the supplier order id is
-  the idempotency key), group calls before fanning out, structured logs that
-  carry the shape and never the contents, and backoff on upstream failure
-  instead of skipping a seller.
-- **The client never awaits any of it.** Requesting a supplier order is a
-  write of `status = requested`; the trigger does the rest. That keeps
-  `docs/rules/GUEST_MODE.md`'s invariant that no user-facing flow awaits the
-  network.
+- **`docs/rules/BACKEND.md` rules that bite hardest here:**
+  - idempotent on retry — a repeated `placeOrder` must not buy twice; the supplier order id is the idempotency key;
+  - group calls before fanning out;
+  - structured logs carry the shape, never the contents;
+  - back off on upstream failure instead of skipping a seller.
+- **The client never awaits any of it.** Requesting a supplier order writes `status = requested`; the trigger does the rest. That keeps `docs/rules/GUEST_MODE.md`'s invariant: no user-facing flow awaits the network.
 
 ## 6. App
 
-Bottom tabs stay at five (hard rule 13). New screens live under More or
-inside existing features.
+Bottom tabs stay at five (hard rule 13). New screens go under More or inside existing features.
 
 | Where | What the seller gets |
 |---|---|
@@ -248,20 +213,13 @@ inside existing features.
 | Home → Needs attention | Orders to place with a supplier; supplier orders past the DAS threshold; synced orders or listings not linked to a supplier; supplier orders that failed; supplier out of stock while listed; margin below a rule's floor after a supplier price rise; listings still live elsewhere after a sale; a connection that needs reconnecting |
 | Analytics | Split by fulfilment; winners and losers; supplier ship time; supplier ROI through the existing source view |
 
-**New notification types**, one switch each: `supplierOrderNeeded`,
-`supplierOrderFailed`, `supplierOutOfStock`, `supplierPriceChanged`,
-`connectionNeedsAttention`, `trackingAdded`.
-
-**Profit stays measured** (hard rule 3). A dropship line's cost is its
-supplier orders' product plus shipping cost; an order with no supplier order
-yet shows `—` for profit (hard rule 5), never an estimate from the listed
-supplier price.
-
-**Every new string ships in all seven ARBs in the same change** (hard rule 7).
+- **New notification types**, one switch each: `supplierOrderNeeded`, `supplierOrderFailed`, `supplierOutOfStock`, `supplierPriceChanged`, `connectionNeedsAttention`, `trackingAdded`.
+- **Profit stays measured** (hard rule 3). A dropship line's cost is its supplier orders' product plus shipping cost. An order with no supplier order yet shows `—` for profit (hard rule 5), never an estimate from the listed supplier price.
+- **Every new string ships in all seven ARBs in the same change** (hard rule 7).
 
 ## 7. Automation levels
 
-Per connection, chosen by the seller; the default is the most manual.
+Per connection, seller's choice; the default is the most manual.
 
 | Level | Repricing | Supplier orders |
 |---|---|---|
@@ -269,24 +227,17 @@ Per connection, chosen by the seller; the default is the most manual.
 | Ask (default) | Proposed; one tap applies | One tap requests it |
 | Auto | Applied, logged in price history | Placed without a tap, under a daily spending cap the seller sets |
 
-- Auto-ordering spends the seller's money, so it is off until the seller turns
-  it on, the cap is required when they do, and the first auto order still
-  asks.
-- Three protections stop an auto order with a reason, as AutoDS's do: maximum
-  purchase price per supplier, maximum loss per order, and the daily cap.
-  "Place anyway" overrides them for one order, by hand only.
-- The supplier charges the seller's own account at the supplier. The app
-  never sees a card or a wallet.
+- Auto-ordering spends the seller's money: off until the seller turns it on, a cap required when they do, and the first auto order still asks.
+- Three protections stop an auto order with a reason, as in AutoDS: max purchase price per supplier, max loss per order, the daily cap. "Place anyway" overrides them for one order, by hand only.
+- The supplier charges the seller's own supplier account. The app never sees a card or wallet.
 
 ## 8. Phases
 
-Each phase ends with `make analyze` clean, the full test suite green, the
-rulebook and `docs/DATA_MODEL.md` current, `docs/DONE_WORK.md` and
-`docs/REMAINING_WORK.md` in step, and samples in `sample_data/`.
+Each phase ends with: `make analyze` clean, full test suite green, rulebook and `docs/architecture/DATA_MODEL.md` current, `docs/status/DONE_WORK.md` and `docs/status/REMAINING_WORK.md` in step, samples in `sample_data/`.
 
 | Phase | Builds | Needs from the owner | Done when |
 |---|---|---|---|
-| 0 — Access | Developer accounts and approvals: eBay developer keys, CJ API key, Shopify Partner app, Etsy app; a Cloud KMS key; secrets in Secret Manager; RevenueCat offering text for connections | Accounts in the business's name; `RELEASE_ACTIONS.md` entries | Each platform answers a sandbox call from a deployed Function |
+| 0 — Access | Developer accounts and approvals: eBay developer keys, CJ API key, Shopify Partner app, Etsy app; a Cloud KMS key; secrets in Secret Manager; RevenueCat offering text for connections | Accounts in the business's name; `docs/release/RELEASE_ACTIONS.md` entries | Each platform answers a sandbox call from a deployed Function |
 | 1 — Manual dropshipping | Fulfilment kind on items, variants, suppliers as sources, supplier products with tax and shipping days, manual supplier orders with DAS, estimated arrival, samples, supplier refunds and invoices, pricing rules, bulk apply, title builder and supplier text cleaner, listing price history, delist-after-sale attention, listing templates, order filters, analytics split with winners and losers | Answers in §11 | A guest runs the whole lifecycle with no connection and every number is right or `—` |
 | 2 — Connection foundation | `connections`, `connection_tokens`, `sync_runs`, OAuth round trip, adapter interfaces, Connections screen, `refreshTokens`, `PlanFeature.connections` with its server-side gate and pause on lapse, rules and their emulator tests | Phase 0 | A seller connects and disconnects a sandbox account; a token never appears in a client read or a log |
 | 3 — eBay | Orders in by polling, tracking out, price and quantity push for API-managed listings | eBay production keys | A real eBay sale appears as an order with no typing, and tracking lands on eBay |
@@ -294,27 +245,18 @@ rulebook and `docs/DATA_MODEL.md` current, `docs/DONE_WORK.md` and
 | 5 — Automation | Auto repricing, stale repricing, minimum-stock guard and restock, auto ordering behind the three protections | Decision 11.2 | A supplier price rise reprices the listing, and a sale is ordered with no tap, within the cap |
 | 6 — More platforms and extras | Shopify, then Etsy, then TikTok Shop and AliExpress as access allows; a POD supplier; eBay buyer messages | Each platform's review | Each adapter passes the same contract tests as eBay or CJ |
 
-Phases 0 and 1 run in parallel: approvals take weeks and Phase 1 needs none.
+Phases 0 and 1 run in parallel: approvals take weeks; Phase 1 needs none.
 
-**Progress.** Phase 1 is built on `feat/dropshipping`. The rule fields
-only Phase 5 reads — `minSupplierStock`, `staleDays`, `staleDropPercent`,
-`applyOnSupplierChange` — and the description cleaner were taken back out
-before review (owner, 2026-10-12): nothing in Phase 1 set or read them, so
-they land with the automation that uses them. Listing templates are
-**deferred** (owner, 2026-10-11): no screen edits a listing's own description
-yet, so a template has nowhere to apply. They come back with a listing editor.
+**Progress.** Phase 1 is built on `feat/dropshipping`.
+
+- The rule fields only Phase 5 reads — `minSupplierStock`, `staleDays`, `staleDropPercent`, `applyOnSupplierChange` — and the description cleaner were removed before review (owner, 2026-10-12). Nothing in Phase 1 set or read them; they land with the automation that uses them.
+- Listing templates are **deferred** (owner, 2026-10-11): no screen edits a listing's description yet, so a template has nowhere to apply. They return with a listing editor.
 
 ## 9. Tests
 
-- **Pure Dart**: pricing-rule arithmetic (rounding, floor, two currencies,
-  no cost recorded), dropship profit with and without supplier orders,
-  supplier-order transitions, attention queries.
-- **Functions**: one contract test suite per adapter interface, run against
-  recorded responses; idempotency of every job under a repeated run; rules
-  emulator tests proving `connections` is read-only and `connection_tokens` is
-  unreadable.
-- **Widget**: Connections screen states, supplier order card in each status,
-  apply-rule bulk bar with 40 rows.
+- **Pure Dart**: pricing-rule arithmetic (rounding, floor, two currencies, no cost recorded), dropship profit with and without supplier orders, supplier-order transitions, attention queries.
+- **Functions**: one contract suite per adapter interface on recorded responses; every job idempotent under a repeated run; rules emulator tests proving `connections` read-only and `connection_tokens` unreadable.
+- **Widget**: Connections screen states, supplier order card in each status, apply-rule bulk bar with 40 rows.
 - Scoped by `docs/rules/TESTING.md`; no test reads `sample_data/`.
 
 ## 10. Not built
@@ -333,8 +275,7 @@ yet, so a template has nowhere to apply. They come back with a listing editor.
 
 ## 11. Decisions
 
-All answered by the owner on 2026-10-11. Where a rule file now carries one,
-it is named; the rest are carried by this plan.
+All answered by the owner on 2026-10-11. A rule file carrying one is named; this plan carries the rest.
 
 | # | Question | Decision | Carried by |
 |---|---|---|---|

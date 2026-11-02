@@ -19,7 +19,7 @@ import 'package:reseller_studio/features/more/presentation/screens/more_screen/m
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
 import 'package:reseller_studio/features/workspace/providers.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../support/add_button_finder.dart';
 import '../support/filter_sheet_finder.dart';

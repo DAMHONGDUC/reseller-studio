@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../features/subscription/domain/services/plan_gate.dart';
 import '../../features/subscription/presentation/widgets/plan_block_sheet.dart';

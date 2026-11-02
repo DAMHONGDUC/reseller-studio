@@ -5,7 +5,7 @@ import 'package:reseller_studio/features/inventory/presentation/screens/inventor
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

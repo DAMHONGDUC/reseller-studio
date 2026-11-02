@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// One instruction in a list of steps: a small dot, then the line.
 ///

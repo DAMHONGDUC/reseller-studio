@@ -60,7 +60,10 @@ jobs:
       - name: Dependencies
         run: |
           flutter pub get
-          (cd packages/flutter-system-design-kit && flutter pub get)
+          # The kit is one package per generation, each with its own pubspec.
+          for kit in packages/flutter-system-design-kit packages/flutter-system-design-kit/packages/*; do
+            (cd "$kit" && flutter pub get)
+          done
           (cd packages/script-tools/flutter/dart && dart pub get)
 
       # `lib/l10n/gen/` is gitignored, so nothing compiles until it is built.
@@ -89,7 +92,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # The runtime Cloud Functions runs, from `functions/package.json`.
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: functions/package-lock.json
 

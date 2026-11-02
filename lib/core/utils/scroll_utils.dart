@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// Moving a scroll view under program control, on the app's own timing.
 ///

@@ -1,5 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/providers/repository_providers.dart';
@@ -9,7 +9,7 @@ import '../../../inventory/domain/enums/item_status.dart';
 import '../../domain/entities/supplier_product.dart';
 
 /// Everything a seller does to a supplier product: save it, check it, list
-/// it, rank it against a backup (`docs/DROPSHIPPING_PLAN.md`).
+/// it, rank it against a backup (`docs/plans/DROPSHIPPING_PLAN.md`).
 ///
 /// True while a write is in flight.
 class SupplierProductController extends Notifier<bool> {

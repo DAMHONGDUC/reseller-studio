@@ -5,7 +5,7 @@ import 'package:reseller_studio/core/widgets/app_filter_chip_group.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
 import 'package:reseller_studio/features/orders/presentation/widgets/order_filter_sheet.dart';
 
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/filter_sheet_finder.dart';
 import '../../support/pump_app.dart';

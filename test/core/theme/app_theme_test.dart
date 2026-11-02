@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/theme/app_colors.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// The two things that silently break the whole UI, tested here because
 /// nothing else would notice until a screen renders wrong:

@@ -102,7 +102,10 @@ jobs:
       - name: Dependencies
         run: |
           flutter pub get
-          (cd packages/flutter-system-design-kit && flutter pub get)
+          # The kit is one package per generation, each with its own pubspec.
+          for kit in packages/flutter-system-design-kit packages/flutter-system-design-kit/packages/*; do
+            (cd "$kit" && flutter pub get)
+          done
 
       # `lib/l10n/gen/` is gitignored, so nothing compiles until it is built.
       - name: Localizations
