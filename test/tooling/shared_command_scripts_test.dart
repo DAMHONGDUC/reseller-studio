@@ -22,20 +22,44 @@ void main() {
     expect(localScripts, isEmpty);
   });
 
-  test('release installs config before it deploys, and never sets up', () {
-    final String release = File('$scripts/release_ios.sh').readAsStringSync();
-    final int prepareEnv = release.indexOf(
-      'bash "\$FLUTTER_TOOLS_DIR/prepare_env.sh"',
-    );
-    final int deploy = release.indexOf(
-      'bash "\$FLUTTER_TOOLS_DIR/deploy_firebase.sh"',
-    );
+  test('every deploy and release installs config first', () {
+    // Owner's rule: env, deploy-be and release-* are three parts, and the
+    // first runs inside the other two before anything is built or sent.
+    const String config = 'install_flavor_config "\$TARGET"';
+    final String common = File('$scripts/lib/common.sh').readAsStringSync();
+    final Map<String, String> after = <String, String>{
+      'deploy_backend.sh': 'bash "\$FLUTTER_TOOLS_DIR/deploy_firebase.sh"',
+      'release_ios.sh': 'bundle exec fastlane beta',
+      'release_android.sh': 'build_flutter_android apk',
+    };
 
-    // A release builds the tree as it stands — owner's rule. A tree that needs
-    // restoring is restored by `make set-up` first, on purpose.
+    expect(common, contains('bash "\$FLUTTER_TOOLS_DIR/prepare_env.sh"'));
+
+    for (final MapEntry<String, String> entry in after.entries) {
+      final String script = File('$scripts/${entry.key}').readAsStringSync();
+
+      expect(
+        script.indexOf(config),
+        greaterThanOrEqualTo(0),
+        reason: entry.key,
+      );
+      expect(
+        script.indexOf(entry.value),
+        greaterThan(script.indexOf(config)),
+        reason: entry.key,
+      );
+    }
+  });
+
+  test('a release never deploys the backend and never sets up', () {
+    final String release = File('$scripts/release_ios.sh').readAsStringSync();
+
+    // The backend is its own command, deploy-be-* — owner's rule.
+    // A call, not a mention: its own comment names deploy_backend.sh.
+    expect(release, isNot(contains('bash "\$FLUTTER_TOOLS_DIR/deploy_')));
+    // A release builds the tree as it stands. A tree that needs restoring is
+    // restored by `make setup` first, on purpose.
     expect(release, isNot(contains('bash "\$FLUTTER_TOOLS_DIR/set_up.sh"')));
-    expect(prepareEnv, greaterThanOrEqualTo(0));
-    expect(deploy, greaterThan(prepareEnv));
   });
 
   test('the preflight gate is a shared fastlane lane make calls', () {
