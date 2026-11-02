@@ -30,7 +30,7 @@ env_assets/
 `make env-dev` / `make env-prod` copies them to where the build reads them. The script's contract, none of it optional:
 
 - **Every copy replaces the destination whole.** Owner's rule. The source's bytes land on the destination; nothing that was there survives — never a merge, never "keep the keys it already had", never an edit adding the flavour's values to someone else's file. A merged file is the one state this script exists to prevent: half says dev, half says prod, and nothing on disk says which. A tracked destination (`ios/Runner/Info.plist`) is overwritten like any other.
-  - `make set-up` is the opposite, with no conflict: it seeds `env/*.json` from the templates **only when the file is missing**, so it never touches a real one. `make env-<flavour>` installs a flavour, and installing means replacing.
+  - `make setup` is the opposite, with no conflict: it seeds `env/*.json` from the templates **only when the file is missing**, so it never touches a real one. `make env-<flavour>` installs a flavour, and installing means replacing.
 - **Both `env/*.json` every run; only the native pair is flavour-picked.** One destination each, so nothing is chosen at build time.
 - **Destinations carry no `dev-`/`prod-` prefix.** The google-services gradle plugin and the Runner target read those exact paths; a prefixed copy beside them is a file nothing opens.
 - **Check every source first, copy after.** A run dying on the third file leaves the tree half one environment, half the other, and nothing on disk says so.
@@ -45,7 +45,7 @@ env_assets/
 
 ## Nobody archives from Xcode
 
-`packages/script-tools/flutter/build_ipa.sh` — `make build-ipa-dev` / `make build-ipa-prod` — is the only place an archive is made, and **the fastlane lane shells out to it instead of calling `gym`**. Not taste: the app's whole config arrives through `--dart-define-from-file`, a flag `xcodebuild`, `gym` and Product > Archive know nothing about. An archive from any of them carries empty config and dies at runtime on `[core/no-app] No Firebase App '[DEFAULT]' has been created` — a crash naming nothing about the missing flag.
+`packages/script-tools/flutter/build_ipa.sh` — `make ipa-dev` / `make ipa-prod` — is the only place an archive is made, and **the fastlane lane shells out to it instead of calling `gym`**. Not taste: the app's whole config arrives through `--dart-define-from-file`, a flag `xcodebuild`, `gym` and Product > Archive know nothing about. An archive from any of them carries empty config and dies at runtime on `[core/no-app] No Firebase App '[DEFAULT]' has been created` — a crash naming nothing about the missing flag.
 
 The script also:
 

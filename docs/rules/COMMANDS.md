@@ -10,22 +10,26 @@ Read when running, building, generating or deploying. **This file is the authori
 
 ## The set
 
+**Every platform answers to one command list, and this app uses it unchanged.** Owner's rule: the owner works across many projects on several platforms, and a command named one way here and another way in the next project is one that gets forgotten. The list, what each command means on each platform and the old names that still work live in `packages/script-tools/common/COMMANDS.md`; this file only says what each does in this app.
+
 Every command is `make <name>`; bare `make` lists them. The root `Makefile` includes `packages/script-tools/flutter/flutter.mk`, which maps each target to a script in `packages/script-tools/flutter/` — except `pre-build`, defined in the `Makefile` itself because its body is this app's fastlane lane.
 
 | Command | Script | Promise |
 |---|---|---|
-| `set-up` | `set_up.sh` | Wipe, then everything a fresh clone needs. Idempotent. |
-| `deep-set-up` | `set_up.sh --deep` | `set-up` plus Xcode's derived data. Costs a cold build. |
+| `setup` | `set_up.sh` | Wipe, then everything a fresh clone needs. Idempotent. |
+| `setup-deep` | `set_up.sh --deep` | `setup` plus Xcode's derived data. Costs a cold build. |
+| `clean` | `clean_build.sh` | Build outputs only — no `pub get`, no codegen. |
 | `env-dev` / `env-prod` | `prepare_env.sh <flavour>` | Install that flavour's config — env files + native files. |
 | `gen` | `generate_code.sh` | Localizations and codegen, nothing else. |
 | `analyze` | `analyze_code.sh` | Zero findings, or fail. What CI runs. |
 | `test` | `run_tests.sh` | `TEST=<path>` scopes it to one file or folder. |
+| `run-dev` / `run-prod` | `run_app.sh <flavour>` | `flutter run` in debug, with that flavour's config. |
 | `pre-build` | fastlane `preflight` | The app's own gate — config, signing, build number. |
-| `build-ipa-dev` / `build-ipa-prod` | `build_ipa.sh <flavour>` | The IPA, with that flavour's config. |
+| `ipa-dev` / `ipa-prod` | `build_ipa.sh <flavour>` | The IPA, with that flavour's config. |
 | `deploy-dev` / `deploy-prod` | `deploy_firebase.sh <flavour>` | Rules, indexes and functions to that alias. `ONLY=rules\|functions` narrows it. |
 | `release-dev` / `release-prod` | `release_ios.sh <flavour>` | Config, Firebase, then TestFlight. `NOTE="…"` for What to Test. |
-| `upload-ipa-dev` / `upload-ipa-prod` | `upload_ipa.sh <flavour>` | Upload the already-built IPA that did not reach TestFlight. |
-| `app-icon` / `app-icon-strip-marker` | `generate_app_icon.sh` / `strip_icon_marker.sh` | Launcher and launch icons from the artwork; erase its watermark. |
+| `upload-dev` / `upload-prod` | `upload_ipa.sh <flavour>` | Upload the already-built IPA that did not reach TestFlight. |
+| `icon` / `icon-strip` | `generate_app_icon.sh` / `strip_icon_marker.sh` | Launcher and launch icons from the artwork; erase its watermark. |
 
 Recurring shapes, and the pattern to copy:
 
@@ -33,16 +37,18 @@ Recurring shapes, and the pattern to copy:
 - **One script serves every flavour, taking it as `$1`.** `flutter.mk` has one pattern rule per command; nothing is duplicated per flavour.
 - **A chaining command calls the other scripts, never their steps.** `release_ios.sh` runs `prepare_env.sh`, `deploy_firebase.sh` and the beta lane in order, re-implementing none — so the confirm prompt and every check are the ones each step gets alone.
 
-**No `run`, `test-rules` or `_url-scheme` command exists, and no `pre-build` script.** The first three were deleted. `pre-build` is the one command whose body is not a shared script: a gate naming this app's bundle ids, entitlements and store rules cannot live in a folder every app shares, so it is the `preflight` lane, reached through this app's `Makefile`. **`release-*` does not run it** — `release_ios.sh` names no app — so run `pre-build` before a release; the release does not run it for you.
+`apk-*` and `aab-*` are on the shared list and say there is no Flutter Android release script yet; the old names (`set-up`, `build-ipa-*`, `app-icon`, …) still run and stay out of `make help`.
+
+**`run-*` is back, with the shared list** — it was deleted here once, and returned when every platform took the same commands. **No `test-rules` or `_url-scheme` command exists, and no `pre-build` script.** Both were deleted. `pre-build` is the one command whose body is not a shared script: a gate naming this app's bundle ids, entitlements and store rules cannot live in a folder every app shares, so it is the `preflight` lane, reached through this app's `Makefile`. **`release-*` does not run it** — `release_ios.sh` names no app — so run `pre-build` before a release; the release does not run it for you.
 
 ## What each one actually does
 
-### `set-up` — the one answer to "it built yesterday and not today"
+### `setup` — the one answer to "it built yesterday and not today"
 
 Ordered; the order is the contract:
 
 1. **Wipe, unconditionally** (top of `set_up.sh`). A clean that must be decided is one nobody runs.
-2. **Submodules onto their branch, not the pinned commit** — read `submodule.<name>.branch` from `.gitmodules`, check out, `pull --ff-only`, and **report per submodule when a step fails instead of dying**: a developer mid-edit in one still gets a working set-up.
+2. **Submodules onto their branch, not the pinned commit** — read `submodule.<name>.branch` from `.gitmodules`, check out, `pull --ff-only`, and **report per submodule when a step fails instead of dying**: a developer mid-edit in one still gets a working setup.
 3. Dependencies: the app, every `packages/*/pubspec.yaml`, and script-tools' own Dart tools.
 4. Localizations and codegen (`generate_code.sh`).
 5. **Env templates** — copy `env/env.example.json` into each missing flavour file, collect the names, and warn loudly at the end, where it is still on screen. One template serves both flavours: they only differed by filled-in values, and a second checked-in copy is a key list that goes stale in one place. Never overwrite: a developer's `dev.json` holds ids they filled in.
@@ -52,7 +58,7 @@ No `pod install`: every iOS plugin resolves as a Swift Package, which Xcode hand
 
 **The submodule choice has a price, stated where people read it:** after this, you build whatever is on each submodule's branch, not what the parent commit pins — so an old parent commit no longer rebuilds byte for byte. It is also why CI runs `git submodule update --remote`, and why a submodule must be **pushed** for CI to see it. When CI and a laptop disagree, check that gap first.
 
-### `deep-set-up` — the second entry point, and the last
+### `setup-deep` — the second entry point, and the last
 
 `set_up.sh --deep`: the same run, and the wipe also clears Xcode's derived data.
 
@@ -62,7 +68,7 @@ No `pod install`: every iOS plugin resolves as a Swift Package, which Xcode hand
 
 ### `gen` — the cheap one
 
-Localizations and codegen, nothing else. It exists so `set-up` never becomes the reflex for a one-line change.
+Localizations and codegen, nothing else. It exists so `setup` never becomes the reflex for a one-line change.
 
 - **There is one `build_runner` step, and it is Drift's.** Riverpod providers are still hand-written — that rule has not moved — but the guest database is generated (`docs/rules/GUEST_MODE.md` has the exception and why it is safe). `generate_code.sh` runs it only when `build_runner` is in `pubspec.yaml`, so the script matches the sibling app's.
 - **Run it after a schema change, never before reading the repo.** The generated file is committed, so `analyze` and `test` need no build step — the clause that keeps the original objection answered.
@@ -81,9 +87,9 @@ Everything a release needs but the build, owned by the app: the installed config
 
 **`flavor:` is optional and skipped, not defaulted** — defaulting to prod would fail a dev-machine rehearsal over the one question it was not asked.
 
-### `env-*` and `build-ipa-*`
+### `env-*` and `ipa-*`
 
-See `docs/rules/RELEASE.md`. One line each: nothing else ties `env/<flavour>.json` to the installed `GoogleService-Info.plist`; and `build-ipa` is **the only place an archive is made** — not `gym`, never Xcode's Product > Archive, both of which skip `--dart-define-from-file` and produce a binary that dies on `[core/no-app] No Firebase App '[DEFAULT]' has been created`.
+See `docs/rules/RELEASE.md`. One line each: nothing else ties `env/<flavour>.json` to the installed `GoogleService-Info.plist`; and `ipa-*` is **the only place an archive is made** — not `gym`, never Xcode's Product > Archive, both of which skip `--dart-define-from-file` and produce a binary that dies on `[core/no-app] No Firebase App '[DEFAULT]' has been created`.
 
 ### `deploy-*` — the one that reaches real users
 
@@ -152,6 +158,6 @@ bundle exec fastlane preflight
 ```
 
 - `preflight` (`make pre-build`) — everything a release needs but the build. Three minutes instead of twenty-eight. Then run `CI=true bundle exec fastlane preflight`: the CI half breaks most often.
-- `upload flavor:prod` (`make upload-ipa-prod`) — the already-built IPA that did not reach TestFlight.
+- `upload flavor:prod` (`make upload-prod`) — the already-built IPA that did not reach TestFlight.
 - `certificates` — **local only**; refuses to run on a runner. `force:true` regenerates the profiles after enabling a capability.
 - `beta flavor:prod bump:true notes:"…"` — the real thing. **Normally run from the `Release` workflow, not by hand**: `workflow_dispatch` on GitHub, because a release is an act, not a side effect of a push.
