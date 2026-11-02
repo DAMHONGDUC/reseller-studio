@@ -12,6 +12,8 @@ Read when running, building, generating or deploying. **This file is the authori
 
 **Every platform answers to one command list, and this app uses it unchanged.** Owner's rule: the owner works across many projects on several platforms, and a command named one way here and another way in the next project is one that gets forgotten. The list, what each command means on each platform and the old names that still work live in `packages/script-tools/common/COMMANDS.md`; this file only says what each does in this app.
 
+**Three parts, and the first is part of the other two** (owner's rule): `env-*` installs a flavour's config, and `deploy-be-*`, `release-ios-*` and `release-android-*` each run it first by themselves. The backend is its own command, never a step of a release.
+
 Every command is `make <name>`; bare `make` lists them. The root `Makefile` includes `packages/script-tools/flutter/flutter.mk`, which maps each target to a script in `packages/script-tools/flutter/` — except `pre-build`, defined in the `Makefile` itself because its body is this app's fastlane lane.
 
 | Command | Script | Promise |
@@ -24,11 +26,9 @@ Every command is `make <name>`; bare `make` lists them. The root `Makefile` incl
 | `test` | `run_tests.sh` | `TEST=<path>` scopes it to one file or folder. |
 | `run-dev` / `run-prod` | `run_app.sh <flavour>` | `flutter run` in debug, with that flavour's config. |
 | `pre-build` | fastlane `preflight` | The app's own gate — config, signing, build number. |
-| `ipa-dev` / `ipa-prod` | `build_ipa.sh <flavour>` | The IPA, with that flavour's config. |
-| `apk-dev` / `apk-prod`, `aab-dev` / `aab-prod` | `build_apk.sh` / `build_aab.sh <flavour>` | Install that flavour's config, then the release APK or AAB into `Release/`. Signed with the debug key until a release `signingConfig` exists — the script warns. |
-| `deploy-dev` / `deploy-prod` | `deploy_firebase.sh <flavour>` | Rules, indexes and functions to that alias. `ONLY=rules\|functions` narrows it. |
-| `release-dev` / `release-prod` | `release_ios.sh <flavour>` | Config, Firebase (only with `.firebaserc`), then TestFlight. `NOTE="…"` for What to Test. |
-| `upload-dev` / `upload-prod` | `upload_ipa.sh <flavour>` | Upload the already-built IPA that did not reach TestFlight. |
+| `deploy-be-dev` / `deploy-be-prod` | `deploy_backend.sh <flavour>` | Install that flavour's config, then rules, indexes and functions to its alias — only with `.firebaserc`. `ONLY=rules\|functions` narrows it. |
+| `release-ios-dev` / `release-ios-prod` | `release_ios.sh <flavour>` | Install that flavour's config, then the IPA to TestFlight. Deploys no backend. `NOTE="…"` for What to Test. |
+| `release-android-dev` / `release-android-prod` | `release_android.sh <flavour>` | Install that flavour's config, then the release APK and AAB into `Release/`. Signed with the debug key until a release `signingConfig` exists — the script warns. |
 | `icon` / `icon-strip` | `generate_app_icon.sh` / `strip_icon_marker.sh` | Launcher and launch icons from the artwork; erase its watermark. |
 
 Recurring shapes, and the pattern to copy:
@@ -37,9 +37,9 @@ Recurring shapes, and the pattern to copy:
 - **One script serves every flavour, taking it as `$1`.** `flutter.mk` has one pattern rule per command; nothing is duplicated per flavour.
 - **A chaining command calls the other scripts, never their steps.** `release_ios.sh` runs `prepare_env.sh`, `deploy_firebase.sh` and the beta lane in order, re-implementing none — so the confirm prompt and every check are the ones each step gets alone.
 
-**The shared list stays minimal** (owner's rule), so `gen` and `analyze` are off it and out of `make help`, and still run; `clean` is gone. The old names (`set-up`, `build-ipa-*`, `app-icon`, …) still run and stay out of `make help`.
+**The shared list stays minimal** (owner's rule), so `gen` and `analyze` are off it and out of `make help`, and still run; `clean` is gone. The old names (`set-up`, `build-ipa-*`, `upload-ipa-*`, `deploy-*`, `release-*`, `app-icon`, …) still run and stay out of `make help` — `release-*` as it always did, the backend then TestFlight.
 
-**`run-*` is back, with the shared list** — it was deleted here once, and returned when every platform took the same commands. **No `test-rules` or `_url-scheme` command exists, and no `pre-build` script.** Both were deleted. `pre-build` is the one command whose body is not a shared script: a gate naming this app's bundle ids, entitlements and store rules cannot live in a folder every app shares, so it is the `preflight` lane, reached through this app's `Makefile`. **`release-*` does not run it** — `release_ios.sh` names no app — so run `pre-build` before a release; the release does not run it for you.
+**`run-*` is back, with the shared list** — it was deleted here once, and returned when every platform took the same commands. **No `test-rules` or `_url-scheme` command exists, and no `pre-build` script.** Both were deleted. `pre-build` is the one command whose body is not a shared script: a gate naming this app's bundle ids, entitlements and store rules cannot live in a folder every app shares, so it is the `preflight` lane, reached through this app's `Makefile`. **`release-ios-*` does not run it** — `release_ios.sh` names no app — so run `pre-build` before a release; the release does not run it for you.
 
 ## What each one actually does
 
@@ -87,11 +87,11 @@ Everything a release needs but the build, owned by the app: the installed config
 
 **`flavor:` is optional and skipped, not defaulted** — defaulting to prod would fail a dev-machine rehearsal over the one question it was not asked.
 
-### `env-*` and `ipa-*`
+### `env-*` and the IPA
 
-See `docs/rules/RELEASE.md`. One line each: nothing else ties `env/<flavour>.json` to the installed `GoogleService-Info.plist`; and `ipa-*` is **the only place an archive is made** — not `gym`, never Xcode's Product > Archive, both of which skip `--dart-define-from-file` and produce a binary that dies on `[core/no-app] No Firebase App '[DEFAULT]' has been created`.
+See `docs/rules/RELEASE.md`. One line each: nothing else ties `env/<flavour>.json` to the installed `GoogleService-Info.plist`; and `build_ipa.sh` — reached through `release-ios-*` — is **the only place an archive is made** — not `gym`, never Xcode's Product > Archive, both of which skip `--dart-define-from-file` and produce a binary that dies on `[core/no-app] No Firebase App '[DEFAULT]' has been created`.
 
-### `deploy-*` — the one that reaches real users
+### `deploy-be-*` — the one that reaches real users
 
 **The environment is a CLI alias in `.firebaserc`, not an `env/*.json` file**: the alias resolves to a project id, which picks the functions' own config and secrets. Naming the environment is the whole switch.
 
@@ -99,7 +99,7 @@ Its contract, in order:
 
 1. Validate the flavour and an optional target (`ONLY=rules` | `ONLY=functions`; both when unset).
 2. **Resolve the alias to a project id itself**, so the prompt names the project before anything is sent, and a missing alias fails with the command that creates it, not a CLI error naming neither.
-3. **Warn when dev and prod resolve to one project.** Until split, `deploy-dev` is a production deploy under another name — exactly what an alias in the prompt would hide.
+3. **Warn when dev and prod resolve to one project.** Until split, `deploy-be-dev` is a production deploy under another name — exactly what an alias in the prompt would hide.
 4. **Confirm interactively, reading `/dev/tty`.** A caller may pipe stdout or stdin; `/dev/tty` survives a redirected call. No terminal means refusal, never a silent yes.
 5. **Build and test the functions before deploying.** Deploying a build that fails its own tests costs a second deploy to undo.
 6. **`--project` on every deploy; never `firebase use` first.** `use` leaves the developer's shell pointed at whatever the script deployed last, so their next bare `firebase deploy` silently goes there.
@@ -112,14 +112,14 @@ Its contract, in order:
 
 **The script is the one place that list is written.** Never copy the `firebase deploy` line into a document: `storage` once went missing from the script while `docs/release/RELEASE_ACTIONS.md` still named it, and the app's upload bucket was the one nobody deployed rules for.
 
-### `release-*` — three steps always run together
+### `release-ios-*` and `release-android-*` — the app, never the backend
 
-Config, Firebase, TestFlight — `prepare_env.sh`, `deploy_firebase.sh`, then the `beta` lane. It never runs `set_up.sh`: it builds the tree as it stands. Over typing them by hand, it adds the two things a person gets wrong at 2am:
+Each installs the flavour's config, then builds: `release-ios-*` runs the `beta` lane, which builds through `build_ipa.sh` and uploads to TestFlight; `release-android-*` builds the release APK and AAB into `Release/`. Neither runs `set_up.sh` — they build the tree as it stands — and **neither deploys the backend** (owner's rule).
 
-- **The order — a rule, not a preference.** Backend first: a build reaching a tester ahead of the rules it needs fails on a query nobody can fix from the App Store.
-- **`set -e`, so it is a chain, not a list.** A failed deploy is never followed by an upload — the `&&` that once did this lived in a shell history nobody shared.
+- **The order is still a rule, now the one running it keeps it.** A build that needs new rules or indexes goes after them: `make deploy-be-prod`, then `make release-ios-prod`. A build reaching a tester ahead of the rules it needs fails on a query nobody can fix from the App Store.
+- **`set -e`, so each is a chain, not a list.** A failed config step is never followed by a build.
 
-It is **no shortcut past anything.** `deploy_firebase.sh` still asks for the project id on `/dev/tty` and refuses without a terminal, so an unattended run stops before shipping. The TestFlight note is the `NOTE` variable (`make release-prod NOTE="what changed"`), quoted so spaces never split it.
+The TestFlight note is the `NOTE` variable (`make release-ios-prod NOTE="what changed"`), quoted so spaces never split it. `make release-prod` still runs both halves in the old order, for a note that still types it.
 
 ## The conventions
 
@@ -158,6 +158,6 @@ bundle exec fastlane preflight
 ```
 
 - `preflight` (`make pre-build`) — everything a release needs but the build. Three minutes instead of twenty-eight. Then run `CI=true bundle exec fastlane preflight`: the CI half breaks most often.
-- `upload flavor:prod` (`make upload-prod`) — the already-built IPA that did not reach TestFlight.
+- `upload flavor:prod` (`make upload-ipa-prod`) — the already-built IPA that did not reach TestFlight.
 - `certificates` — **local only**; refuses to run on a runner. `force:true` regenerates the profiles after enabling a capability.
 - `beta flavor:prod bump:true notes:"…"` — the real thing. **Normally run from the `Release` workflow, not by hand**: `workflow_dispatch` on GitHub, because a release is an act, not a side effect of a push.

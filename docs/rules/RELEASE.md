@@ -45,7 +45,7 @@ env_assets/
 
 ## Nobody archives from Xcode
 
-`packages/script-tools/flutter/build_ipa.sh` — `make ipa-dev` / `make ipa-prod` — is the only place an archive is made, and **the fastlane lane shells out to it instead of calling `gym`**. Not taste: the app's whole config arrives through `--dart-define-from-file`, a flag `xcodebuild`, `gym` and Product > Archive know nothing about. An archive from any of them carries empty config and dies at runtime on `[core/no-app] No Firebase App '[DEFAULT]' has been created` — a crash naming nothing about the missing flag.
+`packages/script-tools/flutter/build_ipa.sh` — reached through `make release-ios-<flavour>` — is the only place an archive is made, and **the fastlane lane shells out to it instead of calling `gym`**. Not taste: the app's whole config arrives through `--dart-define-from-file`, a flag `xcodebuild`, `gym` and Product > Archive know nothing about. An archive from any of them carries empty config and dies at runtime on `[core/no-app] No Firebase App '[DEFAULT]' has been created` — a crash naming nothing about the missing flag.
 
 The script also:
 
@@ -86,7 +86,7 @@ Every step that can fail cheaply runs before the twenty-five-minute one.
    - **The lane commits and pushes, and only on CI** (`bump && is_ci`). The workflow has no push step of its own. A local `bump:true` run rewrites `pubspec.yaml` and leaves it for you — `release_ios.sh` says so at the end.
    - **The design system's gitlink goes in the same commit**, with its short sha and subject in the message. The workflow follows the submodule's `main`, not the commit the parent pins, so without that line the IPA on TestFlight would hold UI the app repo never recorded.
 
-`make pre-build` is the `preflight` lane — everything a release needs but the build, three minutes instead of twenty-eight, and every credential failure ever seen surfaces in it. **`release-*` does not run it**: run it by hand before a release. **`flavor:` is optional there and skipped, not defaulted**: defaulting to prod would fail a dev-machine rehearsal over the one question it was not asked.
+`make pre-build` is the `preflight` lane — everything a release needs but the build, three minutes instead of twenty-eight, and every credential failure ever seen surfaces in it. **`release-ios-*` does not run it**: run it by hand before a release. **`flavor:` is optional there and skipped, not defaulted**: defaulting to prod would fail a dev-machine rehearsal over the one question it was not asked.
 
 `certificates` is **local only**, because CI runs `match(readonly: true)`: a runner that can mint distribution certificates burns Apple's limit of three, one failed job at a time. `force:true` regenerates the *profiles*, not the certificate, and is the only way a newly enabled capability reaches CI — otherwise `match` reuses the existing profile, the trap behind every "profile doesn't include the … entitlement".
 

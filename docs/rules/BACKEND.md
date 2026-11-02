@@ -30,7 +30,7 @@ What is stored, and what a field means: `docs/architecture/DATA_MODEL.md`. This 
 
 ## Indexes
 
-- **Indexes and rules deploy together.** `make deploy-<flavour>` does both; deploying one alone is how a reviewed screen returns `FAILED_PRECONDITION` in production.
+- **Indexes and rules deploy together.** `make deploy-be-<flavour>` does both; deploying one alone is how a reviewed screen returns `FAILED_PRECONDITION` in production.
 - **A missing composite index fails at runtime, not build.** A test can prove `firestore.indexes.json` has what queries need; never that the project has them. Every entry carries a `"//"` note naming the screen it serves — keep it up, or nobody can tell a live index from a leftover.
 - **`test/core/firestore/query_indexes_test.dart` is that test, and it reads the repositories, not a hand-kept list.** It exists because the rule above was broken: every *base* list query — items, orders, listings, offers, expenses, every catalogue table — shipped with no index, because the declared ones all assumed a second filter. A real project answered `failed-precondition` on five collections at once; the app came up empty with nothing saying why.
   - It scans `lib/features/*/data/repositories/` for `.query…` chains, builds each one's `workspaceId` + equality filters + sort, and fails on any signature `firestore.indexes.json` does not cover — a prefix of a longer index counts as covered, as in Firestore.
