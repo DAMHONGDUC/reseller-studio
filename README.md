@@ -22,7 +22,7 @@ Needs [FVM](https://fvm.app) and `make`. Commands come from the `packages/script
 ```sh
 git submodule update --init
 fvm install
-make set-up
+make setup
 ```
 
 Firebase and store accounts are not in the repo. Read [`docs/release/RELEASE_ACTIONS.md`](docs/release/RELEASE_ACTIONS.md) before connecting a real backend.
@@ -31,6 +31,7 @@ Firebase and store accounts are not in the repo. Read [`docs/release/RELEASE_ACT
 
 | Task | Command |
 |---|---|
+| Run the app | `make run-dev` |
 | Generate localization | `make gen` |
 | Analyze | `make analyze` |
 | Test one file | `make test TEST=<path>` |
