@@ -8,7 +8,7 @@ import 'package:reseller_studio/features/workspace/domain/repositories/team_repo
 import 'package:reseller_studio/features/workspace/presentation/screens/team_screen/team_screen.dart';
 import 'package:reseller_studio/features/workspace/presentation/widgets/invite_member_sheet.dart';
 import 'package:reseller_studio/features/workspace/providers.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/add_button_finder.dart';
 import '../../support/pump_app.dart';

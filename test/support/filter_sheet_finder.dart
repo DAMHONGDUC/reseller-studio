@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/widgets/app_filter_sheet_actions.dart';
 import 'package:reseller_studio/core/widgets/app_filter_strip.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// Finds the buttons in a filter sheet's footer, and the chips on the strip
 /// that open one.

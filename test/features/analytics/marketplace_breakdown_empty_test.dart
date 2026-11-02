@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/misc.dart';
 import 'package:reseller_studio/features/analytics/presentation/screens/analytics_screen/analytics_screen.dart';
 import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/providers.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

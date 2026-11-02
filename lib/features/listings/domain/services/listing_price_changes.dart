@@ -1,4 +1,4 @@
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../entities/listing.dart';
 import '../entities/listing_price_change.dart';

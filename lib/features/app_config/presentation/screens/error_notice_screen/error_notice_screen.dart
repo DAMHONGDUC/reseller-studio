@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../../domain/entities/app_error_notice.dart';
 import '../../../domain/enums/app_notice_type.dart';

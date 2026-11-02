@@ -5,7 +5,7 @@ import 'package:reseller_studio/features/orders/domain/entities/order.dart';
 import 'package:reseller_studio/features/orders/domain/enums/order_status.dart';
 import 'package:reseller_studio/features/orders/domain/services/order_search.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

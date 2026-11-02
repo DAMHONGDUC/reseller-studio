@@ -9,7 +9,7 @@ import 'package:reseller_studio/features/subscription/domain/entities/subscripti
 import 'package:reseller_studio/features/subscription/domain/repositories/subscription_repository.dart';
 import 'package:reseller_studio/features/subscription/presentation/screens/paywall_screen/paywall_screen.dart';
 import 'package:reseller_studio/features/subscription/presentation/widgets/paywall_footer_links.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

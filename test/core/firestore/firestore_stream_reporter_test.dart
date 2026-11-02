@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/error/app_failure.dart';
 import 'package:reseller_studio/core/firestore/firestore_stream_reporter.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 /// **A failure that repeats is reported once, not once per retry.**
 ///

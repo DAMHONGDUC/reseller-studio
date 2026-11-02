@@ -5,7 +5,7 @@ import 'package:reseller_studio/features/auth/providers.dart';
 import 'package:reseller_studio/features/subscription/domain/enums/seller_plan.dart';
 import 'package:reseller_studio/features/subscription/presentation/screens/subscription_screen/subscription_screen.dart';
 import 'package:reseller_studio/features/subscription/providers.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

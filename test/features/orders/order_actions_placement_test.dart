@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/order_detail_screen/order_detail_screen.dart';
 import 'package:reseller_studio/features/orders/presentation/widgets/order_actions_sheet.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

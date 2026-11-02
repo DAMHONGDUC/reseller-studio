@@ -1,6 +1,6 @@
 import 'package:reseller_studio/core/constants/log_tag_constant.dart';
 import 'package:reseller_studio/core/storage/file_uploader.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 /// The test uploader: it stores nothing and hands back the file's own path.
 ///

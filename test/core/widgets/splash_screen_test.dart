@@ -11,7 +11,7 @@ import 'package:reseller_studio/core/local/local_providers.dart';
 import 'package:reseller_studio/core/theme/app_theme.dart';
 import 'package:reseller_studio/core/widgets/app_screen_util.dart';
 import 'package:reseller_studio/core/widgets/splash_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// **Nothing below the splash is built until the wipe finishes.**
 ///

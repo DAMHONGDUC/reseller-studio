@@ -1,5 +1,5 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import 'crashlytics_test_exception.dart';
 

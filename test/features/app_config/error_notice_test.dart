@@ -8,7 +8,7 @@ import 'package:reseller_studio/features/app_config/domain/entities/app_error_no
 import 'package:reseller_studio/features/app_config/domain/enums/app_notice_type.dart';
 import 'package:reseller_studio/features/app_config/domain/repositories/app_config_repository.dart';
 import 'package:reseller_studio/features/app_config/presentation/widgets/error_notice_gate.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

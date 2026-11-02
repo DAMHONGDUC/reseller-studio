@@ -9,7 +9,7 @@ import 'package:reseller_studio/features/home/home_constant.dart';
 import 'package:reseller_studio/features/home/presentation/screens/home_screen/home_screen.dart';
 import 'package:reseller_studio/l10n/gen/app_localizations.dart';
 import 'package:reseller_studio/reseller_studio_app.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/load_app_fonts.dart';
 import '../../support/pump_app.dart';

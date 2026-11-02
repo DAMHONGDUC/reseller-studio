@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../features/carriers/data/repositories/local_carrier_repository.dart';
 import '../../features/carriers/domain/entities/carrier.dart';

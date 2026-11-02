@@ -1,4 +1,4 @@
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 /// The gaps and the glyph size the inventory row is tuned by.
 ///

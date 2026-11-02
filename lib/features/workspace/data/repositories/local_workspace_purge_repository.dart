@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../../../core/constants/log_tag_constant.dart';
 import '../../../../core/error/failure_mapper.dart';

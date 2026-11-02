@@ -11,7 +11,7 @@ import 'package:reseller_studio/features/inventory/domain/repositories/item_repo
 import 'package:reseller_studio/features/inventory/presentation/controllers/item_detail_edit_controller.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/item_detail_screen/item_detail_screen.dart';
 import 'package:reseller_studio/features/inventory/presentation/widgets/item_actions_sheet.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

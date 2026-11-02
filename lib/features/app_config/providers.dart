@@ -7,7 +7,7 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../core/config/dev_flags.dart';
 import '../../core/constants/log_tag_constant.dart';

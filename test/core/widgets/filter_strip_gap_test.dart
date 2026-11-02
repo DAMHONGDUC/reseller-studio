@@ -4,7 +4,7 @@ import 'package:reseller_studio/core/widgets/app_filter_strip.dart';
 import 'package:reseller_studio/features/inventory/presentation/screens/inventory_screen/inventory_screen.dart';
 import 'package:reseller_studio/features/offers/presentation/screens/offers_screen/offers_screen.dart';
 import 'package:reseller_studio/features/orders/presentation/screens/orders_screen/orders_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

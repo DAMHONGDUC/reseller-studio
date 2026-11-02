@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reseller_studio/core/constants/app_icon_constant.dart';
 import 'package:reseller_studio/core/widgets/app_detail_action_button.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

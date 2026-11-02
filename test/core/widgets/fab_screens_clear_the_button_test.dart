@@ -5,7 +5,7 @@ import 'package:reseller_studio/features/inventory/presentation/screens/categori
 import 'package:reseller_studio/features/inventory/presentation/screens/locations_screen/locations_screen.dart';
 import 'package:reseller_studio/features/sourcing/presentation/screens/purchases_screen/purchases_screen.dart';
 import 'package:reseller_studio/features/sourcing/presentation/screens/sources_screen/sources_screen.dart';
-import 'package:system_design/index.dart';
+import 'package:system_design_v3/v3.dart';
 
 import '../../support/pump_app.dart';
 

@@ -3,7 +3,7 @@ library;
 
 import 'package:drift/drift.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:system_design/common.dart';
+import 'package:system_design_core/common.dart';
 
 import '../../features/auth/providers.dart';
 import '../../features/carriers/providers.dart';
