@@ -1,6 +1,6 @@
 # Release checklist
 
-Tasks that need an external account, credential, private key or production decision. Do them in order. Run `make pre-build` before a release — `release-dev` and `release-prod` do not run it.
+Tasks that need an external account, credential, private key or production decision. Do them in order. Run `make pre-build` before a release — `release-ios-dev` and `release-ios-prod` do not run it.
 
 ## Blocking setup
 
