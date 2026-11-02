@@ -4,16 +4,16 @@ Read when touching `packages/flutter-system-design-kit/`, or building any screen
 
 ## `system_design` — the design system is a separate package
 
-Tokens and string-free widgets live in `packages/flutter-system-design-kit`, a **separate git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), wired in as a path dependency. Two imports, no others — the index for anything with a look, `common.dart` for shared app infrastructure with none:
+Tokens and string-free widgets live in `packages/flutter-system-design-kit`, a **separate git repo checked out here as a submodule** (`DAMHONGDUC/system_design`), **This app depends on two of its packages and no others: `system_design_core` and `system_design_v3`** (owner's rule). Each generation is its own package inside the kit, so the app resolves v3's dependencies and never another generation's — v5's video plugins once pulled CocoaPods into this iOS build. Never depend on the kit root `system_design`, the umbrella that carries every generation. Two imports, no others — v3's entry point for anything with a look, `common.dart` for shared app infrastructure with none:
 
 ```dart
-import 'package:system_design/index.dart';   // tokens and widgets
-import 'package:system_design/common.dart';  // SdLogger, SdCrashReporter
+import 'package:system_design_v3/v3.dart';         // tokens, widgets and core
+import 'package:system_design_core/common.dart';   // SdLogger, SdCrashReporter
 ```
 
-**`common.dart` is pure Dart on purpose** — it exports no widget, so a feature's `domain/` can log without importing Flutter. `index.dart` re-exports it, so a widget file importing the index already has `SdLogger` and never needs both lines.
+**`common.dart` is pure Dart on purpose** — it exports no widget, so a feature's `domain/` can log without importing Flutter. `v3.dart` re-exports it with the rest of core, so a widget file importing v3 already has `SdLogger` and never needs both lines.
 
-**The package holds two generations and Reseller Studio renders on v3.**
+**The kit holds several generations, one package each, and Reseller Studio renders on v3.**
 
 | | `v2/` | `v3/` |
 | --- | --- | --- |
