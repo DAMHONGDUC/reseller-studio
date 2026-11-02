@@ -37,7 +37,7 @@ Recurring shapes, and the pattern to copy:
 - **One script serves every flavour, taking it as `$1`.** `flutter.mk` has one pattern rule per command; nothing is duplicated per flavour.
 - **A chaining command calls the other scripts, never their steps.** `release_ios.sh` runs `prepare_env.sh`, `deploy_firebase.sh` and the beta lane in order, re-implementing none — so the confirm prompt and every check are the ones each step gets alone.
 
-**The shared list stays minimal** (owner's rule), so `gen` and `analyze` are off it and out of `make help`, and still run; `clean` is gone. The old names (`set-up`, `build-ipa-*`, `upload-ipa-*`, `deploy-*`, `release-*`, `app-icon`, …) still run and stay out of `make help` — `release-*` as it always did, the backend then TestFlight.
+**The shared list stays minimal** (owner's rule), so `gen` and `analyze` are off it and out of `make help`, and still run; `clean` is gone. Off the list and still running: `build-ios-*` and `upload-ios-*` (the two halves of `release-ios-*`, for a retry), `deploy-*`, and the old `set-up` / `app-icon` names. `build-ipa-*`, `upload-ipa-*` and `release-*` fail and print the name to use — `release-*` because it no longer says which platform, and the backend is its own command.
 
 **`run-*` is back, with the shared list** — it was deleted here once, and returned when every platform took the same commands. **No `test-rules` or `_url-scheme` command exists, and no `pre-build` script.** Both were deleted. `pre-build` is the one command whose body is not a shared script: a gate naming this app's bundle ids, entitlements and store rules cannot live in a folder every app shares, so it is the `preflight` lane, reached through this app's `Makefile`. **`release-ios-*` does not run it** — `release_ios.sh` names no app — so run `pre-build` before a release; the release does not run it for you.
 
@@ -119,7 +119,7 @@ Each installs the flavour's config, then builds: `release-ios-*` runs the `beta`
 - **The order is still a rule, now the one running it keeps it.** A build that needs new rules or indexes goes after them: `make deploy-be-prod`, then `make release-ios-prod`. A build reaching a tester ahead of the rules it needs fails on a query nobody can fix from the App Store.
 - **`set -e`, so each is a chain, not a list.** A failed config step is never followed by a build.
 
-The TestFlight note is the `NOTE` variable (`make release-ios-prod NOTE="what changed"`), quoted so spaces never split it. `make release-prod` still runs both halves in the old order, for a note that still types it.
+The TestFlight note is the `NOTE` variable (`make release-ios-prod NOTE="what changed"`), quoted so spaces never split it. `make release-prod` stops and names `release-ios-prod`, `release-android-prod` and `deploy-be-prod`.
 
 ## The conventions
 
@@ -158,6 +158,6 @@ bundle exec fastlane preflight
 ```
 
 - `preflight` (`make pre-build`) — everything a release needs but the build. Three minutes instead of twenty-eight. Then run `CI=true bundle exec fastlane preflight`: the CI half breaks most often.
-- `upload flavor:prod` (`make upload-ipa-prod`) — the already-built IPA that did not reach TestFlight.
+- `upload flavor:prod` (`make upload-ios-prod`) — the already-built IPA that did not reach TestFlight.
 - `certificates` — **local only**; refuses to run on a runner. `force:true` regenerates the profiles after enabling a capability.
 - `beta flavor:prod bump:true notes:"…"` — the real thing. **Normally run from the `Release` workflow, not by hand**: `workflow_dispatch` on GitHub, because a release is an act, not a side effect of a push.
