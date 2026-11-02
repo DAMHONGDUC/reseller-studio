@@ -130,6 +130,10 @@ void main() {
 
   test('nothing reaches fastlane without a UTF-8 locale', () {
     final String makefile = File('Makefile').readAsStringSync();
+    // Shared by every platform's scripts, so it lives in common/lib.
+    final String ruby = File(
+      'packages/script-tools/common/lib/ruby.sh',
+    ).readAsStringSync();
     final String common = File('$scripts/lib/common.sh').readAsStringSync();
     final int guard = makefile.indexOf('LANG=en_US.UTF-8');
     final int lane = makefile.indexOf('bundle exec fastlane preflight');
@@ -137,7 +141,8 @@ void main() {
     // Ruby fixes `Encoding.default_external` at startup, and fastlane reads
     // the shared Fastfile with it — so under `LANG=C` the lane dies on the
     // first em dash, with syntax errors naming lines that are fine.
-    expect(common, contains('ensure_utf8_locale()'));
+    expect(ruby, contains('ensure_utf8_locale()'));
+    expect(common, contains('common/lib/ruby.sh'));
 
     for (final String script in <String>['release_ios.sh', 'upload_ipa.sh']) {
       expect(
