@@ -39,6 +39,22 @@ Firebase and store accounts are not in the repo. Read [`docs/release/RELEASE_ACT
 
 Every command in detail: [`docs/rules/COMMANDS.md`](docs/rules/COMMANDS.md).
 
+### Combo commands
+
+Dev first, then prod. `&&` stops at the first step that fails.
+
+Backend and iOS:
+
+```sh
+make deploy-be-dev && make release-ios-dev && make deploy-be-prod && make release-ios-prod
+```
+
+Android:
+
+```sh
+make release-android-dev && make release-android-prod
+```
+
 ## App identifiers
 
 | Platform | Identifier | Source |
@@ -76,3 +92,12 @@ make release-android-prod
 `deploy-be` ships the backend (Firebase rules, indexes, functions), `release-ios` the IPA to TestFlight, `release-android` the APK and AAB into `Release/`. A build that needs new rules goes after `deploy-be`. Use `dev` for the dev environment.
 
 Never archive from Xcode: only the release lane supplies the build-time config Firebase needs.
+
+Combo cmd:
+```sh
+make deploy-be-dev && make release-ios-dev && make deploy-be-prod && make release-ios-prod
+```
+
+```sh
+make release-android-dev && make release-android-prod
+```
