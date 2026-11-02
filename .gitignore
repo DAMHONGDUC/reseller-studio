@@ -153,5 +153,5 @@ tmp/
 # result; git already holds the committed history, so these never belong in it.
 *.orig.bak
 
-# Release APK/AAB from make apk-<flavor> / aab-<flavor>
+# Release APK/AAB from make release-android-<flavor>
 /Release/
